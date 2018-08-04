@@ -4654,3 +4654,20 @@ input, select, textarea {
 		}
 
 	}
+.rating {
+    float: right;
+    font-size: 18px;
+    color: #337ab7;
+}
+
+		.skill p{
+			font-size:19px;
+		}
+
+		#nus, #njc{
+			width:100%;
+		}
+#aboutblock p{
+	margin:0;
+	font-size:16px !important;
+}
