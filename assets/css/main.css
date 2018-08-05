@@ -3743,9 +3743,11 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 }
 
 #main > * {
-	padding: 4rem 4rem 2rem 4rem ;
 	border-top: solid 2px #eeeeee;
 	margin: 0;
+}
+.homepage > *{
+	padding: 4rem 4rem 2rem 4rem ;
 }
 
 #main > *:first-child {
@@ -3931,7 +3933,7 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 	display: -webkit-flex;
 	display: -ms-flex;
 	display: flex;
-	background-color: #f5f5f5;
+	/* background-color: #f5f5f5; */
 	color: #909498;
 	cursor: default;
 	position: relative;
@@ -3946,7 +3948,7 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 }
 
 #footer a {
-	color: #717981;
+	color: silver;
 	border-bottom-color: rgba(113, 121, 129, 0.5);
 }
 
@@ -3960,7 +3962,7 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 }
 
 #footer h1, #footer h2, #footer h3, #footer h4, #footer h5, #footer h6 {
-	color: #717981;
+	color: white;
 }
 
 #footer blockquote {
@@ -4097,7 +4099,8 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 }
 
 #footer ul.icons li a.icon:hover:before {
-	color: #18bfef;
+	/* color: #18bfef; */
+	color:white;
 }
 
 #footer ul.icons.alt li .icon:before {
