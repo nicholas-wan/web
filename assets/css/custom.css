@@ -18,8 +18,16 @@
 		margin-top:-40px;
 		margin-bottom:-40px;
 	}
+	.image.main{
+		width:100% !important;
+	}
 }
 .cv{
 	padding:20px;
 	margin-bottom:20px;
+}
+@media screen and (min-width: 800px) {
+    .fa-arrow-up{
+			color:black !important;
+		}
 }
