@@ -21,6 +21,9 @@
 	.image.main{
 		width:100% !important;
 	}
+	.blank{
+		display:none;
+	}
 }
 .cv{
 	padding:20px;
