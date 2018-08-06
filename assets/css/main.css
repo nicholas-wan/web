@@ -2966,9 +2966,9 @@ header.major > .date:after {
 
 @media screen and (max-width: 980px) {
 
-	header br {
+	/* header br {
 		display: none;
-	}
+	} */
 
 }
 
