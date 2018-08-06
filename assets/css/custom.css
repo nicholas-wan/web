@@ -26,11 +26,34 @@
 	}
 }
 .cv{
-	padding:20px;
-	margin-bottom:20px;
+	margin-bottom:40px;
 }
 @media screen and (min-width: 800px) {
     .fa-arrow-up{
 			color:black !important;
 		}
 }
+.workbutton{
+	margin-bottom:20px;
+}
+
+@media screen and (min-width: 800px) {
+	.rowpad{
+				padding: 4rem 4rem 2rem 3rem;
+	}
+}
+@media only screen and (max-width: 600px) {
+	.rowpad{
+		padding-left:0 !important;
+	}
+}
+.navrow{
+	padding-left:0;
+}
+/* .navhalfrow{
+	border-right:5px solid white;
+	border-left:5px solid white;
+} */
+/* .resumerow{
+	border-top:none !important;
+} */
