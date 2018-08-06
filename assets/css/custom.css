@@ -50,10 +50,5 @@
 .navrow{
 	padding-left:0;
 }
-/* .navhalfrow{
-	border-right:5px solid white;
-	border-left:5px solid white;
-} */
-/* .resumerow{
-	border-top:none !important;
-} */
+
+#more {display: none;}
