@@ -13,6 +13,17 @@
 	margin:0;
 	font-size:16px !important;
 }
+.cv{
+	margin-bottom:60px;
+}
+.workbutton{
+	margin-bottom:20px;
+}
+.navrow{
+	padding-left:0;
+}
+
+#more {display: none;}
 @media only screen and (max-width: 600px) {
 	.zera{
 		margin-top:-40px;
@@ -24,31 +35,19 @@
 	.blank{
 		display:none;
 	}
-}
-.cv{
-	margin-bottom:50px;
-}
-@media screen and (min-width: 800px) {
-    .fa-arrow-up{
-			color:black !important;
-		}
-}
-.workbutton{
-	margin-bottom:20px;
-}
-
-@media screen and (min-width: 800px) {
-	.rowpad{
-				padding: 4rem 4rem 2rem 3rem;
+	.aboutblock{
+		text-align:justify !important;
 	}
-}
-@media only screen and (max-width: 600px) {
 	.rowpad{
 		padding-left:0 !important;
 	}
 }
-.navrow{
-	padding-left:0;
-}
 
-#more {display: none;}
+@media screen and (min-width: 800px) {
+    .fa-arrow-up{
+			color:black !important;
+		}
+		.rowpad{
+					padding: 4rem 4rem 2rem 3rem;
+		}
+}
