@@ -51,3 +51,50 @@
 					padding: 4rem 4rem 2rem 3rem;
 		}
 }
+
+
+
+/* --------------------------------------------------------------------------- */
+
+.skillstable{
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom:50px;
+		table-layout: fixed;
+}
+
+.skillstable td,.skillstable th {
+    border: 1px solid #ddd;
+    padding: 8px;
+    overflow-wrap:break-word;
+		vertical-align: middle;
+		text-align: center;
+		line-height:160%;
+}
+
+.odd:hover {background-color: #ddd !important;}
+.even:hover {background-color: #ddd !important;}
+
+.skillstable th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    background-color: #d3b171;
+    color: white;
+}
+.odd{
+	background-color:white !important;
+}
+.even{
+	background-color:#f2f2f2 !important;
+}
+.caticon{
+	font-size:25px;
+}
+.fa-star{
+	color:navy;
+}
+.skillrow{
+	margin-right:-1.5em;
+}
