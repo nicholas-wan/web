@@ -54,7 +54,7 @@
 			<!-- Featured Post -->
 			<article class="post featured">
 				<header class="major" style="margin:0;">
-					<span class="date">November 7, 2018</span>
+					<span class="date"><div id="para1"></div></span>
 					<h2><a href="#!">About</a></h2>
 					<a href="#!" class="image main"><img src="images/self.jpg" alt="" /></a>
 					<p class="aboutblock">I am an independent and highly motivated individual who has strong leadership, time-management,
@@ -147,6 +147,16 @@
 	<script src="assets/js/breakpoints.min.js"></script>
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
+	<script>
+		document.getElementById("para1").innerHTML = formatAMPM();
 
+		function formatAMPM() {
+		var d = new Date(),
+
+		    months = ['January','Febuary','March','April','May','June','July','August','September','October','November','December'],
+		    days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+		return days[d.getDay()]+', '+months[d.getMonth()]+' '+d.getDate();
+		}
+	</script>
 </body>
 </html>
