@@ -2947,7 +2947,7 @@ header.major > .date:before, header.major > .date:after {
 	display: block;
 	position: absolute;
 	top: 50%;
-	width: calc(50% - 6rem);
+	width: calc(50% - 7rem);
 	border-top: solid 2px;
 }
 
