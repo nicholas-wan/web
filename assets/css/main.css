@@ -96,7 +96,7 @@ html {
 }
 
 body {
-	background-color: #1e252d;
+	background-color: #000;
 }
 
 body.is-preload *, body.is-preload *:before, body.is-preload *:after {
@@ -3200,7 +3200,7 @@ table.alt tbody tr td {
 	overflow: hidden;
 }
 
-#wrapper > .bg {
+/* #wrapper > .bg {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -3213,7 +3213,7 @@ table.alt tbody tr td {
 	background-repeat: repeat,								no-repeat,													no-repeat;
 	background-attachment: scroll,								scroll,														scroll;
 	z-index: -1;
-}
+} */
 
 #wrapper > .bg.fixed {
 	position: fixed;
@@ -3231,7 +3231,7 @@ table.alt tbody tr td {
 	-webkit-transition-delay: 0.75s;
 	-ms-transition-delay: 0.75s;
 	transition-delay: 0.75s;
-	background: #1e252d;
+	background: #000;
 	content: '';
 	display: block;
 	height: 100%;
