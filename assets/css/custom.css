@@ -102,3 +102,24 @@
 	.desktoponly{
 		display:none;
 	}
+}
+@media screen and (min-width: 800px) {
+	svg {
+	  margin-top:-70px;
+		margin-bottom:30px
+	}
+}
+@media all and (max-width: 600px){
+	svg{
+		margin-top: -50px;
+    margin-bottom: 10px;
+	}
+}
+/* .filler {
+  background: #20B7AF;
+  position: absolute;
+  bottom: 50%;
+  top: 0;
+  left: 0;
+  right: 0;
+} */
