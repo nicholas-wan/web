@@ -44,9 +44,7 @@
 }
 
 @media screen and (min-width: 800px) {
-    .fa-arrow-up{
-			color:black !important;
-		}
+
 		.rowpad{
 					padding: 4rem 4rem 2rem 3rem;
 		}
@@ -125,4 +123,11 @@
 } */
 h3{
 	color:grey !important;
+}
+canvas{
+    background-color: #000;
+		position:absolute;
+	  height: 100vh !important;
+		min-height: 100vh !important;
+		z-index:-1;
 }
