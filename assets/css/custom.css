@@ -48,6 +48,10 @@
 		.rowpad{
 					padding: 4rem 4rem 2rem 3rem;
 		}
+		.zera{
+			margin-top:-21px;
+			margin-bottom:-21px;
+		}
 }
 
 
@@ -133,4 +137,14 @@ canvas{
 	  height: 100vh !important;
 		min-height: 100vh !important;
 		z-index:-1;
+}
+@media screen and (min-width: 800px) {
+	.row1{
+		height:200px !important;
+		object-fit:cover !important;
+	}
+	.row3{
+		height:250px !important;
+		object-fit:cover !important;
+	}
 }
