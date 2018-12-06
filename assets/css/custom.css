@@ -147,4 +147,8 @@ canvas{
 		height:250px !important;
 		object-fit:cover !important;
 	}
+	.mainimg{
+		height:350px !important;
+		object-fit:contain !important;
+	}
 }
