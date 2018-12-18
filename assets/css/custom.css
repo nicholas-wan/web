@@ -162,11 +162,21 @@ html, body {
 		border:1px solid lightgrey;
 	  max-height: 340px;
 	}
+	.captissmobile{
+		border-radius:5px;
+		border:1px solid lightgrey;
+		max-height: 340px;
+	}
 }
 @media all and (max-width: 600px){
+	.captissmobile{
+		border-radius:5px;
+		border:1px solid lightgrey;
+	  max-height: 340px;
+	}
 	.captiss{
 		border-radius:5px;
 		border:1px solid lightgrey;
-	  max-height: 150px;
+		max-height: 170px;
 	}
 }
