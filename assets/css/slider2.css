@@ -58,7 +58,7 @@ a.slide_btn2 {
   max-width: 900px;
   position: relative;
   top: -340px;
-  margin-bottom:-370px;
+  margin-bottom:-370px !important;
 }
 .previous_btn2 {
   bottom: 0;
