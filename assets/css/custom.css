@@ -156,3 +156,17 @@ html, body {
     max-width: 100%;
     overflow-x: hidden;
 }
+@media screen and (min-width: 800px) {
+	.captiss{
+		border-radius:5px;
+		border:1px solid lightgrey;
+	  max-height: 340px;
+	}
+}
+@media all and (max-width: 600px){
+	.captiss{
+		border-radius:5px;
+		border:1px solid lightgrey;
+	  max-height: 150px;
+	}
+}
