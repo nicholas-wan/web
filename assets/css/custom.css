@@ -184,6 +184,10 @@ html, body {
 		margin-right: 0 !important;
 		width:110% !important;
 	}
+	.mobilemargin{
+		margin-top:-40px;
+		margin-bottom:-40px
+	}
 }
 
 .citc{
@@ -191,11 +195,11 @@ html, body {
 	object-fit:contain;
 }
 
-.containimg{
+.imgcontain{
 	height:240px;
 	object-fit:contain;
 }
-.coverimg{
+.imgcover{
 	height:240px;
 	object-fit:cover;
 }
