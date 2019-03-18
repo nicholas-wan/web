@@ -191,7 +191,11 @@ html, body {
 	object-fit:contain;
 }
 
-.yalehack{
+.containimg{
 	height:240px;
 	object-fit:contain;
+}
+.coverimg{
+	height:240px;
+	object-fit:cover;
 }
