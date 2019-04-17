@@ -41,6 +41,9 @@
 	.rowpad{
 		padding-left:0 !important;
 	}
+	.mainimg{
+
+	}
 }
 
 @media screen and (min-width: 800px) {
@@ -150,6 +153,8 @@ canvas{
 	.mainimg{
 		height:350px !important;
 		object-fit:contain !important;
+		margin-top:-20px;
+		margin-bottom:-20px;
 	}
 }
 html, body {
