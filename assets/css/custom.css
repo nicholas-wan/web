@@ -263,3 +263,10 @@ html, body {
 	  column-count: 3;
 	}
   }
+
+.svimg {
+	height: 400px;
+	object-fit: cover;
+	width:100%;
+	border:0px !important;
+}
