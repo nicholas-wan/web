@@ -393,7 +393,10 @@ body {
     -ms-transition: all 0.3s ease;
     -o-transition: all 0.3s ease;
 	transition: all 0.3s ease;
-	opacity:40%;
+	opacity: 0.4; /* Standard compliant browsers */
+    -moz-opacity: 0.4; /* Firefox and Mozilla browsers */
+    -webkit-opacity: 0.4; /* WebKit browser e.g. Safari */
+    filter: alpha(opacity=40); /* For IE8 and earlier */
 	z-index:3;
 }
 #return-to-top i {
@@ -411,7 +414,10 @@ body {
 }
 #return-to-top:hover {
 	background: silver;
-	opacity:60%;
+	opacity: 0.6; /* Standard compliant browsers */
+    -moz-opacity: 0.6; /* Firefox and Mozilla browsers */
+    -webkit-opacity: 0.6; /* WebKit browser e.g. Safari */
+    filter: alpha(opacity=60); /* For IE8 and earlier */
 }
 #return-to-top:hover i {
     color: black;
