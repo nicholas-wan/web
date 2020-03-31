@@ -423,3 +423,7 @@ body {
     color: black;
     top: -15px;
 }
+@media screen and (min-width: 800px) {
+	.mobileonly{
+		display:none;
+	}
