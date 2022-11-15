@@ -157,10 +157,10 @@ canvas {
     object-fit: cover !important;
   }
   .mainimg {
-    height: 350px !important;
+    height: 500px !important;
     object-fit: contain !important;
-    margin-top: -20px;
-    margin-bottom: -20px;
+    margin-top: -30px;
+    margin-bottom: -30px;
   }
 }
 html,
