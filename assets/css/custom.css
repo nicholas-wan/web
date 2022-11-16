@@ -428,3 +428,9 @@ body {
 		display:none;
 	}
 }
+
+@media screen and (min-width: 800px) {
+	.mason4{
+    column-count:4;
+  }
+}
