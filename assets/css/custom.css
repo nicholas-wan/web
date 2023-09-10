@@ -113,6 +113,12 @@
   .desktoponly {
     display: none;
   }
+  html, body {
+    overflow-x: hidden;
+  }
+  body {
+    position: relative
+  }
 }
 @media screen and (min-width: 800px) {
   svg {
@@ -458,3 +464,4 @@ body {
   height: 25px;
   margin-bottom: -5px;
 }
+
