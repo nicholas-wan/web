@@ -4653,3 +4653,12 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 		visibility: visible;
 	}
 }
+
+@font-face { 
+    font-family: 'Joseph'; 
+    src: 
+        url('../assets/fonts/josephsophia.woff2')  
+        format('opentype'); 
+    font-weight: normal; 
+    font-style: normal; 
+} 
