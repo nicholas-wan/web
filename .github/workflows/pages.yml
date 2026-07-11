@@ -23,7 +23,7 @@ jobs:
 
       - name: Build static site
         shell: pwsh
-        run: .\build-site.ps1
+        run: .\build-site.ps1 -Clean
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
