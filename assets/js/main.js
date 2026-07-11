@@ -599,3 +599,25 @@ canvas.addEventListener('mousemove', function(e){
     mouse_ball.y = e.pageY;
     // console.log(mouse_ball);
 });
+
+// Shared progressive enhancement: keep gallery pages fast and external links safe.
+(function() {
+	var images = document.querySelectorAll('img');
+	Array.prototype.forEach.call(images, function(image, index) {
+		image.decoding = 'async';
+		if (image.getAttribute('alt') === '') {
+			var source = image.getAttribute('src') || '';
+			var name = source.split('/').pop().replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ');
+			image.alt = name ? 'Gallery image: ' + name : 'Gallery image';
+		}
+		if (index > 1 && !image.hasAttribute('loading')) {
+			image.loading = 'lazy';
+		}
+	});
+
+	var links = document.querySelectorAll('a[target="_blank"], a[target="__blank"]');
+	Array.prototype.forEach.call(links, function(link) {
+		link.target = '_blank';
+		link.rel = 'noopener noreferrer';
+	});
+})();
