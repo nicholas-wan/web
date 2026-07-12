@@ -358,6 +358,12 @@ body {
   object-fit: contain;
 }
 
+.personal-gallery .image.fit img {
+  width: 100%;
+  height: 272px;
+  object-fit: cover;
+}
+
 .imgcontain {
   height: 240px;
   object-fit: contain;
