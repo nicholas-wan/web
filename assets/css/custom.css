@@ -664,6 +664,7 @@ body {
   text-align: center;
 }
 
+.masonry .content,
 .masonry .content-image,
 .masonry .citc {
   cursor: zoom-in;

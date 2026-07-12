@@ -1,6 +1,8 @@
 (function () {
-  var images = Array.prototype.slice.call(document.querySelectorAll('.masonry .content-image, .masonry .citc'))
-    .filter(function (image) { return !image.classList.contains('countrylogo'); });
+  var containers = Array.prototype.slice.call(document.querySelectorAll('.masonry .content'));
+  var images = containers.map(function (container) {
+    return container.querySelector('.content-image, .citc');
+  }).filter(function (image) { return image && !image.classList.contains('countrylogo'); });
   if (!images.length) return;
 
   var overlay = document.createElement('div');
@@ -29,10 +31,11 @@
     document.body.classList.add('lightbox-open');
   };
   images.forEach(function (image, index) {
-    image.setAttribute('tabindex', '0');
-    image.setAttribute('role', 'button');
-    image.addEventListener('click', function () { show(index); });
-    image.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); show(index); } });
+    var trigger = image.closest('.content') || image;
+    trigger.setAttribute('tabindex', '0');
+    trigger.setAttribute('role', 'button');
+    trigger.addEventListener('click', function () { show(index); });
+    trigger.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); show(index); } });
   });
   overlay.querySelector('.lightbox__close').addEventListener('click', close);
   overlay.querySelector('.lightbox__previous').addEventListener('click', function () { show(current - 1); });
