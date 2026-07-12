@@ -29,7 +29,7 @@
                 <li><a href="https://www.linkedin.com/in/nicholas-wan/" target="_blank" rel="noopener noreferrer" class="icon fa-linkedin"><span class="label">LinkedIn</span></a></li>
             </ul>
         </nav>
-        <div id="main" class="homepage"><nav class="travel-section-nav" aria-label="Trip sections"><strong>Jump to</strong><div><a href="#trip-section-1">🕊️ Hiroshima 🏛️</a><a href="#trip-section-2">&#x1F3C3; Osaka &amp; Nara &#x1F98C;</a><a href="#trip-section-3">⛩️ Kyoto 🎋</a><a href="#trip-section-4">🏯 Nagoya 🏯</a><a href="#trip-section-5">&#x1F5FB; Tokyo &#x1F5FC;</a></div></nav>
+        <div id="main" class="homepage"><nav class="travel-section-nav" aria-label="Trip sections"><label class="travel-jump-label" for="travel-jump">Jump to</label><select id="travel-jump" class="travel-jump" aria-label="Jump to trip section" onchange="if (this.value) window.location.hash = this.value; this.selectedIndex = 0;"><option value="">Select a section</option><optgroup label="Japan"><option value="#trip-section-1">🕊️ Hiroshima 🏛️</option><option value="#trip-section-2">&#x1F3C3; Osaka &amp; Nara &#x1F98C;</option><option value="#trip-section-3">⛩️ Kyoto 🎋</option><option value="#trip-section-4">🏯 Nagoya 🏯</option><option value="#trip-section-5">&#x1F5FB; Tokyo &#x1F5FC;</option></optgroup></select></nav>
 
 						<!-- Featured Post -->
 							<article>
