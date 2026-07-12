@@ -327,8 +327,9 @@ window.onload = function() {
 
 
 /*Canvas*/
-var canvas = document.getElementById('nokey'),
-   can_w = parseInt(canvas.getAttribute('width')),
+var canvas = document.getElementById('nokey');
+if (canvas) {
+   var can_w = parseInt(canvas.getAttribute('width')),
    can_h = parseInt(canvas.getAttribute('height')),
    ctx = canvas.getContext('2d');
 
@@ -599,6 +600,8 @@ canvas.addEventListener('mousemove', function(e){
     mouse_ball.y = e.pageY;
     // console.log(mouse_ball);
 });
+
+}
 
 // Shared progressive enhancement: keep gallery pages fast and external links safe.
 (function() {

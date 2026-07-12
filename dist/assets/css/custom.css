@@ -14,7 +14,7 @@
   width: 90%;
 }
 
-#aboutblock p {
+.education-details p {
   margin: 0;
   font-size: 16px !important;
 }
@@ -68,6 +68,18 @@
   width: 100%;
   margin-bottom: 50px;
   table-layout: fixed;
+}
+
+.skill-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.education-details img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
 .skillstable td,
