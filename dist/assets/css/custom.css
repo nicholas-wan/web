@@ -652,6 +652,32 @@ body {
   white-space: nowrap;
 }
 
+/* Travel groups stay open and use a non-clickable city/country label. */
+.travel-jump-group {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  position: static;
+}
+
+.travel-jump-group__label {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  background: #fff;
+  color: #333;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.travel-jump-group > div {
+  margin-top: 0;
+}
+
 .travel-section-nav strong {
   flex: 0 0 auto;
   color: #333;
@@ -879,20 +905,18 @@ body {
 
   .travel-jump-groups {
     width: 100%;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .travel-jump-group {
     margin-bottom: 0.5rem;
   }
 
-  .travel-jump-group summary {
-    width: 100%;
-    justify-content: space-between;
-  }
-
   .travel-jump-group > div {
-    padding: 0.5rem 0 0.25rem;
+    flex: 1 1 12rem;
+    padding: 0.1rem 0 0.25rem;
   }
 
   .travel-section-nav > div {

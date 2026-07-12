@@ -1,8 +1,4 @@
 (function () {
-  if (window.matchMedia && window.matchMedia('(max-width: 600px)').matches) {
-    document.querySelectorAll('.travel-jump-group').forEach(function (group) { group.removeAttribute('open'); });
-  }
-
   var containers = Array.prototype.slice.call(document.querySelectorAll('.masonry .content'));
   var images = containers.map(function (container) {
     return container.querySelector('.content-image, .citc');
