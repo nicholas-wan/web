@@ -229,6 +229,20 @@
   font-weight: 700;
 }
 
+.homepage-link::before {
+  display: block;
+  height: 1.4rem;
+  margin-bottom: 0.35rem;
+  color: #128a86;
+  font-family: FontAwesome;
+  font-size: 1.25rem;
+  line-height: 1.4rem;
+}
+
+.homepage-link:nth-child(1)::before { content: "\f0b1"; }
+.homepage-link:nth-child(2)::before { content: "\f19d"; }
+.homepage-link:nth-child(3)::before { content: "\f072"; }
+
 .homepage-link > span:last-child {
   color: #596273;
   font-size: 0.9rem;
