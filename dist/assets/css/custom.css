@@ -674,6 +674,11 @@ body {
   font-weight: 700;
 }
 
+a.travel-jump-group__label {
+  color: #333;
+  text-decoration: none;
+}
+
 .travel-jump-group > div {
   margin-top: 0;
 }
