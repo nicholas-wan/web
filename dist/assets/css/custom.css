@@ -457,6 +457,10 @@ body {
 
 .countrylogo{
   height:45px;
+  width:auto !important;
+  max-width:45px;
+  object-fit:contain;
+  vertical-align:middle;
   margin-bottom:-10px;
 }
 
@@ -577,8 +581,8 @@ body {
 .travel-section-nav > div {
   display: flex;
   gap: 0.5rem;
-  overflow-x: auto;
-  scrollbar-width: thin;
+  flex-wrap: wrap;
+  overflow: visible;
 }
 
 .travel-section-nav a {
@@ -685,6 +689,8 @@ body {
 
   .travel-section-nav > div {
     width: 100%;
+    flex-wrap: wrap;
+    overflow: visible;
   }
 
   .travel-pagination {
