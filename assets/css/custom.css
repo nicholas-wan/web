@@ -179,10 +179,12 @@
 }
 
 .homepage-image .mainimg {
+  width: auto !important;
+  max-width: 100%;
   height: auto !important;
-  max-height: 360px;
-  object-fit: cover !important;
-  margin: 0 !important;
+  max-height: 420px;
+  object-fit: contain !important;
+  margin: 0 auto !important;
 }
 
 .homepage .aboutblock {
@@ -244,7 +246,7 @@
   }
 
   .homepage-image .mainimg {
-    max-height: 240px;
+    max-height: 320px;
   }
 }
 @media all and (max-width: 600px) {
