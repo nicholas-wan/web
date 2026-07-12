@@ -6,9 +6,22 @@
 .skill p {
   font-size: 19px;
 }
-.education-row {
-  align-items: center;
-  margin-bottom: 1.25rem;
+.education-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin: 0 0 2.5rem;
+}
+
+.education-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1.25rem 1.15rem 1.1rem;
+  border: 1px solid #e3e3e3;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.06);
 }
 
 .education-logo-column {
@@ -16,6 +29,9 @@
   align-items: center;
   justify-content: center;
   min-height: 150px;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #eeeeee;
 }
 
 .education-logo,
@@ -45,6 +61,11 @@
 .education-details p {
   margin: 0;
   font-size: 16px !important;
+}
+
+.education-details ul {
+  margin-bottom: 0;
+  padding-left: 1.2rem;
 }
 .cv {
   margin-bottom: 60px;
@@ -156,6 +177,15 @@
 }
 
 @media all and (max-width: 600px) {
+  .education-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .education-card {
+    padding: 1rem;
+  }
+
   .education-logo-column {
     min-height: 110px;
     margin-bottom: 0.75rem;
