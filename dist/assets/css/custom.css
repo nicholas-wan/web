@@ -172,6 +172,118 @@
     padding-top: 0.25rem;
   }
 }
+
+/* Homepage presentation */
+.hero-kicker {
+  margin: 0 0 0.75rem;
+  color: #c1efed;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.hero-summary {
+  max-width: 34rem;
+  margin: 1rem auto 1.5rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.hero-actions {
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.homepage-image {
+  display: block;
+  margin-bottom: 1rem !important;
+}
+
+.homepage-image .mainimg {
+  height: auto !important;
+  max-height: 360px;
+  object-fit: cover !important;
+  margin: 0 !important;
+}
+
+.homepage .aboutblock {
+  max-width: 48rem;
+  margin: 0 auto 2rem;
+  text-align: center;
+  line-height: 1.75;
+}
+
+.homepage-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+  text-align: left;
+}
+
+.homepage-link {
+  display: flex;
+  min-height: 7rem;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  border: 1px solid rgba(55, 65, 81, 0.2);
+  border-radius: 0.4rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: inherit;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.homepage-link:hover,
+.homepage-link:focus-visible {
+  border-color: #128a86;
+  box-shadow: 0 0.5rem 1.5rem rgba(3, 14, 30, 0.1);
+  transform: translateY(-2px);
+}
+
+.homepage-link__label {
+  color: #030e1e;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.homepage-link > span:last-child {
+  color: #596273;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media all and (max-width: 600px) {
+  .hero-summary {
+    font-size: 0.95rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: min(100%, 18rem);
+    margin: 0 auto;
+  }
+
+  .hero-actions li,
+  .hero-actions .button {
+    width: 100%;
+  }
+
+  .homepage-links {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .homepage-link {
+    min-height: auto;
+  }
+
+  .homepage-image .mainimg {
+    max-height: 240px;
+  }
+}
 @media all and (max-width: 600px) {
   .desktoponly {
     display: none;
