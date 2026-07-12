@@ -501,6 +501,13 @@ body {
   padding: 1.5rem 1.5rem 0.75rem;
 }
 
+.travel-grid .travel-card h2 {
+  margin-bottom: 0.65rem;
+  font-size: 1.45rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .travel-grid .travel-card .travel-card__image,
 .travel-grid .travel-card > .image {
   display: block;
@@ -540,6 +547,10 @@ body {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     padding: 3rem 2rem;
   }
+
+  .travel-grid .travel-card h2 {
+    font-size: 1.3rem;
+  }
 }
 
 @media screen and (max-width: 600px) {
@@ -552,6 +563,10 @@ body {
   .travel-grid .travel-card .image,
   .travel-grid .travel-card > .image {
     height: 12rem;
+  }
+
+  .travel-grid .travel-card h2 {
+    font-size: 1.45rem;
   }
 }
 
