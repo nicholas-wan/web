@@ -293,6 +293,11 @@ canvas {
   min-height: 100vh !important;
   z-index: -1;
 }
+@media (prefers-reduced-motion: reduce) {
+  canvas#nokey {
+    display: none;
+  }
+}
 @media screen and (min-width: 800px) {
   .row1 {
     height: 200px !important;
