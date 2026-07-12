@@ -25,6 +25,10 @@ jobs:
         shell: pwsh
         run: .\build-site.ps1 -Clean
 
+      - name: Verify generated site
+        shell: pwsh
+        run: .\verify-site.ps1
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
