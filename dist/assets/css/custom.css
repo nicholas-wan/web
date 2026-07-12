@@ -613,7 +613,10 @@ body {
 }
 
 .textlogo {
+  width: 25px !important;
   height: 25px;
+  max-width: 25px;
+  object-fit: contain;
   margin-bottom: -5px;
 }
 
