@@ -464,3 +464,87 @@ body {
   height: 25px;
   margin-bottom: -5px;
 }
+
+/* Travel index cards */
+.travel-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2rem;
+  padding: 4rem;
+}
+
+.travel-grid .travel-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 0 !important;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.travel-grid .travel-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0.9rem 2rem rgba(0, 0, 0, 0.14);
+}
+
+.travel-grid .travel-card header {
+  padding: 1.5rem 1.5rem 0.75rem;
+}
+
+.travel-grid .travel-card .travel-card__image,
+.travel-grid .travel-card > .image {
+  display: block;
+  width: 100%;
+  height: 13rem;
+  margin: 0;
+  overflow: hidden;
+}
+
+.travel-grid .travel-card .travel-card__image img,
+.travel-grid .travel-card > .image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.3s ease;
+}
+
+.travel-grid .travel-card:hover .travel-card__image img,
+.travel-grid .travel-card:hover > .image img {
+  transform: scale(1.04);
+}
+
+.travel-grid .travel-card > p {
+  flex: 1;
+  margin: 0;
+  padding: 1.25rem 1.5rem 0;
+}
+
+.travel-grid .travel-card .actions.special {
+  margin: 0;
+  padding: 1.25rem 1.5rem 1.5rem;
+}
+
+@media screen and (max-width: 1100px) {
+  .travel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 3rem 2rem;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .travel-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding: 2rem 1rem;
+  }
+
+  .travel-grid .travel-card .image,
+  .travel-grid .travel-card > .image {
+    height: 12rem;
+  }
+}
