@@ -585,7 +585,8 @@ body {
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
 }
 
-.travel-jump-label {
+.travel-jump-label,
+.travel-section-nav > strong {
   flex: 0 0 auto;
   color: #333;
   font-size: 0.75rem;
@@ -594,16 +595,61 @@ body {
   text-transform: uppercase;
 }
 
-.travel-jump {
-  min-height: 2.75rem;
-  min-width: min(100%, 22rem);
-  padding: 0.45rem 2.25rem 0.45rem 0.75rem;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 0.25rem;
+.travel-jump-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.travel-jump-group {
+  position: relative;
+}
+
+.travel-jump-group summary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
   background: #fff;
   color: #333;
-  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 700;
   cursor: pointer;
+  list-style: none;
+}
+
+.travel-jump-group summary::-webkit-details-marker {
+  display: none;
+}
+
+.travel-jump-group summary::after {
+  content: "＋";
+  margin-left: 0.45rem;
+  font-size: 0.9rem;
+}
+
+.travel-jump-group[open] summary::after {
+  content: "−";
+}
+
+.travel-jump-group > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+}
+
+.travel-jump-group a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: 999px;
+  font-size: 0.75rem;
+  white-space: nowrap;
 }
 
 .travel-section-nav strong {
@@ -831,8 +877,22 @@ body {
     margin-bottom: 1.25rem;
   }
 
-  .travel-jump {
+  .travel-jump-groups {
     width: 100%;
+    display: block;
+  }
+
+  .travel-jump-group {
+    margin-bottom: 0.5rem;
+  }
+
+  .travel-jump-group summary {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .travel-jump-group > div {
+    padding: 0.5rem 0 0.25rem;
   }
 
   .travel-section-nav > div {
