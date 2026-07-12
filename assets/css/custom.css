@@ -173,28 +173,6 @@
   }
 }
 
-/* Homepage presentation */
-.hero-kicker {
-  margin: 0 0 0.75rem;
-  color: #c1efed;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.hero-summary {
-  max-width: 34rem;
-  margin: 1rem auto 1.5rem;
-  font-size: 1.05rem;
-  line-height: 1.7;
-}
-
-.hero-actions {
-  gap: 0.75rem;
-  justify-content: center;
-}
-
 .homepage-image {
   display: block;
   margin-bottom: 1rem !important;
@@ -256,21 +234,6 @@
 }
 
 @media all and (max-width: 600px) {
-  .hero-summary {
-    font-size: 0.95rem;
-  }
-
-  .hero-actions {
-    flex-direction: column;
-    width: min(100%, 18rem);
-    margin: 0 auto;
-  }
-
-  .hero-actions li,
-  .hero-actions .button {
-    width: 100%;
-  }
-
   .homepage-links {
     grid-template-columns: 1fr;
     gap: 0.75rem;
