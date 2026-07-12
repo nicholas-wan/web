@@ -1,5 +1,5 @@
 (function () {
-  var images = Array.prototype.slice.call(document.querySelectorAll('.content-image, .citc'))
+  var images = Array.prototype.slice.call(document.querySelectorAll('.masonry .content-image, .masonry .citc'))
     .filter(function (image) { return !image.classList.contains('countrylogo'); });
   if (!images.length) return;
 
