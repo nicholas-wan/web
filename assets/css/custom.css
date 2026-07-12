@@ -6,12 +6,40 @@
 .skill p {
   font-size: 19px;
 }
-#njc,
-#stanford {
-  width: 100%;
+.education-row {
+  align-items: center;
+  margin-bottom: 1.25rem;
 }
+
+.education-logo-column {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 150px;
+}
+
+.education-logo,
+#njc,
+#stanford,
 #nus {
-  width: 90%;
+  display: block;
+  width: auto;
+  max-width: 100%;
+  max-height: 140px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+#stanford {
+  max-width: 220px;
+}
+
+#nus {
+  max-width: 260px;
+}
+
+#njc {
+  max-width: 220px;
 }
 
 .education-details p {
@@ -119,7 +147,30 @@
   color: navy;
 }
 .skillrow {
-  margin-right: -1.5em;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.skillstable {
+  min-width: 34rem;
+}
+
+@media all and (max-width: 600px) {
+  .education-logo-column {
+    min-height: 110px;
+    margin-bottom: 0.75rem;
+  }
+
+  .education-logo,
+  #njc,
+  #stanford,
+  #nus {
+    max-height: 100px;
+  }
+
+  .education-details {
+    padding-top: 0.25rem;
+  }
 }
 @media all and (max-width: 600px) {
   .desktoponly {
