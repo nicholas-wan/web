@@ -550,3 +550,150 @@ body {
     height: 12rem;
   }
 }
+
+/* Travel journal navigation */
+.travel-section-nav {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0 0 2rem;
+  padding: 0.85rem 1rem;
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
+}
+
+.travel-section-nav strong {
+  flex: 0 0 auto;
+  color: #333;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.travel-section-nav > div {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.travel-section-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 999px;
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
+
+.travel-pagination {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 3rem 0 1rem;
+  padding: 0 1rem;
+}
+
+.travel-pagination a {
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.65rem 1rem;
+}
+
+/* Personal and house gallery presentation */
+.gallery-intro {
+  margin: 0 0 2rem;
+  padding: 1.25rem 1.5rem;
+  border-left: 0.35rem solid #777;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.gallery-intro__eyebrow {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: #555;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.gallery-intro p {
+  margin: 0;
+}
+
+.masonry .brick {
+  margin-bottom: 1.25rem;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.masonry .brick .content {
+  background: #f4f4f4;
+}
+
+.masonry .brick .content-image {
+  display: block;
+  transition: transform 0.25s ease, filter 0.25s ease;
+}
+
+.masonry .brick:hover .content-image,
+.masonry .brick:focus-within .content-image {
+  transform: scale(1.025);
+  filter: brightness(0.9);
+}
+
+.gallery-caption {
+  margin: 0;
+  padding: 0.55rem 0.75rem;
+  background: #fff;
+  color: #555;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  text-align: center;
+}
+
+@media screen and (max-width: 600px) {
+  #intro {
+    min-height: 72vh;
+    padding: 2rem 1rem;
+  }
+
+  #nav .links a,
+  #nav .icons a,
+  .button,
+  button {
+    min-height: 2.75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .travel-section-nav {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .travel-section-nav > div {
+    width: 100%;
+  }
+
+  .travel-pagination {
+    margin-top: 2rem;
+    padding: 0;
+  }
+
+  .gallery-intro {
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+  }
+}
