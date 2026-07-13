@@ -68,6 +68,10 @@
     initXpBars();
     initHeroBurst();
     initKonami();
+    initAchievements();
+    initQuestLog();
+    initReadProgress();
+    initPhotoTracking();
   });
 
   /* ------------------------------------------------------------------ */
@@ -366,23 +370,263 @@
 
   function unlock() {
     burst(window.innerWidth / 2, window.innerHeight * 0.32, 180, 13);
-    toast('🏆 Achievement Unlocked — you found the secret!');
+    achUnlock('secret');
   }
 
-  var toastTimer = null;
+  /* Toast queue: chapter-complete and achievement toasts can fire in the
+     same instant, so show them one after another instead of clobbering. */
+  var toastQueue = [];
+  var toastActive = false;
   function toast(msg) {
-    var existing = document.querySelector('.game-toast');
-    if (existing && existing.parentNode) { existing.parentNode.removeChild(existing); }
+    toastQueue.push(msg);
+    if (!toastActive) { nextToast(); }
+  }
+  function nextToast() {
+    if (!toastQueue.length) { toastActive = false; return; }
+    toastActive = true;
     var t = document.createElement('div');
     t.className = 'game-toast';
     t.setAttribute('role', 'status');
-    t.textContent = msg;
+    t.textContent = toastQueue.shift();
     document.body.appendChild(t);
-    requestAnimationFrame(function () { t.classList.add('is-visible'); });
-    if (toastTimer) { clearTimeout(toastTimer); }
-    toastTimer = setTimeout(function () {
+    setTimeout(function () { t.classList.add('is-visible'); }, 20);
+    setTimeout(function () {
       t.classList.remove('is-visible');
-      setTimeout(function () { if (t.parentNode) { t.parentNode.removeChild(t); } }, 400);
-    }, 3600);
+      setTimeout(function () {
+        if (t.parentNode) { t.parentNode.removeChild(t); }
+        nextToast();
+      }, 400);
+    }, 3200);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 9. Achievement system (persisted in localStorage)                   */
+  /* ------------------------------------------------------------------ */
+  var TRIPS = {
+    travel_2019_siliconvalley: 'Silicon Valley',
+    travel_2022_europe: 'Europe',
+    travel_2023_perth: 'Perth',
+    travel_2023_usacanada: 'USA & Canada',
+    travel_2024_australia: 'Australia',
+    travel_2024_germany: 'Germany',
+    travel_2025_japan: 'Japan'
+  };
+  var SECTIONS = ['index', 'experience', 'skills', 'personal', 'travel'];
+  var ACHIEVEMENTS = [
+    { id: 'explorer', icon: 'fa-compass', title: 'Explorer', desc: 'Visit every section of the site' },
+    { id: 'globetrotter', icon: 'fa-globe', title: 'Globetrotter', desc: 'Open all 7 travel journals' },
+    { id: 'completionist', icon: 'fa-book', title: 'Completionist', desc: 'Read a travel journal to the end' },
+    { id: 'photographer', icon: 'fa-camera-retro', title: "Photographer's Eye", desc: 'View 25 photos in the gallery' },
+    { id: 'secret', icon: 'fa-gamepad', title: 'Secret Finder', desc: 'Enter a legendary code' }
+  ];
+  var STORE_KEY = 'nw-game-v1';
+  var state = loadState();
+
+  function loadState() {
+    var base = { ach: {}, journals: {}, chapters: {}, pages: {}, photos: 0 };
+    try {
+      var raw = localStorage.getItem(STORE_KEY);
+      if (!raw) { return base; }
+      var parsed = JSON.parse(raw);
+      for (var k in base) { if (!(k in parsed)) { parsed[k] = base[k]; } }
+      return parsed;
+    } catch (e) { return base; }
+  }
+
+  function saveState() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* private mode */ }
+  }
+
+  function pageSlug() {
+    var p = window.location.pathname.split('/').pop() || 'index';
+    return p.replace(/\.html$/, '') || 'index';
+  }
+
+  function achUnlock(id) {
+    if (state.ach[id]) { return; }
+    state.ach[id] = Date.now();
+    saveState();
+    var def = null;
+    for (var i = 0; i < ACHIEVEMENTS.length; i++) {
+      if (ACHIEVEMENTS[i].id === id) { def = ACHIEVEMENTS[i]; break; }
+    }
+    toast('🏆 Achievement unlocked — ' + (def ? def.title : id));
+    burst(window.innerWidth / 2, window.innerHeight - 60, 45, 8);
+    updateAchCount();
+    renderAchList();
+  }
+
+  function achCount() {
+    var n = 0;
+    for (var i = 0; i < ACHIEVEMENTS.length; i++) { if (state.ach[ACHIEVEMENTS[i].id]) { n++; } }
+    return n;
+  }
+
+  var achCountEl = null;
+  var achListEl = null;
+
+  function updateAchCount() {
+    if (achCountEl) { achCountEl.textContent = achCount() + '/' + ACHIEVEMENTS.length; }
+  }
+
+  function renderAchList() {
+    if (!achListEl) { return; }
+    achListEl.innerHTML = '';
+    ACHIEVEMENTS.forEach(function (a) {
+      var unlocked = !!state.ach[a.id];
+      var li = document.createElement('li');
+      li.className = 'ach-item' + (unlocked ? ' is-unlocked' : '');
+      li.innerHTML = '<span class="ach-item__icon icon fa ' + (unlocked ? a.icon : 'fa-lock') + '" aria-hidden="true"></span>' +
+        '<span class="ach-item__text"><strong>' + a.title + '</strong><em>' +
+        (unlocked || a.id !== 'secret' ? a.desc : '???') + '</em></span>';
+      achListEl.appendChild(li);
+    });
+  }
+
+  function initAchievements() {
+    var slug = pageSlug();
+    if (SECTIONS.indexOf(slug) !== -1) { state.pages[slug] = 1; }
+    if (TRIPS[slug]) { state.journals[slug] = 1; }
+    saveState();
+
+    // Trophy toggle + drawer, fixed bottom-left on every page.
+    var toggle = document.createElement('button');
+    toggle.className = 'ach-toggle';
+    toggle.type = 'button';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Achievements');
+    toggle.innerHTML = '<span class="icon fa fa-trophy" aria-hidden="true"></span><span class="ach-toggle__count"></span>';
+    var drawer = document.createElement('aside');
+    drawer.className = 'ach-drawer';
+    drawer.hidden = true;
+    drawer.setAttribute('aria-label', 'Achievements');
+    drawer.innerHTML = '<h4>Achievements</h4><ul class="ach-list"></ul>';
+    document.body.appendChild(toggle);
+    document.body.appendChild(drawer);
+    achCountEl = toggle.querySelector('.ach-toggle__count');
+    achListEl = drawer.querySelector('.ach-list');
+    updateAchCount();
+    renderAchList();
+    toggle.addEventListener('click', function () {
+      var open = drawer.hidden;
+      drawer.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', function (e) {
+      if (!drawer.hidden && !drawer.contains(e.target) && !toggle.contains(e.target)) {
+        drawer.hidden = true;
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Evaluate cross-page achievements on arrival.
+    var allPages = SECTIONS.every(function (s) { return state.pages[s]; });
+    if (allPages) { achUnlock('explorer'); }
+    var allTrips = Object.keys(TRIPS).every(function (t) { return state.journals[t]; });
+    if (allTrips) { achUnlock('globetrotter'); }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 10. Travel quest log: progress meter + visited stamps               */
+  /* ------------------------------------------------------------------ */
+  function initQuestLog() {
+    var grid = document.querySelector('.travel-grid');
+    if (!grid || pageSlug() !== 'travel') { return; }
+
+    var read = Object.keys(TRIPS).filter(function (t) { return state.journals[t]; }).length;
+    var total = Object.keys(TRIPS).length;
+    var pct = Math.round((read / total) * 100);
+
+    var log = document.createElement('div');
+    log.className = 'quest-log';
+    log.innerHTML = '<span class="quest-log__eyebrow"><span class="icon fa fa-map-marker" aria-hidden="true"></span> Quest log</span>' +
+      '<div class="quest-log__row">' +
+      '<div class="xp-bar"><span class="xp-bar__track"><span class="xp-bar__fill" data-pct="' + pct + '" style="width:' + (reduce ? pct + '%' : '0%') + '"></span></span>' +
+      '<span class="xp-bar__label">' + read + '/' + total + ' journals</span></div>' +
+      '<span class="quest-log__meta">7 trips · 9 countries</span></div>';
+    grid.parentNode.insertBefore(log, grid);
+    if (!reduce) {
+      var fill = log.querySelector('.xp-bar__fill');
+      onVisible(fill.parentNode, function () { fill.style.width = fill.getAttribute('data-pct') + '%'; }, 0.5);
+    }
+
+    // Stamp cards whose journals have been opened.
+    var links = grid.querySelectorAll('a[href]');
+    var stamped = {};
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute('href').replace(/\.html$/, '');
+      if (state.journals[href] && TRIPS[href]) {
+        var card = links[i];
+        while (card && !(card.classList && card.classList.contains('travel-card'))) { card = card.parentNode; }
+        if (card && !stamped[href]) {
+          stamped[href] = 1;
+          card.classList.add('is-visited');
+          var stamp = document.createElement('span');
+          stamp.className = 'travel-stamp';
+          stamp.textContent = 'VISITED';
+          card.appendChild(stamp);
+        }
+      }
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 11. Journal reading progress + chapter complete                     */
+  /* ------------------------------------------------------------------ */
+  function initReadProgress() {
+    var slug = pageSlug();
+    if (!TRIPS[slug]) { return; }
+
+    var bar = document.createElement('div');
+    bar.className = 'read-progress';
+    bar.innerHTML = '<span class="read-progress__fill"></span>';
+    document.body.appendChild(bar);
+    var fill = bar.firstChild;
+    var done = false;
+
+    function update() {
+      var max = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = max > 0 ? Math.min(window.scrollY / max, 1) : 1;
+      fill.style.width = (pct * 100) + '%';
+      if (pct >= 0.97 && !done) {
+        done = true;
+        if (!state.chapters[slug]) {
+          state.chapters[slug] = 1;
+          saveState();
+          toast('📖 Chapter complete — ' + TRIPS[slug] + ' ✓');
+          burst(window.innerWidth / 2, window.innerHeight * 0.5, 70, 9);
+          achUnlock('completionist');
+        }
+      }
+    }
+
+    var ticking = false;
+    window.addEventListener('scroll', function () {
+      if (ticking) { return; }
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; update(); });
+    }, { passive: true });
+    update();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 12. Lightbox photo-view tracking                                    */
+  /* ------------------------------------------------------------------ */
+  function initPhotoTracking() {
+    if (!('MutationObserver' in window)) { return; }
+    var seen = {};
+    // gallery.js appends the lightbox lazily; watch for the image's src swaps.
+    var mo = new MutationObserver(function (muts) {
+      for (var i = 0; i < muts.length; i++) {
+        var t = muts[i].target;
+        if (t.className === 'lightbox__image' && t.src && !seen[t.src]) {
+          seen[t.src] = 1;
+          state.photos = (state.photos || 0) + 1;
+          saveState();
+          if (state.photos >= 25) { achUnlock('photographer'); }
+        }
+      }
+    });
+    mo.observe(document.body, { attributes: true, attributeFilter: ['src'], subtree: true });
   }
 })();
