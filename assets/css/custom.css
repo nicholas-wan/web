@@ -339,6 +339,16 @@
   line-height: 1.5;
 }
 
+/* 404 page */
+.notfound .homepage-link {
+  justify-content: center;
+  min-height: 7rem;
+}
+
+.notfound .homepage-link:nth-child(1)::before { content: "\f015"; }
+.notfound .homepage-link:nth-child(2)::before { content: "\f0b1"; }
+.notfound .homepage-link:nth-child(3)::before { content: "\f072"; }
+
 /* Hero highlight badges */
 .hero-badges {
   display: flex;
@@ -1007,6 +1017,7 @@ body {
 
   .travel-grid .travel-card h2 {
     font-size: 1.45rem;
+    white-space: normal;
   }
 }
 
