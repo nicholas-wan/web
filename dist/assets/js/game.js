@@ -1,0 +1,388 @@
+/* ==========================================================================
+   game.js — playful, gamified interactions layer
+   Loaded on every generated page (see build-site.ps1 template + runtimeJs).
+   Everything degrades gracefully and respects prefers-reduced-motion.
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* Fire callback once per element when it scrolls into view. Uses a
+     rAF-throttled scroll/resize check instead of IntersectionObserver so it
+     also works in throttled/embedded renderers where IO never delivers. */
+  var watchers = [];
+  var watchScheduled = false;
+
+  function inViewport(el, ratio) {
+    var r = el.getBoundingClientRect();
+    if (!r.width || !r.height) { return false; }
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
+    return visible > r.height * (ratio || 0.15);
+  }
+
+  function checkWatchers() {
+    watchScheduled = false;
+    for (var i = watchers.length - 1; i >= 0; i--) {
+      var w = watchers[i];
+      if (inViewport(w.el, w.ratio)) {
+        watchers.splice(i, 1);
+        w.cb(w.el);
+      }
+    }
+    if (!watchers.length) {
+      window.removeEventListener('scroll', scheduleWatch);
+      window.removeEventListener('resize', scheduleWatch);
+    }
+  }
+
+  function scheduleWatch() {
+    if (watchScheduled) { return; }
+    watchScheduled = true;
+    requestAnimationFrame(checkWatchers);
+  }
+
+  function onVisible(el, cb, ratio) {
+    if (!watchers.length) {
+      window.addEventListener('scroll', scheduleWatch, { passive: true });
+      window.addEventListener('resize', scheduleWatch);
+    }
+    watchers.push({ el: el, cb: cb, ratio: ratio });
+    scheduleWatch();
+  }
+
+  function ready(fn) {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn);
+    } else {
+      fn();
+    }
+  }
+
+  ready(function () {
+    restoreDateClock();
+    initReveal();
+    initCounters();
+    initTilt();
+    initXpBars();
+    initHeroBurst();
+    initKonami();
+  });
+
+  /* ------------------------------------------------------------------ */
+  /* 1. Date + analog clock                                              */
+  /*    These ran as inline scripts in the source index.html but sit     */
+  /*    after </footer>, so the static build dropped them and the        */
+  /*    deployed home page shipped an empty date + frozen clock. Restore. */
+  /* ------------------------------------------------------------------ */
+  function restoreDateClock() {
+    var para = document.getElementById('para1');
+    if (para && !para.textContent.trim()) {
+      var d = new Date();
+      var months = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
+      var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      para.textContent = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
+    }
+
+    var hourhand = document.getElementById('hourhand');
+    if (!hourhand) { return; }
+    var hands = [
+      document.querySelector('#secondhand > *'),
+      document.querySelector('#minutehand > *'),
+      document.querySelector('#hourhand > *')
+    ];
+    var cx = 100, cy = 100;
+    function shifter(val) { return [val, cx, cy].join(' '); }
+    var date = new Date();
+    var hoursAngle = 360 * date.getHours() / 12 + date.getMinutes() / 2;
+    var minuteAngle = 360 * date.getMinutes() / 60;
+    var secAngle = 360 * date.getSeconds() / 60;
+
+    if (hands[0] && hands[1] && hands[2]) {
+      hands[0].setAttribute('from', shifter(secAngle));
+      hands[0].setAttribute('to', shifter(secAngle + 360));
+      hands[1].setAttribute('from', shifter(minuteAngle));
+      hands[1].setAttribute('to', shifter(minuteAngle + 360));
+      hands[2].setAttribute('from', shifter(hoursAngle));
+      hands[2].setAttribute('to', shifter(hoursAngle + 360));
+    }
+
+    var svg = hourhand.ownerSVGElement || document.querySelector('#main svg');
+    if (svg && !svg.getAttribute('data-ticks')) {
+      for (var i = 1; i <= 12; i++) {
+        var el = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        el.setAttribute('x1', '100');
+        el.setAttribute('y1', '30');
+        el.setAttribute('x2', '100');
+        el.setAttribute('y2', '40');
+        el.setAttribute('transform', 'rotate(' + (i * 360 / 12) + ' 100 100)');
+        el.setAttribute('style', 'stroke: #ffffff;');
+        svg.appendChild(el);
+      }
+      svg.setAttribute('data-ticks', '1');
+    }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 2. Scroll reveal (staggered)                                        */
+  /* ------------------------------------------------------------------ */
+  function initReveal() {
+    var groups = [
+      '.hero-badges .hero-badge',
+      '.homepage-links .homepage-link',
+      '.education-grid .education-card',
+      '.posts > article',
+      '.travel-grid .travel-card'
+    ];
+    var all = [];
+    groups.forEach(function (sel) {
+      var items = document.querySelectorAll(sel);
+      for (var i = 0; i < items.length; i++) {
+        var el = items[i];
+        if (el.hasAttribute('data-reveal')) { continue; }
+        el.setAttribute('data-reveal', '');
+        el.style.setProperty('--reveal-delay', (Math.min(i, 8) * 70) + 'ms');
+        all.push(el);
+      }
+    });
+    // Any elements authored with data-reveal directly.
+    var authored = document.querySelectorAll('[data-reveal]:not(.is-revealed)');
+    for (var j = 0; j < authored.length; j++) {
+      if (all.indexOf(authored[j]) === -1) { all.push(authored[j]); }
+    }
+    if (!all.length) { return; }
+
+    if (reduce) {
+      all.forEach(function (el) { el.classList.add('is-revealed'); });
+      return;
+    }
+    all.forEach(function (el) {
+      onVisible(el, function (target) { target.classList.add('is-revealed'); }, 0.12);
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 3. Count-up stat numbers                                            */
+  /* ------------------------------------------------------------------ */
+  function initCounters() {
+    var els = document.querySelectorAll('[data-count]');
+    if (!els.length) { return; }
+
+    function run(el) {
+      var target = parseFloat(el.getAttribute('data-count')) || 0;
+      if (reduce) { el.textContent = String(target); return; }
+      var dur = 1400;
+      var startTs = null;
+      function step(ts) {
+        if (startTs === null) { startTs = ts; }
+        var p = Math.min((ts - startTs) / dur, 1);
+        var eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = String(Math.round(target * eased));
+        if (p < 1) { requestAnimationFrame(step); }
+        else { el.textContent = String(target); }
+      }
+      requestAnimationFrame(step);
+    }
+
+    if (reduce) {
+      for (var i = 0; i < els.length; i++) { run(els[i]); }
+      return;
+    }
+    for (var k = 0; k < els.length; k++) { onVisible(els[k], run, 0.5); }
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 4. Pointer tilt (3D) with cursor glow                               */
+  /* ------------------------------------------------------------------ */
+  function initTilt() {
+    if (reduce) { return; }
+    if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) { return; }
+    var sel = '.homepage-link, .travel-grid .travel-card, .education-grid .education-card';
+    var els = document.querySelectorAll(sel);
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      el.classList.add('js-tilt');
+      bindTilt(el);
+    }
+  }
+
+  function bindTilt(el) {
+    var max = 8;
+    var frame = null;
+    el.addEventListener('pointermove', function (ev) {
+      if (frame) { return; }
+      frame = requestAnimationFrame(function () {
+        frame = null;
+        var r = el.getBoundingClientRect();
+        var px = (ev.clientX - r.left) / r.width - 0.5;
+        var py = (ev.clientY - r.top) / r.height - 0.5;
+        el.style.transform = 'perspective(760px) rotateX(' + (-py * max).toFixed(2) +
+          'deg) rotateY(' + (px * max).toFixed(2) + 'deg) translateY(-4px)';
+        el.style.setProperty('--gx', (px * 100 + 50) + '%');
+        el.style.setProperty('--gy', (py * 100 + 50) + '%');
+      });
+    });
+    el.addEventListener('pointerleave', function () {
+      if (frame) { cancelAnimationFrame(frame); frame = null; }
+      el.style.transform = '';
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 5. Skill XP bars (skills page)                                      */
+  /* ------------------------------------------------------------------ */
+  function initXpBars() {
+    var table = document.querySelector('.skillstable');
+    if (!table) { return; }
+    var cells = table.querySelectorAll('td');
+    var bars = [];
+    for (var i = 0; i < cells.length; i++) {
+      var td = cells[i];
+      // Proficiency cells contain only star icons and no text.
+      if (td.textContent.trim().length) { continue; }
+      var stars = td.querySelectorAll('.fa-star');
+      if (!stars.length) { continue; }
+      var n = Math.min(stars.length, 3);
+      var pct = Math.round((n / 3) * 100);
+
+      var wrap = document.createElement('div');
+      wrap.className = 'xp-bar';
+      wrap.setAttribute('role', 'img');
+      wrap.setAttribute('aria-label', n + ' out of 3');
+      var track = document.createElement('span');
+      track.className = 'xp-bar__track';
+      var fill = document.createElement('span');
+      fill.className = 'xp-bar__fill';
+      fill.setAttribute('data-pct', pct);
+      fill.style.width = reduce ? (pct + '%') : '0%';
+      var label = document.createElement('span');
+      label.className = 'xp-bar__label';
+      label.textContent = n + '/3';
+      track.appendChild(fill);
+      wrap.appendChild(track);
+      wrap.appendChild(label);
+      td.innerHTML = '';
+      td.appendChild(wrap);
+      bars.push(fill);
+    }
+    if (!bars.length || reduce) { return; }
+
+    function fillBar(fill) { fill.style.width = fill.getAttribute('data-pct') + '%'; }
+    bars.forEach(function (b) {
+      // Watch the row, not the fill: the fill starts at width 0 and a
+      // zero-size element never registers as visible.
+      onVisible(b.parentNode, function () { fillBar(b); }, 0.5);
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 6. Confetti / particle burst helper                                 */
+  /* ------------------------------------------------------------------ */
+  var COLORS = ['#00e0e0', '#128a86', '#ffd166', '#ef476f', '#06d6a0', '#ffffff'];
+
+  function burst(x, y, count, power) {
+    if (reduce) { return; }
+    var cv = document.createElement('canvas');
+    cv.className = 'fx-canvas';
+    var w = cv.width = window.innerWidth;
+    var h = cv.height = window.innerHeight;
+    document.body.appendChild(cv);
+    var ctx = cv.getContext('2d');
+    var parts = [];
+    for (var i = 0; i < count; i++) {
+      var ang = Math.random() * Math.PI * 2;
+      var spd = (0.4 + Math.random()) * power;
+      parts.push({
+        x: x, y: y,
+        vx: Math.cos(ang) * spd,
+        vy: Math.sin(ang) * spd - power * 0.5,
+        s: 4 + Math.random() * 5,
+        rot: Math.random() * Math.PI,
+        vr: (Math.random() - 0.5) * 0.3,
+        color: COLORS[(Math.random() * COLORS.length) | 0],
+        life: 60 + (Math.random() * 40 | 0)
+      });
+    }
+    var maxLife = 110;
+    var frames = 0;
+    (function anim() {
+      frames++;
+      ctx.clearRect(0, 0, w, h);
+      var alive = false;
+      for (var i = 0; i < parts.length; i++) {
+        var p = parts[i];
+        p.vy += 0.16;
+        p.vx *= 0.99;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.life -= 1;
+        if (p.life > 0 && p.y < h + 30) {
+          alive = true;
+          ctx.save();
+          ctx.globalAlpha = Math.max(Math.min(p.life / maxLife, 1), 0);
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s);
+          ctx.restore();
+        }
+      }
+      if (alive && frames < 260) { requestAnimationFrame(anim); }
+      else if (cv.parentNode) { cv.parentNode.removeChild(cv); }
+    })();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 7. Hero image click burst                                           */
+  /* ------------------------------------------------------------------ */
+  function initHeroBurst() {
+    var hero = document.querySelector('.homepage-image');
+    if (!hero) { return; }
+    hero.classList.add('is-interactive');
+    hero.addEventListener('click', function (ev) {
+      burst(ev.clientX, ev.clientY, 60, 9);
+    });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 8. Konami-code easter egg                                           */
+  /* ------------------------------------------------------------------ */
+  function initKonami() {
+    var seq = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
+    var pos = 0;
+    document.addEventListener('keydown', function (e) {
+      var key = e.keyCode || e.which;
+      if (key === seq[pos]) {
+        pos++;
+        if (pos === seq.length) { pos = 0; unlock(); }
+      } else {
+        pos = (key === seq[0]) ? 1 : 0;
+      }
+    });
+  }
+
+  function unlock() {
+    burst(window.innerWidth / 2, window.innerHeight * 0.32, 180, 13);
+    toast('🏆 Achievement Unlocked — you found the secret!');
+  }
+
+  var toastTimer = null;
+  function toast(msg) {
+    var existing = document.querySelector('.game-toast');
+    if (existing && existing.parentNode) { existing.parentNode.removeChild(existing); }
+    var t = document.createElement('div');
+    t.className = 'game-toast';
+    t.setAttribute('role', 'status');
+    t.textContent = msg;
+    document.body.appendChild(t);
+    requestAnimationFrame(function () { t.classList.add('is-visible'); });
+    if (toastTimer) { clearTimeout(toastTimer); }
+    toastTimer = setTimeout(function () {
+      t.classList.remove('is-visible');
+      setTimeout(function () { if (t.parentNode) { t.parentNode.removeChild(t); } }, 400);
+    }, 3600);
+  }
+})();
