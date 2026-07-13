@@ -305,7 +305,9 @@
   }
 
   .intro-swipe__photo {
-    transform: translateX(calc((var(--p, 1) - 1) * 70vw));
+    /* JS measures the exact offscreen-left distance; the fallback only
+       covers the moment before it runs. */
+    transform: translateX(calc((1 - var(--p, 1)) * var(--swipe-photo, -110vw)));
   }
 
   .intro-swipe__photo img {
@@ -315,7 +317,7 @@
 
   .intro-swipe__text {
     flex: 0 1 auto;
-    transform: translateX(calc((1 - var(--p, 1)) * 70vw));
+    transform: translateX(calc((1 - var(--p, 1)) * var(--swipe-text, 110vw)));
   }
 
   .intro-swipe__text h3 {

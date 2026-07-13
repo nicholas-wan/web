@@ -102,14 +102,18 @@
     var photo = section.querySelector('.intro-swipe__photo');
     var text = section.querySelector('.intro-swipe__text');
 
-    // Measure at rest (--p: 1) so the photo starts exactly at the viewport
-    // center and the text starts fully offstage, whatever the layout width.
+    // Measure at rest (--p: 1) so the start positions are exact whatever the
+    // layout width: desktop centers the photo; the stacked mobile variant
+    // parks it fully offscreen left (48px covers the box-shadow bleed).
     function measure() {
-      if (window.innerWidth <= 736) { return; }
       var prev = section.style.getPropertyValue('--p');
       section.style.setProperty('--p', '1');
       var pr = photo.getBoundingClientRect();
-      section.style.setProperty('--swipe-photo', ((window.innerWidth / 2) - (pr.left + pr.width / 2)).toFixed(1) + 'px');
+      if (window.innerWidth <= 736) {
+        section.style.setProperty('--swipe-photo', (-(pr.right + 48)).toFixed(1) + 'px');
+      } else {
+        section.style.setProperty('--swipe-photo', ((window.innerWidth / 2) - (pr.left + pr.width / 2)).toFixed(1) + 'px');
+      }
       var tr = text.getBoundingClientRect();
       section.style.setProperty('--swipe-text', (window.innerWidth - tr.left + 32).toFixed(1) + 'px');
       if (prev) { section.style.setProperty('--p', prev); }
