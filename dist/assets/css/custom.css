@@ -673,6 +673,10 @@ body {
   vertical-align: top; /* Keep the item on the very top */
   line-height: 1px !important;
   margin-bottom: 15px;
+  /* Skip layout/paint for offscreen bricks; long journals render only
+     what is near the viewport. The auto keyword remembers real sizes. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 320px;
 }
 
 /* Masonry image effects */
