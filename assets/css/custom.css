@@ -202,24 +202,119 @@
   }
 }
 
-.homepage-image {
-  display: block;
-  margin-bottom: 1rem !important;
+/* iPhone-style swipe intro: JS drives --p from 0 (photo centered, text
+   offstage right) to 1 (side-by-side). Default 1 keeps the settled layout
+   for no-JS, reduced-motion (.is-static), and small screens. */
+.intro-swipe {
+  height: 220vh;
+  margin: 0 0 0.5rem;
 }
 
-.homepage-image .mainimg {
-  width: auto !important;
-  max-width: 100%;
-  height: auto !important;
-  max-height: 420px;
-  object-fit: contain !important;
-  margin: 0 auto !important;
+.intro-swipe__stage {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  overflow: hidden;
+}
+
+.intro-swipe__photo {
+  flex: 0 0 auto;
+  margin: 0;
+  transform: translateX(calc((1 - var(--p, 1)) * 21vw));
+  will-change: transform;
+}
+
+.intro-swipe__photo img {
+  display: block;
+  width: auto;
+  max-width: 34vw;
+  max-height: 64vh;
+  object-fit: contain;
+  border-radius: 0.6rem;
+  box-shadow: 0 1rem 3rem rgba(3, 14, 30, 0.18);
+}
+
+.intro-swipe__text {
+  flex: 0 1 28rem;
+  text-align: left;
+  transform: translateX(calc((1 - var(--p, 1)) * 55vw));
+  opacity: var(--p, 1);
+  will-change: transform, opacity;
+}
+
+.intro-swipe__text h3 {
+  margin-bottom: 0.75rem;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 2.1rem;
+  font-weight: 900;
+  line-height: 1.15;
+  color: #030e1e !important;
+}
+
+.intro-swipe__text .aboutblock {
+  margin: 0;
+  text-align: left;
+  line-height: 1.75;
+}
+
+.intro-swipe.is-static {
+  height: auto;
+}
+
+.intro-swipe.is-static .intro-swipe__stage {
+  position: static;
+  height: auto;
+  padding: 1.5rem 0;
+}
+
+.intro-swipe.is-static .intro-swipe__photo,
+.intro-swipe.is-static .intro-swipe__text {
+  transform: none;
+  opacity: 1;
+}
+
+@media screen and (max-width: 736px) {
+  .intro-swipe {
+    height: auto;
+  }
+
+  .intro-swipe__stage {
+    position: static;
+    height: auto;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 1rem 0 0.5rem;
+    overflow: visible;
+  }
+
+  .intro-swipe__photo,
+  .intro-swipe__text {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+
+  .intro-swipe__photo img {
+    max-width: 100%;
+    max-height: 48vh;
+  }
+
+  .intro-swipe__text {
+    flex-basis: auto;
+    padding: 0 1rem;
+  }
+
+  .intro-swipe__text .aboutblock {
+    text-align: justify;
+  }
 }
 
 .homepage .aboutblock {
   max-width: 48rem;
   margin: 0 auto 2rem;
-  text-align: center;
   line-height: 1.75;
 }
 
@@ -445,7 +540,7 @@
   pointer-events: none;
 }
 
-.homepage-image.is-interactive {
+.intro-swipe__photo.is-interactive {
   cursor: crosshair;
 }
 
@@ -514,17 +609,13 @@
   .homepage-link {
     min-height: auto;
   }
-
-  .homepage-image .mainimg {
-    max-height: 320px;
-  }
 }
 @media all and (max-width: 600px) {
   .desktoponly {
     display: none;
   }
   html, body {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
   body {
     position: relative
@@ -536,58 +627,6 @@
   }
 }
 
-/* Scroll-scrubbed monogram (replaces the analog clock) */
-.monogram {
-  display: block;
-  margin: -1.5rem auto 0.5rem;
-}
-
-.monogram circle,
-.monogram path {
-  fill: none;
-  stroke: #128a86;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.monogram__ring {
-  stroke-width: 2.5;
-  opacity: 0.45;
-}
-
-.monogram__n,
-.monogram__w {
-  stroke-width: 6;
-}
-
-@media all and (max-width: 600px) {
-  .monogram {
-    width: 110px;
-    height: 110px;
-    margin-top: -0.5rem;
-  }
-}
-
-/* Scroll-settled hero photo: JS drives --settle from 0 to 1; without JS
-   the default of 1 leaves the photo fully settled. */
-.homepage-image {
-  position: relative;
-  overflow: hidden;
-}
-
-.homepage-image .mainimg {
-  transform: scale(calc(1.09 - 0.09 * var(--settle, 1)));
-  will-change: transform;
-}
-
-.homepage-image::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: #ffffff;
-  opacity: calc(0.45 * (1 - var(--settle, 1)));
-  pointer-events: none;
-}
 /* .filler {
   background: #20B7AF;
   position: absolute;
@@ -620,17 +659,17 @@ canvas {
     height: 250px !important;
     object-fit: cover !important;
   }
-  .mainimg {
-    height: 500px !important;
-    object-fit: contain !important;
-    margin-top: -30px;
-    margin-bottom: -30px;
-  }
 }
 html,
 body {
   max-width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+/* The template sets overflow: hidden here, which breaks position: sticky
+   for the intro swipe stage; clip keeps the same visual containment. */
+#wrapper {
+  overflow: clip;
 }
 @media screen and (min-width: 800px) {
   .captiss {

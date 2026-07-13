@@ -62,7 +62,7 @@
 
   ready(function () {
     restoreDate();
-    initScrollScrub();
+    initIntroSwipe();
     initReveal();
     initCounters();
     initTilt();
@@ -89,49 +89,27 @@
     }
   }
 
-  /* Scroll-scrubbed monogram + hero settle. Both are tied to scroll
-     position (reversible), not one-shot: the monogram strokes draw as the
-     About card rises into view and the hero photo settles from a scaled,
-     veiled state to full presence. Without JS the SVG renders fully drawn
-     and the photo is untouched. */
-  function initScrollScrub() {
-    if (reduce) { return; }
-    var mono = document.querySelector('.monogram');
-    var heroWrap = document.querySelector('.homepage-image');
-    if (!mono && !heroWrap) { return; }
-
-    var strokes = [];
-    if (mono) {
-      var order = ['.monogram__ring', '.monogram__n', '.monogram__w'];
-      var windows = [[0, 0.6], [0.22, 0.82], [0.44, 1]];
-      for (var i = 0; i < order.length; i++) {
-        var el = mono.querySelector(order[i]);
-        if (!el || !el.getTotalLength) { continue; }
-        var len = el.getTotalLength();
-        el.style.strokeDasharray = len + ' ' + len;
-        el.style.strokeDashoffset = len;
-        strokes.push({ el: el, len: len, from: windows[i][0], to: windows[i][1] });
-      }
-    }
-
-    function seg(value, from, to) {
-      return Math.min(1, Math.max(0, (value - from) / (to - from)));
-    }
+  /* iPhone-style swipe intro: the section is taller than the viewport and
+     its stage pins while scroll progress (--p, 0 to 1) swipes the profile
+     photo from center to its left slot and slides the intro text in from
+     the right. Reversible; scrolling back re-centers the photo. Without JS
+     --p defaults to 1 (settled layout); small screens and reduced motion
+     use the static layout. */
+  function initIntroSwipe() {
+    var section = document.querySelector('.intro-swipe');
+    if (!section) { return; }
+    if (reduce) { section.classList.add('is-static'); return; }
 
     function update() {
-      var vh = window.innerHeight || 1;
-      if (strokes.length) {
-        var entered = vh - mono.getBoundingClientRect().top;
-        var p = seg(entered, vh * 0.08, vh * 0.62);
-        for (var i = 0; i < strokes.length; i++) {
-          var s = strokes[i];
-          s.el.style.strokeDashoffset = s.len * (1 - seg(p, s.from, s.to));
-        }
+      if (window.innerWidth <= 736) {
+        section.style.setProperty('--p', '1');
+        return;
       }
-      if (heroWrap) {
-        var hp = seg(vh - heroWrap.getBoundingClientRect().top, vh * 0.15, vh * 0.8);
-        heroWrap.style.setProperty('--settle', hp.toFixed(3));
-      }
+      var scrollable = section.offsetHeight - window.innerHeight;
+      var p = scrollable > 0
+        ? Math.min(1, Math.max(0, -section.getBoundingClientRect().top / scrollable))
+        : 1;
+      section.style.setProperty('--p', p.toFixed(4));
     }
 
     var ticking = false;
@@ -358,7 +336,7 @@
   /* 7. Hero image click burst                                           */
   /* ------------------------------------------------------------------ */
   function initHeroBurst() {
-    var hero = document.querySelector('.homepage-image');
+    var hero = document.querySelector('.intro-swipe__photo');
     if (!hero) { return; }
     hero.classList.add('is-interactive');
     hero.addEventListener('click', function (ev) {
