@@ -112,7 +112,6 @@
 /* --------------------------------------------------------------------------- */
 
 .skillstable {
-  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   border-collapse: collapse;
   width: 100%;
   margin-bottom: 50px;
@@ -289,7 +288,7 @@
 }
 
 .homepage-link__num {
-  font-family: "Source Sans Pro", "Trebuchet MS", sans-serif;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
   font-size: 2.6rem;
   font-weight: 900;
   line-height: 1;
