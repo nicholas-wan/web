@@ -215,10 +215,24 @@
   top: 0;
   display: flex;
   height: 100vh;
+  height: 100svh;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.intro-swipe__head {
+  flex: 0 0 auto;
+  padding-top: 1.5rem;
+}
+
+.intro-swipe__row {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
   align-items: center;
   justify-content: center;
   gap: 3rem;
-  overflow: hidden;
+  padding-bottom: 4vh;
 }
 
 .intro-swipe__photo {
@@ -232,7 +246,7 @@
   display: block;
   width: auto;
   max-width: 34vw;
-  max-height: 64vh;
+  max-height: 62vh;
   object-fit: contain;
   border-radius: 0.6rem;
   box-shadow: 0 1rem 3rem rgba(3, 14, 30, 0.18);
@@ -268,47 +282,52 @@
 .intro-swipe.is-static .intro-swipe__stage {
   position: static;
   height: auto;
-  padding: 1.5rem 0;
+  padding: 1rem 0 1.5rem;
 }
 
 .intro-swipe.is-static .intro-swipe__photo,
 .intro-swipe.is-static .intro-swipe__text {
-  transform: none;
-  opacity: 1;
+  transform: none !important;
+  opacity: 1 !important;
 }
 
+/* Mobile keeps the pinned swipe, stacked: the photo sweeps in from the
+   left and the text from the right as the scene scrubs. */
 @media screen and (max-width: 736px) {
   .intro-swipe {
-    height: auto;
+    height: 170vh;
   }
 
-  .intro-swipe__stage {
-    position: static;
-    height: auto;
+  .intro-swipe__row {
     flex-direction: column;
-    gap: 1.5rem;
-    padding: 1rem 0 0.5rem;
-    overflow: visible;
+    gap: 1.25rem;
+    padding: 0 1rem 3vh;
   }
 
-  .intro-swipe__photo,
-  .intro-swipe__text {
-    transform: none !important;
-    opacity: 1 !important;
+  .intro-swipe__photo {
+    transform: translateX(calc((var(--p, 1) - 1) * 70vw));
   }
 
   .intro-swipe__photo img {
     max-width: 100%;
-    max-height: 48vh;
+    max-height: 42vh;
   }
 
   .intro-swipe__text {
-    flex-basis: auto;
-    padding: 0 1rem;
+    flex: 0 1 auto;
+    transform: translateX(calc((1 - var(--p, 1)) * 70vw));
+  }
+
+  .intro-swipe__text h3 {
+    font-size: 1.6rem;
   }
 
   .intro-swipe__text .aboutblock {
     text-align: justify;
+  }
+
+  .intro-swipe.is-static {
+    height: auto;
   }
 }
 

@@ -116,10 +116,6 @@
     }
 
     function update() {
-      if (window.innerWidth <= 736) {
-        section.style.setProperty('--p', '1');
-        return;
-      }
       var scrollable = section.offsetHeight - window.innerHeight;
       var p = scrollable > 0
         ? Math.min(1, Math.max(0, -section.getBoundingClientRect().top / scrollable))
