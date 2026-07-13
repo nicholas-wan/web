@@ -63,6 +63,7 @@
   ready(function () {
     restoreDate();
     initIntroSwipe();
+    initCardScrub();
     initReveal();
     initCounters();
     initTilt();
@@ -160,7 +161,7 @@
       var items = document.querySelectorAll(sel);
       for (var i = 0; i < items.length; i++) {
         var el = items[i];
-        if (el.hasAttribute('data-reveal')) { continue; }
+        if (el.hasAttribute('data-reveal') || el.hasAttribute('data-scrub')) { continue; }
         el.setAttribute('data-reveal', '');
         el.style.setProperty('--reveal-delay', (Math.min(i, 8) * 70) + 'ms');
         all.push(el);
@@ -180,6 +181,47 @@
     all.forEach(function (el) {
       onVisible(el, function (target) { target.classList.add('is-revealed'); }, 0.12);
     });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 2b. Homepage cards: scroll-scrubbed entrance                        */
+  /* ------------------------------------------------------------------ */
+  function initCardScrub() {
+    var cards = document.querySelectorAll('.homepage .homepage-links .homepage-link');
+    if (!cards.length || reduce) { return; }
+    var LIFT = 48;
+    var last = [];
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].setAttribute('data-scrub', '');
+      cards[i].style.setProperty('--cp', '0');
+      last.push(0);
+    }
+
+    function update() {
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      for (var i = 0; i < cards.length; i++) {
+        var r = cards[i].getBoundingClientRect();
+        // Rects include the scrub translate; undo it so progress reads the
+        // layout position and the loop stays stable.
+        var top = r.top - (1 - last[i]) * LIFT;
+        // 0 as the card's top crosses the viewport bottom, 1 once it has
+        // risen 35% of the viewport; each card trails the one before it.
+        var p = (vh - top) / (vh * 0.35) - i * 0.15;
+        p = Math.min(1, Math.max(0, p));
+        last[i] = p;
+        cards[i].style.setProperty('--cp', p.toFixed(4));
+      }
+    }
+
+    var ticking = false;
+    function schedule() {
+      if (ticking) { return; }
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; update(); });
+    }
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    update();
   }
 
   /* ------------------------------------------------------------------ */

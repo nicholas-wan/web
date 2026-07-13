@@ -515,6 +515,16 @@
   transform: none;
 }
 
+/* Homepage cards: scroll-scrubbed entrance driven by --cp (0 offstage
+   below, 1 settled). Default 1 keeps the settled layout for no-JS; the
+   0.25s transition (shared with hover) lets the cards trail the scroll
+   with a soft ease. */
+.homepage-link[data-scrub] {
+  opacity: var(--cp, 1);
+  transform: translateY(calc((1 - var(--cp, 1)) * 48px));
+  transition: border-color 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, opacity 0.25s linear;
+}
+
 /* Skill XP bars */
 .xp-bar {
   display: flex;
