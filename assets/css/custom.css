@@ -530,20 +530,63 @@
     position: relative
   }
 }
-@media screen and (min-width: 800px) {
-  svg {
-    margin-top: -70px;
-    margin-bottom: 30px;
-  }
-}
 @media all and (max-width: 600px) {
-  svg {
-    margin-top: -50px;
-    margin-bottom: 10px;
-  }
   #intro {
     justify-content: center !important;
   }
+}
+
+/* Scroll-scrubbed monogram (replaces the analog clock) */
+.monogram {
+  display: block;
+  margin: -1.5rem auto 0.5rem;
+}
+
+.monogram circle,
+.monogram path {
+  fill: none;
+  stroke: #128a86;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.monogram__ring {
+  stroke-width: 2.5;
+  opacity: 0.45;
+}
+
+.monogram__n,
+.monogram__w {
+  stroke-width: 6;
+}
+
+@media all and (max-width: 600px) {
+  .monogram {
+    width: 110px;
+    height: 110px;
+    margin-top: -0.5rem;
+  }
+}
+
+/* Scroll-settled hero photo: JS drives --settle from 0 to 1; without JS
+   the default of 1 leaves the photo fully settled. */
+.homepage-image {
+  position: relative;
+  overflow: hidden;
+}
+
+.homepage-image .mainimg {
+  transform: scale(calc(1.09 - 0.09 * var(--settle, 1)));
+  will-change: transform;
+}
+
+.homepage-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #ffffff;
+  opacity: calc(0.45 * (1 - var(--settle, 1)));
+  pointer-events: none;
 }
 /* .filler {
   background: #20B7AF;
@@ -692,14 +735,6 @@ body {
 @media all and (max-width: 600px) {
   .perthimg {
     object-fit:contain;
-  }
-}
-@media screen and (min-width: 800px) {
-  svg {
-    /* height: 400px; */
-    object-fit: cover;
-    /* width: 100%; */
-    border: 0px !important;
   }
 }
 

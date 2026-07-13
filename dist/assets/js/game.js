@@ -61,7 +61,8 @@
   }
 
   ready(function () {
-    restoreDateClock();
+    restoreDate();
+    initScrollScrub();
     initReveal();
     initCounters();
     initTilt();
@@ -77,7 +78,7 @@
   /*    after </footer>, so the static build dropped them and the        */
   /*    deployed home page shipped an empty date + frozen clock. Restore. */
   /* ------------------------------------------------------------------ */
-  function restoreDateClock() {
+  function restoreDate() {
     var para = document.getElementById('para1');
     if (para && !para.textContent.trim()) {
       var d = new Date();
@@ -86,44 +87,61 @@
       var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
       para.textContent = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
     }
+  }
 
-    var hourhand = document.getElementById('hourhand');
-    if (!hourhand) { return; }
-    var hands = [
-      document.querySelector('#secondhand > *'),
-      document.querySelector('#minutehand > *'),
-      document.querySelector('#hourhand > *')
-    ];
-    var cx = 100, cy = 100;
-    function shifter(val) { return [val, cx, cy].join(' '); }
-    var date = new Date();
-    var hoursAngle = 360 * date.getHours() / 12 + date.getMinutes() / 2;
-    var minuteAngle = 360 * date.getMinutes() / 60;
-    var secAngle = 360 * date.getSeconds() / 60;
+  /* Scroll-scrubbed monogram + hero settle. Both are tied to scroll
+     position (reversible), not one-shot: the monogram strokes draw as the
+     About card rises into view and the hero photo settles from a scaled,
+     veiled state to full presence. Without JS the SVG renders fully drawn
+     and the photo is untouched. */
+  function initScrollScrub() {
+    if (reduce) { return; }
+    var mono = document.querySelector('.monogram');
+    var heroWrap = document.querySelector('.homepage-image');
+    if (!mono && !heroWrap) { return; }
 
-    if (hands[0] && hands[1] && hands[2]) {
-      hands[0].setAttribute('from', shifter(secAngle));
-      hands[0].setAttribute('to', shifter(secAngle + 360));
-      hands[1].setAttribute('from', shifter(minuteAngle));
-      hands[1].setAttribute('to', shifter(minuteAngle + 360));
-      hands[2].setAttribute('from', shifter(hoursAngle));
-      hands[2].setAttribute('to', shifter(hoursAngle + 360));
-    }
-
-    var svg = hourhand.ownerSVGElement || document.querySelector('#main svg');
-    if (svg && !svg.getAttribute('data-ticks')) {
-      for (var i = 1; i <= 12; i++) {
-        var el = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        el.setAttribute('x1', '100');
-        el.setAttribute('y1', '30');
-        el.setAttribute('x2', '100');
-        el.setAttribute('y2', '40');
-        el.setAttribute('transform', 'rotate(' + (i * 360 / 12) + ' 100 100)');
-        el.setAttribute('style', 'stroke: #ffffff;');
-        svg.appendChild(el);
+    var strokes = [];
+    if (mono) {
+      var order = ['.monogram__ring', '.monogram__n', '.monogram__w'];
+      var windows = [[0, 0.6], [0.22, 0.82], [0.44, 1]];
+      for (var i = 0; i < order.length; i++) {
+        var el = mono.querySelector(order[i]);
+        if (!el || !el.getTotalLength) { continue; }
+        var len = el.getTotalLength();
+        el.style.strokeDasharray = len + ' ' + len;
+        el.style.strokeDashoffset = len;
+        strokes.push({ el: el, len: len, from: windows[i][0], to: windows[i][1] });
       }
-      svg.setAttribute('data-ticks', '1');
     }
+
+    function seg(value, from, to) {
+      return Math.min(1, Math.max(0, (value - from) / (to - from)));
+    }
+
+    function update() {
+      var vh = window.innerHeight || 1;
+      if (strokes.length) {
+        var entered = vh - mono.getBoundingClientRect().top;
+        var p = seg(entered, vh * 0.08, vh * 0.62);
+        for (var i = 0; i < strokes.length; i++) {
+          var s = strokes[i];
+          s.el.style.strokeDashoffset = s.len * (1 - seg(p, s.from, s.to));
+        }
+      }
+      if (heroWrap) {
+        var hp = seg(vh - heroWrap.getBoundingClientRect().top, vh * 0.15, vh * 0.8);
+        heroWrap.style.setProperty('--settle', hp.toFixed(3));
+      }
+    }
+
+    var ticking = false;
+    window.addEventListener('scroll', function () {
+      if (ticking) { return; }
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; update(); });
+    }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
   }
 
   /* ------------------------------------------------------------------ */
