@@ -68,8 +68,6 @@
     initXpBars();
     initHeroBurst();
     initKonami();
-    initJournalTracking();
-    initVisitedStamps();
     initReadProgress();
   });
 
@@ -399,7 +397,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 9. Journal visit tracking (persisted in localStorage)               */
+  /* 9. Journal reading progress bar                                     */
   /* ------------------------------------------------------------------ */
   var TRIPS = {
     travel_2019_siliconvalley: 'Silicon Valley',
@@ -410,65 +408,12 @@
     travel_2024_germany: 'Germany',
     travel_2025_japan: 'Japan'
   };
-  var STORE_KEY = 'nw-game-v1';
-  var state = loadState();
-
-  function loadState() {
-    var base = { journals: {} };
-    try {
-      var raw = localStorage.getItem(STORE_KEY);
-      if (!raw) { return base; }
-      var parsed = JSON.parse(raw);
-      if (!parsed.journals) { parsed.journals = {}; }
-      return parsed;
-    } catch (e) { return base; }
-  }
-
-  function saveState() {
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) { /* private mode */ }
-  }
 
   function pageSlug() {
     var p = window.location.pathname.split('/').pop() || 'index';
     return p.replace(/\.html$/, '') || 'index';
   }
 
-  function initJournalTracking() {
-    var slug = pageSlug();
-    if (TRIPS[slug] && !state.journals[slug]) {
-      state.journals[slug] = 1;
-      saveState();
-    }
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* 10. VISITED stamps on travel cards                                  */
-  /* ------------------------------------------------------------------ */
-  function initVisitedStamps() {
-    var grid = document.querySelector('.travel-grid');
-    if (!grid) { return; }
-    var links = grid.querySelectorAll('a[href]');
-    var stamped = {};
-    for (var i = 0; i < links.length; i++) {
-      var href = links[i].getAttribute('href').replace(/\.html$/, '');
-      if (state.journals[href] && TRIPS[href]) {
-        var card = links[i];
-        while (card && !(card.classList && card.classList.contains('travel-card'))) { card = card.parentNode; }
-        if (card && !stamped[href]) {
-          stamped[href] = 1;
-          card.classList.add('is-visited');
-          var stamp = document.createElement('span');
-          stamp.className = 'travel-stamp';
-          stamp.textContent = 'VISITED';
-          card.appendChild(stamp);
-        }
-      }
-    }
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* 11. Journal reading progress bar                                    */
-  /* ------------------------------------------------------------------ */
   function initReadProgress() {
     if (!TRIPS[pageSlug()]) { return; }
 

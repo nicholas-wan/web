@@ -475,29 +475,6 @@
   transform: translate(-50%, 0);
 }
 
-/* Visited stamp on travel cards */
-.travel-grid .travel-card {
-  position: relative;
-}
-
-.travel-stamp {
-  position: absolute;
-  top: 5.4rem;
-  right: 1rem;
-  z-index: 2;
-  padding: 0.3rem 0.7rem;
-  border: 2px solid rgba(255, 255, 255, 0.9);
-  border-radius: 0.3rem;
-  color: #ffffff;
-  font-size: 0.68rem;
-  font-weight: 900;
-  letter-spacing: 0.18em;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
-  background: rgba(18, 138, 134, 0.75);
-  transform: rotate(8deg);
-  pointer-events: none;
-}
-
 /* Journal reading progress */
 .read-progress {
   position: fixed;
@@ -726,7 +703,7 @@ body {
   }
 }
 
-@import url(https://fonts.googleapis.com/css?family=Raleway);
+/* Raleway is self-hosted via main.css font-face rules */
 
 *,
 *:before,
