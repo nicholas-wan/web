@@ -99,6 +99,21 @@
     var section = document.querySelector('.intro-swipe');
     if (!section) { return; }
     if (reduce) { section.classList.add('is-static'); return; }
+    var photo = section.querySelector('.intro-swipe__photo');
+    var text = section.querySelector('.intro-swipe__text');
+
+    // Measure at rest (--p: 1) so the photo starts exactly at the viewport
+    // center and the text starts fully offstage, whatever the layout width.
+    function measure() {
+      if (window.innerWidth <= 736) { return; }
+      var prev = section.style.getPropertyValue('--p');
+      section.style.setProperty('--p', '1');
+      var pr = photo.getBoundingClientRect();
+      section.style.setProperty('--swipe-photo', ((window.innerWidth / 2) - (pr.left + pr.width / 2)).toFixed(1) + 'px');
+      var tr = text.getBoundingClientRect();
+      section.style.setProperty('--swipe-text', (window.innerWidth - tr.left + 32).toFixed(1) + 'px');
+      if (prev) { section.style.setProperty('--p', prev); }
+    }
 
     function update() {
       if (window.innerWidth <= 736) {
@@ -118,7 +133,14 @@
       ticking = true;
       requestAnimationFrame(function () { ticking = false; update(); });
     }, { passive: true });
-    window.addEventListener('resize', update);
+    window.addEventListener('resize', function () { measure(); update(); });
+    if (document.readyState === 'complete') {
+      measure();
+    } else {
+      // Image dimensions affect the rest layout; re-measure once loaded.
+      window.addEventListener('load', measure);
+      measure();
+    }
     update();
   }
 

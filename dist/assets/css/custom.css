@@ -224,7 +224,7 @@
 .intro-swipe__photo {
   flex: 0 0 auto;
   margin: 0;
-  transform: translateX(calc((1 - var(--p, 1)) * 21vw));
+  transform: translateX(calc((1 - var(--p, 1)) * var(--swipe-photo, 21vw)));
   will-change: transform;
 }
 
@@ -241,7 +241,7 @@
 .intro-swipe__text {
   flex: 0 1 28rem;
   text-align: left;
-  transform: translateX(calc((1 - var(--p, 1)) * 55vw));
+  transform: translateX(calc((1 - var(--p, 1)) * var(--swipe-text, 55vw)));
   opacity: var(--p, 1);
   will-change: transform, opacity;
 }
