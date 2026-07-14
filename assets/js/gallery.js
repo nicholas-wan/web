@@ -1,8 +1,10 @@
 (function () {
-  var containers = Array.prototype.slice.call(document.querySelectorAll('.masonry .content'));
-  var images = containers.map(function (container) {
-    return container.querySelector('.content-image, .citc');
-  }).filter(function (image) { return image && !image.classList.contains('countrylogo'); });
+  var images = Array.prototype.slice.call(document.querySelectorAll('#main img')).filter(function (image, index, candidates) {
+    return !image.classList.contains('countrylogo') &&
+      !image.hasAttribute('data-lightbox-ignore') &&
+      !image.closest('.travel-section-nav, .travel-pagination, .site-pager') &&
+      candidates.indexOf(image) === index;
+  });
   if (!images.length) return;
 
   var overlay = document.createElement('div');
@@ -25,16 +27,18 @@
     var source = images[current];
     viewerImage.src = source.currentSrc || source.src;
     viewerImage.alt = source.alt || 'Gallery image';
-    var title = source.closest('.content')?.querySelector('.content-title, .gallery-caption');
+    var title = source.closest('.content')?.querySelector('.content-title, .gallery-caption') || source.closest('figure')?.querySelector('figcaption');
     caption.textContent = title ? title.textContent.trim() : (source.alt || '');
     overlay.classList.add('is-visible');
     document.body.classList.add('lightbox-open');
   };
   images.forEach(function (image, index) {
     var trigger = image.closest('.content') || image;
+    image.classList.add('journal-lightbox-trigger');
     trigger.setAttribute('tabindex', '0');
     trigger.setAttribute('role', 'button');
-    trigger.addEventListener('click', function () { show(index); });
+    trigger.setAttribute('aria-label', 'Open image: ' + (image.alt || ('journal photo ' + (index + 1))));
+    trigger.addEventListener('click', function (event) { event.preventDefault(); show(index); });
     trigger.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); show(index); } });
   });
   overlay.querySelector('.lightbox__close').addEventListener('click', close);
