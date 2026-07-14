@@ -24,7 +24,7 @@
     if (!years) return;
 
     var bounds = years.getBoundingClientRect();
-    var readingLine = window.innerHeight * 0.56;
+    var readingLine = window.innerHeight * 0.72;
     var progress = (readingLine - bounds.top) / Math.max(bounds.height, 1);
     progress = Math.max(0, Math.min(1, progress));
     years.style.setProperty('--timeline-progress', progress.toFixed(4));
@@ -164,6 +164,21 @@
     button.addEventListener('click', function () {
       openStory(button.getAttribute('data-story-open'));
     });
+
+    if (button.getAttribute('data-story-open') === 'cats' && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      var hoverTimer = null;
+      button.addEventListener('mouseenter', function () {
+        hoverTimer = window.setTimeout(function () {
+          openStory('cats');
+        }, 350);
+      });
+      button.addEventListener('mouseleave', function () {
+        if (hoverTimer !== null) {
+          window.clearTimeout(hoverTimer);
+          hoverTimer = null;
+        }
+      });
+    }
   });
 
   if (dialog) {

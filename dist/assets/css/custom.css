@@ -1704,8 +1704,8 @@ body {
   top: 50%;
   left: 1rem;
   display: block;
-  width: 15.5rem;
-  padding: 0.35rem;
+  width: 18.5rem;
+  padding: 0.45rem;
   border: 1px solid rgba(152, 201, 198, 0.2);
   border-radius: 0.5rem;
   background: rgba(7, 19, 21, 0.96);
@@ -1722,7 +1722,7 @@ body {
 
 .travel-map__journal-link {
   display: grid;
-  grid-template-columns: 3.35rem minmax(0, 1fr);
+  grid-template-columns: 4.25rem minmax(0, 1fr);
   align-items: start;
   gap: 0.55rem;
   border-bottom: 0 !important;
@@ -1750,8 +1750,8 @@ body {
 
 .travel-map__marker-label img {
   display: block;
-  width: 3.35rem;
-  height: 2.55rem;
+  width: 4.25rem;
+  height: 3.2rem;
   margin: 0;
   border-radius: 0.3rem;
   object-fit: cover;
@@ -1769,7 +1769,7 @@ body {
 
 .travel-map__marker-label strong {
   color: #fff;
-  font-size: 0.64rem;
+  font-size: 0.7rem;
   font-weight: 900;
   letter-spacing: 0.045em;
   line-height: 1.15;
@@ -1779,7 +1779,7 @@ body {
 .travel-map__marker-label small {
   margin-top: 0.22rem;
   color: rgba(255, 255, 255, 0.55);
-  font-size: 0.52rem;
+  font-size: 0.56rem;
   letter-spacing: 0.02em;
   line-height: 1.25;
 }
@@ -1791,7 +1791,7 @@ body {
   flex-wrap: wrap;
   gap: 0.25rem;
   margin-top: 0.45rem;
-  margin-left: 3.9rem;
+  margin-left: 4.8rem;
 }
 
 .travel-map__city-links a {
@@ -4856,6 +4856,49 @@ a:focus-visible {
   transition: transform 0.35s ease;
 }
 
+.personal-event-card__image--slideshow {
+  position: relative;
+}
+
+.personal-event-card__image--slideshow img {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: none !important;
+}
+
+.personal-event-card__image--slideshow img:first-child {
+  position: relative;
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .personal-event-card:hover .personal-event-card__image--slideshow img,
+  .personal-event-card:focus-visible .personal-event-card__image--slideshow img {
+    animation: personal-card-slideshow 6s ease-in-out infinite;
+  }
+
+  .personal-event-card:hover .personal-event-card__image--slideshow img:nth-child(2),
+  .personal-event-card:focus-visible .personal-event-card__image--slideshow img:nth-child(2) {
+    animation-delay: 2s;
+  }
+
+  .personal-event-card:hover .personal-event-card__image--slideshow img:nth-child(3),
+  .personal-event-card:focus-visible .personal-event-card__image--slideshow img:nth-child(3) {
+    animation-delay: 4s;
+  }
+}
+
+@keyframes personal-card-slideshow {
+  0%, 29% {
+    opacity: 1;
+  }
+
+  34%, 100% {
+    opacity: 0;
+  }
+}
+
 .personal-event-card__image--contain img {
   padding: 0.75rem;
   object-fit: contain;
@@ -4902,7 +4945,7 @@ a:focus-visible {
 
 .personal-event-card__body > span:not(.personal-event-card__meta):not(.personal-event-card__count):not(.personal-event-card__open) {
   color: #738086;
-  font-weight: 300;
+  font-weight: 300 !important;
 }
 
 .personal-event-card__count {
