@@ -3213,8 +3213,6 @@ a.travel-jump-group__label {
 }
 
 .section-intro--experience::after { content: "\f0b1"; }
-.section-intro--skills::after { content: "\f19d"; }
-.section-intro--personal::after { content: "\f030"; }
 .section-intro--gallery::after { content: "\f015"; }
 
 .section-intro__eyebrow,
