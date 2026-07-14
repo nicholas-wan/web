@@ -1517,6 +1517,9 @@ body {
 .travel-atlas__layout {
   position: relative;
   z-index: 1;
+  width: 100%;
+  max-width: 58rem;
+  margin: 0 auto;
 }
 
 .travel-map {
@@ -1579,6 +1582,29 @@ body {
   background: #fff;
   content: "";
   transform: translate(-50%, -50%);
+}
+
+.travel-map__place {
+  position: absolute;
+  top: 50%;
+  left: 1.2rem;
+  z-index: 1;
+  display: block;
+  padding: 0.18rem 0.34rem;
+  border: 1px solid rgba(152, 201, 198, 0.2);
+  border-radius: 0.25rem;
+  background: rgba(7, 19, 21, 0.88);
+  box-shadow: 0 0.15rem 0.45rem rgba(0, 0, 0, 0.2);
+  color: rgba(255, 255, 255, 0.76);
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.045em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: translateY(-50%);
+  transition: opacity 0.15s ease;
+  white-space: nowrap;
 }
 
 .travel-map__marker-label {
@@ -1655,6 +1681,11 @@ body {
   visibility: visible;
 }
 
+.travel-map__marker:hover .travel-map__place,
+.travel-map__marker:focus .travel-map__place {
+  opacity: 0;
+}
+
 .travel-map__marker:focus-visible {
   border-radius: 50%;
   outline: 0.16rem solid #fff;
@@ -1668,6 +1699,45 @@ body {
 .travel-map__marker--japan { top: 37%; left: 87.6%; }
 .travel-map__marker--perth { top: 78.5%; left: 79%; }
 .travel-map__marker--australia { top: 82%; left: 87.2%; }
+
+.travel-map__marker--silicon-valley .travel-map__place {
+  top: 1.35rem;
+  right: 0.75rem;
+  left: auto;
+}
+
+.travel-map__marker--usa-canada .travel-map__place {
+  top: -0.85rem;
+  left: 0.7rem;
+}
+
+.travel-map__marker--europe .travel-map__place {
+  top: 1.35rem;
+  right: 0.7rem;
+  left: auto;
+}
+
+.travel-map__marker--germany .travel-map__place {
+  top: -0.85rem;
+  left: 0.7rem;
+}
+
+.travel-map__marker--japan .travel-map__place {
+  right: 0.8rem;
+  left: auto;
+}
+
+.travel-map__marker--perth .travel-map__place {
+  top: -0.85rem;
+  right: 0.7rem;
+  left: auto;
+}
+
+.travel-map__marker--australia .travel-map__place {
+  top: 1.35rem;
+  right: 0.7rem;
+  left: auto;
+}
 
 .travel-map__marker--europe .travel-map__marker-label,
 .travel-map__marker--japan .travel-map__marker-label,
@@ -1729,6 +1799,10 @@ body {
     margin-top: 0.8rem !important;
   }
 
+  .travel-atlas__layout {
+    max-width: none;
+  }
+
 }
 
 @media screen and (max-width: 520px) {
@@ -1744,6 +1818,12 @@ body {
   .travel-map__marker-dot {
     width: 0.85rem;
     height: 0.85rem;
+  }
+
+  .travel-map__place {
+    padding: 0.13rem 0.22rem;
+    font-size: 0.4rem;
+    letter-spacing: 0.02em;
   }
 
   .travel-map__hint {
@@ -2642,6 +2722,38 @@ body {
 .education-period {
   color: #5c6d73;
   font-size: 0.82rem;
+}
+
+/* Quieter, more compact desktop section navigation. */
+@media screen and (min-width: 981px) {
+  #nav {
+    height: 3.25rem;
+    margin-top: -3.25rem;
+    padding-right: 1rem;
+    background: rgba(7, 19, 21, 0.36);
+    line-height: 3.25rem;
+  }
+
+  #nav ul.links li a {
+    padding: 0 1.25rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.065em;
+  }
+
+  #nav ul.links li.active {
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 -2px 0 rgba(40, 215, 197, 0.72);
+  }
+
+  #nav ul.links li.active a,
+  #nav ul.links li.active a:hover {
+    color: #ffffff !important;
+  }
+
+  #nav ul.icons a {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
 }
 
 #navPanelToggle,

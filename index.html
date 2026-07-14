@@ -66,7 +66,6 @@
 					<section class="intro-swipe" id="about-me" aria-label="Introduction">
 						<div class="intro-swipe__stage">
 							<header class="major intro-swipe__head" style="margin:0;">
-								<span class="date"><div id="para1"></div></span>
 								<h2>About me</h2>
 							</header>
 							<div class="intro-swipe__row">
@@ -128,17 +127,6 @@
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
 	<script src="assets/js/arrow.js"></script>
-	<script>
-		document.getElementById("para1").innerHTML = formatAMPM();
-
-		function formatAMPM() {
-		var d = new Date(),
-
-		    months = ['January','Febuary','March','April','May','June','July','August','September','October','November','December'],
-		    days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-		return days[d.getDay()]+', '+months[d.getMonth()]+' '+d.getDate();
-		}
-	</script>
 	<script>
 	var hands = [];
 		hands.push(document.querySelector('#secondhand > *'));
