@@ -2338,6 +2338,34 @@ body {
   text-transform: uppercase;
 }
 
+.guangzhou-route {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.65rem;
+  margin-top: 0.55rem;
+}
+
+.guangzhou-route__stop {
+  display: inline-flex;
+  flex-direction: column;
+  color: var(--color-ink-900);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.guangzhou-route__stop small {
+  color: var(--color-ink-500);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+}
+
+.guangzhou-route i {
+  color: var(--color-brand-600);
+  font-style: normal;
+}
+
 .guangzhou-day__note {
   width: 100%;
   max-width: none;
@@ -2365,25 +2393,20 @@ body {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.guangzhou-day--compact .masonry.mason4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .guangzhou-day--compact .masonry .brick {
   display: block;
   width: 100%;
   margin: 0;
 }
 
-.guangzhou-day--arrival .masonry {
-  max-width: 44rem;
-  margin-right: auto;
-  margin-left: auto;
-}
-
-.guangzhou-day--arrival .content-image {
-  height: clamp(14rem, 22vw, 18rem);
+.guangzhou-day--compact .masonry .content-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
   object-fit: cover;
-}
-
-.guangzhou-day--arrival .guangzhou-day__image--cathedral {
-  object-position: center 28%;
 }
 
 .guangzhou-journal .content-details {
@@ -2433,7 +2456,8 @@ body {
 
   .guangzhou-day--compact .masonry,
   .guangzhou-day--compact .masonry.mason2,
-  .guangzhou-day--compact .masonry.mason3 {
+  .guangzhou-day--compact .masonry.mason3,
+  .guangzhou-day--compact .masonry.mason4 {
     display: grid;
     grid-template-columns: none;
     grid-auto-columns: min(76vw, 18rem);
@@ -2454,10 +2478,6 @@ body {
     margin: 0;
     break-inside: avoid;
     scroll-snap-align: start;
-  }
-
-  .guangzhou-day--arrival .content-image {
-    height: 14rem;
   }
 
   .guangzhou-journal .content-overlay {
