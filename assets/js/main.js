@@ -273,8 +273,8 @@ var TxtRotate = function(el, toRotate, period) {
   this.loopNum = 0;
   this.period = parseInt(period, 10) || 2000;
   this.txt = '';
-  this.tick();
   this.isDeleting = false;
+  this.tick();
 };
 
 TxtRotate.prototype.tick = function() {
@@ -308,21 +308,26 @@ TxtRotate.prototype.tick = function() {
   }, delta);
 };
 
-window.onload = function() {
+window.addEventListener('load', function() {
   var elements = document.getElementsByClassName('txt-rotate');
   for (var i=0; i<elements.length; i++) {
     var toRotate = elements[i].getAttribute('data-rotate');
     var period = elements[i].getAttribute('data-period');
     if (toRotate) {
-      new TxtRotate(elements[i], JSON.parse(toRotate), period);
+      var phrases = JSON.parse(toRotate);
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        elements[i].innerHTML = '<span class="wrap">' + phrases[0] + '</span>';
+      } else {
+        new TxtRotate(elements[i], phrases, period);
+      }
     }
   }
   // INJECT CSS
   var css = document.createElement("style");
   css.type = "text/css";
-  css.innerHTML = ".txt-rotate > .wrap { border-right: 0.08em solid #666 }";
+  css.innerHTML = ".txt-rotate > .wrap { border-right: 0.08em solid #55d1cc }";
   document.body.appendChild(css);
-};
+});
 
 
 
