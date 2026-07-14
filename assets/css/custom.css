@@ -1407,7 +1407,13 @@ body {
 
 #intro .portfolio-hero__typewriter {
   min-height: 1.9rem;
-  letter-spacing: 0.02em;
+  color: #fff;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: 0.075em;
+  line-height: 1.3;
+  text-transform: uppercase;
 }
 
 #intro .portfolio-hero__typewriter .wrap {
@@ -1666,6 +1672,76 @@ body {
   background: #e9f6f5;
   color: #128a86;
   font-size: 1.2rem;
+}
+
+.case-study__company {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.1rem;
+  text-align: left;
+}
+
+.case-study--lead > .case-study__company {
+  margin: 1.6rem 2.25rem 0;
+}
+
+.company-mark {
+  display: inline-grid;
+  flex: 0 0 auto;
+  min-width: 3.5rem;
+  min-height: 2.35rem;
+  padding: 0.35rem 0.5rem;
+  place-items: center;
+  border-radius: 0.4rem;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.company-mark--dsta {
+  background: #102d34;
+  color: #69d8d2;
+}
+
+.company-mark--shopee {
+  background: #ee4d2d;
+  color: #fff;
+  font-size: 0.74rem;
+  text-transform: lowercase;
+}
+
+.company-mark--league {
+  background: #3e5b99;
+  color: #fff;
+  font-size: 0.68rem;
+  text-transform: lowercase;
+}
+
+.case-study__company-label,
+.case-study__company-role {
+  display: block;
+}
+
+.case-study__company-label {
+  color: #20343d;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 0.8rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.case-study__company-role {
+  margin-top: 0.2rem;
+  color: #65767d;
+  font-size: 0.78rem;
+  line-height: 1.35;
 }
 
 .case-study header {
@@ -2132,6 +2208,7 @@ body {
   }
 
   .case-study--lead > header,
+  .case-study--lead > .case-study__company,
   .case-study--lead > .case-study__facts,
   .case-study--lead > .case-study__decisions,
   .case-study--lead > .case-study__tags {
@@ -2141,6 +2218,10 @@ body {
 
   .case-study--lead > header {
     margin-top: 1.4rem;
+  }
+
+  .case-study--lead > .case-study__company {
+    margin-top: 1.25rem;
   }
 
   .case-study--lead > .case-study__tags {
