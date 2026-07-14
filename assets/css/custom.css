@@ -2407,6 +2407,37 @@ body {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
+  object-position: var(--focus-x, 50%) var(--focus-y, 50%);
+}
+
+.guangzhou-day--compact img[src$="sacred-heart-cathedral.webp"],
+.guangzhou-day--compact img[src$="guangzhou-ice-cream.webp"],
+.guangzhou-day--compact img[src$="yongqingfang-relief.webp"],
+.guangzhou-day--compact img[src$="yuexiu-zhenhai-tower.webp"],
+.guangzhou-day--compact img[src$="toucan.webp"],
+.guangzhou-day--compact img[src$="panda-walk.gif"] {
+  --focus-y: 43%;
+}
+
+.guangzhou-day--compact img[src$="yuexiu-cat.webp"],
+.guangzhou-day--compact img[src$="chimelong-monkey.webp"],
+.guangzhou-day--compact img[src$="koala.webp"],
+.guangzhou-day--compact img[src$="moxing-summit-couple.webp"],
+.guangzhou-day--compact img[src$="baiyun-cable-car.webp"] {
+  --focus-y: 47%;
+}
+
+.guangzhou-day--compact img[src$="pet-shop-kittens.webp"],
+.guangzhou-day--compact img[src$="roast-duck-wraps.webp"],
+.guangzhou-day--compact img[src$="chagee-tea.webp"],
+.guangzhou-day--compact img[src$="hotpot-dinner.webp"],
+.guangzhou-day--compact img[src$="meal-collage-four.webp"],
+.guangzhou-day--compact img[src$="meal-collage-five.webp"] {
+  --focus-y: 56%;
+}
+
+.guangzhou-day--compact img[src$="roast-duck-wraps.webp"] {
+  --focus-x: 56%;
 }
 
 .guangzhou-journal .content-details {
@@ -2452,6 +2483,61 @@ body {
   .guangzhou-day__note {
     width: 100%;
     max-width: none;
+  }
+
+  .guangzhou-day__route {
+    padding: 0.8rem 0.85rem;
+  }
+
+  .guangzhou-route {
+    display: grid;
+    gap: 0;
+    margin-top: 0.65rem;
+    counter-reset: route-stop;
+  }
+
+  .guangzhou-route__stop {
+    position: relative;
+    display: flex;
+    min-width: 0;
+    padding: 0.05rem 0 0.8rem 1.85rem;
+    counter-increment: route-stop;
+  }
+
+  .guangzhou-route__stop::before {
+    content: counter(route-stop);
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: grid;
+    width: 1.35rem;
+    height: 1.35rem;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-brand-600);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 0.58rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .guangzhou-route__stop:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 1.35rem;
+    bottom: 0;
+    left: 0.65rem;
+    width: 1px;
+    background: color-mix(in srgb, var(--color-brand-600) 35%, transparent);
+  }
+
+  .guangzhou-route__stop:last-child {
+    padding-bottom: 0.1rem;
+  }
+
+  .guangzhou-route i {
+    display: none;
   }
 
   .guangzhou-day--compact .masonry,
@@ -3640,8 +3726,8 @@ a.travel-jump-group__label {
 }
 
 .travel-pagination {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  justify-content: space-between;
   gap: 1rem;
   margin: 3rem auto 1rem;
   padding: 0 1rem;
@@ -3650,7 +3736,10 @@ a.travel-jump-group__label {
 
 .travel-pagination a {
   display: flex;
-  min-height: 5.1rem;
+  min-width: 0;
+  max-width: 25rem;
+  min-height: 4.5rem;
+  flex: 1 1 0;
   flex-direction: column;
   justify-content: center;
   padding: 0.8rem 1rem;
@@ -3689,6 +3778,10 @@ a.travel-jump-group__label {
 .site-pager__link--next {
   align-items: flex-end;
   text-align: right;
+}
+
+.travel-pagination__next {
+  margin-left: auto;
 }
 
 .site-pager {
@@ -3964,7 +4057,7 @@ a:focus-visible {
   }
 
   .travel-pagination a {
-    min-height: 4.6rem;
+    min-height: 4.25rem;
     padding: 0.7rem 0.8rem;
   }
 
