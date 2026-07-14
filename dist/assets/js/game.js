@@ -300,7 +300,7 @@
   function initTilt() {
     if (reduce) { return; }
     if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) { return; }
-    var sel = '.homepage-link, .travel-grid .travel-card, .education-grid .education-card';
+    var sel = '.travel-grid .travel-card, .education-grid .education-card';
     var els = document.querySelectorAll(sel);
     for (var i = 0; i < els.length; i++) {
       var el = els[i];

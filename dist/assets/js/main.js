@@ -363,7 +363,7 @@ var ball = {
 
 // Line
    link_line_width = 0.8,
-   dis_limit = 260,
+   dis_limit = 210,
    add_mouse_point = true,
    mouse_in = false,
    mouse_ball = {
@@ -505,7 +505,7 @@ function renderLines(){
            fraction = getDisOf(balls[i], balls[j]) / dis_limit;
 
            if(fraction < 1){
-               alpha = (1 - fraction).toString();
+               alpha = ((1 - fraction) * 0.45).toString();
 
                ctx.strokeStyle = 'rgba(150,150,150,'+alpha+')';
                ctx.lineWidth = link_line_width;
@@ -530,7 +530,7 @@ function getDisOf(b1, b2){
 
 // add balls if there a little balls
 function addBallIfy(){
-    if(balls.length < 20){
+    if(balls.length < 14){
         balls.push(getRandomBall());
     }
 }
@@ -583,7 +583,7 @@ window.addEventListener('resize', function(e){
 function goMovie(){
     initCanvas();
     if(!balls.length){
-        initBalls(30);
+        initBalls(20);
     }
     if(!document.hidden && !canvasRunning){
         canvasRunning = true;
