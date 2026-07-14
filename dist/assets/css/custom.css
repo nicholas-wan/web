@@ -449,6 +449,94 @@
 .homepage-link:nth-child(2)::before { content: "\f19d"; }
 .homepage-link:nth-child(3)::before { content: "\f072"; }
 
+/* Homepage cards use real icon elements so their motion can be tied to the
+   same reversible scroll progress as the card entrance. */
+.homepage .homepage-link::before {
+  content: none;
+}
+
+.homepage-link__icon {
+  position: absolute;
+  top: 0.9rem;
+  right: 1rem;
+  z-index: 1;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  color: #128a86;
+  opacity: var(--ip, 1);
+  pointer-events: none;
+  transform-origin: center;
+  will-change: transform, opacity;
+  transition: opacity 0.18s linear, transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.homepage-link__icon::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(18, 138, 134, 0.24);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(47, 215, 207, 0.22), rgba(18, 138, 134, 0.05) 65%, transparent 67%);
+  box-shadow: 0 0 1.1rem rgba(18, 138, 134, 0.3);
+  opacity: calc(0.14 + var(--pulse, 0) * 0.72);
+  transform: scale(calc(0.72 + var(--ip, 1) * 0.28 + var(--pulse, 0) * 0.18));
+  transition: opacity 0.18s linear, transform 0.18s ease;
+}
+
+.homepage-link__icon > .icon {
+  position: relative;
+  z-index: 1;
+  font-size: 1.65rem;
+  line-height: 1;
+  transform: translate(var(--icon-x, 0), var(--icon-y, 0));
+  transition: transform 0.18s ease;
+}
+
+.homepage-link__icon--experience {
+  transform:
+    translateY(calc((1 - var(--ip, 1)) * 1.35rem))
+    rotate(calc((1 - var(--ip, 1)) * -10deg))
+    scale(calc(0.72 + var(--ip, 1) * 0.28));
+}
+
+.homepage-link__icon--education {
+  transform:
+    translateY(calc((1 - var(--ip, 1)) * -1.55rem))
+    rotate(calc((1 - var(--ip, 1)) * 14deg))
+    scale(calc(0.72 + var(--ip, 1) * 0.28));
+}
+
+.homepage-link__icon--travel {
+  transform:
+    translate(
+      calc((1 - var(--ip, 1)) * -2.35rem),
+      calc((1 - var(--ip, 1)) * 1.55rem)
+    )
+    rotate(calc((1 - var(--ip, 1)) * -18deg))
+    scale(calc(0.72 + var(--ip, 1) * 0.28));
+}
+
+.homepage-link__icon--travel::after {
+  content: "";
+  position: absolute;
+  top: 1.95rem;
+  right: 2rem;
+  width: 2.4rem;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(18, 138, 134, 0.72));
+  opacity: calc((1 - var(--ip, 1)) * 0.8);
+  transform: rotate(-27deg) scaleX(calc(1 - var(--ip, 1)));
+  transform-origin: right center;
+}
+
+.homepage-link:hover .homepage-link__icon > .icon,
+.homepage-link:focus-visible .homepage-link__icon > .icon {
+  transform: translate(var(--icon-x, 0), var(--icon-y, 0)) scale(1.12) rotate(-5deg);
+}
+
 .homepage-link__desc {
   color: #596273;
   font-size: 0.9rem;
@@ -523,6 +611,16 @@
   opacity: var(--cp, 1);
   transform: translateY(calc((1 - var(--cp, 1)) * 48px));
   transition: border-color 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, opacity 0.25s linear;
+}
+
+.homepage-link[data-scrub]::after {
+  background: linear-gradient(90deg, #128a86, #2fd7cf) top left / calc(var(--ip, 0) * 100%) 2px no-repeat;
+  opacity: calc(var(--pulse, 0) * 0.82);
+}
+
+.homepage-link[data-scrub]:hover::after,
+.homepage-link[data-scrub]:focus-visible::after {
+  opacity: 1;
 }
 
 /* Skill XP bars */
@@ -628,6 +726,16 @@
   }
   .homepage-link {
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .homepage-link__icon,
+  .homepage-link__icon::before,
+  .homepage-link__icon > .icon {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .homepage-link__icon--travel::after {
+    display: none;
   }
 }
 
