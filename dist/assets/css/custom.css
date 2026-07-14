@@ -1438,14 +1438,14 @@ body {
   position: relative;
   margin: 0 2rem;
   padding: 2rem;
-  border: 1px solid #24464b;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-card);
   background:
-    radial-gradient(circle at 16% 0%, rgba(40, 215, 197, 0.12), transparent 30rem),
-    linear-gradient(145deg, #071315 0%, #0a1b1f 58%, #0e2427 100%);
-  color: rgba(255, 255, 255, 0.78);
+    radial-gradient(circle at 16% 0%, rgba(18, 138, 134, 0.08), transparent 30rem),
+    #ffffff;
+  color: var(--color-ink-600);
   overflow: hidden;
-  box-shadow: 0 1rem 2.5rem rgba(3, 14, 30, 0.16);
+  box-shadow: var(--shadow-card);
 }
 
 .travel-atlas::after {
@@ -1454,11 +1454,11 @@ body {
   bottom: -8rem;
   width: 20rem;
   height: 20rem;
-  border: 1px solid rgba(40, 215, 197, 0.08);
+  border: 1px solid rgba(18, 138, 134, 0.08);
   border-radius: 50%;
   box-shadow:
-    0 0 0 3rem rgba(40, 215, 197, 0.025),
-    0 0 0 6rem rgba(40, 215, 197, 0.018);
+    0 0 0 3rem rgba(18, 138, 134, 0.025),
+    0 0 0 6rem rgba(18, 138, 134, 0.018);
   content: "";
   pointer-events: none;
 }
@@ -1474,7 +1474,7 @@ body {
 }
 
 .travel-atlas__eyebrow {
-  color: #28d7c5;
+  color: var(--color-brand-600);
   font-family: var(--font-display);
   font-size: 0.7rem;
   font-weight: 900;
@@ -1484,14 +1484,14 @@ body {
 
 .travel-atlas__header h2 {
   margin: 0.3rem 0 0.4rem;
-  color: #fff;
+  color: var(--color-ink-900);
   font-size: 2rem;
   line-height: 1.15;
 }
 
 .travel-atlas__header p {
   margin: 0;
-  color: rgba(255, 255, 255, 0.68);
+  color: var(--color-ink-500);
   font-size: 0.88rem;
   text-align: left;
 }
@@ -1505,13 +1505,13 @@ body {
 }
 
 .travel-atlas__summary strong {
-  color: #ffb869;
+  color: var(--color-brand-700);
   font-size: 1.1rem;
 }
 
 .travel-atlas__summary span {
   margin: 0 0.35rem;
-  color: #24464b;
+  color: var(--color-border);
 }
 
 .travel-atlas__layout {
@@ -1525,12 +1525,12 @@ body {
 .travel-map {
   min-width: 0;
   padding: 0.75rem 0.75rem 0.55rem;
-  border: 1px solid rgba(152, 201, 198, 0.13);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-compact);
   background:
-    linear-gradient(rgba(152, 201, 198, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(152, 201, 198, 0.035) 1px, transparent 1px),
-    rgba(255, 255, 255, 0.018);
+    linear-gradient(rgba(18, 138, 134, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(18, 138, 134, 0.045) 1px, transparent 1px),
+    var(--color-surface-subtle);
   background-size: 3rem 3rem;
 }
 
@@ -1546,8 +1546,8 @@ body {
   height: 100%;
   margin: 0;
   object-fit: contain;
-  opacity: 0.48;
-  filter: invert(79%) sepia(13%) saturate(754%) hue-rotate(128deg) brightness(88%) contrast(83%);
+  opacity: 0.32;
+  filter: invert(44%) sepia(31%) saturate(888%) hue-rotate(128deg) brightness(92%) contrast(87%);
   pointer-events: none;
 }
 
@@ -1558,7 +1558,7 @@ body {
   width: 1rem;
   height: 1rem;
   border: 0 !important;
-  color: #fff !important;
+  color: var(--color-ink-900) !important;
   transform: translate(-50%, -50%);
 }
 
@@ -1567,12 +1567,12 @@ body {
   display: block;
   width: 1rem;
   height: 1rem;
-  border: 0.18rem solid #071315;
+  border: 0.18rem solid #fff;
   border-radius: 50%;
-  background: #28d7c5;
+  background: var(--color-brand-600);
   box-shadow:
-    0 0 0 0.12rem rgba(40, 215, 197, 0.55),
-    0 0.35rem 0.8rem rgba(0, 0, 0, 0.35);
+    0 0 0 0.12rem rgba(18, 138, 134, 0.28),
+    0 0.25rem 0.65rem rgba(3, 14, 30, 0.18);
   transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -1594,11 +1594,11 @@ body {
   left: 1.35rem;
   display: block;
   padding: 0.3rem 0.48rem;
-  border: 1px solid rgba(152, 201, 198, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: 999px;
-  background: rgba(7, 19, 21, 0.9);
-  box-shadow: 0 0.25rem 0.6rem rgba(0, 0, 0, 0.2);
-  color: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 0.25rem 0.6rem rgba(3, 14, 30, 0.1);
+  color: var(--color-ink-700);
   font-family: var(--font-display);
   font-size: 0.56rem;
   font-weight: 800;
@@ -1615,20 +1615,20 @@ body {
   background: #ffb869;
   box-shadow:
     0 0 0 0.18rem rgba(255, 184, 105, 0.28),
-    0 0.35rem 0.8rem rgba(0, 0, 0, 0.35);
+    0 0.35rem 0.8rem rgba(3, 14, 30, 0.2);
   transform: scale(1.18);
 }
 
 .travel-map__marker:hover .travel-map__marker-label,
 .travel-map__marker:focus .travel-map__marker-label {
   border-color: rgba(255, 184, 105, 0.55);
-  background: #10292c;
-  color: #fff;
+  background: #fffaf4;
+  color: var(--color-ink-900);
 }
 
 .travel-map__marker:focus-visible {
   border-radius: 50%;
-  outline: 0.16rem solid #fff;
+  outline: 0.16rem solid var(--color-brand-700);
   outline-offset: 0.25rem;
 }
 
@@ -1660,7 +1660,7 @@ body {
   align-items: center;
   gap: 0.45rem;
   margin: 0.3rem 0 0;
-  color: rgba(255, 255, 255, 0.48);
+  color: var(--color-ink-500);
   font-family: var(--font-display);
   font-size: 0.68rem;
   letter-spacing: 0.08em;
@@ -1669,7 +1669,7 @@ body {
 }
 
 .travel-map__hint span {
-  color: #28d7c5;
+  color: var(--color-brand-600);
   font-size: 0.55rem;
 }
 
@@ -1678,9 +1678,9 @@ body {
   flex-direction: column;
   min-width: 0;
   padding: 0.25rem 0.8rem;
-  border: 1px solid rgba(152, 201, 198, 0.13);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-compact);
-  background: rgba(255, 255, 255, 0.025);
+  background: var(--color-surface-subtle);
 }
 
 .travel-atlas__journal {
@@ -1692,8 +1692,8 @@ body {
   min-height: 3.5rem;
   padding: 0.55rem 0.15rem;
   border: 0 !important;
-  border-bottom: 1px solid rgba(152, 201, 198, 0.1) !important;
-  color: #fff !important;
+  border-bottom: 1px solid var(--color-border-soft) !important;
+  color: var(--color-ink-900) !important;
   text-decoration: none;
 }
 
@@ -1707,10 +1707,10 @@ body {
   height: 2rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid #24464b;
+  border: 1px solid var(--color-brand-border);
   border-radius: 50%;
-  background: #0e2024;
-  color: #72ddd5;
+  background: var(--color-brand-wash);
+  color: var(--color-brand-700);
   font-family: var(--font-display);
   font-size: 0.58rem;
   font-weight: 900;
@@ -1728,7 +1728,7 @@ body {
 }
 
 .travel-atlas__journal strong {
-  color: #fff;
+  color: var(--color-ink-800);
   font-family: var(--font-display);
   font-size: 0.76rem;
   font-weight: 800;
@@ -1739,13 +1739,13 @@ body {
 
 .travel-atlas__journal small {
   margin-top: 0.16rem;
-  color: rgba(255, 255, 255, 0.48);
+  color: var(--color-ink-500);
   font-size: 0.63rem;
   line-height: 1.35;
 }
 
 .travel-atlas__arrow {
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--color-ink-500);
   font-family: var(--font-display);
   font-size: 0.85rem;
   transition: color 0.2s ease, transform 0.2s ease;
@@ -1753,8 +1753,8 @@ body {
 
 .travel-atlas__journal:hover .travel-atlas__code,
 .travel-atlas__journal:focus .travel-atlas__code {
-  border-color: #28d7c5;
-  background: #123135;
+  border-color: var(--color-brand-600);
+  background: var(--color-brand-600);
   color: #fff;
 }
 
@@ -1766,7 +1766,7 @@ body {
 
 .travel-atlas__journal:focus-visible {
   border-radius: 0.25rem;
-  outline: 0.14rem solid #fff;
+  outline: 0.14rem solid var(--color-brand-700);
   outline-offset: 0.14rem;
 }
 
@@ -1787,7 +1787,7 @@ body {
 
   .travel-atlas__journal:nth-child(even) {
     padding-left: 0.8rem;
-    border-left: 1px solid rgba(152, 201, 198, 0.1) !important;
+    border-left: 1px solid var(--color-border-soft) !important;
   }
 }
 
@@ -2003,7 +2003,7 @@ body {
   min-height: 1.9rem;
   max-width: min(43rem, calc(100vw - 3rem));
   color: var(--color-surface);
-  font-family: var(--font-typewriter);
+  font-family: var(--font-body);
   font-size: clamp(1.15rem, 2vw, 1.55rem);
   font-weight: 700;
   letter-spacing: 0.025em;
