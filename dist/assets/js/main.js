@@ -720,3 +720,78 @@ canvas.addEventListener('mousemove', function(e){
 		});
 	});
 })();
+
+// Figma-led motion language: staggered reveals, a restrained signal-panel tilt,
+// and a reduced-motion path that keeps every interaction fully usable.
+(function() {
+	var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+	var selectors = [
+		'.intro-swipe__stage',
+		'.homepage-link',
+		'.case-study',
+		'.internship-group__label',
+		'.earlier-work',
+		'.education-card',
+		'.toolkit-card',
+		'.travel-card',
+		'.section-intro'
+	];
+	var revealTargets = Array.prototype.slice.call(document.querySelectorAll(selectors.join(',')));
+
+	revealTargets.forEach(function(target, index) {
+		target.classList.add('reveal-on-scroll');
+		target.style.setProperty('--reveal-delay', ((index % 4) * 80) + 'ms');
+	});
+
+	document.body.classList.add('motion-ready');
+
+	if (reducedMotion || !('IntersectionObserver' in window)) {
+		revealTargets.forEach(function(target) {
+			target.classList.add('is-visible');
+		});
+	} else {
+		var observer = new IntersectionObserver(function(entries) {
+			entries.forEach(function(entry) {
+				if (!entry.isIntersecting) return;
+				entry.target.classList.add('is-visible');
+				observer.unobserve(entry.target);
+			});
+		}, {
+			rootMargin: '0px 0px -8% 0px',
+			threshold: 0.08
+		});
+
+		revealTargets.forEach(function(target) {
+			observer.observe(target);
+		});
+	}
+
+	var signalPanel = document.querySelector('.hero-signal');
+	var precisePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+	if (!signalPanel || reducedMotion || !precisePointer) return;
+
+	var frameRequested = false;
+	var pointerX = 0;
+	var pointerY = 0;
+
+	function paintTilt() {
+		var bounds = signalPanel.getBoundingClientRect();
+		var relativeX = (pointerX - bounds.left) / bounds.width - 0.5;
+		var relativeY = (pointerY - bounds.top) / bounds.height - 0.5;
+		signalPanel.style.transform = 'perspective(900px) rotateX(' + (-relativeY * 2.4) + 'deg) rotateY(' + (relativeX * 3.2) + 'deg) translateY(-2px)';
+		frameRequested = false;
+	}
+
+	signalPanel.addEventListener('pointermove', function(event) {
+		pointerX = event.clientX;
+		pointerY = event.clientY;
+		if (!frameRequested) {
+			frameRequested = true;
+			window.requestAnimationFrame(paintTilt);
+		}
+	});
+
+	signalPanel.addEventListener('pointerleave', function() {
+		signalPanel.style.transform = '';
+	});
+})();
