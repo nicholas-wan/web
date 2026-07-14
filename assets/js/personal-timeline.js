@@ -7,7 +7,7 @@
   var years = timeline.querySelector('[data-timeline-years]');
   var events = Array.prototype.slice.call(timeline.querySelectorAll('[data-timeline-event]'));
   var storyButtons = Array.prototype.slice.call(timeline.querySelectorAll('[data-story-open]'));
-  var dialog = timeline.querySelector('[data-story-dialog]');
+  var dialog = document.querySelector('[data-story-dialog]');
   var stories = dialog ? Array.prototype.slice.call(dialog.querySelectorAll('[data-story]')) : [];
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var duration = parseInt(timeline.getAttribute('data-slide-duration'), 10) || 6500;
@@ -122,6 +122,8 @@
     stories.forEach(function (story) {
       story.classList.toggle('is-active', story === activeStory);
     });
+    dialog.classList.toggle('personal-story-dialog--instagram', storyId === 'cats');
+    dialog.classList.toggle('personal-story-dialog--orientation', storyId === 'orientation');
 
     activeStory.style.setProperty('--story-duration', duration + 'ms');
     activeSlide = 0;

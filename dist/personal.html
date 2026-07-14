@@ -15,7 +15,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="stylesheet" href="assets/css/main.css" />
 
-    <link rel="stylesheet" href="assets/css/custom.css?v=71" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=72" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
 </head>
@@ -47,12 +47,8 @@
 							<header class="personal-timeline__intro">
 								<span class="personal-timeline__eyebrow">Personal</span>
 								<h1 id="personal-timeline-title">Life outside work</h1>
-								<p>Projects, communities, and memories from 2016 to today.</p>
+								<p>Projects, communities, and memories beyond work.</p>
 							</header>
-
-							<div class="personal-timeline__guide">
-								<p><strong>Scroll through the years.</strong> Select a moment to see more.</p>
-							</div>
 
 							<div class="personal-timeline__years" data-timeline-years>
 								<div class="personal-timeline__line" aria-hidden="true"><span data-timeline-progress></span></div>
@@ -154,25 +150,15 @@
 									<h2 id="personal-year-2018">2018</h2>
 									<div class="personal-timeline-year__events">
 										<article class="personal-timeline-event personal-timeline-event--right" data-timeline-event data-category="community">
-											<div class="personal-event-card personal-event-card--static">
+											<button class="personal-event-card" type="button" data-story-open="orientation" aria-haspopup="dialog">
 												<span class="personal-event-card__image"><img src="images/personal/gamora.jpg" alt="GAMORA orientation group at the beach" width="1024" height="689" srcset="images/personal/gamora.jpg 1024w, images/personal/gamora-800.jpg 800w" sizes="(max-width: 736px) 100vw, 800px" decoding="async" loading="lazy" /></span>
 												<span class="personal-event-card__body">
-													<span class="personal-event-card__meta">28&ndash;31 July 2018 &middot; Community</span>
-													<strong>Orientation Week</strong>
-													<span>I led GAMORA in House Venus during the School of Computing's Orientation Week.</span>
+													<span class="personal-event-card__meta">23&ndash;31 July 2018 &middot; Community</span>
+													<strong>Two Orientation Communities</strong>
+													<span>I supported NOVA at CAPT before leading GAMORA during the School of Computing's Orientation Week.</span>
+													<span class="personal-event-card__open">View both memories <span aria-hidden="true">&rarr;</span></span>
 												</span>
-											</div>
-										</article>
-
-										<article class="personal-timeline-event personal-timeline-event--left" data-timeline-event data-category="community">
-											<div class="personal-event-card personal-event-card--static">
-												<span class="personal-event-card__image"><img src="images/personal/nova.jpg" alt="NOVA freshmen orientation group photograph" width="1024" height="683" srcset="images/personal/nova.jpg 1024w, images/personal/nova-800.jpg 800w" sizes="(max-width: 736px) 100vw, 800px" decoding="async" loading="lazy" /></span>
-												<span class="personal-event-card__body">
-													<span class="personal-event-card__meta">23&ndash;27 July 2018 &middot; Community</span>
-													<strong>Freshmen Orientation</strong>
-													<span>I supported NOVA in House Phoenix during CAPT's Freshmen Orientation Camp.</span>
-												</span>
-											</div>
+											</button>
 										</article>
 
 										<article class="personal-timeline-event personal-timeline-event--right" data-timeline-event data-category="community">
@@ -210,9 +196,9 @@
 
 						</section>
 
-						<dialog class="personal-story-dialog personal-story-dialog--instagram" data-story-dialog aria-labelledby="cats-story-title">
+						<dialog class="personal-story-dialog" data-story-dialog aria-label="Personal memory">
 							<div class="personal-story-dialog__shell">
-								<button class="personal-story-dialog__close" type="button" data-story-close aria-label="Close Instagram popup">&times;</button>
+								<button class="personal-story-dialog__close" type="button" data-story-close aria-label="Close memory popup">&times;</button>
 								<article class="personal-story personal-story--instagram" data-story="cats">
 									<section class="cats-instagram" aria-labelledby="cats-story-title">
 										<header class="cats-instagram__header">
@@ -229,6 +215,22 @@
 											<noscript><p class="cats-instagram__fallback">Instagram needs JavaScript to display the live profile. <a href="https://www.instagram.com/twoshotsofcuteness/" target="_blank" rel="noopener noreferrer">Open @twoshotsofcuteness</a>.</p></noscript>
 										</div>
 									</section>
+								</article>
+								<article class="personal-story personal-story--orientation" data-story="orientation" aria-labelledby="orientation-story-title">
+									<header class="orientation-memory__heading">
+										<span>23&ndash;31 July 2018 &middot; Community</span>
+										<h2 id="orientation-story-title">Two orientation communities</h2>
+									</header>
+									<div class="orientation-memory__grid">
+										<section class="orientation-memory">
+											<img src="images/personal/nova.jpg" alt="NOVA freshmen orientation group photograph" width="1024" height="683" srcset="images/personal/nova.jpg 1024w, images/personal/nova-800.jpg 800w" sizes="(max-width: 736px) 100vw, 800px" decoding="async" loading="lazy" />
+											<div><span>23&ndash;27 July</span><h3>Freshmen Orientation</h3><p>I supported NOVA in House Phoenix during CAPT's Freshmen Orientation Camp.</p></div>
+										</section>
+										<section class="orientation-memory">
+											<img src="images/personal/gamora.jpg" alt="GAMORA orientation group at the beach" width="1024" height="689" srcset="images/personal/gamora.jpg 1024w, images/personal/gamora-800.jpg 800w" sizes="(max-width: 736px) 100vw, 800px" decoding="async" loading="lazy" />
+											<div><span>28&ndash;31 July</span><h3>Orientation Week</h3><p>I led GAMORA in House Venus during the School of Computing's Orientation Week.</p></div>
+										</section>
+									</div>
 								</article>
 							</div>
 						</dialog>
@@ -257,7 +259,7 @@
     <script src="assets/js/main.js?v=6"></script>
     <script src="assets/js/arrow.js"></script>
     <script src="assets/js/game.js?v=12"></script>
-<script src="assets/js/personal-timeline.js?v=3"></script>
+<script src="assets/js/personal-timeline.js?v=4"></script>
     <script async src="https://www.instagram.com/embed.js"></script>
 </body>
 </html>
