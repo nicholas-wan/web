@@ -420,17 +420,6 @@
   text-align: center;
 }
 
-.tech-stack__heading span {
-  display: block;
-  margin-bottom: 0.2rem;
-  color: var(--color-brand-700);
-  font-family: var(--font-display);
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
 .tech-stack__heading h2 {
   margin: 0;
   color: var(--color-ink-900);
@@ -473,32 +462,10 @@
   transform: translateY(-2px);
 }
 
-.tech-stack__icon {
-  display: grid;
-  width: 2.35rem;
-  height: 2.35rem;
-  place-items: center;
-}
-
-.tech-stack__icon img {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: 2rem;
-  max-height: 2rem;
-  object-fit: contain;
-}
-
-.tech-stack__icon img.tech-stack__icon--wide {
-  max-width: 2.2rem;
-  max-height: 1.35rem;
-}
-
-.tech-stack__icon--glyph {
-  border-radius: 0.65rem;
-  background: var(--color-brand-100);
+.tech-stack__grid li > i {
   color: var(--color-brand-600);
-  font-size: 1.1rem;
+  font-size: 1.65rem;
+  line-height: 1;
 }
 
 .tech-stack__grid strong {
@@ -4561,6 +4528,7 @@ a:focus-visible {
   text-transform: none !important;
   white-space: normal !important;
   cursor: pointer;
+  appearance: none;
   text-decoration: none;
   overflow: hidden;
   transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease, transform 0.5s ease !important;
@@ -4774,6 +4742,25 @@ body.personal-story-is-open {
 .personal-story-dialog::backdrop {
   background: rgba(3, 14, 30, 0.72);
   backdrop-filter: blur(5px);
+}
+
+.personal-story-dialog--instagram {
+  width: min(42rem, calc(100% - 2rem));
+  max-width: 42rem;
+}
+
+.personal-story.personal-story--instagram {
+  min-height: 0;
+  padding: 1rem;
+}
+
+.personal-story.personal-story--instagram.is-active {
+  display: block;
+}
+
+.personal-story--instagram .cats-instagram {
+  border: 0;
+  box-shadow: none;
 }
 
 .personal-story-dialog__shell {
@@ -5417,6 +5404,10 @@ body.personal-story-is-open {
   font-family: var(--font-display);
   font-size: 0.78rem;
   font-weight: 800;
+}
+
+body.page-event #nav {
+  margin-top: 0 !important;
 }
 
 @media screen and (max-width: 980px) {

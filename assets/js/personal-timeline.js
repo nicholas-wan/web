@@ -134,6 +134,12 @@
       dialog.setAttribute('open', '');
     }
 
+    if (storyId === 'cats' && window.instgrm && window.instgrm.Embeds) {
+      window.setTimeout(function () {
+        window.instgrm.Embeds.process();
+      }, 0);
+    }
+
     document.body.classList.add('personal-story-is-open');
     window.setTimeout(function () {
       var closeButton = dialog.querySelector('[data-story-close]');

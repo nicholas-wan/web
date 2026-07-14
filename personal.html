@@ -65,7 +65,7 @@
 									<h2 id="personal-year-2025">2025</h2>
 									<div class="personal-timeline-year__events">
 										<article class="personal-timeline-event personal-timeline-event--right" data-timeline-event data-category="memory">
-											<a class="personal-event-card personal-event-card--cats" href="cats">
+											<button class="personal-event-card personal-event-card--cats" type="button" data-story-open="cats" aria-haspopup="dialog">
 												<span class="personal-event-card__image personal-event-card__image--cats" aria-hidden="true">
 													<span class="cats-mini-profile"><span class="cats-mini-profile__latte">L</span><span class="cats-mini-profile__mocha">M</span></span>
 												</span>
@@ -73,9 +73,9 @@
 													<span class="personal-event-card__meta">27 November 2025 &middot; Memory</span>
 													<strong>Latte &amp; Mocha</strong>
 													<span>We brought Latte and Mocha home.</span>
-													<span class="personal-event-card__open">Visit their page <span aria-hidden="true">&rarr;</span></span>
+													<span class="personal-event-card__open">View Instagram <span aria-hidden="true">&rarr;</span></span>
 												</span>
-											</a>
+											</button>
 										</article>
 									</div>
 								</section>
@@ -212,6 +212,29 @@
 							</div>
 
 						</section>
+
+						<dialog class="personal-story-dialog personal-story-dialog--instagram" data-story-dialog aria-labelledby="cats-story-title">
+							<div class="personal-story-dialog__shell">
+								<button class="personal-story-dialog__close" type="button" data-story-close aria-label="Close Instagram popup">&times;</button>
+								<article class="personal-story personal-story--instagram" data-story="cats">
+									<section class="cats-instagram" aria-labelledby="cats-story-title">
+										<header class="cats-instagram__header">
+											<span class="icon fa-instagram" aria-hidden="true"></span>
+											<div>
+												<h2 id="cats-story-title">Latte &amp; Mocha</h2>
+												<p>Home since 27 November 2025 &middot; Latte is lighter, Mocha is darker.</p>
+											</div>
+										</header>
+										<div class="cats-instagram__embed">
+											<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/twoshotsofcuteness/" data-instgrm-version="14">
+												<a href="https://www.instagram.com/twoshotsofcuteness/" target="_blank" rel="noopener noreferrer">View @twoshotsofcuteness on Instagram</a>
+											</blockquote>
+											<noscript><p class="cats-instagram__fallback">Instagram needs JavaScript to display the live profile. <a href="https://www.instagram.com/twoshotsofcuteness/" target="_blank" rel="noopener noreferrer">Open @twoshotsofcuteness</a>.</p></noscript>
+										</div>
+									</section>
+								</article>
+							</div>
+						</dialog>
 
 								</div>
 								<footer id="footer">
