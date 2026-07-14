@@ -2244,6 +2244,26 @@ body {
   margin-top: 1.25rem;
 }
 
+.guangzhou-day--compact .masonry {
+  display: grid;
+  column-count: initial;
+  gap: 1rem;
+}
+
+.guangzhou-day--compact .masonry.mason2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.guangzhou-day--compact .masonry.mason3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.guangzhou-day--compact .masonry .brick {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+
 .guangzhou-journal .content-details {
   line-height: 1.35 !important;
 }
@@ -2289,8 +2309,11 @@ body {
     max-width: none;
   }
 
-  .guangzhou-day--compact .masonry {
+  .guangzhou-day--compact .masonry,
+  .guangzhou-day--compact .masonry.mason2,
+  .guangzhou-day--compact .masonry.mason3 {
     display: grid;
+    grid-template-columns: none;
     grid-auto-columns: min(76vw, 18rem);
     grid-auto-flow: column;
     column-count: initial;
@@ -3247,6 +3270,10 @@ body {
 }
 
 /* Travel journal navigation */
+[id^="trip-section-"] {
+  scroll-margin-top: 7rem;
+}
+
 .travel-section-nav {
   position: sticky;
   top: 0;
@@ -3415,6 +3442,10 @@ a.travel-jump-group__label {
 }
 
 @media screen and (max-width: 600px) {
+  [id^="trip-section-"] {
+    scroll-margin-top: 8.25rem;
+  }
+
   .travel-section-nav {
     top: 3.5rem;
     gap: 0;
