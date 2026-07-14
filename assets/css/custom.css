@@ -2019,6 +2019,12 @@ body {
     height: 0.85rem;
   }
 
+  .travel-map__marker::before {
+    position: absolute;
+    inset: -0.55rem;
+    content: "";
+  }
+
   .travel-map__place {
     padding: 0.13rem 0.22rem;
     font-size: 0.36rem;
@@ -2031,8 +2037,9 @@ body {
   }
 
   .travel-map__city-links a {
-    padding: 0.18rem 0.26rem;
-    font-size: 0.43rem;
+    min-height: 1.6rem;
+    padding: 0.26rem 0.34rem;
+    font-size: 0.48rem;
   }
 
   .travel-map__hint {
@@ -2681,9 +2688,18 @@ body {
     grid-row: auto;
   }
 
+  .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall .content {
+    height: auto;
+  }
+
   .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall .content-image {
     height: auto;
     aspect-ratio: 4 / 3;
+  }
+
+  .guangzhou-day--compact .masonry .content {
+    min-width: 0;
+    background: #0a1b1f;
   }
 
   .guangzhou-journal .content-overlay {
@@ -2699,6 +2715,13 @@ body {
     background: #0a1b1f;
     opacity: 1;
     transform: none;
+  }
+
+  .guangzhou-journal .content-details h3,
+  .guangzhou-journal .content-details p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .guangzhou-journal .content-details h3 {
@@ -4144,7 +4167,7 @@ a:focus-visible {
 
 @media screen and (max-width: 600px) {
   .lightbox {
-    padding: 1rem 3.5rem;
+    padding: 4rem 0.75rem 1rem;
   }
 
   .lightbox__image {
@@ -4192,9 +4215,24 @@ a:focus-visible {
     padding: 0.4rem 0.5rem;
   }
 
+  .site-pager__link > strong {
+    overflow-wrap: anywhere;
+  }
+
+  body.page-event .site-pager {
+    padding: 0.5rem 1rem 1.5rem !important;
+  }
+
   .gallery-intro {
     margin-bottom: 1.25rem;
     padding: 1rem;
+  }
+
+  iframe,
+  video,
+  canvas,
+  blockquote.instagram-media {
+    max-width: 100% !important;
   }
 }
 
@@ -4894,34 +4932,13 @@ a:focus-visible {
 }
 
 .personal-event-card__image--cats {
-  display: grid;
   min-height: 9.75rem;
-  place-items: center;
-  background: linear-gradient(145deg, #feda75 0%, #fa7e1e 28%, #d62976 58%, #962fbf 78%, #4f5bd5 100%);
+  background: #d8dde0;
 }
 
-.cats-mini-profile {
-  display: grid;
-  width: 5.6rem;
-  height: 5.6rem;
-  grid-template-columns: 1fr 1fr;
-  border: 0.28rem solid rgba(255, 255, 255, 0.92);
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 0.45rem 1.4rem rgba(39, 13, 40, 0.24);
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 900;
-  overflow: hidden;
+.personal-event-card__image--cats img {
+  object-position: center 38%;
 }
-
-.cats-mini-profile > span {
-  display: grid;
-  place-items: center;
-}
-
-.cats-mini-profile__latte { background: #ead7b8; color: #5f4935; }
-.cats-mini-profile__mocha { background: #71503f; color: #fff7eb; }
 
 .personal-event-card--static:hover,
 .personal-event-card--static:focus-visible,
@@ -5887,6 +5904,10 @@ body.page-event .site-pager__link:focus-visible {
 
   .personal-event-card__image img {
     min-height: 0;
+  }
+
+  .personal-event-card__image--cats img {
+    object-position: center 32%;
   }
 
   .personal-event-card--static .personal-event-card__image img {
