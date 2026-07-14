@@ -325,7 +325,7 @@ window.addEventListener('load', function() {
   // INJECT CSS
   var css = document.createElement("style");
   css.type = "text/css";
-  css.innerHTML = ".txt-rotate > .wrap { border-right: 0.08em solid #55d1cc }";
+  css.innerHTML = ".txt-rotate > .wrap { border-right: 0.08em solid var(--color-brand-400, #55d1cc) }";
   document.body.appendChild(css);
 });
 
@@ -657,5 +657,66 @@ canvas.addEventListener('mousemove', function(e){
 	Array.prototype.forEach.call(links, function(link) {
 		link.target = '_blank';
 		link.rel = 'noopener noreferrer';
+	});
+})();
+
+// Expandable toolkit cards work with hover, keyboard focus, and touch.
+(function() {
+	var cards = Array.prototype.slice.call(document.querySelectorAll('.toolkit-card'));
+	if (!cards.length) return;
+
+	function setExpanded(card, expanded) {
+		var detail = card.querySelector('.toolkit-card__detail');
+		card.classList.toggle('is-expanded', expanded);
+		card.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+		if (detail) detail.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+	}
+
+	function collapseOthers(activeCard) {
+		cards.forEach(function(card) {
+			if (card === activeCard) return;
+			card.dataset.pinned = 'false';
+			setExpanded(card, false);
+		});
+	}
+
+	cards.forEach(function(card) {
+		card.dataset.pinned = 'false';
+
+		function togglePinned() {
+			var expanded = card.dataset.pinned !== 'true';
+			collapseOthers(card);
+			card.dataset.pinned = expanded ? 'true' : 'false';
+			setExpanded(card, expanded);
+		}
+
+		card.addEventListener('mouseenter', function() {
+			setExpanded(card, true);
+		});
+		card.addEventListener('mouseleave', function() {
+			if (card.dataset.pinned !== 'true' && !card.contains(document.activeElement)) {
+				setExpanded(card, false);
+			}
+		});
+		card.addEventListener('focusin', function() {
+			collapseOthers(card);
+			setExpanded(card, true);
+		});
+		card.addEventListener('focusout', function(event) {
+			if (!card.contains(event.relatedTarget) && card.dataset.pinned !== 'true') {
+				setExpanded(card, false);
+			}
+		});
+		card.addEventListener('click', togglePinned);
+		card.addEventListener('keydown', function(event) {
+			if (event.key === 'Enter' || event.key === ' ') {
+				event.preventDefault();
+				togglePinned();
+			}
+			if (event.key === 'Escape') {
+				card.dataset.pinned = 'false';
+				setExpanded(card, false);
+			}
+		});
 	});
 })();
