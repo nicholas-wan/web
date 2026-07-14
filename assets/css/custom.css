@@ -5009,6 +5009,55 @@ a:focus-visible {
   object-position: center 38%;
 }
 
+.personal-timeline-event--cats-preview.is-cats-preview-open {
+  z-index: 12;
+}
+
+.personal-event-card__instagram-preview {
+  position: absolute;
+  top: calc(100% - 0.35rem);
+  left: calc(50% + 1.25rem);
+  z-index: 11;
+  width: min(22rem, calc(50% - 1.25rem));
+  max-height: 22rem;
+  padding: 0.65rem;
+  border: 1px solid #edc4d2;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
+  background: #fff;
+  box-shadow: 0 1rem 2.2rem rgba(3, 14, 30, 0.18);
+  opacity: 0;
+  overflow: auto;
+  pointer-events: none;
+  transform: translateY(-0.45rem);
+  transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s ease;
+  visibility: hidden;
+}
+
+.personal-timeline-event--cats-preview.is-cats-preview-open .personal-event-card__instagram-preview {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  visibility: visible;
+}
+
+.personal-event-card__instagram-handle {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--color-ink-900);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.personal-event-card__instagram-preview .cats-instagram__embed {
+  min-height: 6rem;
+}
+
+.personal-event-card__instagram-preview iframe {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
 .personal-event-card--static:hover,
 .personal-event-card--static:focus-visible,
 .personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card--static:hover,
@@ -5048,25 +5097,6 @@ body.personal-story-is-open {
 .personal-story-dialog::backdrop {
   background: rgba(3, 14, 30, 0.72);
   backdrop-filter: blur(5px);
-}
-
-.personal-story-dialog--instagram {
-  width: min(42rem, calc(100% - 2rem));
-  max-width: 42rem;
-}
-
-.personal-story.personal-story--instagram {
-  min-height: 0;
-  padding: 1rem;
-}
-
-.personal-story.personal-story--instagram.is-active {
-  display: block;
-}
-
-.personal-story--instagram .cats-instagram {
-  border: 0;
-  box-shadow: none;
 }
 
 .personal-story-dialog__shell {
@@ -5897,6 +5927,28 @@ body.page-event .site-pager__link:focus-visible {
     min-height: 0;
     margin-top: 0 !important;
     padding-left: 3rem;
+  }
+
+  .personal-event-card__instagram-preview {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: 100%;
+    max-height: 0;
+    margin-top: 0;
+    padding: 0 0.65rem;
+    border-width: 0;
+    border-radius: 0 0 var(--radius-card) var(--radius-card);
+    box-shadow: none;
+    overflow: hidden;
+    transform: translateY(-0.35rem);
+  }
+
+  .personal-timeline-event--cats-preview.is-cats-preview-open .personal-event-card__instagram-preview {
+    max-height: 22rem;
+    margin-top: -0.35rem;
+    padding: 0.65rem;
+    border-width: 1px;
   }
 
   .personal-timeline-event::before {

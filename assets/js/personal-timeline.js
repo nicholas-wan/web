@@ -7,6 +7,8 @@
   var years = timeline.querySelector('[data-timeline-years]');
   var events = Array.prototype.slice.call(timeline.querySelectorAll('[data-timeline-event]'));
   var storyButtons = Array.prototype.slice.call(timeline.querySelectorAll('[data-story-open]'));
+  var catsPreviewEvent = timeline.querySelector('.personal-timeline-event--cats-preview');
+  var catsPreviewButton = timeline.querySelector('[data-cats-preview-toggle]');
   var dialog = document.querySelector('[data-story-dialog]');
   var stories = dialog ? Array.prototype.slice.call(dialog.querySelectorAll('[data-story]')) : [];
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -122,7 +124,6 @@
     stories.forEach(function (story) {
       story.classList.toggle('is-active', story === activeStory);
     });
-    dialog.classList.toggle('personal-story-dialog--instagram', storyId === 'cats');
     dialog.classList.toggle('personal-story-dialog--orientation', storyId === 'orientation');
 
     activeStory.style.setProperty('--story-duration', duration + 'ms');
@@ -134,12 +135,6 @@
       if (!dialog.open) dialog.showModal();
     } else {
       dialog.setAttribute('open', '');
-    }
-
-    if (storyId === 'cats' && window.instgrm && window.instgrm.Embeds) {
-      window.setTimeout(function () {
-        window.instgrm.Embeds.process();
-      }, 0);
     }
 
     document.body.classList.add('personal-story-is-open');
@@ -164,22 +159,41 @@
     button.addEventListener('click', function () {
       openStory(button.getAttribute('data-story-open'));
     });
-
-    if (button.getAttribute('data-story-open') === 'cats' && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      var hoverTimer = null;
-      button.addEventListener('mouseenter', function () {
-        hoverTimer = window.setTimeout(function () {
-          openStory('cats');
-        }, 350);
-      });
-      button.addEventListener('mouseleave', function () {
-        if (hoverTimer !== null) {
-          window.clearTimeout(hoverTimer);
-          hoverTimer = null;
-        }
-      });
-    }
   });
+
+  function setCatsPreview(open) {
+    if (!catsPreviewEvent || !catsPreviewButton) return;
+    catsPreviewEvent.classList.toggle('is-cats-preview-open', open);
+    catsPreviewButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open && window.instgrm && window.instgrm.Embeds) {
+      window.setTimeout(function () { window.instgrm.Embeds.process(); }, 0);
+    }
+  }
+
+  if (catsPreviewEvent && catsPreviewButton) {
+    catsPreviewButton.addEventListener('click', function () {
+      setCatsPreview(!catsPreviewEvent.classList.contains('is-cats-preview-open'));
+    });
+
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      catsPreviewEvent.addEventListener('mouseenter', function () { setCatsPreview(true); });
+      catsPreviewEvent.addEventListener('mouseleave', function () { setCatsPreview(false); });
+    }
+
+    catsPreviewEvent.addEventListener('focusout', function () {
+      window.setTimeout(function () {
+        if (!catsPreviewEvent.contains(document.activeElement)) setCatsPreview(false);
+      }, 0);
+    });
+
+    document.addEventListener('click', function (event) {
+      if (!catsPreviewEvent.contains(event.target)) setCatsPreview(false);
+    });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') setCatsPreview(false);
+    });
+  }
 
   if (dialog) {
     dialog.addEventListener('click', function (event) {

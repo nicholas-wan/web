@@ -15,7 +15,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="stylesheet" href="assets/css/main.css" />
 
-    <link rel="stylesheet" href="assets/css/custom.css?v=73" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=74" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
 </head>
@@ -56,8 +56,8 @@
 								<section class="personal-timeline-year" aria-labelledby="personal-year-2025">
 									<h2 id="personal-year-2025">2025</h2>
 									<div class="personal-timeline-year__events">
-										<article class="personal-timeline-event personal-timeline-event--right" data-timeline-event data-category="memory">
-											<button class="personal-event-card personal-event-card--cats" type="button" data-story-open="cats" aria-haspopup="dialog">
+										<article class="personal-timeline-event personal-timeline-event--right personal-timeline-event--cats-preview" data-timeline-event data-category="memory">
+											<button class="personal-event-card personal-event-card--cats" type="button" data-cats-preview-toggle aria-expanded="false" aria-controls="cats-instagram-preview">
 												<span class="personal-event-card__image personal-event-card__image--cats">
 													<img src="images/personal/cats-banner.webp" width="960" height="1280" alt="Latte grooming Mocha while they rest together" decoding="async" loading="eager" fetchpriority="high" />
 												</span>
@@ -65,9 +65,17 @@
 													<span class="personal-event-card__meta">27 November 2025 &middot; Memory</span>
 													<strong>Latte &amp; Mocha</strong>
 													<span>We brought Latte and Mocha home.</span>
-													<span class="personal-event-card__open">Preview Instagram <span aria-hidden="true">&rarr;</span></span>
+													<span class="personal-event-card__open">Preview Instagram <span aria-hidden="true">&darr;</span></span>
 												</span>
 											</button>
+											<aside class="personal-event-card__instagram-preview" id="cats-instagram-preview" aria-label="Latte and Mocha Instagram preview">
+												<span class="personal-event-card__instagram-handle">@twoshotsofcuteness</span>
+												<div class="cats-instagram__embed">
+													<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/twoshotsofcuteness/" data-instgrm-version="14">
+														<a href="https://www.instagram.com/twoshotsofcuteness/" target="_blank" rel="noopener noreferrer">View @twoshotsofcuteness on Instagram</a>
+													</blockquote>
+												</div>
+											</aside>
 										</article>
 									</div>
 								</section>
@@ -206,23 +214,6 @@
 						<dialog class="personal-story-dialog" data-story-dialog aria-label="Personal memory">
 							<div class="personal-story-dialog__shell">
 								<button class="personal-story-dialog__close" type="button" data-story-close aria-label="Close memory popup">&times;</button>
-								<article class="personal-story personal-story--instagram" data-story="cats">
-									<section class="cats-instagram" aria-labelledby="cats-story-title">
-										<header class="cats-instagram__header">
-											<span class="icon fa-instagram" aria-hidden="true"></span>
-											<div>
-												<h2 id="cats-story-title">Latte &amp; Mocha</h2>
-												<p>Home since 27 November 2025 &middot; Latte is lighter, Mocha is darker.</p>
-											</div>
-										</header>
-										<div class="cats-instagram__embed">
-											<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/twoshotsofcuteness/" data-instgrm-version="14">
-												<a href="https://www.instagram.com/twoshotsofcuteness/" target="_blank" rel="noopener noreferrer">View @twoshotsofcuteness on Instagram</a>
-											</blockquote>
-											<noscript><p class="cats-instagram__fallback">Instagram needs JavaScript to display the live profile. <a href="https://www.instagram.com/twoshotsofcuteness/" target="_blank" rel="noopener noreferrer">Open @twoshotsofcuteness</a>.</p></noscript>
-										</div>
-									</section>
-								</article>
 								<article class="personal-story personal-story--orientation" data-story="orientation" aria-labelledby="orientation-story-title">
 									<header class="orientation-memory__heading">
 										<span>23&ndash;31 July 2018 &middot; Community</span>
@@ -266,7 +257,7 @@
     <script src="assets/js/main.js?v=6"></script>
     <script src="assets/js/arrow.js"></script>
     <script src="assets/js/game.js?v=12"></script>
-<script src="assets/js/personal-timeline.js?v=5"></script>
+<script src="assets/js/personal-timeline.js?v=6"></script>
     <script async src="https://www.instagram.com/embed.js"></script>
 </body>
 </html>
