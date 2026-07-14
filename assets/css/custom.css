@@ -1987,6 +1987,16 @@ body {
   justify-content: center;
 }
 
+#navPanelToggle {
+  display: none;
+}
+
+@media screen and (max-width: 980px) {
+  #navPanelToggle {
+    display: inline-flex;
+  }
+}
+
 .earlier-work__grid a {
   display: inline-flex;
   min-height: 2.75rem;
