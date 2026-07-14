@@ -257,7 +257,7 @@
 
 .toolkit-card:hover .toolkit-card__detail,
 .toolkit-card:focus .toolkit-card__detail {
-  max-height: 14rem;
+  max-height: 22rem;
   opacity: 1;
   transform: translateY(0);
 }
@@ -302,6 +302,60 @@
   content: "";
 }
 
+.tool-logo-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tool-logo-list li {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.42rem 0.5rem;
+  border: 1px solid #e6ecee;
+  border-radius: 0.45rem;
+  background: #f8faf9;
+  color: #40545b;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 750;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.tool-logo-frame {
+  display: grid;
+  flex: 0 0 1.85rem;
+  width: 1.85rem;
+  height: 1.85rem;
+  place-items: center;
+  border-radius: 0.35rem;
+  background: #fff;
+}
+
+.tool-logo-frame img {
+  display: block;
+  width: 1.45rem;
+  height: 1.45rem;
+  object-fit: contain;
+}
+
+.tool-logo-frame img.tool-logo--wide {
+  width: 1.55rem;
+  height: 1rem;
+}
+
+.tool-logo-frame--fallback {
+  color: #4c6f7b;
+  font-size: 1rem;
+}
+
 @media all and (max-width: 736px) {
   .education-heading h2,
   .skills-heading h2 {
@@ -310,6 +364,10 @@
 
   .skills-grid {
     grid-template-columns: 1fr;
+  }
+
+  .tool-logo-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .toolkit-card {
@@ -1669,17 +1727,10 @@ body {
   gap: 1.25rem;
 }
 
-.case-study-supporting {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  gap: 1.25rem;
-  align-items: stretch;
-}
-
 .internship-group {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-column: 1 / -1;
+  grid-template-rows: auto auto auto;
   min-width: 0;
 }
 
@@ -1707,6 +1758,80 @@ body {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.25rem;
   align-items: stretch;
+}
+
+.case-study--compact {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-areas:
+    "company facts"
+    "intro facts"
+    "tags tags";
+  grid-template-columns: minmax(16rem, 0.85fr) minmax(0, 1.5fr);
+  gap: 0 1.35rem;
+  padding: 1.35rem 1.5rem;
+}
+
+.case-study--compact > .case-study__company {
+  grid-area: company;
+  margin-bottom: 0.65rem;
+}
+
+.case-study--compact > header {
+  grid-area: intro;
+}
+
+.case-study--compact > .case-study__facts {
+  grid-area: facts;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-self: stretch;
+  margin: 0;
+}
+
+.case-study--compact > .case-study__tags {
+  grid-area: tags;
+  margin-top: 1rem;
+}
+
+.case-study--compact h2,
+.case-study--internship-brief h2 {
+  font-size: 1.35rem;
+}
+
+.case-study--compact .case-study__lede,
+.case-study--internship-brief .case-study__lede {
+  margin-bottom: 0;
+}
+
+.case-study--compact .case-study__facts > div {
+  padding: 0.85rem;
+}
+
+.case-study--internship-brief {
+  display: grid;
+  grid-template-areas:
+    "company intro"
+    "tags tags";
+  grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 1.2fr);
+  gap: 0 1.5rem;
+  margin-top: 1.25rem;
+  padding: 1.2rem 1.5rem;
+  background: #f8faf9;
+  box-shadow: none;
+}
+
+.case-study--internship-brief > .case-study__company {
+  grid-area: company;
+  margin: 0;
+}
+
+.case-study--internship-brief > header {
+  grid-area: intro;
+}
+
+.case-study--internship-brief > .case-study__tags {
+  grid-area: tags;
+  margin-top: 0.9rem;
 }
 
 .case-study {
@@ -1807,6 +1932,14 @@ body {
   width: 5.25rem;
   background: #102d34;
   padding: 0.55rem;
+}
+
+.company-logo--guco {
+  width: 5.5rem;
+  height: 3rem;
+  padding: 0;
+  border: 1px solid #dfe6e7;
+  object-fit: cover;
 }
 
 .case-study__company-label,
@@ -2210,15 +2343,6 @@ body {
   #navPanelToggle {
     display: inline-flex;
   }
-
-  .case-study-supporting {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
-  }
-
-  .internship-group__grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .earlier-work__grid a {
@@ -2295,13 +2419,28 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .case-study-supporting,
   .internship-group__grid {
     grid-template-columns: 1fr;
   }
 
   .case-study {
     padding: 1.3rem;
+  }
+
+  .case-study--compact,
+  .case-study--internship-brief {
+    display: flex;
+    padding: 1.3rem;
+  }
+
+  .case-study--compact .case-study__facts {
+    grid-template-columns: 1fr;
+    margin-bottom: 1.35rem;
+  }
+
+  .case-study--compact .case-study__tags,
+  .case-study--internship-brief .case-study__tags {
+    margin-top: 0;
   }
 
   .case-study--lead {
