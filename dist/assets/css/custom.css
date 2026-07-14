@@ -102,6 +102,12 @@
 #more {
   display: none;
 }
+
+.image.main img {
+  display: block;
+  height: auto;
+}
+
 @media only screen and (max-width: 600px) {
   .zera {
     margin-top: -40px;
