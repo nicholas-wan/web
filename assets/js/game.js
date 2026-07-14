@@ -67,7 +67,6 @@
     initReveal();
     initCounters();
     initTilt();
-    initXpBars();
     initHeroBurst();
     initKonami();
     initReadProgress();
@@ -337,54 +336,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 5. Skill XP bars (skills page)                                      */
-  /* ------------------------------------------------------------------ */
-  function initXpBars() {
-    var table = document.querySelector('.skillstable');
-    if (!table) { return; }
-    var cells = table.querySelectorAll('td');
-    var bars = [];
-    for (var i = 0; i < cells.length; i++) {
-      var td = cells[i];
-      // Proficiency cells contain only star icons and no text.
-      if (td.textContent.trim().length) { continue; }
-      var stars = td.querySelectorAll('.fa-star');
-      if (!stars.length) { continue; }
-      var n = Math.min(stars.length, 3);
-      var pct = Math.round((n / 3) * 100);
-
-      var wrap = document.createElement('div');
-      wrap.className = 'xp-bar';
-      wrap.setAttribute('role', 'img');
-      wrap.setAttribute('aria-label', n + ' out of 3');
-      var track = document.createElement('span');
-      track.className = 'xp-bar__track';
-      var fill = document.createElement('span');
-      fill.className = 'xp-bar__fill';
-      fill.setAttribute('data-pct', pct);
-      fill.style.width = reduce ? (pct + '%') : '0%';
-      var label = document.createElement('span');
-      label.className = 'xp-bar__label';
-      label.textContent = n + '/3';
-      track.appendChild(fill);
-      wrap.appendChild(track);
-      wrap.appendChild(label);
-      td.innerHTML = '';
-      td.appendChild(wrap);
-      bars.push(fill);
-    }
-    if (!bars.length || reduce) { return; }
-
-    function fillBar(fill) { fill.style.width = fill.getAttribute('data-pct') + '%'; }
-    bars.forEach(function (b) {
-      // Watch the row, not the fill: the fill starts at width 0 and a
-      // zero-size element never registers as visible.
-      onVisible(b.parentNode, function () { fillBar(b); }, 0.5);
-    });
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* 6. Confetti / particle burst helper                                 */
+  /* 5. Confetti / particle burst helper                                 */
   /* ------------------------------------------------------------------ */
   var COLORS = ['#00e0e0', '#128a86', '#ffd166', '#ef476f', '#06d6a0', '#ffffff'];
 
@@ -442,7 +394,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 7. Hero image click burst                                           */
+  /* 6. Hero image click burst                                           */
   /* ------------------------------------------------------------------ */
   function initHeroBurst() {
     var hero = document.querySelector('.intro-swipe__photo');
@@ -454,7 +406,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 8. Konami-code easter egg                                           */
+  /* 7. Konami-code easter egg                                           */
   /* ------------------------------------------------------------------ */
   function initKonami() {
     var seq = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
@@ -502,7 +454,7 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 9. Journal reading progress bar                                     */
+  /* 8. Journal reading progress bar                                     */
   /* ------------------------------------------------------------------ */
   var TRIPS = {
     travel_2019_siliconvalley: 'Silicon Valley',

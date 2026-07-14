@@ -1,11 +1,3 @@
-.rating {
-  float: right;
-  font-size: 18px;
-  color: #337ab7;
-}
-.skill p {
-  font-size: 19px;
-}
 .education-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -139,105 +131,94 @@
   }
 }
 
-/* --------------------------------------------------------------------------- */
-
-.skillstable {
-  border-collapse: collapse;
-  width: 100%;
-  margin-bottom: 50px;
-  table-layout: fixed;
+.skills-heading p {
+  max-width: 42rem;
+  margin: 0.85rem auto 0;
+  color: #66767d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.65;
+  text-transform: none;
 }
 
-.skill-table-wrap {
-  max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+.cyber-toolkit {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 2.5rem;
 }
 
-.education-details img {
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
+.toolkit-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1.4rem;
+  border: 1px solid #dfe8e9;
+  border-radius: 9px;
+  background: #f8fbfb;
 }
 
-.skillstable td,
-.skillstable th {
-  border: 1px solid #ddd;
-  padding: 8px;
-  overflow-wrap: break-word;
-  vertical-align: middle;
-  text-align: center;
-  line-height: 160%;
+.toolkit-card__eyebrow {
+  margin: 0 0 0.55rem;
+  color: #16817e;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  line-height: 1.3;
+  text-align: left;
+  text-transform: uppercase;
 }
 
-.odd:hover {
-  background-color: #ddd !important;
-}
-.even:hover {
-  background-color: #ddd !important;
-}
-
-.skillstable th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: center;
-  background-color: cadetblue;
-  color: white;
-}
-.odd {
-  background-color: white !important;
-}
-.even {
-  background-color: #f2f2f2 !important;
-}
-.caticon {
-  font-size: 25px;
-}
-.fa-star {
-  color: navy;
-}
-.skillrow {
-  margin-right: 0;
-  margin-left: 0;
+.toolkit-card h2 {
+  margin: 0 0 0.75rem;
+  color: #20343d !important;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  text-align: left;
 }
 
-.skillstable {
-  min-width: 34rem;
+.toolkit-card > p:not(.toolkit-card__eyebrow) {
+  flex: 1 1 auto;
+  margin: 0 0 1.2rem;
+  color: #53656c;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  text-align: left;
 }
 
-@media all and (max-width: 600px) {
-  .skill-table-wrap {
-    width: 100%;
-    overflow-x: visible;
+.toolkit-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.toolkit-tags li {
+  margin: 0;
+  padding: 0.38rem 0.58rem;
+  border: 1px solid #d7e4e4;
+  border-radius: 999px;
+  background: #fff;
+  color: #29464b;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  line-height: 1.25;
+}
+
+@media all and (max-width: 736px) {
+  .cyber-toolkit {
+    grid-template-columns: 1fr;
   }
 
-  .skillstable {
-    min-width: 0;
-    margin-bottom: 2rem;
-    font-size: 0.76rem;
-  }
-
-  .skillstable th:nth-child(1) { width: 30%; }
-  .skillstable th:nth-child(2) { width: 34%; }
-  .skillstable th:nth-child(3) { width: 36%; }
-
-  .skillstable td,
-  .skillstable th {
-    padding: 0.5rem 0.3rem;
-    line-height: 1.35;
-  }
-
-  .skillstable .caticon {
-    font-size: 1.15rem;
-  }
-
-  .skillstable .xp-bar {
-    min-width: 0;
-    gap: 0.3rem;
-  }
-
-  .skillstable .xp-bar__label {
-    font-size: 0.62rem;
+  .toolkit-card {
+    padding: 1.2rem;
   }
 }
 
@@ -691,42 +672,6 @@
 .homepage-link[data-scrub]:hover::after,
 .homepage-link[data-scrub]:focus-visible::after {
   opacity: 1;
-}
-
-/* Skill XP bars */
-.xp-bar {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  width: 100%;
-  min-width: 8rem;
-}
-
-.xp-bar__track {
-  position: relative;
-  flex: 1;
-  height: 0.7rem;
-  border-radius: 999px;
-  background: rgba(3, 14, 30, 0.12);
-  overflow: hidden;
-}
-
-.xp-bar__fill {
-  display: block;
-  height: 100%;
-  width: 0;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #128a86, #2fd7cf 70%, #4ff5f0);
-  box-shadow: 0 0 0.5rem rgba(47, 215, 207, 0.5);
-  transition: width 1.1s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.xp-bar__label {
-  flex: 0 0 auto;
-  font-size: 0.72rem;
-  font-weight: 700;
-  color: #0c4a48;
-  font-variant-numeric: tabular-nums;
 }
 
 /* Confetti / burst overlay */
