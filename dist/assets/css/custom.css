@@ -1628,11 +1628,8 @@ body {
   position: absolute;
   top: 50%;
   left: 1rem;
-  display: grid;
+  display: block;
   width: 15.5rem;
-  grid-template-columns: 3.35rem minmax(0, 1fr);
-  align-items: start;
-  gap: 0.55rem;
   padding: 0.35rem;
   border: 1px solid rgba(152, 201, 198, 0.2);
   border-radius: 0.5rem;
@@ -1646,6 +1643,34 @@ body {
   transform-origin: left center;
   transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
   visibility: hidden;
+}
+
+.travel-map__journal-link {
+  display: grid;
+  grid-template-columns: 3.35rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.55rem;
+  border-bottom: 0 !important;
+  color: inherit !important;
+  text-decoration: none;
+}
+
+.travel-map__journal-link::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  content: "";
+}
+
+.travel-map__journal-link > * {
+  position: relative;
+  z-index: 1;
+}
+
+.travel-map__journal-link:hover strong,
+.travel-map__journal-link:focus-visible strong {
+  color: #ffb869;
 }
 
 .travel-map__marker-label img {
@@ -1685,10 +1710,13 @@ body {
 }
 
 .travel-map__city-links {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
   margin-top: 0.45rem;
+  margin-left: 3.9rem;
 }
 
 .travel-map__city-links a {
@@ -1900,6 +1928,9 @@ body {
 
   .travel-map__marker-label {
     width: 10.5rem;
+  }
+
+  .travel-map__journal-link {
     grid-template-columns: 1fr;
   }
 
@@ -1921,6 +1952,7 @@ body {
 
   .travel-map__city-links {
     gap: 0.18rem;
+    margin-left: 0;
   }
 
   .travel-map__city-links a {
