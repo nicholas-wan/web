@@ -1450,7 +1450,7 @@ body {
   text-transform: uppercase;
 }
 
-.homepage-link__icon--resume {
+.homepage-link__icon--personal {
   transform:
     translateY(calc((1 - var(--ip, 1)) * 1.35rem))
     rotate(calc((1 - var(--ip, 1)) * 8deg))
@@ -2161,7 +2161,7 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .earlier-work summary .icon,
-  .homepage-link__icon--resume {
+  .homepage-link__icon--personal {
     transition: none;
     transform: none;
   }
