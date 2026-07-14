@@ -29,23 +29,16 @@
 #stanford,
 #nus {
   display: block;
-  width: auto;
+  width: 165px;
+  height: 60px;
   max-width: 100%;
-  max-height: 72px;
+  max-height: 60px;
   margin: 0;
   object-fit: contain;
 }
 
 #stanford {
-  max-width: 165px;
-}
-
-#nus {
-  max-width: 185px;
-}
-
-#njc {
-  max-width: 170px;
+  width: 165px;
 }
 
 .education-details {
@@ -267,6 +260,8 @@
   #njc,
   #stanford,
   #nus {
+    width: 150px;
+    height: 52px;
     max-height: 62px;
   }
 
@@ -1686,40 +1681,31 @@ body {
   margin: 1.6rem 2.25rem 0;
 }
 
-.company-mark {
-  display: inline-grid;
+.company-logo {
+  display: block;
   flex: 0 0 auto;
-  min-width: 3.5rem;
-  min-height: 2.35rem;
-  padding: 0.35rem 0.5rem;
-  place-items: center;
+  width: 4.5rem;
+  height: 2.75rem;
+  padding: 0.35rem;
   border-radius: 0.4rem;
-  font-family: "Source Sans Pro", Helvetica, sans-serif;
-  font-size: 0.78rem;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  line-height: 1;
-  text-align: center;
-  text-transform: uppercase;
+  background: #fff;
+  object-fit: contain;
 }
 
-.company-mark--dsta {
+.company-logo--dsta {
+  width: 5.25rem;
+}
+
+.company-logo--shopee {
+  width: 3rem;
+  height: 3rem;
+  padding: 0.3rem;
+}
+
+.company-logo--league {
+  width: 5.25rem;
   background: #102d34;
-  color: #69d8d2;
-}
-
-.company-mark--shopee {
-  background: #ee4d2d;
-  color: #fff;
-  font-size: 0.74rem;
-  text-transform: lowercase;
-}
-
-.company-mark--league {
-  background: #3e5b99;
-  color: #fff;
-  font-size: 0.68rem;
-  text-transform: lowercase;
+  padding: 0.55rem;
 }
 
 .case-study__company-label,
