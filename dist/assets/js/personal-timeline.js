@@ -19,30 +19,6 @@
 
   timeline.classList.add('is-enhanced');
 
-  function revealEvents() {
-    if (reducedMotion.matches || !('IntersectionObserver' in window)) {
-      events.forEach(function (event) {
-        event.classList.add('is-visible');
-      });
-      return;
-    }
-
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('is-visible');
-        observer.unobserve(entry.target);
-      });
-    }, {
-      threshold: 0.18,
-      rootMargin: '0px 0px -8% 0px'
-    });
-
-    events.forEach(function (event) {
-      observer.observe(event);
-    });
-  }
-
   function updateTimelineProgress() {
     scrollFrame = null;
     if (!years) return;
@@ -56,7 +32,9 @@
     events.forEach(function (event) {
       var eventBounds = event.getBoundingClientRect();
       var eventMiddle = eventBounds.top + (eventBounds.height / 2);
-      event.classList.toggle('is-past', eventMiddle <= readingLine);
+      var reached = eventMiddle <= readingLine;
+      event.classList.toggle('is-past', reached);
+      event.classList.toggle('is-visible', reducedMotion.matches || reached);
     });
   }
 
@@ -228,6 +206,5 @@
   window.addEventListener('scroll', requestProgressUpdate, { passive: true });
   window.addEventListener('resize', requestProgressUpdate);
 
-  revealEvents();
   updateTimelineProgress();
 }());
