@@ -2904,6 +2904,12 @@ a:focus-visible {
   grid-template-columns: minmax(0, 1.15fr) minmax(19rem, 0.85fr);
   column-gap: clamp(2rem, 5vw, 5rem);
   padding: clamp(2rem, 4vw, 3rem);
+  border-color: #24464b;
+  background:
+    radial-gradient(circle at 96% 0%, rgba(40, 215, 197, 0.11), transparent 23rem),
+    #071315;
+  color: #f4f2ea;
+  box-shadow: 0 1.5rem 3.5rem rgba(7, 19, 21, 0.2);
 }
 
 .page-experience #agentic-ai .case-study__company,
@@ -2916,8 +2922,25 @@ a:focus-visible {
   margin-bottom: 2rem;
 }
 
+.page-experience #agentic-ai .case-study__company-label,
+.page-experience #agentic-ai h2,
+.page-experience #agentic-ai .case-study__highlights strong {
+  color: #f4f2ea;
+}
+
+.page-experience #agentic-ai .case-study__company-role,
+.page-experience #agentic-ai .case-study__lede {
+  color: #9db4b3;
+}
+
 .page-experience #agentic-ai .case-study__lede {
   max-width: 37rem;
+}
+
+.page-experience #agentic-ai .case-study__eyebrow,
+.page-experience #agentic-ai .case-study__highlights span {
+  color: #28d7c5;
+  font-family: var(--font-typewriter);
 }
 
 .page-experience #agentic-ai .case-study__highlights {
@@ -2938,7 +2961,7 @@ a:focus-visible {
   bottom: 3.2rem;
   left: 0.46rem;
   width: 1px;
-  background: var(--color-border-soft);
+  background: #24464b;
   content: "";
 }
 
@@ -2960,20 +2983,30 @@ a:focus-visible {
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
-  background: var(--color-brand-600);
-  box-shadow: 0 0 0 0.35rem var(--color-surface);
+  background: #28d7c5;
+  box-shadow: 0 0 0 0.35rem #071315;
   content: "";
+}
+
+.page-experience #agentic-ai .case-study__highlights li:last-child::before {
+  background: #ffb869;
 }
 
 .page-experience #agentic-ai .case-study__highlights span::before {
   margin-right: 0.65rem;
-  color: var(--color-brand-600);
+  color: #28d7c5;
   content: counter(outcome-step, decimal-leading-zero);
 }
 
 .page-experience #agentic-ai .case-study__tags {
   align-self: end;
   margin-top: 1.2rem;
+}
+
+.page-experience #agentic-ai .case-study__tags li {
+  border: 1px solid #24464b;
+  background: #0e2024;
+  color: #b8f2eb;
 }
 
 .page-experience #cloud-analytics {
@@ -3038,7 +3071,7 @@ a:focus-visible {
 
   .page-skills .education-heading,
   .page-skills .skills-heading {
-    align-self: end;
+    align-self: start;
     margin: 0;
     text-align: left;
   }
