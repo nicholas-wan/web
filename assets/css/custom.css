@@ -331,7 +331,7 @@
    left and the text from the right as the scene scrubs. */
 @media screen and (max-width: 736px) {
   .intro-swipe {
-    height: 170vh;
+    height: 130vh;
   }
 
   .intro-swipe__row {
@@ -821,6 +821,11 @@ canvas {
   z-index: -1;
 }
 @media (prefers-reduced-motion: reduce) {
+  canvas#nokey {
+    display: none;
+  }
+}
+@media screen and (max-width: 736px) {
   canvas#nokey {
     display: none;
   }

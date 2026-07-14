@@ -329,10 +329,16 @@ window.onload = function() {
 /*Canvas*/
 var canvas = document.getElementById('nokey');
 var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if (canvas && !reducedMotion) {
+var compactCanvas = window.matchMedia && window.matchMedia('(max-width: 736px)').matches;
+if (canvas && (reducedMotion || compactCanvas)) {
+   canvas.hidden = true;
+}
+if (canvas && !reducedMotion && !compactCanvas) {
    var can_w = parseInt(canvas.getAttribute('width')),
    can_h = parseInt(canvas.getAttribute('height')),
-   ctx = canvas.getContext('2d');
+   ctx = canvas.getContext('2d'),
+   animationFrameId = null,
+   canvasRunning = false;
 
 // console.log(typeof can_w);
 
@@ -531,6 +537,9 @@ function addBallIfy(){
 
 // Render
 function render(){
+    if(!canvasRunning){
+        return;
+    }
     ctx.clearRect(0, 0, can_w, can_h);
 
     renderBalls();
@@ -541,7 +550,7 @@ function render(){
 
     addBallIfy();
 
-    window.requestAnimationFrame(render);
+    animationFrameId = window.requestAnimationFrame(render);
 }
 
 // Init Balls
@@ -573,10 +582,30 @@ window.addEventListener('resize', function(e){
 
 function goMovie(){
     initCanvas();
-    initBalls(30);
-    window.requestAnimationFrame(render);
+    if(!balls.length){
+        initBalls(30);
+    }
+    if(!document.hidden && !canvasRunning){
+        canvasRunning = true;
+        animationFrameId = window.requestAnimationFrame(render);
+    }
+}
+function stopMovie(){
+    canvasRunning = false;
+    if(animationFrameId !== null){
+        window.cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+    }
 }
 goMovie();
+
+document.addEventListener('visibilitychange', function(){
+    if(document.hidden){
+        stopMovie();
+    } else {
+        goMovie();
+    }
+});
 
 // Mouse effect
 canvas.addEventListener('mouseenter', function(){
