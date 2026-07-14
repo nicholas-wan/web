@@ -1482,7 +1482,7 @@ body {
   text-transform: uppercase;
 }
 
-.travel-atlas__header h2 {
+.travel-atlas__header h1 {
   margin: 0.3rem 0 0.4rem;
   color: var(--color-ink-900);
   font-size: 2rem;
@@ -1791,7 +1791,7 @@ body {
     display: block;
   }
 
-  .travel-atlas__header h2 {
+  .travel-atlas__header h1 {
     font-size: 1.55rem;
   }
 
@@ -3204,7 +3204,6 @@ a.travel-jump-group__label {
 
 .section-intro--experience::after { content: "\f0b1"; }
 .section-intro--skills::after { content: "\f19d"; }
-.section-intro--travel::after { content: "\f072"; }
 .section-intro--personal::after { content: "\f030"; }
 .section-intro--gallery::after { content: "\f015"; }
 
