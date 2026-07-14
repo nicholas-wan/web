@@ -137,6 +137,14 @@
   }
 }
 
+.education-heading h1 {
+  font-size: 2.8rem !important;
+}
+
+.skills-heading h1 {
+  font-size: 3rem !important;
+}
+
 .skills-heading p {
   max-width: 42rem;
   margin: 0.85rem auto 0;
@@ -149,9 +157,44 @@
   text-transform: none;
 }
 
-.cyber-toolkit {
+.skills-impact {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0 0 1rem;
+  border: 1px solid #dfe8e9;
+  border-radius: 9px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.skills-impact > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 1rem 1.2rem;
+  text-align: center;
+}
+
+.skills-impact > div + div {
+  border-left: 1px solid #dfe8e9;
+}
+
+.skills-impact strong {
+  color: #128a86;
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.skills-impact span {
+  color: #65767d;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
   margin-bottom: 2.5rem;
 }
@@ -219,12 +262,35 @@
 }
 
 @media all and (max-width: 736px) {
-  .cyber-toolkit {
+  .education-heading h1 {
+    font-size: 2.15rem !important;
+  }
+
+  .skills-heading h1 {
+    font-size: 1.95rem !important;
+  }
+
+  .skills-grid {
     grid-template-columns: 1fr;
   }
 
   .toolkit-card {
     padding: 1.2rem;
+  }
+}
+
+@media all and (max-width: 480px) {
+  .skills-impact {
+    grid-template-columns: 1fr;
+  }
+
+  .skills-impact > div {
+    padding: 0.8rem 1rem;
+  }
+
+  .skills-impact > div + div {
+    border-top: 1px solid #dfe8e9;
+    border-left: 0;
   }
 }
 
