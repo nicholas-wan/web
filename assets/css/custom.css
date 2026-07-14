@@ -1421,43 +1421,8 @@ body {
 }
 
 #header {
-  height: 7rem;
-  padding-bottom: 1.5rem;
-}
-
-#nav > .nav-home {
-  display: none;
-  flex: 0 0 4rem;
-  width: 4rem;
-  height: 4rem;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-right: 1px solid rgba(255, 255, 255, 0.14);
-  font-size: 1.05rem;
-  line-height: 4rem;
-}
-
-#nav > .nav-home:hover,
-#nav > .nav-home:focus-visible {
-  background: rgba(255, 255, 255, 0.1);
-  color: #55d1cc !important;
-  outline: none;
-}
-
-@media screen and (min-width: 981px) {
-  #header {
-    height: 4rem;
-    padding: 0;
-  }
-
-  #header .logo {
-    display: none;
-  }
-
-  #nav > .nav-home {
-    display: flex;
-  }
+  height: 10rem;
+  padding-bottom: 5rem;
 }
 
 #header .logo {
@@ -1490,9 +1455,9 @@ body {
 }
 
 .homepage .homepage-link {
-  min-height: 6rem;
+  min-height: 8rem;
   justify-content: center;
-  gap: 0;
+  gap: 0.35rem;
   padding: 1.15rem 3.75rem 1.15rem 1.25rem;
   background: #ffffff;
   box-shadow: none;
@@ -1522,6 +1487,13 @@ body {
 
 .homepage .homepage-link__icon > .icon {
   font-size: 1.35rem;
+}
+
+.homepage .homepage-link__desc {
+  max-width: 15rem;
+  color: #68727e;
+  font-size: 0.86rem;
+  line-height: 1.45;
 }
 
 .homepage-secondary {
