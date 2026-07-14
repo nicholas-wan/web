@@ -82,6 +82,7 @@
 }
 
 .education-highlights {
+  min-height: 3.55rem;
   margin-top: 0.85rem !important;
   padding-top: 0.8rem;
   border-top: 1px solid #edf0f1;
@@ -1699,7 +1700,10 @@ body {
   text-align: left;
 }
 
-.portfolio-overview,
+.portfolio-overview {
+  padding: 2rem !important;
+}
+
 .credentials {
   padding: 4rem !important;
 }
@@ -1708,13 +1712,6 @@ body {
   scroll-margin-top: 1.5rem;
 }
 
-.portfolio-heading {
-  max-width: 52rem;
-  margin: 0 auto 3rem;
-  text-align: center;
-}
-
-.portfolio-heading__eyebrow,
 .resume-hero header > span {
   display: block;
   margin-bottom: 0.65rem;
@@ -1727,7 +1724,6 @@ body {
   text-transform: uppercase;
 }
 
-.portfolio-heading h1,
 .resume-hero h1 {
   margin: 0 0 1rem;
   color: #1f3038;
@@ -1735,7 +1731,6 @@ body {
   line-height: 1.1;
 }
 
-.portfolio-heading p,
 .resume-hero header > p {
   margin: 0;
   color: #53656c;
@@ -1783,45 +1778,6 @@ body {
   align-items: stretch;
 }
 
-.case-study.case-study--compact {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-areas:
-    "company intro"
-    "highlights highlights"
-    "tags tags";
-  grid-template-columns: minmax(15rem, 0.8fr) minmax(0, 1.4fr);
-  gap: 0 1.35rem;
-  padding: 1.25rem 1.4rem;
-}
-
-.case-study--compact > .case-study__company {
-  grid-area: company;
-  margin-bottom: 0.65rem;
-}
-
-.case-study--compact > header {
-  grid-area: intro;
-}
-
-.case-study--compact > .case-study__highlights {
-  grid-area: highlights;
-  margin: 0.8rem 0 1rem;
-}
-
-.case-study--compact > .case-study__tags {
-  grid-area: tags;
-  margin-top: 1rem;
-}
-
-.case-study--compact h2 {
-  font-size: 1.35rem;
-}
-
-.case-study--compact .case-study__lede {
-  margin-bottom: 0;
-}
-
 .case-study {
   position: relative;
   display: flex;
@@ -1834,7 +1790,7 @@ body {
   box-shadow: 0 0.45rem 1.5rem rgba(3, 14, 30, 0.055);
 }
 
-.case-study--lead {
+.case-study--work {
   grid-column: 1 / -1;
   padding: 1.6rem 1.75rem;
 }
@@ -1847,7 +1803,7 @@ body {
   text-align: left;
 }
 
-.case-study--lead > .case-study__company {
+.case-study--work > .case-study__company {
   margin-bottom: 1rem;
 }
 
@@ -1993,12 +1949,13 @@ body {
 }
 
 .case-study--internship .case-study__company {
-  min-height: 4.5rem;
+  min-height: 5.4rem;
   align-items: flex-start;
   margin-bottom: 0.8rem;
 }
 
 .case-study--internship h2 {
+  min-height: 2.8rem;
   margin-bottom: 0.5rem;
   font-size: 1.15rem;
 }
@@ -2320,16 +2277,14 @@ body {
     padding: 0.65rem 1rem;
   }
 
-  .portfolio-overview,
+  .portfolio-overview {
+    padding: 1rem !important;
+  }
+
   .credentials {
     padding: 2.25rem 1rem !important;
   }
 
-  .portfolio-heading {
-    margin-bottom: 2rem;
-  }
-
-  .portfolio-heading h1,
   .resume-hero h1 {
     font-size: 2.2rem;
   }
@@ -2348,11 +2303,6 @@ body {
     padding: 1.3rem;
   }
 
-  .case-study.case-study--compact {
-    display: flex;
-    padding: 1.3rem;
-  }
-
   .case-study__highlights {
     grid-template-columns: 1fr;
     padding: 0;
@@ -2368,12 +2318,13 @@ body {
     border-top: 0;
   }
 
-  .case-study--compact .case-study__tags {
-    margin-top: 0;
+  .case-study--work {
+    padding: 1.3rem;
   }
 
-  .case-study--lead {
-    padding: 1.3rem;
+  .case-study--internship .case-study__company,
+  .case-study--internship h2 {
+    min-height: 0;
   }
 
   .case-study h2 {
@@ -2687,6 +2638,7 @@ a.travel-jump-group__label {
 }
 
 .section-intro--experience::after { content: "\f0b1"; }
+.section-intro--skills::after { content: "\f19d"; }
 .section-intro--travel::after { content: "\f072"; }
 .section-intro--personal::after { content: "\f030"; }
 .section-intro--gallery::after { content: "\f015"; }
