@@ -4420,6 +4420,7 @@ a:focus-visible {
   text-transform: none !important;
   white-space: normal !important;
   cursor: pointer;
+  text-decoration: none;
   overflow: hidden;
   transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease, transform 0.5s ease !important;
 }
@@ -4551,6 +4552,7 @@ a:focus-visible {
 }
 
 .personal-event-card--static .personal-event-card__body {
+  min-height: 100%;
   justify-content: center;
 }
 
@@ -5201,6 +5203,79 @@ body.personal-story-is-open {
   font-size: 0.62rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.cats-instagram {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 1.6rem);
+  border: 1px solid #dedede;
+  border-radius: 0.7rem;
+  background: #fff;
+  box-shadow: 0 1rem 2.4rem rgba(23, 30, 31, 0.08);
+}
+
+.cats-instagram__header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  margin-bottom: 1.1rem;
+}
+
+.cats-instagram__header > .icon {
+  display: grid;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: 0 0 auto;
+  border-radius: 0.75rem;
+  background: linear-gradient(145deg, #feda75 0%, #fa7e1e 28%, #d62976 58%, #962fbf 78%, #4f5bd5 100%);
+  color: #fff;
+  font-size: 1.45rem;
+  place-items: center;
+}
+
+.cats-instagram__header h2 {
+  margin: 0 0 0.2rem;
+  color: var(--color-ink-900);
+  font-size: clamp(1.15rem, 3vw, 1.55rem);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.cats-instagram__header p,
+.cats-instagram__fallback {
+  margin: 0;
+  color: #707070;
+  font-size: 0.78rem;
+  text-align: left;
+}
+
+.cats-instagram__embed {
+  min-height: 10rem;
+}
+
+.cats-instagram__embed .instagram-media {
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+}
+
+.cats-instagram__embed > .instagram-media:not([style]) {
+  display: grid;
+  min-height: 10rem;
+  padding: 1.5rem;
+  border: 1px solid #e5e5e5;
+  border-radius: 0.45rem;
+  background: #fafafa;
+  place-items: center;
+  text-align: center;
+}
+
+.cats-instagram__embed > .instagram-media:not([style]) a {
+  color: var(--color-brand-700);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 800;
 }
 
 @media screen and (max-width: 980px) {
