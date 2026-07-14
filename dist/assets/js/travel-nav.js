@@ -53,10 +53,33 @@
     if (!button || !route) return;
 
     group.classList.add('is-truncated');
+    button.setAttribute('aria-expanded', 'false');
+
+    var updateDesktopWrap = function () {
+      group.classList.remove('is-desktop-wrapped');
+      if (window.matchMedia('(max-width: 600px)').matches) return;
+
+      var stops = route.querySelectorAll('.guangzhou-route__stop');
+      var firstTop = stops.length ? stops[0].offsetTop : 0;
+      var wrapped = Array.prototype.some.call(stops, function (stop) {
+        return stop.offsetTop > firstTop + 2;
+      });
+      group.classList.toggle('is-desktop-wrapped', wrapped);
+    };
+
+    requestAnimationFrame(updateDesktopWrap);
     button.addEventListener('click', function () {
+      if (window.matchMedia('(min-width: 601px)').matches) {
+        var desktopExpanded = group.classList.toggle('is-expanded');
+        button.textContent = desktopExpanded ? 'Show less' : 'View full route';
+        button.setAttribute('aria-expanded', desktopExpanded ? 'true' : 'false');
+        return;
+      }
+
       if (!supportsDialog) {
         var expanded = group.classList.toggle('is-expanded');
         button.textContent = expanded ? 'Show less' : 'View full route';
+        button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
         return;
       }
 
@@ -82,6 +105,13 @@
       });
       dialog.addEventListener('close', function () { dialog.remove(); });
       dialog.showModal();
+    });
+
+    window.addEventListener('resize', function () {
+      group.classList.remove('is-expanded');
+      button.textContent = 'View full route';
+      button.setAttribute('aria-expanded', 'false');
+      requestAnimationFrame(updateDesktopWrap);
     });
   });
 }());
