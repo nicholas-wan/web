@@ -1651,7 +1651,7 @@ body {
   --map-scale: 1;
   position: relative;
   width: 100%;
-  aspect-ratio: 3151 / 1667;
+  aspect-ratio: 1200 / 624;
   transform-origin: 0 0;
 }
 
@@ -1661,8 +1661,7 @@ body {
   height: 100%;
   margin: 0;
   object-fit: contain;
-  opacity: 0.48;
-  filter: invert(79%) sepia(13%) saturate(754%) hue-rotate(128deg) brightness(88%) contrast(83%);
+  opacity: 1;
   pointer-events: none;
 }
 
@@ -1735,7 +1734,20 @@ body {
   line-height: 1.15;
   text-transform: none;
   transform: translateY(-50%);
+  transition: opacity 0.15s ease, visibility 0.15s ease,
+    border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
   white-space: nowrap;
+}
+
+.travel-map__detail.is-label-hidden .travel-map__detail-label {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.travel-map__detail.is-label-hidden:hover .travel-map__detail-label,
+.travel-map__detail.is-label-hidden:focus-visible .travel-map__detail-label {
+  opacity: 1;
+  visibility: visible;
 }
 
 .travel-map__detail[data-label-side="left"] .travel-map__detail-label {
