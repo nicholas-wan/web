@@ -4,7 +4,7 @@
 
   var menuToggle = document.getElementById('navPanelToggle');
   if (menuToggle) {
-    nav.appendChild(menuToggle);
+    nav.insertBefore(menuToggle, nav.firstChild);
     nav.classList.add('travel-section-nav--with-menu');
   }
 

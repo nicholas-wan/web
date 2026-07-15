@@ -107,7 +107,9 @@
     // parks it fully offscreen left (48px covers the box-shadow bleed).
     function measure() {
       var prev = section.style.getPropertyValue('--p');
+      var prevPhoto = section.style.getPropertyValue('--photo-p');
       section.style.setProperty('--p', '1');
+      section.style.setProperty('--photo-p', '1');
       var pr = photo.getBoundingClientRect();
       if (window.innerWidth <= 736) {
         section.style.setProperty('--swipe-photo', (-(pr.right + 48)).toFixed(1) + 'px');
@@ -117,6 +119,9 @@
       var tr = text.getBoundingClientRect();
       section.style.setProperty('--swipe-text', (window.innerWidth - tr.left + 32).toFixed(1) + 'px');
       if (prev) { section.style.setProperty('--p', prev); }
+      else { section.style.removeProperty('--p'); }
+      if (prevPhoto) { section.style.setProperty('--photo-p', prevPhoto); }
+      else { section.style.removeProperty('--photo-p'); }
     }
 
     function update() {
@@ -125,6 +130,13 @@
         ? Math.min(1, Math.max(0, -section.getBoundingClientRect().top / scrollable))
         : 1;
       section.style.setProperty('--p', p.toFixed(4));
+      /* Let the mobile portrait announce the transition immediately instead
+         of staying outside the viewport for the first part of this short
+         pinned scene. The text keeps its natural scroll progress. */
+      var photoProgress = window.innerWidth <= 736
+        ? Math.min(1, 0.28 + (p * 1.3))
+        : p;
+      section.style.setProperty('--photo-p', photoProgress.toFixed(4));
     }
 
     var ticking = false;

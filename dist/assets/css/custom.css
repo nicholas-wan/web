@@ -654,7 +654,7 @@
   .intro-swipe__photo {
     /* JS measures the exact offscreen-left distance; the fallback only
        covers the moment before it runs. */
-    transform: translateX(calc((1 - var(--p, 1)) * var(--swipe-photo, -110vw)));
+    transform: translateX(calc((1 - var(--photo-p, var(--p, 1))) * var(--swipe-photo, -110vw)));
   }
 
   .intro-swipe__photo img {
@@ -1109,7 +1109,7 @@ canvas {
 }
 @media screen and (max-width: 736px) {
   canvas#nokey {
-    display: none;
+    display: block;
   }
 }
 @media screen and (min-width: 800px) {
@@ -3975,7 +3975,7 @@ a.travel-jump-group__label {
     min-height: 3.5rem;
     gap: 0;
     margin-bottom: 1.25rem;
-    padding: 0 0 0 0.75rem !important;
+    padding: 0 0.75rem 0 0 !important;
     box-sizing: border-box;
     overflow: hidden;
     background: rgba(25, 30, 35, 0.98);
@@ -4003,9 +4003,10 @@ a.travel-jump-group__label {
     flex: 0 0 3.5rem;
     align-items: center;
     justify-content: center;
-    margin-left: auto;
+    margin-right: 0.5rem;
     padding: 0;
-    border-left: 1px solid rgba(255, 255, 255, 0.16);
+    border: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 0;
     background: transparent;
     box-shadow: none;
@@ -4016,7 +4017,7 @@ a.travel-jump-group__label {
 
   .travel-section-nav--with-menu.is-stuck #navPanelToggle,
   .travel-section-nav--with-menu.is-stuck #navPanelToggle.alt {
-    border-left-color: rgba(0, 0, 0, 0.12);
+    border-right-color: rgba(0, 0, 0, 0.12);
     background: transparent;
     color: #212931;
   }
@@ -4459,8 +4460,19 @@ a:focus-visible {
   }
 
   .travel-pagination a {
-    min-height: 4.25rem;
-    padding: 0.7rem 0.8rem;
+    min-height: 3.25rem;
+    padding: 0.45rem 0.55rem;
+    border: 0;
+    border-radius: 0.25rem;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .travel-pagination a:hover,
+  .travel-pagination a:focus-visible {
+    border-color: transparent;
+    background: var(--color-brand-faint);
+    box-shadow: none;
   }
 
   .site-pager__link {
@@ -6157,26 +6169,53 @@ body.page-home #nav {
     position: relative;
     top: auto;
     left: auto;
-    width: 100%;
+    width: min(19.5rem, calc(100vw - 4.75rem));
     max-height: 0;
-    margin-top: 0;
-    padding: 0 0.65rem;
-    border-width: 0;
-    border-radius: 0 0 var(--radius-card) var(--radius-card);
+    margin: 0 auto;
+    padding: 0;
+    border: 0 solid #111820;
+    border-radius: 1.6rem;
+    background: #fff;
     box-shadow: none;
     overflow: hidden;
     transform: translateY(-0.35rem);
   }
 
   .personal-timeline-event--cats-preview.is-cats-preview-open .personal-event-card__instagram-preview {
-    max-height: 32rem;
-    margin-top: -0.35rem;
-    padding: 0.65rem;
-    border-width: 1px;
+    max-height: min(36rem, 72svh);
+    margin-top: 0.75rem;
+    padding: 0.55rem;
+    border-width: 1.45rem 0.42rem 0.55rem;
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0);
     visibility: visible;
+    box-shadow: 0 1rem 2.1rem rgba(3, 14, 30, 0.22);
+    overflow: hidden auto;
+  }
+
+  .personal-event-card__instagram-preview::before {
+    position: absolute;
+    top: -0.93rem;
+    left: 50%;
+    width: 3.25rem;
+    height: 0.28rem;
+    border-radius: 999px;
+    background: #56606a;
+    content: "";
+    transform: translateX(-50%);
+  }
+
+  .personal-event-card__instagram-preview .instagram-media,
+  .personal-event-card__instagram-preview iframe {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+  }
+
+  .personal-event-card__instagram-preview .cats-instagram__embed {
+    border-radius: 0.9rem;
+    overflow: hidden;
   }
 
   .personal-timeline-event::before {

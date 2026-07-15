@@ -335,10 +335,10 @@ window.addEventListener('load', function() {
 var canvas = document.getElementById('nokey');
 var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var compactCanvas = window.matchMedia && window.matchMedia('(max-width: 736px)').matches;
-if (canvas && (reducedMotion || compactCanvas)) {
+if (canvas && reducedMotion) {
    canvas.hidden = true;
 }
-if (canvas && !reducedMotion && !compactCanvas) {
+if (canvas && !reducedMotion) {
    var can_w = parseInt(canvas.getAttribute('width')),
    can_h = parseInt(canvas.getAttribute('height')),
    ctx = canvas.getContext('2d'),
@@ -368,7 +368,8 @@ var ball = {
 
 // Line
    link_line_width = 0.8,
-   dis_limit = 210,
+   dis_limit = compactCanvas ? 145 : 210,
+   ball_limit = compactCanvas ? 9 : 14,
    add_mouse_point = true,
    mouse_in = false,
    mouse_ball = {
@@ -534,7 +535,7 @@ function getDisOf(b1, b2){
 
 // add balls if there a little balls
 function addBallIfy(){
-    if(balls.length < 14){
+    if(balls.length < ball_limit){
         balls.push(getRandomBall());
     }
 }
@@ -590,7 +591,7 @@ window.addEventListener('resize', function(e){
 function goMovie(){
     initCanvas();
     if(!balls.length){
-        initBalls(20);
+        initBalls(compactCanvas ? 11 : 20);
     }
     if(!document.hidden && !canvasRunning){
         canvasRunning = true;
