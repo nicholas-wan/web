@@ -2390,6 +2390,27 @@ body {
 }
 
 /* Guangzhou journal */
+.page-travel-journal header.major > .date {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  white-space: nowrap;
+}
+
+.page-travel-journal header.major > .date::before,
+.page-travel-journal header.major > .date::after {
+  position: static;
+  flex: 1 1 0;
+  width: auto;
+}
+
+@media screen and (max-width: 480px) {
+  .page-travel-journal header.major > .date {
+    gap: 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
 .guangzhou-journal__hero {
   margin-bottom: 3rem !important;
   text-align: center;
