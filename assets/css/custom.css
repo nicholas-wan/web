@@ -2050,31 +2050,6 @@ body {
   opacity: 0.4;
 }
 
-.travel-map__wheel-hint {
-  position: absolute;
-  bottom: 0.6rem;
-  left: 50%;
-  z-index: 6;
-  padding: 0.3rem 0.6rem;
-  border: 1px solid rgba(152, 201, 198, 0.25);
-  border-radius: 0.35rem;
-  background: rgba(7, 19, 21, 0.92);
-  color: rgba(255, 255, 255, 0.85);
-  font-family: var(--font-display);
-  font-size: 0.62rem;
-  letter-spacing: 0.05em;
-  opacity: 0;
-  pointer-events: none;
-  text-transform: uppercase;
-  transform: translateX(-50%);
-  transition: opacity 0.2s ease;
-  white-space: nowrap;
-}
-
-.travel-map__wheel-hint.is-visible {
-  opacity: 1;
-}
-
 @media screen and (max-width: 736px) {
   .travel-atlas {
     margin: 0 1rem;
@@ -2830,6 +2805,44 @@ body {
     overscroll-behavior-inline: contain;
     scroll-snap-type: inline proximity;
     scrollbar-width: thin;
+  }
+
+  .journal-scroll-cue {
+    display: flex;
+    min-height: 1.35rem;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    margin: 0.7rem 0 -0.7rem;
+    color: var(--color-brand-700);
+    font-family: var(--font-display);
+    font-size: 0.63rem;
+    font-weight: 800;
+    letter-spacing: 0.07em;
+    opacity: 0.72;
+    text-transform: uppercase;
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+  }
+
+  .journal-scroll-cue[hidden] {
+    display: none;
+  }
+
+  .journal-scroll-cue i {
+    font-size: 0.9rem;
+    font-style: normal;
+    animation: journal-scroll-nudge 1.4s ease-in-out infinite;
+  }
+
+  .journal-scroll-cue.is-dismissed {
+    opacity: 0;
+    transform: translateX(0.4rem);
+    visibility: hidden;
+  }
+
+  .guangzhou-day--compact .masonry.has-scroll-cue {
+    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 2.25rem), transparent 100%);
+    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 2.25rem), transparent 100%);
   }
 
   .guangzhou-day--compact .masonry .brick {
@@ -4125,6 +4138,17 @@ a.travel-jump-group__label {
   }
 }
 
+@keyframes journal-scroll-nudge {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(0.22rem); }
+}
+
+@media screen and (min-width: 601px) {
+  .journal-scroll-cue {
+    display: none;
+  }
+}
+
 .travel-pagination {
   display: flex;
   justify-content: space-between;
@@ -4381,30 +4405,35 @@ a:focus-visible {
 .lightbox button {
   appearance: none;
   box-sizing: border-box;
-  width: 3rem !important;
-  height: 3rem !important;
-  min-width: 3rem !important;
-  min-height: 3rem !important;
+  width: 2.65rem !important;
+  height: 2.65rem !important;
+  min-width: 2.65rem !important;
+  min-height: 2.65rem !important;
   padding: 0 !important;
-  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 50% !important;
-  background: rgba(20, 24, 32, 0.82) !important;
-  box-shadow: 0 0.35rem 1rem rgba(0, 0, 0, 0.3) !important;
-  color: #fff !important;
+  background: rgba(20, 24, 32, 0.3) !important;
+  box-shadow: none !important;
+  color: rgba(255, 255, 255, 0.72) !important;
   font-family: Arial, sans-serif !important;
-  font-size: 1.25rem !important;
+  font-size: 1.1rem !important;
   font-weight: 400 !important;
   line-height: 1 !important;
   text-align: center !important;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  opacity: 0.72;
+  backdrop-filter: blur(0.2rem);
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
 }
 
 .lightbox button:hover,
 .lightbox button:focus-visible {
-  background: rgba(70, 80, 98, 0.95) !important;
+  border-color: rgba(255, 255, 255, 0.34) !important;
+  background: rgba(20, 24, 32, 0.68) !important;
+  color: #fff !important;
+  opacity: 1;
   outline: none;
-  transform: scale(1.06);
+  transform: scale(1.03);
 }
 
 .lightbox__close,
@@ -4470,10 +4499,6 @@ a:focus-visible {
 
   .site-pager__link > strong {
     overflow-wrap: anywhere;
-  }
-
-  body.page-event .site-pager {
-    padding: 0.5rem 1rem 1.5rem !important;
   }
 
   .gallery-intro {
@@ -6055,41 +6080,21 @@ body.page-event #nav {
   margin-top: 0 !important;
 }
 
-body.page-event .site-pager {
-  display: block;
+body.page-home #intro {
   width: 100%;
-  max-width: none;
-  margin: 0 !important;
-  padding: 0 !important;
-  border-top: 1px solid var(--color-border-soft) !important;
-  background: #fff;
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0;
 }
 
-body.page-event .site-pager__link {
-  width: 100%;
-  max-width: 64rem;
-  min-height: 4rem;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  margin: 0 auto;
-  padding: 1rem 2rem;
-  background: transparent;
+body.page-home #nav {
+  margin-top: 0;
 }
 
-body.page-event .site-pager__link > span {
-  display: none;
-}
-
-body.page-event .site-pager__link > strong {
-  color: var(--color-brand-700);
-  font-size: 0.78rem;
-}
-
-body.page-event .site-pager__link:hover,
-body.page-event .site-pager__link:focus-visible {
-  background: transparent;
-  color: var(--color-brand-600);
+@media (prefers-reduced-motion: reduce) {
+  .journal-scroll-cue i {
+    animation: none;
+  }
 }
 
 @media screen and (max-width: 980px) {

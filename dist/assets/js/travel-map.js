@@ -1,7 +1,7 @@
-/* Travel map zoom + pan. Pointer-events based: Ctrl/Cmd + wheel (and trackpad
-   pinch) zooms, buttons zoom, double-click zooms in, one-finger/mouse drag pans
-   while zoomed, two-finger pinch zooms on touch. Markers counter-scale via the
-   --map-scale custom property so pins and popups keep their screen size. */
+/* Travel map zoom + pan. The wheel zooms whenever the pointer is over the map;
+   at either zoom limit the page is allowed to continue scrolling. Buttons,
+   double-click, drag, and touch pinch remain available. Markers counter-scale
+   so pins and popups keep their screen size. */
 (function () {
   var viewport = document.querySelector('.travel-map__viewport');
   if (!viewport || typeof window.PointerEvent !== 'function') return;
@@ -12,7 +12,7 @@
   if (!canvas || !controls) return;
 
   var MIN_SCALE = 1;
-  var MAX_SCALE = 4;
+  var MAX_SCALE = 7;
   var BUTTON_STEP = 1.5;
 
   var scale = 1;
@@ -68,26 +68,15 @@
     else { scale = 1; tx = 0; ty = 0; apply(); }
   });
 
-  /* Ctrl/Cmd + wheel zooms (trackpad pinches arrive as ctrlKey wheels). A bare
-     wheel keeps scrolling the page, with a short hint so the gesture is
-     discoverable. */
-  var hint = document.createElement('div');
-  hint.className = 'travel-map__wheel-hint';
-  hint.setAttribute('aria-hidden', 'true');
-  hint.textContent = 'Use Ctrl + scroll to zoom the map';
-  viewport.appendChild(hint);
-  var hintTimer = null;
-
+  /* Wheel and trackpad scrolling zoom around the pointer. Once the map reaches
+     either limit, that same-direction gesture returns to normal page scroll. */
   viewport.addEventListener('wheel', function (event) {
-    if (event.ctrlKey || event.metaKey) {
-      event.preventDefault();
-      var rect = viewport.getBoundingClientRect();
-      zoomAt(event.clientX - rect.left, event.clientY - rect.top, scale * Math.exp(-event.deltaY * 0.0022));
-    } else if (scale > 1.001) {
-      hint.classList.add('is-visible');
-      window.clearTimeout(hintTimer);
-      hintTimer = window.setTimeout(function () { hint.classList.remove('is-visible'); }, 1200);
-    }
+    if (event.target.closest('.travel-map__controls')) return;
+    var nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * Math.exp(-event.deltaY * 0.0018)));
+    if (Math.abs(nextScale - scale) < 0.001) return;
+    event.preventDefault();
+    var rect = viewport.getBoundingClientRect();
+    zoomAt(event.clientX - rect.left, event.clientY - rect.top, nextScale);
   }, { passive: false });
 
   viewport.addEventListener('dblclick', function (event) {

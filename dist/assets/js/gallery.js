@@ -66,6 +66,33 @@
     trigger.addEventListener('click', function (event) { event.preventDefault(); show(index); });
     trigger.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); show(index); } });
   });
+
+  /* Compact mobile journals are horizontal. A fading edge plus one short cue
+     makes that interaction discoverable, then gets out of the way after the
+     visitor actually scrolls each gallery. */
+  Array.prototype.forEach.call(document.querySelectorAll('.guangzhou-day--compact .masonry'), function (gallery) {
+    var cue = document.createElement('div');
+    cue.className = 'journal-scroll-cue';
+    cue.setAttribute('aria-hidden', 'true');
+    cue.innerHTML = '<span>Swipe to browse</span><i aria-hidden="true">&#8594;</i>';
+    gallery.parentNode.insertBefore(cue, gallery);
+
+    var refreshCue = function () {
+      var scrollable = gallery.scrollWidth > gallery.clientWidth + 4;
+      cue.hidden = !scrollable;
+      gallery.classList.toggle('has-scroll-cue', scrollable && gallery.scrollLeft < 6);
+    };
+    var dismissCue = function () {
+      if (gallery.scrollLeft < 6) return;
+      cue.classList.add('is-dismissed');
+      gallery.classList.remove('has-scroll-cue');
+    };
+
+    gallery.addEventListener('scroll', dismissCue, { passive: true });
+    window.addEventListener('resize', refreshCue);
+    requestAnimationFrame(refreshCue);
+  });
+
   overlay.querySelector('.lightbox__close').addEventListener('click', close);
   overlay.querySelector('.lightbox__previous').addEventListener('click', function () { show(current - 1); });
   overlay.querySelector('.lightbox__next').addEventListener('click', function () { show(current + 1); });
