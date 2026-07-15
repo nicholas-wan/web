@@ -8,6 +8,12 @@
     nav.classList.add('travel-section-nav--with-menu');
   }
 
+  var mobileNav = window.matchMedia('(max-width: 980px)');
+  var updateNavSurface = function () {
+    var isStuck = mobileNav.matches && nav.getBoundingClientRect().top <= 1;
+    nav.classList.toggle('is-stuck', isStuck);
+  };
+
   var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#trip-section-"]'));
   var sections = links.map(function (link) {
     return document.getElementById(link.getAttribute('href').slice(1));
@@ -28,6 +34,7 @@
      IntersectionObserver band, this also resolves after anchor jumps and on
      initial load. */
   var update = function () {
+    updateNavSurface();
     var line = window.innerHeight * 0.3;
     var current = sections[0];
     for (var i = 0; i < sections.length; i++) {

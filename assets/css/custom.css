@@ -3980,11 +3980,9 @@ a.travel-jump-group__label {
   color: #fff;
 }
 
-/* Single-row sticky trip nav for phones AND tablets (up to 980px, where the
-   desktop #nav is hidden and the hamburger toggle is the only site nav). This
-   keeps the moved Menu button in-flow instead of letting it float over the nav
-   pills / an open lightbox, and keeps the nav one predictable row tall so
-   anchor jumps land cleanly (scroll-margin-top matches). */
+/* Single-row trip toolbar for phones and tablets. It begins as a continuation
+   of the dark journal opening, then eases into the light sticky reading state
+   once the black header has left the screen. */
 @media screen and (max-width: 980px) {
   [id^="trip-section-"] {
     scroll-margin-top: 4rem;
@@ -4000,6 +3998,16 @@ a.travel-jump-group__label {
     padding: 0 0 0 0.75rem !important;
     box-sizing: border-box;
     overflow: hidden;
+    background: rgba(25, 30, 35, 0.98);
+    border-bottom-color: rgba(255, 255, 255, 0.14);
+    box-shadow: none;
+    transition: background-color 0.38s ease, border-color 0.38s ease, box-shadow 0.38s ease;
+  }
+
+  .travel-section-nav.is-stuck {
+    background: rgba(255, 255, 255, 0.97);
+    border-bottom-color: rgba(0, 0, 0, 0.12);
+    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
   }
 
   .travel-section-nav--with-menu #navPanelToggle,
@@ -4017,12 +4025,20 @@ a.travel-jump-group__label {
     justify-content: center;
     margin-left: auto;
     padding: 0;
-    border-left: 1px solid rgba(0, 0, 0, 0.12);
+    border-left: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 0;
-    background: rgba(255, 255, 255, 0.96);
-    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
-    color: #212931;
+    background: transparent;
+    box-shadow: none;
+    color: #fff;
     font-size: 0;
+    transition: color 0.38s ease, border-color 0.38s ease;
+  }
+
+  .travel-section-nav--with-menu.is-stuck #navPanelToggle,
+  .travel-section-nav--with-menu.is-stuck #navPanelToggle.alt {
+    border-left-color: rgba(0, 0, 0, 0.12);
+    background: transparent;
+    color: #212931;
   }
 
   .travel-section-nav--with-menu #navPanelToggle::before {
@@ -4074,6 +4090,38 @@ a.travel-jump-group__label {
   .travel-section-nav a {
     min-height: 2.25rem;
     padding: 0.4rem 0.7rem;
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    transition: background-color 0.38s ease, border-color 0.38s ease, color 0.38s ease;
+  }
+
+  .travel-section-nav a.is-active {
+    border-color: #128a86;
+    background: #128a86;
+    color: #fff;
+  }
+
+  .travel-section-nav.is-stuck .travel-jump-group__label,
+  .travel-section-nav.is-stuck a {
+    border-color: rgba(0, 0, 0, 0.16);
+    background: #fff;
+    color: #333;
+  }
+
+  .travel-section-nav.is-stuck a.is-active {
+    border-color: #128a86;
+    background: #128a86;
+    color: #fff;
+  }
+
+  .travel-section-nav .travel-jump-group + .travel-jump-group {
+    border-left-color: rgba(255, 255, 255, 0.18);
+    transition: border-color 0.38s ease;
+  }
+
+  .travel-section-nav.is-stuck .travel-jump-group + .travel-jump-group {
+    border-left-color: rgba(0, 0, 0, 0.12);
   }
 }
 
