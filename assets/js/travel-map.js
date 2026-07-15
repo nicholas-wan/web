@@ -141,7 +141,7 @@
       link.style.left = position.x + '%';
       link.style.top = position.y + '%';
       link.setAttribute('data-map-level', point[0]);
-      link.setAttribute('data-label-side', index % 3 === 0 ? 'left' : (index % 3 === 1 ? 'right' : 'below'));
+      link.setAttribute('data-label-order', index.toString());
       link.setAttribute('aria-label', 'Open ' + point[1] + ' in its travel journal');
       link.setAttribute('tabindex', '-1');
 
@@ -151,7 +151,11 @@
       var label = document.createElement('span');
       label.className = 'travel-map__detail-label';
       label.textContent = point[1];
+      var leader = document.createElement('span');
+      leader.className = 'travel-map__detail-leader';
+      leader.setAttribute('aria-hidden', 'true');
       link.appendChild(dot);
+      link.appendChild(leader);
       link.appendChild(label);
       layer.appendChild(link);
       detailLinks.push(link);
@@ -164,22 +168,107 @@
       first.top < second.bottom + padding && first.bottom + padding > second.top;
   };
 
-  /* Keep every geographic dot visible and clickable. When labels collide,
-     only the later label is tucked away; hover or keyboard focus reveals it. */
+  var overlapArea = function (first, second, padding) {
+    var width = Math.min(first.right, second.right + padding) - Math.max(first.left, second.left - padding);
+    var height = Math.min(first.bottom, second.bottom + padding) - Math.max(first.top, second.top - padding);
+    return Math.max(0, width) * Math.max(0, height);
+  };
+
+  var LABEL_DIRECTIONS = [
+    { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: -1 }, { x: 0, y: 1 },
+    { x: 1, y: -1 }, { x: -1, y: -1 }, { x: 1, y: 1 }, { x: -1, y: 1 }
+  ];
+  var LABEL_DISTANCES = [0, 14, 28, 44, 62, 82, 104];
+
+  var makeLabelCandidate = function (markerX, markerY, width, height, direction, distance) {
+    var gap = 11 + distance;
+    var left = direction.x > 0 ? gap : (direction.x < 0 ? -width - gap : -width / 2);
+    var top = direction.y > 0 ? gap : (direction.y < 0 ? -height - gap : -height / 2);
+    return {
+      left: markerX + left,
+      top: markerY + top,
+      right: markerX + left + width,
+      bottom: markerY + top + height,
+      offsetX: left,
+      offsetY: top
+    };
+  };
+
+  var applyLabelCandidate = function (link, label, leader, candidate, width, height) {
+    label.style.setProperty('--label-x', candidate.offsetX + 'px');
+    label.style.setProperty('--label-y', candidate.offsetY + 'px');
+    var centreX = candidate.offsetX + width / 2;
+    var centreY = candidate.offsetY + height / 2;
+    leader.style.setProperty('--leader-length', Math.hypot(centreX, centreY) + 'px');
+    leader.style.setProperty('--leader-angle', Math.atan2(centreY, centreX) + 'rad');
+    link.classList.remove('is-label-offscreen');
+  };
+
+  /* Labels remain readable callouts while their dots retain true coordinates.
+     Try progressively wider placements and draw a thin leader back to each
+     marker instead of silently hiding later labels in a dense cluster. */
   var layoutLabels = function () {
     labelLayoutFrame = 0;
     var occupied = [];
-    detailLinks.forEach(function (link) { link.classList.remove('is-label-hidden'); });
+    detailLinks.forEach(function (link) { link.classList.remove('is-label-hidden', 'is-label-offscreen'); });
     if (detailLevel === 'region') return;
+
+    var viewportRect = viewport.getBoundingClientRect();
+    var viewportPadding = 5;
 
     detailLinks.forEach(function (link) {
       if (link.getAttribute('data-map-level') !== detailLevel) return;
       var label = link.querySelector('.travel-map__detail-label');
-      if (!label) return;
-      var rect = label.getBoundingClientRect();
-      var collides = occupied.some(function (accepted) { return boxesOverlap(rect, accepted, 4); });
-      if (collides) link.classList.add('is-label-hidden');
-      else occupied.push(rect);
+      var leader = link.querySelector('.travel-map__detail-leader');
+      var dot = link.querySelector('.travel-map__detail-dot');
+      if (!label || !leader || !dot) return;
+
+      var dotRect = dot.getBoundingClientRect();
+      var markerX = dotRect.left + dotRect.width / 2;
+      var markerY = dotRect.top + dotRect.height / 2;
+      if (markerX < viewportRect.left || markerX > viewportRect.right ||
+          markerY < viewportRect.top || markerY > viewportRect.bottom) {
+        link.classList.add('is-label-offscreen');
+        return;
+      }
+
+      var width = label.offsetWidth;
+      var height = label.offsetHeight;
+      var order = parseInt(link.getAttribute('data-label-order'), 10) || 0;
+      var candidates = [];
+      LABEL_DISTANCES.forEach(function (distance) {
+        LABEL_DIRECTIONS.forEach(function (_, directionIndex) {
+          var direction = LABEL_DIRECTIONS[(directionIndex + order) % LABEL_DIRECTIONS.length];
+          candidates.push(makeLabelCandidate(markerX, markerY, width, height, direction, distance));
+        });
+      });
+
+      var selected = candidates.find(function (candidate) {
+        var insideViewport = candidate.left >= viewportRect.left + viewportPadding &&
+          candidate.right <= viewportRect.right - viewportPadding &&
+          candidate.top >= viewportRect.top + viewportPadding &&
+          candidate.bottom <= viewportRect.bottom - viewportPadding;
+        return insideViewport && !occupied.some(function (accepted) {
+          return boxesOverlap(candidate, accepted, 4);
+        });
+      });
+
+      if (!selected) {
+        selected = candidates.reduce(function (best, candidate) {
+          var outside = Math.max(0, viewportRect.left + viewportPadding - candidate.left) +
+            Math.max(0, candidate.right - viewportRect.right + viewportPadding) +
+            Math.max(0, viewportRect.top + viewportPadding - candidate.top) +
+            Math.max(0, candidate.bottom - viewportRect.bottom + viewportPadding);
+          var collision = occupied.reduce(function (total, accepted) {
+            return total + overlapArea(candidate, accepted, 4);
+          }, 0);
+          var score = outside * 1000 + collision;
+          return !best || score < best.score ? { candidate: candidate, score: score } : best;
+        }, null).candidate;
+      }
+
+      applyLabelCandidate(link, label, leader, selected, width, height);
+      occupied.push(selected);
     });
   };
 
@@ -363,4 +452,5 @@
   positionRegionMarkers();
   createDetailPoints();
   apply();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleLabelLayout);
 }());

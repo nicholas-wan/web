@@ -1695,12 +1695,14 @@ body {
   color: #fff !important;
   opacity: 0;
   pointer-events: none;
-  transform: translate(-50%, -50%) scale(calc(0.82 / var(--map-scale, 1)));
-  transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+  transform: translate(-50%, -50%) scale(calc(1 / var(--map-scale, 1)));
+  transition: opacity 0.2s ease, visibility 0.2s ease;
   visibility: hidden;
 }
 
 .travel-map__detail-dot {
+  position: relative;
+  z-index: 2;
   display: block;
   width: 0.72rem;
   height: 0.72rem;
@@ -1715,10 +1717,30 @@ body {
   box-shadow: 0 0 0 0.1rem rgba(40, 215, 197, 0.45), 0 0.25rem 0.55rem rgba(0, 0, 0, 0.4);
 }
 
-.travel-map__detail-label {
+.travel-map__detail-leader {
   position: absolute;
   top: 50%;
-  left: 0.95rem;
+  left: 50%;
+  z-index: 1;
+  display: block;
+  width: var(--leader-length, 0.55rem);
+  height: 1px;
+  background: rgba(255, 184, 105, 0.58);
+  pointer-events: none;
+  transform: rotate(var(--leader-angle, 0rad));
+  transform-origin: 0 50%;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+.travel-map__detail--stop .travel-map__detail-leader {
+  background: rgba(40, 215, 197, 0.52);
+}
+
+.travel-map__detail-label {
+  position: absolute;
+  top: calc(50% + var(--label-y, -50%));
+  left: calc(50% + var(--label-x, 0.95rem));
+  z-index: 3;
   display: block;
   max-width: 8.5rem;
   padding: 0.2rem 0.34rem;
@@ -1733,32 +1755,15 @@ body {
   letter-spacing: 0.025em;
   line-height: 1.15;
   text-transform: none;
-  transform: translateY(-50%);
   transition: opacity 0.15s ease, visibility 0.15s ease,
     border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
   white-space: nowrap;
 }
 
-.travel-map__detail.is-label-hidden .travel-map__detail-label {
+.travel-map__detail.is-label-offscreen .travel-map__detail-label,
+.travel-map__detail.is-label-offscreen .travel-map__detail-leader {
   opacity: 0;
   visibility: hidden;
-}
-
-.travel-map__detail.is-label-hidden:hover .travel-map__detail-label,
-.travel-map__detail.is-label-hidden:focus-visible .travel-map__detail-label {
-  opacity: 1;
-  visibility: visible;
-}
-
-.travel-map__detail[data-label-side="left"] .travel-map__detail-label {
-  right: 0.95rem;
-  left: auto;
-}
-
-.travel-map__detail[data-label-side="below"] .travel-map__detail-label {
-  top: 0.95rem;
-  left: 50%;
-  transform: translateX(-50%);
 }
 
 .travel-map__canvas[data-map-detail="area"] .travel-map__marker,
@@ -1793,6 +1798,11 @@ body {
   border-color: rgba(255, 184, 105, 0.72);
   background: #10292c;
   color: #fff;
+}
+
+.travel-map__detail:hover .travel-map__detail-leader,
+.travel-map__detail:focus-visible .travel-map__detail-leader {
+  background: rgba(255, 255, 255, 0.82);
 }
 
 .travel-map__marker:hover,
