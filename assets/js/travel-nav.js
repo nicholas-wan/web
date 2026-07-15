@@ -2,6 +2,12 @@
   var nav = document.querySelector('.travel-section-nav');
   if (!nav) return;
 
+  var menuToggle = document.getElementById('navPanelToggle');
+  if (menuToggle) {
+    nav.appendChild(menuToggle);
+    nav.classList.add('travel-section-nav--with-menu');
+  }
+
   var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#trip-section-"]'));
   var sections = links.map(function (link) {
     return document.getElementById(link.getAttribute('href').slice(1));

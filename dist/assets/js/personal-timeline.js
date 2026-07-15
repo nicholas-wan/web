@@ -240,7 +240,10 @@
     }
   });
 
-  window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+  window.addEventListener('scroll', function () {
+    setCatsPreview(false);
+    requestProgressUpdate();
+  }, { passive: true });
   window.addEventListener('resize', requestProgressUpdate);
 
   updateTimelineProgress();
