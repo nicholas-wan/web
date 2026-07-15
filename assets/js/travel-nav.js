@@ -14,6 +14,59 @@
     nav.classList.toggle('is-stuck', isStuck);
   };
 
+  /* A browser hash jump can happen before lazy media and web fonts settle.
+     Keep the requested heading just below the real sticky toolbar for a short,
+     bounded landing window, then release control as soon as the visitor acts. */
+  var landingCleanup = null;
+  var startAnchorLanding = function () {
+    if (landingCleanup) landingCleanup();
+    var hash = window.location.hash;
+    if (!/^#trip-section-\d+$/.test(hash)) return;
+    var target = document.getElementById(hash.slice(1));
+    if (!target) return;
+
+    var cancelled = false;
+    var observer = null;
+    var timer = null;
+    var deadline = Date.now() + 5000;
+    var manualEvents = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
+    var cancel = function () { cancelled = true; cleanup(); };
+    var cleanup = function () {
+      if (timer) window.clearTimeout(timer);
+      if (observer) observer.disconnect();
+      manualEvents.forEach(function (name) { window.removeEventListener(name, cancel, true); });
+      if (landingCleanup === cleanup) landingCleanup = null;
+    };
+    landingCleanup = cleanup;
+    manualEvents.forEach(function (name) { window.addEventListener(name, cancel, true); });
+
+    var correct = function () {
+      if (cancelled || Date.now() > deadline || window.location.hash !== hash) {
+        cleanup();
+        return;
+      }
+      var offset = Math.ceil(nav.getBoundingClientRect().height) + 12;
+      var delta = target.getBoundingClientRect().top - offset;
+      if (Math.abs(delta) > 1) window.scrollTo(0, Math.max(0, window.pageYOffset + delta));
+      if (timer) window.clearTimeout(timer);
+      timer = window.setTimeout(correct, 160);
+    };
+
+    if (typeof ResizeObserver === 'function') {
+      observer = new ResizeObserver(function () { window.requestAnimationFrame(correct); });
+      observer.observe(document.getElementById('main') || document.body);
+    }
+    window.requestAnimationFrame(function () { window.requestAnimationFrame(correct); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(correct);
+  };
+
+  window.addEventListener('hashchange', startAnchorLanding);
+  window.addEventListener('pageshow', startAnchorLanding);
+  window.addEventListener('load', function () {
+    if (window.location.hash) startAnchorLanding();
+  });
+  startAnchorLanding();
+
   var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#trip-section-"]'));
   var sections = links.map(function (link) {
     return document.getElementById(link.getAttribute('href').slice(1));
