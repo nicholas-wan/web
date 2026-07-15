@@ -126,16 +126,21 @@
 
     function update() {
       var scrollable = section.offsetHeight - window.innerHeight;
+      var sectionTop = section.getBoundingClientRect().top;
       var p = scrollable > 0
-        ? Math.min(1, Math.max(0, -section.getBoundingClientRect().top / scrollable))
+        ? Math.min(1, Math.max(0, -sectionTop / scrollable))
         : 1;
       section.style.setProperty('--p', p.toFixed(4));
-      /* Let the mobile portrait announce the transition immediately instead
-         of staying outside the viewport for the first part of this short
-         pinned scene. The text keeps its natural scroll progress. */
-      var photoProgress = window.innerWidth <= 736
-        ? Math.min(1, 0.28 + (p * 1.3))
-        : p;
+      /* On phones, begin the horizontal motion when the portrait itself first
+         enters the bottom of the viewport. Waiting for the sticky section to
+         reach the top made a visible sliver sit still for too long. */
+      var photoProgress = p;
+      if (window.innerWidth <= 736) {
+        var photoTop = photo.getBoundingClientRect().top;
+        var settledPhotoTop = photoTop - Math.max(sectionTop, 0);
+        var visibleTravel = Math.max(window.innerHeight - settledPhotoTop, 1);
+        photoProgress = Math.min(1, Math.max(0, (window.innerHeight - photoTop) / visibleTravel));
+      }
       section.style.setProperty('--photo-p', photoProgress.toFixed(4));
     }
 

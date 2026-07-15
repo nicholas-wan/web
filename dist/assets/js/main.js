@@ -122,7 +122,7 @@
 
 		// Toggle.
 			$navPanelToggle = $(
-				'<a href="#navPanel" id="navPanelToggle" aria-label="Open navigation menu">Menu</a>'
+				'<a href="#navPanel" id="navPanelToggle" aria-label="Open navigation menu" aria-controls="navPanel" aria-expanded="false">Menu</a>'
 			)
 				.appendTo($wrapper);
 
@@ -139,7 +139,9 @@
 
 		// Panel.
 			$navPanel = $(
-				'<div id="navPanel">' +
+				'<div id="navPanel" role="dialog" aria-modal="true" aria-label="Site navigation" aria-hidden="true">' +
+					'<span class="nav-panel__handle" aria-hidden="true"></span>' +
+					'<div class="nav-panel__header"><span>Navigate</span></div>' +
 					'<nav>' +
 					'</nav>' +
 					'<a href="#navPanel" class="close" aria-label="Close navigation menu"></a>' +
@@ -147,15 +149,25 @@
 			)
 				.appendTo($body)
 				.panel({
-					delay: 500,
+					delay: 280,
 					hideOnClick: true,
+					hideOnEscape: true,
 					hideOnSwipe: true,
 					resetScroll: true,
 					resetForms: true,
-					side: 'right',
+					side: 'bottom',
 					target: $body,
 					visibleClass: 'is-navPanel-visible'
 				});
+
+			// Keep the toggle and sheet state available to assistive technology.
+				var syncNavPanelState = function() {
+					var isOpen = $body.hasClass('is-navPanel-visible');
+					$navPanelToggle.attr('aria-expanded', isOpen ? 'true' : 'false');
+					$navPanel.attr('aria-hidden', isOpen ? 'false' : 'true');
+				};
+				new MutationObserver(syncNavPanelState).observe($body.get(0), { attributes: true, attributeFilter: ['class'] });
+				syncNavPanelState();
 
 			// Get inner.
 				$navPanelInner = $navPanel.children('nav');
