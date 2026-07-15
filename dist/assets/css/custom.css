@@ -2614,6 +2614,7 @@ body {
 
 .guangzhou-day--compact .masonry .content-image {
   width: 100%;
+  height: auto;
   aspect-ratio: 4 / 3;
   object-fit: cover;
   object-position: var(--focus-x, 50%) var(--focus-y, 50%);
