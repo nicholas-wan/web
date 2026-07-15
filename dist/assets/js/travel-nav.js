@@ -45,6 +45,9 @@
         cleanup();
         return;
       }
+      /* Apply the sticky visual state before measuring: its compact mobile
+         typography can change the toolbar height after the native hash jump. */
+      updateNavSurface();
       var offset = Math.ceil(nav.getBoundingClientRect().height) + 12;
       var delta = target.getBoundingClientRect().top - offset;
       if (Math.abs(delta) > 1) window.scrollTo(0, Math.max(0, window.pageYOffset + delta));
@@ -55,6 +58,7 @@
     if (typeof ResizeObserver === 'function') {
       observer = new ResizeObserver(function () { window.requestAnimationFrame(correct); });
       observer.observe(document.getElementById('main') || document.body);
+      observer.observe(nav);
     }
     window.requestAnimationFrame(function () { window.requestAnimationFrame(correct); });
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(correct);
