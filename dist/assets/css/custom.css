@@ -4231,6 +4231,7 @@ a:focus-visible {
 
 .masonry .brick .content-image {
   display: block;
+  height: auto;
   transition: transform 0.25s ease, filter 0.25s ease;
 }
 
