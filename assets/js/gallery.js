@@ -74,7 +74,7 @@
     var cue = document.createElement('div');
     cue.className = 'journal-scroll-cue';
     cue.setAttribute('aria-hidden', 'true');
-    cue.innerHTML = '<span>Swipe to browse</span><i aria-hidden="true">&#8594;</i>';
+    cue.innerHTML = '<span>Swipe to browse</span><i aria-hidden="true">&#8596;</i>';
     gallery.parentNode.insertBefore(cue, gallery);
 
     var refreshCue = function () {

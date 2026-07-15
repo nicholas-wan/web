@@ -58,8 +58,6 @@
   var routeGroups = document.querySelectorAll('.guangzhou-day__route--collapsible');
   if (!routeGroups.length) return;
 
-  var supportsDialog = typeof window.HTMLDialogElement === 'function';
-
   Array.prototype.forEach.call(routeGroups, function (group) {
     var button = group.querySelector('.guangzhou-route__more');
     var route = group.querySelector('.guangzhou-route');
@@ -82,42 +80,9 @@
 
     requestAnimationFrame(updateDesktopWrap);
     button.addEventListener('click', function () {
-      if (window.matchMedia('(min-width: 601px)').matches) {
-        var desktopExpanded = group.classList.toggle('is-expanded');
-        button.textContent = desktopExpanded ? 'Show less' : 'View full route';
-        button.setAttribute('aria-expanded', desktopExpanded ? 'true' : 'false');
-        return;
-      }
-
-      if (!supportsDialog) {
-        var expanded = group.classList.toggle('is-expanded');
-        button.textContent = expanded ? 'Show less' : 'View full route';
-        button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-        return;
-      }
-
-      var dayHeading = group.closest('.guangzhou-day').querySelector('h2');
-      var dialog = document.createElement('dialog');
-      var dialogHeading = document.createElement('strong');
-      var closeButton = document.createElement('button');
-      var routeCopy = route.cloneNode(true);
-
-      dialog.className = 'guangzhou-route-dialog';
-      dialogHeading.textContent = dayHeading ? dayHeading.textContent + ' route' : 'Full route';
-      closeButton.type = 'button';
-      closeButton.className = 'guangzhou-route-dialog__close';
-      closeButton.textContent = 'Close';
-      dialog.appendChild(dialogHeading);
-      dialog.appendChild(routeCopy);
-      dialog.appendChild(closeButton);
-      document.body.appendChild(dialog);
-
-      closeButton.addEventListener('click', function () { dialog.close(); });
-      dialog.addEventListener('click', function (event) {
-        if (event.target === dialog) dialog.close();
-      });
-      dialog.addEventListener('close', function () { dialog.remove(); });
-      dialog.showModal();
+      var expanded = group.classList.toggle('is-expanded');
+      button.textContent = expanded ? 'Show less' : 'View full route';
+      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     });
 
     window.addEventListener('resize', function () {
