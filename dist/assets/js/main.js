@@ -408,7 +408,6 @@ function randomArrayItem(arr){
 function randomNumFrom(min, max){
     return Math.random()*(max - min) + min;
 }
-console.log(randomNumFrom(0, 10));
 // Random Ball
 function getRandomBall(){
     var pos = randomArrayItem(['top', 'right', 'bottom', 'left']);
@@ -574,14 +573,17 @@ function initBalls(num){
 }
 // Init Canvas
 function initCanvas(){
-    canvas.setAttribute('width', window.innerWidth);
-    canvas.setAttribute('height', window.innerHeight);
+    // clientWidth/Height exclude the scrollbar; innerWidth/Height include it,
+    // which made the canvas wider than the layout viewport and let the page
+    // scroll horizontally by the scrollbar width.
+    var docEl = document.documentElement;
+    canvas.setAttribute('width', docEl.clientWidth);
+    canvas.setAttribute('height', docEl.clientHeight);
 
     can_w = parseInt(canvas.getAttribute('width'));
     can_h = parseInt(canvas.getAttribute('height'));
 }
 window.addEventListener('resize', function(e){
-    console.log('Window Resize...');
     initCanvas();
 });
 
@@ -614,12 +616,10 @@ document.addEventListener('visibilitychange', function(){
 
 // Mouse effect
 canvas.addEventListener('mouseenter', function(){
-    console.log('mouseenter');
     mouse_in = true;
     balls.push(mouse_ball);
 });
 canvas.addEventListener('mouseleave', function(){
-    console.log('mouseleave');
     mouse_in = false;
     var new_balls = [];
     Array.prototype.forEach.call(balls, function(b){
@@ -643,11 +643,8 @@ canvas.addEventListener('mousemove', function(e){
 	var images = document.querySelectorAll('img');
 	Array.prototype.forEach.call(images, function(image, index) {
 		image.decoding = 'async';
-		if (image.getAttribute('alt') === '') {
-			var source = image.getAttribute('src') || '';
-			var name = source.split('/').pop().replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ');
-			image.alt = name ? 'Gallery image: ' + name : 'Gallery image';
-		}
+		// Leave alt="" alone: an intentional empty alt marks a decorative image
+		// and must stay empty, not be filled with filename noise.
 		if (index > 1 && !image.hasAttribute('loading')) {
 			image.loading = 'lazy';
 		}

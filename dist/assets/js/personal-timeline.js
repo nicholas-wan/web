@@ -18,6 +18,9 @@
   var autoplayTimer = null;
   var isPlaying = false;
   var scrollFrame = null;
+  var catsHoverCapable = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  var catsOpenedByHover = false;
+  var catsOpenedAt = 0;
 
   timeline.classList.add('is-enhanced');
 
@@ -163,21 +166,41 @@
 
   function setCatsPreview(open) {
     if (!catsPreviewEvent || !catsPreviewButton) return;
+    if (catsPreviewEvent.classList.contains('is-cats-preview-open') === open) return;
     catsPreviewEvent.classList.toggle('is-cats-preview-open', open);
     catsPreviewButton.setAttribute('aria-expanded', open ? 'true' : 'false');
-    if (open && window.instgrm && window.instgrm.Embeds) {
-      window.setTimeout(function () { window.instgrm.Embeds.process(); }, 0);
+    if (open) {
+      catsOpenedAt = Date.now();
+      if (window.instgrm && window.instgrm.Embeds) {
+        window.setTimeout(function () { window.instgrm.Embeds.process(); }, 0);
+      }
+    } else {
+      catsOpenedByHover = false;
     }
   }
 
   if (catsPreviewEvent && catsPreviewButton) {
     catsPreviewButton.addEventListener('click', function () {
-      setCatsPreview(!catsPreviewEvent.classList.contains('is-cats-preview-open'));
+      var isOpen = catsPreviewEvent.classList.contains('is-cats-preview-open');
+      if (catsHoverCapable && isOpen) {
+        /* Hover already opened it; an explicit click pins it so a later scroll
+           or mouseleave won't dismiss the thing the user just reached for. */
+        catsOpenedByHover = false;
+        return;
+      }
+      setCatsPreview(!isOpen);
     });
 
-    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
-      catsPreviewEvent.addEventListener('mouseenter', function () { setCatsPreview(true); });
-      catsPreviewEvent.addEventListener('mouseleave', function () { setCatsPreview(false); });
+    if (catsHoverCapable) {
+      /* Bind the opener to the card only (not the full-width timeline row) so
+         sweeping the cursor across the empty gutter can't trigger a 29rem
+         layout jump; closing is bound to the whole row so moving card→popover
+         (a child of the row) doesn't count as leaving. */
+      catsPreviewButton.addEventListener('mouseenter', function () {
+        catsOpenedByHover = true;
+        setCatsPreview(true);
+      });
+      catsPreviewEvent.addEventListener('mouseleave', function () { if (catsOpenedByHover) setCatsPreview(false); });
     }
 
     catsPreviewEvent.addEventListener('focusout', function () {
@@ -241,10 +264,20 @@
   });
 
   window.addEventListener('scroll', function () {
-    setCatsPreview(false);
+    /* Only the desktop hover popover auto-dismisses on scroll, and only after a
+       grace period so the opening/momentum scroll can't close it instantly. The
+       mobile tap-to-open accordion stays put until toggled, dismissed, or
+       Escape — otherwise the first scroll to reach it (or an iOS URL-bar
+       collapse) would slam it shut before it can be read. */
+    if (catsHoverCapable && catsOpenedByHover &&
+        catsPreviewEvent && catsPreviewEvent.classList.contains('is-cats-preview-open') &&
+        Date.now() - catsOpenedAt > 400) {
+      setCatsPreview(false);
+    }
     requestProgressUpdate();
   }, { passive: true });
   window.addEventListener('resize', requestProgressUpdate);
+  window.addEventListener('load', requestProgressUpdate);
 
   updateTimelineProgress();
 }());

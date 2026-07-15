@@ -15,7 +15,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="stylesheet" href="assets/css/main.css" />
 
-    <link rel="stylesheet" href="assets/css/custom.css?v=76" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=77" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
 </head>
@@ -29,7 +29,7 @@
 </header>
 <nav id="nav">
     <ul class="links">
-        <li><a href="index#about-me">About</a></li>
+        <li><a href="index">About</a></li>
         <li><a href="experience">Work</a></li>
         <li><a href="skills">Skills</a></li>
         <li><a href="personal">Personal</a></li>
@@ -57,6 +57,7 @@
 
 							<div class="travel-atlas__layout">
 								<div class="travel-map">
+									<div class="travel-map__viewport">
 									<div class="travel-map__canvas">
 										<img src="images/travel/world-map.png" alt="World map with journal destinations in North America, Europe, China, Japan, and Australia" width="3151" height="1667" decoding="async" loading="eager" fetchpriority="high" />
 
@@ -111,7 +112,13 @@
 											<span class="travel-map__marker-label"><a class="travel-map__journal-link" href="travel_2024_australia" aria-label="Open the Melbourne and Sydney journal"><img src="images/travel/2024_australia/sydney_city/opera1.jpg" alt="Sydney Opera House" width="1600" height="1200" srcset="images/travel/2024_australia/sydney_city/opera1.jpg 1600w, images/travel/2024_australia/sydney_city/opera1-800.jpg 800w" sizes="(max-width: 736px) 100vw, 800px" decoding="async" loading="lazy" /><span class="travel-map__marker-copy"><strong>Sydney</strong><small>2 &ndash; 14 August 2024</small></span></a><span class="travel-map__city-links"><a href="travel_2024_australia#trip-section-6">Sydney</a><a href="travel_2024_australia#trip-section-7">Blue Mountains</a><a href="travel_2024_australia#trip-section-8">Taronga Zoo</a><a href="travel_2024_australia#trip-section-9">Wollongong</a><a href="travel_2024_australia#trip-section-10">SEA LIFE Aquarium</a></span></span>
 										</div>
 									</div>
-									<p class="travel-map__hint"><span aria-hidden="true">&#9679;</span> Select a pin, then open a journal or choose a stop</p>
+									</div>
+									<div class="travel-map__controls" role="group" aria-label="Map zoom controls">
+										<button type="button" class="travel-map__zoom-btn" data-map-zoom="in" aria-label="Zoom in">+</button>
+										<button type="button" class="travel-map__zoom-btn" data-map-zoom="out" aria-label="Zoom out" disabled>&minus;</button>
+										<button type="button" class="travel-map__zoom-btn travel-map__zoom-btn--reset" data-map-zoom="reset" aria-label="Reset map view" hidden>&#8634;</button>
+									</div>
+									<p class="travel-map__hint"><span aria-hidden="true">&#9679;</span> Select a pin, then open a journal or choose a stop &middot; zoom to explore</p>
 								</div>
 							</div>
 						</section>
@@ -245,9 +252,9 @@
     <script src="assets/js/browser.min.js"></script>
     <script src="assets/js/breakpoints.min.js"></script>
     <script src="assets/js/util.js"></script>
-    <script src="assets/js/main.js?v=6"></script>
+    <script src="assets/js/main.js?v=7"></script>
     <script src="assets/js/arrow.js"></script>
     <script src="assets/js/game.js?v=12"></script>
-
+<script src="assets/js/travel-map.js?v=1"></script>
 </body>
 </html>

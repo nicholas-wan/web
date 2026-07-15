@@ -7,6 +7,16 @@
   });
   if (!images.length) return;
 
+  /* Backfill alt text from each photo's caption so screen readers (and the
+     lightbox trigger's aria-label below) announce the real place instead of a
+     filename. Journal images carry .content-text / .content-title captions. */
+  images.forEach(function (image) {
+    if (image.getAttribute('alt')) return;
+    var content = image.closest('.content');
+    var cap = content && content.querySelector('.content-text, .content-title, .gallery-caption');
+    if (cap && cap.textContent.trim()) image.setAttribute('alt', cap.textContent.trim());
+  });
+
   var overlay = document.createElement('div');
   overlay.className = 'lightbox';
   overlay.setAttribute('role', 'dialog');
@@ -27,8 +37,23 @@
     var source = images[current];
     viewerImage.src = source.currentSrc || source.src;
     viewerImage.alt = source.alt || 'Gallery image';
-    var title = source.closest('.content')?.querySelector('.content-title, .gallery-caption') || source.closest('figure')?.querySelector('figcaption');
-    caption.textContent = title ? title.textContent.trim() : (source.alt || '');
+    /* Caption = place + detail. `.content-title` is often the city (repeated
+       across dozens of photos) and `.content-text` the actual location, so show
+       both, de-duplicated, rather than just the first match (which was the city). */
+    var content = source.closest('.content');
+    var parts = [];
+    if (content) {
+      var titleEl = content.querySelector('.content-title');
+      var textEl = content.querySelector('.content-text, .gallery-caption');
+      if (titleEl) parts.push(titleEl.textContent.trim());
+      if (textEl) parts.push(textEl.textContent.trim());
+    } else {
+      var figCaption = source.closest('figure') ? source.closest('figure').querySelector('figcaption') : null;
+      if (figCaption) parts.push(figCaption.textContent.trim());
+    }
+    parts = parts.filter(function (part, index) { return part && parts.indexOf(part) === index; });
+    if (!parts.length && source.alt) parts.push(source.alt);
+    caption.textContent = parts.join(' · ');
     overlay.classList.add('is-visible');
     document.body.classList.add('lightbox-open');
   };
