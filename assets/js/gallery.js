@@ -70,7 +70,7 @@
   /* Compact mobile journals are horizontal. A fading edge plus one short cue
      makes that interaction discoverable, then gets out of the way after the
      visitor actually scrolls each gallery. */
-  Array.prototype.forEach.call(document.querySelectorAll('.guangzhou-day--compact .masonry'), function (gallery) {
+  Array.prototype.forEach.call(document.querySelectorAll('.travel-gallery--compact, .guangzhou-day--compact .masonry'), function (gallery) {
     var cue = document.createElement('div');
     cue.className = 'journal-scroll-cue';
     cue.setAttribute('aria-hidden', 'true');

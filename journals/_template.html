@@ -1,23 +1,43 @@
-<!-- Content fragment only: the build supplies the page shell, navigation, trip tabs, pagination, scripts, and footer. -->
-<article>
-  <header class="major">
+<!-- Content fragment only: the build supplies the page shell, navigation, trip tabs, pagination, scripts, lightbox, mobile swipe cue, and footer. -->
+<article class="travel-journal__content">
+  <header class="major travel-journal__hero guangzhou-journal__hero">
     <span class="date">D Month YYYY &ndash; D Month YYYY</span>
-    <h1>Journal title</h1>
-    <p>Short trip introduction.</p>
+    <p class="travel-journal__title guangzhou-journal__location">Journal title</p>
+    <p class="travel-journal__lede guangzhou-journal__lede">Short trip introduction.</p>
+    <div class="travel-journal__hero-image guangzhou-journal__hero-image">
+      <img class="journal-banner" src="images/travel/example/banner.jpg" alt="Description of the journal banner" style="--hero-focus-x: 50%; --hero-focus-y: 52%;" />
+    </div>
   </header>
-  <img class="image main journal-banner" src="images/travel/example/banner.jpg" alt="Description of the journal banner" />
 </article>
 
-<section class="guangzhou-day guangzhou-day--compact">
-  <header class="major">
-    <h2>Destination</h2>
-    <p>What happened here.</p>
-  </header>
-  <div class="masonry mason4">
-    <div class="brick">
+<section class="travel-journal__day travel-journal__day--compact guangzhou-day guangzhou-day--compact">
+  <span class="travel-journal__date guangzhou-day__date">Day, D Month</span>
+  <h2>Day 1 - Destination</h2>
+  <div class="travel-journal__route guangzhou-day__route guangzhou-day__route--collapsible">
+    <strong>Route</strong>
+    <div class="travel-route guangzhou-route">
+      <span class="travel-route__stop guangzhou-route__stop"><span>First place</span><small>Local name or area</small></span><i aria-hidden="true">&rarr;</i>
+      <span class="travel-route__stop guangzhou-route__stop"><span>Second place</span><small>Local name or area</small></span><i aria-hidden="true">&rarr;</i>
+      <span class="travel-route__stop guangzhou-route__stop"><span>Third place</span><small>Local name or area</small></span><i aria-hidden="true">&rarr;</i>
+      <span class="travel-route__stop guangzhou-route__stop"><span>Fourth place</span><small>Local name or area</small></span><i aria-hidden="true">&rarr;</i>
+      <span class="travel-route__stop guangzhou-route__stop"><span>Final place</span><small>Local name or area</small></span>
+    </div>
+    <button class="travel-route__more guangzhou-route__more" type="button" aria-expanded="false">View full route</button>
+  </div>
+  <p class="travel-journal__note guangzhou-day__note">A short summary of the day.</p>
+  <div class="travel-gallery travel-gallery--compact masonry mason4">
+    <div class="travel-gallery__item brick lazyload container">
       <div class="content">
-        <img class="content-image" src="images/travel/example/photo.jpg" alt="Description of the photograph" />
-        <div class="content-details"><p class="content-text">Caption</p></div>
+        <div class="content-overlay"></div>
+        <img class="content-image" src="images/travel/example/photo.jpg" alt="Description of the photograph" style="--focus-x: 50%; --focus-y: 45%;" />
+        <div class="content-details fadeIn-left fadeIn-top"><h3 class="content-title">Location</h3><p class="content-text">Caption</p></div>
+      </div>
+    </div>
+    <div class="travel-gallery__item travel-gallery__item--tall brick lazyload container guangzhou-gallery__brick--tall">
+      <div class="content">
+        <div class="content-overlay"></div>
+        <img class="content-image" src="images/travel/example/vertical-collage.jpg" alt="Description of the vertical collage" style="--focus-x: 50%; --focus-y: 50%;" />
+        <div class="content-details fadeIn-left fadeIn-top"><h3 class="content-title">Food and moments</h3><p class="content-text">Two-row collage</p></div>
       </div>
     </div>
   </div>

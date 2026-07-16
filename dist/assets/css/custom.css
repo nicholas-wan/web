@@ -2434,11 +2434,13 @@ body {
   }
 }
 
+.travel-journal__hero,
 .guangzhou-journal__hero {
   margin-bottom: 3rem !important;
   text-align: center;
 }
 
+.travel-journal__title,
 .guangzhou-journal__location {
   margin: 0.85rem 0 0.35rem;
   color: var(--color-ink-900);
@@ -2450,6 +2452,7 @@ body {
   text-transform: uppercase;
 }
 
+.travel-journal__lede,
 .guangzhou-journal__lede {
   max-width: 42rem;
   margin: 0 auto 1.5rem;
@@ -2457,6 +2460,7 @@ body {
   text-align: center;
 }
 
+.travel-journal__hero-image,
 .guangzhou-journal__hero-image {
   position: relative;
   max-height: 27rem;
@@ -2465,13 +2469,14 @@ body {
   box-shadow: var(--shadow-card);
 }
 
+.travel-journal__hero-image img,
 .guangzhou-journal__hero-image img {
   display: block;
   width: 100%;
   height: clamp(16rem, 34vw, 27rem);
   margin: 0;
   object-fit: cover;
-  object-position: center 58%;
+  object-position: var(--hero-focus-x, 50%) var(--hero-focus-y, 58%);
 }
 
 .guangzhou-day {
@@ -2590,6 +2595,7 @@ body {
   margin-top: 1.25rem;
 }
 
+.travel-gallery--compact,
 .guangzhou-day--compact .masonry {
   display: grid;
   grid-auto-rows: 1fr;
@@ -2597,24 +2603,29 @@ body {
   gap: 1rem;
 }
 
+.travel-gallery--compact.mason2,
 .guangzhou-day--compact .masonry.mason2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.travel-gallery--compact.mason3,
 .guangzhou-day--compact .masonry.mason3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.travel-gallery--compact.mason4,
 .guangzhou-day--compact .masonry.mason4 {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+.travel-gallery--compact .brick,
 .guangzhou-day--compact .masonry .brick {
   display: block;
   width: 100%;
   margin: 0;
 }
 
+.travel-gallery--compact .content-image,
 .guangzhou-day--compact .masonry .content-image {
   width: 100%;
   height: auto;
@@ -2623,16 +2634,20 @@ body {
   object-position: var(--focus-x, 50%) var(--focus-y, 50%);
 }
 
+.travel-gallery--compact .travel-gallery__item--tall,
 .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall {
   grid-row: span 2;
   min-height: 0;
 }
 
+.travel-gallery--compact .travel-gallery__item--tall .content,
+.travel-gallery--compact .travel-gallery__item--tall .content-image,
 .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall .content,
 .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall .content-image {
   height: 100%;
 }
 
+.travel-gallery--compact .travel-gallery__item--tall .content-image,
 .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall .content-image {
   aspect-ratio: auto;
 }
@@ -2824,6 +2839,10 @@ body {
     letter-spacing: 0.04em;
   }
 
+  .travel-gallery--compact,
+  .travel-gallery--compact.mason2,
+  .travel-gallery--compact.mason3,
+  .travel-gallery--compact.mason4,
   .guangzhou-day--compact .masonry,
   .guangzhou-day--compact .masonry.mason2,
   .guangzhou-day--compact .masonry.mason3,
@@ -2893,11 +2912,13 @@ body {
     visibility: hidden;
   }
 
+  .travel-gallery--compact.has-scroll-cue,
   .guangzhou-day--compact .masonry.has-scroll-cue {
     -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 2.25rem), transparent 100%);
     mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 2.25rem), transparent 100%);
   }
 
+  .travel-gallery--compact .brick,
   .guangzhou-day--compact .masonry .brick {
     display: block;
     width: auto;
@@ -2906,19 +2927,23 @@ body {
     scroll-snap-align: start;
   }
 
+  .travel-gallery--compact .travel-gallery__item--tall,
   .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall {
     grid-row: auto;
   }
 
+  .travel-gallery--compact .travel-gallery__item--tall .content,
   .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall .content {
     height: auto;
   }
 
+  .travel-gallery--compact .travel-gallery__item--tall .content-image,
   .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall .content-image {
     height: auto;
     aspect-ratio: 4 / 3;
   }
 
+  .travel-gallery--compact .content,
   .guangzhou-day--compact .masonry .content {
     min-width: 0;
     background: #0a1b1f;
