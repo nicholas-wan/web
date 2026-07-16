@@ -2784,6 +2784,35 @@ body {
   --focus-x: 56%;
 }
 
+/* The Australia journal uses the same compact, even photo rhythm as
+   Guangzhou. Keep faces and full-height subjects inside the 4:3 crops. */
+.australia-journal img[src$="city5.jpg"],
+.australia-journal img[src$="city8.jpg"],
+.australia-journal img[src$="anglesea2.jpg"],
+.australia-journal img[src$="canyon2.jpg"],
+.australia-journal img[src$="mackenzie3.jpg"],
+.australia-journal img[src$="phillip4.jpg"],
+.australia-journal img[src$="phillip6.jpg"],
+.australia-journal img[src$="observatory1.jpg"],
+.australia-journal img[src$="bluemountain3.jpg"],
+.australia-journal img[src*="/sydney_bluemountain/zoo1.jpg"],
+.australia-journal img[src*="/sydney_bluemountain/zoo2.jpg"] {
+  --focus-y: 38%;
+}
+
+.australia-journal img[src$="moonlit1.jpg"] {
+  --focus-y: 30%;
+}
+
+.australia-journal img[src$="worldsquare2.jpg"],
+.australia-journal img[src$="camy.jpg"] {
+  --focus-y: 22%;
+}
+
+.australia-journal .guangzhou-day__route {
+  margin-top: 0.15rem;
+}
+
 .guangzhou-journal .content-details {
   line-height: 1.35 !important;
 }
@@ -2801,6 +2830,10 @@ body {
 }
 
 @media screen and (max-width: 600px) {
+  #main.australia-journal > article {
+    padding-bottom: 2.5rem;
+  }
+
   #main.guangzhou-journal > article {
     padding-right: 1.1rem;
     padding-left: 1.1rem;
