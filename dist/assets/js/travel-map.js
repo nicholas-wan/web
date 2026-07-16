@@ -13,6 +13,7 @@
 
   var MIN_SCALE = 1;
   var MAX_SCALE = 10;
+  var DESKTOP_INITIAL_SCALE = 1.12;
   var BUTTON_STEP = 1.5;
   var AREA_SCALE = 2.2;
   var STOP_SCALE = 4.2;
@@ -319,6 +320,17 @@
     if (resetBtn) resetBtn.hidden = !zoomed;
   };
 
+  /* The desktop atlas opens on a restrained crop that removes the unused
+     polar margin while keeping every journal region visible. Mobile keeps
+     the full-world baseline behind its separate destination list. */
+  var resetView = function () {
+    var useDesktopCrop = window.matchMedia('(min-width: 981px)').matches;
+    scale = useDesktopCrop ? DESKTOP_INITIAL_SCALE : 1;
+    tx = useDesktopCrop ? (viewport.clientWidth - canvas.offsetWidth * scale) / 2 : 0;
+    ty = 0;
+    apply();
+  };
+
   /* Zoom keeping the viewport point (px, py) anchored. */
   var zoomAt = function (px, py, nextScale) {
     nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, nextScale));
@@ -340,7 +352,7 @@
     var mode = button.getAttribute('data-map-zoom');
     if (mode === 'in') zoomAtCenter(BUTTON_STEP);
     else if (mode === 'out') zoomAtCenter(1 / BUTTON_STEP);
-    else { scale = 1; tx = 0; ty = 0; apply(); }
+    else resetView();
   });
 
   /* Wheel and trackpad scrolling zoom around the pointer. Once the map reaches
@@ -452,6 +464,6 @@
   window.addEventListener('resize', apply);
   positionRegionMarkers();
   createDetailPoints();
-  apply();
+  resetView();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleLabelLayout);
 }());

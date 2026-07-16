@@ -2785,6 +2785,16 @@ body {
     padding-top: 1.75rem;
   }
 
+  .page-travel-journal #main > .guangzhou-day {
+    margin-top: 2.25rem;
+    padding-bottom: 0;
+    border-top: 1px solid var(--color-border-soft);
+  }
+
+  .page-travel-journal #main > .guangzhou-day:first-of-type {
+    margin-top: 0;
+  }
+
   .guangzhou-day__route,
   .guangzhou-day__note {
     width: 100%;
@@ -2951,12 +2961,9 @@ body {
 
   .journal-scroll-cue.is-dismissed {
     animation: none;
-    min-height: 0;
-    max-height: 0;
-    margin-bottom: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    border-width: 0;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
     opacity: 0;
     transform: translateX(0.4rem);
     visibility: hidden;
@@ -3008,6 +3015,11 @@ body {
     position: static;
     top: auto;
     left: auto;
+    display: flex;
+    height: 4rem;
+    box-sizing: border-box;
+    flex-direction: column;
+    justify-content: center;
     padding: 0.7rem 0.8rem 0.75rem;
     background: #0a1b1f;
     opacity: 1;
@@ -3085,6 +3097,19 @@ body {
 
 #intro .portfolio-hero__actions li {
   padding: 0;
+}
+
+#intro .portfolio-hero__actions .button.primary {
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+#intro .portfolio-hero__actions .button.primary:hover,
+#intro .portfolio-hero__actions .button.primary:focus {
+  background: rgba(18, 138, 134, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(40, 215, 197, 0.58);
+  color: #ffffff !important;
 }
 
 #intro + #header {
@@ -6005,11 +6030,11 @@ body.page-home #nav {
   gap: 0.28rem;
   margin: 0;
   color: rgba(255, 255, 255, 0.88);
-  font-family: var(--font-typewriter);
-  font-size: 0.96rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
   font-style: normal;
-  font-weight: 700;
-  letter-spacing: 0.015em;
+  font-weight: 800;
+  letter-spacing: 0.025em;
   line-height: 1.55;
   text-align: center;
   text-transform: none;
@@ -6069,7 +6094,7 @@ body.page-home #nav {
   #intro .portfolio-hero__scramble {
     min-height: 3.35rem;
     max-width: calc(100vw - 2.5rem);
-    font-size: clamp(0.76rem, 3.4vw, 0.9rem);
+    font-size: clamp(0.82rem, 3.6vw, 0.96rem);
     line-height: 1.5;
   }
 
