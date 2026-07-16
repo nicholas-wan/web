@@ -126,8 +126,15 @@
 			)
 				.appendTo($wrapper);
 
-			// Change toggle styling once we've scrolled past the header.
-				$header.scrollex({
+			// Event pages intentionally omit the large masthead. Keep their menu in
+			// the compact contextual bar; pages without either surface use the
+			// contrasting pill from the outset so white content can never hide it.
+				var $mobileContextBar = $('.mobile-context-bar').first();
+				if ($mobileContextBar.length)
+					$navPanelToggle.appendTo($mobileContextBar).addClass('alt');
+
+			// Change toggle styling once we've scrolled past a real header.
+				if ($header.length) $header.scrollex({
 					bottom: '5vh',
 					enter: function() {
 						$navPanelToggle.removeClass('alt');
@@ -136,6 +143,8 @@
 						$navPanelToggle.addClass('alt');
 					}
 				});
+				else
+					$navPanelToggle.addClass('alt');
 
 		// Panel.
 			$navPanel = $(

@@ -25,15 +25,18 @@
     if (!years) return;
 
     var bounds = years.getBoundingClientRect();
-    var readingLine = window.innerHeight * 0.72;
+    /* Reveal as the leading portion of a card enters the reading area. Using
+       the midpoint at 72% left bare dots and year labels on phones, which read
+       like missing content rather than a reversible timeline. */
+    var readingLine = window.innerHeight * 0.88;
     var progress = (readingLine - bounds.top) / Math.max(bounds.height, 1);
     progress = Math.max(0, Math.min(1, progress));
     years.style.setProperty('--timeline-progress', progress.toFixed(4));
 
     events.forEach(function (event) {
       var eventBounds = event.getBoundingClientRect();
-      var eventMiddle = eventBounds.top + (eventBounds.height / 2);
-      var reached = eventMiddle <= readingLine;
+      var eventRevealPoint = eventBounds.top + Math.min(eventBounds.height * 0.24, 64);
+      var reached = eventRevealPoint <= readingLine;
       event.classList.toggle('is-past', reached);
       event.classList.toggle('is-visible', reducedMotion.matches || reached);
     });

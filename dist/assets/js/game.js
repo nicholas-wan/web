@@ -130,7 +130,7 @@
       var p = scrollable > 0
         ? Math.min(1, Math.max(0, -sectionTop / scrollable))
         : 1;
-      section.style.setProperty('--p', p.toFixed(4));
+      var textProgress = p;
       /* On phones, begin the horizontal motion when the portrait itself first
          enters the bottom of the viewport. Waiting for the sticky section to
          reach the top made a visible sliver sit still for too long. */
@@ -140,7 +140,11 @@
         var settledPhotoTop = photoTop - Math.max(sectionTop, 0);
         var visibleTravel = Math.max(window.innerHeight - settledPhotoTop, 1);
         photoProgress = Math.min(1, Math.max(0, (window.innerHeight - photoTop) / visibleTravel));
+        /* Bring the copy in as soon as the portrait starts moving rather than
+           leaving a portrait-only pause in the middle of the mobile handoff. */
+        textProgress = Math.max(p, Math.min(1, Math.max(0, (photoProgress - 0.06) / 0.82)));
       }
+      section.style.setProperty('--p', textProgress.toFixed(4));
       section.style.setProperty('--photo-p', photoProgress.toFixed(4));
     }
 

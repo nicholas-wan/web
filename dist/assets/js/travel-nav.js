@@ -77,6 +77,7 @@
   }).filter(Boolean);
   if (!sections.length) return;
 
+  var activeSectionId = '';
   var setActive = function (section) {
     links.forEach(function (link) {
       var active = link.getAttribute('href') === '#' + section.id;
@@ -84,6 +85,18 @@
       if (active) link.setAttribute('aria-current', 'location');
       else link.removeAttribute('aria-current');
     });
+
+    if (mobileNav.matches && activeSectionId !== section.id) {
+      var activeLink = nav.querySelector('a[href="#' + section.id + '"]');
+      if (activeLink) {
+        activeLink.scrollIntoView({
+          block: 'nearest',
+          inline: 'center',
+          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+        });
+      }
+    }
+    activeSectionId = section.id;
   };
 
   /* Position-based scrollspy: the current section is the last heading above
