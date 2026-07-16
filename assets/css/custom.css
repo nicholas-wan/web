@@ -2734,6 +2734,18 @@ body {
     padding-bottom: 2.5rem;
   }
 
+  .australia-journal .travel-journal__hero-image {
+    max-height: none;
+    background: #071315;
+  }
+
+  .australia-journal .travel-journal__hero-image img {
+    height: auto;
+    aspect-ratio: auto;
+    object-fit: contain;
+    object-position: center;
+  }
+
   #main.guangzhou-journal > article {
     padding-right: 1.1rem;
     padding-left: 1.1rem;
@@ -2862,7 +2874,16 @@ body {
     scrollbar-width: thin;
   }
 
+  .journal-gallery-shell {
+    position: relative;
+    min-width: 0;
+  }
+
   .journal-scroll-cue {
+    position: absolute;
+    z-index: 2;
+    top: 0.5rem;
+    right: 0.55rem;
     display: flex;
     width: max-content;
     min-height: 2rem;
@@ -2870,7 +2891,7 @@ body {
     justify-content: center;
     gap: 0.35rem;
     max-height: 2rem;
-    margin: 0.75rem 0 0.75rem auto;
+    margin: 0;
     padding: 0.28rem 0.6rem;
     border: 1px solid rgba(18, 138, 134, 0.24);
     border-radius: 999px;
@@ -2886,8 +2907,12 @@ body {
     text-transform: uppercase;
     animation: journal-scroll-cue-shake 3s ease-in-out infinite;
     overflow: hidden;
-    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s,
-      max-height 0.25s ease, margin 0.25s ease, padding 0.25s ease, border-width 0.25s ease;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+  }
+
+  .guangzhou-day.guangzhou-day--compact .journal-gallery-shell > .journal-scroll-cue {
+    top: 1.75rem;
   }
 
   .journal-scroll-cue[hidden] {
@@ -2901,12 +2926,6 @@ body {
 
   .journal-scroll-cue.is-dismissed {
     animation: none;
-    min-height: 0;
-    max-height: 0;
-    margin: 0 0 0 auto;
-    padding-top: 0;
-    padding-bottom: 0;
-    border-width: 0;
     opacity: 0;
     transform: translateX(0.4rem);
     visibility: hidden;
