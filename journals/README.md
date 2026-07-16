@@ -13,4 +13,4 @@ To add a journal:
 7. Add the destination's map points in `assets/js/travel-map.js`.
 8. Run the normal clean build and verification workflow.
 
-Existing legacy journal sources remain supported while they are migrated. Guangzhou is the reference `contentOnly` implementation. Regardless of source format, every generated journal is rendered through the shared journal partial.
+All current travel journals now live in this directory and use the `contentOnly` contract. The build still supports the retired full-page source format for compatibility, but new and updated journals should remain content fragments. Guangzhou is the reference compact implementation. Every generated journal is rendered through the shared journal partial.
