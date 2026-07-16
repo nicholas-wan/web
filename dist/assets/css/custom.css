@@ -2740,7 +2740,8 @@ body {
     align-items: center;
     justify-content: center;
     gap: 0.35rem;
-    margin: 0.65rem 0 -0.55rem auto;
+    max-height: 2rem;
+    margin: 0.75rem 0 0.75rem auto;
     padding: 0.28rem 0.6rem;
     border: 1px solid rgba(18, 138, 134, 0.24);
     border-radius: 999px;
@@ -2755,7 +2756,9 @@ body {
     opacity: 0.92;
     text-transform: uppercase;
     animation: journal-scroll-cue-shake 3s ease-in-out infinite;
-    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+    overflow: hidden;
+    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s,
+      max-height 0.25s ease, margin 0.25s ease, padding 0.25s ease, border-width 0.25s ease;
   }
 
   .journal-scroll-cue[hidden] {
@@ -2769,6 +2772,12 @@ body {
 
   .journal-scroll-cue.is-dismissed {
     animation: none;
+    min-height: 0;
+    max-height: 0;
+    margin: 0 0 0 auto;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
     opacity: 0;
     transform: translateX(0.4rem);
     visibility: hidden;

@@ -1,0 +1,90 @@
+[
+  {
+    "order": 1,
+    "slug": "travel_2019_siliconvalley",
+    "label": "Silicon Valley",
+    "source": "travel_2019_siliconvalley.html",
+    "contentOnly": false,
+    "mainClass": "homepage",
+    "title": "Nicholas Wan - Silicon Valley",
+    "description": "Nicholas Wan's 2019 Silicon Valley work and travel journal.",
+    "ogImage": "images/travel/2019_sv/SF_sutro_sunset-800.jpg"
+  },
+  {
+    "order": 2,
+    "slug": "travel_2022_europe",
+    "label": "Europe",
+    "source": "travel_2022_europe.html",
+    "contentOnly": false,
+    "mainClass": "homepage",
+    "title": "Nicholas Wan - Europe Trip",
+    "description": "Nicholas Wan's Europe travel journal and photography from 2022.",
+    "ogImage": "images/travel/2022_europe/europe_cover.jpg"
+  },
+  {
+    "order": 3,
+    "slug": "travel_2023_perth",
+    "label": "Perth",
+    "source": "travel_2023_perth.html",
+    "contentOnly": false,
+    "mainClass": "homepage",
+    "title": "Nicholas Wan - Perth Trip",
+    "description": "Nicholas Wan's Perth travel journal and photography from 2023.",
+    "ogImage": "images/travel/2023_perth/perth_card.jpg"
+  },
+  {
+    "order": 4,
+    "slug": "travel_2023_usacanada",
+    "label": "USA & Canada",
+    "source": "travel_2023_usacanada.html",
+    "contentOnly": false,
+    "mainClass": "homepage",
+    "title": "Nicholas Wan - USA & Canada Trip",
+    "description": "Nicholas Wan's USA and Canada travel journal and photography from 2023.",
+    "ogImage": "images/travel/2023_usa_canada/cover_photo-800.jpg"
+  },
+  {
+    "order": 5,
+    "slug": "travel_2024_australia",
+    "label": "Australia",
+    "source": "travel_2024_australia.html",
+    "contentOnly": false,
+    "mainClass": "homepage australia-journal guangzhou-day--compact",
+    "title": "Nicholas Wan - Australia Trip",
+    "description": "Nicholas Wan's Melbourne and Sydney honeymoon travel journal and photography from 2024.",
+    "ogImage": "images/travel/2024_australia/banner-800.jpg"
+  },
+  {
+    "order": 6,
+    "slug": "travel_2024_germany",
+    "label": "Germany",
+    "source": "travel_2024_germany.html",
+    "contentOnly": false,
+    "mainClass": "homepage",
+    "title": "Nicholas Wan - Germany Trip",
+    "description": "Nicholas Wan's Germany work and travel journal from 2024.",
+    "ogImage": "images/travel/2024_germany/germany_banner_card.jpg"
+  },
+  {
+    "order": 7,
+    "slug": "travel_2025_japan",
+    "label": "Japan",
+    "source": "travel_2025_japan.html",
+    "contentOnly": false,
+    "mainClass": "homepage guangzhou-journal japan-journal",
+    "title": "Nicholas Wan - Japan Trip",
+    "description": "Nicholas Wan's Japan travel journal and photography from 2025.",
+    "ogImage": "images/travel/2025_japan/japan_banner_japan-800.jpg"
+  },
+  {
+    "order": 8,
+    "slug": "travel_2026_guangzhou",
+    "label": "Guangzhou",
+    "source": "travel_2026_guangzhou.html",
+    "contentOnly": false,
+    "mainClass": "homepage guangzhou-journal",
+    "title": "Nicholas Wan - Guangzhou Trip",
+    "description": "Nicholas Wan's six-day Guangzhou travel journal from May 2026, covering Old Guangzhou, Chimelong, Baiyun Mountain, and Canton Tower.",
+    "ogImage": "images/travel/2026_guangzhou/day5/canton-tower-couple.webp"
+  }
+]
