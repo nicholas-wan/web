@@ -71,11 +71,17 @@
      makes that interaction discoverable, then gets out of the way after the
      visitor actually scrolls each gallery. */
   Array.prototype.forEach.call(document.querySelectorAll('.travel-gallery--compact, .guangzhou-day--compact .masonry'), function (gallery) {
+    var shell = document.createElement('div');
     var cue = document.createElement('div');
+
+    shell.className = 'journal-gallery-shell';
+    gallery.parentNode.insertBefore(shell, gallery);
+    shell.appendChild(gallery);
+
     cue.className = 'journal-scroll-cue';
     cue.setAttribute('aria-hidden', 'true');
     cue.innerHTML = '<span>Swipe to browse</span><i aria-hidden="true">&#8596;</i>';
-    gallery.parentNode.insertBefore(cue, gallery);
+    shell.appendChild(cue);
 
     var refreshCue = function () {
       var scrollable = gallery.scrollWidth > gallery.clientWidth + 4;
