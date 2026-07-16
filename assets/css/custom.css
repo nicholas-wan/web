@@ -5943,3 +5943,96 @@ body.page-home #nav {
     transform: none;
   }
 }
+
+/* The homepage roles resolve once, replacing the looping typewriter. The
+   source text retains layout and accessibility; JS draws only the animated
+   aria-hidden layer above it. */
+#intro .portfolio-hero__scramble {
+  display: grid;
+  min-height: 3.55rem;
+  max-width: min(32rem, calc(100vw - 3rem));
+  grid-template-columns: 1fr;
+  gap: 0.28rem;
+  margin: 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-family: var(--font-typewriter);
+  font-size: 0.96rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.015em;
+  line-height: 1.55;
+  text-align: center;
+  text-transform: none;
+}
+
+.portfolio-hero__scramble-support {
+  display: block;
+  color: rgba(255, 255, 255, 0.66);
+  font-family: var(--font-display);
+  font-size: 0.76rem;
+  font-weight: 400;
+  letter-spacing: 0.075em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.portfolio-hero__scramble-row {
+  position: relative;
+  display: block;
+  min-width: 0;
+  white-space: pre;
+}
+
+.portfolio-hero__scramble-visual {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  color: inherit;
+  white-space: pre;
+}
+
+.has-js .portfolio-hero__scramble:not(.is-complete) .portfolio-hero__scramble-row {
+  opacity: 0;
+}
+
+.portfolio-hero__scramble.is-enhanced [data-scramble-source] {
+  color: transparent;
+}
+
+.portfolio-hero__scramble.is-enhanced.is-running .portfolio-hero__scramble-row {
+  animation: portfolio-scramble-fade 400ms ease-out var(--scramble-delay, 0ms) forwards;
+}
+
+.portfolio-hero__scramble.is-complete .portfolio-hero__scramble-row {
+  opacity: 1;
+  animation: none;
+}
+
+@keyframes portfolio-scramble-fade {
+  to {
+    opacity: 1;
+  }
+}
+
+@media screen and (max-width: 736px) {
+  #intro .portfolio-hero__scramble {
+    min-height: 3.35rem;
+    max-width: calc(100vw - 2.5rem);
+    font-size: clamp(0.76rem, 3.4vw, 0.9rem);
+    line-height: 1.5;
+  }
+
+  .portfolio-hero__scramble-support {
+    font-size: clamp(0.62rem, 2.6vw, 0.72rem);
+    letter-spacing: 0.045em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-hero__scramble-row,
+  .has-js .portfolio-hero__scramble .portfolio-hero__scramble-row {
+    opacity: 1;
+    animation: none;
+  }
+}
