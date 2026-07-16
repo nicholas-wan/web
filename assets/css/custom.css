@@ -6067,27 +6067,12 @@ body.page-home #nav {
   white-space: pre;
 }
 
-.has-js .portfolio-hero__scramble:not(.is-complete) .portfolio-hero__scramble-row {
-  opacity: 0;
-}
-
 .portfolio-hero__scramble.is-enhanced [data-scramble-source] {
   color: transparent;
 }
 
-.portfolio-hero__scramble.is-enhanced.is-running .portfolio-hero__scramble-row {
-  animation: portfolio-scramble-fade 400ms ease-out var(--scramble-delay, 0ms) forwards;
-}
-
 .portfolio-hero__scramble.is-complete .portfolio-hero__scramble-row {
   opacity: 1;
-  animation: none;
-}
-
-@keyframes portfolio-scramble-fade {
-  to {
-    opacity: 1;
-  }
 }
 
 @media screen and (max-width: 736px) {
@@ -6105,8 +6090,7 @@ body.page-home #nav {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portfolio-hero__scramble-row,
-  .has-js .portfolio-hero__scramble .portfolio-hero__scramble-row {
+  .portfolio-hero__scramble-row {
     opacity: 1;
     animation: none;
   }

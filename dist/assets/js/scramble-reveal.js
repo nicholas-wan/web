@@ -11,13 +11,12 @@
   }
 
   var CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  var TICK_MS = 33;
+  var TICK_MS = 45;
   var ROW_STAGGER_MS = 100;
-  var SCRAMBLE_TAIL = 5;
+  var SCRAMBLE_TAIL = 7;
   var activeTimers = new Set();
   var completedRows = 0;
   var hasPlayed = false;
-  var observer = null;
 
   var segmenter = typeof Intl !== "undefined" && Intl.Segmenter
     ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
@@ -123,13 +122,11 @@
       item.visual.textContent = item.text;
     });
     list.classList.add("is-complete");
-    if (observer) observer.disconnect();
   }
 
   function play() {
     if (hasPlayed) return;
     hasPlayed = true;
-    if (observer) observer.disconnect();
 
     items.forEach(function (item, index) {
       item.visual.textContent = renderFrame(item.characters, 0);
@@ -139,19 +136,7 @@
     list.classList.add("is-running");
   }
 
-  if ("IntersectionObserver" in window) {
-    observer = new IntersectionObserver(function (entries) {
-      if (entries.some(function (entry) { return entry.isIntersecting; })) {
-        play();
-      }
-    }, {
-      threshold: 0.35,
-      rootMargin: "0px 0px -8% 0px"
-    });
-    observer.observe(list);
-  } else {
-    play();
-  }
+  play();
 
   function handleMotionChange(event) {
     if (event.matches) finishImmediately();
