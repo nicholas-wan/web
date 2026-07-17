@@ -3525,101 +3525,6 @@ body {
   line-height: 1.4;
 }
 
-.case-study__expand {
-  grid-column: 1 / -1;
-  min-width: 0;
-  max-width: 100%;
-  margin: 0 0 1.15rem;
-  border: 1px solid var(--color-border-soft);
-  border-radius: var(--radius-compact);
-  background: var(--color-surface-subtle);
-}
-
-.case-study__expand summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 3rem;
-  padding: 0.55rem 0.9rem;
-  cursor: pointer;
-  list-style: none;
-  color: var(--color-brand-600);
-  font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.case-study__expand summary::-webkit-details-marker { display: none; }
-
-.case-study__expand summary .icon { transition: transform 0.2s ease; }
-.case-study__expand[open] summary .icon { transform: rotate(45deg); }
-
-.case-study__expand-body {
-  padding: 0 0.9rem 0.95rem;
-}
-
-.case-study__expand-body > p:first-child {
-  margin: 0 0 0.9rem;
-  color: var(--color-ink-600);
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-.case-study__pipeline-scroll {
-  margin: 0 0 0.9rem;
-  overflow-x: auto;
-}
-
-.case-study__pipeline {
-  display: block;
-  width: 100%;
-  min-width: 33rem;
-  height: auto;
-}
-
-.case-study__pipeline .pipeline-node { fill: var(--color-brand-100); }
-.case-study__pipeline .pipeline-node--analyst { fill: var(--color-brand-700); }
-.case-study__pipeline .pipeline-flow { stroke: var(--color-brand-400); stroke-width: 1.5; }
-
-.case-study__pipeline text {
-  font-family: "Source Sans Pro", Helvetica, sans-serif;
-  font-size: 13px;
-  fill: var(--color-brand-700);
-}
-
-.case-study__pipeline .pipeline-label--analyst {
-  fill: var(--color-brand-100);
-  font-weight: 600;
-}
-
-.case-study__pipeline .pipeline-label--analyst-sub {
-  fill: var(--color-brand-200);
-  font-size: 11px;
-}
-
-.case-study__pipeline .pipeline-caption {
-  font-size: 11px;
-  fill: var(--color-brand-600);
-}
-
-.case-study__expand-body ul {
-  margin: 0 0 0.75rem;
-  padding-left: 1.15rem;
-  color: var(--color-ink-700);
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-.case-study__expand-note {
-  margin: 0;
-  color: var(--color-ink-500);
-  font-size: 0.78rem;
-  font-style: italic;
-}
-
 .case-study--internship {
   padding: 1.15rem;
   background: var(--color-surface-subtle);
@@ -5069,6 +4974,139 @@ a:focus-visible {
 .page-experience #agentic-ai .case-study__highlights.is-complete [data-scramble-row] {
   color: #28d7c5;
 }
+
+/* "How I led it" expand section. Structure is generic; every colour rule is
+   scoped to the dark #agentic-ai card — reusing the component on a light card
+   needs its own palette pass first. */
+.case-study__expand {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 0 0 1.35rem;
+  border-radius: var(--radius-compact);
+}
+
+.case-study__expand summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3rem;
+  padding: 0.55rem 1.1rem;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-typewriter);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.case-study__expand summary::-webkit-details-marker { display: none; }
+
+.case-study__expand summary .icon { transition: transform 0.2s ease; }
+.case-study__expand[open] summary .icon { transform: rotate(45deg); }
+
+/* Must sit AFTER the base rule above — the site-wide reduced-motion group
+   earlier in the file loses to it on source order at equal specificity. */
+@media (prefers-reduced-motion: reduce) {
+  .case-study__expand summary .icon { transition: none; }
+}
+
+.case-study__expand-body {
+  padding: 0.2rem 1.1rem 1.1rem;
+}
+
+.case-study__expand-hook {
+  margin: 0 0 1rem;
+  max-width: 42rem;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.case-study__pipeline-scroll {
+  margin: 0 0 1rem;
+  overflow-x: auto;
+}
+
+.case-study__pipeline {
+  display: block;
+  width: 100%;
+  /* px on purpose: 1:1 with the 600-unit viewBox so SVG text never renders
+     below its authored size (root rem is 14.67px here, not 16). */
+  min-width: 600px;
+  height: auto;
+}
+
+.case-study__pipeline text {
+  font-family: var(--font-typewriter);
+  font-size: 12px;
+}
+
+.case-study__pipeline .pipeline-label--analyst { font-weight: 700; }
+.case-study__pipeline .pipeline-label--analyst-sub { font-size: 10px; }
+.case-study__pipeline .pipeline-caption { font-size: 10px; }
+
+.case-study__expand-body ul {
+  margin: 0 0 0.85rem;
+  max-width: 42rem;
+  padding-left: 1.15rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+.case-study__expand-note {
+  margin: 0;
+  font-size: 0.78rem;
+  font-style: italic;
+}
+
+.page-experience #agentic-ai .case-study__expand {
+  border: 1px solid #24464b;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.page-experience #agentic-ai .case-study__expand summary { color: #28d7c5; }
+
+.page-experience #agentic-ai .case-study__expand summary:focus-visible,
+.page-experience #agentic-ai .case-study__pipeline-scroll:focus-visible {
+  outline: 2px solid #28d7c5;
+  outline-offset: 3px;
+}
+
+.page-experience #agentic-ai .case-study__expand-hook { color: #9db4b3; }
+
+/* Scroll shadows: only visible while diagram content is clipped. Cover colour
+   matches the expand panel (card #071315 + its 2.5% white wash), not the bare
+   card, so the strips do not read as darker seams at rest. */
+.page-experience #agentic-ai .case-study__pipeline-scroll {
+  background:
+    linear-gradient(90deg, rgb(13, 25, 27) 40%, transparent), linear-gradient(270deg, rgb(13, 25, 27) 40%, transparent) 100% 0,
+    linear-gradient(90deg, rgba(40, 215, 197, 0.18), transparent 12px), linear-gradient(270deg, rgba(40, 215, 197, 0.18), transparent 12px) 100% 0;
+  background-repeat: no-repeat;
+  background-size: 40px 100%, 40px 100%, 12px 100%, 12px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
+.page-experience #agentic-ai .pipeline-node {
+  fill: rgba(40, 215, 197, 0.1);
+  stroke: rgba(40, 215, 197, 0.35);
+  stroke-width: 1;
+}
+
+.page-experience #agentic-ai .pipeline-node--analyst {
+  fill: #28d7c5;
+  stroke: none;
+}
+
+.page-experience #agentic-ai .pipeline-flow { stroke: rgba(40, 215, 197, 0.45); stroke-width: 1.5; }
+.page-experience #agentic-ai .case-study__pipeline text { fill: #8fd8d0; }
+.page-experience #agentic-ai .pipeline-label--analyst { fill: #071315; }
+.page-experience #agentic-ai .pipeline-label--analyst-sub { fill: rgba(7, 19, 21, 0.72); }
+.page-experience #agentic-ai .pipeline-caption { fill: #9db4b3; }
+
+.page-experience #agentic-ai .case-study__expand-body ul { color: #f4f2ea; }
+.page-experience #agentic-ai .case-study__expand-body ul li::marker { color: #28d7c5; }
+.page-experience #agentic-ai .case-study__expand-note { color: rgba(157, 180, 179, 0.8); }
 
 .page-experience #cloud-analytics {
   display: grid;
