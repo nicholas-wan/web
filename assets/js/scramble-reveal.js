@@ -39,6 +39,23 @@
     return /^\s$/u.test(character);
   }
 
+  /* The opening words never scramble. data-scramble-lead is a word count; the
+     characters it covers render as real text from the first frame, so the line
+     reads as copy resolving out of noise instead of a noise field that later
+     turns into words. Returns the character offset the reveal starts from. */
+  function leadOffset(characters, wordCount) {
+    var index = 0;
+    var words = 0;
+
+    while (words < wordCount && index < characters.length) {
+      while (index < characters.length && !isWhitespace(characters[index])) index += 1;
+      while (index < characters.length && isWhitespace(characters[index])) index += 1;
+      words += 1;
+    }
+
+    return index;
+  }
+
   function noiseFor(character) {
     for (var i = 0; i < WIDTH_POOLS.length; i++) {
       var pool = WIDTH_POOLS[i];
@@ -72,6 +89,7 @@
     var source = row.querySelector("[data-scramble-source]");
     var text = source.textContent.trim();
     var characters = splitText(text);
+    var lead = leadOffset(characters, parseInt(row.getAttribute("data-scramble-lead"), 10) || 0);
     var visual = document.createElement("span");
 
     visual.className = "scramble-reveal__visual";
@@ -83,6 +101,7 @@
     return {
       text: text,
       characters: characters,
+      lead: lead,
       visual: visual
     };
   });
@@ -101,10 +120,11 @@
   }
 
   function animateRow(item) {
-    var resolvedCount = 0;
+    var resolvedCount = item.lead;
     // Resolve enough characters per tick that the reveal finishes in about
-    // TARGET_DURATION_MS however long the copy is.
-    var step = Math.max(1, Math.ceil(item.characters.length / (TARGET_DURATION_MS / TICK_MS)));
+    // TARGET_DURATION_MS however long the copy is. The lead words are already
+    // resolved, so the step scales to what is actually left to reveal.
+    var step = Math.max(1, Math.ceil((item.characters.length - item.lead) / (TARGET_DURATION_MS / TICK_MS)));
 
     item.visual.textContent = renderFrame(item.characters, resolvedCount);
 
@@ -146,7 +166,7 @@
     hasPlayed = true;
 
     items.forEach(function (item, index) {
-      item.visual.textContent = renderFrame(item.characters, 0);
+      item.visual.textContent = renderFrame(item.characters, item.lead);
       scheduleRow(item, index * ROW_STAGGER_MS);
     });
 
