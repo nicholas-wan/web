@@ -10,11 +10,15 @@
     return;
   }
 
-  var CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  // Noise is width-matched: each lowercase letter scrambles to a random
+  // letter from the same width class, and anything else (capitals,
+  // punctuation, digits, spaces) stays fixed. Finer buckets mean each
+  // frame's word widths stay within a few px of the real text, so the
+  // centered, wrapping headline keeps its line breaks and centering.
+  var WIDTH_POOLS = ["ijl", "ftr", "csvxyz", "aeou", "bdghknpq", "mw"];
   var TICK_MS = 45;
   var TARGET_DURATION_MS = 1200;
   var ROW_STAGGER_MS = 100;
-  var SCRAMBLE_TAIL = 7;
   var VIEW_THRESHOLD = 0.6;
   var activeTimers = new Set();
   var completedRows = 0;
@@ -35,16 +39,24 @@
     return /^\s$/u.test(character);
   }
 
-  function randomCharacter() {
-    return CHARS.charAt(Math.floor(Math.random() * CHARS.length));
+  function noiseFor(character) {
+    for (var i = 0; i < WIDTH_POOLS.length; i++) {
+      var pool = WIDTH_POOLS[i];
+      if (pool.indexOf(character) >= 0) {
+        return pool.charAt(Math.floor(Math.random() * pool.length));
+      }
+    }
+    return character;
   }
 
+  /* Every frame is FULL LENGTH: unresolved characters render as noise, not
+     blanks. Blank tails collapse at line ends, which makes centered wrapped
+     text re-measure and shift every tick; full-length, width-matched frames
+     keep the same word widths so line breaks and centering stay stable. */
   function renderFrame(characters, resolvedCount) {
     return characters.map(function (character, index) {
       if (index < resolvedCount) return character;
-      if (isWhitespace(character)) return character;
-      if (index < resolvedCount + SCRAMBLE_TAIL) return randomCharacter();
-      return " ";
+      return noiseFor(character);
     }).join("");
   }
 

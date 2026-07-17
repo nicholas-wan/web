@@ -6062,7 +6062,12 @@ body.page-home #nav {
    for no-JS visitors, and under reduced motion. */
 #intro .portfolio-hero__summary {
   display: grid;
-  max-width: min(34rem, calc(100vw - 3rem));
+  /* Explicit width, not max-width: as a centered flex child the summary
+     shrink-wraps to exactly the resolved sentence's width, leaving the
+     scramble's noise frames (which vary a few px per word) zero slack —
+     they wrap inside the overlay and the centered line marches left and
+     right. A fixed box wider than the text absorbs the variance. */
+  width: min(44rem, calc(100vw - 3rem));
   grid-template-columns: 1fr;
   gap: 0.55rem;
   margin: 0;
@@ -6107,7 +6112,7 @@ body.page-home #nav {
 
 @media screen and (max-width: 736px) {
   #intro .portfolio-hero__summary {
-    max-width: calc(100vw - 2.5rem);
+    width: calc(100vw - 2.5rem);
   }
 
   #intro .portfolio-hero__scramble-row {
