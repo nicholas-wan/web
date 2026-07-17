@@ -545,6 +545,10 @@
   margin: 0 0 0.5rem;
 }
 
+/* Desktop scene: heading + photo/text row form one vertically centered
+   cluster with equal elastic space above and below. Safe to reposition
+   freely here — the desktop scrub in game.js uses scroll progress only.
+   Fixed rhythm: 2.25rem heading→row, 3rem photo↔text. */
 .intro-swipe__stage {
   position: sticky;
   top: 0;
@@ -552,22 +556,28 @@
   height: 100vh;
   height: 100svh;
   flex-direction: column;
+  justify-content: center;
   overflow: hidden;
 }
 
 .intro-swipe__head {
   flex: 0 0 auto;
-  padding-top: 1.5rem;
+  padding-bottom: 2.25rem;
+}
+
+/* Out-rank main.css's "#main > .post header.major h2" (2rem bottom margin)
+   so the scene's heading→photo rhythm is exact. */
+#main > .post header.major.intro-swipe__head h2 {
+  margin-bottom: 0;
 }
 
 .intro-swipe__row {
-  flex: 1 1 auto;
+  flex: 0 0 auto;
   display: flex;
   min-height: 0;
   align-items: center;
   justify-content: center;
   gap: 3rem;
-  padding-bottom: 4vh;
 }
 
 .intro-swipe__photo {
@@ -604,7 +614,9 @@
   color: #030e1e !important;
 }
 
-.intro-swipe__text .aboutblock {
+/* Out-rank the later .homepage .aboutblock margin so the scene's rhythm
+   stays exact. */
+.intro-swipe .intro-swipe__text .aboutblock {
   margin: 0;
   text-align: left;
   line-height: 1.75;
@@ -634,11 +646,25 @@
     margin-bottom: 0;
   }
 
+  /* Mobile scene: bottom-anchored cluster — the photo must keep its low
+     rest position because the mobile swipe math in game.js scrubs from the
+     photo's settled top. All spare height lands above the heading; inside
+     the cluster the rhythm is fixed: 1rem heading→photo, 1rem photo→text,
+     0.75rem h3→paragraph, 3vh below the paragraph. */
+  .intro-swipe__stage {
+    justify-content: flex-end;
+  }
+
+  .intro-swipe__head {
+    padding-bottom: 1rem;
+  }
+
   .intro-swipe__row {
+    flex: 0 0 auto;
     flex-direction: column;
     justify-content: flex-end;
-    gap: 0.9rem;
-    padding: 0 1rem 2vh;
+    gap: 1rem;
+    padding: 0 1rem 3vh;
   }
 
   .intro-swipe__photo {

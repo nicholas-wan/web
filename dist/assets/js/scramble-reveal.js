@@ -12,6 +12,7 @@
 
   var CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   var TICK_MS = 45;
+  var TARGET_DURATION_MS = 1200;
   var ROW_STAGGER_MS = 100;
   var SCRAMBLE_TAIL = 7;
   var VIEW_THRESHOLD = 0.6;
@@ -89,11 +90,14 @@
 
   function animateRow(item) {
     var resolvedCount = 0;
+    // Resolve enough characters per tick that the reveal finishes in about
+    // TARGET_DURATION_MS however long the copy is.
+    var step = Math.max(1, Math.ceil(item.characters.length / (TARGET_DURATION_MS / TICK_MS)));
 
     item.visual.textContent = renderFrame(item.characters, resolvedCount);
 
     var interval = setInterval(function () {
-      resolvedCount += 1;
+      resolvedCount += step;
       while (resolvedCount < item.characters.length && isWhitespace(item.characters[resolvedCount])) {
         resolvedCount += 1;
       }
