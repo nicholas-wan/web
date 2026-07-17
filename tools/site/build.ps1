@@ -717,7 +717,7 @@ $navigation
     <script src="assets/js/browser.min.js"></script>
     <script src="assets/js/breakpoints.min.js"></script>
     <script src="assets/js/util.js"></script>
-    <script src="assets/js/main.js?v=13"></script>
+    <script src="assets/js/main.js?v=14"></script>
     <script src="assets/js/arrow.js?v=1"></script>
     <script src="assets/js/game.js?v=16"></script>
 $optionalScripts
