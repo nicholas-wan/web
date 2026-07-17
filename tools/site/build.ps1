@@ -182,7 +182,7 @@ function Sync-Directory([string]$Source, [string]$Destination) {
 
 function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]$WebpRoot) {
     $references = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
-    $scanFiles = Get-ChildItem -LiteralPath $OutputRoot -Recurse -File | Where-Object { $_.Extension -in @('.html', '.css', '.js') }
+    $scanFiles = Get-ChildItem -LiteralPath $OutputRoot -Recurse -File | Where-Object { $_.Extension -in @('.html', '.css', '.js', '.webmanifest') }
     $patterns = @(
         '(?i)(?:src|href|content)=["''][^"'']*(images/[^"''?#]+)["'']',
         '(?i)url\(["'']?[^\)"'']*(images/[^\)"''?#]+)',
@@ -690,6 +690,8 @@ $fontAwesomeStylesheet
     <link rel="stylesheet" href="assets/css/custom.css?v=116" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
 </head>
 <body class="$bodyClass">
     <canvas id="nokey" width="800" height="800" aria-hidden="true"></canvas>
@@ -744,6 +746,8 @@ foreach ($file in $runtimeJs) {
     Copy-Item -LiteralPath (Join-Path $root "assets\js\$file") -Destination (Join-Path $out "assets\js\$file") -Force
 }
 Sync-Directory (Join-Path $root "assets\fonts") (Join-Path $out "assets\fonts")
+# Copied before the image scan so the manifest's icon references get published.
+Copy-Item -LiteralPath (Join-Path $root "site.webmanifest") -Destination (Join-Path $out "site.webmanifest")
 Copy-ReferencedImages $out (Join-Path $root "images") $(if (Test-Path -LiteralPath $webpSource) { $webpSource } else { $null })
 Copy-Item -LiteralPath (Join-Path $root "CNAME") -Destination (Join-Path $out "CNAME")
 Copy-Item -LiteralPath (Join-Path $root "robots.txt") -Destination (Join-Path $out "robots.txt")

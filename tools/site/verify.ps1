@@ -302,6 +302,10 @@ if ([regex]::Matches($experience, 'Jan 2021 &ndash; Present').Count -ne 2 -or $e
 if ([regex]::Matches($experience, 'class="case-study__company"').Count -ne 4) { throw "Only the agentic AI card and the three internships carry a full company header; Cloud Analytics defers to the hero card." }
 if ($homeHtml -notmatch 'id="about-me"') { throw "Homepage About section anchor is missing." }
 if ($homeHtml -notmatch '<canvas id="nokey"') { throw "Homepage background animation canvas is missing." }
+if ($homeHtml -notmatch '<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon\.png" />' -or $homeHtml -notmatch '<link rel="manifest" href="site\.webmanifest" />') { throw "Home-screen icon or manifest link is missing." }
+foreach ($iconAsset in @('site.webmanifest', 'images\apple-touch-icon.png', 'images\icon-192.png', 'images\icon-512.png')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $dist $iconAsset))) { throw "Missing published home-screen icon asset: $iconAsset" }
+}
 if ($homeHtml -match 'href=["'']resume["'']') { throw "Homepage still exposes the Resume page." }
 if ($homeHtml -notmatch 'href=["'']personal["'']') { throw "Homepage Personal card is missing." }
 if ($experience -notmatch 'id="agentic-ai"') { throw "Lead agentic AI case study is missing." }
