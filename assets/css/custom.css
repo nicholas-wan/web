@@ -5788,6 +5788,16 @@ body.page-home.is-preload #intro {
   transform: none;
 }
 
+/* The theme's .fade-in load overlay (#wrapper.fade-in::before, fixed,
+   full-viewport) shares z-index 1 with #intro and #wrapper appears later
+   in the DOM, so the overlay paints OVER the hero — the scramble was
+   playing to completion behind it. Lift the hero above the overlay: the
+   hero is black-on-black against it, so first paint stays seamless and
+   the reveal is actually visible. */
+body.page-home #intro {
+  z-index: 2;
+}
+
 .page-travel-journal .guangzhou-journal__hero-image,
 .page-travel-journal .image.main.journal-banner {
   background: linear-gradient(135deg, #dce7e6, #edf2f1);
