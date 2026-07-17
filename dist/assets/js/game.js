@@ -359,7 +359,7 @@
   /* ------------------------------------------------------------------ */
   /* 5. Confetti / particle burst helper                                 */
   /* ------------------------------------------------------------------ */
-  var COLORS = ['#00e0e0', '#128a86', '#ffd166', '#ef476f', '#06d6a0', '#ffffff'];
+  var COLORS = ['#00e0e0', '#11807d', '#ffd166', '#ef476f', '#06d6a0', '#ffffff'];
 
   function burst(x, y, count, power) {
     if (reduce) { return; }
