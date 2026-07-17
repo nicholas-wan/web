@@ -50,6 +50,8 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 
 ## Dead ends and hidden dependencies
 
+- **No SEO, analytics, or resume-PDF work (owner decision, Jul 2026)** — do not add og tags, structured data, or tracking scripts; the League "1 year internship" journal note is intentional.
+
 - **Build size — measured, no easy win (do not retry).** Travel JPEGs are already q40–42;
   recompressing is break-even or worse (the 1600px cap makes them *bigger*). JPEG→WebP was
   refuted — 104 of 495 files grew, net +81MB to save 24MB; only the 9 banners (q82) have
