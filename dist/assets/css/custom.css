@@ -1084,9 +1084,6 @@
   }
 }
 @media all and (max-width: 600px) {
-  .desktoponly {
-    display: none;
-  }
   html, body {
     overflow-x: clip;
   }
@@ -1356,6 +1353,14 @@ body {
 #return-to-top:hover i {
     color: black;
     top: -15px;
+}
+/* .desktoponly / .mobileonly swap at exactly 800px. These used to switch at
+   different widths (600px / 800px), so 601-799px viewports rendered BOTH
+   prewed hero wordmarks stacked on top of each other. */
+@media screen and (max-width: 799.98px) {
+	.desktoponly{
+		display:none;
+	}
 }
 @media screen and (min-width: 800px) {
 	.mobileonly{

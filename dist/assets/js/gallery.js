@@ -31,8 +31,18 @@
   var current = 0;
   var viewerImage = overlay.querySelector('.lightbox__image');
   var caption = overlay.querySelector('.lightbox__caption');
-  var close = function () { overlay.classList.remove('is-visible'); document.body.classList.remove('lightbox-open'); };
+  /* aria-modal tells assistive tech the page behind the dialog is gone, so
+     focus must actually move into the dialog on open, stay inside it while it
+     is up, and land back on the opening photo on close. */
+  var lastTrigger = null;
+  var closeButton = overlay.querySelector('.lightbox__close');
+  var close = function () {
+    overlay.classList.remove('is-visible');
+    document.body.classList.remove('lightbox-open');
+    if (lastTrigger) { lastTrigger.focus(); lastTrigger = null; }
+  };
   var show = function (index) {
+    var opening = !overlay.classList.contains('is-visible');
     current = (index + images.length) % images.length;
     var source = images[current];
     viewerImage.src = source.currentSrc || source.src;
@@ -56,6 +66,7 @@
     caption.textContent = parts.join(' · ');
     overlay.classList.add('is-visible');
     document.body.classList.add('lightbox-open');
+    if (opening) closeButton.focus();
   };
   images.forEach(function (image, index) {
     var trigger = image.closest('.content') || image;
@@ -63,8 +74,8 @@
     trigger.setAttribute('tabindex', '0');
     trigger.setAttribute('role', 'button');
     trigger.setAttribute('aria-label', 'Open image: ' + (image.alt || ('journal photo ' + (index + 1))));
-    trigger.addEventListener('click', function (event) { event.preventDefault(); show(index); });
-    trigger.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); show(index); } });
+    trigger.addEventListener('click', function (event) { event.preventDefault(); lastTrigger = trigger; show(index); });
+    trigger.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); lastTrigger = trigger; show(index); } });
   });
 
   /* Compact mobile journals are horizontal. A fading edge plus one short cue
@@ -108,5 +119,20 @@
     if (event.key === 'Escape') close();
     if (event.key === 'ArrowLeft') show(current - 1);
     if (event.key === 'ArrowRight') show(current + 1);
+    if (event.key === 'Tab') {
+      var focusable = overlay.querySelectorAll('button');
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (!overlay.contains(document.activeElement)) {
+        event.preventDefault();
+        first.focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
   });
 }());
