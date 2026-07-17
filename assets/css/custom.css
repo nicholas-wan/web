@@ -4026,15 +4026,22 @@ body {
     margin-top: -5rem;
   }
 
+  /* The home button forms one toolbar row with the fixed Menu pill
+     (top 0.75rem, 3rem tall): same height, same vertical centre, and
+     1rem of clear black between the button and the white sheet below —
+     it previously touched the seam with a sub-44px tap target. */
   #header {
-    height: 3.5rem;
-    min-height: 3.5rem;
-    padding: 0 1rem;
+    height: 4.75rem;
+    min-height: 4.75rem;
+    padding: 0 1rem 1rem;
   }
 
   #header .logo {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
     font-size: 1rem;
-    padding: 0.45rem 0.75rem;
+    padding: 0 1rem;
   }
 
   .page-travel-journal #header {
