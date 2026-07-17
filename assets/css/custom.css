@@ -3525,6 +3525,101 @@ body {
   line-height: 1.4;
 }
 
+.case-study__expand {
+  grid-column: 1 / -1;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0 0 1.15rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-compact);
+  background: var(--color-surface-subtle);
+}
+
+.case-study__expand summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 3rem;
+  padding: 0.55rem 0.9rem;
+  cursor: pointer;
+  list-style: none;
+  color: var(--color-brand-600);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.case-study__expand summary::-webkit-details-marker { display: none; }
+
+.case-study__expand summary .icon { transition: transform 0.2s ease; }
+.case-study__expand[open] summary .icon { transform: rotate(45deg); }
+
+.case-study__expand-body {
+  padding: 0 0.9rem 0.95rem;
+}
+
+.case-study__expand-body > p:first-child {
+  margin: 0 0 0.9rem;
+  color: var(--color-ink-600);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.case-study__pipeline-scroll {
+  margin: 0 0 0.9rem;
+  overflow-x: auto;
+}
+
+.case-study__pipeline {
+  display: block;
+  width: 100%;
+  min-width: 33rem;
+  height: auto;
+}
+
+.case-study__pipeline .pipeline-node { fill: var(--color-brand-100); }
+.case-study__pipeline .pipeline-node--analyst { fill: var(--color-brand-700); }
+.case-study__pipeline .pipeline-flow { stroke: var(--color-brand-400); stroke-width: 1.5; }
+
+.case-study__pipeline text {
+  font-family: "Source Sans Pro", Helvetica, sans-serif;
+  font-size: 13px;
+  fill: var(--color-brand-700);
+}
+
+.case-study__pipeline .pipeline-label--analyst {
+  fill: var(--color-brand-100);
+  font-weight: 600;
+}
+
+.case-study__pipeline .pipeline-label--analyst-sub {
+  fill: var(--color-brand-200);
+  font-size: 11px;
+}
+
+.case-study__pipeline .pipeline-caption {
+  font-size: 11px;
+  fill: var(--color-brand-600);
+}
+
+.case-study__expand-body ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.15rem;
+  color: var(--color-ink-700);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.case-study__expand-note {
+  margin: 0;
+  color: var(--color-ink-500);
+  font-size: 0.78rem;
+  font-style: italic;
+}
+
 .case-study--internship {
   padding: 1.15rem;
   background: var(--color-surface-subtle);
