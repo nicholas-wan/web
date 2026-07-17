@@ -116,7 +116,11 @@
 		$('.scrolly').scrolly();
 
 	// Background.
-		$wrapper._parallax(0.925);
+		// Parallax drives the backdrop off scroll position, so it is exactly the
+		// kind of motion reduced-motion asks us to drop. The canvas below already
+		// checks the same query.
+		if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches))
+			$wrapper._parallax(0.925);
 
 	// Nav Panel.
 

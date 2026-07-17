@@ -7,7 +7,9 @@ $(window).scroll(function() {
     }
 });
 $('#return-to-top').click(function() {      // When arrow is clicked
+    // A 500ms scroll animation is motion; under reduced motion jump instead.
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     $('body,html').animate({
         scrollTop : 0                       // Scroll to top of body
-    }, 500);
+    }, reduce ? 0 : 500);
 });

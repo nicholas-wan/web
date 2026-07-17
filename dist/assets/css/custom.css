@@ -1035,6 +1035,15 @@
   transform: translate(-50%, 0);
 }
 
+/* The toast slides up as it fades in. Keep the fade (it is what makes the
+   queued toasts legible as separate messages) but drop the travel. */
+@media (prefers-reduced-motion: reduce) {
+  .game-toast {
+    transform: translate(-50%, 0);
+    transition: opacity 0.35s ease;
+  }
+}
+
 /* Journal reading progress */
 .read-progress {
   position: fixed;
@@ -1152,6 +1161,13 @@ body {
      what is near the viewport. The auto keyword remembers real sizes. */
   content-visibility: auto;
   contain-intrinsic-size: auto 320px;
+  /* contain-intrinsic-size supplies BOTH dimensions, so a never-yet-rendered
+     brick claims a 320px width. Grid galleries ignore it (the track sizes the
+     item) but the multicol ones (prewed, house) let it through: at 768px the
+     column is 281px, so skipped bricks overflowed it by 39px until scrolled
+     into view. Take the width from the column instead and the placeholder
+     only ever supplies the height, which is the part that earns the perf. */
+  width: 100%;
 }
 
 /* Masonry image effects */
@@ -1324,10 +1340,10 @@ body {
     -ms-transition: all 0.3s ease;
     -o-transition: all 0.3s ease;
 	transition: all 0.3s ease;
-	opacity: 0.4; /* Standard compliant browsers */
-    -moz-opacity: 0.4; /* Firefox and Mozilla browsers */
-    -webkit-opacity: 0.4; /* WebKit browser e.g. Safari */
-    filter: alpha(opacity=40); /* For IE8 and earlier */
+	opacity: 0.6; /* Standard compliant browsers */
+    -moz-opacity: 0.6; /* Firefox and Mozilla browsers */
+    -webkit-opacity: 0.6; /* WebKit browser e.g. Safari */
+    filter: alpha(opacity=60); /* For IE8 and earlier */
 	z-index:3;
 }
 #return-to-top i {
@@ -1345,10 +1361,10 @@ body {
 }
 #return-to-top:hover {
 	background: silver;
-	opacity: 0.6; /* Standard compliant browsers */
-    -moz-opacity: 0.6; /* Firefox and Mozilla browsers */
-    -webkit-opacity: 0.6; /* WebKit browser e.g. Safari */
-    filter: alpha(opacity=60); /* For IE8 and earlier */
+	opacity: 0.85; /* Standard compliant browsers */
+    -moz-opacity: 0.85; /* Firefox and Mozilla browsers */
+    -webkit-opacity: 0.85; /* WebKit browser e.g. Safari */
+    filter: alpha(opacity=85); /* For IE8 and earlier */
 }
 #return-to-top:hover i {
     color: black;
@@ -3789,8 +3805,8 @@ body {
   }
 
   #nav ul.icons a {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
+    min-width: 3rem;
+    min-height: 3rem;
   }
 }
 
@@ -3971,8 +3987,8 @@ body {
   }
 
   #navPanel .icons a {
-    min-width: 2.75rem;
-    min-height: 2.75rem;
+    min-width: 3rem;
+    min-height: 3rem;
     border: 1px solid var(--color-border);
     border-radius: 999px;
     color: var(--color-ink-700);
@@ -4477,6 +4493,14 @@ a.travel-jump-group__label {
     transition: background-color 0.38s ease, border-color 0.38s ease, color 0.38s ease;
   }
 
+  /* Every jump link is a touch target at this width: 3rem = 44px at the mobile
+     root, where 2.25rem rendered 41.6px. This out-ranks the shared rule above
+     for anchors only (0,1,1 vs 0,1,0), so the group labels that are plain spans
+     keep the compact height while the ones that are links grow with the pills. */
+  .travel-section-nav a {
+    min-height: 3rem;
+  }
+
   .travel-section-nav a.is-active {
     border-color: #11807d;
     background: #11807d;
@@ -4525,11 +4549,19 @@ a.travel-jump-group__label {
   display: flex;
   justify-content: space-between;
   gap: 0.75rem;
-  margin: 3rem auto 0;
   padding: 1.25rem 2rem;
   border-top: 1px solid var(--color-border-soft);
   background: #fff;
   max-width: 64rem;
+}
+
+/* main.css's `#main > *` sets margin:0 and, being ID-weighted (1,0,0), it beat
+   the plain `.travel-pagination` (0,1,0) class — so `margin: 3rem auto 0` never
+   applied. The pager was left-aligned in a 1056px main while the content column
+   starts 58.7px in, and it had no top margin either. Out-rank it, as the About
+   scene does. Keep the 600px override at this weight too or it dies the same way. */
+#main > .travel-pagination {
+  margin: 3rem auto 0;
 }
 
 .travel-pagination a {
@@ -4839,17 +4871,20 @@ a:focus-visible {
     padding: 2rem 1rem;
   }
 
+  /* 3rem = 44px at the theme's 14.67px mobile root, matching #navPanelToggle
+     and the lightbox buttons. 2.75rem was 40.3px — aimed at the touch minimum
+     and landed under it. */
   #nav .links a,
   #nav .icons a,
   .button,
   button {
-    min-height: 2.75rem;
+    min-height: 3rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
   }
 
-  .travel-pagination {
+  #main > .travel-pagination {
     margin-top: 2rem;
     padding: 0 1rem;
   }
