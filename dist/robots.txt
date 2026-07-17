@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /assets/Stanford_Unofficial_Transcript.pdf
-Sitemap: https://nicholaswan.me/sitemap.xml

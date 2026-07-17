@@ -1,0 +1,10 @@
+# dist/ is generated. .github/workflows/pages.yml checks out this repo, runs
+# build-site.ps1 -Clean, and uploads the freshly built dist/ as the Pages
+# artifact — the committed copy was never the thing that got deployed (BUILD.md).
+# Tracking it duplicated every image and rewrote ~30 files on each commit.
+# Build locally with:  .\build-site.ps1 -Clean
+dist/
+
+# Python bytecode from the image tooling (make-responsive-variants.py et al).
+__pycache__/
+*.pyc
