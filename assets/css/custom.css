@@ -1,6 +1,6 @@
 :root {
   --color-brand-700: #0c6663;
-  --color-brand-600: #128a86;
+  --color-brand-600: #11807d;
   --color-brand-400: #55a7a3;
   --color-brand-200: #98c9c6;
   --color-brand-100: #e9f6f5;
@@ -12,7 +12,7 @@
   --color-ink-800: #243640;
   --color-ink-700: #34474f;
   --color-ink-600: #53656c;
-  --color-ink-500: #69787e;
+  --color-ink-500: #66757b;
   --color-surface: #ffffff;
   --color-surface-subtle: #f8faf9;
   --color-border: #e1e7e9;
@@ -828,7 +828,7 @@
   top: 1.1rem;
   right: 1.2rem;
   height: 1.6rem;
-  color: #128a86;
+  color: #11807d;
   font-family: FontAwesome;
   font-size: 1.35rem;
   line-height: 1.6rem;
@@ -860,7 +860,7 @@
   width: 2.75rem;
   height: 2.75rem;
   place-items: center;
-  color: #128a86;
+  color: #11807d;
   opacity: var(--ip, 1);
   pointer-events: none;
   transform-origin: center;
@@ -953,7 +953,7 @@
 }
 
 .hero-badges .hero-badge .icon {
-  color: #128a86;
+  color: #11807d;
 }
 
 .hero-badges .hero-badge:hover {
@@ -986,7 +986,7 @@
 }
 
 .homepage-link[data-scrub]::after {
-  background: linear-gradient(90deg, #128a86, #2fd7cf) top left / calc(var(--ip, 0) * 100%) 2px no-repeat;
+  background: linear-gradient(90deg, #11807d, #2fd7cf) top left / calc(var(--ip, 0) * 100%) 2px no-repeat;
   opacity: calc(var(--pulse, 0) * 0.82);
 }
 
@@ -1051,7 +1051,7 @@
   display: block;
   height: 100%;
   width: 0;
-  background: linear-gradient(90deg, #128a86, #2fd7cf);
+  background: linear-gradient(90deg, #11807d, #2fd7cf);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3295,7 +3295,7 @@ body {
 .resume-hero header > span {
   display: block;
   margin-bottom: 0.65rem;
-  color: #128a86;
+  color: #11807d;
   font-family: "Source Sans Pro", Helvetica, sans-serif;
   font-size: 0.76rem;
   font-weight: 800;
@@ -3346,7 +3346,7 @@ body {
 
 .internship-group__label span {
   margin-right: 0.45rem;
-  color: #128a86;
+  color: #11807d;
   font-size: 0.7rem;
   letter-spacing: 0.1em;
 }
@@ -3638,7 +3638,7 @@ body {
 
 .earlier-work summary small {
   margin-top: 0.2rem;
-  color: #69787e;
+  color: var(--color-ink-500);
 }
 
 .earlier-work[open] summary .icon { transform: rotate(45deg); }
@@ -3700,7 +3700,7 @@ body {
 }
 
 .earlier-project-card__body > span {
-  color: #128a86;
+  color: #11807d;
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -4478,8 +4478,8 @@ a.travel-jump-group__label {
   }
 
   .travel-section-nav a.is-active {
-    border-color: #128a86;
-    background: #128a86;
+    border-color: #11807d;
+    background: #11807d;
     color: #fff;
   }
 
@@ -4491,8 +4491,8 @@ a.travel-jump-group__label {
   }
 
   .travel-section-nav.is-stuck a.is-active {
-    border-color: #128a86;
-    background: #128a86;
+    border-color: #11807d;
+    background: #11807d;
     color: #fff;
   }
 
@@ -4932,6 +4932,7 @@ a:focus-visible {
 }
 
 .page-experience #agentic-ai .case-study__company-role,
+.page-experience #agentic-ai .case-study__company-meta,
 .page-experience #agentic-ai .case-study__lede {
   color: #9db4b3;
 }
@@ -5298,13 +5299,13 @@ a:focus-visible {
 
 .personal-timeline__intro p {
   margin: 0.75rem 0 0;
-  color: #748187;
+  color: var(--color-ink-500);
   font-size: 1rem;
   font-weight: 300;
   text-align: center;
 }
 
-[data-category="service"] { --timeline-accent: #128a86; }
+[data-category="service"] { --timeline-accent: #11807d; }
 [data-category="community"] { --timeline-accent: #3f78b7; }
 [data-category="build"] { --timeline-accent: #5b9a52; }
 [data-category="memory"] { --timeline-accent: #d7912f; }
@@ -5331,7 +5332,7 @@ a:focus-visible {
   display: block;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #31aaa4 0%, #128a86 72%, #0d6663 100%);
+  background: linear-gradient(180deg, #31aaa4 0%, #11807d 72%, #0d6663 100%);
   transform: scaleY(var(--timeline-progress, 0));
   transform-origin: center top;
   transition: transform 0.08s linear;
@@ -5395,7 +5396,7 @@ a:focus-visible {
 }
 
 .personal-timeline-event {
-  --timeline-accent: #128a86;
+  --timeline-accent: #11807d;
   position: relative;
   display: grid;
   min-height: 6.5rem;
