@@ -4209,9 +4209,12 @@ body {
   }
 }
 
-/* Travel journal navigation */
+/* Travel journal navigation. travel-nav.js publishes the toolbar's measured
+   height as --travel-nav-offset so native anchor jumps clear it even when it
+   wraps to several rows (USA/Canada's 17 links reach ~206px at desktop,
+   burying targets under a fixed offset); the rem values are no-JS fallbacks. */
 [id^="trip-section-"] {
-  scroll-margin-top: 7rem;
+  scroll-margin-top: var(--travel-nav-offset, 7rem);
 }
 
 .travel-section-nav {
@@ -4345,7 +4348,7 @@ a.travel-jump-group__label {
    once the black header has left the screen. */
 @media screen and (max-width: 980px) {
   [id^="trip-section-"] {
-    scroll-margin-top: 4rem;
+    scroll-margin-top: var(--travel-nav-offset, 4rem);
   }
 
   .travel-section-nav {
@@ -4766,10 +4769,12 @@ a:focus-visible {
 .lightbox button {
   appearance: none;
   box-sizing: border-box;
-  width: 2.65rem !important;
-  height: 2.65rem !important;
-  min-width: 2.65rem !important;
-  min-height: 2.65rem !important;
+  /* 3rem = 44px at the 14.67px mobile root: the WCAG minimum tap target
+     (2.65rem measured 38.9px on phones). */
+  width: 3rem !important;
+  height: 3rem !important;
+  min-width: 3rem !important;
+  min-height: 3rem !important;
   padding: 0 !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: 50% !important;
@@ -4793,8 +4798,14 @@ a:focus-visible {
   background: rgba(20, 24, 32, 0.68) !important;
   color: #fff !important;
   opacity: 1;
-  outline: none;
   transform: scale(1.03);
+}
+
+/* Keyboard focus needs a real ring on the modal's only controls; the
+   hover-style background shift alone is too subtle against photos. */
+.lightbox button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
 }
 
 .lightbox__close,

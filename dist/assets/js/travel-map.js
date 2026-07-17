@@ -14,6 +14,10 @@
   var MIN_SCALE = 1;
   var MAX_SCALE = 10;
   var DESKTOP_INITIAL_SCALE = 1.12;
+  /* The zoom-out floor is the opening view, not the raw world map: the desktop
+     crop exists to hide the empty polar margins, so zooming out past it only
+     reveals blank space. Tracks the breakpoint via resetView. */
+  var minScale = MIN_SCALE;
   var BUTTON_STEP = 1.5;
   var AREA_SCALE = 2.2;
   var STOP_SCALE = 4.2;
@@ -298,7 +302,7 @@
   };
 
   var clamp = function () {
-    scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale));
+    scale = Math.min(MAX_SCALE, Math.max(minScale, scale));
     var minX = viewport.clientWidth - canvas.offsetWidth * scale;
     var minY = viewport.clientHeight - canvas.offsetHeight * scale;
     tx = Math.min(0, Math.max(minX, tx));
@@ -316,7 +320,7 @@
     /* While zoomed the map owns touch gestures; at rest the page scrolls. */
     viewport.style.touchAction = zoomed ? 'none' : 'pan-y';
     if (zoomInBtn) zoomInBtn.disabled = scale >= MAX_SCALE - 0.001;
-    if (zoomOutBtn) zoomOutBtn.disabled = !zoomed;
+    if (zoomOutBtn) zoomOutBtn.disabled = scale <= minScale + 0.001;
     if (resetBtn) resetBtn.hidden = !zoomed;
   };
 
@@ -325,7 +329,8 @@
      the full-world baseline behind its separate destination list. */
   var resetView = function () {
     var useDesktopCrop = window.matchMedia('(min-width: 981px)').matches;
-    scale = useDesktopCrop ? DESKTOP_INITIAL_SCALE : 1;
+    minScale = useDesktopCrop ? DESKTOP_INITIAL_SCALE : MIN_SCALE;
+    scale = minScale;
     tx = useDesktopCrop ? (viewport.clientWidth - canvas.offsetWidth * scale) / 2 : 0;
     ty = 0;
     apply();
@@ -333,12 +338,16 @@
 
   /* Zoom keeping the viewport point (px, py) anchored. */
   var zoomAt = function (px, py, nextScale) {
-    nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, nextScale));
+    nextScale = Math.min(MAX_SCALE, Math.max(minScale, nextScale));
     var ratio = nextScale / scale;
     tx = px - (px - tx) * ratio;
     ty = py - (py - ty) * ratio;
     scale = nextScale;
-    if (scale <= 1.001) { tx = 0; ty = 0; }
+    /* Fully zoomed out returns to the opening composition. */
+    if (scale <= minScale + 0.001) {
+      tx = minScale > MIN_SCALE ? (viewport.clientWidth - canvas.offsetWidth * scale) / 2 : 0;
+      ty = 0;
+    }
     apply();
   };
 
@@ -359,7 +368,7 @@
      either limit, that same-direction gesture returns to normal page scroll. */
   viewport.addEventListener('wheel', function (event) {
     if (event.target.closest('.travel-map__controls')) return;
-    var nextScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale * Math.exp(-event.deltaY * 0.0018)));
+    var nextScale = Math.min(MAX_SCALE, Math.max(minScale, scale * Math.exp(-event.deltaY * 0.0018)));
     if (Math.abs(nextScale - scale) < 0.001) return;
     event.preventDefault();
     var rect = viewport.getBoundingClientRect();
@@ -462,6 +471,10 @@
   });
 
   window.addEventListener('resize', apply);
+  /* Crossing the desktop breakpoint changes the opening crop, and with it the
+     zoom-out floor — re-establish the matching baseline view. */
+  var desktopCrop = window.matchMedia('(min-width: 981px)');
+  if (desktopCrop.addEventListener) desktopCrop.addEventListener('change', resetView);
   positionRegionMarkers();
   createDetailPoints();
   resetView();

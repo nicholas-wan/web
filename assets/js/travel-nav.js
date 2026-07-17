@@ -9,10 +9,25 @@
   }
 
   var mobileNav = window.matchMedia('(max-width: 980px)');
+  /* Publish the toolbar's real height as --travel-nav-offset so the CSS
+     scroll-margin-top on trip sections clears it even when the link row wraps
+     (USA/Canada reaches ~5 rows at desktop). This makes the native hash jump
+     land correctly on its own; the bounded landing correction below stays as
+     the safety net for late layout shifts. */
+  var lastNavOffset = 0;
+  var publishNavOffset = function () {
+    var offset = Math.ceil(nav.getBoundingClientRect().height) + 12;
+    if (offset !== lastNavOffset) {
+      lastNavOffset = offset;
+      document.documentElement.style.setProperty('--travel-nav-offset', offset + 'px');
+    }
+  };
   var updateNavSurface = function () {
     var isStuck = mobileNav.matches && nav.getBoundingClientRect().top <= 1;
     nav.classList.toggle('is-stuck', isStuck);
+    publishNavOffset();
   };
+  updateNavSurface();
 
   /* A browser hash jump can happen before lazy media and web fonts settle.
      Keep the requested heading just below the real sticky toolbar for a short,

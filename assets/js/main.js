@@ -170,13 +170,62 @@
 				});
 
 			// Keep the toggle and sheet state available to assistive technology.
+			// The toggle advertises button semantics via aria-expanded, and the
+			// sheet is an aria-modal dialog, so focus has to behave accordingly:
+			// Space activates the toggle (anchors only handle Enter natively),
+			// opening moves focus into the sheet, and closing hands it back.
+				var navPanelWasOpen = false;
 				var syncNavPanelState = function() {
 					var isOpen = $body.hasClass('is-navPanel-visible');
 					$navPanelToggle.attr('aria-expanded', isOpen ? 'true' : 'false');
 					$navPanel.attr('aria-hidden', isOpen ? 'false' : 'true');
+					if (isOpen && !navPanelWasOpen) {
+						// The sheet's visibility flips as its slide-in transition
+						// starts, so a same-tick focus can land on a still-hidden
+						// link; retry briefly until the focus takes.
+						var firstLink = $navPanel.find('nav a').get(0);
+						var focusTries = 0;
+						var focusIntoPanel = function() {
+							if (!firstLink || !$body.hasClass('is-navPanel-visible')) return;
+							firstLink.focus({ preventScroll: true });
+							if (document.activeElement !== firstLink && ++focusTries < 30)
+								window.setTimeout(focusIntoPanel, 20);
+						};
+						focusIntoPanel();
+					}
+					else if (!isOpen && navPanelWasOpen && $navPanel.get(0).contains(document.activeElement))
+						$navPanelToggle.get(0).focus({ preventScroll: true });
+					navPanelWasOpen = isOpen;
 				};
 				new MutationObserver(syncNavPanelState).observe($body.get(0), { attributes: true, attributeFilter: ['class'] });
 				syncNavPanelState();
+
+				$navPanelToggle.on('keydown', function(event) {
+					if (event.key === ' ' || event.key === 'Spacebar') {
+						event.preventDefault();
+						$(this).trigger('click');
+					}
+				});
+
+				$window.on('keydown', function(event) {
+					if (event.key !== 'Tab' || !$body.hasClass('is-navPanel-visible')) return;
+					var focusable = $navPanel.find('a').filter(':visible');
+					if (!focusable.length) return;
+					var first = focusable.get(0);
+					var last = focusable.get(focusable.length - 1);
+					if (!$navPanel.get(0).contains(document.activeElement)) {
+						event.preventDefault();
+						first.focus();
+					}
+					else if (event.shiftKey && document.activeElement === first) {
+						event.preventDefault();
+						last.focus();
+					}
+					else if (!event.shiftKey && document.activeElement === last) {
+						event.preventDefault();
+						first.focus();
+					}
+				});
 
 			// Get inner.
 				$navPanelInner = $navPanel.children('nav');
