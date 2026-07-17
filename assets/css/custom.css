@@ -3391,9 +3391,25 @@ body {
 .case-study__company-meta {
   display: block;
   margin-top: 0.25rem;
-  color: #7a888e;
+  /* Keep at least ink-500: lighter greys fall below WCAG AA 4.5:1 at this
+     size on the card backgrounds. */
+  color: var(--color-ink-500);
   font-size: 0.78rem;
   line-height: 1.35;
+}
+
+/* Slim replacement for a repeated company header — the second DSTA card
+   defers to the dark hero card above it. */
+.case-study__company-context {
+  margin: 0;
+  color: var(--color-ink-500);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+  text-align: left;
+  text-transform: uppercase;
 }
 
 .case-study header {
@@ -3524,8 +3540,12 @@ body {
   line-height: 1.3;
 }
 
-.earlier-work {
-  margin: 0 4rem 4rem;
+/* #main > .earlier-work out-ranks main.css's ID-weighted `#main > *`
+   (margin: 0), which silently flattens a bare class margin. Horizontal
+   margins mirror .portfolio-overview's padding so the box edges align
+   with the case-study grid above. */
+#main > .earlier-work {
+  margin: 0 2rem 4rem;
   border: 1px solid #dde5e7;
   border-radius: 0.65rem;
   background: #f8faf9;
@@ -4074,8 +4094,12 @@ body {
     font-size: 1.35rem;
   }
 
-  .earlier-work {
-    margin: 0 1rem 2.5rem;
+  #main > .earlier-work {
+    margin: 0 1.15rem 2.5rem;
+  }
+
+  .earlier-work summary {
+    padding: 1rem 1.15rem;
   }
 
   .earlier-work__grid {
@@ -4851,17 +4875,6 @@ a:focus-visible {
   gap: 0;
   margin: 0;
   padding: 2.25rem 0 0 2.25rem;
-  counter-reset: outcome-step;
-}
-
-.page-experience #agentic-ai .case-study__highlights::before {
-  position: absolute;
-  top: 4.2rem;
-  bottom: 3.2rem;
-  left: 0.46rem;
-  width: 1px;
-  background: #24464b;
-  content: "";
 }
 
 .page-experience #agentic-ai .case-study__highlights li {
@@ -4872,11 +4885,11 @@ a:focus-visible {
   border: 0;
   border-radius: 0;
   background: transparent;
-  counter-increment: outcome-step;
 }
 
 .page-experience #agentic-ai .case-study__highlights li::before {
   position: absolute;
+  z-index: 1;
   top: 0.18rem;
   left: -2.2rem;
   width: 1rem;
@@ -4887,14 +4900,22 @@ a:focus-visible {
   content: "";
 }
 
-.page-experience #agentic-ai .case-study__highlights li:last-child::before {
-  background: #ffb869;
+/* Connector segments run dot-centre to dot-centre so they track the
+   content instead of hard-coded offsets; each dot's dark ring masks the
+   line where they meet. Items are contiguous, so extending one dot-offset
+   past the item's bottom lands exactly on the next dot's centre. */
+.page-experience #agentic-ai .case-study__highlights li:not(:last-child)::after {
+  position: absolute;
+  top: 0.68rem;
+  bottom: -0.68rem;
+  left: calc(-1.7rem - 0.5px);
+  width: 1px;
+  background: #24464b;
+  content: "";
 }
 
-.page-experience #agentic-ai .case-study__highlights li > span::before {
-  margin-right: 0.65rem;
-  color: #28d7c5;
-  content: counter(outcome-step, decimal-leading-zero);
+.page-experience #agentic-ai .case-study__highlights li:last-child::before {
+  background: #ffb869;
 }
 
 .page-experience #agentic-ai .case-study__tags {
@@ -4908,6 +4929,22 @@ a:focus-visible {
   color: #b8f2eb;
 }
 
+/* The Threat Hunting outcome resolves once from noise into the accent —
+   performing the raw-context-to-signal move the copy claims. The real text
+   ships in the DOM and keeps the layout; scramble-reveal.js paints only an
+   aria-hidden layer above it, so the copy is visible before enhancement,
+   without JS, and under reduced motion. */
+.page-experience #agentic-ai .case-study__highlights [data-scramble-row] {
+  position: relative;
+  transition: color 300ms ease-out;
+}
+
+/* #agentic-ai is a dark card where the brand accent renders as #28d7c5
+   (matching the card's own labels); --color-brand-600 fails contrast there. */
+.page-experience #agentic-ai .case-study__highlights.is-complete [data-scramble-row] {
+  color: #28d7c5;
+}
+
 .page-experience #cloud-analytics {
   display: grid;
   grid-template-columns: minmax(13rem, 0.65fr) minmax(18rem, 1fr) minmax(18rem, 1fr);
@@ -4916,7 +4953,7 @@ a:focus-visible {
   padding: 1.4rem 1.6rem;
 }
 
-.page-experience #cloud-analytics .case-study__company,
+.page-experience #cloud-analytics .case-study__company-context,
 .page-experience #cloud-analytics header,
 .page-experience #cloud-analytics .case-study__highlights,
 .page-experience #cloud-analytics .case-study__tags {
@@ -5091,6 +5128,17 @@ a:focus-visible {
 
   .page-experience #agentic-ai .case-study__highlights {
     padding-left: 2rem;
+  }
+
+  /* Keep dots and connectors centred on each other when the list padding
+     narrows: dot left edge stays just inside the box, connector stays on
+     the dot centre. */
+  .page-experience #agentic-ai .case-study__highlights li::before {
+    left: -1.95rem;
+  }
+
+  .page-experience #agentic-ai .case-study__highlights li:not(:last-child)::after {
+    left: calc(-1.45rem - 0.5px);
   }
 
   .page-experience #cloud-analytics {
