@@ -4370,6 +4370,7 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 }
 
 #footer form label,
+#footer h2,
 #footer h3,
 #footer p {
 	font-size: 0.8rem;

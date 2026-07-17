@@ -210,6 +210,10 @@
   -webkit-appearance: none;
   display: flex;
   align-items: center;
+  /* The ≤600px tap-target rule centres bare <button>s; that made each card
+     centre its icon+title as a unit, so shorter titles pushed their icon
+     rightward and the four cards never lined up. Pin the row left. */
+  justify-content: flex-start;
   gap: 0.85rem;
   width: 100%;
   height: auto;
@@ -5670,14 +5674,11 @@ a:focus-visible {
 }
 
 .personal-timeline-event--cats-preview.is-cats-preview-open {
-  min-height: 39rem;
-  align-items: start;
+  /* No min-height here: the row once grew to 39rem to "reserve" space for the
+     popover, which shoved the whole timeline down on hover (owner: don't).
+     The preview is absolute and z-indexed, so it overlays the rows below and
+     closes on mouseleave; row geometry is identical open or closed. */
   z-index: 12;
-}
-
-.personal-timeline-event--cats-preview.is-cats-preview-open::before,
-.personal-timeline-event--cats-preview.is-cats-preview-open::after {
-  top: 5.05rem;
 }
 
 .personal-event-card__instagram-preview {
@@ -6026,15 +6027,6 @@ body.page-home #nav {
     min-height: 0;
     margin-top: 0 !important;
     padding-left: 3rem;
-  }
-
-  .personal-timeline-event--cats-preview.is-cats-preview-open {
-    min-height: 0;
-  }
-
-  .personal-timeline-event--cats-preview.is-cats-preview-open::before,
-  .personal-timeline-event--cats-preview.is-cats-preview-open::after {
-    top: 50%;
   }
 
   .personal-event-card__instagram-preview {
