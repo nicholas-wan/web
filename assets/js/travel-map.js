@@ -24,7 +24,7 @@
 
   /* Semantic zoom keeps the world view calm, then progressively reveals
      map-scale destinations. Latitude/longitude is projected with the same
-     Natural Earth 1 projection used by generate-world-map.ps1. */
+     Natural Earth 1 projection used by tools/maps/generate-world-map.ps1. */
   var DETAIL_POINTS = [
     /* Countries, states and larger areas. */
     ['area', 'California', 'travel_2019_siliconvalley#trip-section-1', 36.7783, -119.4179],

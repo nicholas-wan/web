@@ -1,0 +1,399 @@
+$ErrorActionPreference = "Stop"
+$root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+$dist = Join-Path $root "dist"
+$journalManifestPath = Join-Path $root 'journals\manifest.json'
+$journalPartialPath = Join-Path $root 'partials\travel-journal.html'
+$journalStarterPath = Join-Path $root 'journals\_template.html'
+
+if (-not (Test-Path -LiteralPath $dist)) { throw "Missing dist directory. Run tools/site.ps1 build first." }
+if (-not (Test-Path -LiteralPath $journalManifestPath) -or -not (Test-Path -LiteralPath $journalPartialPath) -or -not (Test-Path -LiteralPath $journalStarterPath)) { throw "Travel journal manifest, shared partial, or starter is missing." }
+$journalManifestData = Get-Content -LiteralPath $journalManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+$journalManifest = @($journalManifestData | Sort-Object order)
+$journalPartial = Get-Content -LiteralPath $journalPartialPath -Raw -Encoding UTF8
+$journalStarter = Get-Content -LiteralPath $journalStarterPath -Raw -Encoding UTF8
+if ($journalManifest.Count -ne 8 -or ($journalManifest.slug | Select-Object -Unique).Count -ne $journalManifest.Count) { throw "Travel journal manifest must contain eight unique journal slugs." }
+foreach ($partialToken in @('{{MAIN_ATTRIBUTES}}', '{{TRIP_NAVIGATION}}', '{{JOURNAL_CONTENT}}', '{{TRIP_PAGINATION}}')) {
+    if ($journalPartial -notmatch [regex]::Escape($partialToken)) { throw "Shared travel journal partial is missing token: $partialToken" }
+}
+if ($journalPartial -notmatch 'data-journal-template="v2"') { throw "Shared travel journal shell must expose its versioned layout contract." }
+if ($journalStarter -notmatch 'travel-journal__hero-image guangzhou-journal__hero-image' -or $journalStarter -notmatch 'travel-journal__route guangzhou-day__route guangzhou-day__route--collapsible' -or $journalStarter -notmatch 'travel-gallery travel-gallery--compact masonry mason4' -or $journalStarter -notmatch 'travel-gallery__item--tall[^\"]*guangzhou-gallery__brick--tall' -or $journalStarter -notmatch '--hero-focus-x:' -or $journalStarter -notmatch '--focus-x:') { throw "Travel journal starter must demonstrate the responsive hero, collapsible route, compact gallery, tall collage, and focal-point controls." }
+$modularJournals = @($journalManifest | Where-Object { $_.contentOnly })
+if ($modularJournals.Count -ne $journalManifest.Count -or $modularJournals.slug -notcontains 'travel_2026_guangzhou') { throw "Every travel journal must use the content-only build path, with Guangzhou retained as the reference implementation." }
+foreach ($journal in $modularJournals) {
+    if ($journal.source -notmatch '^journals/travel_[^/]+\.html$') { throw "$($journal.slug) must source its content fragment from the journals directory." }
+    $journalSourcePath = Join-Path $root ($journal.source -replace '/', '\')
+    if (-not (Test-Path -LiteralPath $journalSourcePath)) { throw "Missing journal content fragment: $($journal.source)" }
+    $journalSource = Get-Content -LiteralPath $journalSourcePath -Raw -Encoding UTF8
+    if ($journalSource -match '<(?:!DOCTYPE|html|head|body)\b|<div id="main"|<footer id="footer"') { throw "$($journal.source) must contain journal content only, without a document shell." }
+}
+$pages = Get-ChildItem -LiteralPath $dist -Filter *.html -File
+if ($pages.Count -ne 17) { throw "Expected 17 generated pages, found $($pages.Count)." }
+$retiredPaths = @(
+    'league.html',
+    'assets\css\slider1.css',
+    'assets\css\slider2.css',
+    'assets\css\webflow.css',
+    'assets\js\animate.js',
+    'assets\js\slider1.js',
+    'assets\js\slider2.js'
+)
+foreach ($retiredPath in $retiredPaths) {
+    if (Test-Path -LiteralPath (Join-Path $dist $retiredPath)) { throw "Retired page asset was published: $retiredPath" }
+}
+$eventPageNames = @('experience_ndu.html', 'house.html', 'prewed.html')
+$navSignatures = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+
+foreach ($page in $pages) {
+    $html = Get-Content -LiteralPath $page.FullName -Raw -Encoding UTF8
+    $scan = [regex]::Replace($html, '<!--.*?-->', '', 'Singleline')
+    foreach ($tag in @('html', 'head', 'body')) {
+        if ([regex]::Matches($scan, "<$tag\b", 'IgnoreCase').Count -ne 1) { throw "$($page.Name) must contain exactly one <$tag> tag." }
+    }
+    if ([regex]::Matches($scan, '<main\b', 'IgnoreCase').Count -ne 1) { throw "$($page.Name) must contain exactly one <main> landmark." }
+    if ([regex]::Matches($scan, '<h1\b', 'IgnoreCase').Count -ne 1) { throw "$($page.Name) must contain exactly one <h1> heading." }
+    if ($scan -notmatch '<meta name="viewport" content="width=device-width, initial-scale=1(?:\.0)?') { throw "$($page.Name) is missing the responsive viewport configuration." }
+    if ($scan -notmatch 'assets/css/main\.css\?v=2' -or $scan -notmatch 'assets/css/custom\.css\?v=116') { throw "$($page.Name) is missing the current shared stylesheet versions." }
+    if ($scan -notmatch 'href=["'']personal["'']') { throw "$($page.Name) is missing the Personal navigation tab." }
+    if ($eventPageNames -notcontains $page.Name -and $page.Name -ne 'index.html' -and $scan -notmatch 'class="logo icon fa-home"') { throw "$($page.Name) is missing the centered home control." }
+    if ($page.Name -eq 'index.html' -and $scan -match 'class="logo icon fa-home"|<header id="header">') { throw "Homepage must flow directly from its full-screen opening without a redundant home control." }
+    if ($eventPageNames -contains $page.Name -and $scan -match '<header id="header">') { throw "$($page.Name) still contains the retired event-page banner." }
+    if ($scan -match 'class="row rowpad"|\bworkbutton\b') { throw "$($page.Name) still contains retired or inconsistent bottom navigation." }
+    $primaryNav = [regex]::Match($scan, '(?s)<nav id="nav">.*?<ul class="links">(.*?)</ul>', 'IgnoreCase')
+    if (-not $primaryNav.Success) { throw "$($page.Name) is missing the primary navigation list." }
+    $navLabels = foreach ($navLink in [regex]::Matches($primaryNav.Groups[1].Value, '(?s)<a\b[^>]*>(.*?)</a>', 'IgnoreCase')) {
+        [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($navLink.Groups[1].Value, '<[^>]+>', '') -replace '\s+', ' ').Trim())
+    }
+    if (($navLabels -join '|') -ne 'About|Work|Skills|Personal|Travel') { throw "$($page.Name) has inconsistent primary navigation labels." }
+    $sharedNav = [regex]::Match($scan, '(?s)<nav id="nav">.*?</nav>', 'IgnoreCase')
+    if (-not $sharedNav.Success) { throw "$($page.Name) is missing the shared navigation block." }
+    $navSignature = (($sharedNav.Value -replace ' class="active"', '') -replace '\s+', ' ').Trim()
+    [void]$navSignatures.Add($navSignature)
+    if ([regex]::IsMatch($scan, '<img\b(?=[^>]*\balt="")[^>]*>', 'IgnoreCase')) { throw "$($page.Name) contains an image with empty alt text." }
+    if ([regex]::IsMatch($scan, '<a\b(?=[^>]*\bhref="#!")[^>]*>', 'IgnoreCase')) { throw "$($page.Name) contains a dead #! link." }
+    $nonTopDeadLink = [regex]::Matches($scan, '<a\b(?=[^>]*\bhref="#")[^>]*>', 'IgnoreCase') | Where-Object { $_.Value -notmatch '\bid="return-to-top"' }
+    if ($nonTopDeadLink.Count -gt 0) { throw "$($page.Name) contains a dead # link." }
+
+    $references = [System.Collections.Generic.List[string]]::new()
+    foreach ($match in [regex]::Matches($scan, '(?:src|href|data)="([^"#?]+)"', 'IgnoreCase')) {
+        $references.Add($match.Groups[1].Value)
+    }
+    foreach ($match in [regex]::Matches($scan, 'srcset="([^"]+)"', 'IgnoreCase')) {
+        foreach ($candidate in $match.Groups[1].Value -split ',') {
+            $candidatePath = ($candidate.Trim() -split '\s+')[0]
+            if ($candidatePath) { $references.Add($candidatePath) }
+        }
+    }
+    foreach ($reference in $references) {
+        if ($reference -match '^(https?:|//|mailto:|javascript:)') { continue }
+        $target = Join-Path $dist ($reference -replace '/', '\')
+        if (-not (Test-Path -LiteralPath $target) -and [IO.Path]::GetExtension($reference) -eq '') {
+            $target = "$target.html"
+        }
+        if (-not (Test-Path -LiteralPath $target)) { throw "$($page.Name) references missing file: $reference" }
+    }
+}
+
+if ($navSignatures.Count -ne 1) { throw "Generated pages do not share one consistent navigation block." }
+
+$travel = Get-Content -LiteralPath (Join-Path $dist 'travel.html') -Raw -Encoding UTF8
+$homeHtml = Get-Content -LiteralPath (Join-Path $dist 'index.html') -Raw -Encoding UTF8
+$experience = Get-Content -LiteralPath (Join-Path $dist 'experience.html') -Raw -Encoding UTF8
+$personal = Get-Content -LiteralPath (Join-Path $dist 'personal.html') -Raw -Encoding UTF8
+$ndu = Get-Content -LiteralPath (Join-Path $dist 'experience_ndu.html') -Raw -Encoding UTF8
+$house = Get-Content -LiteralPath (Join-Path $dist 'house.html') -Raw -Encoding UTF8
+$prewed = Get-Content -LiteralPath (Join-Path $dist 'prewed.html') -Raw -Encoding UTF8
+$customCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\custom.css') -Raw -Encoding UTF8
+$personalTimelineJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\personal-timeline.js') -Raw -Encoding UTF8
+$galleryJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\gallery.js') -Raw -Encoding UTF8
+$travelNavJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\travel-nav.js') -Raw -Encoding UTF8
+$travelMapJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\travel-map.js') -Raw -Encoding UTF8
+$mainJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\main.js') -Raw -Encoding UTF8
+$gameJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\game.js') -Raw -Encoding UTF8
+$scrambleRevealJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\scramble-reveal.js') -Raw -Encoding UTF8
+if ([regex]::Matches($travel, 'class="travel-card"').Count -ne 8) { throw "Travel page must contain eight travel cards." }
+if ($travel -notmatch 'class="travel-atlas"' -or $travel -notmatch 'Explore by destination' -or $travel -notmatch 'browse trip stories and photos') { throw "Travel destination atlas or visitor-facing introduction is missing." }
+if ([regex]::Matches($travel, 'class="travel-map__marker travel-map__marker--').Count -ne 10) { throw "Travel atlas must contain ten regional map pins." }
+if ([regex]::Matches($travel, 'class="travel-map__marker-label"').Count -ne 10) { throw "Travel atlas must contain ten thumbnail popovers." }
+if ([regex]::Matches($travel, 'class="travel-map__place"').Count -ne 10) { throw "Travel atlas must contain ten persistent, non-overlapping place labels." }
+if ([regex]::Matches($travel, 'class="travel-mobile-destination"').Count -ne 10 -or $travel -notmatch 'class="travel-mobile-destinations" aria-label="Browse destinations"') { throw "Travel must provide ten readable mobile destination groups." }
+foreach ($travelDate in @('August 2019 &ndash; April 2020','22 October &ndash; 1 November 2022', '28 June &ndash; 8 July 2023', '10 &ndash; 28 October 2023', '2 &ndash; 14 August 2024', '6 &ndash; 28 April 2024', '23 October &ndash; 8 November 2025', '10 &ndash; 15 May 2026')) {
+    if ($travel -notmatch [regex]::Escape($travelDate)) { throw "Travel map hover cards are missing trip date: $travelDate" }
+}
+if ([regex]::Matches($travel, 'class="travel-map__city-links"').Count -ne 10 -or $travel -notmatch 'travel_2023_usacanada#trip-section-2' -or $travel -notmatch 'travel_2023_usacanada#trip-section-6' -or $travel -notmatch 'travel_2023_usacanada#trip-section-9' -or $travel -notmatch 'travel_2023_usacanada#trip-section-11' -or $travel -notmatch 'travel_2023_usacanada#trip-section-14' -or $travel -notmatch 'travel_2024_australia#trip-section-1' -or $travel -notmatch 'travel_2024_australia#trip-section-6') { throw "Travel map pins must target the first matching USA, Canada, Melbourne, and Sydney journal sections." }
+foreach ($cityLink in [regex]::Matches($travel, 'href="(travel_[^"#]+)#(trip-section-\d+)"')) {
+    $targetPage = Join-Path $dist ($cityLink.Groups[1].Value + '.html')
+    if (-not (Test-Path -LiteralPath $targetPage)) { throw "Travel map city link points to a missing journal: $($cityLink.Value)" }
+    $targetHtml = Get-Content -LiteralPath $targetPage -Raw -Encoding UTF8
+    if ($targetHtml -notmatch ('id="' + [regex]::Escape($cityLink.Groups[2].Value) + '"')) { throw "Travel map city link points to a missing section: $($cityLink.Value)" }
+}
+if ($travel -match 'travel-atlas__destinations|travel-atlas__journal|travel-atlas__thumb') { throw "Travel atlas must not duplicate the journal archive with a destination list." }
+if ($travel -match 'Photography &amp; stories|Trips, stories, and photography from 2019 to today') { throw "Travel page must not repeat a separate introductory banner above the destination atlas." }
+if ($travel -notmatch '<div class="travel-archive-heading">' -or $travel -notmatch 'All travel journals') { throw "Compact travel journal archive heading is missing or uses inherited header styling." }
+foreach ($archiveImage in @('2025_japan/day14_hakone/fuji1.jpg', '2024_australia/melbourne_12apostles/apostles3.jpg', '2024_germany/cologne/cologne-card.jpg', '2023_usa_canada/day2/empire_state1.jpg', '2023_perth/day1/bathers_bay_02.jpg', '2022_europe/day2/paris3-card.jpg')) {
+    if ($travel -notmatch [regex]::Escape("images/travel/$archiveImage")) { throw "Travel archive is missing in-journal thumbnail: $archiveImage" }
+}
+if ($travel -notmatch 'travel_2026_guangzhou' -or [regex]::Matches($travel, '2026_guangzhou/day5/pearl-river-view\.webp').Count -lt 2 -or $travel -notmatch 'alt="Guangzhou skyline beside the Pearl River"') { throw "Guangzhou journal card must use the scenery-based Pearl River thumbnail at desktop and mobile sizes." }
+$travelMapMarkup = [regex]::Match($travel, '(?s)<div class="travel-map__canvas">(.*?)<p class="travel-map__hint">').Groups[1].Value
+if ([regex]::Matches($travelMapMarkup, 'class="travel-map__journal-link"').Count -ne 10 -or $travelMapMarkup -match 'class="travel-map__journal-link"[^>]*href="[^"]+#') { throw "Every travel map popup must link to the top of its journal without a section fragment." }
+foreach ($mapLabel in @('CA &middot; NV', 'NY &middot; MA &middot; DC', 'Ontario', 'W. Europe', 'NRW', 'Honshu', 'Guangdong', 'W. Australia', 'Victoria', 'NSW')) {
+    if ($travelMapMarkup -notmatch ('class="travel-map__place"[^>]*>' + [regex]::Escape($mapLabel) + '</span>')) { throw "Travel map is missing normalized place label: $mapLabel" }
+}
+if ($travelMapMarkup -match '<small>\s*20\d{2}' -or $travelMapMarkup -match 'class="travel-map__place"[^>]*>(?:USA|[^<]*WA|[^<]*''\d{2})</span>') { throw "Travel map labels or popup summaries still contain inconsistent regions or years." }
+if ((Get-Content -LiteralPath (Join-Path $dist 'travel_2019_siliconvalley.html') -Raw -Encoding UTF8) -notmatch '<h2 id="trip-section-1">#1 - The League</h2>') { throw "The Silicon Valley map link must land on the first journal chapter without repeating the journal title." }
+$guangzhou = Get-Content -LiteralPath (Join-Path $dist 'travel_2026_guangzhou.html') -Raw -Encoding UTF8
+$japan = Get-Content -LiteralPath (Join-Path $dist 'travel_2025_japan.html') -Raw -Encoding UTF8
+$australia = Get-Content -LiteralPath (Join-Path $dist 'travel_2024_australia.html') -Raw -Encoding UTF8
+$europe = Get-Content -LiteralPath (Join-Path $dist 'travel_2022_europe.html') -Raw -Encoding UTF8
+$perth = Get-Content -LiteralPath (Join-Path $dist 'travel_2023_perth.html') -Raw -Encoding UTF8
+$usaCanada = Get-Content -LiteralPath (Join-Path $dist 'travel_2023_usacanada.html') -Raw -Encoding UTF8
+$siliconValley = Get-Content -LiteralPath (Join-Path $dist 'travel_2019_siliconvalley.html') -Raw -Encoding UTF8
+$germany = Get-Content -LiteralPath (Join-Path $dist 'travel_2024_germany.html') -Raw -Encoding UTF8
+$journalDates = [ordered]@{
+    'travel_2019_siliconvalley.html' = 'August 2019 &ndash; April 2020'
+    'travel_2022_europe.html' = '22 October 2022 &ndash; 1 November 2022'
+    'travel_2023_perth.html' = '28 June 2023 &ndash; 8 July 2023'
+    'travel_2023_usacanada.html' = '10 October 2023 &ndash; 28 October 2023'
+    'travel_2024_australia.html' = '2 August 2024 &ndash; 14 August 2024'
+    'travel_2024_germany.html' = '6 April 2024 &ndash; 28 April 2024'
+    'travel_2025_japan.html' = '23 October 2025 &ndash; 8 November 2025'
+    'travel_2026_guangzhou.html' = '10 May 2026 &ndash; 15 May 2026'
+}
+foreach ($journalDate in $journalDates.GetEnumerator()) {
+    $journalDateMarkup = Get-Content -LiteralPath (Join-Path $dist $journalDate.Key) -Raw -Encoding UTF8
+    if ($journalDateMarkup -notmatch ('<span class="date">' + [regex]::Escape($journalDate.Value) + '</span>')) { throw "$($journalDate.Key) must use the shared full-year travel date format." }
+}
+if ($guangzhou -notmatch '10 May 2026 &ndash; 15 May 2026' -or $guangzhou -notmatch 'Shamian Island' -or $guangzhou -notmatch 'Chimelong Safari Park' -or $guangzhou -notmatch 'Baiyun Mountain' -or $guangzhou -notmatch 'Canton Tower') { throw "Guangzhou journal is missing itinerary dates or core destinations." }
+if ([regex]::Matches($guangzhou, '2026_guangzhou/.+?\.gif').Count -ne 1) { throw "Guangzhou journal must retain only the rotated driving-simulator GIF." }
+if ([regex]::Matches($guangzhou, 'class="guangzhou-day[^\"]*guangzhou-day--compact').Count -ne 6) { throw "Every Guangzhou day must use the compact gallery treatment." }
+if ([regex]::Matches($guangzhou, 'class="brick lazyload container(?: guangzhou-gallery__brick--tall)?"').Count -ne 55) { throw "Guangzhou journal must retain the curated 55-item gallery after the requested removals." }
+foreach ($restoredPhoto in @('day2/yongqingfang-calligraphy.webp', 'day2/guangzhou-ice-cream.webp', 'day2/opera-museum-courtyard.webp', 'day3/yuexiu-cat.webp', 'day3/chimelong-entrance.webp', 'day3/chimelong-monkey.webp', 'day3/circus-stage.webp', 'day4/massage-stop.webp', 'day5/tianhe-steak.webp', 'day5/chagee-tea.webp', 'day5/pearl-river-view.webp')) {
+    if ($guangzhou -notmatch [regex]::Escape("2026_guangzhou/$restoredPhoto")) { throw "Guangzhou journal is missing restored photo: $restoredPhoto" }
+}
+if ($guangzhou -notmatch 'day5/canton-tower-frame\.jpg' -or $guangzhou -match 'panda-(?:lunch|bamboo)\.webp|day5/canton-tower-frame\.webp') { throw "Guangzhou image curation or rotated Canton Tower frame has regressed." }
+if ($guangzhou -notmatch 'day3/circus-globe\.webp' -or $guangzhou -match 'day3/(?:circus-globe|panda-walk|white-tiger)\.gif|pet-shop-kittens\.webp') { throw "The rebuilt circus animation or requested Guangzhou removals have regressed." }
+$circusGlobePath = Join-Path $dist 'images\travel\2026_guangzhou\day3\circus-globe.webp'
+if (-not (Test-Path -LiteralPath $circusGlobePath) -or (Get-Item -LiteralPath $circusGlobePath).Length -lt 1MB -or (Get-Item -LiteralPath $circusGlobePath).Length -gt 2MB) { throw "The rebuilt circus animation must retain its higher-quality source-video export." }
+$drivingSimulatorPath = Join-Path $dist 'images\travel\2026_guangzhou\day5\driving-simulator.gif'
+$drivingSimulatorBytes = [IO.File]::ReadAllBytes($drivingSimulatorPath)
+$drivingSimulatorWidth = [BitConverter]::ToUInt16($drivingSimulatorBytes, 6)
+$drivingSimulatorHeight = [BitConverter]::ToUInt16($drivingSimulatorBytes, 8)
+if ($drivingSimulatorWidth -ne 236 -or $drivingSimulatorHeight -ne 420) { throw "The Guangzhou driving simulator GIF must remain rotated into portrait orientation." }
+$guangzhouMomentImages = [regex]::Matches($guangzhou, 'images/travel/2026_guangzhou/moments/[^"?]+\.webp') | ForEach-Object { $_.Value } | Select-Object -Unique
+if ($guangzhouMomentImages.Count -ne 12 -or $guangzhou -match 'qinglong-restaurant\.webp|pet-shop-kittens\.webp') { throw "Guangzhou journal must include the 12 retained photos from the second import." }
+foreach ($momentImage in $guangzhouMomentImages) {
+    $momentPath = Join-Path $dist ($momentImage -replace '/', '\')
+    if (-not (Test-Path -LiteralPath $momentPath)) { throw "Guangzhou moment image is missing: $momentImage" }
+    if ((Get-Item -LiteralPath $momentPath).Length -gt 300KB) { throw "Guangzhou moment image is not sufficiently compressed: $momentImage" }
+}
+$guangzhouNewImages = @('day1/sacred-heart-cathedral-side.webp', 'day1/qiaomei-lunch-spread.webp', 'day1/qiaomei-roast-pigeon.webp', 'day1/green-island-dinner.webp', 'day1/green-island-restaurant.webp', 'day1/puyu-hotel-room.webp', 'day1/shamian-architecture.webp', 'day2/bruce-lee-heritage.webp', 'day2/wanguo-outlet-mall.webp', 'day5/canton-tower-bubble-tram.webp')
+foreach ($newImage in $guangzhouNewImages) {
+    if ($guangzhou -notmatch [regex]::Escape("2026_guangzhou/$newImage")) { throw "Guangzhou journal is missing newly imported photo: $newImage" }
+    $newImagePath = Join-Path $dist ("images\travel\2026_guangzhou\" + ($newImage -replace '/', '\'))
+    if (-not (Test-Path -LiteralPath $newImagePath) -or (Get-Item -LiteralPath $newImagePath).Length -gt 350KB) { throw "New Guangzhou photo is missing or not sufficiently compressed: $newImage" }
+}
+$worldMapPath = Join-Path $dist 'images\travel\world-map.svg'
+$mapGeneratorPath = Join-Path $root 'tools\maps\generate-world-map.ps1'
+if ($travel -notmatch 'images/travel/world-map\.svg' -or -not (Test-Path -LiteralPath $worldMapPath) -or $travel -match 'images/travel/world-map\.png') { throw "Travel atlas must use the scalable vector world map." }
+$worldMapSvg = Get-Content -LiteralPath $worldMapPath -Raw -Encoding UTF8
+$mapGenerator = Get-Content -LiteralPath $mapGeneratorPath -Raw -Encoding UTF8
+if ($worldMapSvg -notmatch 'Natural Earth admin-0 110m and admin-1 50m' -or $worldMapSvg -notmatch 'viewBox="0 0 1200 624"' -or $mapGenerator -notmatch 'ne_110m_admin_0_countries\.geojson' -or $mapGenerator -notmatch 'ne_50m_admin_1_states_provinces\.geojson') { throw "Travel vector map must retain its Natural Earth country and state/province geography source." }
+if ($customCss -notmatch '(?s)\.travel-atlas\s*\{[^}]*border:\s*1px solid var\(--color-border\)[^}]*#ffffff' -or $customCss -notmatch '(?s)\.travel-map\s*\{[^}]*#071315' -or $customCss -notmatch '(?s)\.travel-map__marker\s*\{[^}]*position:\s*absolute') { throw "Travel atlas light shell, dark map, or marker positioning is missing from custom.css." }
+if ($customCss -match '(?s)\.travel-map\s*\{[^}]*background-size:' -or $customCss -notmatch '(?s)\.travel-map__marker-label\s*\{[^}]*opacity:\s*0[^}]*visibility:\s*hidden') { throw "Travel map must be grid-free and use hover thumbnail popovers." }
+if ($customCss -notmatch '(?s)\.travel-map__city-links\s*\{[^}]*flex-wrap:\s*wrap' -or $customCss -notmatch '\.travel-map__marker:focus-within \.travel-map__marker-label') { throw "Travel map city links must remain compact and keyboard/touch accessible." }
+if ($customCss -notmatch '(?s)\.travel-map__detail-layer\s*\{[^}]*pointer-events:\s*none' -or $customCss -notmatch '(?s)\[data-map-detail="area"\] \.travel-map__detail--area[^}]*opacity:\s*1' -or $customCss -notmatch '(?s)\[data-map-detail="stop"\] \.travel-map__detail--stop[^}]*visibility:\s*visible' -or $customCss -notmatch '(?s)\.travel-map__detail-label\s*\{[^}]*white-space:\s*nowrap' -or $customCss -notmatch '(?s)\.travel-map__detail-leader\s*\{[^}]*height:\s*1px[^}]*--leader-angle' -or $customCss -notmatch '(?s)\.travel-map__detail\.is-label-offscreen \.travel-map__detail-label,[^{]+\{[^}]*opacity:\s*0[^}]*visibility:\s*hidden') { throw "Progressive map detail markers must retain compact labels and thin adaptive leader lines." }
+if ($customCss -notmatch '(?s)\.travel-map__journal-link::before\s*\{[^}]*inset:\s*0' -or $customCss -notmatch '(?s)\.travel-map__city-links\s*\{[^}]*z-index:\s*2') { throw "Travel map popup overview links must remain clickable without covering city links." }
+if ($customCss -notmatch '(?s)\.travel-atlas__layout\s*\{[^}]*max-width:\s*58rem' -or $customCss -notmatch '(?s)\.travel-map__place\s*\{[^}]*position:\s*absolute[^}]*white-space:\s*nowrap') { throw "Travel map must use a restrained desktop width and persistent place labels." }
+if ($customCss -notmatch '(?s)\.travel-grid\s+\.travel-card\s*\{[^}]*width:\s*100%\s*!important') { throw "Travel card width safeguard is missing from custom.css." }
+if ($customCss -notmatch '(?s)\.travel-grid\s*\{[^}]*grid-template-columns:\s*repeat\(2' -or $customCss -notmatch '(?s)\.travel-grid \.travel-card\s*\{[^}]*display:\s*grid') { throw "Travel journal archive must use compact horizontal cards." }
+if ($customCss -notmatch '(?s)\.masonry \.brick \.content-image\s*\{[^}]*display:\s*block[^}]*height:\s*auto') { throw "Shared travel masonry images must override generated height attributes and preserve their aspect ratios." }
+if ($customCss -notmatch '(?s)\.guangzhou-day--compact \.masonry\.mason3\s*\{[^}]*grid-template-columns:\s*repeat\(3' -or $customCss -notmatch '(?s)\.guangzhou-day--compact \.masonry\.mason4\s*\{[^}]*grid-template-columns:\s*repeat\(4' -or $customCss -notmatch '(?s)\.guangzhou-day--compact \.masonry \.content-image\s*\{[^}]*height:\s*auto[^}]*aspect-ratio:\s*4\s*/\s*3[^}]*object-position:\s*var\(--focus-x' -or $customCss -notmatch '(?s)\.guangzhou-day--compact \.masonry(?:,|\s*\{)[\s\S]*?grid-auto-flow:\s*column[^}]*overflow-x:\s*auto' -or $customCss -notmatch '(?s)\.guangzhou-journal \.content-details\s*\{[^}]*line-height:\s*1\.35\s*!important' -or $customCss -notmatch '(?s)#main\.guangzhou-journal > article\s*\{[^}]*padding-right:\s*1\.1rem[^}]*padding-left:\s*1\.1rem') { throw "Compact travel galleries, focal crops, full-width copy, or caption spacing are missing." }
+if ($customCss -notmatch '(?s)\.travel-journal__hero-image,\s*\.guangzhou-journal__hero-image\s*\{[^}]*max-height:\s*27rem[^}]*overflow:\s*hidden' -or $customCss -notmatch '(?s)\.travel-journal__hero-image img,\s*\.guangzhou-journal__hero-image img\s*\{[^}]*height:\s*clamp\(16rem, 34vw, 27rem\)[^}]*object-position:\s*var\(--hero-focus-x[^}]*var\(--hero-focus-y' -or $customCss -notmatch '(?s)\.travel-gallery--compact,\s*\.guangzhou-day--compact \.masonry\s*\{[^}]*grid-auto-rows:\s*1fr' -or $customCss -notmatch '(?s)\.travel-gallery--compact \.travel-gallery__item--tall,\s*\.guangzhou-day--compact \.masonry \.guangzhou-gallery__brick--tall\s*\{[^}]*grid-row:\s*span 2' -or $customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.travel-gallery--compact,.*?grid-auto-flow:\s*column[^}]*overflow-x:\s*auto') { throw "Generic journal classes must retain constrained banners, compact desktop masonry, two-row collages, and horizontal mobile galleries." }
+if ($customCss -notmatch '(?s)\.travel-gallery--compact,\s*\.guangzhou-day--compact \.masonry\s*\{[^}]*grid-auto-flow:\s*row dense' -or $customCss -notmatch '(?s)\.travel-gallery--compact\.travel-gallery--sparse\s*\{[^}]*max-width:\s*42rem' -or $customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.travel-journal__hero-image--contain-mobile img\s*\{[^}]*height:\s*auto[^}]*object-fit:\s*contain' -or $customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.travel-gallery--compact\.travel-gallery--sparse\s*\{[^}]*max-width:\s*none') { throw "Converted journals must retain dense desktop packing, bounded sparse galleries, complete mobile banners, and uncapped mobile scrolling." }
+if ([regex]::Matches($guangzhou, 'class="guangzhou-route__stop"').Count -ne 36 -or [regex]::Matches($guangzhou, 'class="guangzhou-route__stop"><span>[^<]+</span><small>[^<]+</small>').Count -ne 36) { throw "Guangzhou routes must retain stacked Chinese names and Hanyu Pinyin." }
+if ([regex]::Matches($guangzhou, '<strong>Route</strong>').Count -ne 6) { throw "Every Guangzhou itinerary must use the English Route label." }
+if ($japan -notmatch '<main id="main" class="[^"]*\bhomepage\b[^"]*\bguangzhou-journal\b[^"]*\bjapan-journal\b' -or [regex]::Matches($japan, 'class="guangzhou-day guangzhou-day--compact"').Count -ne 5 -or [regex]::Matches($japan, '<div class="masonry mason4">').Count -ne 5) { throw "Japan must use the Guangzhou compact journal and gallery treatment for all five destinations." }
+if ($japan -match 'class="guangzhou-journal__location">Japan<' -or $japan -notmatch 'class="journal-banner"[^>]+japan_banner_japan\.jpg') { throw "Japan must rely on its title-bearing banner without a duplicate visible trip name." }
+if ([regex]::Matches($japan, 'class="guangzhou-route__stop"').Count -ne 64 -or [regex]::Matches($japan, 'class="guangzhou-route__stop"><span>[^<]+</span><small>[^<]+</small>').Count -ne 64 -or [regex]::Matches($japan, 'class="guangzhou-route__more"').Count -ne 5) { throw "Japan must retain 64 stacked Japanese and English route stops across five collapsible routes." }
+if ($japan -notmatch '<span>[^\x00-\x7F]+</span><small>Hiroshima Airport</small>' -or $japan -notmatch '<span>[^\x00-\x7F]+</span><small>Amanohashidate</small>' -or $japan -notmatch '<span>[^\x00-\x7F]+</span><small>Narita Airport</small>') { throw "Japan itinerary endpoints or bilingual labels are missing." }
+if ([regex]::Matches($europe, 'class="travel-journal__day travel-journal__day--compact guangzhou-day guangzhou-day--compact"').Count -ne 8 -or [regex]::Matches($europe, 'class="travel-journal__route guangzhou-day__route guangzhou-day__route--collapsible"').Count -ne 8 -or [regex]::Matches($europe, 'class="travel-gallery travel-gallery--compact[^\"]* masonry mason[234]"').Count -ne 8 -or [regex]::Matches($europe, 'class="travel-route__stop guangzhou-route__stop"').Count -ne 63 -or $europe -notmatch 'assets/css/custom\.css\?v=116') { throw "Europe must use eight itinerary-backed Guangzhou-style compact sections, routes, galleries, and the current journal stylesheet." }
+if ([regex]::Matches($perth, 'class="travel-journal__day travel-journal__day--compact guangzhou-day guangzhou-day--compact"').Count -ne 10 -or [regex]::Matches($perth, 'class="travel-journal__route guangzhou-day__route guangzhou-day__route--collapsible"').Count -ne 10 -or [regex]::Matches($perth, 'class="travel-gallery travel-gallery--compact[^\"]* masonry mason[234]"').Count -ne 10 -or [regex]::Matches($perth, 'class="travel-route__stop guangzhou-route__stop"').Count -ne 63 -or $perth -notmatch 'travel-journal__hero-image--contain-mobile') { throw "Perth must use ten itinerary-backed Guangzhou-style sections and retain its complete mobile banner." }
+if ([regex]::Matches($usaCanada, 'class="travel-journal__day travel-journal__day--compact guangzhou-day guangzhou-day--compact"').Count -ne 18 -or [regex]::Matches($usaCanada, 'class="travel-journal__route guangzhou-day__route guangzhou-day__route--collapsible"').Count -ne 18 -or [regex]::Matches($usaCanada, 'class="travel-gallery travel-gallery--compact[^\"]* masonry mason[234]"').Count -ne 18 -or [regex]::Matches($usaCanada, 'class="travel-route__stop guangzhou-route__stop"').Count -ne 107 -or [regex]::Matches($usaCanada, 'class="travel-journal__note guangzhou-day__note"').Count -ne 1 -or $usaCanada -notmatch 'travel-journal__hero-image--contain-mobile' -or $usaCanada -notmatch 'Friday, 27 October &ndash; Saturday, 28 October') { throw "USA and Canada must retain eighteen itinerary-backed sections, one genuine arrival narrative, and no route-only writeups." }
+if ([regex]::Matches($europe, '<img class="content-image"[^>]+alt="[^"]+"[^>]+--focus-x:').Count -ne 89 -or [regex]::Matches($perth, '<img class="content-image"[^>]+alt="[^"]+"[^>]+--focus-x:').Count -ne 120 -or [regex]::Matches($usaCanada, '<img class="content-image"[^>]+alt="[^"]+"[^>]+--focus-x:').Count -ne 250) { throw "Converted Europe, Perth, and USA/Canada gallery images must retain descriptive alt text and explicit focal points." }
+if ([regex]::Matches($siliconValley, 'class="travel-journal__day travel-journal__day--compact guangzhou-day guangzhou-day--compact"').Count -ne 9 -or [regex]::Matches($siliconValley, 'class="travel-gallery travel-gallery--compact[^\"]* masonry mason[234]"').Count -ne 9 -or [regex]::Matches($siliconValley, '<img class="content-image"[^>]+alt="[^"]+"[^>]+--focus-x:').Count -ne 63 -or [regex]::Matches($siliconValley, 'travel-gallery--sparse').Count -ne 2 -or $siliconValley -match 'travel-journal__route|travel-gallery__item--tall' -or $siliconValley -notmatch 'MONTEREY_bigsby\.jpg[^>]+--hero-focus-x: 44%; --hero-focus-y: 55%') { throw "Silicon Valley must use nine route-free compact chapters, two bounded sparse galleries, and accessible focal crops." }
+if ([regex]::Matches($germany, 'class="travel-journal__day travel-journal__day--compact guangzhou-day guangzhou-day--compact"').Count -ne 8 -or [regex]::Matches($germany, 'class="travel-gallery travel-gallery--compact[^\"]* masonry mason[234]"').Count -ne 8 -or [regex]::Matches($germany, '<img class="content-image"[^>]+alt="[^"]+"[^>]+--focus-x:').Count -ne 53 -or [regex]::Matches($germany, 'travel-gallery--sparse').Count -ne 4 -or $germany -match 'travel-journal__route|travel-gallery__item--tall' -or $germany -notmatch 'travel-journal__hero-image--contain-mobile') { throw "Germany must use eight route-free compact chapters, four bounded sparse galleries, and a complete mobile banner." }
+foreach ($journalWithArtworkTitle in @($japan, $australia, $germany, $perth, $usaCanada)) {
+    if ($journalWithArtworkTitle -match 'travel-journal__title') { throw "A journal whose banner contains the trip name must not repeat it as an HTML title." }
+}
+foreach ($journalWithHtmlTitle in @($guangzhou, $europe, $siliconValley)) {
+    if ($journalWithHtmlTitle -notmatch 'travel-journal__title') { throw "A journal with title-free banner artwork must retain its HTML trip title." }
+}
+if ($australia -notmatch '<main id="main" class="[^"]*\bhomepage\b[^"]*\baustralia-journal\b[^"]*\bguangzhou-day--compact\b' -or [regex]::Matches($australia, '<strong>Route</strong>').Count -ne 10 -or [regex]::Matches($australia, 'class="guangzhou-route__stop"').Count -ne 57 -or [regex]::Matches($australia, 'class="guangzhou-day__route guangzhou-day__route--collapsible"').Count -ne 6 -or [regex]::Matches($australia, '<p style="text-align:justify;">').Count -ne 1 -or $australia -match '(?i)Tap on the pictures' -or $australia -match '<h2 id="trip-section-\d+">(?:Melbourne|Sydney)\s*-') { throw "The Australia journal must retain ten routes, one genuine narrative, concise headings, and no obsolete tap prompt or route-only writeups." }
+if ([regex]::Matches($australia, '<div class="masonry mason4">').Count -ne 10 -or $australia -notmatch 'assets/js/gallery\.js\?v=11' -or $australia -notmatch 'assets/js/travel-nav\.js\?v=12') { throw "Every Australia destination must retain its compact, swipeable gallery and inline route controls." }
+if ($australia -notmatch 'class="[^"]*travel-journal__hero-image[^"]*"' -or $australia -notmatch 'class="[^"]*journal-banner[^"]*"[^>]+alt="Melbourne and Sydney travel journal banner"' -or $customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.australia-journal \.travel-journal__hero-image img\s*\{[^}]*height:\s*auto[^}]*object-fit:\s*contain') { throw "The Melbourne and Sydney banner must retain its complete mobile composition." }
+if ($customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.guangzhou-route\s*\{[^}]*display:\s*grid[^}]*counter-reset:\s*route-stop' -or $customCss -notmatch '(?s)\.guangzhou-route__stop::before\s*\{[^}]*content:\s*counter\(route-stop\)' -or $customCss -notmatch '(?s)\.guangzhou-route i\s*\{[^}]*display:\s*none') { throw "Guangzhou mobile routes must use the numbered vertical itinerary." }
+if ($australia -notmatch 'sydney_bluemountain/zoo1\.jpg[^>]+--focus-y: 18%' -or $australia -notmatch 'sydney_bluemountain/zoo2\.jpg[^>]+--focus-y: 8%' -or $australia -notmatch 'sydney_zoo/zoo2\.jpg[^>]+--focus-y: 28%' -or $australia -notmatch 'sydney_aquarium/aqua5\.jpg[^>]+--focus-y: 18%' -or $japan -notmatch 'day5_osaka_usj/usj3\.jpg[^>]+--focus-y: 8%' -or $guangzhou -notmatch 'owl-photo-stop\.webp[^>]+--focus-y: 35%') { throw "Reviewed human and animal subjects must retain their head-safe focal points." }
+if ([regex]::Matches($guangzhou, 'class="guangzhou-day__route guangzhou-day__route--collapsible"').Count -ne 2 -or [regex]::Matches($guangzhou, 'class="guangzhou-route__more"').Count -ne 2 -or $guangzhou -notmatch 'assets/js/travel-nav\.js\?v=12' -or $travelNavJs -notmatch "group\.classList\.toggle\('is-expanded'" -or $travelNavJs -match 'HTMLDialogElement|showModal\(' -or $travelNavJs -notmatch 'is-desktop-wrapped' -or $customCss -notmatch '(?s)\.guangzhou-day__route--collapsible\.is-truncated[^}]*nth-of-type\(n \+ 5\)' -or $customCss -notmatch '(?s)\.is-desktop-wrapped\.is-truncated[^}]*max-height:\s*2\.45rem') { throw "Long Guangzhou routes must expand inline on both desktop and mobile." }
+if ([regex]::Matches($guangzhou, 'guangzhou-gallery__brick--tall').Count -ne 4 -or $customCss -notmatch '(?s)\.guangzhou-day--compact \.masonry\s*\{[^}]*grid-auto-rows:\s*1fr' -or $customCss -notmatch '(?s)\.guangzhou-gallery__brick--tall\s*\{[^}]*grid-row:\s*span 2' -or $guangzhou -match 'meal-collage-two\.webp') { throw "Vertical Guangzhou meal collages must span exactly two equal desktop rows and the duplicate Day 1 collage must stay removed." }
+if ($customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.guangzhou-gallery__brick--tall \.content\s*\{[^}]*height:\s*auto' -or $customCss -notmatch '(?s)\.guangzhou-journal \.content-details h3,\s*\.guangzhou-journal \.content-details p\s*\{[^}]*text-overflow:\s*ellipsis[^}]*white-space:\s*nowrap') { throw "Guangzhou mobile collages and captions must remain flush and single-line." }
+if ($guangzhou -notmatch '(?s)Monday, 11 May.*?<small>W.ngu. .ot.l.is.</small>.*?wanguo-outlet-mall\.webp.*?</section>' -or $guangzhou -match '(?s)Wednesday, 13 May.*?<small>W.ngu. .ot.l.is.</small>.*?</section>') { throw "Wanguo Outlets must remain on 11 May only." }
+if ($guangzhou -match 'class="content-(?:title|text)"[^>]*>[^<]*(?:10|11|12|13|14|15) May') { throw "Guangzhou image captions must not repeat itinerary dates." }
+if ($guangzhou -notmatch '(?s)Sunday, 10 May.*?hotel-breakfast-buffet\.webp.*?</section>' -or $guangzhou -notmatch '(?s)Wednesday, 13 May.*?echic-hotel-room\.webp.*?roast-duck-wraps\.webp.*?</section>' -or $guangzhou -notmatch 'Men Tong Bing Sutt' -or $guangzhou -notmatch 'Secret Trip Western Restaurant' -or $guangzhou -notmatch 'Kapeng Western Restaurant') { throw "Guangzhou meal locations or corrected moments are missing." }
+if ($guangzhou -notmatch '(?s)Day 5 - Science Centre.*?bubble-tram-sunset\.webp.*?meal-collage-four\.webp.*?hotpot-dinner\.webp.*?meal-collage-five\.webp.*?tianhe-steak\.webp.*?canton-tower-frame\.jpg.*?canton-tower-bubble-tram\.webp.*?</section>') { throw "Guangzhou Day 5 must alternate its final tall and standard images to fill the desktop grid without an empty row." }
+if ($customCss -notmatch '(?s)\[id\^="trip-section-"\]\s*\{[^}]*scroll-margin-top:\s*var\(--travel-nav-offset, 7rem\)' -or $customCss -notmatch '(?s)@media screen and \(max-width: 980px\).*?\[id\^="trip-section-"\]\s*\{[^}]*scroll-margin-top:\s*var\(--travel-nav-offset, 4rem\)' -or $customCss -notmatch '(?s)\.travel-section-nav--with-menu #navPanelToggle[^}]*position:\s*static[^}]*border-right:' -or $customCss -notmatch '(?s)\.travel-section-nav\s*\{[^}]*width:\s*100%[^}]*background:\s*rgba\(25, 30, 35, 0\.98\)[^}]*transition:' -or $customCss -notmatch '(?s)\.travel-section-nav\.is-stuck\s*\{[^}]*background:\s*rgba\(255, 255, 255, 0\.97\)' -or $travelNavJs -notmatch 'nav\.insertBefore\(menuToggle, nav\.firstChild\)' -or $travelNavJs -notmatch "nav\.classList\.toggle\('is-stuck'" -or $travelNavJs -notmatch 'ResizeObserver' -or $travelNavJs -notmatch 'observer\.observe\(nav\)' -or $travelNavJs -notmatch '(?s)var correct = function.*?updateNavSurface\(\).*?getBoundingClientRect\(\)\.height' -or $travelNavJs -notmatch 'window\.location\.hash' -or $travelNavJs -notmatch '--travel-nav-offset') { throw "Travel tabs must retain the integrated sticky bar and live post-load anchor correction." }
+foreach ($journalName in @('travel_2019_siliconvalley.html', 'travel_2022_europe.html', 'travel_2023_perth.html', 'travel_2023_usacanada.html', 'travel_2024_australia.html', 'travel_2024_germany.html', 'travel_2025_japan.html', 'travel_2026_guangzhou.html')) {
+    $journalMarkup = Get-Content -LiteralPath (Join-Path $dist $journalName) -Raw -Encoding UTF8
+    if ($journalMarkup -notmatch '<body class="is-preload page-travel-journal">') { throw "$journalName is missing the shared mobile travel-navigation scope." }
+    if ($journalMarkup -notmatch '<li class="active"><a href="travel">Travel</a>') { throw "$journalName must highlight Travel in the global navigation." }
+    if ($journalMarkup -notmatch 'class="[^"]*journal-banner[^"]*"') { throw "$journalName is missing its explicit high-resolution journal banner marker." }
+    if ($journalMarkup -notmatch '<main id="main"[^>]*data-journal-template="v2"' -or [regex]::Matches($journalMarkup, 'class="travel-section-nav').Count -ne 1 -or [regex]::Matches($journalMarkup, 'class="travel-pagination"').Count -ne 1 -or $journalMarkup -match '{{[A-Z_]+}}') { throw "$journalName is not rendered exactly once through the shared travel journal template." }
+}
+if ($guangzhou -notmatch '<main id="main" class="[^"]*travel-journal[^"]*travel-journal--compact[^"]*guangzhou-journal' -or $guangzhou -notmatch 'class="travel-journal__content"' -or $guangzhou -match '<!DOCTYPE HTML>.*<!DOCTYPE HTML>') { throw "Guangzhou must prove the content-only compact journal build path without nesting a legacy document shell." }
+if ($japan -notmatch 'sizes="\(max-width: 736px\) 100vw, 1152px"' -or $customCss -notmatch '(?s)\.page-travel-journal header\.major > \.date::before,\s*\.page-travel-journal header\.major > \.date::after\s*\{[^}]*position:\s*static[^}]*flex:\s*1 1 0') { throw "Journal banners must request full-width sources and date dividers must not overlap their labels." }
+if ($guangzhou -match '(?i)\b(?:6:40|6 pm|10:40)\b' -or $guangzhou -notmatch 'We left early for the airport and flew home') { throw "Guangzhou notes must avoid fixed timings and retain the departure summary." }
+if ($galleryJs -notmatch "querySelectorAll\('#main img'\)" -or $galleryJs -notmatch 'travel-gallery--compact' -or $galleryJs -notmatch 'journal-lightbox-trigger' -or $galleryJs -notmatch 'journal-scroll-cue' -or $galleryJs -notmatch 'has-scroll-cue' -or $guangzhou -notmatch 'assets/js/gallery\.js\?v=11') { throw "Journal photos must use the shared lightbox and generic compact mobile galleries must expose a dismissible horizontal-scroll cue." }
+if ($travel -notmatch 'assets/css/custom\.css\?v=116' -or $travel -notmatch 'assets/js/travel-map\.js\?v=8' -or $travel -notmatch 'Scroll to zoom' -or $travel -notmatch 'class="travel-map__status" aria-live="polite"' -or [regex]::Matches($travel, 'data-map-lat="[-\d.]+" data-map-lon="[-\d.]+"').Count -ne 10 -or $travelMapJs -notmatch 'MAX_SCALE = 10' -or $travelMapJs -notmatch 'DESKTOP_INITIAL_SCALE = 1\.12' -or $travelMapJs -notmatch 'AREA_SCALE = 2\.2' -or $travelMapJs -notmatch 'STOP_SCALE = 4\.2' -or [regex]::Matches($travelMapJs, "\['area',").Count -ne 17 -or [regex]::Matches($travelMapJs, "\['stop',").Count -ne 47 -or $travelMapJs -notmatch 'var projectCoordinate = function' -or $travelMapJs -notmatch 'var resetView = function' -or $travelMapJs -notmatch 'LABEL_DIRECTIONS' -or $travelMapJs -notmatch 'travel-map__detail-leader' -or $travelMapJs -notmatch 'scheduleLabelLayout' -or $travelMapJs -match "classList\.add\('is-label-hidden'" -or $travelMapJs -notmatch "setAttribute\('data-map-detail'" -or $travelMapJs -notmatch "addEventListener\('wheel'" -or $travelMapJs -match 'event\.ctrlKey|Use Ctrl') { throw "Travel map must use geographic coordinates, a tighter desktop opening view, direct wheel zoom, adaptive leader-line callouts, and progressive detail." }
+foreach ($detailLink in [regex]::Matches($travelMapJs, "'(travel_[^'#]+)#(trip-section-\d+)'")) {
+    $detailPage = Join-Path $dist ($detailLink.Groups[1].Value + '.html')
+    if (-not (Test-Path -LiteralPath $detailPage)) { throw "Progressive map point targets a missing journal: $($detailLink.Value)" }
+    $detailHtml = Get-Content -LiteralPath $detailPage -Raw -Encoding UTF8
+    if ($detailHtml -notmatch ('id="' + [regex]::Escape($detailLink.Groups[2].Value) + '"')) { throw "Progressive map point targets a missing section: $($detailLink.Value)" }
+}
+$middleDot = [char]0x00B7
+$requiredMapTargets = [ordered]@{}
+$requiredMapTargets['Western Australia'] = 'travel_2023_perth#trip-section-2'
+$requiredMapTargets['Victoria'] = 'travel_2024_australia#trip-section-1'
+$requiredMapTargets['New South Wales'] = 'travel_2024_australia#trip-section-6'
+$requiredMapTargets['Melbourne'] = 'travel_2024_australia#trip-section-1'
+$requiredMapTargets['Phillip Island'] = 'travel_2024_australia#trip-section-2'
+$requiredMapTargets['Great Ocean Road'] = 'travel_2024_australia#trip-section-3'
+$requiredMapTargets['Werribee'] = 'travel_2024_australia#trip-section-4'
+$requiredMapTargets['Grampians'] = 'travel_2024_australia#trip-section-5'
+$requiredMapTargets['Sydney'] = 'travel_2024_australia#trip-section-6'
+$requiredMapTargets['Blue Mountains'] = 'travel_2024_australia#trip-section-7'
+$requiredMapTargets['Wollongong'] = 'travel_2024_australia#trip-section-9'
+$requiredMapTargets["Cologne $middleDot 2022"] = 'travel_2022_europe#trip-section-5'
+$requiredMapTargets["Cologne $middleDot 2024"] = 'travel_2024_germany#trip-section-4'
+$requiredMapTargets['Tokyo'] = 'travel_2025_japan#trip-section-5'
+foreach ($mapTarget in $requiredMapTargets.GetEnumerator()) {
+    $signature = "'" + $mapTarget.Key + "', '" + $mapTarget.Value + "'"
+    if ($travelMapJs -notmatch [regex]::Escape($signature)) { throw "Travel map is missing direct section link: $signature" }
+}
+if ($homeHtml -notmatch 'View selected work') { throw "Homepage selected-work call to action is missing." }
+if ($homeHtml -notmatch 'href="experience#selected-work"') { throw "Homepage selected-work links should land above the portfolio cards." }
+if ($homeHtml -notmatch '<body class="is-preload page-home">' -or $homeHtml -match 'page-index|hero-signal|hero-capabilities' -or $homeHtml -match 'class="logo icon fa-home"|<header id="header">') { throw "Homepage must retain the clean hero while using the full-screen page scope without a redundant home header." }
+if ($homeHtml -notmatch 'assets/js/main\.js\?v=13' -or $homeHtml -notmatch 'assets/js/game\.js\?v=16' -or $mainJs -match '!reducedMotion && !compactCanvas' -or $mainJs -notmatch 'ball_limit = compactCanvas \? 9 : 14' -or $gameJs -notmatch 'window\.innerHeight - photoTop' -or $gameJs -notmatch 'textProgress = Math\.max' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\)\s*\{\s*canvas#nokey\s*\{\s*display:\s*block') { throw "Homepage mobile animation or visibility-driven About transition is missing." }
+if ($customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?\.intro-swipe\s*\{[^}]*height:\s*122vh[^}]*margin-bottom:\s*0' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?\.intro-swipe__row\s*\{[^}]*flex-direction:\s*column[^}]*gap:\s*1rem[^}]*padding:\s*0 1rem 3vh' -or $customCss -notmatch '(?s)@media all and \(max-width: 600px\).*?\.homepage \.homepage-links\s*\{[^}]*margin-top:\s*0\.5rem' -or $customCss -notmatch '(?s)\.intro-swipe__text \.aboutblock\s*\{[^}]*text-align:\s*left') { throw "Homepage mobile intro must hand off cleanly with readable left-aligned copy." }
+if ($mainJs -notmatch "side: 'bottom'" -or $mainJs -notmatch 'hideOnEscape: true' -or $mainJs -notmatch 'aria-expanded' -or $customCss -notmatch '(?s)@media screen and \(max-width: 980px\).*?#navPanel\s*\{[^}]*bottom:\s*0[^}]*max-height:\s*72svh[^}]*border-radius:\s*1\.4rem 1\.4rem 0 0[^}]*translateY' -or $customCss -notmatch '(?s)#navPanel \.links li\.active a\s*\{[^}]*background:\s*var\(--color-brand-wash\)' -or $customCss -notmatch '(?s)body\.is-navPanel-visible::before\s*\{[^}]*opacity:\s*1') { throw "Mobile navigation must use the accessible, active-state bottom sheet and soft backdrop." }
+if ($homeHtml -notmatch 'data-scramble-list' -or $homeHtml -notmatch 'data-scramble-source>I build agents that plan threat hunts in hours, not&nbsp;days\.<' -or $homeHtml -notmatch 'data-scramble-row data-scramble-lead="2"' -or $homeHtml -notmatch 'Product direction <span aria-hidden="true">&middot;</span> DSTA' -or $homeHtml -notmatch 'assets/js/scramble-reveal\.js\?v=7' -or $homeHtml -match 'Analysts drown|portfolio-hero__line--|class="txt-rotate"') { throw "Homepage must use the one-sentence scramble hero with the DSTA support line and two unscrambled lead words." }
+if ($customCss -notmatch '(?s)#intro \.portfolio-hero__scramble-row\s*\{[^}]*font-family:\s*var\(--font-display\)' -or $customCss -notmatch '(?s)\[data-scramble-list\]\.is-enhanced \[data-scramble-source\]\s*\{[^}]*color:\s*transparent' -or $customCss -notmatch '(?s)#intro \.portfolio-hero__actions \.button\.primary\s*\{[^}]*background:\s*rgba\(255, 255, 255, 0\.055\)[^}]*box-shadow:\s*inset 0 0 0 1px rgba\(255, 255, 255, 0\.22\)' -or $customCss -notmatch '(?s)body\.page-home #intro\s*\{[^}]*z-index:\s*2') { throw "Hero scramble must keep display-font styling, a visible-before-enhancement source, the quiet CTA, and sit above the theme load overlay." }
+if ($scrambleRevealJs -notmatch 'prefers-reduced-motion: reduce' -or $scrambleRevealJs -notmatch 'TICK_MS = 45' -or $scrambleRevealJs -notmatch 'TARGET_DURATION_MS = 1200' -or $scrambleRevealJs -notmatch 'VIEW_THRESHOLD = 0\.6' -or $scrambleRevealJs -notmatch 'IntersectionObserver' -or $scrambleRevealJs -notmatch 'if \(hasPlayed\) return;' -or $scrambleRevealJs -notmatch 'list\.classList\.add\("is-complete"\)' -or $scrambleRevealJs -notmatch 'function leadOffset' -or $scrambleRevealJs -notmatch 'data-scramble-lead') { throw "Scramble must be a one-shot, duration-capped reveal with a reduced-motion fallback and unscrambled lead words." }
+if ($homeHtml -match 'id="para1"|formatAMPM\(') { throw "Homepage About Me section must not display a generated date." }
+if ($customCss -notmatch '(?s)@media screen and \(min-width: 981px\).*?#nav\s*\{[^}]*height:\s*3\.25rem[^}]*background:\s*rgba\(7, 19, 21, 0\.36\)' -or $customCss -notmatch '(?s)#nav ul\.links li\.active\s*\{[^}]*box-shadow:\s*inset 0 -2px') { throw "Desktop section navigation must use the compact, quiet active treatment." }
+if ($customCss -notmatch '(?s)\.site-pager\s*\{[^}]*padding:\s*1\.25rem 2rem[^}]*background:\s*#fff' -or $customCss -notmatch '(?s)\.site-pager__link\s*\{[^}]*min-height:\s*3\.25rem[^}]*background:\s*transparent[^}]*box-shadow:\s*none') { throw "Bottom page links must retain the compact white pager treatment." }
+if ($customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.lightbox\s*\{[^}]*padding:\s*4rem 0\.75rem 1rem' -or $customCss -notmatch '(?s)\.journal-gallery-shell\s*\{[^}]*position:\s*relative[^}]*display:\s*flex[^}]*flex-direction:\s*column' -or $customCss -notmatch '(?s)\.journal-scroll-cue\s*\{[^}]*position:\s*static[^}]*order:\s*1[^}]*align-self:\s*flex-end[^}]*margin:\s*0 0 0\.45rem[^}]*border-radius:\s*999px[^}]*animation:\s*journal-scroll-cue-shake[^}]*pointer-events:\s*none' -or $customCss -notmatch '(?s)\.journal-scroll-cue\.is-dismissed\s*\{[^}]*border-color:\s*transparent[^}]*opacity:\s*0[^}]*visibility:\s*hidden' -or $customCss -notmatch '(?s)\.guangzhou-journal \.content-details,\s*\.guangzhou-journal \.content:hover \.content-details\s*\{[^}]*height:\s*4rem' -or $customCss -notmatch '(?s)\.page-travel-journal #main > \.guangzhou-day\s*\{[^}]*margin-top:\s*2\.25rem[^}]*padding-bottom:\s*0[^}]*border-top:\s*1px solid var\(--color-border-soft\)' -or $galleryJs -notmatch "shell\.className = 'journal-gallery-shell'" -or $galleryJs -notmatch 'shell\.appendChild\(gallery\)' -or $customCss -notmatch '(?s)@keyframes journal-scroll-cue-shake\s*\{.*?translateX\(-0\.22rem\)' -or $customCss -notmatch '(?s)\.masonry\.has-scroll-cue\s*\{[^}]*mask-image:' -or $customCss -notmatch '(?s)blockquote\.instagram-media\s*\{[^}]*max-width:\s*100%\s*!important') { throw "Small-screen lightboxes, fixed-height captions, stable section spacing, stable scroll cues, and embedded media must remain viewport-safe." }
+if ($customCss -notmatch '(?s)\.lightbox button\s*\{[^}]*border:\s*1px solid rgba\(255, 255, 255, 0\.12\)[^}]*background:\s*rgba\(20, 24, 32, 0\.3\)[^}]*opacity:\s*0\.72') { throw "Lightbox controls must retain their subtle low-contrast treatment." }
+if ($customCss -notmatch '(?s)body\.page-home #intro\s*\{[^}]*min-height:\s*100vh[^}]*min-height:\s*100svh' -or $homeHtml -notmatch '<div id="intro">\s*<h1>Nicholas Wan') { throw "Homepage opening must occupy a complete black viewport before the next section." }
+if ($customCss -notmatch '(?s)@media screen and \(max-width: 520px\).*?\.travel-map\s*\{[^}]*display:\s*none' -or $customCss -notmatch '(?s)\.travel-mobile-destinations\s*\{[^}]*display:\s*grid' -or $customCss -notmatch '(?s)\.travel-mobile-destination__links a\s*\{[^}]*min-height:\s*2\.35rem') { throw "Phones must use readable destination accordions with accessible touch targets instead of a miniature map." }
+if ($personalTimelineJs -notmatch 'window\.innerHeight \* 0\.88' -or $personalTimelineJs -notmatch 'eventRevealPoint' -or $mainJs -notmatch '\$header\.length' -or $house -notmatch 'class="mobile-context-bar"') { throw "Timeline reveals and headerless mobile pages must remain immediately understandable and navigable." }
+if ($experience -notmatch 'data-scramble-list' -or $experience -notmatch 'data-scramble-source>Planning reduced from days to hours<' -or $experience -notmatch 'data-scramble-row data-scramble-lead="1"' -or $experience -notmatch 'assets/js/scramble-reveal\.js\?v=7') { throw "The experience page must scramble its Threat Hunting outcome (the site's second moment, with the homepage hero), with one unscrambled lead word." }
+if ($experience -match 'og:image' -or $experience -match 'twitter:card') { throw "The experience page opts out of a share-preview image." }
+if ((Get-Content -LiteralPath (Join-Path $dist 'skills.html') -Raw -Encoding UTF8) -match 'og:image|twitter:card') { throw "The skills page opts out of a share-preview image." }
+if ([regex]::Matches($experience, 'Jan 2021 &ndash; Present').Count -ne 2 -or $experience -notmatch 'Also at DSTA') { throw "Both DSTA cards must carry the Jan 2021 - Present period, with the slim context line on Cloud Analytics." }
+if ([regex]::Matches($experience, 'class="case-study__company"').Count -ne 4) { throw "Only the agentic AI card and the three internships carry a full company header; Cloud Analytics defers to the hero card." }
+if ($homeHtml -notmatch 'id="about-me"') { throw "Homepage About section anchor is missing." }
+if ($homeHtml -notmatch '<canvas id="nokey"') { throw "Homepage background animation canvas is missing." }
+if ($homeHtml -match 'href=["'']resume["'']') { throw "Homepage still exposes the Resume page." }
+if ($homeHtml -notmatch 'href=["'']personal["'']') { throw "Homepage Personal card is missing." }
+if ($experience -notmatch 'id="agentic-ai"') { throw "Lead agentic AI case study is missing." }
+if ($experience -notmatch '<body class="is-preload page-experience">') { throw "Work layout scope is missing." }
+if ($experience -notmatch 'id="selected-work" class="section-intro section-intro--experience"' -or $experience -notmatch 'Product &amp; AI portfolio' -or $experience -notmatch 'Product leadership and outcomes across AI, cybersecurity, and data\.' -or $experience -notmatch 'class="internship-group') { throw "Work banner or portfolio layout is missing." }
+if ([regex]::Matches($experience, 'class="case-study case-study--work"').Count -ne 2) { throw "The two DSTA cards must use the same work-card format." }
+if ($experience -match 'case-study--compact' -or $experience -match 'case-study--lead' -or $experience -match 'case-study--wide') { throw "Retired work-card variants are still present." }
+if ([regex]::Matches($experience, 'class="case-study case-study--internship"').Count -ne 3) { throw "Internships must be presented as three compact cards in one row." }
+if ($experience -notmatch 'Apr 2020 &ndash; Nov 2020 &middot; 8 mos' -or $experience -notmatch 'Aug 2019 &ndash; Apr 2020 &middot; 9 mos' -or $experience -notmatch 'San Francisco, USA') { throw "Internship dates or locations are missing." }
+if ([regex]::Matches($experience, '>Singapore</span>').Count -ne 2) { throw "Shopee and NUHS internships should be located in Singapore." }
+if ($experience -notmatch 'id="clinical-data-science"' -or $experience -notmatch 'National University Health System logo' -or $experience -notmatch '>NUHS</span>' -or $experience -notmatch 'Dec 2018 &ndash; Jul 2019 &middot; 8 mos') { throw "The aligned NUHS data science internship card is missing." }
+if ($experience -match 'Guco Consulting' -or $experience -match 'Professional timeline' -or $experience -match 'career-timeline') { throw "Retired Guco or professional timeline content is still present." }
+if ($experience -match 'case-study__visual' -or $experience -match 'case-study__facts' -or $experience -match 'case-study__decisions' -or $experience -match 'R&amp;D') { throw "Verbose or retired case-study content is still present." }
+if ([regex]::Matches($experience, 'class="case-study__highlights"').Count -ne 2) { throw "Main work cards should use concise challenge, leadership, and impact highlights." }
+if ($experience -notmatch 'images/company/dsta\.svg' -or $experience -notmatch 'images/company/the-league\.png' -or $experience -notmatch 'images/company/shopee\.svg' -or $experience -notmatch 'images/company/nuhs\.png') { throw "Portfolio company logos are missing." }
+if ($experience -match 'case-study__icon') { throw "Standalone work-card icons should not consume a separate row." }
+if ($customCss -notmatch '(?s)\.company-logo--shopee\s*\{[^}]*background:\s*transparent' -or $customCss -notmatch '(?s)\.company-logo--nuhs\s*\{[^}]*background:\s*transparent') { throw "Shopee and NUHS logos must not sit on white tiles." }
+foreach ($companyLogo in @('images\company\dsta.svg', 'images\company\the-league.png', 'images\company\shopee.svg', 'images\company\nuhs.png')) {
+    if (-not (Test-Path -LiteralPath (Join-Path $dist $companyLogo))) { throw "Generated site is missing company logo: $companyLogo" }
+}
+if ($personal -notmatch '(?s)<a class="personal-event-card" href="experience_ndu">.*?<span class="personal-event-card__meta">2016&ndash;2017 &middot; Service</span>.*?<strong>Naval Diving Unit</strong>.*?<span>I completed National Service with the Naval Diving Unit\.</span>') { throw "Naval Diving Unit timeline card must link directly to its page and retain its service details." }
+if ($personal -match 'section-intro--personal|Projects, communities, and memories from 2016|Scroll through the years|personal-timeline__guide' -or $personal -notmatch '<body class="is-preload page-personal">' -or $personal -notmatch '<h1 id="personal-timeline-title">Life outside work</h1>' -or $personal -notmatch 'Projects, communities, and memories beyond work\.') { throw "Personal page must begin with concise timeline copy and no redundant scrolling instruction." }
+if ($personal -notmatch 'data-personal-timeline' -or $personal -notmatch 'data-timeline-progress' -or $personal -notmatch 'assets/js/personal-timeline\.js\?v=10' -or -not (Test-Path -LiteralPath (Join-Path $dist 'assets\js\personal-timeline.js'))) { throw "Personal page scroll timeline or its interaction script is missing." }
+if ($personalTimelineJs -match 'data-story-(?:previous|next|toggle|counter)|scheduleAutoplay|activeSlides' -or $personal -match 'data-slide-duration') { throw "Retired personal-story slideshow code was reintroduced." }
+if ($personal -notmatch 'data-story-open="orientation"' -or $personal -notmatch '>Orientation Group Leader</strong>' -or [regex]::Matches($personal, '>Freshmen Orientation<').Count -ne 1 -or [regex]::Matches($personal, '>Orientation Week<').Count -ne 1 -or $personal -notmatch 'class="orientation-memory__grid"') { throw "The two orientation entries must be compressed into one side-by-side popup memory." }
+if ($personal -notmatch 'data-cats-preview-toggle' -or $personal -notmatch 'id="cats-instagram-preview"' -or $personal -notmatch 'class="cats-instagram-phone-screen"' -or $personal -notmatch 'class="instagram-media"' -or $personal -notmatch 'data-instgrm-permalink="https://www\.instagram\.com/twoshotsofcuteness/"' -or $personal -notmatch 'src="https://www\.instagram\.com/embed\.js"' -or $personal -match 'data-story-open="cats"|data-story="cats"|href="cats"') { throw "The cats timeline event must contain its phone preview and desktop Instagram embed without a modal story." }
+if ($personal -notmatch 'images/personal/cats-banner\.webp' -or -not (Test-Path -LiteralPath (Join-Path $dist 'images\personal\cats-banner.webp')) -or (Get-Item -LiteralPath (Join-Path $dist 'images\personal\cats-banner.webp')).Length -gt 150KB -or $personal -notmatch 'images/personal/cats-instagram-profile\.webp' -or -not (Test-Path -LiteralPath (Join-Path $dist 'images\personal\cats-instagram-profile.webp')) -or (Get-Item -LiteralPath (Join-Path $dist 'images\personal\cats-instagram-profile.webp')).Length -gt 80KB) { throw "The cats event must use the optimized banner and mobile Instagram profile assets." }
+if ($guangzhou -notmatch 'images/travel/2026_guangzhou/canton-tower-sunset-banner\.webp' -or -not (Test-Path -LiteralPath (Join-Path $dist 'images\travel\2026_guangzhou\canton-tower-sunset-banner.webp')) -or (Get-Item -LiteralPath (Join-Path $dist 'images\travel\2026_guangzhou\canton-tower-sunset-banner.webp')).Length -gt 200KB) { throw "The Guangzhou journal must use the cropped and optimized Canton Tower sunset banner." }
+if ($personal -notmatch 'href="house"' -or $personal -notmatch 'href="prewed"' -or $personal -notmatch 'href="https://github\.com/nicholas-wan/brawlstars"' -or $personal -notmatch 'href="experience_ndu"') { throw "Non-cat timeline entries with real destinations must continue to link directly." }
+if ($personalTimelineJs -notmatch "classList\.toggle\('is-visible', reducedMotion\.matches \|\| reached\)" -or $personalTimelineJs -notmatch 'window\.innerHeight \* 0\.88' -or $personalTimelineJs -notmatch 'eventRevealPoint' -or $personalTimelineJs -notmatch "document\.querySelector\('\[data-story-dialog\]'\)" -or $personalTimelineJs -notmatch "catsPreviewEvent\.addEventListener\('mouseleave'.*?setCatsPreview\(false\)" -or $personalTimelineJs -notmatch '\(hover: hover\) and \(pointer: fine\)') { throw "Timeline reveal reversal or dismissing cats hover preview has regressed." }
+if ($customCss -notmatch '(?s)\.personal-timeline-year__events\s*\{[^}]*gap:\s*0;' -or $customCss -notmatch '(?s)\.personal-timeline-event\s*\{[^}]*min-height:\s*6\.5rem;' -or $customCss -notmatch '(?s)\.personal-timeline-event \+ \.personal-timeline-event\s*\{[^}]*margin-top:\s*-4\.75rem;') { throw "Desktop timeline cards should use the compact overlapping layout." }
+if ([regex]::Matches($personal, 'personal-event-card__image--slideshow').Count -ne 2 -or $customCss -notmatch '@keyframes personal-card-slideshow' -or $customCss -notmatch '(?s)\.personal-event-card__body > span:not\([^}]*font-weight:\s*300\s*!important') { throw "Personal hover galleries or lighter descriptions are missing." }
+if ($personal -match 'personal-timeline__eyebrow' -or $personal -notmatch '(?s)personal-timeline-event--right"[^>]*data-timeline-event[^>]*data-category="community".*?Orientation Group Leader.*?personal-timeline-event personal-timeline-event--left"[^>]*data-timeline-event[^>]*data-category="community".*?Deaf Lightsabering') { throw "Personal heading cleanup or the separated 2018 timeline layout has regressed." }
+if ($personal -match '(?i)milestone' -or $personal -match 'personal-timeline__legend') { throw "Personal timeline should not show milestone labels or a category legend." }
+foreach ($timelineDate in @('27 November 2025', 'November 2024', 'February 2024', 'November 2022', 'January&ndash;April 2019', '2017&ndash;2019', '23&ndash;31 July 2018', 'January&ndash;April 2018', '2016&ndash;2017')) {
+    if ($personal -notmatch ('class="personal-event-card__meta">[^<]*' + [regex]::Escape($timelineDate))) { throw "Personal timeline card is missing its date: $timelineDate" }
+}
+if ($personal -notmatch 'I taught underprivileged children basic coding skills using Scratch\.' -or $personal -notmatch 'I served on the CAPTs_Lock committee' -or $personal -notmatch 'I facilitated the Lightsabering with the Deaf trail') { throw "Personal page writeups are missing their past-tense community descriptions." }
+if ($personal -match 'I am excited to volunteer|we will be teaching|I am part of a committee|It was an amazing experience that taught me many things|Life &amp; Service|Check out our') { throw "Personal page still contains present-tense or retired writeup copy." }
+if ($ndu -notmatch '(?s)<body class="is-preload page-personal page-event">.*?<li class="active"><a href="personal">Personal</a>' -or $ndu -notmatch 'Personal timeline') { throw "Naval Diving Unit page should be classified under Personal without a top banner." }
+foreach ($eventMarkup in @($house, $prewed, $ndu)) {
+    if ($eventMarkup -match '<header id="header">|section-intro--gallery' -or $eventMarkup -notmatch '<body class="is-preload page-personal page-event">') { throw "Personal event pages must open directly without top banners." }
+    if ($eventMarkup -notmatch '(?s)<nav class="site-pager site-pager--single".*?site-pager__link site-pager__link--next" href="personal".*?<span>Back to</span><strong>Personal timeline &#8594;</strong>' -or $eventMarkup -match 'site-pager__link--previous" href="personal"') { throw "Personal event pages must use the About-page-style right-aligned return link." }
+}
+if (Test-Path -LiteralPath (Join-Path $dist 'cats.html')) { throw "Cats must remain an embedded timeline popup, not a separate generated page." }
+if ($customCss -notmatch '(?s)\.personal-event-card__body\s*\{[^}]*justify-content:\s*center' -or $customCss -notmatch '(?s)\.personal-event-card__instagram-preview\s*\{[^}]*width:\s*min\(22rem[^}]*max-height:\s*28rem[^}]*overflow:\s*hidden[^}]*visibility:\s*hidden' -or $customCss -notmatch '(?s)@media screen and \(max-width: 980px\).*?\.personal-event-card__instagram-preview\s*\{[^}]*width:\s*min\(18\.2rem[^}]*border-radius:\s*2\.85rem' -or $customCss -notmatch '(?s)\.cats-instagram-phone-screen\s*\{[^}]*display:\s*block[^}]*border-radius:\s*2\.25rem' -or $customCss -notmatch '(?s)\.orientation-memory__grid\s*\{[^}]*grid-template-columns:\s*repeat\(2' -or $customCss -match 'body\.page-event \.site-pager(?:__link)?\s*\{') { throw "Personal iPhone preview, centered cards, orientation popup, or shared event pager treatment is missing." }
+$primaryPagers = @{
+    'index.html' = @('href="experience"', '>Work &#8594;</strong>')
+    'experience.html' = @('href="index"', 'href="skills"')
+    'skills.html' = @('href="experience"', 'href="personal"')
+    'personal.html' = @('href="skills"', 'href="travel"')
+    'travel.html' = @('href="personal"', '&#8592; Personal</strong>')
+}
+foreach ($pagerPage in $primaryPagers.Keys) {
+    $pagerHtml = Get-Content -LiteralPath (Join-Path $dist $pagerPage) -Raw -Encoding UTF8
+    if ($pagerHtml -notmatch 'class="site-pager') { throw "$pagerPage is missing the shared page navigation." }
+    foreach ($pagerPattern in $primaryPagers[$pagerPage]) {
+        if ($pagerHtml -notmatch $pagerPattern) { throw "$pagerPage has an incorrect previous or next destination." }
+    }
+}
+if ($customCss -notmatch '(?s)\.site-pager\s*\{[^}]*grid-template-columns:\s*repeat\(2' -or $customCss -notmatch '(?s)\.travel-pagination\s*\{[^}]*display:\s*flex[^}]*justify-content:\s*space-between[^}]*border-top:\s*1px solid var\(--color-border-soft\)' -or $customCss -notmatch '(?s)\.travel-pagination a\s*\{[^}]*max-width:\s*25rem[^}]*border:\s*0[^}]*background:\s*transparent[^}]*box-shadow:\s*none') { throw "Shared page and journal navigation must use the unboxed About-page treatment." }
+if ($customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.travel-pagination a\s*\{[^}]*border:\s*0[^}]*background:\s*transparent[^}]*box-shadow:\s*none') { throw "Mobile journal pagination must use the same unboxed link treatment as the rest of the site." }
+$skillsHtml = Get-Content -LiteralPath (Join-Path $dist 'skills.html') -Raw -Encoding UTF8
+if ($skillsHtml -notmatch '<body class="is-preload page-skills">') { throw "Skills layout scope is missing." }
+if ($skillsHtml -match 'section-intro--skills' -or $skillsHtml -notmatch '<h1 class="sr-only">Education &amp; Skills</h1>' -or $skillsHtml -notmatch '<h2>Education</h2>' -or $skillsHtml -notmatch '<h2>Skills</h2>') { throw "Skills page must begin directly with Education and Skills without a generated top banner." }
+if ($skillsHtml -notmatch 'CS246 Mining Massive Datasets &mdash; <strong>Grade: A</strong>') { throw "Stanford course grade is not clearly labelled." }
+if ($skillsHtml -notmatch 'stanford\.png" width="1200" height="526"' -or $skillsHtml -notmatch 'nus\.webp" width="1200" height="554"' -or $skillsHtml -notmatch 'njc\.png" width="324" height="100"') { throw "Education logos are missing stable image dimensions." }
+if ($customCss -notmatch '(?s)#stanford\s*\{[^}]*width:\s*170px' -or $customCss -notmatch '(?s)#nus\s*\{[^}]*width:\s*148px' -or $customCss -notmatch '(?s)#njc\s*\{[^}]*width:\s*170px' -or $customCss -notmatch '(?s)\.education-highlights\s*\{[^}]*min-height:\s*3\.55rem') { throw "Education card alignment is not normalized." }
+if ($customCss -notmatch '(?s)\.tool-logo-list\s*\{[^}]*grid-template-columns:\s*repeat\(2' -or $customCss -notmatch '(?s)\.tool-logo-list li\s*\{[^}]*background:\s*transparent' -or $customCss -notmatch '(?s)\.tool-logo-frame\s*\{[^}]*background:\s*transparent' -or $customCss -notmatch '(?s)\.tool-logo-frame img\s*\{[^}]*width:\s*auto[^}]*max-width:\s*1\.7rem') { throw "Skills tool logos must retain their proportions without white tiles or clipped labels." }
+if ([regex]::Matches($skillsHtml, 'class="toolkit-card toolkit-card--').Count -ne 4 -or [regex]::Matches($skillsHtml, '<button type="button" class="toolkit-card__summary" aria-controls="toolkit-').Count -ne 4) { throw "Skills cards must contain four compact, expandable categories with disclosure buttons." }
+if ($skillsHtml -match 'toolkit-card[^>]*tabindex' -or $skillsHtml -match 'toolkit-card__detail"[^>]*aria-hidden') { throw "Toolkit cards must not hardcode ARIA/focus state; main.js owns it so details stay reachable without JS." }
+if ($mainJs -notmatch "classList\.add\('toolkit-card--js'\)" -or $customCss -notmatch '(?s)\.toolkit-card--js \.toolkit-card__detail\s*\{[^}]*max-height:\s*0' -or $customCss -match '\.toolkit-card:hover \.toolkit-card__detail') { throw "Toolkit detail collapse must be JS-gated with no CSS hover expansion." }
+if ($skillsHtml -notmatch 'id="tech-stack-title">Tech stack</h2>' -or [regex]::Matches($skillsHtml, '<li><i class="fa[bs] fa-').Count -ne 9 -or $skillsHtml -notmatch 'font-awesome/6\.5\.0/css/all\.min\.css" integrity="sha512-Avb2Qiu[^"]+" crossorigin="anonymous"' -or $skillsHtml -match 'Tools I work with' -or $skillsHtml -notmatch '>Agentic AI</strong>' -or $skillsHtml -notmatch '>Microsoft 365</strong>') { throw "Skills page must include nine consistent Font Awesome technology icons (SRI-pinned) without a secondary heading." }
+if ($customCss -notmatch '(?s)\.tech-stack__grid\s*\{[^}]*grid-template-columns:\s*repeat\(9' -or $customCss -notmatch '(?s)\.page-skills \.tech-stack\s*\{[^}]*grid-column:\s*1 / -1') { throw "Technology stack must retain its responsive full-width tile layout." }
+if ($customCss -match 'Signal Console redesign|\.page-index #intro' -or $customCss -notmatch 'Retained Work and Skills layouts' -or $customCss -notmatch '(?s)\.page-experience #agentic-ai\s*\{[^}]*grid-template-columns[^}]*#071315' -or $customCss -notmatch '(?s)\.page-skills #main > \.post\s*\{[^}]*grid-template-columns' -or $customCss -notmatch '(?s)\.page-skills \.education-heading,\s*\.page-skills \.skills-heading\s*\{[^}]*align-self:\s*start') { throw "The partial visual rollback is not correctly scoped to Work and Skills." }
+foreach ($toolLogo in @('python.svg', 'aws.svg', 'microsoft-365.svg', 'apache-spark.svg', 'apache-hadoop.svg', 'splunk.svg', 'elastic.svg', 'velociraptor.png')) {
+    if ($skillsHtml -notmatch [regex]::Escape("images/tools/$toolLogo")) { throw "Skills page is missing tool logo: $toolLogo" }
+    if (-not (Test-Path -LiteralPath (Join-Path $dist "images\tools\$toolLogo"))) { throw "Generated site is missing tool logo: $toolLogo" }
+}
+if ([regex]::Matches($experience, 'class="earlier-project-card"').Count -ne 3) { throw "Earlier projects must contain three visual cards." }
+foreach ($projectImage in @('brainhack2022.webp', 'techshowcase.png', 'yalehack.jpg')) {
+    if ($experience -notmatch [regex]::Escape($projectImage)) { throw "Earlier projects are missing image: $projectImage" }
+}
+$privateArtifacts = Get-ChildItem -LiteralPath $dist -Recurse -File | Where-Object {
+    $_.Name -match '(?i)(resume|transcript|(?:^|_)CV(?:_|\.|$))' -or $_.FullName -match '(?i)[\\/]certificates[\\/]'
+}
+if ($privateArtifacts.Count -gt 0) { throw "Private resume or credential files were published: $($privateArtifacts.Name -join ', ')" }
+$sitemap = Get-Content -LiteralPath (Join-Path $dist 'sitemap.xml') -Raw -Encoding UTF8
+if ($sitemap -match 'https://nicholaswan\.me/resume') { throw "Sitemap still exposes the Resume page." }
+if ($sitemap -match 'https://nicholaswan\.me/cats') { throw "Sitemap still exposes the retired cats page." }
+foreach ($retiredPage in @('experience_captqr', 'experience_guco')) {
+    if (Test-Path -LiteralPath (Join-Path $dist "$retiredPage.html")) { throw "Retired page is still published: $retiredPage" }
+    if ($sitemap -match [regex]::Escape("https://nicholaswan.me/$retiredPage")) { throw "Sitemap still exposes retired page: $retiredPage" }
+}
+Write-Output "Verified $($pages.Count) generated pages, landmarks, headings, assets, and portfolio content."

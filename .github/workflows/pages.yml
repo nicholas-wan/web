@@ -21,13 +21,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v6
 
-      - name: Build static site
+      - name: Build and verify static site
         shell: pwsh
-        run: .\build-site.ps1 -Clean
-
-      - name: Verify generated site
-        shell: pwsh
-        run: .\verify-site.ps1
+        run: .\tools\site.ps1 check
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

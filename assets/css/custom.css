@@ -3296,33 +3296,6 @@ body {
   scroll-margin-top: 1.5rem;
 }
 
-.resume-hero header > span {
-  display: block;
-  margin-bottom: 0.65rem;
-  color: #11807d;
-  font-family: "Source Sans Pro", Helvetica, sans-serif;
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  line-height: 1.3;
-  text-transform: uppercase;
-}
-
-.resume-hero h1 {
-  margin: 0 0 1rem;
-  color: #1f3038;
-  font-size: 3rem;
-  line-height: 1.1;
-}
-
-.resume-hero header > p {
-  margin: 0;
-  color: #53656c;
-  font-size: 1rem;
-  line-height: 1.75;
-  text-align: center;
-}
-
 .case-study-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3743,29 +3716,6 @@ body {
   border-bottom: 0;
 }
 
-.resume-hero {
-  padding: 4rem 4rem 2.5rem !important;
-  text-align: center;
-}
-
-.resume-hero header {
-  max-width: 48rem;
-  margin: 0 auto 1.5rem;
-}
-
-.resume-preview {
-  padding: 0 4rem 4rem !important;
-}
-
-.resume-preview object {
-  display: block;
-  width: 100%;
-  height: 72rem;
-  border: 1px solid #dfe6e8;
-  border-radius: 0.5rem;
-  background: #f5f7f7;
-}
-
 /* Quieter, more compact desktop section navigation. */
 @media screen and (min-width: 981px) {
   #nav {
@@ -4114,10 +4064,6 @@ body {
     padding: 2.25rem 1rem !important;
   }
 
-  .resume-hero h1 {
-    font-size: 2.2rem;
-  }
-
   .case-study-grid,
   .earlier-work__grid {
     grid-template-columns: 1fr;
@@ -4169,18 +4115,6 @@ body {
 
   .earlier-work__grid {
     padding: 0 1rem 1rem;
-  }
-
-  .resume-hero {
-    padding: 2.5rem 1rem 2rem !important;
-  }
-
-  .resume-preview {
-    padding: 0 1rem 2.5rem !important;
-  }
-
-  .resume-preview object {
-    height: 34rem;
   }
 
   .section-intro__title {

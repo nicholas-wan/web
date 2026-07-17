@@ -1,10 +1,12 @@
-# dist/ is generated. .github/workflows/pages.yml checks out this repo, runs
-# build-site.ps1 -Clean, and uploads the freshly built dist/ as the Pages
-# artifact — the committed copy was never the thing that got deployed (BUILD.md).
-# Tracking it duplicated every image and rewrote ~30 files on each commit.
-# Build locally with:  .\build-site.ps1 -Clean
+# dist/ is generated. GitHub Actions runs tools/site.ps1 check and uploads
+# the freshly built directory as the Pages artifact. Tracking dist duplicated
+# every image and rewrote generated pages on each commit.
+# Build and verify locally with:  .\tools\site.ps1 check
 dist/
 
-# Python bytecode from the image tooling (make-responsive-variants.py et al).
+# Python bytecode from the image tooling.
 __pycache__/
 *.pyc
+
+# Local-only private documents retained outside the published source tree.
+.private/
