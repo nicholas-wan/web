@@ -680,14 +680,18 @@ canvas.addEventListener('mousemove', function(e){
 })();
 
 // Expandable toolkit cards work with hover, keyboard focus, and touch.
+// Details ship expanded so the content stays reachable without JS and in
+// print; this collapses them at init (toolkit-card--js) and manages the
+// disclosure state on the summary button, where aria-expanded is valid.
 (function() {
 	var cards = Array.prototype.slice.call(document.querySelectorAll('.toolkit-card'));
 	if (!cards.length) return;
 
 	function setExpanded(card, expanded) {
+		var button = card.querySelector('.toolkit-card__summary');
 		var detail = card.querySelector('.toolkit-card__detail');
 		card.classList.toggle('is-expanded', expanded);
-		card.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+		if (button) button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
 		if (detail) detail.setAttribute('aria-hidden', expanded ? 'false' : 'true');
 	}
 
@@ -700,14 +704,10 @@ canvas.addEventListener('mousemove', function(e){
 	}
 
 	cards.forEach(function(card) {
+		var button = card.querySelector('.toolkit-card__summary');
 		card.dataset.pinned = 'false';
-
-		function togglePinned() {
-			var expanded = card.dataset.pinned !== 'true';
-			collapseOthers(card);
-			card.dataset.pinned = expanded ? 'true' : 'false';
-			setExpanded(card, expanded);
-		}
+		card.classList.add('toolkit-card--js');
+		setExpanded(card, false);
 
 		card.addEventListener('mouseenter', function() {
 			setExpanded(card, true);
@@ -726,15 +726,20 @@ canvas.addEventListener('mousemove', function(e){
 				setExpanded(card, false);
 			}
 		});
-		card.addEventListener('click', togglePinned);
+		if (button) {
+			// Enter/Space arrive as native button clicks.
+			button.addEventListener('click', function() {
+				var expanded = card.dataset.pinned !== 'true';
+				collapseOthers(card);
+				card.dataset.pinned = expanded ? 'true' : 'false';
+				setExpanded(card, expanded);
+			});
+		}
 		card.addEventListener('keydown', function(event) {
-			if (event.key === 'Enter' || event.key === ' ') {
-				event.preventDefault();
-				togglePinned();
-			}
 			if (event.key === 'Escape') {
 				card.dataset.pinned = 'false';
 				setExpanded(card, false);
+				if (button) button.focus();
 			}
 		});
 	});
