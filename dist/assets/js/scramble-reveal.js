@@ -14,6 +14,7 @@
   var TICK_MS = 45;
   var ROW_STAGGER_MS = 100;
   var SCRAMBLE_TAIL = 7;
+  var VIEW_THRESHOLD = 0.6;
   var activeTimers = new Set();
   var completedRows = 0;
   var hasPlayed = false;
@@ -60,7 +61,7 @@
     var characters = splitText(text);
     var visual = document.createElement("span");
 
-    visual.className = "portfolio-hero__scramble-visual";
+    visual.className = "scramble-reveal__visual";
     visual.setAttribute("aria-hidden", "true");
     visual.textContent = text;
     source.insertAdjacentElement("afterend", visual);
@@ -136,10 +137,29 @@
     list.classList.add("is-running");
   }
 
-  play();
+  if (!("IntersectionObserver" in window)) {
+    finishImmediately();
+  } else {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting || hasPlayed) return;
+        observer.disconnect();
+        play();
+      });
+    }, { threshold: VIEW_THRESHOLD });
+
+    observer.observe(list);
+  }
 
   function handleMotionChange(event) {
-    if (event.matches) finishImmediately();
+    if (event.matches) {
+      if (hasPlayed) {
+        finishImmediately();
+      } else if (observer) {
+        observer.disconnect();
+        finishImmediately();
+      }
+    }
   }
 
   if (reducedMotion.addEventListener) {
