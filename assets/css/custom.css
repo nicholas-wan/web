@@ -6019,111 +6019,42 @@ body.page-home #nav {
   }
 }
 
-/* The hero resolves as a staged opacity sequence: name, problem, answer,
-   role, then the CTA. Opacity only, no movement. Massively blocks all
-   animation during body.is-preload, so each rule is re-stated with
-   !important at higher specificity to start the fade at first paint; the
-   base state stays visible for no-JS and reduced-motion visitors. */
-@keyframes hero-fade {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
+/* The hero headline resolves once from noise, replacing the retired
+   typewriter. The source text keeps layout and accessibility — it wraps
+   naturally and reserves the block's height; JS paints only the animated
+   aria-hidden layer above it, so the copy is visible before enhancement,
+   for no-JS visitors, and under reduced motion. */
 #intro .portfolio-hero__summary {
   display: grid;
   max-width: min(34rem, calc(100vw - 3rem));
   grid-template-columns: 1fr;
-  gap: 0.42rem;
+  gap: 0.55rem;
   margin: 0;
   font-style: normal;
   text-align: center;
   text-transform: none;
 }
 
-.portfolio-hero__line {
+#intro .portfolio-hero__scramble-row {
+  position: relative;
   display: block;
-  text-wrap: balance;
-}
-
-.portfolio-hero__line--hook {
   color: rgba(255, 255, 255, 0.92);
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
-  line-height: 1.5;
-}
-
-.portfolio-hero__line--claim {
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 0.95rem;
-  font-weight: 400;
+  letter-spacing: 0.025em;
   line-height: 1.55;
 }
 
-.portfolio-hero__line--role {
-  margin-top: 0.35rem;
-  color: rgba(255, 255, 255, 0.6);
+.portfolio-hero__scramble-support {
+  display: block;
+  color: rgba(255, 255, 255, 0.62);
   font-family: var(--font-display);
   font-size: 0.72rem;
   font-weight: 400;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.075em;
   line-height: 1.5;
   text-transform: uppercase;
-}
-
-#intro > h1,
-body.page-home.is-preload #intro > h1 {
-  animation: hero-fade 400ms ease-out 0ms both !important;
-}
-
-#intro .portfolio-hero__line--hook,
-body.page-home.is-preload #intro .portfolio-hero__line--hook {
-  animation: hero-fade 400ms ease-out 90ms both !important;
-}
-
-#intro .portfolio-hero__line--claim,
-body.page-home.is-preload #intro .portfolio-hero__line--claim {
-  animation: hero-fade 400ms ease-out 180ms both !important;
-}
-
-#intro .portfolio-hero__line--role,
-body.page-home.is-preload #intro .portfolio-hero__line--role {
-  animation: hero-fade 400ms ease-out 260ms both !important;
-}
-
-#intro .portfolio-hero__actions,
-body.page-home.is-preload #intro .portfolio-hero__actions {
-  animation: hero-fade 400ms ease-out 320ms both !important;
-}
-
-@media screen and (max-width: 736px) {
-  #intro .portfolio-hero__summary {
-    max-width: calc(100vw - 2.5rem);
-  }
-
-  .portfolio-hero__line--hook {
-    font-size: clamp(0.92rem, 3.8vw, 1.02rem);
-  }
-
-  .portfolio-hero__line--claim {
-    font-size: clamp(0.82rem, 3.4vw, 0.92rem);
-  }
-
-  .portfolio-hero__line--role {
-    font-size: clamp(0.6rem, 2.5vw, 0.7rem);
-    letter-spacing: 0.045em;
-  }
-}
-
-/* The Threat Hunting outcome resolves once from noise into the accent —
-   performing the raw-context-to-signal move the homepage copy claims. The
-   real text ships in the DOM and keeps the layout; JS paints only the
-   aria-hidden layer above it. */
-[data-scramble-row] {
-  position: relative;
-  display: inline-block;
-  transition: color 300ms ease-out;
 }
 
 .scramble-reveal__visual {
@@ -6134,31 +6065,22 @@ body.page-home.is-preload #intro .portfolio-hero__actions {
   color: inherit;
 }
 
-.page-experience #agentic-ai .case-study__highlights .scramble-reveal__visual {
-  color: inherit;
-}
-
-.page-experience #agentic-ai .case-study__highlights.is-enhanced [data-scramble-source] {
+[data-scramble-list].is-enhanced [data-scramble-source] {
   color: transparent;
 }
 
-/* #agentic-ai is a dark card where the brand accent renders as #28d7c5
-   (matching the card's own labels); --color-brand-600 fails contrast there. */
-.page-experience #agentic-ai .case-study__highlights.is-complete [data-scramble-row] {
-  color: #28d7c5;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  #intro > h1,
-  #intro .portfolio-hero__line,
-  #intro .portfolio-hero__actions,
-  body.page-home.is-preload #intro > h1,
-  body.page-home.is-preload #intro .portfolio-hero__line,
-  body.page-home.is-preload #intro .portfolio-hero__actions {
-    animation: none !important;
+@media screen and (max-width: 736px) {
+  #intro .portfolio-hero__summary {
+    max-width: calc(100vw - 2.5rem);
   }
 
-  [data-scramble-row] {
-    transition: none;
+  #intro .portfolio-hero__scramble-row {
+    font-size: clamp(0.84rem, 3.7vw, 0.96rem);
+    line-height: 1.5;
+  }
+
+  .portfolio-hero__scramble-support {
+    font-size: clamp(0.6rem, 2.5vw, 0.7rem);
+    letter-spacing: 0.045em;
   }
 }

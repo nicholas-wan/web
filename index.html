@@ -27,10 +27,9 @@
 		<!-- Intro -->
 		<div id="intro">
 			<h1>Nicholas Wan</h1>
-			<p class="portfolio-hero__summary">
-				<span class="portfolio-hero__line portfolio-hero__line--hook">Analysts drown in raw operational context.</span>
-				<span class="portfolio-hero__line portfolio-hero__line--claim">I build agents that turn it into hypotheses they can act on.</span>
-				<span class="portfolio-hero__line portfolio-hero__line--role">Product direction through delivery at Singapore&rsquo;s Defence Science and Technology Agency.</span>
+			<p class="portfolio-hero__summary portfolio-hero__scramble" data-scramble-list aria-label="I build agents that turn raw operational context into hypotheses analysts can act on. Product direction, Defence Science and Technology Agency.">
+				<span class="portfolio-hero__scramble-row" data-scramble-row><span data-scramble-source>I build agents that turn raw operational context into hypotheses analysts can act on.</span></span>
+				<span class="portfolio-hero__scramble-support">Product direction <span aria-hidden="true">&middot;</span> Defence Science and Technology Agency</span>
 			</p>
 			<ul class="actions portfolio-hero__actions">
 				<li><a href="experience#selected-work" class="button primary">View selected work</a></li>
@@ -130,6 +129,7 @@
 	<script src="assets/js/util.js"></script>
 	<script src="assets/js/main.js"></script>
 	<script src="assets/js/arrow.js"></script>
+	<script src="assets/js/scramble-reveal.js?v=4"></script>
 	<script>
 	var hands = [];
 		hands.push(document.querySelector('#secondhand > *'));
