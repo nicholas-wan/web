@@ -4937,10 +4937,13 @@ a:focus-visible {
   padding: 5.2rem 0 0 2.25rem;
 }
 
+/* 5rem floor, not 7rem: the rail's minimum must not outgrow the card's
+   shortened left column, or the 1fr writeup row inherits the difference as
+   a void under the paragraph. Rows still stretch when the column is tall. */
 .page-experience #agentic-ai .case-study__highlights li {
   position: relative;
   display: block;
-  min-height: 7rem;
+  min-height: 5rem;
   padding: 0.2rem 0 1.5rem;
   border: 0;
   border-radius: 0;
