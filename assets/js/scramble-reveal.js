@@ -22,6 +22,7 @@
   var TARGET_DURATION_MS = 1200;
   var ROW_STAGGER_MS = 100;
   var VIEW_THRESHOLD = 0.6;
+  var PAGE_REVEAL_DELAY_MS = 1200;
 
   var segmenter = typeof Intl !== "undefined" && Intl.Segmenter
     ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
@@ -184,9 +185,8 @@
       ? { threshold: VIEW_THRESHOLD }
       : { threshold: 0, rootMargin: "0px 0px -70% 0px" };
 
-    if (!("IntersectionObserver" in window)) {
-      finishImmediately();
-    } else {
+    function observeTrigger() {
+      if (hasPlayed) return;
       observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (!entry.isIntersecting || hasPlayed) return;
@@ -196,6 +196,25 @@
       }, observerOptions);
 
       observer.observe(trigger);
+    }
+
+    function observeAfterPageReveal() {
+      if (hasPlayed) return;
+      var timeout = setTimeout(function () {
+        activeTimers.delete(timeout);
+        observeTrigger();
+      }, PAGE_REVEAL_DELAY_MS);
+      activeTimers.add(timeout);
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      finishImmediately();
+    } else if (trigger === list) {
+      observeTrigger();
+    } else if (document.readyState === "complete") {
+      observeAfterPageReveal();
+    } else {
+      window.addEventListener("load", observeAfterPageReveal, { once: true });
     }
 
     return {
