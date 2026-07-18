@@ -5006,6 +5006,13 @@ a:focus-visible {
   font-style: italic;
 }
 
+/* Column 1 (not full width): fills the void under the lede beside the
+   three-row timeline instead of waiting below it. */
+.page-experience #agentic-ai .case-study__writeup {
+  grid-column: 1;
+  margin-bottom: 0.9rem;
+}
+
 .page-experience #agentic-ai .case-study__writeup-label { color: #28d7c5; }
 .page-experience #agentic-ai .case-study__writeup-body { color: #9db4b3; }
 
