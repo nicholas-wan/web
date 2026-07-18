@@ -39,6 +39,12 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 - Use focal-point custom properties for banner and gallery crops. Tall collage cards span two desktop rows and return to standard cards on mobile. Keep mobile swipe cues in normal document flow rather than overlaying photos.
 - Journal section links use the measured sticky-toolbar correction in `assets/js/travel-nav.js`. Do not replace it with a fixed pixel offset; the toolbar can wrap to several rows.
 
+## Personal page contracts
+
+- The Latte and Mocha card links directly to `@twoshotsofcuteness` with an Instagram icon. Do not restore the hover popover, mobile phone mockup, or third-party Instagram embed.
+- The orientation memory uses one centered modal containing both entries. Preserve root scroll locking, focus restoration, and proportional dialog images with an explicit `height: auto` override for generated height attributes.
+- Mobile timeline endpoints stay fully inside the viewport. Personal-page cards use larger mobile type, and the legacy floating return-to-top control remains hidden on that breakpoint so it cannot cover card content.
+
 ## Travel atlas contracts
 
 - The atlas is progressive: the opening view shows broad trip regions, intermediate zoom shows countries or states, and close zoom shows journal stops.
