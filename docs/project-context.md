@@ -22,7 +22,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 
 - Keep the scroll animation and background canvas.
 - The hero contains the name, one scrambling headline, one short support line, and the selected-work CTA. The current copy is:
-  - Headline: `I build agents that plan threat hunts in hours, not days.`
+  - Headline: `I build agentic AI products for real-world security operations.`
   - Support: `Product direction · DSTA`
 - The headline is owner-approved product copy. Propose copy changes instead of silently rewriting it. Do not restore the rejected multi-line paragraph hero or a skills list in the hero.
 - The site has exactly three scramble effects: the homepage headline and both Outcome rows on the experience page. All use `assets/js/scramble-reveal.js`; do not add another or remove one as incidental cleanup.
