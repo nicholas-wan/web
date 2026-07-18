@@ -30,8 +30,7 @@
 							<li><span>Outcome</span><strong data-scramble-row data-scramble-lead="1"><span data-scramble-source>Planning reduced from days to hours</span></strong></li>
 						</ul>
 						<div class="case-study__writeup">
-							<p class="case-study__writeup-label">How I built it</p>
-							<p class="case-study__writeup-body">Spearheaded the design and implementation of a LangGraph-based agent orchestration pattern where agents <strong>reason and select tools in a single inference step</strong> &mdash; no separate planning phase. The engine manages <strong>isolated virtual conversation threads</strong> between a root agent and each of its collaborators, so their contexts never bleed into each other regardless of how many agents are in the graph. One unified flow supports <strong>native ReAct agents, external A2A agents, and flow-based sub-workflows</strong>, and the engine <strong>auto-selects the execution path for the model in use</strong> &mdash; different inference providers require different tool-calling conventions, and the graph handles that transparently, so calling code never needs to know which backend it's talking to.</p>
+							<p class="case-study__writeup-body">Spearheaded the design and implementation of a LangGraph-based agentic threat-hunting solution. The workflow combines ReAct agents and external A2A agents, each with access to skills and tools. The main challenge was building the tools and context engineering needed for agents to perform well on a local LLM in an on-premise environment, while reasoning over large volumes of telemetry.</p>
 							<p class="case-study__writeup-note">Specifics are limited by the nature of defence work.</p>
 						</div>
 						<ul class="case-study__tags" aria-label="Agentic AI case study capabilities"><li>Product direction</li><li>Multi-agent systems</li><li>Analyst workflows</li><li>Team leadership</li></ul>

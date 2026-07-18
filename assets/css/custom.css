@@ -5000,22 +5000,13 @@ a:focus-visible {
   color: #ffb869;
 }
 
-/* "How I built it" writeup. Structure is generic; the colour rules are scoped
-   to the dark #agentic-ai card — reusing it on a light card needs its own
-   palette pass first. */
+/* Label-free writeup block (the owner dropped the "How I built it" eyebrow).
+   Structure is generic; the colour rules are scoped to the dark #agentic-ai
+   card — reusing it on a light card needs its own palette pass first. */
 .case-study__writeup {
   grid-column: 1 / -1;
   min-width: 0;
   margin: 0 0 1.35rem;
-}
-
-.case-study__writeup-label {
-  margin: 0 0 0.7rem;
-  font-family: var(--font-typewriter);
-  font-size: 0.76rem;
-  font-weight: 800;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 /* Merriweather ships at 300 and 700 only, so the longest text block on the
@@ -5040,13 +5031,7 @@ a:focus-visible {
   margin-bottom: 0.9rem;
 }
 
-.page-experience #agentic-ai .case-study__writeup-label { color: #28d7c5; }
 .page-experience #agentic-ai .case-study__writeup-body { color: #a9bfbe; }
-
-.page-experience #agentic-ai .case-study__writeup-body strong {
-  color: #f4f2ea;
-  font-weight: 600;
-}
 
 .page-experience #agentic-ai .case-study__writeup-note { color: rgba(157, 180, 179, 0.8); }
 
