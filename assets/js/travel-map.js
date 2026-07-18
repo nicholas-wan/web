@@ -118,6 +118,14 @@
   var zoomInBtn = controls.querySelector('[data-map-zoom="in"]');
   var zoomOutBtn = controls.querySelector('[data-map-zoom="out"]');
   var resetBtn = controls.querySelector('[data-map-zoom="reset"]');
+  var teaser = document.querySelector('[data-map-open]');
+  var closeBtn = map.querySelector('[data-map-close]');
+  var regionsBar = map.querySelector('.travel-map__regions');
+  var mobileMapQuery = window.matchMedia('(max-width: 520px)');
+  var reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var isFullscreen = false;
+  var lastFocused = null;
+  var flyFrame = 0;
   var detailLinks = [];
   var regionMarkers = Array.prototype.slice.call(canvas.querySelectorAll('.travel-map__marker'));
   var detailLevel = '';
@@ -324,16 +332,126 @@
     if (resetBtn) resetBtn.hidden = !zoomed;
   };
 
+  /* Phones open the map as a full-screen overlay and never see the tiny
+     letterboxed world strip: the overlay's zoom-out floor is the scale that
+     fills the screen height, which already reads as country-level detail. */
+  var fitHeightScale = function () {
+    if (!canvas.offsetHeight) return MIN_SCALE;
+    return Math.min(MAX_SCALE, viewport.clientHeight / canvas.offsetHeight);
+  };
+
+  var REGION_VIEWS = {
+    americas: { lat: 38.5, lon: -98.5, scale: 4.4 },
+    /* Europe's stops span only ~6 degrees of longitude, so its chip zooms
+       well past STOP_SCALE before the cluster is comfortably separated. */
+    europe: { lat: 49.6, lon: 5.5, scale: 8 },
+    asia: { lat: 29.5, lon: 126.5, scale: 4.4 },
+    australia: { lat: -33.2, lon: 132.7, scale: 4.4 }
+  };
+  var OPENING_VIEW = { lat: 28, lon: 123 };
+
+  var viewFor = function (lat, lon, targetScale) {
+    targetScale = Math.min(MAX_SCALE, Math.max(minScale, targetScale));
+    var point = projectCoordinate(lat, lon);
+    var targetTx = viewport.clientWidth / 2 - point.x / 100 * canvas.offsetWidth * targetScale;
+    var targetTy = viewport.clientHeight / 2 - point.y / 100 * canvas.offsetHeight * targetScale;
+    targetTx = Math.min(0, Math.max(viewport.clientWidth - canvas.offsetWidth * targetScale, targetTx));
+    targetTy = Math.min(0, Math.max(viewport.clientHeight - canvas.offsetHeight * targetScale, targetTy));
+    return { scale: targetScale, tx: targetTx, ty: targetTy };
+  };
+
+  var stopFly = function () {
+    if (flyFrame) {
+      window.cancelAnimationFrame(flyFrame);
+      flyFrame = 0;
+    }
+  };
+
+  var flyTo = function (lat, lon, targetScale) {
+    stopFly();
+    var target = viewFor(lat, lon, targetScale);
+    if (reducedMotionQuery.matches) {
+      scale = target.scale;
+      tx = target.tx;
+      ty = target.ty;
+      apply();
+      return;
+    }
+    var from = { scale: scale, tx: tx, ty: ty };
+    var start = null;
+    var DURATION = 520;
+    var step = function (now) {
+      if (start === null) start = now;
+      var t = Math.min(1, (now - start) / DURATION);
+      var eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      scale = from.scale + (target.scale - from.scale) * eased;
+      tx = from.tx + (target.tx - from.tx) * eased;
+      ty = from.ty + (target.ty - from.ty) * eased;
+      apply();
+      flyFrame = t < 1 ? window.requestAnimationFrame(step) : 0;
+    };
+    flyFrame = window.requestAnimationFrame(step);
+  };
+
+  var setActiveRegion = function (key) {
+    if (!regionsBar) return;
+    Array.prototype.forEach.call(regionsBar.querySelectorAll('[data-map-region]'), function (button) {
+      button.classList.toggle('is-active', button.getAttribute('data-map-region') === key);
+    });
+  };
+
   /* The desktop atlas opens on a restrained crop that removes the unused
-     polar margin while keeping every journal region visible. Mobile keeps
-     the full-world baseline behind its separate destination list. */
+     polar margin while keeping every journal region visible. The phone
+     overlay opens fit-to-height over East Asia instead. */
   var resetView = function () {
+    stopFly();
+    if (isFullscreen) {
+      minScale = fitHeightScale();
+      var opening = viewFor(OPENING_VIEW.lat, OPENING_VIEW.lon, minScale);
+      scale = opening.scale;
+      tx = opening.tx;
+      ty = opening.ty;
+      setActiveRegion('');
+      apply();
+      return;
+    }
     var useDesktopCrop = window.matchMedia('(min-width: 981px)').matches;
     minScale = useDesktopCrop ? DESKTOP_INITIAL_SCALE : MIN_SCALE;
     scale = minScale;
     tx = useDesktopCrop ? (viewport.clientWidth - canvas.offsetWidth * scale) / 2 : 0;
     ty = 0;
     apply();
+  };
+
+  var openFullscreen = function () {
+    if (isFullscreen) return;
+    isFullscreen = true;
+    lastFocused = document.activeElement;
+    map.classList.add('is-fullscreen');
+    map.setAttribute('role', 'dialog');
+    map.setAttribute('aria-modal', 'true');
+    map.setAttribute('aria-label', 'Interactive travel map');
+    document.body.classList.add('is-map-fullscreen');
+    /* Overlay layout must settle before the fit-to-height floor is measured. */
+    window.requestAnimationFrame(function () {
+      resetView();
+      if (closeBtn) closeBtn.focus();
+    });
+  };
+
+  var closeFullscreen = function () {
+    if (!isFullscreen) return;
+    isFullscreen = false;
+    stopFly();
+    map.classList.remove('is-fullscreen');
+    map.removeAttribute('role');
+    map.removeAttribute('aria-modal');
+    map.removeAttribute('aria-label');
+    document.body.classList.remove('is-map-fullscreen');
+    setActiveRegion('');
+    resetView();
+    if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+    lastFocused = null;
   };
 
   /* Zoom keeping the viewport point (px, py) anchored. */
@@ -364,6 +482,51 @@
     else resetView();
   });
 
+  if (teaser) teaser.addEventListener('click', openFullscreen);
+  if (closeBtn) closeBtn.addEventListener('click', closeFullscreen);
+  if (regionsBar) {
+    regionsBar.addEventListener('click', function (event) {
+      var button = event.target.closest('[data-map-region]');
+      if (!button) return;
+      var view = REGION_VIEWS[button.getAttribute('data-map-region')];
+      if (!view) return;
+      setActiveRegion(button.getAttribute('data-map-region'));
+      flyTo(view.lat, view.lon, view.scale);
+    });
+  }
+
+  /* The overlay is a modal dialog: Escape closes it and Tab stays inside. */
+  document.addEventListener('keydown', function (event) {
+    if (!isFullscreen) return;
+    if (event.key === 'Escape' || event.key === 'Esc') {
+      event.preventDefault();
+      closeFullscreen();
+      return;
+    }
+    if (event.key !== 'Tab') return;
+    var focusables = Array.prototype.filter.call(
+      map.querySelectorAll('a[href], button:not([disabled]):not([hidden]), [tabindex="0"]'),
+      function (element) { return element.offsetParent !== null; }
+    );
+    if (!focusables.length) return;
+    var first = focusables[0];
+    var last = focusables[focusables.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
+
+  /* Leaving the phone breakpoint (e.g. rotating to landscape past 520px)
+     returns to the inline map so the overlay never strands itself. */
+  var handleMobileChange = function (event) {
+    if (!event.matches) closeFullscreen();
+  };
+  if (mobileMapQuery.addEventListener) mobileMapQuery.addEventListener('change', handleMobileChange);
+
   /* Wheel and trackpad scrolling zoom around the pointer. Once the map reaches
      either limit, that same-direction gesture returns to normal page scroll. */
   viewport.addEventListener('wheel', function (event) {
@@ -371,6 +534,7 @@
     var nextScale = Math.min(MAX_SCALE, Math.max(minScale, scale * Math.exp(-event.deltaY * 0.0018)));
     if (Math.abs(nextScale - scale) < 0.001) return;
     event.preventDefault();
+    stopFly();
     var rect = viewport.getBoundingClientRect();
     zoomAt(event.clientX - rect.left, event.clientY - rect.top, nextScale);
   }, { passive: false });
@@ -397,16 +561,35 @@
     };
   };
 
+  /* iOS Safari does not reliably fire dblclick for touch, so double-tap
+     zoom is detected from the pointer stream instead. */
+  var lastTap = { time: 0, x: 0, y: 0 };
+
   viewport.addEventListener('pointerdown', function (event) {
-    if (event.target.closest('.travel-map__controls')) return;
+    if (event.target.closest('.travel-map__controls, .travel-map__close, .travel-map__regions')) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
+    stopFly();
+    if (event.pointerType === 'touch' && pointers.size === 0) {
+      var tapGap = event.timeStamp - lastTap.time;
+      if (tapGap > 0 && tapGap < 350 &&
+          Math.hypot(event.clientX - lastTap.x, event.clientY - lastTap.y) < 30) {
+        lastTap.time = 0;
+        var tapRect = viewport.getBoundingClientRect();
+        zoomAt(event.clientX - tapRect.left, event.clientY - tapRect.top, scale * 1.8);
+      } else {
+        lastTap = { time: event.timeStamp, x: event.clientX, y: event.clientY };
+      }
+    }
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     if (pointers.size === 2) {
       var info = pinchInfo();
       pinchStart = { dist: info.dist, scale: scale };
     }
     if (pointers.size === 1) { dragMoved = false; dragDistance = 0; }
-    if (scale > 1.001 || pointers.size === 2) viewport.setPointerCapture(event.pointerId);
+    /* Capture only once a pinch (or, below, a real drag) starts: capturing
+       on every press retargets the eventual click to the viewport, which
+       silently swallowed marker and journal-link taps while zoomed. */
+    if (pointers.size === 2) viewport.setPointerCapture(event.pointerId);
   });
 
   viewport.addEventListener('pointermove', function (event) {
@@ -427,7 +610,10 @@
       ty += next.y - prev.y;
       dragDistance += Math.abs(next.x - prev.x) + Math.abs(next.y - prev.y);
       /* Threshold keeps a slightly-jittery tap on a marker working. */
-      if (dragDistance > 5) dragMoved = true;
+      if (dragDistance > 5 && !dragMoved) {
+        dragMoved = true;
+        viewport.setPointerCapture(event.pointerId);
+      }
       pointers.set(event.pointerId, next);
       apply();
     }
@@ -470,7 +656,14 @@
     apply();
   });
 
-  window.addEventListener('resize', apply);
+  window.addEventListener('resize', function () {
+    /* Orientation changes move the overlay's fit-to-height floor. */
+    if (isFullscreen) {
+      minScale = fitHeightScale();
+      if (scale < minScale) scale = minScale;
+    }
+    apply();
+  });
   /* Crossing the desktop breakpoint changes the opening crop, and with it the
      zoom-out floor — re-establish the matching baseline view. */
   var desktopCrop = window.matchMedia('(min-width: 981px)');

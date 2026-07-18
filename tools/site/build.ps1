@@ -652,7 +652,7 @@ foreach ($page in $pages) {
     $galleryPages = @("house", "prewed") + $tripOrder
     $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=11"></script>' } else { "" }
     $travelNavScript = if ($tripOrder -contains $slug) { '<script src="assets/js/travel-nav.js?v=12"></script>' } else { "" }
-    $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=8"></script>' } else { "" }
+    $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=9"></script>' } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=13"></script>' } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { '<script src="assets/js/scramble-reveal.js?v=12"></script>' } else { "" }
     $optionalScripts = (@($galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
@@ -686,7 +686,7 @@ foreach ($page in $pages) {
 $shareImageMeta
     <link rel="stylesheet" href="assets/css/main.css?v=2" />
 $fontAwesomeStylesheet
-    <link rel="stylesheet" href="assets/css/custom.css?v=137" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=138" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />

@@ -2036,11 +2036,145 @@ body {
   pointer-events: none;
 }
 
-/* The full atlas remains a desktop/tablet interaction. Phones use the same
-   destinations in a readable accordion instead of shrinking labels below a
-   usable size. */
-.travel-mobile-destinations {
+/* Phones never render the letterboxed world strip. The inline map is
+   replaced by a teaser card that opens the same map as a full-screen
+   overlay whose zoom-out floor is the fit-to-height view (travel-map.js). */
+.travel-map-teaser,
+.travel-map__close,
+.travel-map__regions {
   display: none;
+}
+
+body.is-map-fullscreen {
+  overflow: hidden;
+}
+
+/* The map overlay is modal; the theme's floating chrome sits at z-index
+   10001+ inside its own stacking context and would otherwise cover the
+   dialog's close control. */
+body.is-map-fullscreen #header,
+body.is-map-fullscreen #navPanelToggle,
+body.is-map-fullscreen #return-to-top {
+  visibility: hidden;
+}
+
+.travel-map.is-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 10005;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.travel-map.is-fullscreen .travel-map__viewport {
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.travel-map.is-fullscreen .travel-map__hint {
+  display: none;
+}
+
+.travel-map.is-fullscreen .travel-map__status {
+  top: calc(0.85rem + env(safe-area-inset-top));
+  left: calc(0.85rem + env(safe-area-inset-left));
+}
+
+.travel-map.is-fullscreen .travel-map__close {
+  position: absolute;
+  top: calc(0.75rem + env(safe-area-inset-top));
+  right: calc(0.75rem + env(safe-area-inset-right));
+  z-index: 8;
+  display: flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(152, 201, 198, 0.35);
+  border-radius: 50%;
+  background: rgba(7, 19, 21, 0.92);
+  box-shadow: 0 0.2rem 0.55rem rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.travel-map.is-fullscreen .travel-map__close:focus-visible {
+  outline: 2px solid #28d7c5;
+  outline-offset: 2px;
+}
+
+.travel-map.is-fullscreen .travel-map__controls {
+  position: absolute;
+  top: calc(4.15rem + env(safe-area-inset-top));
+  right: calc(0.875rem + env(safe-area-inset-right));
+  flex-direction: column;
+  margin: 0;
+  gap: 0.3rem;
+}
+
+.travel-map.is-fullscreen .travel-map__regions {
+  position: absolute;
+  bottom: calc(0.9rem + env(safe-area-inset-bottom));
+  left: 50%;
+  z-index: 8;
+  display: flex;
+  max-width: calc(100vw - 1.25rem);
+  padding: 0.3rem;
+  border: 1px solid rgba(152, 201, 198, 0.28);
+  border-radius: 999px;
+  background: rgba(7, 19, 21, 0.9);
+  box-shadow: 0 0.35rem 1rem rgba(0, 0, 0, 0.4);
+  gap: 0.15rem;
+  transform: translateX(-50%);
+}
+
+.travel-map__region-btn {
+  display: inline-flex;
+  height: auto;
+  min-height: 2.75rem;
+  align-items: center;
+  padding: 0.4rem 0.7rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: rgba(255, 255, 255, 0.78);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1;
+  text-transform: uppercase;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.travel-map__region-btn.is-active {
+  background: rgba(40, 215, 197, 0.18);
+  color: #28d7c5;
+}
+
+.travel-map__region-btn:focus-visible {
+  outline: 2px solid #28d7c5;
+  outline-offset: 1px;
+}
+
+/* City-level dots need a comfortable thumb target in the overlay; the
+   visible dot stays small while the tappable halo grows. */
+.travel-map.is-fullscreen .travel-map__detail::after {
+  position: absolute;
+  inset: -0.75rem;
+  content: "";
 }
 
 .travel-map__controls {
@@ -2133,95 +2267,67 @@ body {
     display: none;
   }
 
-  .travel-mobile-destinations {
+  /* The theme's global button rules (fixed 3.5em height, nowrap, inset
+     ring, uppercase) would clip the card, so each is explicitly reset. */
+  .travel-map-teaser {
     position: relative;
     z-index: 1;
-    display: grid;
-    gap: 0.45rem;
-  }
-
-  .travel-mobile-destinations > h2 {
-    margin: 0 0 0.35rem;
-    color: var(--color-ink-900);
-    font-size: 1rem;
-    text-align: left;
-  }
-
-  .travel-mobile-destination {
-    margin: 0;
-    border: 1px solid var(--color-border-soft);
-    border-radius: 0.55rem;
-    background: #fff;
-    overflow: hidden;
-  }
-
-  .travel-mobile-destination summary {
-    position: relative;
-    display: grid;
-    min-height: 3.1rem;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.65rem 2.3rem 0.65rem 0.8rem;
-    cursor: pointer;
-    list-style: none;
-  }
-
-  .travel-mobile-destination summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .travel-mobile-destination summary::after {
-    position: absolute;
-    right: 0.85rem;
-    color: var(--color-brand-700);
-    font-size: 1.1rem;
-    content: "+";
-  }
-
-  .travel-mobile-destination[open] summary::after {
-    content: "\2212";
-  }
-
-  .travel-mobile-destination summary strong,
-  .travel-mobile-destination summary small {
-    display: block;
-    min-width: 0;
-  }
-
-  .travel-mobile-destination summary strong {
-    color: var(--color-ink-900);
-    font-size: 0.88rem;
-    line-height: 1.25;
-    text-align: left;
-  }
-
-  .travel-mobile-destination summary small {
-    color: var(--color-ink-500);
-    font-size: 0.72rem;
-    text-align: right;
-  }
-
-  .travel-mobile-destination__links {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    padding: 0 0.8rem 0.8rem;
-    border-top: 1px solid var(--color-border-soft);
+    width: 100%;
+    height: auto;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem;
+    border: 1px solid #24464b;
+    border-radius: var(--radius-compact);
+    background: linear-gradient(145deg, #071315 0%, #0a1b1f 60%, #0e2427 100%);
+    box-shadow: 0 0.45rem 1.1rem rgba(0, 0, 0, 0.28);
+    cursor: pointer;
+    font-weight: normal;
+    letter-spacing: normal;
+    line-height: 1.4;
+    text-align: left;
+    text-transform: none;
+    white-space: normal;
   }
 
-  .travel-mobile-destination__links a {
-    display: inline-flex;
-    min-height: 2.35rem;
-    align-items: center;
-    margin-top: 0.65rem;
-    padding: 0.45rem 0.65rem;
-    border: 1px solid var(--color-brand-border);
-    border-radius: 999px;
-    background: var(--color-brand-faint);
-    color: var(--color-brand-700);
-    font-size: 0.76rem;
-    font-weight: 700;
+  .travel-map-teaser__media {
+    display: block;
+    flex: 0 0 7.2rem;
+    aspect-ratio: 1200 / 624;
+    border: 1px solid rgba(152, 201, 198, 0.24);
+    border-radius: 0.45rem;
+    background-image: url("../../images/travel/world-map.svg");
+    background-position: center;
+    background-size: cover;
+  }
+
+  .travel-map-teaser__copy {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-family: var(--font-display);
+  }
+
+  .travel-map-teaser__copy strong {
+    display: block;
+    color: #fff;
+    font-size: 0.92rem;
+    line-height: 1.3;
+  }
+
+  .travel-map-teaser__copy small {
+    display: block;
+    margin-top: 0.25rem;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.62rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .travel-map-teaser__arrow {
+    flex: 0 0 auto;
+    color: #28d7c5;
+    font-size: 1.15rem;
   }
 
   .travel-map {
