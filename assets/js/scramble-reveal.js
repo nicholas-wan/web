@@ -174,10 +174,15 @@
   }
 
   /* On the experience page the reveal belongs to its dark case-study card,
-     so it waits for the reader to reach the card's top edge. The homepage
-     hero has no card and keeps observing the list at the 0.6 threshold. */
+     and it waits until the reader has scrolled the card to the top of the
+     screen: the -70% bottom rootMargin keeps only the top 30% of the
+     viewport as the trigger zone, so the card's company header is near the
+     viewport top when the animation starts. The homepage hero has no card
+     and keeps observing the list at the 0.6 threshold. */
   var trigger = list.closest(".case-study") || list;
-  var threshold = trigger === list ? VIEW_THRESHOLD : 0;
+  var observerOptions = trigger === list
+    ? { threshold: VIEW_THRESHOLD }
+    : { threshold: 0, rootMargin: "0px 0px -70% 0px" };
 
   if (!("IntersectionObserver" in window)) {
     finishImmediately();
@@ -188,7 +193,7 @@
         observer.disconnect();
         play();
       });
-    }, { threshold: threshold });
+    }, observerOptions);
 
     observer.observe(trigger);
   }
