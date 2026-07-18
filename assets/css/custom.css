@@ -5772,20 +5772,13 @@ a:focus-visible {
   }
 }
 
-.personal-event-card__image--contain img {
-  padding: 0.75rem;
-  object-fit: contain;
-}
-
 .personal-event-card:hover .personal-event-card__image img,
 .personal-event-card:focus-visible .personal-event-card__image img {
   transform: scale(1.035);
 }
 
-.personal-event-card__image--contain img,
-.personal-event-card:hover .personal-event-card__image--contain img,
-.personal-event-card:focus-visible .personal-event-card__image--contain img {
-  transform: none;
+.personal-event-card--gallery-only {
+  cursor: default;
 }
 
 .personal-event-card__body {
@@ -6070,14 +6063,6 @@ body.page-home #nav {
 
   .personal-event-card__image img {
     min-height: 0;
-  }
-
-  /* The wide Brawl Stars artwork needs contain in the narrow desktop tile, but
-     this tile is 16/9 -- close enough to the art's own 1.97 that cover trims
-     only the outer 5% per side and the card reads full-bleed like the rest. */
-  .personal-event-card__image--contain img {
-    padding: 0;
-    object-fit: cover;
   }
 
   .personal-event-card--static .personal-event-card__image img {
