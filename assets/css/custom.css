@@ -5018,7 +5018,6 @@ a:focus-visible {
 
 .case-study__expand-hook {
   margin: 0 0 1rem;
-  max-width: 42rem;
   font-size: 1rem;
   line-height: 1.65;
 }
@@ -5038,17 +5037,15 @@ a:focus-visible {
 }
 
 .case-study__pipeline text {
-  font-family: var(--font-typewriter);
+  font-family: var(--font-display);
   font-size: 12px;
 }
 
 .case-study__pipeline .pipeline-label--analyst { font-weight: 700; }
 .case-study__pipeline .pipeline-label--analyst-sub { font-size: 10px; }
-.case-study__pipeline .pipeline-caption { font-size: 10px; }
 
 .case-study__expand-body ul {
   margin: 0 0 0.85rem;
-  max-width: 42rem;
   padding-left: 1.15rem;
   font-size: 0.95rem;
   line-height: 1.65;
@@ -5100,9 +5097,10 @@ a:focus-visible {
 
 .page-experience #agentic-ai .pipeline-flow { stroke: rgba(40, 215, 197, 0.45); stroke-width: 1.5; }
 .page-experience #agentic-ai .case-study__pipeline text { fill: #8fd8d0; }
-.page-experience #agentic-ai .pipeline-label--analyst { fill: #071315; }
-.page-experience #agentic-ai .pipeline-label--analyst-sub { fill: rgba(7, 19, 21, 0.72); }
-.page-experience #agentic-ai .pipeline-caption { fill: #9db4b3; }
+/* One class deeper than the generic text rule above, or its fill loses on
+   specificity and the analyst labels vanish into the solid teal node. */
+.page-experience #agentic-ai .case-study__pipeline .pipeline-label--analyst { fill: #071315; }
+.page-experience #agentic-ai .case-study__pipeline .pipeline-label--analyst-sub { fill: rgba(7, 19, 21, 0.72); }
 
 .page-experience #agentic-ai .case-study__expand-body ul { color: #f4f2ea; }
 .page-experience #agentic-ai .case-study__expand-body ul li::marker { color: #28d7c5; }
