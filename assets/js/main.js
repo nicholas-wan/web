@@ -150,6 +150,23 @@
 				else
 					$navPanelToggle.addClass('alt');
 
+			// The floating pill covers content at reading position, so step it
+			// away on downward scroll and restore it on any upward intent (or
+			// near the top). Only the wrapper-level pill scrolls away: the
+			// mobile context bar and the travel sticky nav re-home the toggle
+			// as a static control, so those parents opt out via the guard.
+				var toggleScrollY = $window.scrollTop();
+				$window.on('scroll', function() {
+					if ($navPanelToggle.parent().get(0) !== $wrapper.get(0)) return;
+					var y = $window.scrollTop();
+					if (Math.abs(y - toggleScrollY) < 8) return;
+					if (y > toggleScrollY && y > 160 && !$body.hasClass('is-navPanel-visible'))
+						$navPanelToggle.addClass('is-scrolled-away');
+					else
+						$navPanelToggle.removeClass('is-scrolled-away');
+					toggleScrollY = y;
+				});
+
 		// Panel.
 			$navPanel = $(
 				'<div id="navPanel" role="dialog" aria-modal="true" aria-label="Site navigation" aria-hidden="true">' +

@@ -687,7 +687,7 @@ foreach ($page in $pages) {
 $shareImageMeta
     <link rel="stylesheet" href="assets/css/main.css?v=2" />
 $fontAwesomeStylesheet
-    <link rel="stylesheet" href="assets/css/custom.css?v=121" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=122" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
@@ -719,7 +719,7 @@ $navigation
     <script src="assets/js/browser.min.js"></script>
     <script src="assets/js/breakpoints.min.js"></script>
     <script src="assets/js/util.js"></script>
-    <script src="assets/js/main.js?v=14"></script>
+    <script src="assets/js/main.js?v=15"></script>
     <script src="assets/js/arrow.js?v=1"></script>
     <script src="assets/js/game.js?v=16"></script>
 $optionalScripts

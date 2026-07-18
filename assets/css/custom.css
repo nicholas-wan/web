@@ -3787,6 +3787,28 @@ body {
     font-size: 1rem;
   }
 
+  /* The floating pill otherwise sits over card text at reading position.
+     main.js steps it away on downward scroll and restores it on upward
+     intent; keyboard focus and the open sheet always bring it back. Scoped
+     to the wrapper-level pill: context bars and the travel sticky nav
+     re-home the toggle as a static, always-visible control. */
+  #wrapper > #navPanelToggle {
+    transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  #wrapper > #navPanelToggle.is-scrolled-away {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-0.75rem);
+  }
+
+  #wrapper > #navPanelToggle.is-scrolled-away:focus-visible,
+  body.is-navPanel-visible #wrapper > #navPanelToggle.is-scrolled-away {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
   body::before {
     position: fixed;
     inset: 0;
@@ -3937,6 +3959,14 @@ body {
     border-color: var(--color-brand-600);
     background: var(--color-brand-faint);
     color: var(--color-brand-700);
+  }
+}
+
+/* Reduced motion keeps the scroll-away pill but swaps the slide for an
+   instant show/hide. Must follow the 980px block so it wins the tie. */
+@media screen and (max-width: 980px) and (prefers-reduced-motion: reduce) {
+  #wrapper > #navPanelToggle {
+    transition: none;
   }
 }
 
@@ -4969,10 +4999,11 @@ a:focus-visible {
   transition: color 300ms ease-out;
 }
 
-/* #agentic-ai is a dark card where the brand accent renders as #28d7c5
-   (matching the card's own labels); --color-brand-600 fails contrast there. */
+/* The outcome resolves into the same amber as its timeline dot, so the row
+   lands as one accent gesture instead of amber-dot-plus-teal-text.
+   #ffb869 clears AA on the #071315 card; --color-brand-600 does not. */
 .page-experience #agentic-ai .case-study__highlights.is-complete [data-scramble-row] {
-  color: #28d7c5;
+  color: #ffb869;
 }
 
 /* "How I led it" writeup. Structure is generic; the colour rules are scoped
@@ -4993,9 +5024,11 @@ a:focus-visible {
   text-transform: uppercase;
 }
 
+/* Merriweather ships at 300 and 700 only, so the longest text block on the
+   page cannot take a 400 weight; size and ink carry its presence instead. */
 .case-study__writeup-body {
   margin: 0 0 0.55rem;
-  font-size: 0.95rem;
+  font-size: 1rem;
   line-height: 1.75;
   text-align: left;
 }
@@ -5014,7 +5047,7 @@ a:focus-visible {
 }
 
 .page-experience #agentic-ai .case-study__writeup-label { color: #28d7c5; }
-.page-experience #agentic-ai .case-study__writeup-body { color: #9db4b3; }
+.page-experience #agentic-ai .case-study__writeup-body { color: #a9bfbe; }
 
 .page-experience #agentic-ai .case-study__writeup-body strong {
   color: #f4f2ea;
@@ -5184,10 +5217,18 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  /* Single-column card: the rail no longer stretches beside three grid
+     rows, so drop the desktop stretch spacing (7rem rows, deep top pad)
+     and let each stop size to its one-line content. */
   .page-experience #agentic-ai .case-study__highlights {
     grid-column: 1;
     grid-row: auto;
     margin-top: 1.4rem;
+    padding-top: 0.5rem;
+  }
+
+  .page-experience #agentic-ai .case-study__highlights li {
+    min-height: 0;
   }
 
   .page-experience #cloud-analytics .case-study__tags {
