@@ -5602,15 +5602,6 @@ a:focus-visible {
   opacity: 1;
 }
 
-/* One second per photo across a five-image rotation. The delays sit outside the
-   gated blocks below and the animation is set with longhands, never the
-   shorthand -- `animation:` would reset animation-delay to 0 and collapse the
-   whole stagger onto one frame. */
-.personal-event-card__image--slideshow img:nth-child(2) { animation-delay: 1s; }
-.personal-event-card__image--slideshow img:nth-child(3) { animation-delay: 2s; }
-.personal-event-card__image--slideshow img:nth-child(4) { animation-delay: 3s; }
-.personal-event-card__image--slideshow img:nth-child(5) { animation-delay: 4s; }
-
 @media (hover: hover) and (pointer: fine) {
   .personal-event-card:hover .personal-event-card__image--slideshow img,
   .personal-event-card:focus-visible .personal-event-card__image--slideshow img {
@@ -5619,17 +5610,30 @@ a:focus-visible {
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
   }
+
+  .personal-event-card__image--slideshow img:nth-child(2) { animation-delay: 1s; }
+  .personal-event-card__image--slideshow img:nth-child(3) { animation-delay: 2s; }
+  .personal-event-card__image--slideshow img:nth-child(4) { animation-delay: 3s; }
+  .personal-event-card__image--slideshow img:nth-child(5) { animation-delay: 4s; }
 }
 
 /* Touch devices have no hover to trigger the rotation, so it plays on its own --
-   otherwise phones only ever see the first photo of five. */
+   otherwise phones only ever see the first photo of five. A four-second slot
+   gives each image time to register without making the desktop hover preview
+   feel sluggish. Keep the delays as longhands: the animation shorthand would
+   reset the stagger and collapse every image onto the same frame. */
 @media (hover: none) {
   .personal-event-card__image--slideshow img {
     animation-name: personal-card-slideshow;
-    animation-duration: 5s;
+    animation-duration: 20s;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
   }
+
+  .personal-event-card__image--slideshow img:nth-child(2) { animation-delay: 4s; }
+  .personal-event-card__image--slideshow img:nth-child(3) { animation-delay: 8s; }
+  .personal-event-card__image--slideshow img:nth-child(4) { animation-delay: 12s; }
+  .personal-event-card__image--slideshow img:nth-child(5) { animation-delay: 16s; }
 }
 
 @keyframes personal-card-slideshow {

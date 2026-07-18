@@ -686,7 +686,7 @@ foreach ($page in $pages) {
 $shareImageMeta
     <link rel="stylesheet" href="assets/css/main.css?v=2" />
 $fontAwesomeStylesheet
-    <link rel="stylesheet" href="assets/css/custom.css?v=133" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=134" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
