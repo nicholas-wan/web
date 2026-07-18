@@ -654,7 +654,7 @@ foreach ($page in $pages) {
     $travelNavScript = if ($tripOrder -contains $slug) { '<script src="assets/js/travel-nav.js?v=12"></script>' } else { "" }
     $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=8"></script>' } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=10"></script>' } else { "" }
-    $scrambleRevealScript = if ($slug -in @('index', 'experience')) { '<script src="assets/js/scramble-reveal.js?v=9"></script>' } else { "" }
+    $scrambleRevealScript = if ($slug -in @('index', 'experience')) { '<script src="assets/js/scramble-reveal.js?v=10"></script>' } else { "" }
     $instagramEmbedScript = if ($slug -eq 'personal') { '<script async src="https://www.instagram.com/embed.js"></script>' } else { "" }
     $optionalScripts = (@($galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript, $instagramEmbedScript) | Where-Object { $_ }) -join "`n    "
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
@@ -687,7 +687,7 @@ foreach ($page in $pages) {
 $shareImageMeta
     <link rel="stylesheet" href="assets/css/main.css?v=2" />
 $fontAwesomeStylesheet
-    <link rel="stylesheet" href="assets/css/custom.css?v=128" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=129" />
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />

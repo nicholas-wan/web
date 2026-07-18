@@ -25,7 +25,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
   - Headline: `I build agents that plan threat hunts in hours, not days.`
   - Support: `Product direction · DSTA`
 - The headline is owner-approved product copy. Propose copy changes instead of silently rewriting it. Do not restore the rejected multi-line paragraph hero or a skills list in the hero.
-- The site has exactly two scramble effects: the homepage headline and the Threat Hunting outcome on the experience page. Both use `assets/js/scramble-reveal.js`; do not add a third or remove either as incidental cleanup.
+- The site has exactly three scramble effects: the homepage headline and both Outcome rows on the experience page. All use `assets/js/scramble-reveal.js`; do not add another or remove one as incidental cleanup.
 - Preserve the scramble’s current constraints: it plays once, finishes in about 1.2 seconds, keeps opening words readable from the first frame, renders full-length width-matched noise to avoid reflow, and leaves real text in the DOM. Reduced motion skips the effect.
 - The theme’s load fade can cover the hero. Preserve the homepage intro stacking fix when changing hero layers or entrance effects.
 - On mobile, the About photo remains low and bottom-anchored because `game.js` derives swipe progress from its settled position. Desktop centers the About cluster. Do not normalize those layouts into one shared vertical alignment.

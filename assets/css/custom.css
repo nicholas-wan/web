@@ -4947,6 +4947,7 @@ a:focus-visible {
   border-radius: 50%;
   background: #28d7c5;
   box-shadow: 0 0 0 0.35rem #071315;
+  transition: background-color 300ms ease-out;
   content: "";
 }
 
@@ -4964,7 +4965,7 @@ a:focus-visible {
   content: "";
 }
 
-.page-experience #agentic-ai .case-study__highlights li:last-child::before {
+.page-experience #agentic-ai .case-study__highlights.is-complete li:last-child::before {
   background: #ffb869;
 }
 
@@ -4982,12 +4983,13 @@ a:focus-visible {
   color: #b8f2eb;
 }
 
-/* The Threat Hunting outcome resolves once from noise into the accent —
-   performing the raw-context-to-signal move the copy claims. The real text
+/* Both experience outcomes resolve once from noise into their card accents.
+   The real text
    ships in the DOM and keeps the layout; scramble-reveal.js paints only an
    aria-hidden layer above it, so the copy is visible before enhancement,
    without JS, and under reduced motion. */
-.page-experience #agentic-ai .case-study__highlights [data-scramble-row] {
+.page-experience #agentic-ai .case-study__highlights [data-scramble-row],
+.page-experience #cloud-analytics .case-study__highlights [data-scramble-row] {
   position: relative;
   transition: color 300ms ease-out;
 }
@@ -5079,6 +5081,7 @@ a:focus-visible {
   border-radius: 50%;
   background: #11807d;
   box-shadow: 0 0 0 0.25rem #ffffff;
+  transition: background-color 300ms ease-out;
 }
 
 .page-experience #cloud-analytics .case-study__highlights li:not(:last-child)::after {
@@ -5091,13 +5094,13 @@ a:focus-visible {
   background: #d7e4e2;
 }
 
-/* Amber marks the Outcome, echoing the hero rail; #a05e12 clears AA on the
-   white card where the hero's #ffb869 cannot. */
-.page-experience #cloud-analytics .case-study__highlights li:last-child::before {
+/* Amber marks the completed Outcome, echoing the hero rail; #a05e12 clears
+   AA on the white card where the hero's #ffb869 cannot. */
+.page-experience #cloud-analytics .case-study__highlights.is-complete li:last-child::before {
   background: #e8963f;
 }
 
-.page-experience #cloud-analytics .case-study__highlights li:last-child strong {
+.page-experience #cloud-analytics .case-study__highlights.is-complete [data-scramble-row] {
   color: #a05e12;
 }
 

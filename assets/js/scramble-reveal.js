@@ -1,12 +1,14 @@
 (function () {
   "use strict";
 
-  var list = document.querySelector("[data-scramble-list]");
-  if (!list) return;
+  var lists = Array.from(document.querySelectorAll("[data-scramble-list]"));
+  if (!lists.length) return;
 
   var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   if (reducedMotion.matches) {
-    list.classList.add("is-complete");
+    lists.forEach(function (list) {
+      list.classList.add("is-complete");
+    });
     return;
   }
 
@@ -20,9 +22,6 @@
   var TARGET_DURATION_MS = 1200;
   var ROW_STAGGER_MS = 100;
   var VIEW_THRESHOLD = 0.6;
-  var activeTimers = new Set();
-  var completedRows = 0;
-  var hasPlayed = false;
 
   var segmenter = typeof Intl !== "undefined" && Intl.Segmenter
     ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
@@ -66,10 +65,8 @@
     return character;
   }
 
-  /* Every frame is FULL LENGTH: unresolved characters render as noise, not
-     blanks. Blank tails collapse at line ends, which makes centered wrapped
-     text re-measure and shift every tick; full-length, width-matched frames
-     keep the same word widths so line breaks and centering stay stable. */
+  /* Every frame is full length: unresolved characters render as noise, not
+     blanks. This keeps centered wrapped text from re-measuring and shifting. */
   function renderFrame(characters, resolvedCount) {
     return characters.map(function (character, index) {
       if (index < resolvedCount) return character;
@@ -77,136 +74,144 @@
     }).join("");
   }
 
-  function clearTimers() {
-    activeTimers.forEach(function (timer) {
-      clearTimeout(timer);
-      clearInterval(timer);
-    });
-    activeTimers.clear();
-  }
+  function initialiseList(list) {
+    var activeTimers = new Set();
+    var completedRows = 0;
+    var hasPlayed = false;
+    var observer = null;
 
-  var items = Array.from(list.querySelectorAll("[data-scramble-row]")).map(function (row, index) {
-    var source = row.querySelector("[data-scramble-source]");
-    var text = source.textContent.trim();
-    var characters = splitText(text);
-    var lead = leadOffset(characters, parseInt(row.getAttribute("data-scramble-lead"), 10) || 0);
-    var visual = document.createElement("span");
-
-    visual.className = "scramble-reveal__visual";
-    visual.setAttribute("aria-hidden", "true");
-    visual.textContent = text;
-    source.insertAdjacentElement("afterend", visual);
-    row.style.setProperty("--scramble-delay", (index * ROW_STAGGER_MS) + "ms");
-
-    return {
-      text: text,
-      characters: characters,
-      lead: lead,
-      visual: visual
-    };
-  });
-
-  list.classList.add("is-enhanced");
-
-  function markRowComplete(item, interval) {
-    clearInterval(interval);
-    activeTimers.delete(interval);
-    item.visual.textContent = item.text;
-    completedRows += 1;
-
-    if (completedRows === items.length) {
-      list.classList.add("is-complete");
+    function clearTimers() {
+      activeTimers.forEach(function (timer) {
+        clearTimeout(timer);
+        clearInterval(timer);
+      });
+      activeTimers.clear();
     }
-  }
 
-  function animateRow(item) {
-    var resolvedCount = item.lead;
-    // Resolve enough characters per tick that the reveal finishes in about
-    // TARGET_DURATION_MS however long the copy is. The lead words are already
-    // resolved, so the step scales to what is actually left to reveal.
-    var step = Math.max(1, Math.ceil((item.characters.length - item.lead) / (TARGET_DURATION_MS / TICK_MS)));
+    var items = Array.from(list.querySelectorAll("[data-scramble-row]")).map(function (row, index) {
+      var source = row.querySelector("[data-scramble-source]");
+      var text = source.textContent.trim();
+      var characters = splitText(text);
+      var lead = leadOffset(characters, parseInt(row.getAttribute("data-scramble-lead"), 10) || 0);
+      var visual = document.createElement("span");
 
-    item.visual.textContent = renderFrame(item.characters, resolvedCount);
+      visual.className = "scramble-reveal__visual";
+      visual.setAttribute("aria-hidden", "true");
+      visual.textContent = text;
+      source.insertAdjacentElement("afterend", visual);
+      row.style.setProperty("--scramble-delay", (index * ROW_STAGGER_MS) + "ms");
 
-    var interval = setInterval(function () {
-      resolvedCount += step;
-      while (resolvedCount < item.characters.length && isWhitespace(item.characters[resolvedCount])) {
-        resolvedCount += 1;
+      return {
+        text: text,
+        characters: characters,
+        lead: lead,
+        visual: visual
+      };
+    });
+
+    list.classList.add("is-enhanced");
+
+    function markRowComplete(item, interval) {
+      clearInterval(interval);
+      activeTimers.delete(interval);
+      item.visual.textContent = item.text;
+      completedRows += 1;
+
+      if (completedRows === items.length) {
+        list.classList.add("is-complete");
       }
+    }
+
+    function animateRow(item) {
+      var resolvedCount = item.lead;
+      // Scale the resolve step so copy length does not extend the duration.
+      var step = Math.max(1, Math.ceil((item.characters.length - item.lead) / (TARGET_DURATION_MS / TICK_MS)));
 
       item.visual.textContent = renderFrame(item.characters, resolvedCount);
 
-      if (resolvedCount >= item.characters.length) {
-        markRowComplete(item, interval);
-      }
-    }, TICK_MS);
+      var interval = setInterval(function () {
+        resolvedCount += step;
+        while (resolvedCount < item.characters.length && isWhitespace(item.characters[resolvedCount])) {
+          resolvedCount += 1;
+        }
 
-    activeTimers.add(interval);
-  }
+        item.visual.textContent = renderFrame(item.characters, resolvedCount);
 
-  function scheduleRow(item, delay) {
-    var timeout = setTimeout(function () {
-      activeTimers.delete(timeout);
-      animateRow(item);
-    }, delay);
+        if (resolvedCount >= item.characters.length) {
+          markRowComplete(item, interval);
+        }
+      }, TICK_MS);
 
-    activeTimers.add(timeout);
-  }
+      activeTimers.add(interval);
+    }
 
-  function finishImmediately() {
-    clearTimers();
-    items.forEach(function (item) {
-      item.visual.textContent = item.text;
-    });
-    list.classList.add("is-complete");
-  }
+    function scheduleRow(item, delay) {
+      var timeout = setTimeout(function () {
+        activeTimers.delete(timeout);
+        animateRow(item);
+      }, delay);
 
-  function play() {
-    if (hasPlayed) return;
-    hasPlayed = true;
+      activeTimers.add(timeout);
+    }
 
-    items.forEach(function (item, index) {
-      item.visual.textContent = renderFrame(item.characters, item.lead);
-      scheduleRow(item, index * ROW_STAGGER_MS);
-    });
-
-    list.classList.add("is-running");
-  }
-
-  /* On the experience page the reveal belongs to its dark case-study card,
-     and it waits until the reader has scrolled the card to the top of the
-     screen: the -70% bottom rootMargin keeps only the top 30% of the
-     viewport as the trigger zone, so the card's company header is near the
-     viewport top when the animation starts. The homepage hero has no card
-     and keeps observing the list at the 0.6 threshold. */
-  var trigger = list.closest(".case-study") || list;
-  var observerOptions = trigger === list
-    ? { threshold: VIEW_THRESHOLD }
-    : { threshold: 0, rootMargin: "0px 0px -70% 0px" };
-
-  if (!("IntersectionObserver" in window)) {
-    finishImmediately();
-  } else {
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting || hasPlayed) return;
-        observer.disconnect();
-        play();
+    function finishImmediately() {
+      clearTimers();
+      hasPlayed = true;
+      if (observer) observer.disconnect();
+      items.forEach(function (item) {
+        item.visual.textContent = item.text;
       });
-    }, observerOptions);
+      list.classList.add("is-complete");
+    }
 
-    observer.observe(trigger);
+    function play() {
+      if (hasPlayed) return;
+      hasPlayed = true;
+
+      items.forEach(function (item, index) {
+        item.visual.textContent = renderFrame(item.characters, item.lead);
+        scheduleRow(item, index * ROW_STAGGER_MS);
+      });
+
+      list.classList.add("is-running");
+    }
+
+    /* Experience reveals use their own case-study card as the trigger and
+       wait until that card reaches the top 30% of the viewport. The homepage
+       hero has no card and observes its list at the 0.6 threshold. */
+    var trigger = list.closest(".case-study") || list;
+    var observerOptions = trigger === list
+      ? { threshold: VIEW_THRESHOLD }
+      : { threshold: 0, rootMargin: "0px 0px -70% 0px" };
+
+    if (!("IntersectionObserver" in window)) {
+      finishImmediately();
+    } else {
+      observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting || hasPlayed) return;
+          observer.disconnect();
+          play();
+        });
+      }, observerOptions);
+
+      observer.observe(trigger);
+    }
+
+    return {
+      clearTimers: clearTimers,
+      finishImmediately: finishImmediately,
+      hasPlayed: function () { return hasPlayed; }
+    };
   }
+
+  var contexts = lists.map(initialiseList);
 
   function handleMotionChange(event) {
-    if (event.matches) {
-      if (hasPlayed) {
-        finishImmediately();
-      } else if (observer) {
-        observer.disconnect();
-        finishImmediately();
-      }
-    }
+    if (!event.matches) return;
+    contexts.forEach(function (context) {
+      context.finishImmediately();
+    });
   }
 
   if (reducedMotion.addEventListener) {
@@ -216,7 +221,15 @@
   }
 
   document.addEventListener("visibilitychange", function () {
-    if (document.hidden && hasPlayed) finishImmediately();
+    if (!document.hidden) return;
+    contexts.forEach(function (context) {
+      if (context.hasPlayed()) context.finishImmediately();
+    });
   });
-  window.addEventListener("pagehide", clearTimers);
+
+  window.addEventListener("pagehide", function () {
+    contexts.forEach(function (context) {
+      context.clearTimers();
+    });
+  });
 })();
