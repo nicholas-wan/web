@@ -4883,6 +4883,10 @@ a:focus-visible {
 
 .page-experience #agentic-ai {
   display: grid;
+  /* Company and header rows stay content-sized so the timeline's top padding
+     can align its first stop with the title; the writeup row absorbs any
+     slack the taller rail creates. */
+  grid-template-rows: auto auto 1fr auto auto;
   grid-template-columns: minmax(0, 1.15fr) minmax(19rem, 0.85fr);
   column-gap: clamp(2rem, 5vw, 5rem);
   padding: clamp(2rem, 4vw, 3rem);
@@ -4895,8 +4899,7 @@ a:focus-visible {
 }
 
 .page-experience #agentic-ai .case-study__company,
-.page-experience #agentic-ai header,
-.page-experience #agentic-ai .case-study__tags {
+.page-experience #agentic-ai header {
   grid-column: 1;
 }
 
@@ -4920,6 +4923,9 @@ a:focus-visible {
   font-family: var(--font-typewriter);
 }
 
+/* 5.2rem top padding starts the first PROBLEM stop level with the title
+   band, so both columns begin on the same line and the company header
+   reads as a crown across the card. */
 .page-experience #agentic-ai .case-study__highlights {
   position: relative;
   grid-column: 2;
@@ -4928,7 +4934,7 @@ a:focus-visible {
   align-self: stretch;
   gap: 0;
   margin: 0;
-  padding: 2.25rem 0 0 2.25rem;
+  padding: 5.2rem 0 0 2.25rem;
 }
 
 .page-experience #agentic-ai .case-study__highlights li {
@@ -4972,9 +4978,17 @@ a:focus-visible {
   background: #ffb869;
 }
 
+/* Tags span both columns as a base strip (closing the corner under the
+   timeline), and the defence note sits under them as the card's last line. */
 .page-experience #agentic-ai .case-study__tags {
+  grid-column: 1 / -1;
   align-self: end;
   margin-top: 1.2rem;
+}
+
+.page-experience #agentic-ai .case-study__writeup-note {
+  grid-column: 1 / -1;
+  margin-top: 0.9rem;
 }
 
 .page-experience #agentic-ai .case-study__tags li {
@@ -5196,6 +5210,12 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  /* Single column has six auto rows; the desktop row template would hand
+     the 1fr slack to the timeline instead of the writeup. */
+  .page-experience #agentic-ai {
+    grid-template-rows: none;
+  }
+
   /* Single-column card: the rail no longer stretches beside three grid
      rows, so drop the desktop stretch spacing (7rem rows, deep top pad)
      and let each stop size to its one-line content. */
@@ -5208,6 +5228,13 @@ a:focus-visible {
 
   .page-experience #agentic-ai .case-study__highlights li {
     min-height: 0;
+  }
+
+  /* Single column loses the desktop rail's stretch, which had supplied the
+     air before the writeup; without this the paragraph starts at the card's
+     tightest seam, right against the Outcome row. */
+  .page-experience #agentic-ai .case-study__writeup {
+    margin-top: 0.75rem;
   }
 
   .page-experience #cloud-analytics .case-study__tags {
