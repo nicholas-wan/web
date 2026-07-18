@@ -177,13 +177,12 @@
       list.classList.add("is-running");
     }
 
-    /* Experience reveals use their own case-study card as the trigger and
-       wait until that card reaches the top 30% of the viewport. The homepage
-       hero has no card and observes its list at the 0.6 threshold. */
-    var trigger = list.closest(".case-study") || list;
-    var observerOptions = trigger === list
-      ? { threshold: VIEW_THRESHOLD }
-      : { threshold: 0, rootMargin: "0px 0px -70% 0px" };
+    /* Observe the text that will actually change. On experience cards this
+       avoids tying the reveal to the card's top edge when the Outcome row is
+       already visible. The homepage continues to observe its one-row list. */
+    var card = list.closest(".case-study");
+    var trigger = card ? list.querySelector("[data-scramble-row]") : list;
+    var observerOptions = { threshold: VIEW_THRESHOLD };
 
     function observeTrigger() {
       if (hasPlayed) return;
@@ -209,7 +208,7 @@
 
     if (!("IntersectionObserver" in window)) {
       finishImmediately();
-    } else if (trigger === list) {
+    } else if (!card) {
       observeTrigger();
     } else if (document.readyState === "complete") {
       observeAfterPageReveal();
