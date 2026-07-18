@@ -9,12 +9,7 @@
   var galleryEvents = events.filter(function (event) {
     return event.querySelector('.personal-event-card__image--slideshow');
   });
-  var storyButtons = Array.prototype.slice.call(timeline.querySelectorAll('[data-story-open]'));
-  var dialog = document.querySelector('[data-story-dialog]');
-  var stories = dialog ? Array.prototype.slice.call(dialog.querySelectorAll('[data-story]')) : [];
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  var activeStory = null;
-  var storyOpener = null;
   var scrollFrame = null;
 
   timeline.classList.add('is-enhanced');
@@ -69,78 +64,6 @@
   function requestProgressUpdate() {
     if (scrollFrame !== null) return;
     scrollFrame = window.requestAnimationFrame(updateTimelineProgress);
-  }
-
-  function openStory(storyId) {
-    if (!dialog) return;
-
-    activeStory = stories.find(function (story) {
-      return story.getAttribute('data-story') === storyId;
-    }) || null;
-    if (!activeStory) return;
-
-    stories.forEach(function (story) {
-      story.classList.toggle('is-active', story === activeStory);
-    });
-    dialog.classList.toggle('personal-story-dialog--orientation', storyId === 'orientation');
-
-    if (typeof dialog.showModal === 'function') {
-      if (!dialog.open) dialog.showModal();
-    } else {
-      dialog.setAttribute('open', '');
-    }
-
-    document.documentElement.classList.add('personal-story-is-open');
-    document.body.classList.add('personal-story-is-open');
-    window.setTimeout(function () {
-      var closeButton = dialog.querySelector('[data-story-close]');
-      if (closeButton) closeButton.focus();
-    }, 0);
-  }
-
-  function restoreStoryFocus() {
-    if (storyOpener && document.contains(storyOpener)) storyOpener.focus();
-    storyOpener = null;
-  }
-
-  function closeStory() {
-    document.documentElement.classList.remove('personal-story-is-open');
-    document.body.classList.remove('personal-story-is-open');
-
-    if (dialog && dialog.open) {
-      if (typeof dialog.close === 'function') dialog.close();
-      else {
-        dialog.removeAttribute('open');
-        restoreStoryFocus();
-      }
-    }
-  }
-
-  storyButtons.forEach(function (button) {
-    button.addEventListener('click', function () {
-      storyOpener = button;
-      openStory(button.getAttribute('data-story-open'));
-    });
-  });
-
-  if (dialog) {
-    dialog.addEventListener('click', function (event) {
-      var closeButton = event.target.closest('[data-story-close]');
-
-      if (closeButton || event.target === dialog) closeStory();
-    });
-
-    dialog.addEventListener('keydown', function (event) {
-      if (event.key !== 'Escape') return;
-      event.preventDefault();
-      closeStory();
-    });
-
-    dialog.addEventListener('close', function () {
-      document.documentElement.classList.remove('personal-story-is-open');
-      document.body.classList.remove('personal-story-is-open');
-      restoreStoryFocus();
-    });
   }
 
   window.addEventListener('scroll', requestProgressUpdate, { passive: true });
