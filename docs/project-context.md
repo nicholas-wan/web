@@ -44,7 +44,8 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 - The Latte and Mocha card links directly to `@twoshotsofcuteness` with an Instagram icon. Do not restore the hover popover, mobile phone mockup, or third-party Instagram embed.
 - The orientation memory uses one centered modal containing both entries. Preserve root scroll locking, focus restoration, and proportional dialog images with an explicit `height: auto` override for generated height attributes.
 - Mobile timeline endpoints stay fully inside the viewport. Personal-page cards use larger mobile type, and the legacy floating return-to-top control remains hidden on that breakpoint so it cannot cover card content.
-- Event thumbnails are cropped per breakpoint, not globally. Desktop tiles are portrait, so the cats photo needs no focal correction there and the wide Brawl Stars artwork needs `contain`; the 16/9 mobile tile inverts both, so it anchors the cats crop near the top to keep Latte's head in frame and lets the artwork `cover` edge to edge.
+- The cats, house, and pre-wedding cards each rotate exactly five photos, one second apart. Desktop plays on hover; touch plays automatically, since there is no hover to start it. Set the animation with longhands — the `animation:` shorthand resets `animation-delay` and collapses the stagger.
+- Desktop tiles are portrait and mobile tiles are 16/9, so no single crop suits both. Each image carries its own `--focus-x`/`--focus-y`; do not reintroduce a per-class `object-position`. The Brawl Stars artwork still needs `contain` in the narrow desktop tile and `cover` on mobile.
 - Timeline events carry `data-category` for structure only. The four category accent colours were unused — shadowed by `.personal-timeline-event` since they shared its specificity — and are deliberately gone; a category legend is separately forbidden, so re-adding colour would encode something the page never decodes.
 
 ## Travel atlas contracts
