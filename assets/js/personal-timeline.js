@@ -6,6 +6,9 @@
 
   var years = timeline.querySelector('[data-timeline-years]');
   var events = Array.prototype.slice.call(timeline.querySelectorAll('[data-timeline-event]'));
+  var galleryEvents = events.filter(function (event) {
+    return event.querySelector('.personal-event-card__image--slideshow');
+  });
   var storyButtons = Array.prototype.slice.call(timeline.querySelectorAll('[data-story-open]'));
   var dialog = document.querySelector('[data-story-dialog]');
   var stories = dialog ? Array.prototype.slice.call(dialog.querySelectorAll('[data-story]')) : [];
@@ -34,6 +37,32 @@
       var reached = eventRevealPoint <= readingLine;
       event.classList.toggle('is-past', reached);
       event.classList.toggle('is-visible', reducedMotion.matches || reached);
+    });
+
+    /* On touch, animate only the gallery card nearest the reader's visual
+       focus. Other cards return to their first image instead of running three
+       synchronized slideshows elsewhere on the page. */
+    var galleryFocus = window.innerHeight * 0.55;
+    var activeGallery = null;
+    var activeGalleryDistance = Infinity;
+
+    if (!reducedMotion.matches) {
+      galleryEvents.forEach(function (event) {
+        var card = event.querySelector('.personal-event-card');
+        var cardBounds = card.getBoundingClientRect();
+        var isInReadingBand = cardBounds.bottom > window.innerHeight * 0.15 &&
+          cardBounds.top < window.innerHeight * 0.9;
+        var distance = Math.abs((cardBounds.top + cardBounds.bottom) / 2 - galleryFocus);
+
+        if (isInReadingBand && distance < activeGalleryDistance) {
+          activeGallery = event;
+          activeGalleryDistance = distance;
+        }
+      });
+    }
+
+    galleryEvents.forEach(function (event) {
+      event.classList.toggle('is-gallery-active', event === activeGallery);
     });
   }
 

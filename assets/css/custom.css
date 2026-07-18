@@ -5611,23 +5611,32 @@ a:focus-visible {
     animation-iteration-count: infinite;
   }
 
+  .personal-event-card:hover .personal-event-card__image--slideshow img:first-child,
+  .personal-event-card:focus-visible .personal-event-card__image--slideshow img:first-child {
+    animation-name: personal-card-slideshow-first;
+  }
+
   .personal-event-card__image--slideshow img:nth-child(2) { animation-delay: 1s; }
   .personal-event-card__image--slideshow img:nth-child(3) { animation-delay: 2s; }
   .personal-event-card__image--slideshow img:nth-child(4) { animation-delay: 3s; }
   .personal-event-card__image--slideshow img:nth-child(5) { animation-delay: 4s; }
 }
 
-/* Touch devices have no hover to trigger the rotation, so it plays on its own --
-   otherwise phones only ever see the first photo of five. A four-second slot
-   gives each image time to register without making the desktop hover preview
-   feel sluggish. Keep the delays as longhands: the animation shorthand would
-   reset the stagger and collapse every image onto the same frame. */
+/* Touch devices have no hover to trigger a rotation, so the gallery nearest the
+   reading focus plays on its own. A four-second slot gives each image time to
+   register without making the desktop hover preview feel sluggish. Keep the
+   delays as longhands: the animation shorthand would reset the stagger and
+   collapse every image onto the same frame. */
 @media (hover: none) {
-  .personal-event-card__image--slideshow img {
+  .personal-timeline-event.is-gallery-active .personal-event-card__image--slideshow img {
     animation-name: personal-card-slideshow;
     animation-duration: 20s;
     animation-timing-function: ease-in-out;
     animation-iteration-count: infinite;
+  }
+
+  .personal-timeline-event.is-gallery-active .personal-event-card__image--slideshow img:first-child {
+    animation-name: personal-card-slideshow-first;
   }
 
   .personal-event-card__image--slideshow img:nth-child(2) { animation-delay: 4s; }
@@ -5637,12 +5646,33 @@ a:focus-visible {
 }
 
 @keyframes personal-card-slideshow {
-  0%, 17% {
+  0% {
+    opacity: 0;
+  }
+
+  5%, 20% {
     opacity: 1;
   }
 
-  20%, 100% {
+  25%, 100% {
     opacity: 0;
+  }
+}
+
+/* The first frame starts visible, then joins the same one-second mobile
+   crossfade as the delayed frames. Its closing fade bridges the loop boundary
+   so autoplay never flashes or snaps back to the opening photo. */
+@keyframes personal-card-slideshow-first {
+  0%, 20% {
+    opacity: 1;
+  }
+
+  25%, 95% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
   }
 }
 
