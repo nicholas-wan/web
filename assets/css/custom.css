@@ -4910,14 +4910,8 @@ a:focus-visible {
   color: #f4f2ea;
 }
 
-.page-experience #agentic-ai .case-study__company-role,
-.page-experience #agentic-ai .case-study__company-meta,
-.page-experience #agentic-ai .case-study__lede {
+.page-experience #agentic-ai .case-study__company-meta {
   color: #9db4b3;
-}
-
-.page-experience #agentic-ai .case-study__lede {
-  max-width: 37rem;
 }
 
 .page-experience #agentic-ai .case-study__eyebrow,
@@ -5006,7 +5000,7 @@ a:focus-visible {
   color: #ffb869;
 }
 
-/* "How I led it" writeup. Structure is generic; the colour rules are scoped
+/* "How I built it" writeup. Structure is generic; the colour rules are scoped
    to the dark #agentic-ai card — reusing it on a light card needs its own
    palette pass first. */
 .case-study__writeup {
