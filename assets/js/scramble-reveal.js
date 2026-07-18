@@ -173,6 +173,12 @@
     list.classList.add("is-running");
   }
 
+  /* On the experience page the reveal belongs to its dark case-study card,
+     so it waits for the reader to reach the card's top edge. The homepage
+     hero has no card and keeps observing the list at the 0.6 threshold. */
+  var trigger = list.closest(".case-study") || list;
+  var threshold = trigger === list ? VIEW_THRESHOLD : 0;
+
   if (!("IntersectionObserver" in window)) {
     finishImmediately();
   } else {
@@ -182,9 +188,9 @@
         observer.disconnect();
         play();
       });
-    }, { threshold: VIEW_THRESHOLD });
+    }, { threshold: threshold });
 
-    observer.observe(list);
+    observer.observe(trigger);
   }
 
   function handleMotionChange(event) {

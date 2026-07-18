@@ -4989,11 +4989,6 @@ a:focus-visible {
   margin-top: 1.2rem;
 }
 
-.page-experience #agentic-ai .case-study__writeup-note {
-  grid-column: 1 / -1;
-  margin-top: 0.9rem;
-}
-
 .page-experience #agentic-ai .case-study__tags li {
   border: 1px solid #24464b;
   background: #0e2024;
@@ -5035,12 +5030,6 @@ a:focus-visible {
   text-align: left;
 }
 
-.case-study__writeup-note {
-  margin: 0;
-  font-size: 0.78rem;
-  font-style: italic;
-}
-
 /* Column 1 (not full width): fills the void under the lede beside the
    three-row timeline instead of waiting below it. */
 .page-experience #agentic-ai .case-study__writeup {
@@ -5049,8 +5038,6 @@ a:focus-visible {
 }
 
 .page-experience #agentic-ai .case-study__writeup-body { color: #a9bfbe; }
-
-.page-experience #agentic-ai .case-study__writeup-note { color: rgba(157, 180, 179, 0.8); }
 
 .page-experience #cloud-analytics {
   display: grid;
