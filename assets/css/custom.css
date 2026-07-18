@@ -5381,11 +5381,6 @@ a:focus-visible {
   text-align: center;
 }
 
-[data-category="service"] { --timeline-accent: #11807d; }
-[data-category="community"] { --timeline-accent: #3f78b7; }
-[data-category="build"] { --timeline-accent: #5b9a52; }
-[data-category="memory"] { --timeline-accent: #d7912f; }
-
 .personal-timeline__years {
   position: relative;
   max-width: 66rem;
@@ -6087,8 +6082,19 @@ body.page-home #nav {
     min-height: 0;
   }
 
+  /* The cats photo is portrait (960x1280) in a 16/9 tile, so most of its height
+     is cropped away. Anchor near the top: below about 8% Latte's head leaves the
+     frame and only her muzzle survives. */
   .personal-event-card__image--cats img {
-    object-position: center 32%;
+    object-position: center 5%;
+  }
+
+  /* The wide Brawl Stars artwork needs contain in the narrow desktop tile, but
+     this tile is 16/9 -- close enough to the art's own 1.97 that cover trims
+     only the outer 5% per side and the card reads full-bleed like the rest. */
+  .personal-event-card__image--contain img {
+    padding: 0;
+    object-fit: cover;
   }
 
   .personal-event-card--static .personal-event-card__image img {
