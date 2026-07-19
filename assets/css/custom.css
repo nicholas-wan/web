@@ -5673,7 +5673,13 @@ a:focus-visible {
   width: min(100%, 29.5rem) !important;
   height: auto !important;
   min-height: 0 !important;
-  grid-template-columns: 7.5rem minmax(0, 1fr);
+  /* How much of a photo survives is decided by how close the frame's shape is
+     to the photo's own, because object-fit crops away whatever does not match.
+     Six of the nine photos are 3:2, so the frame aims at that shape rather than
+     the near-square it used to be, which was costing those six a third of their
+     width. --image-col lets the two upright photos opt out. */
+  --image-col: 12.5rem;
+  grid-template-columns: var(--image-col) minmax(0, 1fr);
   align-items: stretch !important;
   padding: 0 !important;
   border: 1px solid var(--color-border) !important;
@@ -5693,7 +5699,7 @@ a:focus-visible {
   appearance: none;
   text-decoration: none;
   overflow: hidden;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.28s ease, transform 0.28s ease !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.28s ease, transform 0.28s ease, grid-template-columns 0.32s ease !important;
 }
 
 .personal-timeline-event--left .personal-event-card {
@@ -5725,6 +5731,7 @@ a:focus-visible {
   min-height: 100%;
   background: #edf2f2;
   overflow: hidden;
+  transition: min-height 0.32s ease;
 }
 
 /* Desktop tiles are portrait and mobile tiles are 16/9, so a single crop cannot
@@ -5737,7 +5744,7 @@ a:focus-visible {
   min-height: 9.75rem;
   object-fit: cover;
   object-position: var(--focus-x, 50%) var(--focus-y, 50%);
-  transition: transform 0.35s ease;
+  transition: transform 0.35s ease, min-height 0.32s ease;
 }
 
 .personal-event-card__image--slideshow {
@@ -5943,6 +5950,13 @@ a:focus-visible {
   align-items: flex-start;
   justify-content: center;
   padding: 0.85rem;
+  transition: padding-block 0.32s ease;
+}
+
+.personal-timeline.is-enhanced .personal-event-card__body > span:not(.personal-event-card__meta) {
+  max-height: var(--detail-height, none);
+  overflow: hidden;
+  transition: max-height 0.32s ease, padding-top 0.32s ease, opacity 0.22s ease;
 }
 
 .personal-event-card__meta {
@@ -5962,11 +5976,13 @@ a:focus-visible {
   font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.2;
+  transition: margin 0.32s ease;
 }
 
 .personal-event-card__body > span:not(.personal-event-card__meta):not(.personal-event-card__open) {
   color: #66767c;
-  font-weight: 300 !important;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 500 !important;
 }
 
 .personal-event-card__open {
@@ -5988,24 +6004,124 @@ a:focus-visible {
   font-size: 1rem;
 }
 
+/* Entrance offset, hover lift, and reading-focus scale share one transform so
+   a card can be lifted and scaled at once instead of the last rule winning.
+   Custom properties do not interpolate, but the composed transform does, so
+   every state change still animates. */
+.personal-timeline.is-enhanced .personal-timeline-event .personal-event-card {
+  transform: translate(var(--card-enter-x, 0px), calc(var(--card-enter-y, 0px) + var(--card-lift, 0px))) scale(var(--card-scale-x, var(--card-scale, 1)), var(--card-scale-y, var(--card-scale, 1)));
+}
+
 .personal-timeline.is-enhanced .personal-timeline-event--left .personal-event-card {
+  --card-enter-x: -1.5rem;
   opacity: 0;
-  transform: translateX(-1.5rem);
 }
 
 .personal-timeline.is-enhanced .personal-timeline-event--right .personal-event-card {
+  --card-enter-x: 1.5rem;
   opacity: 0;
-  transform: translateX(1.5rem);
 }
 
 .personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card {
+  --card-enter-x: 0px;
   opacity: 1;
-  transform: translateX(0);
 }
 
 .personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card:hover,
 .personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card:focus-visible {
-  transform: translateY(-4px);
+  --card-lift: -4px;
+}
+
+.personal-timeline.is-measuring .personal-timeline-event,
+.personal-timeline.is-measuring .personal-event-card,
+.personal-timeline.is-measuring .personal-event-card * {
+  transition: none !important;
+}
+
+/* The card nearest the reading focus leads. Scale keeps that emphasis out of
+   the layout, so growing a card can never nudge the page under the reader. */
+.personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card {
+  --card-scale-x: 1.01;
+  --card-scale-y: 1.01;
+  z-index: 3;
+  border-color: color-mix(in srgb, var(--timeline-accent) 45%, #fff) !important;
+  box-shadow: var(--shadow-card-hover) !important;
+}
+
+.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card {
+  --card-scale: 0.995;
+  opacity: 0.74;
+}
+
+@media screen and (min-width: 521px) {
+  /* The photo sets a floor on the card's height but never a ceiling, so it
+     always fills the column. Capping it instead stops the frame short of the
+     row whenever the text runs taller, leaving a band of bare card beneath the
+     picture. */
+  .personal-timeline.is-enhanced .personal-event-card__image {
+    position: relative;
+    min-height: 8.5rem;
+    max-height: none;
+  }
+
+  /* Every frame is taken out of flow so the photo fills whatever height the
+     card settles on rather than setting that height from its own aspect ratio,
+     which would leave an upright source standing a third taller than its
+     neighbours. */
+  .personal-timeline.is-enhanced .personal-event-card__image img {
+    position: absolute;
+    inset: 0;
+    min-height: 0;
+    max-height: none;
+  }
+
+  .personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__image {
+    min-height: 5.75rem;
+  }
+}
+
+/* The focused card's reveal is mostly horizontal. Growing it by height alone
+   sets a card height the three or four lines of text cannot fill, and the
+   leftover becomes an empty band beside the words — the taller the reveal, the
+   wider that band reads. Taking most of the growth in width instead enlarges
+   the picture by more than height alone did, while still leaving the card
+   taller than its neighbours. */
+@media screen and (min-width: 737px) {
+  /* The focused card grows in height, which squares its frame up again and
+     crops the 3:2 photos harder than any other state — so its width has to grow
+     further still to keep pace. */
+  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card {
+    --image-col: 17rem;
+  }
+
+  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card__image {
+    min-height: 12rem;
+  }
+
+  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card--upright {
+    --image-col: 12.5rem;
+  }
+}
+
+/* Latte & Mocha is upright and Code in the Community is square, so the wide
+   frame that suits the other seven crops these two hardest. A narrower column
+   at the same card height reads as a squarer frame, which is what they want. */
+.personal-timeline.is-enhanced .personal-event-card--upright {
+  --image-col: 9.5rem;
+}
+
+.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__body {
+  padding-block: 0.6rem;
+}
+
+.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__body > strong {
+  margin-bottom: 0;
+}
+
+.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__body > span:not(.personal-event-card__meta) {
+  max-height: 0;
+  padding-top: 0;
+  opacity: 0;
 }
 
 .personal-event-card--static {
@@ -6032,13 +6148,28 @@ a:focus-visible {
 
 
 .personal-event-card--static:hover,
-.personal-event-card--static:focus-visible,
-.personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card--static:hover,
-.personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card--static:focus-visible {
+.personal-event-card--static:focus-visible {
   z-index: 1;
   border-color: var(--color-border) !important;
   box-shadow: var(--shadow-card) !important;
   transform: none;
+}
+
+/* Cancel the hover lift through the shared variable rather than clearing the
+   whole transform, which would also drop the reading-focus scale the moment
+   the pointer crossed a card that is not a link. */
+.personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card--static:hover,
+.personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card--static:focus-visible {
+  --card-lift: 0px;
+  z-index: 1;
+}
+
+/* A focused card keeps its accent under the pointer; only unfocused ones fall
+   back to the resting border and shadow. */
+.personal-timeline.is-enhanced .personal-timeline-event.is-visible:not(.is-focus) .personal-event-card--static:hover,
+.personal-timeline.is-enhanced .personal-timeline-event.is-visible:not(.is-focus) .personal-event-card--static:focus-visible {
+  border-color: var(--color-border) !important;
+  box-shadow: var(--shadow-card) !important;
 }
 
 .personal-event-card--static:hover .personal-event-card__image img,
@@ -6168,6 +6299,7 @@ body.page-home #nav {
     padding-left: 3rem;
   }
 
+
   .personal-timeline-event::before {
     left: 1.25rem;
   }
@@ -6193,16 +6325,24 @@ body.page-home #nav {
 
   .personal-timeline.is-enhanced .personal-timeline-event--left .personal-event-card,
   .personal-timeline.is-enhanced .personal-timeline-event--right .personal-event-card {
-    transform: translateY(1rem);
+    --card-enter-x: 0px;
+    --card-enter-y: 1rem;
   }
 
   .personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card {
-    transform: translateY(0);
+    --card-enter-y: 0px;
   }
 
   .personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card:hover,
   .personal-timeline.is-enhanced .personal-timeline-event.is-visible .personal-event-card:focus-visible {
-    transform: translateY(-3px);
+    --card-lift: -3px;
+  }
+
+  /* One card fills most of a phone screen, so the emphasis has to be gentler
+     than on desktop or the focused card reads as a different component. */
+  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card {
+    --card-scale-x: 1.01;
+    --card-scale-y: 1.01;
   }
 
 }
@@ -6214,6 +6354,7 @@ body.page-home #nav {
 
   .personal-event-card__image {
     aspect-ratio: 16 / 9;
+    transition: aspect-ratio 0.32s ease;
   }
 
   .personal-event-card__image img {
@@ -6221,6 +6362,45 @@ body.page-home #nav {
   }
 
   .personal-event-card--static .personal-event-card__image img {
+    min-height: 0;
+  }
+
+  /* object-fit: cover crops rather than scales, so at a fixed card width the
+     box ratio alone decides how much of a photo survives — and any ratio the
+     sources do not share reads as zooming in. Five of the nine photos are 3:2,
+     so the open card matches them exactly and crops nothing; it also stays
+     taller than the 16/9 base, keeping the focused card's extra presence. A
+     taller 4/3 box instead cut the sides off the wide photos, taking the
+     near-2:1 Brawl Stars artwork from 90% of its width down to 68%. */
+  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card__image {
+    aspect-ratio: 3 / 2;
+  }
+
+  /* The upright and square photos lose half their picture to a 3:2 frame that
+     fits the landscape cards exactly, so they keep the taller box here too. */
+  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card--upright .personal-event-card__image {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* Brawl Stars is artwork rather than a photograph, so the composition reads
+     as a whole and cropping it is more obvious than cropping a scene. At
+     nearly 2:1 it is the widest source on the page: a 3:2 frame takes a
+     quarter of its width off, while its own near-16/9 frame keeps the artwork
+     almost complete, which is how this tile is meant to read. */
+  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card__image--brawl {
+    aspect-ratio: 16 / 9;
+  }
+
+  /* Folded, the photo has to give height back, and every step shorter shows
+     less of it: 32/9 halved what each card displayed. At 2:1 the 3:2 photos
+     keep three quarters of their height and Brawl Stars is almost whole, while
+     the card still loses most of its height once the description folds too. */
+  .personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__image {
+    aspect-ratio: 2 / 1;
+  }
+
+  .personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__image,
+  .personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__image img {
     min-height: 0;
   }
 
@@ -6239,6 +6419,12 @@ body.page-home #nav {
     opacity: 1;
     transform: none;
   }
+
+  .personal-timeline.is-enhanced .personal-event-card__body > span:not(.personal-event-card__meta) {
+    max-height: none;
+    opacity: 1;
+  }
+
 }
 
 /* The hero headline resolves once from noise, replacing the retired
