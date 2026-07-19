@@ -3018,6 +3018,17 @@ body.is-map-fullscreen #return-to-top {
     margin-top: 0;
   }
 
+  /* Guangzhou trial: keep the day divider while removing the large compound
+     gap created by the gallery tail, section margin and section padding
+     on iPhone Safari. Other journals retain their existing rhythm for now. */
+  #main.guangzhou-2026-journal .travel-journal__content > .guangzhou-day {
+    padding-top: 1.25rem;
+  }
+
+  #main.guangzhou-2026-journal .travel-journal__content > .guangzhou-day:not(:first-of-type) {
+    margin-top: 0.75rem;
+  }
+
   .guangzhou-day__route,
   .guangzhou-day__note {
     width: 100%;

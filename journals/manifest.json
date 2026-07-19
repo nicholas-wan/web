@@ -82,7 +82,7 @@
     "label": "Guangzhou",
     "source": "journals/travel_2026_guangzhou.html",
     "contentOnly": true,
-    "mainClass": "homepage guangzhou-journal",
+    "mainClass": "homepage guangzhou-journal guangzhou-2026-journal",
     "title": "Nicholas Wan - Guangzhou Trip",
     "description": "Nicholas Wan's six-day Guangzhou travel journal from May 2026, covering Old Guangzhou, Chimelong, Baiyun Mountain, and Canton Tower.",
     "ogImage": "images/travel/2026_guangzhou/day5/canton-tower-couple.webp"
