@@ -12,6 +12,15 @@
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var scrollFrame = null;
 
+  function warmGallery(event) {
+    if (!event || event.dataset.galleryWarm === 'true') return;
+    event.dataset.galleryWarm = 'true';
+    Array.prototype.forEach.call(event.querySelectorAll('.personal-event-card__image--slideshow img'), function (image) {
+      image.fetchPriority = 'low';
+      image.loading = 'eager';
+    });
+  }
+
   timeline.classList.add('is-enhanced');
 
   function updateTimelineProgress() {
@@ -59,6 +68,10 @@
     galleryEvents.forEach(function (event) {
       event.classList.toggle('is-gallery-active', event === activeGallery);
     });
+    /* A touch slideshow waits four seconds between frames. Starting these
+       nearby low-priority fetches when its card enters the reading band gives
+       later frames time to decode without loading every gallery up front. */
+    warmGallery(activeGallery);
   }
 
   function requestProgressUpdate() {

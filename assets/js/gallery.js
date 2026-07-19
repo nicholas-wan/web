@@ -7,6 +7,28 @@
   });
   if (!images.length) return;
 
+  /* Native lazy loading is deliberately conservative, which can leave a
+     blank tile after a quick journal scroll or horizontal swipe. Warm only
+     the low-priority images approaching the viewport; the rest keep their
+     native lazy behaviour and do not compete with the page's first image. */
+  var warmImage = function (image) {
+    if (image.loading !== 'lazy') return;
+    image.fetchPriority = 'low';
+    image.loading = 'eager';
+  };
+  if ('IntersectionObserver' in window) {
+    var imageWarmup = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        warmImage(entry.target);
+        imageWarmup.unobserve(entry.target);
+      });
+    }, { rootMargin: '900px' });
+    images.forEach(function (image) {
+      if (image.loading === 'lazy') imageWarmup.observe(image);
+    });
+  }
+
   /* Backfill alt text from each photo's caption so screen readers (and the
      lightbox trigger's aria-label below) announce the real place instead of a
      filename. Journal images carry .content-text / .content-title captions. */
@@ -45,6 +67,7 @@
     var opening = !overlay.classList.contains('is-visible');
     current = (index + images.length) % images.length;
     var source = images[current];
+    warmImage(source);
     viewerImage.src = source.currentSrc || source.src;
     viewerImage.alt = source.alt || 'Gallery image';
     /* Caption = place + detail. `.content-title` is often the city (repeated

@@ -105,12 +105,20 @@
 
 	};
 
-	// Play initial animations on page load.
-		$window.on('load', function() {
+	// Reveal content as soon as its DOM and interaction handlers are ready.
+	// The homepage keeps its load-synchronised intro/scramble choreography;
+	// content pages should not remain under the theme fade while images load.
+		var revealPage = function() {
 			window.setTimeout(function() {
 				$body.removeClass('is-preload');
 			}, 100);
-		});
+		};
+		if ($body.hasClass('page-home'))
+			$window.on('load', revealPage);
+		else if (document.readyState === 'loading')
+			document.addEventListener('DOMContentLoaded', revealPage, { once: true });
+		else
+			revealPage();
 
 	// Scrolly.
 		$('.scrolly').scrolly();
@@ -136,6 +144,11 @@
 				var $mobileContextBar = $('.mobile-context-bar').first();
 				if ($mobileContextBar.length)
 					$navPanelToggle.appendTo($mobileContextBar).addClass('alt');
+				// The homepage hero intentionally sits above the wrapper's load
+				// overlay. Keep its fixed menu outside that lower stacking context
+				// so a touch lands on the control instead of the hero beneath it.
+				else if ($body.hasClass('page-home'))
+					$navPanelToggle.appendTo($body).addClass('alt');
 
 			// Change toggle styling once we've scrolled past a real header.
 				if ($header.length) $header.scrollex({
@@ -189,6 +202,15 @@
 					target: $body,
 					visibleClass: 'is-navPanel-visible'
 				});
+
+			// Bind the control itself instead of relying solely on the panel
+			// helper's body-level delegation. A direct handler also survives the
+			// toggle being re-homed into contextual/sticky mobile navigation bars.
+			$navPanelToggle.on('click', function(event) {
+				event.preventDefault();
+				event.stopPropagation();
+				$body.toggleClass('is-navPanel-visible');
+			});
 
 			// Keep the toggle and sheet state available to assistive technology.
 			// The toggle advertises button semantics via aria-expanded, and the

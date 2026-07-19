@@ -8,6 +8,7 @@
 
   var map = viewport.closest('.travel-map');
   var canvas = viewport.querySelector('.travel-map__canvas');
+  var mapImage = canvas ? canvas.querySelector('img') : null;
   var controls = map ? map.querySelector('.travel-map__controls') : null;
   if (!canvas || !controls) return;
 
@@ -130,6 +131,8 @@
   var regionMarkers = Array.prototype.slice.call(canvas.querySelectorAll('.travel-map__marker'));
   var detailLevel = '';
   var labelLayoutFrame = 0;
+  var labelLayoutTimer = 0;
+  var applyFrame = 0;
   var status = map.querySelector('.travel-map__status');
 
   var positionRegionMarkers = function () {
@@ -223,9 +226,10 @@
      marker instead of silently hiding later labels in a dense cluster. */
   var layoutLabels = function () {
     labelLayoutFrame = 0;
+    labelLayoutTimer = 0;
     var occupied = [];
     detailLinks.forEach(function (link) { link.classList.remove('is-label-hidden', 'is-label-offscreen'); });
-    if (detailLevel === 'region') return;
+    if (detailLevel === 'region' || (mobileMapQuery.matches && !isFullscreen)) return;
 
     var viewportRect = viewport.getBoundingClientRect();
     var viewportPadding = 5;
@@ -288,7 +292,12 @@
 
   var scheduleLabelLayout = function () {
     if (labelLayoutFrame) window.cancelAnimationFrame(labelLayoutFrame);
-    labelLayoutFrame = window.requestAnimationFrame(layoutLabels);
+    if (labelLayoutTimer) window.clearTimeout(labelLayoutTimer);
+    /* Collision layout reads every visible label's geometry. Debounce it until
+       zoom/pan input settles so touch gestures stay on the compositor path. */
+    labelLayoutTimer = window.setTimeout(function () {
+      labelLayoutFrame = window.requestAnimationFrame(layoutLabels);
+    }, 90);
   };
 
   var updateDetailLevel = function () {
@@ -318,6 +327,7 @@
   };
 
   var apply = function () {
+    applyFrame = 0;
     clamp();
     var zoomed = scale > 1.001;
     canvas.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + scale + ')';
@@ -330,6 +340,11 @@
     if (zoomInBtn) zoomInBtn.disabled = scale >= MAX_SCALE - 0.001;
     if (zoomOutBtn) zoomOutBtn.disabled = scale <= minScale + 0.001;
     if (resetBtn) resetBtn.hidden = !zoomed;
+  };
+
+  var scheduleApply = function () {
+    if (applyFrame) return;
+    applyFrame = window.requestAnimationFrame(apply);
   };
 
   /* Phones open the map as a full-screen overlay and never see the tiny
@@ -420,11 +435,17 @@
     scale = minScale;
     tx = useDesktopCrop ? (viewport.clientWidth - canvas.offsetWidth * scale) / 2 : 0;
     ty = 0;
-    apply();
+    scheduleApply();
   };
 
   var openFullscreen = function () {
     if (isFullscreen) return;
+    /* The full vector map stays out of the phone's initial critical path, then
+       starts fetching as soon as the visitor asks to open the overlay. */
+    if (mapImage) {
+      mapImage.fetchPriority = 'low';
+      mapImage.loading = 'eager';
+    }
     isFullscreen = true;
     lastFocused = document.activeElement;
     map.classList.add('is-fullscreen');
@@ -466,7 +487,7 @@
       tx = minScale > MIN_SCALE ? (viewport.clientWidth - canvas.offsetWidth * scale) / 2 : 0;
       ty = 0;
     }
-    apply();
+    scheduleApply();
   };
 
   var zoomAtCenter = function (factor) {
@@ -615,7 +636,7 @@
         viewport.setPointerCapture(event.pointerId);
       }
       pointers.set(event.pointerId, next);
-      apply();
+      scheduleApply();
     }
   });
 
@@ -653,7 +674,7 @@
     else if (markerX > viewport.clientWidth - pad) tx -= markerX - (viewport.clientWidth - pad);
     if (markerY < pad) ty += pad - markerY;
     else if (markerY > viewport.clientHeight - pad) ty -= markerY - (viewport.clientHeight - pad);
-    apply();
+    scheduleApply();
   });
 
   window.addEventListener('resize', function () {

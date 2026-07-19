@@ -268,6 +268,13 @@
 
 			// Event: Hide panel on body click/tap.
 				$body.on('click touchend', function(event) {
+					// The delegated toggle below runs on this same element before
+					// direct body handlers. Without this guard, the body handler closes
+					// the panel in the very click that opened it on current mobile
+					// browsers. Clicks on the panel itself are handled by its own
+					// close/link handlers above.
+					if ($(event.target).closest('a[href="#' + id + '"], #' + id).length)
+						return;
 					$this._hide(event);
 				});
 

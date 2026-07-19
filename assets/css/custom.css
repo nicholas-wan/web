@@ -1536,6 +1536,7 @@ body {
   width: 100%;
   aspect-ratio: 1200 / 624;
   transform-origin: 0 0;
+  will-change: transform;
 }
 
 .travel-map__canvas > img {
