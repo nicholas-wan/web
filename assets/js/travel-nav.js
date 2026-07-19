@@ -2,9 +2,9 @@
   var nav = document.querySelector('.travel-section-nav');
   if (!nav) return;
 
-  var main = document.getElementById('main');
-  var guangzhouScrollTrial = Boolean(main && main.classList.contains('guangzhou-2026-journal'));
-  if (guangzhouScrollTrial) document.documentElement.classList.add('is-guangzhou-scroll-guard');
+  /* Every journal uses the same iPhone scroll safeguards. The bug was first
+     isolated on one trip, but it came from this shared sticky navigation. */
+  document.documentElement.classList.add('is-travel-journal-scroll-guard');
 
   var menuToggle = document.getElementById('navPanelToggle');
   if (menuToggle) {
@@ -58,16 +58,37 @@
     var observer = null;
     var timer = null;
     var deadline = Date.now() + 5000;
+    var scrollArmed = false;
+    var expectedScrollY = null;
     var manualEvents = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
     var cancel = function () { cancelled = true; cleanup(); };
+    var cancelUnexpectedScroll = function () {
+      /* A visitor can move the page after load but before the first delayed
+         correction sample on image-heavy journals. Treat that as ownership
+         of the viewport too. Native pre-load hash movement is still allowed. */
+      if (!scrollArmed) {
+        if (document.readyState !== 'complete') return;
+        manualSinceNav = true;
+        cancel();
+        return;
+      }
+      if (expectedScrollY !== null && Math.abs(window.pageYOffset - expectedScrollY) <= 2) {
+        expectedScrollY = null;
+        return;
+      }
+      manualSinceNav = true;
+      cancel();
+    };
     var cleanup = function () {
       if (timer) window.clearTimeout(timer);
       if (observer) observer.disconnect();
       manualEvents.forEach(function (name) { window.removeEventListener(name, cancel, true); });
+      window.removeEventListener('scroll', cancelUnexpectedScroll, true);
       if (landingCleanup === cleanup) landingCleanup = null;
     };
     landingCleanup = cleanup;
     manualEvents.forEach(function (name) { window.addEventListener(name, cancel, true); });
+    window.addEventListener('scroll', cancelUnexpectedScroll, { capture: true, passive: true });
 
     /* While media, fonts, and gallery shells are still settling, both the
        scroll position and the anchor's document position keep moving. On
@@ -78,6 +99,7 @@
        heading once, when the layout is actually ready to receive it. */
     var lastScrollY = null;
     var lastTargetTop = null;
+    var stableTicks = 0;
     var correct = function () {
       if (cancelled || Date.now() > deadline || window.location.hash !== hash) {
         cleanup();
@@ -89,17 +111,31 @@
       var offset = Math.ceil(nav.getBoundingClientRect().height) + 12;
       var scrollY = window.pageYOffset;
       var targetTop = target.getBoundingClientRect().top + scrollY;
-      var settled = (lastScrollY === null || Math.abs(scrollY - lastScrollY) <= 1) &&
-        (lastTargetTop === null || Math.abs(targetTop - lastTargetTop) <= 1);
+      var settled = lastScrollY !== null && lastTargetTop !== null &&
+        Math.abs(scrollY - lastScrollY) <= 1 &&
+        Math.abs(targetTop - lastTargetTop) <= 1;
       lastScrollY = scrollY;
       lastTargetTop = targetTop;
       if (settled) {
         var delta = targetTop - scrollY - offset;
         if (Math.abs(delta) > 1) {
-          window.scrollTo(0, Math.max(0, scrollY + delta));
+          stableTicks = 0;
+          expectedScrollY = Math.max(0, scrollY + delta);
+          scrollArmed = true;
+          window.scrollTo(0, expectedScrollY);
           lastScrollY = window.pageYOffset;
+        } else if (document.readyState === 'complete' &&
+                   (!document.fonts || document.fonts.status === 'loaded')) {
+          stableTicks += 1;
+          if (stableTicks >= 2) {
+            cleanup();
+            return;
+          }
         }
+      } else {
+        stableTicks = 0;
       }
+      scrollArmed = true;
       if (timer) window.clearTimeout(timer);
       timer = window.setTimeout(correct, 160);
     };
@@ -132,7 +168,7 @@
   var activeSectionId = '';
   var centreActiveLink = function (activeLink) {
     var strip = nav.querySelector('.travel-jump-groups');
-    if (!guangzhouScrollTrial || !strip) {
+    if (!strip) {
       activeLink.scrollIntoView({
         block: 'nearest',
         inline: 'center',
@@ -142,8 +178,8 @@
     }
 
     /* iPhone Safari may move the root page when scrollIntoView is called on a
-       child of a sticky horizontal strip. Scroll the strip itself so changing
-       the active day can never contribute vertical momentum at the page top. */
+       child of a sticky horizontal strip. Scroll only the strip so changing
+       the active section can never add vertical momentum to the document. */
     var stripRect = strip.getBoundingClientRect();
     var linkRect = activeLink.getBoundingClientRect();
     var targetLeft = strip.scrollLeft + linkRect.left - stripRect.left -

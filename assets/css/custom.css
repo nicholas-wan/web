@@ -1520,6 +1520,8 @@ body {
   overflow: visible;
   border-radius: calc(var(--radius-compact) - 0.25rem);
   touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .travel-map__viewport.is-zoomed {
@@ -1555,6 +1557,9 @@ body {
   object-fit: contain;
   opacity: 1;
   pointer-events: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .travel-map__marker {
@@ -1948,6 +1953,12 @@ body {
   left: auto;
 }
 
+.travel-map__marker--seoul .travel-map__place {
+  top: 1.8rem;
+  right: 0.7rem;
+  left: auto;
+}
+
 .travel-map__marker--guangzhou .travel-map__place {
   top: 1.35rem;
   right: 0.75rem;
@@ -1974,6 +1985,7 @@ body {
 .travel-map__marker--europe .travel-map__marker-label,
 .travel-map__marker--germany .travel-map__marker-label,
 .travel-map__marker--japan .travel-map__marker-label,
+.travel-map__marker--seoul .travel-map__marker-label,
 .travel-map__marker--guangzhou .travel-map__marker-label,
 .travel-map__marker--perth .travel-map__marker-label,
 .travel-map__marker--melbourne .travel-map__marker-label,
@@ -3029,10 +3041,10 @@ body.is-map-fullscreen #return-to-top {
     margin-top: 0.75rem;
   }
 
-  /* Prevent a fast upward fling from turning into Safari's native
-     pull-to-refresh once the Guangzhou journal reaches the document top. */
-  html.is-guangzhou-scroll-guard,
-  html.is-guangzhou-scroll-guard body {
+  /* A fast upward fling at the top of any journal should stop at the page,
+     not become Safari's native pull-to-refresh gesture. */
+  html.is-travel-journal-scroll-guard,
+  html.is-travel-journal-scroll-guard body {
     overscroll-behavior-y: none;
   }
 
