@@ -133,7 +133,17 @@
   var labelLayoutFrame = 0;
   var labelLayoutTimer = 0;
   var applyFrame = 0;
+  var renderSettleTimer = 0;
+  var committedScale = 1;
   var status = map.querySelector('.travel-map__status');
+
+  var baseCanvasWidth = function () {
+    return viewport.clientWidth;
+  };
+
+  var baseCanvasHeight = function () {
+    return baseCanvasWidth() * 624 / 1200;
+  };
 
   var positionRegionMarkers = function () {
     regionMarkers.forEach(function (marker) {
@@ -320,18 +330,41 @@
 
   var clamp = function () {
     scale = Math.min(MAX_SCALE, Math.max(minScale, scale));
-    var minX = viewport.clientWidth - canvas.offsetWidth * scale;
-    var minY = viewport.clientHeight - canvas.offsetHeight * scale;
+    var minX = viewport.clientWidth - baseCanvasWidth() * scale;
+    var minY = viewport.clientHeight - baseCanvasHeight() * scale;
     tx = Math.min(0, Math.max(minX, tx));
     ty = Math.min(0, Math.max(minY, ty));
+  };
+
+  /* Keep transforms on the compositor while the map moves, then commit most
+     or all of the zoom into the SVG's CSS dimensions. This prompts a sharp
+     vector rerender without making every gesture pay layout/paint costs. */
+  var settleRenderScale = function () {
+    renderSettleTimer = 0;
+    var width = baseCanvasWidth();
+    var maxLayoutScale = width ? Math.max(1, 4800 / width) : scale;
+    committedScale = Math.min(scale, maxLayoutScale);
+    canvas.style.width = (committedScale * 100) + '%';
+    canvas.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + (scale / committedScale) + ')';
+    canvas.style.setProperty('--map-scale', scale / committedScale);
+    viewport.classList.remove('is-map-interacting');
+    scheduleLabelLayout();
+  };
+
+  var scheduleRenderSettle = function () {
+    viewport.classList.add('is-map-interacting');
+    if (renderSettleTimer) window.clearTimeout(renderSettleTimer);
+    renderSettleTimer = window.setTimeout(settleRenderScale, 120);
   };
 
   var apply = function () {
     applyFrame = 0;
     clamp();
     var zoomed = scale > 1.001;
-    canvas.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + scale + ')';
-    canvas.style.setProperty('--map-scale', scale);
+    var transientScale = scale / committedScale;
+    canvas.style.transform = 'translate(' + tx + 'px, ' + ty + 'px) scale(' + transientScale + ')';
+    canvas.style.setProperty('--map-scale', transientScale);
+    scheduleRenderSettle();
     updateDetailLevel();
     scheduleLabelLayout();
     viewport.classList.toggle('is-zoomed', zoomed);
@@ -351,8 +384,9 @@
      letterboxed world strip: the overlay's zoom-out floor is the scale that
      fills the screen height, which already reads as country-level detail. */
   var fitHeightScale = function () {
-    if (!canvas.offsetHeight) return MIN_SCALE;
-    return Math.min(MAX_SCALE, viewport.clientHeight / canvas.offsetHeight);
+    var height = baseCanvasHeight();
+    if (!height) return MIN_SCALE;
+    return Math.min(MAX_SCALE, viewport.clientHeight / height);
   };
 
   var REGION_VIEWS = {
@@ -368,10 +402,12 @@
   var viewFor = function (lat, lon, targetScale) {
     targetScale = Math.min(MAX_SCALE, Math.max(minScale, targetScale));
     var point = projectCoordinate(lat, lon);
-    var targetTx = viewport.clientWidth / 2 - point.x / 100 * canvas.offsetWidth * targetScale;
-    var targetTy = viewport.clientHeight / 2 - point.y / 100 * canvas.offsetHeight * targetScale;
-    targetTx = Math.min(0, Math.max(viewport.clientWidth - canvas.offsetWidth * targetScale, targetTx));
-    targetTy = Math.min(0, Math.max(viewport.clientHeight - canvas.offsetHeight * targetScale, targetTy));
+    var width = baseCanvasWidth();
+    var height = baseCanvasHeight();
+    var targetTx = viewport.clientWidth / 2 - point.x / 100 * width * targetScale;
+    var targetTy = viewport.clientHeight / 2 - point.y / 100 * height * targetScale;
+    targetTx = Math.min(0, Math.max(viewport.clientWidth - width * targetScale, targetTx));
+    targetTy = Math.min(0, Math.max(viewport.clientHeight - height * targetScale, targetTy));
     return { scale: targetScale, tx: targetTx, ty: targetTy };
   };
 
@@ -433,7 +469,7 @@
     var useDesktopCrop = window.matchMedia('(min-width: 981px)').matches;
     minScale = useDesktopCrop ? DESKTOP_INITIAL_SCALE : MIN_SCALE;
     scale = minScale;
-    tx = useDesktopCrop ? (viewport.clientWidth - canvas.offsetWidth * scale) / 2 : 0;
+    tx = useDesktopCrop ? (viewport.clientWidth - baseCanvasWidth() * scale) / 2 : 0;
     ty = 0;
     scheduleApply();
   };
@@ -484,7 +520,7 @@
     scale = nextScale;
     /* Fully zoomed out returns to the opening composition. */
     if (scale <= minScale + 0.001) {
-      tx = minScale > MIN_SCALE ? (viewport.clientWidth - canvas.offsetWidth * scale) / 2 : 0;
+      tx = minScale > MIN_SCALE ? (viewport.clientWidth - baseCanvasWidth() * scale) / 2 : 0;
       ty = 0;
     }
     scheduleApply();
@@ -667,8 +703,9 @@
     viewport.scrollTop = 0;
     var marker = event.target.closest('.travel-map__marker, .travel-map__detail');
     if (!marker || scale <= 1.001) return;
-    var markerX = (marker.offsetLeft) * scale + tx;
-    var markerY = (marker.offsetTop) * scale + ty;
+    var transientScale = scale / committedScale;
+    var markerX = marker.offsetLeft * transientScale + tx;
+    var markerY = marker.offsetTop * transientScale + ty;
     var pad = 40;
     if (markerX < pad) tx += pad - markerX;
     else if (markerX > viewport.clientWidth - pad) tx -= markerX - (viewport.clientWidth - pad);

@@ -1514,6 +1514,7 @@ body {
 
 .travel-map__viewport {
   position: relative;
+  aspect-ratio: 1200 / 624;
   /* Popups may spill past the map edge at rest; clip only while zoomed,
      when the enlarged canvas must not bleed into the page. */
   overflow: visible;
@@ -1532,10 +1533,17 @@ body {
 
 .travel-map__canvas {
   --map-scale: 1;
-  position: relative;
+  position: absolute;
+  inset: 0 auto auto 0;
   width: 100%;
   aspect-ratio: 1200 / 624;
   transform-origin: 0 0;
+}
+
+/* Promote only while a gesture or fly-to animation is moving. Once input
+   settles, JS expands the SVG's layout size so the browser rerenders it at
+   the final zoom resolution instead of enlarging a cached texture. */
+.travel-map__viewport.is-map-interacting .travel-map__canvas {
   will-change: transform;
 }
 
