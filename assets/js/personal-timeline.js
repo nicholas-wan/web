@@ -95,7 +95,13 @@
       var eventRevealPoint = rect.top + Math.min(rect.height * 0.12, 32);
       var reached = eventRevealPoint <= readingLine;
       event.classList.toggle('is-past', reached);
-      event.classList.toggle('is-visible', reducedMotion.matches || reached);
+
+      /* The reveal is an entrance, not a state. Re-deriving it from position
+         every frame meant scrolling up ran the entrance backwards: each card
+         crossing back under the reading line faded to nothing and slid out
+         through its 1.5rem offset, so an upward read dismantled the timeline
+         card by card. The rail dot above still tracks position both ways. */
+      if (reducedMotion.matches || reached) event.classList.add('is-visible');
 
       if (reducedMotion.matches || rect.bottom <= 0 || rect.top >= viewport) return;
       distances[index] = Math.abs((rect.top + rect.bottom) / 2 - readingFocus);
