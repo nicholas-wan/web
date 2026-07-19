@@ -59,6 +59,15 @@
     landingCleanup = cleanup;
     manualEvents.forEach(function (name) { window.addEventListener(name, cancel, true); });
 
+    /* While media, fonts, and gallery shells are still settling, both the
+       scroll position and the anchor's document position keep moving. On
+       iPhone Safari, correcting during that churn — or during the browser's
+       own in-flight anchor scroll — yanks the viewport every tick and reads
+       as the page scrolling by itself. Only correct after both have held
+       still for a full tick, so the loop observes the churn and pins the
+       heading once, when the layout is actually ready to receive it. */
+    var lastScrollY = null;
+    var lastTargetTop = null;
     var correct = function () {
       if (cancelled || Date.now() > deadline || window.location.hash !== hash) {
         cleanup();
@@ -68,8 +77,19 @@
          typography can change the toolbar height after the native hash jump. */
       updateNavSurface();
       var offset = Math.ceil(nav.getBoundingClientRect().height) + 12;
-      var delta = target.getBoundingClientRect().top - offset;
-      if (Math.abs(delta) > 1) window.scrollTo(0, Math.max(0, window.pageYOffset + delta));
+      var scrollY = window.pageYOffset;
+      var targetTop = target.getBoundingClientRect().top + scrollY;
+      var settled = (lastScrollY === null || Math.abs(scrollY - lastScrollY) <= 1) &&
+        (lastTargetTop === null || Math.abs(targetTop - lastTargetTop) <= 1);
+      lastScrollY = scrollY;
+      lastTargetTop = targetTop;
+      if (settled) {
+        var delta = targetTop - scrollY - offset;
+        if (Math.abs(delta) > 1) {
+          window.scrollTo(0, Math.max(0, scrollY + delta));
+          lastScrollY = window.pageYOffset;
+        }
+      }
       if (timer) window.clearTimeout(timer);
       timer = window.setTimeout(correct, 160);
     };
