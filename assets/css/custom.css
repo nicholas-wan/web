@@ -5633,6 +5633,20 @@ a:focus-visible {
   margin-top: -4.75rem;
 }
 
+/* Phone focus swaps are laid out atomically, then these compositor-only FLIP
+   transforms recreate the old geometry and ease each visible event into its
+   new position and height. The document itself stays still for Safari. */
+.personal-timeline-event.is-focus-flipping {
+  transform: translate3d(0, var(--focus-flip-y, 0px), 0) scaleY(var(--focus-flip-scale-y, 1));
+  transform-origin: top center;
+  transition: none;
+  will-change: transform;
+}
+
+.personal-timeline-event.is-focus-flipping.is-focus-flipping-active {
+  transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
 .personal-timeline-event::before {
   position: absolute;
   top: 50%;

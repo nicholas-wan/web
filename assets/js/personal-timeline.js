@@ -16,6 +16,63 @@
   var focusedEvent = null;
   var scrollDirection = 1;
   var touchY = null;
+  var focusAnimationFrame = null;
+  var focusAnimationTimer = null;
+  var focusAnimatedEvents = [];
+
+  function cancelFocusAnimations() {
+    if (focusAnimationFrame !== null) window.cancelAnimationFrame(focusAnimationFrame);
+    if (focusAnimationTimer !== null) window.clearTimeout(focusAnimationTimer);
+    focusAnimatedEvents.forEach(function (event) {
+      event.classList.remove('is-focus-flipping', 'is-focus-flipping-active');
+      event.style.removeProperty('--focus-flip-y');
+      event.style.removeProperty('--focus-flip-scale-y');
+    });
+    focusAnimationFrame = null;
+    focusAnimationTimer = null;
+    focusAnimatedEvents = [];
+  }
+
+  /* Keep the fold/unfold itself atomic so Safari never follows a changing
+     document height during momentum scrolling. FLIP the rendered event boxes
+     from their old geometry to the new geometry instead: transforms stay on
+     the compositor and make the same handoff read as a short, smooth resize. */
+  function animateMobileFocusHandoff(beforeBounds, previousEvent, nextEvent) {
+    if (!singleRail.matches || reducedMotion.matches || !previousEvent || !nextEvent ||
+        previousEvent === nextEvent) return;
+
+    cancelFocusAnimations();
+    var viewport = window.innerHeight;
+
+    events.forEach(function (event, index) {
+      var before = beforeBounds[index];
+      var after = event.getBoundingClientRect();
+      if ((before.bottom < -64 && after.bottom < -64) ||
+          (before.top > viewport + 64 && after.top > viewport + 64)) return;
+
+      var deltaY = before.top - after.top;
+      var scaleY = after.height > 0 ? before.height / after.height : 1;
+      if (Math.abs(deltaY) < 0.5 && Math.abs(scaleY - 1) < 0.005) return;
+
+      event.style.setProperty('--focus-flip-y', deltaY.toFixed(2) + 'px');
+      event.style.setProperty('--focus-flip-scale-y', scaleY.toFixed(4));
+      event.classList.add('is-focus-flipping');
+      focusAnimatedEvents.push(event);
+    });
+
+    if (!focusAnimatedEvents.length) return;
+    /* Commit the inverted geometry before starting the transform transition. */
+    timeline.offsetHeight;
+    focusAnimationFrame = window.requestAnimationFrame(function () {
+      focusAnimationFrame = null;
+      focusAnimatedEvents.forEach(function (event) {
+        event.classList.add('is-focus-flipping-active');
+        event.style.setProperty('--focus-flip-y', '0px');
+        event.style.setProperty('--focus-flip-scale-y', '1');
+      });
+      focusAnimationTimer = window.setTimeout(cancelFocusAnimations, 260);
+    });
+  }
 
   function warmGallery(event) {
     if (!event || event.dataset.galleryWarm === 'true') return;
@@ -119,6 +176,7 @@
         focusEvent !== focusedEvent && focusDistance > distances[heldIndex] - focusMargin) {
       focusEvent = focusedEvent;
     }
+    var previousFocusedEvent = focusedEvent;
     focusedEvent = focusEvent;
 
     events.forEach(function (event, index) {
@@ -136,6 +194,8 @@
       event.classList.toggle('is-focus', event === focusEvent);
       event.classList.toggle('is-condensed', folded && !reducedMotion.matches);
     });
+
+    animateMobileFocusHandoff(eventBounds, previousFocusedEvent, focusEvent);
 
     var activeGallery = null;
     var activeGalleryDistance = Infinity;
