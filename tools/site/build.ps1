@@ -652,7 +652,7 @@ foreach ($page in $pages) {
     $galleryPages = @("house", "prewed") + $tripOrder
     $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=12"></script>' } else { "" }
     $travelNavScript = if ($tripOrder -contains $slug) { '<script src="assets/js/travel-nav.js?v=15"></script>' } else { "" }
-    $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=12"></script>' } else { "" }
+    $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=13"></script>' } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=14"></script>' } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { '<script src="assets/js/scramble-reveal.js?v=12"></script>' } else { "" }
     $optionalScripts = (@($galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
@@ -720,7 +720,7 @@ $navigation
     <script src="assets/js/util.js?v=1"></script>
     <script src="assets/js/main.js?v=18"></script>
     <script src="assets/js/arrow.js?v=1"></script>
-    <script src="assets/js/game.js?v=16"></script>
+    <script src="assets/js/game.js?v=17"></script>
 $optionalScripts
 </body>
 </html>

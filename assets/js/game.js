@@ -478,13 +478,15 @@
   /* 8. Journal reading progress bar                                     */
   /* ------------------------------------------------------------------ */
   var TRIPS = {
+    travel_2017_seoul: 'Seoul',
     travel_2019_siliconvalley: 'Silicon Valley',
     travel_2022_europe: 'Europe',
     travel_2023_perth: 'Perth',
     travel_2023_usacanada: 'USA & Canada',
     travel_2024_australia: 'Australia',
     travel_2024_germany: 'Germany',
-    travel_2025_japan: 'Japan'
+    travel_2025_japan: 'Japan',
+    travel_2026_guangzhou: 'Guangzhou'
   };
 
   function pageSlug() {
