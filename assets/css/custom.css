@@ -4303,9 +4303,8 @@ body.is-map-fullscreen #return-to-top {
 }
 
 /* Travel journal navigation. travel-nav.js publishes the toolbar's measured
-   height as --travel-nav-offset so native anchor jumps clear it even when it
-   wraps to several rows (USA/Canada's 17 links reach ~206px at desktop,
-   burying targets under a fixed offset); the rem values are no-JS fallbacks. */
+   height as --travel-nav-offset so native anchor jumps clear the single-row
+   rail precisely; the rem values are no-JS fallbacks. */
 [id^="trip-section-"] {
   scroll-margin-top: var(--travel-nav-offset, 7rem);
 }
@@ -4319,6 +4318,7 @@ body.is-map-fullscreen #return-to-top {
   gap: 1rem;
   margin: 0 0 2rem;
   padding: 0.6rem 0.85rem;
+  overflow: hidden;
   background: rgba(255, 255, 255, 0.96);
   border-bottom: 1px solid rgba(0, 0, 0, 0.12);
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
@@ -4335,9 +4335,20 @@ body.is-map-fullscreen #return-to-top {
 
 .travel-jump-groups {
   display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  min-width: 0;
+  flex: 1 1 auto;
+  align-items: center;
+  flex-wrap: nowrap;
   gap: 0.55rem 0.75rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.travel-jump-groups::-webkit-scrollbar {
+  display: none;
 }
 
 .travel-jump-group a {
@@ -4354,8 +4365,9 @@ body.is-map-fullscreen #return-to-top {
 /* Travel groups stay open and use a non-clickable city/country label. */
 .travel-jump-group {
   display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
+  flex: 0 0 auto;
+  align-items: center;
+  flex-wrap: nowrap;
   gap: 0.45rem;
   position: static;
 }
@@ -4394,7 +4406,8 @@ a.travel-jump-group__label {
 
 .travel-jump-group > div {
   display: flex;
-  flex-wrap: wrap;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
   gap: 0.35rem;
   margin-top: 0;
 }
@@ -4415,8 +4428,7 @@ a.travel-jump-group__label {
 .travel-section-nav > div {
   display: flex;
   gap: 0.5rem;
-  flex-wrap: wrap;
-  overflow: visible;
+  flex-wrap: nowrap;
 }
 
 .travel-section-nav a {
@@ -4436,9 +4448,9 @@ a.travel-jump-group__label {
   color: #fff;
 }
 
-/* Single-row trip toolbar for phones and tablets. It begins as a continuation
-   of the dark journal opening, then eases into the light sticky reading state
-   once the black header has left the screen. */
+/* On phones and tablets the rail remains a continuation of the dark journal
+   opening after it sticks. Keeping one surface avoids a white toolbar flashing
+   against the black header while the menu control is being re-homed. */
 @media screen and (max-width: 980px) {
   [id^="trip-section-"] {
     scroll-margin-top: var(--travel-nav-offset, 4rem);
@@ -4474,13 +4486,18 @@ a.travel-jump-group__label {
   }
 
   .travel-section-nav.is-stuck {
-    background: rgba(255, 255, 255, 0.97);
-    border-bottom-color: rgba(0, 0, 0, 0.12);
-    box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
+    background: rgba(25, 30, 35, 0.98);
+    border-bottom-color: rgba(255, 255, 255, 0.14);
+    box-shadow: 0 0.3rem 0.8rem rgba(3, 14, 30, 0.22);
   }
 
   .travel-section-nav.is-stuck::after {
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.97) 82%);
+    background: linear-gradient(90deg, rgba(25, 30, 35, 0), rgba(25, 30, 35, 0.98) 82%);
+  }
+
+  .page-travel-journal #wrapper > #navPanelToggle {
+    opacity: 0;
+    pointer-events: none;
   }
 
   .travel-section-nav--with-menu #navPanelToggle,
@@ -4510,9 +4527,9 @@ a.travel-jump-group__label {
 
   .travel-section-nav--with-menu.is-stuck #navPanelToggle,
   .travel-section-nav--with-menu.is-stuck #navPanelToggle.alt {
-    border-right-color: rgba(0, 0, 0, 0.12);
+    border-right-color: rgba(255, 255, 255, 0.16);
     background: transparent;
-    color: #212931;
+    color: #fff;
   }
 
   .travel-section-nav--with-menu #navPanelToggle::before {
@@ -4542,7 +4559,7 @@ a.travel-jump-group__label {
     flex: 1 1 auto;
     align-items: center;
     align-self: stretch;
-    padding: 0.55rem 0;
+    padding: 0.25rem 0;
     overflow-x: auto;
     overflow-y: hidden;
     overscroll-behavior-inline: contain;
@@ -4562,20 +4579,12 @@ a.travel-jump-group__label {
 
   .travel-jump-group__label,
   .travel-section-nav a {
-    min-height: 2.25rem;
+    min-height: 3rem;
     padding: 0.4rem 0.7rem;
     border-color: rgba(255, 255, 255, 0.28);
     background: rgba(255, 255, 255, 0.06);
     color: #fff;
     transition: background-color 0.38s ease, border-color 0.38s ease, color 0.38s ease;
-  }
-
-  /* Every jump link is a touch target at this width: 3rem = 44px at the mobile
-     root, where 2.25rem rendered 41.6px. This out-ranks the shared rule above
-     for anchors only (0,1,1 vs 0,1,0), so the group labels that are plain spans
-     keep the compact height while the ones that are links grow with the pills. */
-  .travel-section-nav a {
-    min-height: 3rem;
   }
 
   .travel-section-nav a.is-active {
@@ -4586,9 +4595,9 @@ a.travel-jump-group__label {
 
   .travel-section-nav.is-stuck .travel-jump-group__label,
   .travel-section-nav.is-stuck a {
-    border-color: rgba(0, 0, 0, 0.16);
-    background: #fff;
-    color: #333;
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
   }
 
   .travel-section-nav.is-stuck a.is-active {
@@ -4603,7 +4612,7 @@ a.travel-jump-group__label {
   }
 
   .travel-section-nav.is-stuck .travel-jump-group + .travel-jump-group {
-    border-left-color: rgba(0, 0, 0, 0.12);
+    border-left-color: rgba(255, 255, 255, 0.18);
   }
 }
 

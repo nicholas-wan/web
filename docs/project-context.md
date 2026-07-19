@@ -37,7 +37,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 - Follow the class combinations and markup hierarchy in `journals/_template.html`, including the generic `travel-*` classes and `guangzhou-*` compatibility classes. Heading order is structural because the build derives section and map anchors from it.
 - Journal date ranges use four-digit years: `D Month YYYY – D Month YYYY`, or `Month YYYY – Month YYYY` when exact days are unknown.
 - Use focal-point custom properties for banner and gallery crops. Tall collage cards span two desktop rows and return to standard cards on mobile. Keep mobile swipe cues in normal document flow rather than overlaying photos.
-- Journal section links use the measured sticky-toolbar correction in `assets/js/travel-nav.js`. Do not replace it with a fixed pixel offset; the toolbar can wrap to several rows.
+- Journal section links use the measured sticky-toolbar correction in `assets/js/travel-nav.js`. Do not replace it with a fixed pixel offset. Every journal keeps its section controls in one horizontally scrollable row, including long itineraries such as Europe and USA/Canada.
 
 ### Journal scrolling contract
 
@@ -45,6 +45,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 - A hash landing must wait until both the document scroll position and the target heading position have settled. Late image, gallery-shell, and font layout changes may move the target; repeatedly correcting during that churn makes the page appear to scroll by itself. Once the aligned position is stable for two checks after load and fonts are ready, stop the correction loop instead of retaining control for the full deadline.
 - Any wheel, touch, pointer, keyboard, or otherwise unexpected document scroll cancels the bounded landing correction. This includes movement immediately after `load`, before an image-heavy journal has produced its first correction sample. The correction records its own expected `scrollTo` destination so its one intentional movement is not mistaken for user input. `load` and `pageshow` must not re-land an old hash after the visitor has started reading; a deliberate new section-tab selection re-arms the correction through `hashchange`.
 - On mobile, scrollspy centres the active section tab by calling `scrollTo` on `.travel-jump-groups` itself. Do not use `scrollIntoView` for a child of the sticky strip: iPhone Safari can transfer that movement to the root page and create a vertical jump.
+- The mobile rail and its embedded hamburger remain dark before and after the rail becomes sticky. Hide the wrapper-level hamburger until `travel-nav.js` moves it into the rail; otherwise the generic white floating style can flash against the black journal header.
 - All journal pages add `is-travel-journal-scroll-guard`; at the phone breakpoint it sets `overscroll-behavior-y: none` on the root and body so an upward fling at the top cannot become pull-to-refresh.
 - Regression checks cover every generated journal at desktop and phone widths: no root horizontal overflow, the shared navigation script and guard are present, section anchors exist, the sticky strip owns its horizontal overflow, and user input is never followed by an automatic re-landing.
 
