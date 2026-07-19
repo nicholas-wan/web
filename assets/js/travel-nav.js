@@ -37,8 +37,18 @@
      Keep the requested heading just below the real sticky toolbar for a short,
      bounded landing window, then release control as soon as the visitor acts. */
   var landingCleanup = null;
-  var startAnchorLanding = function () {
+  /* Once the visitor scrolls or touches, the load/pageshow restarts below
+     must not re-land the old hash: arriving with #trip-section-1, reading
+     ahead, and then being yanked back to the top when the page finished
+     loading was a real iPhone report. A fresh chip tap re-arms via
+     hashchange. */
+  var manualSinceNav = false;
+  ['wheel', 'touchstart', 'pointerdown', 'keydown'].forEach(function (name) {
+    window.addEventListener(name, function () { manualSinceNav = true; }, { capture: true, passive: true });
+  });
+  var startAnchorLanding = function (force) {
     if (landingCleanup) landingCleanup();
+    if (manualSinceNav && !force) return;
     var hash = window.location.hash;
     if (!/^#trip-section-\d+$/.test(hash)) return;
     var target = document.getElementById(hash.slice(1));
@@ -103,12 +113,15 @@
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(correct);
   };
 
-  window.addEventListener('hashchange', startAnchorLanding);
-  window.addEventListener('pageshow', startAnchorLanding);
+  window.addEventListener('hashchange', function () {
+    manualSinceNav = false;
+    startAnchorLanding(true);
+  });
+  window.addEventListener('pageshow', function () { startAnchorLanding(); });
   window.addEventListener('load', function () {
     if (window.location.hash) startAnchorLanding();
   });
-  startAnchorLanding();
+  startAnchorLanding(true);
 
   var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#trip-section-"]'));
   var sections = links.map(function (link) {
