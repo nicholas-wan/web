@@ -2,6 +2,10 @@
   var nav = document.querySelector('.travel-section-nav');
   if (!nav) return;
 
+  var main = document.getElementById('main');
+  var guangzhouScrollTrial = Boolean(main && main.classList.contains('guangzhou-2026-journal'));
+  if (guangzhouScrollTrial) document.documentElement.classList.add('is-guangzhou-scroll-guard');
+
   var menuToggle = document.getElementById('navPanelToggle');
   if (menuToggle) {
     nav.insertBefore(menuToggle, nav.firstChild);
@@ -93,6 +97,30 @@
   if (!sections.length) return;
 
   var activeSectionId = '';
+  var centreActiveLink = function (activeLink) {
+    var strip = nav.querySelector('.travel-jump-groups');
+    if (!guangzhouScrollTrial || !strip) {
+      activeLink.scrollIntoView({
+        block: 'nearest',
+        inline: 'center',
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+      });
+      return;
+    }
+
+    /* iPhone Safari may move the root page when scrollIntoView is called on a
+       child of a sticky horizontal strip. Scroll the strip itself so changing
+       the active day can never contribute vertical momentum at the page top. */
+    var stripRect = strip.getBoundingClientRect();
+    var linkRect = activeLink.getBoundingClientRect();
+    var targetLeft = strip.scrollLeft + linkRect.left - stripRect.left -
+      (stripRect.width - linkRect.width) / 2;
+    strip.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  };
+
   var setActive = function (section) {
     links.forEach(function (link) {
       var active = link.getAttribute('href') === '#' + section.id;
@@ -103,13 +131,7 @@
 
     if (mobileNav.matches && activeSectionId !== section.id) {
       var activeLink = nav.querySelector('a[href="#' + section.id + '"]');
-      if (activeLink) {
-        activeLink.scrollIntoView({
-          block: 'nearest',
-          inline: 'center',
-          behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
-        });
-      }
+      if (activeLink) centreActiveLink(activeLink);
     }
     activeSectionId = section.id;
   };

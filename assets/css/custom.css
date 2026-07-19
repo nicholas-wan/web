@@ -3029,6 +3029,13 @@ body.is-map-fullscreen #return-to-top {
     margin-top: 0.75rem;
   }
 
+  /* Prevent a fast upward fling from turning into Safari's native
+     pull-to-refresh once the Guangzhou journal reaches the document top. */
+  html.is-guangzhou-scroll-guard,
+  html.is-guangzhou-scroll-guard body {
+    overscroll-behavior-y: none;
+  }
+
   .guangzhou-day__route,
   .guangzhou-day__note {
     width: 100%;
