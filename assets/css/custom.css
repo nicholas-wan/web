@@ -5501,13 +5501,6 @@ a:focus-visible {
   padding: clamp(2rem, 5vw, 4rem) clamp(1rem, 5vw, 4rem) 3rem !important;
   border-top: 0 !important;
   background: #fff;
-  /* Fold and unfold already pay for each other, so the reverse-scroll page is
-     net stable without help. Scroll anchoring (Safari 18.2+, Chrome) does not
-     know that: it re-corrects scrollTop on every frame of the 0.32s height
-     transitions and loses its anchor when a folding detail reaches max-height
-     0, which reads as the page lurching both ways while scrolling up. Excluding
-     the timeline subtree leaves the raw layout, which is the smooth path. */
-  overflow-anchor: none;
 }
 
 .personal-timeline__intro {
@@ -6352,6 +6345,17 @@ body.page-home #nav {
     --card-scale-y: 1.01;
   }
 
+  /* Safari keeps momentum scrolling on a separate path from layout. Animating
+     the outgoing description closed while the incoming one opens makes their
+     heights diverge for several frames, so the page moves underneath the
+     finger on every reverse-scroll handoff. Apply both halves in one layout
+     pass on phones; the card's compositor-only opacity and scale still ease. */
+  .personal-event-card__body,
+  .personal-timeline.is-enhanced .personal-event-card__body > span:not(.personal-event-card__meta),
+  .personal-event-card__body > strong {
+    transition: none;
+  }
+
 }
 
 @media screen and (max-width: 520px) {
@@ -6361,7 +6365,9 @@ body.page-home #nav {
 
   .personal-event-card__image {
     aspect-ratio: 16 / 9;
-    transition: aspect-ratio 0.32s ease;
+    /* This ratio is the other intrinsic-height half of the phone handoff. It
+       must switch in the same layout pass as the description above. */
+    transition: none;
   }
 
   .personal-event-card__image img {
