@@ -5752,10 +5752,10 @@ a:focus-visible {
 }
 
 /* Touch devices have no hover to trigger a rotation, so the gallery nearest the
-   reading focus plays on its own. A four-second slot gives each image time to
-   register without making the desktop hover preview feel sluggish. Keep the
-   delays as longhands: the animation shorthand would reset the stagger and
-   collapse every image onto the same frame. */
+   reading focus plays on its own. Start two seconds into the opening slot so
+   the first transition arrives quickly, then retain four seconds per image.
+   Keep the delays as longhands: the animation shorthand would reset the
+   stagger and collapse every image onto the same frame. */
 @media (hover: none) {
   .personal-timeline-event.is-gallery-active .personal-event-card__image--slideshow img {
     animation-name: personal-card-slideshow;
@@ -5766,12 +5766,13 @@ a:focus-visible {
 
   .personal-timeline-event.is-gallery-active .personal-event-card__image--slideshow img:first-child {
     animation-name: personal-card-slideshow-first;
+    animation-delay: -2s;
   }
 
-  .personal-event-card__image--slideshow img:nth-child(2) { animation-delay: 4s; }
-  .personal-event-card__image--slideshow img:nth-child(3) { animation-delay: 8s; }
-  .personal-event-card__image--slideshow img:nth-child(4) { animation-delay: 12s; }
-  .personal-event-card__image--slideshow img:nth-child(5) { animation-delay: 16s; }
+  .personal-event-card__image--slideshow img:nth-child(2) { animation-delay: 2s; }
+  .personal-event-card__image--slideshow img:nth-child(3) { animation-delay: 6s; }
+  .personal-event-card__image--slideshow img:nth-child(4) { animation-delay: 10s; }
+  .personal-event-card__image--slideshow img:nth-child(5) { animation-delay: 14s; }
 
   .personal-timeline-event.is-gallery-active .personal-event-card__image--slides-2 img {
     animation-name: personal-card-slideshow-2;
