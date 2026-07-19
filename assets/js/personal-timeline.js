@@ -16,8 +16,6 @@
   var focusedEvent = null;
   var scrollDirection = 1;
   var touchY = null;
-  var lastScrollY = NaN;
-  var settleTimer = null;
 
   function warmGallery(event) {
     if (!event || event.dataset.galleryWarm === 'true') return;
@@ -67,12 +65,6 @@
     scrollFrame = null;
     if (!years) return;
     if (needsMeasure) measureCards();
-
-    /* Input events flip scrollDirection on 2px finger tremor, so the freeze
-       below keys on actual page movement instead. */
-    var pageY = window.pageYOffset;
-    var movedUp = pageY < lastScrollY;
-    lastScrollY = pageY;
 
     var viewport = window.innerHeight;
     var bounds = years.getBoundingClientRect();
@@ -127,17 +119,6 @@
         focusEvent !== focusedEvent && focusDistance > distances[heldIndex] - focusMargin) {
       focusEvent = focusedEvent;
     }
-
-    /* On the phone a reverse promotion grows the card above the reading line,
-       shoving the page against the direction of travel, and the next frame
-       re-decides focus from that still-animating geometry — which can flip it
-       straight back. Scrolling down shows neither, because the folding card
-       sits above and its shrink aids travel. So while the page is moving up,
-       hold the open card; the trailing settle pass promotes the nearest card
-       once, on resting geometry. */
-    if (singleRail.matches && movedUp && focusedEvent && focusEvent !== focusedEvent) {
-      focusEvent = focusedEvent;
-    }
     focusedEvent = focusEvent;
 
     events.forEach(function (event, index) {
@@ -190,14 +171,7 @@
     requestProgressUpdate();
   }
 
-  /* The last pass of a reverse scroll always sees upward movement and holds
-     focus, so once the events stop nothing would ever promote; the trailing
-     timer runs one pass on resting geometry, where movedUp is false. */
-  window.addEventListener('scroll', function () {
-    if (settleTimer !== null) window.clearTimeout(settleTimer);
-    settleTimer = window.setTimeout(requestProgressUpdate, 170);
-    requestProgressUpdate();
-  }, { passive: true });
+  window.addEventListener('scroll', requestProgressUpdate, { passive: true });
   window.addEventListener('wheel', function (event) {
     if (event.deltaY) scrollDirection = event.deltaY < 0 ? -1 : 1;
   }, { passive: true });
