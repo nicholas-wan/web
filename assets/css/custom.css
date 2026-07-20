@@ -5637,14 +5637,22 @@ a:focus-visible {
    transforms recreate the old geometry and ease each visible event into its
    new position and height. The document itself stays still for Safari. */
 .personal-timeline-event.is-focus-flipping {
-  transform: translate3d(0, var(--focus-flip-y, 0px), 0) scaleY(var(--focus-flip-scale-y, 1));
-  transform-origin: top center;
+  transform: translate3d(0, var(--focus-flip-y, 0px), 0);
   transition: none;
   will-change: transform;
 }
 
 .personal-timeline-event.is-focus-flipping.is-focus-flipping-active {
-  transition: transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.personal-timeline-event.is-focus-revealing .personal-event-card {
+  clip-path: inset(0 0 var(--focus-reveal-bottom, 0px) 0 round var(--radius-card));
+  transition: none !important;
+}
+
+.personal-timeline-event.is-focus-revealing.is-focus-flipping-active .personal-event-card {
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, transform 0.18s ease, grid-template-columns 0.18s ease, clip-path 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
 .personal-timeline-event::before {

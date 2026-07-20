@@ -19,14 +19,19 @@
   var focusAnimationFrame = null;
   var focusAnimationTimer = null;
   var focusAnimatedEvents = [];
+  var lastScrollY = window.scrollY;
+  var lastScrollTime = Date.now();
+  var scrollVelocity = 0;
+  var touchTime = null;
+  var MAX_FOCUS_ANIMATION_VELOCITY = 0.85;
 
   function cancelFocusAnimations() {
     if (focusAnimationFrame !== null) window.cancelAnimationFrame(focusAnimationFrame);
     if (focusAnimationTimer !== null) window.clearTimeout(focusAnimationTimer);
     focusAnimatedEvents.forEach(function (event) {
-      event.classList.remove('is-focus-flipping', 'is-focus-flipping-active');
+      event.classList.remove('is-focus-flipping', 'is-focus-flipping-active', 'is-focus-revealing');
       event.style.removeProperty('--focus-flip-y');
-      event.style.removeProperty('--focus-flip-scale-y');
+      event.style.removeProperty('--focus-reveal-bottom');
     });
     focusAnimationFrame = null;
     focusAnimationTimer = null;
@@ -41,21 +46,29 @@
     if (!singleRail.matches || reducedMotion.matches || !previousEvent || !nextEvent ||
         previousEvent === nextEvent) return;
 
-    cancelFocusAnimations();
-    var viewport = window.innerHeight;
+    var previousIndex = events.indexOf(previousEvent);
+    var nextIndex = events.indexOf(nextEvent);
+    if (Math.abs(previousIndex - nextIndex) !== 1 || scrollVelocity > MAX_FOCUS_ANIMATION_VELOCITY) {
+      cancelFocusAnimations();
+      return;
+    }
 
-    events.forEach(function (event, index) {
+    cancelFocusAnimations();
+
+    [previousEvent, nextEvent].forEach(function (event) {
+      var index = events.indexOf(event);
       var before = beforeBounds[index];
       var after = event.getBoundingClientRect();
-      if ((before.bottom < -64 && after.bottom < -64) ||
-          (before.top > viewport + 64 && after.top > viewport + 64)) return;
 
       var deltaY = before.top - after.top;
-      var scaleY = after.height > 0 ? before.height / after.height : 1;
-      if (Math.abs(deltaY) < 0.5 && Math.abs(scaleY - 1) < 0.005) return;
+      var revealBottom = event === nextEvent ? Math.max(after.height - before.height, 0) : 0;
+      if (Math.abs(deltaY) < 0.5 && revealBottom < 0.5) return;
 
       event.style.setProperty('--focus-flip-y', deltaY.toFixed(2) + 'px');
-      event.style.setProperty('--focus-flip-scale-y', scaleY.toFixed(4));
+      if (revealBottom >= 0.5) {
+        event.style.setProperty('--focus-reveal-bottom', revealBottom.toFixed(2) + 'px');
+        event.classList.add('is-focus-revealing');
+      }
       event.classList.add('is-focus-flipping');
       focusAnimatedEvents.push(event);
     });
@@ -68,9 +81,9 @@
       focusAnimatedEvents.forEach(function (event) {
         event.classList.add('is-focus-flipping-active');
         event.style.setProperty('--focus-flip-y', '0px');
-        event.style.setProperty('--focus-flip-scale-y', '1');
+        event.style.setProperty('--focus-reveal-bottom', '0px');
       });
-      focusAnimationTimer = window.setTimeout(cancelFocusAnimations, 260);
+      focusAnimationTimer = window.setTimeout(cancelFocusAnimations, 210);
     });
   }
 
@@ -231,18 +244,38 @@
     requestProgressUpdate();
   }
 
-  window.addEventListener('scroll', requestProgressUpdate, { passive: true });
+  function trackScroll() {
+    var now = Date.now();
+    var nextScrollY = window.scrollY;
+    var elapsed = Math.max(1, Math.min(now - lastScrollTime, 80));
+    var measuredVelocity = Math.abs(nextScrollY - lastScrollY) / elapsed;
+    scrollVelocity = Math.max(measuredVelocity, scrollVelocity * 0.72);
+    lastScrollY = nextScrollY;
+    lastScrollTime = now;
+    requestProgressUpdate();
+  }
+
+  window.addEventListener('scroll', trackScroll, { passive: true });
   window.addEventListener('wheel', function (event) {
-    if (event.deltaY) scrollDirection = event.deltaY < 0 ? -1 : 1;
+    if (event.deltaY) {
+      scrollDirection = event.deltaY < 0 ? -1 : 1;
+    }
   }, { passive: true });
   window.addEventListener('touchstart', function (event) {
     touchY = event.touches.length ? event.touches[0].clientY : null;
+    touchTime = Date.now();
+    lastScrollY = window.scrollY;
+    lastScrollTime = touchTime;
   }, { passive: true });
   window.addEventListener('touchmove', function (event) {
     if (touchY === null || !event.touches.length) return;
     var nextTouchY = event.touches[0].clientY;
+    var nextTouchTime = Date.now();
+    var touchElapsed = Math.max(nextTouchTime - touchTime, 1);
+    scrollVelocity = Math.max(scrollVelocity, Math.abs(nextTouchY - touchY) / touchElapsed);
     if (Math.abs(nextTouchY - touchY) > 2) scrollDirection = nextTouchY > touchY ? -1 : 1;
     touchY = nextTouchY;
+    touchTime = nextTouchTime;
   }, { passive: true });
   window.addEventListener('keydown', function (event) {
     if (event.key === 'ArrowUp' || event.key === 'PageUp' || event.key === 'Home') scrollDirection = -1;
