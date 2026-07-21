@@ -692,68 +692,69 @@ canvas.addEventListener('mousemove', function(e){
 	});
 })();
 
-// Expandable toolkit cards work with hover, keyboard focus, and touch.
-// Details ship expanded so the content stays reachable without JS and in
-// print; this collapses them at init (toolkit-card--js) and manages the
-// disclosure state on the summary button, where aria-expanded is valid.
+// Toolkit details stay visible in the static desktop rows and become explicit
+// disclosures on smaller screens, so pointer travel and keyboard focus never
+// resize the desktop layout unexpectedly. Details ship expanded so the content
+// also remains reachable without JS and in print.
 (function() {
 	var cards = Array.prototype.slice.call(document.querySelectorAll('.toolkit-card'));
 	if (!cards.length) return;
+	var desktopCards = window.matchMedia('(min-width: 981px)');
 
 	function setExpanded(card, expanded) {
-		var button = card.querySelector('.toolkit-card__summary');
+		var button = card.querySelector('.toolkit-card__toggle');
 		var detail = card.querySelector('.toolkit-card__detail');
+		var hint = card.querySelector('.toolkit-card__hint');
+		var label = card.querySelector('.toolkit-card__toggle-label');
+		var title = card.querySelector('.toolkit-card__title');
 		card.classList.toggle('is-expanded', expanded);
 		if (button) button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-		if (detail) detail.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+		if (detail) {
+			if (expanded) detail.style.setProperty('--toolkit-detail-height', detail.scrollHeight + 'px');
+			detail.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+		}
+		if (hint) hint.textContent = expanded ? 'Hide details' : 'View details';
+		if (label && title) label.textContent = (expanded ? 'Hide ' : 'View ') + title.textContent + ' details';
 	}
-
 	function collapseOthers(activeCard) {
 		cards.forEach(function(card) {
 			if (card === activeCard) return;
-			card.dataset.pinned = 'false';
 			setExpanded(card, false);
 		});
 	}
-
 	cards.forEach(function(card) {
-		var button = card.querySelector('.toolkit-card__summary');
-		card.dataset.pinned = 'false';
+		var button = card.querySelector('.toolkit-card__toggle');
 		card.classList.add('toolkit-card--js');
-		setExpanded(card, false);
+		setExpanded(card, desktopCards.matches);
 
-		card.addEventListener('mouseenter', function() {
-			setExpanded(card, true);
-		});
-		card.addEventListener('mouseleave', function() {
-			if (card.dataset.pinned !== 'true' && !card.contains(document.activeElement)) {
-				setExpanded(card, false);
-			}
-		});
-		card.addEventListener('focusin', function() {
-			collapseOthers(card);
-			setExpanded(card, true);
-		});
-		card.addEventListener('focusout', function(event) {
-			if (!card.contains(event.relatedTarget) && card.dataset.pinned !== 'true') {
-				setExpanded(card, false);
-			}
-		});
 		if (button) {
 			// Enter/Space arrive as native button clicks.
 			button.addEventListener('click', function() {
-				var expanded = card.dataset.pinned !== 'true';
+				var expanded = !card.classList.contains('is-expanded');
 				collapseOthers(card);
-				card.dataset.pinned = expanded ? 'true' : 'false';
 				setExpanded(card, expanded);
 			});
 		}
 		card.addEventListener('keydown', function(event) {
 			if (event.key === 'Escape') {
-				card.dataset.pinned = 'false';
 				setExpanded(card, false);
 				if (button) button.focus();
 			}
 		});
 	});
+
+	function syncCardMode() {
+		cards.forEach(function(card) {
+			setExpanded(card, desktopCards.matches ? true : card.classList.contains('is-expanded'));
+		});
+	}
+
+	if (desktopCards.addEventListener) desktopCards.addEventListener('change', function() {
+		cards.forEach(function(card) { setExpanded(card, desktopCards.matches); });
+	});
+	else desktopCards.addListener(function() {
+		cards.forEach(function(card) { setExpanded(card, desktopCards.matches); });
+	});
+
+	window.addEventListener('resize', syncCardMode);
 })();
