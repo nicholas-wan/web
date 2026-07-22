@@ -550,8 +550,7 @@ $optimizedAnimatedImages = @(
     "travel\2023_usa_canada\day6\aquarium_gif2.gif",
     "travel\2023_usa_canada\day6\viewboston_gif1.gif",
     "travel\2023_usa_canada\day7\science_museum_gif1.gif",
-    "travel\2023_usa_canada\day7\zoo_gif1.gif",
-    "travel\2024_australia\sydney_wollongong\kiamagif.gif"
+    "travel\2023_usa_canada\day7\zoo_gif1.gif"
 )
 if (Test-Path -LiteralPath $webpSource) {
     Get-ChildItem -LiteralPath $webpSource -Recurse -File -Filter *.webp | ForEach-Object {
