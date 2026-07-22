@@ -511,47 +511,7 @@ function Convert-MainLandmark([string]$Markup) {
 
 $webpMap = @{}
 $webpSource = Join-Path $root "images-webp"
-$optimizedAnimatedImages = @(
-    "travel\2019_sv\SF_aqua1.gif",
-    "travel\2022_europe\day7\switzerlandgif4.gif",
-    "travel\2023_usa_canada\day10\arcade_gif1.gif",
-    "travel\2023_usa_canada\day10\arcade_gif2.gif",
-    "travel\2023_usa_canada\day10\arcade_gif4.gif",
-    "travel\2023_usa_canada\day11\aquarium_gif1.gif",
-    "travel\2023_usa_canada\day11\aquarium_gif2.gif",
-    "travel\2023_usa_canada\day11\aquarium_gif3.gif",
-    "travel\2023_usa_canada\day11\aquarium_gif4.gif",
-    "travel\2023_usa_canada\day11\aquarium_gif5.gif",
-    "travel\2023_usa_canada\day11\aquarium_gif6.gif",
-    "travel\2023_usa_canada\day12\zoo_gif1.gif",
-    "travel\2023_usa_canada\day12\zoo_gif2.gif",
-    "travel\2023_usa_canada\day12\zoo_gif3.gif",
-    "travel\2023_usa_canada\day12\zoo_gif4.gif",
-    "travel\2023_usa_canada\day13\train_gif1.gif",
-    "travel\2023_usa_canada\day14\zoo_gif1.gif",
-    "travel\2023_usa_canada\day14\zoo_gif2.gif",
-    "travel\2023_usa_canada\day14\zoo_gif3.gif",
-    "travel\2023_usa_canada\day14\zoo_gif4.gif",
-    "travel\2023_usa_canada\day14\zoo_gif5.gif",
-    "travel\2023_usa_canada\day14\zoo_gif6.gif",
-    "travel\2023_usa_canada\day14\zoo_gif7.gif",
-    "travel\2023_usa_canada\day16\mnm_gif1.gif",
-    "travel\2023_usa_canada\day3\cruise_gif1.gif",
-    "travel\2023_usa_canada\day3\madame_gif1.gif",
-    "travel\2023_usa_canada\day3\madame_gif2.gif",
-    "travel\2023_usa_canada\day3\museum_sex_gif1.gif",
-    "travel\2023_usa_canada\day4\little_island_gif1.gif",
-    "travel\2023_usa_canada\day4\okiboru_gif1.gif",
-    "travel\2023_usa_canada\day4\okiboru_gif2.gif",
-    "travel\2023_usa_canada\day5\moma_gif1.gif",
-    "travel\2023_usa_canada\day5\moma_gif2.gif",
-    "travel\2023_usa_canada\day6\amtrak_gif1.gif",
-    "travel\2023_usa_canada\day6\aquarium_gif1.gif",
-    "travel\2023_usa_canada\day6\aquarium_gif2.gif",
-    "travel\2023_usa_canada\day6\viewboston_gif1.gif",
-    "travel\2023_usa_canada\day7\science_museum_gif1.gif",
-    "travel\2023_usa_canada\day7\zoo_gif1.gif"
-)
+$optimizedAnimatedImages = @()
 if (Test-Path -LiteralPath $webpSource) {
     Get-ChildItem -LiteralPath $webpSource -Recurse -File -Filter *.webp | ForEach-Object {
         $relativeWebp = $_.FullName.Substring($webpSource.Length + 1).Replace('\', '/')
