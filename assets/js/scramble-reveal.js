@@ -21,8 +21,9 @@
   var TICK_MS = 45;
   var TARGET_DURATION_MS = 1200;
   var ROW_STAGGER_MS = 100;
-  var VIEW_THRESHOLD = 0.6;
-  var PAGE_REVEAL_DELAY_MS = 1200;
+  var VIEW_THRESHOLD = 0.7;
+  var VISIBLE_HOLD_MS = 180;
+  var PAGE_REVEAL_DELAY_MS = 150;
 
   var segmenter = typeof Intl !== "undefined" && Intl.Segmenter
     ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
@@ -80,6 +81,7 @@
     var completedRows = 0;
     var hasPlayed = false;
     var observer = null;
+    var startTimeout = null;
 
     function clearTimers() {
       activeTimers.forEach(function (timer) {
@@ -87,6 +89,7 @@
         clearInterval(timer);
       });
       activeTimers.clear();
+      startTimeout = null;
     }
 
     var items = Array.from(list.querySelectorAll("[data-scramble-row]")).map(function (row, index) {
@@ -190,9 +193,25 @@
       if (hasPlayed) return;
       observer = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
-          if (!entry.isIntersecting || hasPlayed) return;
-          observer.disconnect();
-          play();
+          if (hasPlayed) return;
+
+          if (!entry.isIntersecting) {
+            if (startTimeout) {
+              clearTimeout(startTimeout);
+              activeTimers.delete(startTimeout);
+              startTimeout = null;
+            }
+            return;
+          }
+
+          if (startTimeout) return;
+          startTimeout = setTimeout(function () {
+            activeTimers.delete(startTimeout);
+            startTimeout = null;
+            observer.disconnect();
+            play();
+          }, VISIBLE_HOLD_MS);
+          activeTimers.add(startTimeout);
         });
       }, observerOptions);
 
@@ -212,10 +231,10 @@
       finishImmediately();
     } else if (!card) {
       observeTrigger();
-    } else if (document.readyState === "complete") {
-      observeAfterPageReveal();
+    } else if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", observeAfterPageReveal, { once: true });
     } else {
-      window.addEventListener("load", observeAfterPageReveal, { once: true });
+      observeAfterPageReveal();
     }
 
     return {
