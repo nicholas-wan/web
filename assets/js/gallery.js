@@ -1,4 +1,23 @@
 (function () {
+  var journalAnimations = Array.prototype.slice.call(document.querySelectorAll('video.journal-animation'));
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var syncAnimationPreference = function () {
+    journalAnimations.forEach(function (video) {
+      if (reducedMotion.matches) {
+        video.pause();
+        video.currentTime = 0;
+      } else {
+        var playback = video.play();
+        if (playback && playback.catch) playback.catch(function () {});
+      }
+    });
+  };
+  if (journalAnimations.length) {
+    syncAnimationPreference();
+    if (reducedMotion.addEventListener) reducedMotion.addEventListener('change', syncAnimationPreference);
+    else if (reducedMotion.addListener) reducedMotion.addListener(syncAnimationPreference);
+  }
+
   var images = Array.prototype.slice.call(document.querySelectorAll('#main img')).filter(function (image, index, candidates) {
     return !image.classList.contains('countrylogo') &&
       !image.hasAttribute('data-lightbox-ignore') &&

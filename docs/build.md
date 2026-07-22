@@ -45,7 +45,7 @@ python .\tools\images\make-responsive-variants.py
 python .\tools\images\convert-curated-webp.py
 ```
 
-`make-responsive-variants.py` emits the controlled `-480` and `-800` JPEG set and the matching Guangzhou WebP variants; animated WebPs are excluded. `convert-curated-webp.py` regenerates the selected deterministic WebP overlay.
+`make-responsive-variants.py` emits the controlled `-480` and `-800` JPEG set and closes responsive-coverage gaps for journal JPEGs and WebPs when the result is smaller; animated WebPs are excluded. `convert-curated-webp.py` regenerates the selected deterministic WebP overlay.
 
 The map generator lives at `tools/maps/generate-world-map.ps1` and downloads Natural Earth data before replacing `images/travel/world-map.svg`.
 

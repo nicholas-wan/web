@@ -235,7 +235,7 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
         foreach ($pattern in $patterns) {
             foreach ($match in [regex]::Matches($content, $pattern)) {
                 $path = [Uri]::UnescapeDataString($match.Groups[1].Value) -replace '\\', '/'
-                if ($path -match '(?i)\.(?:avif|gif|jpe?g|png|svg|webp)$') { [void]$references.Add($path) }
+                if ($path -match '(?i)\.(?:avif|gif|jpe?g|mp4|png|svg|webm|webp)$') { [void]$references.Add($path) }
             }
         }
     }
@@ -678,14 +678,16 @@ foreach ($page in $pages) {
     $main = Add-PageNavigation $main $slug
     $main = Normalize-MissingJpegReferences $main (Join-Path $root "images")
     $intro = Normalize-MissingJpegReferences $intro (Join-Path $root "images")
-    $main = Add-ImagePerformanceAttributes $main (Join-Path $root "images") $sourceImageIndex
-    $main = Add-GalleryAltText $main $slug
-    $intro = Add-ImagePerformanceAttributes $intro (Join-Path $root "images") $sourceImageIndex
-
+    # Resolve the controlled WebP overlay before image inspection so responsive
+    # variants follow the asset that the browser will actually receive.
     foreach ($mapping in $webpMap.GetEnumerator()) {
         $main = $main.Replace($mapping.Key, $mapping.Value)
         $intro = $intro.Replace($mapping.Key, $mapping.Value)
     }
+    $main = Add-ImagePerformanceAttributes $main (Join-Path $root "images") $sourceImageIndex
+    $main = Add-GalleryAltText $main $slug
+    $intro = Add-ImagePerformanceAttributes $intro (Join-Path $root "images") $sourceImageIndex
+
     $main = Convert-MainLandmark $main
 
     $navigation = $navigationTemplate
@@ -704,7 +706,7 @@ foreach ($page in $pages) {
     }
 
     $galleryPages = @("house", "prewed") + $tripOrder
-    $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=12"></script>' } else { "" }
+    $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=13"></script>' } else { "" }
     $travelNavScript = if ($tripOrder -contains $slug) { '<script src="assets/js/travel-nav.js?v=18"></script>' } else { "" }
     $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=13"></script>' } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=20"></script>' } else { "" }
