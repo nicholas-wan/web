@@ -27,7 +27,7 @@ Preview the generated site with the existing `dist` launch configuration or any 
 - `journals/` contains content-only travel journals, their manifest, and canonical template.
 - `partials/` contains shared generated-page fragments.
 - `tools/` contains build, verification, image, map, and retired migration tooling.
-- `docs/` contains architecture, preserved UX decisions, build notes, and the active review backlog.
+- `docs/` contains architecture, preserved UX decisions, and build notes.
 - `dist/` is generated output and must not be edited or committed.
 
 See [docs/build.md](docs/build.md) for build and deployment details and [docs/project-context.md](docs/project-context.md) for the site's maintained behavior contracts.
