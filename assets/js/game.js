@@ -1,6 +1,6 @@
 /* ==========================================================================
    game.js — playful, gamified interactions layer
-   Loaded on every generated page (see tools/site/build.ps1 template + runtimeJs).
+   Loaded on the homepage; smaller route-specific bundles cover listings and journals.
    Everything degrades gracefully and respects prefers-reduced-motion.
    ========================================================================== */
 (function () {

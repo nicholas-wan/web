@@ -5,6 +5,15 @@ $journalManifestPath = Join-Path $root 'journals\manifest.json'
 $journalPartialPath = Join-Path $root 'partials\travel-journal.html'
 $journalStarterPath = Join-Path $root 'journals\_template.html'
 
+function Assert-FileSizeBudget([string]$RelativePath, [int]$MaximumKB) {
+    $path = Join-Path $dist $RelativePath
+    if (-not (Test-Path -LiteralPath $path)) { throw "Performance budget target is missing: $RelativePath" }
+    $size = (Get-Item -LiteralPath $path).Length
+    if ($size -gt ($MaximumKB * 1KB)) {
+        throw "$RelativePath exceeds its $MaximumKB KB performance budget ($([math]::Round($size / 1KB, 1)) KB)."
+    }
+}
+
 if (-not (Test-Path -LiteralPath $dist)) { throw "Missing dist directory. Run tools/site.ps1 build first." }
 if (-not (Test-Path -LiteralPath $journalManifestPath) -or -not (Test-Path -LiteralPath $journalPartialPath) -or -not (Test-Path -LiteralPath $journalStarterPath)) { throw "Travel journal manifest, shared partial, or starter is missing." }
 $journalManifestData = Get-Content -LiteralPath $journalManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -42,6 +51,7 @@ foreach ($retiredPath in $retiredPaths) {
     if (Test-Path -LiteralPath (Join-Path $dist $retiredPath)) { throw "Retired page asset was published: $retiredPath" }
 }
 $eventPageNames = @('house.html', 'prewed.html')
+$journalPageNames = @($journalManifest | ForEach-Object { "$($_.slug).html" })
 $navSignatures = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
 
 foreach ($page in $pages) {
@@ -53,12 +63,18 @@ foreach ($page in $pages) {
     if ([regex]::Matches($scan, '<main\b', 'IgnoreCase').Count -ne 1) { throw "$($page.Name) must contain exactly one <main> landmark." }
     if ([regex]::Matches($scan, '<h1\b', 'IgnoreCase').Count -ne 1) { throw "$($page.Name) must contain exactly one <h1> heading." }
     if ($scan -notmatch '<meta name="viewport" content="width=device-width, initial-scale=1(?:\.0)?') { throw "$($page.Name) is missing the responsive viewport configuration." }
-    if ($scan -notmatch 'assets/css/main\.css\?v=2' -or $scan -notmatch 'assets/css/custom\.css\?v=167' -or $scan -notmatch 'assets/js/util\.js\?v=1' -or $scan -notmatch 'assets/js/main\.js\?v=18') { throw "$($page.Name) is missing the current shared asset versions." }
+    if ($scan -notmatch 'assets/css/main\.css\?v=2' -or $scan -notmatch 'assets/css/custom\.css\?v=167' -or $scan -notmatch 'assets/js/util\.js\?v=1' -or $scan -notmatch 'assets/js/main\.js\?v=19') { throw "$($page.Name) is missing the current shared asset versions." }
     if ($scan -notmatch 'href=["'']personal["'']') { throw "$($page.Name) is missing the Personal navigation tab." }
     if ($eventPageNames -notcontains $page.Name -and $page.Name -ne 'index.html' -and $scan -notmatch 'class="logo icon fa-home"') { throw "$($page.Name) is missing the centered home control." }
     if ($page.Name -eq 'index.html' -and $scan -match 'class="logo icon fa-home"|<header id="header">') { throw "Homepage must flow directly from its full-screen opening without a redundant home control." }
-    if ($page.Name -ne 'index.html' -and $scan -match '<canvas id="nokey"') { throw "$($page.Name) must not run the homepage background canvas." }
-    if ($page.Name -in @('404.html', 'house.html', 'prewed.html') -and $scan -match 'assets/js/game\.js') { throw "$($page.Name) must not load the unused gamification bundle." }
+    if ($page.Name -ne 'index.html' -and ($scan -match '<canvas id="nokey"|assets/js/canvas-background\.js')) { throw "$($page.Name) must not run the homepage background canvas." }
+    if ($page.Name -ne 'index.html' -and $scan -match 'assets/js/game\.js') { throw "$($page.Name) must not load the homepage interaction bundle." }
+    if ($page.Name -in @('skills.html', 'travel.html')) {
+        if ($scan -notmatch 'assets/js/listing-effects\.js\?v=1') { throw "$($page.Name) is missing its listing effects bundle." }
+    } elseif ($scan -match 'assets/js/listing-effects\.js') { throw "$($page.Name) must not load the listing effects bundle." }
+    if ($journalPageNames -contains $page.Name) {
+        if ($scan -notmatch 'assets/js/journal-progress\.js\?v=1') { throw "$($page.Name) is missing its reading-progress bundle." }
+    } elseif ($scan -match 'assets/js/journal-progress\.js') { throw "$($page.Name) must not load the journal progress bundle." }
     if ($page.Name -ne 'travel.html' -and $scan -match 'assets/css/travel-map-page\.css') { throw "$($page.Name) must not load the travel-atlas stylesheet." }
     if ($eventPageNames -contains $page.Name -and $scan -match '<header id="header">') { throw "$($page.Name) still contains the retired event-page banner." }
     if ($scan -match 'class="row rowpad"|\bworkbutton\b') { throw "$($page.Name) still contains retired or inconsistent bottom navigation." }
@@ -95,6 +111,13 @@ foreach ($page in $pages) {
         }
         if (-not (Test-Path -LiteralPath $target)) { throw "$($page.Name) references missing file: $reference" }
     }
+    $scriptBytes = 0
+    foreach ($scriptMatch in [regex]::Matches($scan, '<script\b[^>]*\bsrc="(assets/js/[^"?]+)')) {
+        $scriptPath = Join-Path $dist ($scriptMatch.Groups[1].Value -replace '/', '\')
+        $scriptBytes += (Get-Item -LiteralPath $scriptPath).Length
+    }
+    if ($scriptBytes -gt 160KB) { throw "$($page.Name) exceeds the 160 KB raw JavaScript budget." }
+    if ($page.Length -gt 225KB) { throw "$($page.Name) exceeds the 225 KB generated-HTML budget." }
 }
 
 if ($navSignatures.Count -ne 1) { throw "Generated pages do not share one consistent navigation block." }
@@ -113,8 +136,20 @@ $galleryJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\gallery.js') -
 $travelNavJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\travel-nav.js') -Raw -Encoding UTF8
 $travelMapJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\travel-map.js') -Raw -Encoding UTF8
 $mainJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\main.js') -Raw -Encoding UTF8
+$canvasJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\canvas-background.js') -Raw -Encoding UTF8
 $gameJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\game.js') -Raw -Encoding UTF8
+$listingEffectsJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\listing-effects.js') -Raw -Encoding UTF8
+$journalProgressJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\journal-progress.js') -Raw -Encoding UTF8
 $scrambleRevealJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\scramble-reveal.js') -Raw -Encoding UTF8
+Assert-FileSizeBudget 'assets\css\custom.css' 155
+Assert-FileSizeBudget 'assets\css\travel-map-page.css' 30
+Assert-FileSizeBudget 'assets\js\main.js' 14
+Assert-FileSizeBudget 'assets\js\canvas-background.js' 14
+Assert-FileSizeBudget 'assets\js\game.js' 22
+Assert-FileSizeBudget 'assets\js\listing-effects.js' 8
+Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
+if ($listingEffectsJs -notmatch 'prefers-reduced-motion: reduce' -or $listingEffectsJs -notmatch '\.education-grid \.education-card' -or $listingEffectsJs -notmatch '\.travel-grid \.travel-card' -or $listingEffectsJs -notmatch "classList\.add\('js-tilt'\)") { throw 'Listing effects must preserve reduced-motion reveals and pointer tilt for skills and travel cards.' }
+if ($journalProgressJs -notmatch "bar\.className = 'read-progress'" -or $journalProgressJs -notmatch 'requestAnimationFrame\(update\)' -or $journalProgressJs -notmatch "addEventListener\('resize'") { throw 'Journal progress must remain frame-throttled and respond to layout changes.' }
 if ([regex]::Matches($travel, 'class="travel-card"').Count -ne 9) { throw "Travel page must contain nine travel cards." }
 if ($travel -notmatch 'class="travel-atlas"' -or $travel -notmatch 'Explore by destination' -or $travel -notmatch 'browse trip stories and photos') { throw "Travel destination atlas or visitor-facing introduction is missing." }
 if ([regex]::Matches($travel, 'class="travel-map__marker travel-map__marker--').Count -ne 11) { throw "Travel atlas must contain eleven regional map pins." }
@@ -295,7 +330,7 @@ foreach ($mapTarget in $requiredMapTargets.GetEnumerator()) {
 if ($homeHtml -notmatch 'class="portfolio-hero__cta"' -or $homeHtml -notmatch 'class="portfolio-hero__cta-icon icon fa fa-briefcase"' -or $homeHtml -notmatch '<span class="portfolio-hero__cta-label">View selected work</span>') { throw "Homepage selected-work call to action is missing." }
 if ($homeHtml -notmatch 'href="experience#selected-work"') { throw "Homepage selected-work links should land above the portfolio cards." }
 if ($homeHtml -notmatch '<body class="is-preload page-home">' -or $homeHtml -match 'page-index|hero-signal|hero-capabilities' -or $homeHtml -match 'class="logo icon fa-home"|<header id="header">') { throw "Homepage must retain the clean hero while using the full-screen page scope without a redundant home header." }
-if ($homeHtml -notmatch 'assets/js/main\.js\?v=18' -or $homeHtml -notmatch 'assets/js/game\.js\?v=17' -or $mainJs -match '!reducedMotion && !compactCanvas' -or $mainJs -notmatch 'ball_limit = compactCanvas \? 9 : 14' -or $mainJs -notmatch "hasClass\('page-home'\)" -or $mainJs -notmatch '\$navPanelToggle\.appendTo\(\$body\)' -or $mainJs -notmatch "toggleClass\('is-navPanel-visible'\)" -or $gameJs -notmatch 'window\.innerHeight - photoTop' -or $gameJs -notmatch 'textProgress = Math\.max' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\)\s*\{\s*canvas#nokey\s*\{\s*display:\s*block') { throw "Homepage mobile animation, navigation, or visibility-driven About transition is missing." }
+if ($homeHtml -notmatch 'assets/js/main\.js\?v=19' -or $homeHtml -notmatch 'assets/js/canvas-background\.js\?v=1' -or $homeHtml -notmatch 'assets/js/game\.js\?v=17' -or $mainJs -match 'ball_limit|compactCanvas' -or $canvasJs -match '!reducedMotion && !compactCanvas' -or $canvasJs -notmatch 'ball_limit = compactCanvas \? 9 : 14' -or $mainJs -notmatch "hasClass\('page-home'\)" -or $mainJs -notmatch '\$navPanelToggle\.appendTo\(\$body\)' -or $mainJs -notmatch "toggleClass\('is-navPanel-visible'\)" -or $gameJs -notmatch 'window\.innerHeight - photoTop' -or $gameJs -notmatch 'textProgress = Math\.max' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\)\s*\{\s*canvas#nokey\s*\{\s*display:\s*block') { throw "Homepage mobile animation, navigation, or visibility-driven About transition is missing." }
 if ($customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?\.intro-swipe\s*\{[^}]*height:\s*122vh[^}]*margin-bottom:\s*0' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?\.intro-swipe__row\s*\{[^}]*flex-direction:\s*column[^}]*gap:\s*1rem[^}]*padding:\s*0 1rem 3vh' -or $customCss -notmatch '(?s)@media all and \(max-width: 600px\).*?\.homepage \.homepage-links\s*\{[^}]*margin-top:\s*0\.5rem' -or $customCss -notmatch '(?s)\.intro-swipe__text \.aboutblock\s*\{[^}]*text-align:\s*left') { throw "Homepage mobile intro must hand off cleanly with readable left-aligned copy." }
 if ($mainJs -notmatch "side: 'bottom'" -or $mainJs -notmatch 'hideOnEscape: true' -or $mainJs -notmatch 'aria-expanded' -or $customCss -notmatch '(?s)@media screen and \(max-width: 980px\).*?#navPanel\s*\{[^}]*bottom:\s*0[^}]*max-height:\s*72svh[^}]*border-radius:\s*1\.4rem 1\.4rem 0 0[^}]*translateY' -or $customCss -notmatch '(?s)#navPanel \.links li\.active a\s*\{[^}]*background:\s*var\(--color-brand-wash\)' -or $customCss -notmatch '(?s)body\.is-navPanel-visible::before\s*\{[^}]*opacity:\s*1') { throw "Mobile navigation must use the accessible, active-state bottom sheet and soft backdrop." }
 if ($homeHtml -notmatch 'data-scramble-list' -or $homeHtml -notmatch 'data-scramble-source>I build agentic AI products for real-world security operations\.<' -or $homeHtml -notmatch 'aria-label="I build agentic AI products for real-world security operations\. Product direction, DSTA\."' -or $homeHtml -notmatch 'data-scramble-row data-scramble-lead="2"' -or $homeHtml -notmatch 'Product direction <span aria-hidden="true">&middot;</span> DSTA' -or $homeHtml -notmatch 'assets/js/scramble-reveal\.js\?v=12' -or $homeHtml -match 'Analysts drown|portfolio-hero__line--|class="txt-rotate"') { throw "Homepage must use the one-sentence scramble hero with the DSTA support line and two unscrambled lead words." }

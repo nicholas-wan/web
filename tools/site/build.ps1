@@ -709,8 +709,11 @@ foreach ($page in $pages) {
     $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=13"></script>' } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=20"></script>' } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { '<script src="assets/js/scramble-reveal.js?v=12"></script>' } else { "" }
-    $gameScript = if ($slug -in @('index', 'experience', 'skills', 'personal', 'travel') -or $tripOrder -contains $slug) { '<script src="assets/js/game.js?v=17"></script>' } else { "" }
-    $optionalScripts = (@($galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
+    $gameScript = if ($slug -eq 'index') { '<script src="assets/js/game.js?v=17"></script>' } else { "" }
+    $listingEffectsScript = if ($slug -in @('skills', 'travel')) { '<script src="assets/js/listing-effects.js?v=1"></script>' } else { "" }
+    $journalProgressScript = if ($tripOrder -contains $slug) { '<script src="assets/js/journal-progress.js?v=1"></script>' } else { "" }
+    $canvasScript = if ($slug -eq 'index') { '<script src="assets/js/canvas-background.js?v=1"></script>' } else { "" }
+    $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
     # FontAwesome 6 only draws the tech-stack icons, well below the fold, but as a
     # plain stylesheet it blocked first paint on a third-party round trip. Load it
@@ -776,9 +779,8 @@ $navigation
     <script src="assets/js/browser.min.js"></script>
     <script src="assets/js/breakpoints.min.js"></script>
     <script src="assets/js/util.js?v=1"></script>
-    <script src="assets/js/main.js?v=18"></script>
+    <script src="assets/js/main.js?v=19"></script>
     <script src="assets/js/arrow.js?v=1"></script>
-$gameScript
 $optionalScripts
 </body>
 </html>
@@ -799,7 +801,7 @@ if ($imageDimensionCacheDirty) {
 
 # Publish only runtime assets used by the generated Pages site.
 $runtimeCss = @("main.css", "font-awesome.min.css", "noscript.css")
-$runtimeJs = @("jquery.min.js", "jquery.scrollex.min.js", "jquery.scrolly.min.js", "browser.min.js", "breakpoints.min.js", "util.js", "main.js", "arrow.js", "game.js", "gallery.js", "travel-nav.js", "travel-map.js", "personal-timeline.js", "scramble-reveal.js")
+$runtimeJs = @("jquery.min.js", "jquery.scrollex.min.js", "jquery.scrolly.min.js", "browser.min.js", "breakpoints.min.js", "util.js", "arrow.js", "game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "personal-timeline.js", "scramble-reveal.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCss) {
@@ -815,6 +817,16 @@ $travelMapCss = $customCssSource.Substring($travelMapStart, $travelMapEnd - $tra
 $sharedCustomCss = ($customCssSource.Substring(0, $travelMapStart).TrimEnd() + "`n`n" + $customCssSource.Substring($travelMapEnd).TrimStart())
 Write-Utf8 (Join-Path $out 'assets\css\custom.css') $sharedCustomCss
 Write-Utf8 (Join-Path $out 'assets\css\travel-map-page.css') $travelMapCss
+$mainJsSource = Get-Content -LiteralPath (Join-Path $root 'assets\js\main.js') -Raw -Encoding UTF8
+$canvasStartMarker = '/*Canvas*/'
+$canvasEndMarker = '// Shared progressive enhancement'
+$canvasStart = $mainJsSource.IndexOf($canvasStartMarker)
+$canvasEnd = $mainJsSource.IndexOf($canvasEndMarker)
+if ($canvasStart -lt 0 -or $canvasEnd -le $canvasStart) { throw 'Could not locate the homepage canvas JavaScript boundaries.' }
+$canvasJs = $mainJsSource.Substring($canvasStart, $canvasEnd - $canvasStart).Trim() + "`n"
+$sharedMainJs = ($mainJsSource.Substring(0, $canvasStart).TrimEnd() + "`n`n" + $mainJsSource.Substring($canvasEnd).TrimStart())
+Write-Utf8 (Join-Path $out 'assets\js\main.js') $sharedMainJs
+Write-Utf8 (Join-Path $out 'assets\js\canvas-background.js') $canvasJs
 foreach ($file in $runtimeJs) {
     Copy-Item -LiteralPath (Join-Path $root "assets\js\$file") -Destination (Join-Path $out "assets\js\$file") -Force
 }

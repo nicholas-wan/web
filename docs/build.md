@@ -26,6 +26,8 @@ The build adds intrinsic image dimensions, native lazy loading, first-image prio
 
 `assets/css/custom.css` remains the authored source of truth. The build extracts its self-contained travel-atlas block into `travel-map-page.css`, which is loaded only by the travel index; all other rules remain in the generated `custom.css`.
 
+`assets/js/main.js` also remains the authored theme source. The build extracts its marked canvas block into `canvas-background.js` for the homepage only. Homepage interactions stay in `game.js`; Skills and Travel use `listing-effects.js`, and journals use `journal-progress.js`. Verification enforces route ownership and size budgets for these generated assets.
+
 Preview `dist/` with any static web server. The `.claude/launch.json` configuration serves it on port 4321.
 
 ## Deployment
