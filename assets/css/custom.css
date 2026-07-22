@@ -5047,6 +5047,12 @@ a:focus-visible {
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.45);
 }
 
+/* The image and video share the same sizing class. Keep the inactive medium
+   out of layout even though that class sets display: block. */
+.lightbox__image[hidden] {
+  display: none;
+}
+
 .lightbox__caption {
   display: inline-block;
   margin-top: 0.9rem;

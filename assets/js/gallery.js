@@ -24,7 +24,10 @@
       !image.closest('.travel-section-nav, .travel-pagination, .site-pager') &&
       candidates.indexOf(image) === index;
   });
-  if (!images.length) return;
+  var galleryMedia = images.concat(journalAnimations).sort(function (left, right) {
+    return left.compareDocumentPosition(right) & 4 ? -1 : 1;
+  });
+  if (!galleryMedia.length) return;
 
   /* Native lazy loading is deliberately conservative, which can leave a
      blank tile after a quick journal scroll or horizontal swipe. Warm only
@@ -62,15 +65,16 @@
   overlay.className = 'lightbox';
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
-  overlay.setAttribute('aria-label', 'Image viewer');
-  overlay.innerHTML = '<button class="lightbox__close" type="button" aria-label="Close image viewer">&times;</button>' +
-    '<button class="lightbox__previous" type="button" aria-label="Previous image">&#8592;</button>' +
-    '<figure class="lightbox__figure"><img class="lightbox__image" alt=""><figcaption class="lightbox__caption"></figcaption></figure>' +
-    '<button class="lightbox__next" type="button" aria-label="Next image">&#8594;</button>';
+  overlay.setAttribute('aria-label', 'Media viewer');
+  overlay.innerHTML = '<button class="lightbox__close" type="button" aria-label="Close media viewer">&times;</button>' +
+    '<button class="lightbox__previous" type="button" aria-label="Previous media">&#8592;</button>' +
+    '<figure class="lightbox__figure"><img class="lightbox__image" alt=""><video class="lightbox__image lightbox__video" controls loop muted playsinline hidden></video><figcaption class="lightbox__caption"></figcaption></figure>' +
+    '<button class="lightbox__next" type="button" aria-label="Next media">&#8594;</button>';
   document.body.appendChild(overlay);
 
   var current = 0;
-  var viewerImage = overlay.querySelector('.lightbox__image');
+  var viewerImage = overlay.querySelector('img.lightbox__image');
+  var viewerVideo = overlay.querySelector('.lightbox__video');
   var caption = overlay.querySelector('.lightbox__caption');
   /* aria-modal tells assistive tech the page behind the dialog is gone, so
      focus must actually move into the dialog on open, stay inside it while it
@@ -78,17 +82,35 @@
   var lastTrigger = null;
   var closeButton = overlay.querySelector('.lightbox__close');
   var close = function () {
+    viewerVideo.pause();
     overlay.classList.remove('is-visible');
     document.body.classList.remove('lightbox-open');
     if (lastTrigger) { lastTrigger.focus(); lastTrigger = null; }
   };
   var show = function (index) {
     var opening = !overlay.classList.contains('is-visible');
-    current = (index + images.length) % images.length;
-    var source = images[current];
-    warmImage(source);
-    viewerImage.src = source.currentSrc || source.src;
-    viewerImage.alt = source.alt || 'Gallery image';
+    current = (index + galleryMedia.length) % galleryMedia.length;
+    var source = galleryMedia[current];
+    var isVideo = source.tagName === 'VIDEO';
+    var accessibleName = source.alt || source.getAttribute('aria-label') || 'Gallery media';
+    if (isVideo) {
+      viewerImage.hidden = true;
+      viewerVideo.hidden = false;
+      viewerVideo.src = source.currentSrc || source.querySelector('source').src;
+      viewerVideo.poster = source.poster;
+      if (reducedMotion.matches) viewerVideo.pause();
+      else {
+        var lightboxPlayback = viewerVideo.play();
+        if (lightboxPlayback && lightboxPlayback.catch) lightboxPlayback.catch(function () {});
+      }
+    } else {
+      viewerVideo.pause();
+      viewerVideo.hidden = true;
+      viewerImage.hidden = false;
+      warmImage(source);
+      viewerImage.src = source.currentSrc || source.src;
+      viewerImage.alt = accessibleName;
+    }
     /* Caption = place + detail. `.content-title` is often the city (repeated
        across dozens of photos) and `.content-text` the actual location, so show
        both, de-duplicated, rather than just the first match (which was the city). */
@@ -104,18 +126,18 @@
       if (figCaption) parts.push(figCaption.textContent.trim());
     }
     parts = parts.filter(function (part, index) { return part && parts.indexOf(part) === index; });
-    if (!parts.length && source.alt) parts.push(source.alt);
+    if (!parts.length) parts.push(accessibleName);
     caption.textContent = parts.join(' · ');
     overlay.classList.add('is-visible');
     document.body.classList.add('lightbox-open');
     if (opening) closeButton.focus();
   };
-  images.forEach(function (image, index) {
-    var trigger = image.closest('.content') || image;
-    image.classList.add('journal-lightbox-trigger');
+  galleryMedia.forEach(function (media, index) {
+    var trigger = media.closest('.content') || media;
+    media.classList.add('journal-lightbox-trigger');
     trigger.setAttribute('tabindex', '0');
     trigger.setAttribute('role', 'button');
-    trigger.setAttribute('aria-label', 'Open image: ' + (image.alt || ('journal photo ' + (index + 1))));
+    trigger.setAttribute('aria-label', 'Open media: ' + (media.alt || media.getAttribute('aria-label') || ('journal item ' + (index + 1))));
     trigger.addEventListener('click', function (event) { event.preventDefault(); lastTrigger = trigger; show(index); });
     trigger.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); lastTrigger = trigger; show(index); } });
   });
@@ -162,7 +184,7 @@
     if (event.key === 'ArrowLeft') show(current - 1);
     if (event.key === 'ArrowRight') show(current + 1);
     if (event.key === 'Tab') {
-      var focusable = overlay.querySelectorAll('button');
+      var focusable = overlay.querySelectorAll('button, video[controls]');
       var first = focusable[0];
       var last = focusable[focusable.length - 1];
       if (!overlay.contains(document.activeElement)) {
