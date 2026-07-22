@@ -5163,6 +5163,41 @@ a:focus-visible {
   cursor: zoom-in;
 }
 
+.journal-lightbox-trigger[role="button"]:focus-visible,
+.masonry .content[role="button"]:focus-visible {
+  outline: 3px solid rgba(18, 138, 134, 0.72);
+  outline-offset: 3px;
+}
+
+/* Touch-first layouts keep primary controls at a comfortable 44px-or-larger
+   target without enlarging their desktop mouse treatment. */
+@media screen and (max-width: 980px) {
+  #intro .portfolio-hero__cta,
+  #intro .portfolio-hero__cta:hover,
+  #intro .portfolio-hero__cta:focus-visible,
+  .earlier-work__grid a {
+    min-height: 3rem;
+  }
+
+  #intro .portfolio-hero__cta,
+  #intro .portfolio-hero__cta:hover,
+  #intro .portfolio-hero__cta:focus-visible,
+  #main .travel-map.is-fullscreen .travel-map__close,
+  #main .travel-map__zoom-btn,
+  .travel-grid .travel-card .actions.special .button {
+    height: 3rem;
+  }
+
+  #main .travel-map.is-fullscreen .travel-map__close,
+  #main .travel-map__zoom-btn {
+    width: 3rem;
+  }
+
+  .travel-grid .travel-card .actions.special .button {
+    line-height: 3rem;
+  }
+}
+
 .lightbox-open {
   overflow: hidden;
 }
@@ -6735,6 +6770,20 @@ body.page-home #intro {
 .page-travel-journal .guangzhou-journal__hero-image,
 .page-travel-journal .image.main.journal-banner {
   background: linear-gradient(135deg, #dce7e6, #edf2f1);
+}
+
+/* Japan's artwork already carries its title. Present it as a quieter poster
+   inside the banner instead of cropping and enlarging the wordmark. */
+.page-travel-journal .japan-journal .guangzhou-journal__hero-image img.journal-banner {
+  height: clamp(18rem, 30vw, 24rem);
+  object-fit: contain;
+  object-position: center;
+}
+
+@media screen and (max-width: 600px) {
+  .page-travel-journal .japan-journal .guangzhou-journal__hero-image img.journal-banner {
+    height: 13.5rem;
+  }
 }
 
 body.page-home #nav {
