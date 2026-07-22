@@ -6772,17 +6772,18 @@ body.page-home #intro {
   background: linear-gradient(135deg, #dce7e6, #edf2f1);
 }
 
-/* Japan's artwork already carries its title. Present it as a quieter poster
-   inside the banner instead of cropping and enlarging the wordmark. */
+/* Japan's artwork already carries its title. Keep the banner full-bleed while
+   favouring the lower photograph so the embedded wordmark stays out of the
+   primary composition. */
 .page-travel-journal .japan-journal .guangzhou-journal__hero-image img.journal-banner {
-  height: clamp(18rem, 30vw, 24rem);
-  object-fit: contain;
-  object-position: center;
+  height: clamp(16rem, 28vw, 22rem);
+  object-fit: cover;
+  object-position: 50% 100%;
 }
 
 @media screen and (max-width: 600px) {
   .page-travel-journal .japan-journal .guangzhou-journal__hero-image img.journal-banner {
-    height: 13.5rem;
+    height: 10rem;
   }
 }
 

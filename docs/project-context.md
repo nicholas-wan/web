@@ -41,7 +41,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 - Follow the class combinations and markup hierarchy in `journals/_template.html`, including the generic `travel-*` classes and `guangzhou-*` compatibility classes. Heading order is structural because the build derives section and map anchors from it.
 - Journal date ranges use four-digit years: `D Month YYYY – D Month YYYY`, or `Month YYYY – Month YYYY` when exact days are unknown.
 - Use focal-point custom properties for banner and gallery crops. Tall collage cards span two desktop rows and return to standard cards on mobile. Keep mobile swipe cues in normal document flow rather than overlaying photos; their prompt shakes twice, then remains still until the visitor scrolls and dismisses it.
-- Japan's title-bearing banner is intentionally contained in a shorter poster-style frame so its embedded `JAPAN` wordmark does not dominate or crop like a conventional photographic hero.
+- Japan's title-bearing banner stays full-bleed and uses a lower crop so its embedded `JAPAN` wordmark does not dominate the photographic header.
 - Journal section links use the measured sticky-toolbar correction in `assets/js/travel-nav.js`. Do not replace it with a fixed pixel offset. Every journal keeps its section controls in one horizontally scrollable row, including long itineraries such as Europe and USA/Canada.
 
 ### Journal scrolling contract
