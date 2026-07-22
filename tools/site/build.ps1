@@ -13,6 +13,26 @@ $navigationTemplate = Get-Content -LiteralPath $navigationPartialPath -Raw -Enco
 $travelJournalPartialPath = Join-Path $root "partials\travel-journal.html"
 if (-not (Test-Path -LiteralPath $travelJournalPartialPath)) { throw "Missing shared travel journal partial: $travelJournalPartialPath" }
 $travelJournalTemplate = Get-Content -LiteralPath $travelJournalPartialPath -Raw -Encoding UTF8
+$imageDimensionCachePath = Join-Path $root '.cache\site-image-dimensions.json'
+$imageDimensionCache = @{}
+$imageDimensionCacheDirty = $false
+$sourceImageIndex = @{}
+foreach ($imageSourceRoot in @((Join-Path $root 'images'), (Join-Path $root 'images-webp'))) {
+    if (Test-Path -LiteralPath $imageSourceRoot) {
+        foreach ($imageFile in Get-ChildItem -LiteralPath $imageSourceRoot -Recurse -File) {
+            $sourceImageIndex[$imageFile.FullName.ToLowerInvariant()] = $imageFile
+        }
+    }
+}
+if (Test-Path -LiteralPath $imageDimensionCachePath) {
+    try {
+        foreach ($entry in @(Get-Content -LiteralPath $imageDimensionCachePath -Raw -Encoding UTF8 | ConvertFrom-Json)) {
+            $imageDimensionCache[$entry.Path] = $entry
+        }
+    } catch {
+        Write-Warning "Ignoring invalid image dimension cache: $imageDimensionCachePath"
+    }
+}
 
 function Write-Utf8([string]$Path, [string]$Content) {
     $utf8 = New-Object System.Text.UTF8Encoding($false)
@@ -61,9 +81,46 @@ function Get-WebpDimensions([string]$Path) {
     } catch { return $null }
 }
 
-function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot) {
+function Get-SourceImageInfo([string]$Path, [hashtable]$Index) {
+    if (-not $Path) { return $null }
+    return $Index[[IO.Path]::GetFullPath($Path).ToLowerInvariant()]
+}
+
+function Get-CachedImageDimensions([string]$Path, [hashtable]$SourceIndex) {
+    $info = Get-SourceImageInfo $Path $SourceIndex
+    if (-not $info) { return $null }
+    $key = $info.FullName.ToLowerInvariant()
+    $cached = $script:imageDimensionCache[$key]
+    if ($cached -and $cached.Length -eq $info.Length -and $cached.LastWriteTicks -eq $info.LastWriteTimeUtc.Ticks) {
+        return @{ Width = [int]$cached.Width; Height = [int]$cached.Height }
+    }
+
+    try {
+        if ($Path -match '\.webp$') {
+            $dimensions = Get-WebpDimensions $Path
+        } else {
+            $loadedImage = [System.Drawing.Image]::FromFile($Path)
+            try { $dimensions = @{ Width = $loadedImage.Width; Height = $loadedImage.Height } }
+            finally { $loadedImage.Dispose() }
+        }
+        if ($dimensions) {
+            $script:imageDimensionCache[$key] = [pscustomobject]@{
+                Path = $key
+                Length = $info.Length
+                LastWriteTicks = $info.LastWriteTimeUtc.Ticks
+                Width = $dimensions.Width
+                Height = $dimensions.Height
+            }
+            $script:imageDimensionCacheDirty = $true
+        }
+        return $dimensions
+    } catch {
+        return $null
+    }
+}
+
+function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [hashtable]$SourceIndex) {
     $state = @{ Counter = 0 }
-    $imageDimensions = @{}
     return [regex]::Replace($Markup, '<img\b[^>]*>', {
         param($match)
         $tag = $match.Value
@@ -72,7 +129,7 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot) {
         if (-not $srcMatch.Success -or $srcMatch.Groups[1].Value -match '^(https?:|data:)') { return $tag }
         $relative = $srcMatch.Groups[1].Value.Replace('/', '\')
         $path = Join-Path $ImageRoot ($relative -replace '^images\\', '')
-        if (-not (Test-Path -LiteralPath $path)) {
+        if (-not (Get-SourceImageInfo $path $SourceIndex)) {
             $webpRootPath = Join-Path (Split-Path $ImageRoot -Parent) 'images-webp'
             $bare = $relative -replace '^images\\', ''
             if ($relative -match '\.webp$') {
@@ -85,24 +142,7 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot) {
                 $path = Join-Path $webpRootPath ([IO.Path]::ChangeExtension($bare, '.webp'))
             }
         }
-        $image = $null
-        $dimensions = $null
-        if ($imageDimensions.ContainsKey($path)) {
-            $dimensions = $imageDimensions[$path]
-        } else {
-            try {
-                if (Test-Path -LiteralPath $path) {
-                    if ($path -match '\.webp$') {
-                        $dimensions = Get-WebpDimensions $path
-                    } else {
-                        $loadedImage = [System.Drawing.Image]::FromFile($path)
-                        $dimensions = @{ Width = $loadedImage.Width; Height = $loadedImage.Height }
-                        $loadedImage.Dispose()
-                    }
-                    if ($dimensions) { $imageDimensions[$path] = $dimensions }
-                }
-            } catch { $dimensions = $null }
-        }
+        $dimensions = Get-CachedImageDimensions $path $SourceIndex
         if ($dimensions) {
             # Emit intrinsic width/height on every image, including masonry
             # bricks. With CSS `.content-image { width: 100% }` and height auto,
@@ -121,8 +161,8 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot) {
                 $sources = @()
                 $variant480 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-480' + $variantSuffix))
                 $variant800 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-800' + $variantSuffix))
-                $has480 = $dimensions.Width -gt 480 -and (Test-Path -LiteralPath $variant480)
-                $has800 = $dimensions.Width -gt 800 -and (Test-Path -LiteralPath $variant800)
+                $has480 = $dimensions.Width -gt 480 -and [bool](Get-SourceImageInfo $variant480 $SourceIndex)
+                $has800 = $dimensions.Width -gt 800 -and [bool](Get-SourceImageInfo $variant800 $SourceIndex)
                 if ($has480) {
                     $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-480' + $variantSuffix)) 480w"
                 }
@@ -180,7 +220,7 @@ function Sync-Directory([string]$Source, [string]$Destination) {
     }
 }
 
-function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]$WebpRoot) {
+function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]$WebpRoot, [hashtable]$SourceIndex) {
     $references = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
     $scanFiles = Get-ChildItem -LiteralPath $OutputRoot -Recurse -File | Where-Object { $_.Extension -in @('.html', '.css', '.js', '.webmanifest') }
     $patterns = @(
@@ -201,16 +241,20 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
     }
 
     $destinationRoot = Join-Path $OutputRoot 'images'
-    if (Test-Path -LiteralPath $destinationRoot) { Remove-Item -LiteralPath $destinationRoot -Recurse -Force }
     New-Item -ItemType Directory -Path $destinationRoot -Force | Out-Null
+    $publishedImageIndex = @{}
+    foreach ($publishedFile in Get-ChildItem -LiteralPath $destinationRoot -Recurse -File -ErrorAction SilentlyContinue) {
+        $publishedImageIndex[$publishedFile.FullName.ToLowerInvariant()] = $publishedFile
+    }
+    $copied = 0
 
     foreach ($reference in ($references | Sort-Object)) {
         $relative = $reference.Substring('images/'.Length) -replace '/', '\\'
         $source = $null
         $webpCandidate = if ($WebpRoot) { Join-Path $WebpRoot $relative } else { $null }
         $imageCandidate = Join-Path $ImageRoot $relative
-        if ($webpCandidate -and (Test-Path -LiteralPath $webpCandidate)) { $source = $webpCandidate }
-        elseif (Test-Path -LiteralPath $imageCandidate) { $source = $imageCandidate }
+        if ($webpCandidate -and (Get-SourceImageInfo $webpCandidate $SourceIndex)) { $source = $webpCandidate }
+        elseif (Get-SourceImageInfo $imageCandidate $SourceIndex) { $source = $imageCandidate }
         if (-not $source) {
             Write-Warning "Skipping stale image reference: $reference"
             continue
@@ -218,9 +262,19 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
 
         $destination = Join-Path $OutputRoot ($reference -replace '/', '\\')
         New-Item -ItemType Directory -Path (Split-Path $destination -Parent) -Force | Out-Null
-        Copy-Item -LiteralPath $source -Destination $destination -Force
+        $destinationInfo = $publishedImageIndex[[IO.Path]::GetFullPath($destination).ToLowerInvariant()]
+        $copyRequired = -not $destinationInfo
+        if (-not $copyRequired) {
+            $sourceInfo = Get-SourceImageInfo $source $SourceIndex
+            $copyRequired = $sourceInfo.Length -ne $destinationInfo.Length -or
+                $sourceInfo.LastWriteTimeUtc -gt $destinationInfo.LastWriteTimeUtc
+        }
+        if ($copyRequired) {
+            Copy-Item -LiteralPath $source -Destination $destination -Force
+            $copied++
+        }
     }
-    Write-Output "Published $($references.Count) referenced images."
+    Write-Output "Published $($references.Count) referenced images ($copied copied)."
 }
 
 $journalManifestPath = Join-Path $root "journals\manifest.json"
@@ -624,9 +678,9 @@ foreach ($page in $pages) {
     $main = Add-PageNavigation $main $slug
     $main = Normalize-MissingJpegReferences $main (Join-Path $root "images")
     $intro = Normalize-MissingJpegReferences $intro (Join-Path $root "images")
-    $main = Add-ImagePerformanceAttributes $main (Join-Path $root "images")
+    $main = Add-ImagePerformanceAttributes $main (Join-Path $root "images") $sourceImageIndex
     $main = Add-GalleryAltText $main $slug
-    $intro = Add-ImagePerformanceAttributes $intro (Join-Path $root "images")
+    $intro = Add-ImagePerformanceAttributes $intro (Join-Path $root "images") $sourceImageIndex
 
     foreach ($mapping in $webpMap.GetEnumerator()) {
         $main = $main.Replace($mapping.Key, $mapping.Value)
@@ -655,6 +709,7 @@ foreach ($page in $pages) {
     $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=13"></script>' } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=20"></script>' } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { '<script src="assets/js/scramble-reveal.js?v=12"></script>' } else { "" }
+    $gameScript = if ($slug -in @('index', 'experience', 'skills', 'personal', 'travel') -or $tripOrder -contains $slug) { '<script src="assets/js/game.js?v=17"></script>' } else { "" }
     $optionalScripts = (@($galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
     # FontAwesome 6 only draws the tech-stack icons, well below the fold, but as a
@@ -665,10 +720,12 @@ foreach ($page in $pages) {
     $fontAwesomeUrl = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css'
     $fontAwesomeIntegrity = 'sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=='
     $fontAwesomeStylesheet = if ($slug -eq 'skills') { "    <link rel=`"preload`" as=`"style`" href=`"$fontAwesomeUrl`" integrity=`"$fontAwesomeIntegrity`" crossorigin=`"anonymous`" onload=`"this.onload=null;this.rel='stylesheet'`" />`n    <noscript><link rel=`"stylesheet`" href=`"$fontAwesomeUrl`" integrity=`"$fontAwesomeIntegrity`" crossorigin=`"anonymous`" /></noscript>" } else { '' }
+    $travelMapStylesheet = if ($slug -eq 'travel') { '    <link rel="stylesheet" href="assets/css/travel-map-page.css?v=1" />' } else { '' }
     # The professional pages opt out of a share-preview image (owner decision,
     # Jul 2026): scrapers show a text-only card rather than the travel default.
     $shareImageMeta = if ($slug -in @('experience', 'skills')) { '' } else { "    <meta property=`"og:image`" content=`"__OGIMAGE__`" />`n    <meta name=`"twitter:card`" content=`"summary_large_image`" />" }
     $introLine = if ($intro) { "    $intro" } else { "" }
+    $canvasMarkup = if ($slug -eq 'index') { '    <canvas id="nokey" width="800" height="800" aria-hidden="true"></canvas>' } else { '' }
     $template = @"
 <!DOCTYPE HTML>
 <html lang="en">
@@ -686,14 +743,15 @@ foreach ($page in $pages) {
 $shareImageMeta
     <link rel="stylesheet" href="assets/css/main.css?v=2" />
 $fontAwesomeStylesheet
-    <link rel="stylesheet" href="assets/css/custom.css?v=166" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=167" />
+$travelMapStylesheet
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
     <link rel="manifest" href="site.webmanifest" />
 </head>
 <body class="$bodyClass">
-    <canvas id="nokey" width="800" height="800" aria-hidden="true"></canvas>
+$canvasMarkup
 $introLine
     <a href="#" id="return-to-top" aria-label="Return to top"><i class="icon fa-chevron-up"></i></a>
     <div id="wrapper" class="fade-in">
@@ -720,7 +778,7 @@ $navigation
     <script src="assets/js/util.js?v=1"></script>
     <script src="assets/js/main.js?v=18"></script>
     <script src="assets/js/arrow.js?v=1"></script>
-    <script src="assets/js/game.js?v=17"></script>
+$gameScript
 $optionalScripts
 </body>
 </html>
@@ -733,21 +791,37 @@ $optionalScripts
     Write-Utf8 (Join-Path $out $page.Name) $template
 }
 
+if ($imageDimensionCacheDirty) {
+    New-Item -ItemType Directory -Path (Split-Path $imageDimensionCachePath -Parent) -Force | Out-Null
+    $cacheJson = @($imageDimensionCache.Values | Sort-Object Path) | ConvertTo-Json -Depth 3
+    Write-Utf8 $imageDimensionCachePath $cacheJson
+}
+
 # Publish only runtime assets used by the generated Pages site.
-$runtimeCss = @("main.css", "custom.css", "font-awesome.min.css", "noscript.css")
+$runtimeCss = @("main.css", "font-awesome.min.css", "noscript.css")
 $runtimeJs = @("jquery.min.js", "jquery.scrollex.min.js", "jquery.scrolly.min.js", "browser.min.js", "breakpoints.min.js", "util.js", "main.js", "arrow.js", "game.js", "gallery.js", "travel-nav.js", "travel-map.js", "personal-timeline.js", "scramble-reveal.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCss) {
     Copy-Item -LiteralPath (Join-Path $root "assets\css\$file") -Destination (Join-Path $out "assets\css\$file") -Force
 }
+$customCssSource = Get-Content -LiteralPath (Join-Path $root 'assets\css\custom.css') -Raw -Encoding UTF8
+$travelMapStartMarker = '/* Travel destination atlas */'
+$travelMapEndMarker = '/* Compact travel journal archive */'
+$travelMapStart = $customCssSource.IndexOf($travelMapStartMarker)
+$travelMapEnd = $customCssSource.IndexOf($travelMapEndMarker)
+if ($travelMapStart -lt 0 -or $travelMapEnd -le $travelMapStart) { throw 'Could not locate the travel-map CSS boundaries.' }
+$travelMapCss = $customCssSource.Substring($travelMapStart, $travelMapEnd - $travelMapStart).Trim() + "`n"
+$sharedCustomCss = ($customCssSource.Substring(0, $travelMapStart).TrimEnd() + "`n`n" + $customCssSource.Substring($travelMapEnd).TrimStart())
+Write-Utf8 (Join-Path $out 'assets\css\custom.css') $sharedCustomCss
+Write-Utf8 (Join-Path $out 'assets\css\travel-map-page.css') $travelMapCss
 foreach ($file in $runtimeJs) {
     Copy-Item -LiteralPath (Join-Path $root "assets\js\$file") -Destination (Join-Path $out "assets\js\$file") -Force
 }
 Sync-Directory (Join-Path $root "assets\fonts") (Join-Path $out "assets\fonts")
 # Copied before the image scan so the manifest's icon references get published.
 Copy-Item -LiteralPath (Join-Path $root "site.webmanifest") -Destination (Join-Path $out "site.webmanifest")
-Copy-ReferencedImages $out (Join-Path $root "images") $(if (Test-Path -LiteralPath $webpSource) { $webpSource } else { $null })
+Copy-ReferencedImages $out (Join-Path $root "images") $(if (Test-Path -LiteralPath $webpSource) { $webpSource } else { $null }) $sourceImageIndex
 Copy-Item -LiteralPath (Join-Path $root "CNAME") -Destination (Join-Path $out "CNAME")
 Copy-Item -LiteralPath (Join-Path $root "robots.txt") -Destination (Join-Path $out "robots.txt")
 Copy-Item -LiteralPath (Join-Path $root "sitemap.xml") -Destination (Join-Path $out "sitemap.xml")

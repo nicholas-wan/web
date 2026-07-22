@@ -20,7 +20,11 @@ Builds are incremental by default. Use a clean build after removing files or whe
 .\tools\site.ps1 verify
 ```
 
+Incremental builds retain unchanged published images and cache source-image dimensions in the ignored `.cache/` directory. Clean builds reset `dist/` but may reuse valid dimension metadata.
+
 The build adds intrinsic image dimensions, native lazy loading, first-image priority, responsive `srcset` markup, and the controlled `images-webp/` overlay. Source originals remain in `images/`; only referenced runtime assets are copied to `dist/`.
+
+`assets/css/custom.css` remains the authored source of truth. The build extracts its self-contained travel-atlas block into `travel-map-page.css`, which is loaded only by the travel index; all other rules remain in the generated `custom.css`.
 
 Preview `dist/` with any static web server. The `.claude/launch.json` configuration serves it on port 4321.
 
@@ -39,7 +43,7 @@ python .\tools\images\make-responsive-variants.py
 python .\tools\images\convert-curated-webp.py
 ```
 
-`make-responsive-variants.py` emits the controlled `-480` and `-800` JPEG set. `convert-curated-webp.py` regenerates the selected deterministic WebP overlay.
+`make-responsive-variants.py` emits the controlled `-480` and `-800` JPEG set and the matching Guangzhou WebP variants; animated WebPs are excluded. `convert-curated-webp.py` regenerates the selected deterministic WebP overlay.
 
 The map generator lives at `tools/maps/generate-world-map.ps1` and downloads Natural Earth data before replacing `images/travel/world-map.svg`.
 

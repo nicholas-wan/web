@@ -4,6 +4,9 @@
 # Build and verify locally with:  .\tools\site.ps1 check
 dist/
 
+# Local build metadata used to avoid decoding every image on incremental builds.
+.cache/
+
 # Python bytecode from the image tooling.
 __pycache__/
 *.pyc
