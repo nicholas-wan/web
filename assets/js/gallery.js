@@ -66,6 +66,7 @@
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
   overlay.setAttribute('aria-label', 'Media viewer');
+  overlay.setAttribute('aria-hidden', 'true');
   overlay.innerHTML = '<button class="lightbox__close" type="button" aria-label="Close media viewer">&times;</button>' +
     '<button class="lightbox__previous" type="button" aria-label="Previous media">&#8592;</button>' +
     '<figure class="lightbox__figure"><img class="lightbox__image" alt=""><video class="lightbox__image lightbox__video" controls loop muted playsinline hidden></video><figcaption class="lightbox__caption"></figcaption></figure>' +
@@ -84,6 +85,7 @@
   var close = function () {
     viewerVideo.pause();
     overlay.classList.remove('is-visible');
+    overlay.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('lightbox-open');
     if (lastTrigger) { lastTrigger.focus(); lastTrigger = null; }
   };
@@ -128,6 +130,7 @@
     parts = parts.filter(function (part, index) { return part && parts.indexOf(part) === index; });
     if (!parts.length) parts.push(accessibleName);
     caption.textContent = parts.join(' · ');
+    overlay.setAttribute('aria-hidden', 'false');
     overlay.classList.add('is-visible');
     document.body.classList.add('lightbox-open');
     if (opening) closeButton.focus();

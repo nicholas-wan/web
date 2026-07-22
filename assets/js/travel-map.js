@@ -130,6 +130,7 @@
   var reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   var isFullscreen = false;
   var lastFocused = null;
+  var fullscreenCloseTimer = 0;
   var flyFrame = 0;
   var detailLinks = [];
   var regionMarkers = Array.prototype.slice.call(canvas.querySelectorAll('.travel-map__marker'));
@@ -478,8 +479,24 @@
     scheduleApply();
   };
 
+  var finishFullscreenClose = function () {
+    if (fullscreenCloseTimer) window.clearTimeout(fullscreenCloseTimer);
+    fullscreenCloseTimer = 0;
+    map.classList.remove('is-fullscreen', 'is-fullscreen-visible');
+    map.removeAttribute('role');
+    map.removeAttribute('aria-modal');
+    map.removeAttribute('aria-label');
+    map.removeAttribute('aria-hidden');
+    document.body.classList.remove('is-map-fullscreen');
+    resetView();
+  };
+
   var openFullscreen = function () {
     if (isFullscreen) return;
+    if (fullscreenCloseTimer) {
+      window.clearTimeout(fullscreenCloseTimer);
+      fullscreenCloseTimer = 0;
+    }
     /* The full vector map stays out of the phone's initial critical path, then
        starts fetching as soon as the visitor asks to open the overlay. */
     if (mapImage) {
@@ -492,27 +509,32 @@
     map.setAttribute('role', 'dialog');
     map.setAttribute('aria-modal', 'true');
     map.setAttribute('aria-label', 'Interactive travel map');
+    map.removeAttribute('aria-hidden');
     document.body.classList.add('is-map-fullscreen');
     /* Overlay layout must settle before the fit-to-height floor is measured. */
     window.requestAnimationFrame(function () {
       resetView();
       if (closeBtn) closeBtn.focus();
+      window.requestAnimationFrame(function () {
+        map.classList.add('is-fullscreen-visible');
+      });
     });
   };
 
-  var closeFullscreen = function () {
-    if (!isFullscreen) return;
+  var closeFullscreen = function (immediate) {
+    if (!isFullscreen) {
+      if (immediate === true && fullscreenCloseTimer) finishFullscreenClose();
+      return;
+    }
     isFullscreen = false;
     stopFly();
-    map.classList.remove('is-fullscreen');
-    map.removeAttribute('role');
-    map.removeAttribute('aria-modal');
-    map.removeAttribute('aria-label');
-    document.body.classList.remove('is-map-fullscreen');
+    map.classList.remove('is-fullscreen-visible');
+    map.setAttribute('aria-hidden', 'true');
     setActiveRegion('');
-    resetView();
     if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
     lastFocused = null;
+    if (immediate === true || reducedMotionQuery.matches) finishFullscreenClose();
+    else fullscreenCloseTimer = window.setTimeout(finishFullscreenClose, 220);
   };
 
   /* Zoom keeping the viewport point (px, py) anchored. */
@@ -584,7 +606,7 @@
   /* Leaving the phone breakpoint (e.g. rotating to landscape past 520px)
      returns to the inline map so the overlay never strands itself. */
   var handleMobileChange = function (event) {
-    if (!event.matches) closeFullscreen();
+    if (!event.matches) closeFullscreen(true);
   };
   if (mobileMapQuery.addEventListener) mobileMapQuery.addEventListener('change', handleMobileChange);
 

@@ -14,7 +14,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 ## Site-wide behavior
 
 - Ordinary interface motion uses the duration and easing tokens in `assets/css/custom.css`: quick feedback is 150ms, card and navigation feedback is 220ms, image treatments are 320ms, listing reveals are 480ms with a 60ms stagger, and large spatial moves may use 520ms. Keep bespoke functional sequences such as the scramble, timeline FLIP, mobile navigation sheet, and atlas fly-to on their documented timings rather than forcing them onto the shared card rhythm.
-- The lightbox and mobile navigation sheet are modal dialogs. Preserve focus-on-open, trapped Tab navigation, Escape/close behavior, and focus restoration when editing `gallery.js` or `main.js`.
+- The lightbox and mobile navigation sheet are modal dialogs. Preserve focus-on-open, trapped Tab navigation, Escape/close behavior, and focus restoration when editing `gallery.js` or `main.js`. The lightbox uses a quiet backdrop fade and content fade/scale; reduced motion resolves both immediately.
 - The pre-wedding hero wordmark intentionally uses private-use Wedding-font glyphs. Do not “correct” its unusual DOM text; its accessible name is `Nicholas and Yingxian` through `role="img"` and `aria-label`.
 - Do not add fixed image dimensions to `.content-image` masonry tiles when they would distort the gallery. Preserve useful alt text, lazy loading below the fold, and visible subjects at both desktop and mobile crops.
 - New links that open another tab need `rel="noopener noreferrer"`.
@@ -37,7 +37,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 - Preserve `data-journal-template="v2"` and the four tokens in `partials/travel-journal.html`: `{{MAIN_ATTRIBUTES}}`, `{{TRIP_NAVIGATION}}`, `{{JOURNAL_CONTENT}}`, and `{{TRIP_PAGINATION}}`.
 - Follow the class combinations and markup hierarchy in `journals/_template.html`, including the generic `travel-*` classes and `guangzhou-*` compatibility classes. Heading order is structural because the build derives section and map anchors from it.
 - Journal date ranges use four-digit years: `D Month YYYY – D Month YYYY`, or `Month YYYY – Month YYYY` when exact days are unknown.
-- Use focal-point custom properties for banner and gallery crops. Tall collage cards span two desktop rows and return to standard cards on mobile. Keep mobile swipe cues in normal document flow rather than overlaying photos.
+- Use focal-point custom properties for banner and gallery crops. Tall collage cards span two desktop rows and return to standard cards on mobile. Keep mobile swipe cues in normal document flow rather than overlaying photos; their prompt shakes twice, then remains still until the visitor scrolls and dismisses it.
 - Journal section links use the measured sticky-toolbar correction in `assets/js/travel-nav.js`. Do not replace it with a fixed pixel offset. Every journal keeps its section controls in one horizontally scrollable row, including long itineraries such as Europe and USA/Canada.
 
 ### Journal scrolling contract
@@ -66,7 +66,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 ## Travel atlas contracts
 
 - The atlas is progressive: the opening view shows broad trip regions, intermediate zoom shows countries or states, and close zoom shows journal stops.
-- The desktop zoom-out floor is the intentional cropped opening view; tablets may use the full map, while phones (≤520px) never render the inline world strip — a teaser card opens a full-screen overlay whose floor is the fit-to-height view, with region jump chips. Preserve the breakpoint-aware rebase.
+- The desktop zoom-out floor is the intentional cropped opening view; tablets may use the full map, while phones (≤520px) never render the inline world strip — a teaser card fades in a full-screen overlay whose floor is the fit-to-height view, with region jump chips. Closing fades the overlay before teardown; reduced motion and exits from the phone breakpoint tear it down immediately. Preserve the breakpoint-aware rebase.
 - Store marker locations as latitude and longitude and project them with the shared Natural Earth 1 implementation in `assets/js/travel-map.js`. Do not hand-place percentage coordinates or replace the vector map with a raster.
 - Every map link must resolve to a matching `trip-section-*` anchor. Keep separate labelled callouts when the same city appears in more than one journal.
 - Dense labels may move and use leader lines, but an in-view destination must not disappear merely because labels collide. Hyper-local attractions belong in regional popup links rather than as overlapping world-map dots.

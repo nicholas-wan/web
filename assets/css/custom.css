@@ -2174,6 +2174,12 @@ body.is-map-fullscreen #return-to-top {
   padding: 0;
   border: 0;
   border-radius: 0;
+  opacity: 0;
+  transition: opacity var(--motion-standard) ease;
+}
+
+.travel-map.is-fullscreen.is-fullscreen-visible {
+  opacity: 1;
 }
 
 .travel-map.is-fullscreen .travel-map__viewport {
@@ -2331,7 +2337,8 @@ body.is-map-fullscreen #return-to-top {
 
 @media (prefers-reduced-motion: reduce) {
   .travel-map__marker,
-  .travel-map__detail {
+  .travel-map__detail,
+  .travel-map.is-fullscreen {
     transition: none;
   }
 }
@@ -3312,7 +3319,7 @@ body.is-map-fullscreen #return-to-top {
     line-height: 1;
     opacity: 0.92;
     text-transform: uppercase;
-    animation: journal-scroll-cue-shake 3s ease-in-out infinite;
+    animation: journal-scroll-cue-shake 3s ease-in-out 2;
     overflow: hidden;
     pointer-events: none;
     transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
@@ -5089,22 +5096,39 @@ a:focus-visible {
   position: fixed;
   inset: 0;
   z-index: 20;
-  display: none;
+  display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem 5rem;
   background: rgba(8, 10, 14, 0.96);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-standard) ease,
+    visibility 0s linear var(--motion-standard);
+  visibility: hidden;
 }
 
 .lightbox.is-visible {
-  display: flex;
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0s;
+  visibility: visible;
 }
 
 .lightbox__figure {
   max-width: min(88vw, 1200px);
   max-height: 90vh;
   margin: 0;
+  opacity: 0;
   text-align: center;
+  transform: translateY(0.35rem) scale(0.985);
+  transition: opacity var(--motion-slow) ease,
+    transform var(--motion-slow) var(--ease-standard);
+}
+
+.lightbox.is-visible .lightbox__figure {
+  opacity: 1;
+  transform: none;
 }
 
 .lightbox__image {
@@ -5200,6 +5224,17 @@ a:focus-visible {
 
   .lightbox__previous { left: 0.5rem; }
   .lightbox__next { right: 0.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightbox,
+  .lightbox__figure {
+    transition: none;
+  }
+
+  .lightbox__figure {
+    transform: none;
+  }
 }
 
 @media screen and (max-width: 600px) {
