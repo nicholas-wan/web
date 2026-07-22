@@ -95,10 +95,12 @@
       var characters = splitText(text);
       var lead = leadOffset(characters, parseInt(row.getAttribute("data-scramble-lead"), 10) || 0);
       var visual = document.createElement("span");
-
       visual.className = "scramble-reveal__visual";
       visual.setAttribute("aria-hidden", "true");
-      visual.textContent = text;
+      // Seed the enhanced layer with its actual opening frame. Painting the
+      // final sentence here makes the first observer tick visibly run
+      // resolved -> noise -> resolved, especially on fast local loads.
+      visual.textContent = renderFrame(characters, lead);
       source.insertAdjacentElement("afterend", visual);
       row.style.setProperty("--scramble-delay", (index * ROW_STAGGER_MS) + "ms");
 
