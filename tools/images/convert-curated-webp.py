@@ -30,25 +30,7 @@ FILES = [
     "travel/2025_japan/day3_osaka/osaka2.jpg",
 ]
 
-ANIMATED_FILES = [
-    "travel/2022_europe/day2/parisgif1.gif",
-    "travel/2022_europe/day2/parisgif2.gif",
-    "travel/2022_europe/day2/parisgif3.gif",
-    "travel/2022_europe/day2/parisgif4.gif",
-    "travel/2022_europe/day3/brusselsgif1.gif",
-    "travel/2022_europe/day7/switzerlandgif1.gif",
-    "travel/2023_perth/day7/greenough_gif_01.gif",
-    "travel/2019_sv/LV_lights1.gif",
-    "travel/2023_perth/day2/quokka_gif_01.gif",
-    "travel/2019_sv/MONTEREY_aqua1.gif",
-    "travel/2022_europe/day7/switzerlandgif3.gif",
-    "travel/2022_europe/day8/zurichgif1.gif",
-    "travel/2022_europe/day4/netherlands1.gif",
-    "travel/2019_sv/SF_lombard.gif",
-    "travel/2023_perth/day2/quokka_gif_02.gif",
-    "travel/2023_perth/day5/nesuto_geraldton_01_gif.gif",
-    "travel/2023_perth/day2/cycling_gif_01.gif",
-]
+ANIMATED_FILES = []
 
 files = [SOURCE / path for path in FILES if (SOURCE / path).exists()]
 
