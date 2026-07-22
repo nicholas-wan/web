@@ -13,6 +13,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 
 ## Site-wide behavior
 
+- Ordinary interface motion uses the duration and easing tokens in `assets/css/custom.css`: quick feedback is 150ms, card and navigation feedback is 220ms, image treatments are 320ms, listing reveals are 480ms with a 60ms stagger, and large spatial moves may use 520ms. Keep bespoke functional sequences such as the scramble, timeline FLIP, mobile navigation sheet, and atlas fly-to on their documented timings rather than forcing them onto the shared card rhythm.
 - The lightbox and mobile navigation sheet are modal dialogs. Preserve focus-on-open, trapped Tab navigation, Escape/close behavior, and focus restoration when editing `gallery.js` or `main.js`.
 - The pre-wedding hero wordmark intentionally uses private-use Wedding-font glyphs. Do not “correct” its unusual DOM text; its accessible name is `Nicholas and Yingxian` through `role="img"` and `aria-label`.
 - Do not add fixed image dimensions to `.content-image` masonry tiles when they would distort the gallery. Preserve useful alt text, lazy loading below the fold, and visible subjects at both desktop and mobile crops.

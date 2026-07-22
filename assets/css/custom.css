@@ -24,6 +24,13 @@
   --radius-compact: 0.5rem;
   --shadow-card: 0 0.45rem 1.35rem rgba(3, 14, 30, 0.07);
   --shadow-card-hover: 0 0.9rem 2rem rgba(3, 14, 30, 0.12);
+  --motion-fast: 150ms;
+  --motion-standard: 220ms;
+  --motion-slow: 320ms;
+  --motion-reveal: 480ms;
+  --motion-spatial: 520ms;
+  --ease-standard: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-emphasized: cubic-bezier(0.22, 0.8, 0.32, 1);
 }
 
 .education-grid {
@@ -192,7 +199,9 @@
   border-radius: var(--radius-card);
   background: var(--color-surface);
   box-shadow: var(--shadow-card);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color var(--motion-standard) ease,
+    box-shadow var(--motion-standard) ease,
+    transform var(--motion-standard) var(--ease-standard);
 }
 
 .toolkit-card:hover,
@@ -563,7 +572,9 @@
   background: var(--color-surface);
   box-shadow: 0 0.2rem 0.7rem rgba(3, 14, 30, 0.05);
   text-align: center;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: border-color var(--motion-standard) ease,
+    box-shadow var(--motion-standard) ease,
+    transform var(--motion-standard) var(--ease-standard);
 }
 
 .tech-stack__grid li:hover {
@@ -850,7 +861,9 @@
   box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
   transform-style: preserve-3d;
   will-change: transform;
-  transition: border-color 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease;
+  transition: border-color var(--motion-standard) ease,
+    transform var(--motion-standard) var(--ease-standard),
+    box-shadow var(--motion-standard) ease;
 }
 
 .homepage-link::after {
@@ -861,7 +874,7 @@
   pointer-events: none;
   box-shadow: inset 0 0 0 1px rgba(18, 138, 134, 0.18);
   opacity: 0;
-  transition: opacity 0.25s ease;
+  transition: opacity var(--motion-standard) ease;
 }
 
 .homepage-link:hover,
@@ -898,7 +911,7 @@
   font-size: 1.35rem;
   line-height: 1.6rem;
   opacity: 0.85;
-  transition: transform 0.25s ease;
+  transition: transform var(--motion-standard) var(--ease-standard);
 }
 
 .homepage-link:hover::before,
@@ -930,7 +943,8 @@
   pointer-events: none;
   transform-origin: center;
   will-change: transform, opacity;
-  transition: opacity 0.18s linear, transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity var(--motion-fast) linear,
+    transform var(--motion-standard) var(--ease-standard);
 }
 
 .homepage-link__icon::before {
@@ -943,7 +957,7 @@
   box-shadow: 0 0 1.1rem rgba(18, 138, 134, 0.3);
   opacity: calc(0.14 + var(--pulse, 0) * 0.72);
   transform: scale(calc(0.72 + var(--ip, 1) * 0.28 + var(--pulse, 0) * 0.18));
-  transition: opacity 0.18s linear, transform 0.18s ease;
+  transition: opacity var(--motion-fast) linear, transform var(--motion-fast) ease;
 }
 
 .homepage-link__icon > .icon {
@@ -952,7 +966,7 @@
   font-size: 1.65rem;
   line-height: 1;
   transform: translate(var(--icon-x, 0), var(--icon-y, 0));
-  transition: transform 0.18s ease;
+  transition: transform var(--motion-fast) ease;
 }
 
 .homepage-link__icon--experience {
@@ -1014,7 +1028,9 @@
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.02em;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition: transform var(--motion-standard) var(--ease-standard),
+    box-shadow var(--motion-standard) ease,
+    border-color var(--motion-standard) ease;
 }
 
 .hero-badges .hero-badge .icon {
@@ -1031,7 +1047,8 @@
 [data-reveal] {
   opacity: 0;
   transform: translateY(22px);
-  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity var(--motion-reveal) ease,
+    transform var(--motion-reveal) var(--ease-standard);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
@@ -1042,12 +1059,15 @@
 
 /* Homepage cards: scroll-scrubbed entrance driven by --cp (0 offstage
    below, 1 settled). Default 1 keeps the settled layout for no-JS; the
-   0.25s transition (shared with hover) lets the cards trail the scroll
+   standard transition (shared with hover) lets the cards trail the scroll
    with a soft ease. */
 .homepage-link[data-scrub] {
   opacity: var(--cp, 1);
   transform: translateY(calc((1 - var(--cp, 1)) * 48px));
-  transition: border-color 0.25s ease, transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, opacity 0.25s linear;
+  transition: border-color var(--motion-standard) ease,
+    transform var(--motion-standard) var(--ease-standard),
+    box-shadow var(--motion-standard) ease,
+    opacity var(--motion-standard) linear;
 }
 
 .homepage-link[data-scrub]::after {
@@ -1237,7 +1257,9 @@ body {
 
 /* Masonry image effects */
 .masonry .brick img {
-  transition: all 0.5s ease-in-out;
+  transition: opacity var(--motion-slow) ease-in-out,
+    transform var(--motion-slow) var(--ease-standard),
+    filter var(--motion-slow) ease-in-out;
   backface-visibility: hidden; /* Remove Image flickering on hover */
   object-fit: cover;
   /* max-height: 450px; */
@@ -1314,9 +1336,7 @@ body {
   bottom: 0;
   right: 0;
   opacity: 0;
-  -webkit-transition: all 0.4s ease-in-out 0s;
-  -moz-transition: all 0.4s ease-in-out 0s;
-  transition: all 0.4s ease-in-out 0s;
+  transition: opacity var(--motion-slow) ease-in-out;
 }
 
 .content:hover .content-overlay {
@@ -1340,9 +1360,9 @@ body {
   -webkit-transform: translate(-50%, -50%);
   -moz-transform: translate(-50%, -50%);
   transform: translate(-50%, -50%);
-  -webkit-transition: all 0.3s ease-in-out 0s;
-  -moz-transition: all 0.3s ease-in-out 0s;
-  transition: all 0.3s ease-in-out 0s;
+  transition: top var(--motion-slow) var(--ease-standard),
+    left var(--motion-slow) var(--ease-standard),
+    opacity var(--motion-standard) ease;
   z-index: 2;
 }
 
@@ -1400,11 +1420,8 @@ body {
     -moz-border-radius: 35px;
     border-radius: 35px;
     display: none;
-    -webkit-transition: all 0.3s linear;
-    -moz-transition: all 0.3s ease;
-    -ms-transition: all 0.3s ease;
-    -o-transition: all 0.3s ease;
-	transition: all 0.3s ease;
+	transition: background-color var(--motion-standard) ease,
+      opacity var(--motion-standard) ease;
 	opacity: 0.6; /* Standard compliant browsers */
     -moz-opacity: 0.6; /* Firefox and Mozilla browsers */
     -webkit-opacity: 0.6; /* WebKit browser e.g. Safari */
@@ -1418,11 +1435,8 @@ body {
     left: 16px;
     top: 0px;
     font-size: 19px;
-    -webkit-transition: all 0.3s ease;
-    -moz-transition: all 0.3s ease;
-    -ms-transition: all 0.3s ease;
-    -o-transition: all 0.3s ease;
-	transition: all 0.3s ease;
+	transition: color var(--motion-standard) ease,
+      top var(--motion-standard) var(--ease-standard);
 }
 #return-to-top:hover {
 	background: silver;
@@ -1434,6 +1448,16 @@ body {
 #return-to-top:hover i {
     color: black;
     top: -15px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .masonry .brick img,
+  .content .content-overlay,
+  .content-details,
+  #return-to-top,
+  #return-to-top i {
+    transition: none;
+  }
 }
 /* .desktoponly / .mobileonly swap at exactly 800px. These used to switch at
    different widths (600px / 800px), so 601-799px viewports rendered BOTH
@@ -2564,7 +2588,20 @@ body.is-map-fullscreen #return-to-top {
   background: #fff;
   overflow: hidden;
   box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color var(--motion-standard) ease,
+    transform var(--motion-standard) var(--ease-standard),
+    box-shadow var(--motion-standard) ease;
+}
+
+/* The card's hover transition is intentionally shorter than its entrance.
+   Keep the reveal timing until JS marks the one-shot entrance as settled,
+   then fall back to the standard card feedback above. */
+.travel-grid .travel-card[data-reveal]:not(.is-reveal-settled) {
+  transition: opacity var(--motion-reveal) ease,
+    transform var(--motion-reveal) var(--ease-standard),
+    border-color var(--motion-standard) ease,
+    box-shadow var(--motion-standard) ease;
+  transition-delay: var(--reveal-delay, 0ms), var(--reveal-delay, 0ms), 0ms, 0ms;
 }
 
 .travel-grid .travel-card:hover,
@@ -2614,7 +2651,7 @@ body.is-map-fullscreen #return-to-top {
   height: 100%;
   object-fit: cover;
   object-position: center;
-  transition: transform 0.3s ease;
+  transition: transform var(--motion-slow) var(--ease-standard);
 }
 
 .travel-grid .travel-card .travel-card__image picture,
@@ -2655,6 +2692,23 @@ body.is-map-fullscreen #return-to-top {
   padding: 0 1rem;
   font-size: 0.62rem;
   line-height: 2.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .travel-grid .travel-card,
+  .travel-grid .travel-card .travel-card__image img,
+  .travel-grid .travel-card > .image img {
+    transition: none;
+  }
+
+  .travel-grid .travel-card:hover,
+  .travel-grid .travel-card:focus-within,
+  .travel-grid .travel-card:hover .travel-card__image img,
+  .travel-grid .travel-card:hover > .image img,
+  .travel-grid .travel-card:focus-within .travel-card__image img,
+  .travel-grid .travel-card:focus-within > .image img {
+    transform: none;
+  }
 }
 
 @media screen and (max-width: 1100px) {
@@ -3913,7 +3967,9 @@ body.is-map-fullscreen #return-to-top {
   background: #fff;
   box-shadow: 0 0.45rem 1.35rem rgba(3, 14, 30, 0.07);
   overflow: hidden;
-  transition: border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
+  transition: border-color var(--motion-standard) ease,
+    box-shadow var(--motion-standard) ease,
+    transform var(--motion-standard) var(--ease-standard);
 }
 
 .earlier-work__grid article:hover,
@@ -3937,7 +3993,7 @@ body.is-map-fullscreen #return-to-top {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.35s ease;
+  transition: transform var(--motion-slow) var(--ease-standard);
 }
 
 .earlier-project-card:hover .earlier-project-card__image img,
@@ -4642,7 +4698,9 @@ a.travel-jump-group__label {
     background: rgba(25, 30, 35, 0.98);
     border-bottom-color: rgba(255, 255, 255, 0.14);
     box-shadow: none;
-    transition: background-color 0.38s ease, border-color 0.38s ease, box-shadow 0.38s ease;
+    transition: background-color var(--motion-standard) ease,
+      border-color var(--motion-standard) ease,
+      box-shadow var(--motion-standard) ease;
   }
 
   .travel-section-nav::after {
@@ -4655,7 +4713,7 @@ a.travel-jump-group__label {
     background: linear-gradient(90deg, rgba(25, 30, 35, 0), rgba(25, 30, 35, 0.98) 82%);
     content: "";
     pointer-events: none;
-    transition: background 0.38s ease;
+    transition: background var(--motion-standard) ease;
   }
 
   .travel-section-nav.is-stuck {
@@ -4695,7 +4753,8 @@ a.travel-jump-group__label {
     box-shadow: none;
     color: #fff;
     font-size: 0;
-    transition: color 0.38s ease, border-color 0.38s ease;
+    transition: color var(--motion-standard) ease,
+      border-color var(--motion-standard) ease;
   }
 
   .travel-section-nav--with-menu.is-stuck #navPanelToggle,
@@ -4757,7 +4816,9 @@ a.travel-jump-group__label {
     border-color: rgba(255, 255, 255, 0.28);
     background: rgba(255, 255, 255, 0.06);
     color: #fff;
-    transition: background-color 0.38s ease, border-color 0.38s ease, color 0.38s ease;
+    transition: background-color var(--motion-standard) ease,
+      border-color var(--motion-standard) ease,
+      color var(--motion-standard) ease;
   }
 
   .travel-section-nav a.is-active {
@@ -4781,11 +4842,22 @@ a.travel-jump-group__label {
 
   .travel-section-nav .travel-jump-group + .travel-jump-group {
     border-left-color: rgba(255, 255, 255, 0.18);
-    transition: border-color 0.38s ease;
+    transition: border-color var(--motion-standard) ease;
   }
 
   .travel-section-nav.is-stuck .travel-jump-group + .travel-jump-group {
     border-left-color: rgba(255, 255, 255, 0.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .travel-section-nav,
+  .travel-section-nav::after,
+  .travel-section-nav--with-menu #navPanelToggle,
+  .travel-jump-group__label,
+  .travel-section-nav a,
+  .travel-section-nav .travel-jump-group + .travel-jump-group {
+    transition: none;
   }
 }
 

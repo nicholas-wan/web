@@ -4,6 +4,17 @@
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var watchers = [];
   var scheduled = false;
+  var REVEAL_DURATION = 480;
+  var REVEAL_STAGGER = 60;
+
+  function reveal(element) {
+    var delay = parseInt(element.style.getPropertyValue('--reveal-delay'), 10) || 0;
+    element.classList.add('is-revealed');
+    window.setTimeout(function () {
+      element.style.removeProperty('--reveal-delay');
+      element.classList.add('is-reveal-settled');
+    }, REVEAL_DURATION + delay + 40);
+  }
 
   function inViewport(element, ratio) {
     var rect = element.getBoundingClientRect();
@@ -19,7 +30,7 @@
       var watcher = watchers[index];
       if (inViewport(watcher.element, watcher.ratio)) {
         watchers.splice(index, 1);
-        watcher.element.classList.add('is-revealed');
+        reveal(watcher.element);
       }
     }
     if (!watchers.length) {
@@ -40,13 +51,17 @@
     selectors.forEach(function (selector) {
       Array.prototype.forEach.call(document.querySelectorAll(selector), function (element, index) {
         element.setAttribute('data-reveal', '');
-        element.style.setProperty('--reveal-delay', (Math.min(index, 8) * 70) + 'ms');
+        element.style.setProperty('--reveal-delay', (Math.min(index, 8) * REVEAL_STAGGER) + 'ms');
         items.push(element);
       });
     });
     if (!items.length) return;
     if (reduce) {
-      items.forEach(function (element) { element.classList.add('is-revealed'); });
+      items.forEach(function (element) {
+        element.classList.add('is-revealed');
+        element.classList.add('is-reveal-settled');
+        element.style.removeProperty('--reveal-delay');
+      });
       return;
     }
     watchers = items.map(function (element) {

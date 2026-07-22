@@ -630,7 +630,7 @@ foreach ($page in $pages) {
     $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=20"></script>' } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { '<script src="assets/js/scramble-reveal.js?v=14"></script>' } else { "" }
     $gameScript = if ($slug -eq 'index') { '<script src="assets/js/game.js?v=17"></script>' } else { "" }
-    $listingEffectsScript = if ($slug -in @('skills', 'travel')) { '<script src="assets/js/listing-effects.js?v=1"></script>' } else { "" }
+    $listingEffectsScript = if ($slug -in @('skills', 'travel')) { '<script src="assets/js/listing-effects.js?v=2"></script>' } else { "" }
     $journalProgressScript = if ($tripOrder -contains $slug) { '<script src="assets/js/journal-progress.js?v=1"></script>' } else { "" }
     $canvasScript = if ($slug -eq 'index') { '<script src="assets/js/canvas-background.js?v=1"></script>' } else { "" }
     $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
@@ -666,7 +666,7 @@ foreach ($page in $pages) {
 $shareImageMeta
     <link rel="stylesheet" href="assets/css/main.css?v=2" />
 $fontAwesomeStylesheet
-    <link rel="stylesheet" href="assets/css/custom.css?v=168" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=169" />
 $travelMapStylesheet
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
