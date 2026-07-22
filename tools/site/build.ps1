@@ -666,7 +666,7 @@ foreach ($page in $pages) {
 $shareImageMeta
     <link rel="stylesheet" href="assets/css/main.css?v=2" />
 $fontAwesomeStylesheet
-    <link rel="stylesheet" href="assets/css/custom.css?v=170" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=171" />
 $travelMapStylesheet
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />

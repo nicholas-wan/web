@@ -2749,6 +2749,7 @@ body.is-map-fullscreen #return-to-top {
   }
 
   #main > .travel-archive-heading {
+    gap: 0.1rem;
     margin: 1.5rem 1rem 0;
     padding: 0.9rem 0 0.75rem !important;
   }
@@ -4903,6 +4904,7 @@ a.travel-jump-group__label {
 }
 
 .travel-pagination a {
+  position: relative;
   display: flex;
   min-width: 0;
   max-width: 25rem;
@@ -4967,8 +4969,9 @@ a.travel-jump-group__label {
 }
 
 .site-pager__link {
+  position: relative;
   display: flex;
-  min-height: 3.25rem;
+  min-height: 3.75rem;
   flex-direction: column;
   justify-content: center;
   padding: 0.45rem 0.7rem;
@@ -4976,6 +4979,8 @@ a.travel-jump-group__label {
   border-radius: 0.25rem;
   background: transparent;
   box-shadow: none;
+  overflow: hidden;
+  transition: background-color var(--motion-standard) ease;
 }
 
 .site-pager__link:hover,
@@ -4988,8 +4993,78 @@ a.travel-jump-group__label {
   font-size: 0.8rem;
 }
 
+.travel-pagination a::after,
+.site-pager__link::after {
+  position: absolute;
+  bottom: 0.3rem;
+  left: 0.7rem;
+  width: 1.8rem;
+  height: 2px;
+  background: var(--color-brand-200);
+  content: "";
+  opacity: 0.65;
+  transform: scaleX(0.45);
+  transform-origin: left center;
+  transition: background-color var(--motion-standard) ease,
+    opacity var(--motion-standard) ease,
+    transform var(--motion-standard) var(--ease-standard);
+}
+
+.travel-pagination__next::after,
+.site-pager__link--next::after {
+  right: 0.7rem;
+  left: auto;
+  transform-origin: right center;
+}
+
+.travel-pagination a > strong,
+.site-pager__link > strong {
+  transition: transform var(--motion-standard) var(--ease-standard);
+}
+
+.travel-pagination a:hover::after,
+.travel-pagination a:focus-visible::after,
+.site-pager__link:hover::after,
+.site-pager__link:focus-visible::after {
+  background: var(--color-brand-600);
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.travel-pagination__previous:hover > strong,
+.travel-pagination__previous:focus-visible > strong,
+.site-pager__link--previous:hover > strong,
+.site-pager__link--previous:focus-visible > strong {
+  transform: translateX(-0.2rem);
+}
+
+.travel-pagination__next:hover > strong,
+.travel-pagination__next:focus-visible > strong,
+.site-pager__link--next:hover > strong,
+.site-pager__link--next:focus-visible > strong {
+  transform: translateX(0.2rem);
+}
+
 .site-pager--single .site-pager__link--next {
   grid-column: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .travel-pagination a,
+  .travel-pagination a::after,
+  .travel-pagination a > strong,
+  .site-pager__link,
+  .site-pager__link::after,
+  .site-pager__link > strong {
+    transition: none;
+  }
+
+  .travel-pagination a:hover > strong,
+  .travel-pagination a:focus-visible > strong,
+  .site-pager__link:hover > strong,
+  .site-pager__link:focus-visible > strong {
+    transform: none;
+  }
 }
 
 /* Compact page introductions keep the main sections visually consistent. */
@@ -5849,7 +5924,7 @@ a:focus-visible {
   }
 
   .page-skills #main > .post {
-    padding: 2rem 1rem;
+    padding: 1.5rem 1.15rem 2rem;
   }
 
   .page-skills .education-grid,
@@ -5908,7 +5983,7 @@ a:focus-visible {
   }
 
   .tech-stack__grid li {
-    min-height: 6.25rem;
+    min-height: 5.75rem;
   }
 
   .page-skills .toolkit-card__hint,
@@ -6965,6 +7040,20 @@ body.page-home #nav {
 
 /* Quiet Skills-card treatment: compact, static capability cards modelled on
    the reference's low-contrast surface, icon-title row, and short summary. */
+.page-skills .skills-heading::before {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--color-brand-700);
+  content: "Capabilities";
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  line-height: 1;
+  text-align: left;
+  text-transform: uppercase;
+}
+
 @media screen and (min-width: 981px) {
   .page-skills #main > .post {
     display: grid;
@@ -7009,7 +7098,7 @@ body.page-home #nav {
   .page-skills .skills-heading p {
     margin: 0.2rem 0 0;
     font-family: "Raleway", Helvetica, sans-serif;
-    font-size: 0.78rem;
+    font-size: max(0.82rem, 12px);
     font-style: normal;
     font-weight: 400;
     text-align: left;
@@ -7171,14 +7260,14 @@ body.page-home #nav {
   .page-skills .skills-heading p {
     margin: 0.2rem 0 0;
     font-family: "Raleway", Helvetica, sans-serif;
-    font-size: 0.78rem;
+    font-size: max(0.82rem, 12px);
     font-style: normal;
     font-weight: 400;
     text-align: left;
   }
 
   .page-skills .toolkit-card {
-    min-height: 7rem;
+    min-height: 6.5rem;
     padding: 0.8rem;
     border-color: #d7dddd;
     border-radius: 0.7rem;
@@ -7246,7 +7335,7 @@ body.page-home #nav {
     margin: 0;
     color: #53666c;
     font-family: "Raleway", Helvetica, sans-serif;
-    font-size: 0.76rem;
+    font-size: max(0.8rem, 12px);
     font-weight: 400;
     line-height: 1.48;
     text-align: left;
