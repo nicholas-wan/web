@@ -3634,6 +3634,7 @@ body.is-map-fullscreen #return-to-top {
   text-align: left;
 }
 
+/* Route bundle: experience-base:start */
 .portfolio-overview {
   padding: 2rem !important;
 }
@@ -4056,6 +4057,7 @@ body.is-map-fullscreen #return-to-top {
   border-bottom: 0;
 }
 
+/* Route bundle: experience-base:end */
 /* Quieter, more compact desktop section navigation. */
 @media screen and (min-width: 981px) {
   #nav {
@@ -4884,6 +4886,7 @@ a.travel-jump-group__label {
   }
 }
 
+/* Route bundle: journal-nav:end */
 .travel-pagination {
   display: flex;
   justify-content: space-between;
@@ -6034,6 +6037,7 @@ a:focus-visible {
   }
 }
 
+/* Route bundle: personal-base:start */
 /* --------------------------------------------------------------------------
    Personal timeline: a scroll-led archive with an accessible story viewer.
    -------------------------------------------------------------------------- */
@@ -6740,6 +6744,7 @@ a:focus-visible {
   transform: none;
 }
 
+/* Route bundle: personal-base:end */
 body.page-event #nav {
   margin-top: 0 !important;
 }
@@ -6818,6 +6823,7 @@ body.page-home #intro {
 
 }
 
+/* Route bundle: journal-japan:end */
 body.page-home #nav {
   margin-top: 0;
 }
@@ -6834,6 +6840,7 @@ body.page-home #nav {
   }
 }
 
+/* Route bundle: personal-responsive:start */
 @media screen and (max-width: 980px) {
   .personal-timeline-page > .personal-timeline {
     padding-right: 2rem !important;
@@ -7048,6 +7055,7 @@ body.page-home #nav {
 
 }
 
+/* Route bundle: personal-responsive:end */
 /* The hero headline resolves once from noise, replacing the retired
    typewriter. The source text keeps layout and accessibility — it wraps
    naturally and reserves the block's height; JS paints only the animated
@@ -7422,3 +7430,4 @@ body.page-home #nav {
     text-align: left;
   }
 }
+/* Route bundle: skills-polish:end */

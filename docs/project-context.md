@@ -7,7 +7,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 ## Architecture
 
 - This is a static HTML site based on the Massively theme. Root HTML files are legacy sources; `tools/site/build.ps1` generates `dist/`.
-- Shared behavior belongs in `assets/css/custom.css`, `assets/js/`, and generated-page partials. Upstream Sass in `vendor/massively/sass/` is reference material, not the active CSS source.
+- Shared behavior belongs in `assets/css/custom.css`, `assets/js/`, and generated-page partials. Marker-bounded route CSS remains authored in `custom.css`; the build extracts it into page-specific generated bundles. Upstream Sass in `vendor/massively/sass/` is reference material, not the active CSS source.
 - Travel journals are content fragments registered in `journals/manifest.json` and rendered through `partials/travel-journal.html`.
 - Preserve public URLs, responsive behavior, accessibility, and the existing visual language unless Nicholas explicitly requests a change.
 
