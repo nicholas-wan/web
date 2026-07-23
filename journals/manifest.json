@@ -56,17 +56,6 @@
   },
   {
     "order": 6,
-    "slug": "travel_2024_australia",
-    "label": "Australia",
-    "source": "journals/travel_2024_australia.html",
-    "contentOnly": true,
-    "mainClass": "homepage australia-journal guangzhou-day--compact",
-    "title": "Nicholas Wan - Australia Trip",
-    "description": "Nicholas Wan's Melbourne and Sydney honeymoon travel journal and photography from 2024.",
-    "ogImage": "images/travel/2024_australia/banner-800.jpg"
-  },
-  {
-    "order": 7,
     "slug": "travel_2024_germany",
     "label": "Germany",
     "source": "journals/travel_2024_germany.html",
@@ -75,6 +64,17 @@
     "title": "Nicholas Wan - Germany Trip",
     "description": "Nicholas Wan's Germany work and travel journal from 2024.",
     "ogImage": "images/travel/2024_germany/germany_banner_card.jpg"
+  },
+  {
+    "order": 7,
+    "slug": "travel_2024_australia",
+    "label": "Australia",
+    "source": "journals/travel_2024_australia.html",
+    "contentOnly": true,
+    "mainClass": "homepage australia-journal guangzhou-day--compact",
+    "title": "Nicholas Wan - Australia Trip",
+    "description": "Nicholas Wan's Melbourne and Sydney honeymoon travel journal and photography from 2024.",
+    "ogImage": "images/travel/2024_australia/banner-800.jpg"
   },
   {
     "order": 8,
