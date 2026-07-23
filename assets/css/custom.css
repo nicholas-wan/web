@@ -5624,6 +5624,7 @@ a:focus-visible {
 .page-experience #cloud-analytics .case-study__highlights li::before {
   content: "";
   position: absolute;
+  z-index: 1;
   left: -1.6rem;
   top: 0.3rem;
   width: 0.7rem;
