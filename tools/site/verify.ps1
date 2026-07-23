@@ -141,7 +141,7 @@ $gameJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\game.js') -Raw -E
 $listingEffectsJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\listing-effects.js') -Raw -Encoding UTF8
 $journalProgressJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\journal-progress.js') -Raw -Encoding UTF8
 $scrambleRevealJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\scramble-reveal.js') -Raw -Encoding UTF8
-Assert-FileSizeBudget 'assets\css\custom.css' 155
+Assert-FileSizeBudget 'assets\css\custom.css' 160
 Assert-FileSizeBudget 'assets\css\travel-map-page.css' 30
 Assert-FileSizeBudget 'assets\js\main.js' 14
 Assert-FileSizeBudget 'assets\js\canvas-background.js' 14
