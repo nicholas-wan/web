@@ -1,5 +1,3 @@
-@import url(font-awesome.min.css);
-
 /* Self-hosted fonts (formerly Google Fonts) */
 /* Merriweather 300 italic latin-ext */
 @font-face {
@@ -2532,16 +2530,6 @@ input[type="radio"] + label {
 
 input[type="checkbox"] + label:before,
 input[type="radio"] + label:before {
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-	font-family: FontAwesome;
-	font-style: normal;
-	font-weight: normal;
-	text-transform: none !important;
-}
-
-input[type="checkbox"] + label:before,
-input[type="radio"] + label:before {
 	border-radius: 0;
 	border: solid 2px;
 	content: '';
@@ -2557,7 +2545,20 @@ input[type="radio"] + label:before {
 
 input[type="checkbox"]:checked + label:before,
 input[type="radio"]:checked + label:before {
-	content: '\f00c';
+	content: '';
+}
+
+input[type="checkbox"]:checked + label:after,
+input[type="radio"]:checked + label:after {
+	border: solid #ffffff;
+	border-width: 0 0.14rem 0.14rem 0;
+	content: '';
+	height: 0.75rem;
+	left: 0.65rem;
+	position: absolute;
+	top: 0.2rem;
+	transform: rotate(45deg);
+	width: 0.4rem;
 }
 
 input[type="checkbox"] + label:before {
@@ -2665,15 +2666,6 @@ input[type="radio"]:focus + label:before {
 	text-decoration: none;
 	border-bottom: none;
 	position: relative;
-}
-
-.icon:before {
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-	font-family: FontAwesome;
-	font-style: normal;
-	font-weight: normal;
-	text-transform: none !important;
 }
 
 .icon > .label {
@@ -2913,17 +2905,20 @@ ul.icons li:last-child {
 	padding-right: 0;
 }
 
-ul.icons li .icon:before {
+ul.icons li .icon {
+	align-items: center;
+	display: inline-grid;
 	width: 2.25rem;
 	height: 2.25rem;
-	line-height: 2.25rem;
-	display: inline-block;
-	text-align: center;
 	border-radius: 100%;
+	justify-items: center;
+}
+
+ul.icons li .icon:before {
 	font-size: 1.25rem;
 }
 
-ul.icons.alt li .icon:before {
+ul.icons.alt li .icon {
 	-moz-transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 	-webkit-transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 	-ms-transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -2990,11 +2985,11 @@ ul.icons li a.icon:hover:before {
 	color: #18bfef;
 }
 
-ul.icons.alt li .icon:before {
+ul.icons.alt li .icon {
 	box-shadow: inset 0 0 0 2px #eeeeee;
 }
 
-ul.icons.alt li a.icon:hover:before {
+ul.icons.alt li a.icon:hover {
 	box-shadow: inset 0 0 0 2px #18bfef;
 }
 
@@ -3240,28 +3235,31 @@ table.alt tbody tr td {
 }
 
 .pagination .next:before, .pagination .previous:before {
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-	font-family: FontAwesome;
-	font-style: normal;
-	font-weight: normal;
-	text-transform: none !important;
-}
-
-.pagination .next:before, .pagination .previous:before {
+	background-color: currentColor;
+	content: '';
 	display: inline-block;
 	color: inherit !important;
+	height: 0.8em;
+	-webkit-mask-position: center;
+	mask-position: center;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: contain;
+	mask-size: contain;
+	width: 0.8em;
 }
 
 .pagination .previous:before {
-	content: '\f104';
 	margin-right: 0.9375em;
+	-webkit-mask-image: url("../icons/fontawesome/solid/angle-left.svg");
+	mask-image: url("../icons/fontawesome/solid/angle-left.svg");
 }
 
 .pagination .next:before {
-	content: '\f105';
 	float: right;
 	margin-left: 0.9375em;
+	-webkit-mask-image: url("../icons/fontawesome/solid/angle-right.svg");
+	mask-image: url("../icons/fontawesome/solid/angle-right.svg");
 }
 
 @media screen and (max-width: 980px) {
@@ -3712,11 +3710,11 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 	color: #18bfef;
 }
 
-#nav ul.icons.alt li .icon:before {
+#nav ul.icons.alt li .icon {
 	box-shadow: inset 0 0 0 2px #ffffff;
 }
 
-#nav ul.icons.alt li a.icon:hover:before {
+#nav ul.icons.alt li a.icon:hover {
 	box-shadow: inset 0 0 0 2px #18bfef;
 }
 
@@ -4202,11 +4200,11 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 	color:white;
 }
 
-#footer ul.icons.alt li .icon:before {
+#footer ul.icons.alt li .icon {
 	box-shadow: inset 0 0 0 2px #e2e2e2;
 }
 
-#footer ul.icons.alt li a.icon:hover:before {
+#footer ul.icons.alt li a.icon:hover {
 	box-shadow: inset 0 0 0 2px #18bfef;
 }
 
@@ -4587,17 +4585,15 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 }
 
 #navPanelToggle:before {
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-	font-family: FontAwesome;
-	font-style: normal;
-	font-weight: normal;
-	text-transform: none !important;
-}
-
-#navPanelToggle:before {
-	content: '\f0c9';
+	background-color: currentColor;
+	content: '';
+	display: inline-block;
+	height: 1em;
 	margin-right: 0.5rem;
+	-webkit-mask: url("../icons/fontawesome/solid/bars.svg") center / contain no-repeat;
+	mask: url("../icons/fontawesome/solid/bars.svg") center / contain no-repeat;
+	vertical-align: -0.1em;
+	width: 1em;
 }
 
 #navPanelToggle.alt {
@@ -4701,17 +4697,14 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 }
 
 #navPanel .close:before {
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-	font-family: FontAwesome;
-	font-style: normal;
-	font-weight: normal;
-	text-transform: none !important;
-}
-
-#navPanel .close:before {
-	content: '\f00d';
+	background-color: currentColor;
+	content: '';
+	display: inline-block;
 	font-size: 1.25rem;
+	height: 1em;
+	-webkit-mask: url("../icons/fontawesome/solid/xmark.svg") center / contain no-repeat;
+	mask: url("../icons/fontawesome/solid/xmark.svg") center / contain no-repeat;
+	width: 1em;
 }
 
 #navPanel .close:hover {

@@ -635,14 +635,6 @@ foreach ($page in $pages) {
     $canvasScript = if ($slug -eq 'index') { '<script src="assets/js/canvas-background.js?v=1"></script>' } else { "" }
     $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
-    # FontAwesome 6 only draws the tech-stack icons, well below the fold, but as a
-    # plain stylesheet it blocked first paint on a third-party round trip. Load it
-    # async (rel=preload promoted on load) with a noscript fallback. Self-hosting is
-    # not a drop-in: the local font-awesome.min.css is v4 and this page uses v6
-    # fab/fas names.
-    $fontAwesomeUrl = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css'
-    $fontAwesomeIntegrity = 'sha512-Avb2QiuDEEvB4bZJYdft2mNjVShBftLdPG8FJ0V7irTLQ8Uo0qcPxh4Plq7G5tGm0rU+1SPhVotteLpBERwTkw=='
-    $fontAwesomeStylesheet = if ($slug -eq 'skills') { "    <link rel=`"preload`" as=`"style`" href=`"$fontAwesomeUrl`" integrity=`"$fontAwesomeIntegrity`" crossorigin=`"anonymous`" onload=`"this.onload=null;this.rel='stylesheet'`" />`n    <noscript><link rel=`"stylesheet`" href=`"$fontAwesomeUrl`" integrity=`"$fontAwesomeIntegrity`" crossorigin=`"anonymous`" /></noscript>" } else { '' }
     $routeStylesheets = @()
     if ($slug -eq 'travel') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/travel-map-page.css?v=2" />' }
     if ($tripOrder -contains $slug) { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/travel-journal.css?v=1" />' }
@@ -670,9 +662,9 @@ foreach ($page in $pages) {
     <meta property="og:description" content="$description" />
     <meta property="og:url" content="__CANONICAL__" />
 $shareImageMeta
-    <link rel="stylesheet" href="assets/css/main.css?v=2" />
-$fontAwesomeStylesheet
-    <link rel="stylesheet" href="assets/css/custom.css?v=177" />
+    <link rel="stylesheet" href="assets/css/icons.css?v=1" />
+    <link rel="stylesheet" href="assets/css/main.css?v=3" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=178" />
 $routeStylesheetMarkup
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
@@ -726,7 +718,7 @@ if ($imageDimensionCacheDirty) {
 }
 
 # Publish only runtime assets used by the generated Pages site.
-$runtimeCss = @("main.css", "font-awesome.min.css", "noscript.css")
+$runtimeCss = @("icons.css", "main.css", "noscript.css")
 $runtimeJs = @("jquery.min.js", "jquery.scrollex.min.js", "jquery.scrolly.min.js", "browser.min.js", "breakpoints.min.js", "util.js", "arrow.js", "game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "personal-timeline.js", "scramble-reveal.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
@@ -790,6 +782,7 @@ foreach ($file in $runtimeJs) {
     Copy-Item -LiteralPath (Join-Path $root "assets\js\$file") -Destination (Join-Path $out "assets\js\$file") -Force
 }
 Sync-Directory (Join-Path $root "assets\fonts") (Join-Path $out "assets\fonts")
+Sync-Directory (Join-Path $root "assets\icons") (Join-Path $out "assets\icons")
 # Copied before the image scan so the manifest's icon references get published.
 Copy-Item -LiteralPath (Join-Path $root "site.webmanifest") -Destination (Join-Path $out "site.webmanifest")
 Copy-ReferencedImages $out (Join-Path $root "images") $(if (Test-Path -LiteralPath $webpSource) { $webpSource } else { $null }) $sourceImageIndex

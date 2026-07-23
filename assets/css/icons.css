@@ -1,0 +1,43 @@
+/*
+ * Minimal Font Awesome Free 6.5.0 icon layer.
+ * The selected SVGs are self-hosted under assets/icons/fontawesome.
+ * Font Awesome Free is licensed under CC BY 4.0; see the bundled LICENSE.txt.
+ */
+
+.icon::before,
+.fa::before,
+.fas::before,
+.fab::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-color: currentColor;
+  -webkit-mask: var(--fa-icon) center / contain no-repeat;
+  mask: var(--fa-icon) center / contain no-repeat;
+  vertical-align: -0.125em;
+}
+
+.fa-home::before { --fa-icon: url("../icons/fontawesome/solid/house.svg"); }
+.fa-user::before { --fa-icon: url("../icons/fontawesome/solid/user.svg"); }
+.fa-plus::before { --fa-icon: url("../icons/fontawesome/solid/plus.svg"); }
+.fa-plane::before { --fa-icon: url("../icons/fontawesome/solid/plane.svg"); }
+.fa-chevron-up::before { --fa-icon: url("../icons/fontawesome/solid/chevron-up.svg"); }
+.fa-envelope::before { --fa-icon: url("../icons/fontawesome/solid/envelope.svg"); }
+.fa-briefcase::before { --fa-icon: url("../icons/fontawesome/solid/briefcase.svg"); }
+.fa-graduation-cap::before { --fa-icon: url("../icons/fontawesome/solid/graduation-cap.svg"); }
+.fa-bolt::before { --fa-icon: url("../icons/fontawesome/solid/bolt.svg"); }
+.fa-code::before { --fa-icon: url("../icons/fontawesome/solid/code.svg"); }
+.fa-shield::before { --fa-icon: url("../icons/fontawesome/solid/shield.svg"); }
+.fa-brain::before { --fa-icon: url("../icons/fontawesome/solid/brain.svg"); }
+.fa-chart-line::before { --fa-icon: url("../icons/fontawesome/solid/chart-line.svg"); }
+.fa-database::before { --fa-icon: url("../icons/fontawesome/solid/database.svg"); }
+.fa-magnifying-glass-chart::before { --fa-icon: url("../icons/fontawesome/solid/magnifying-glass-chart.svg"); }
+.fa-robot::before { --fa-icon: url("../icons/fontawesome/solid/robot.svg"); }
+
+.fa-github::before { --fa-icon: url("../icons/fontawesome/brands/github.svg"); }
+.fa-linkedin::before { --fa-icon: url("../icons/fontawesome/brands/linkedin.svg"); }
+.fa-instagram::before { --fa-icon: url("../icons/fontawesome/brands/instagram.svg"); }
+.fa-aws::before { --fa-icon: url("../icons/fontawesome/brands/aws.svg"); }
+.fa-microsoft::before { --fa-icon: url("../icons/fontawesome/brands/microsoft.svg"); }
+.fa-python::before { --fa-icon: url("../icons/fontawesome/brands/python.svg"); }
