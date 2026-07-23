@@ -1,369 +1,351 @@
 
-(function($) {
+(function() {
+	'use strict';
 
-	var	$window = $(window),
-		$body = $('body'),
-		$wrapper = $('#wrapper'),
-		$header = $('#header'),
-		$nav = $('#nav'),
-		$main = $('#main'),
-		$navPanelToggle, $navPanel, $navPanelInner;
+	var body = document.body;
+	var wrapper = document.getElementById('wrapper');
+	var header = document.getElementById('header');
+	var nav = document.getElementById('nav');
+	var main = document.getElementById('main');
+	if (!body || !wrapper || !nav || !main) return;
 
-	// Breakpoints.
-		breakpoints({
-			default:   ['1681px',   null       ],
-			xlarge:    ['1281px',   '1680px'   ],
-			large:     ['981px',    '1280px'   ],
-			medium:    ['737px',    '980px'    ],
-			small:     ['481px',    '736px'    ],
-			xsmall:    ['361px',    '480px'    ],
-			xxsmall:   [null,       '360px'    ]
-		});
+	var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+	var mobileNav = window.matchMedia('(max-width: 980px)');
+	var compactIntro = window.matchMedia('(max-width: 480px)');
 
-	/**
-	 * Applies parallax scrolling to an element's background image.
-	 * @return {jQuery} jQuery object.
-	 */
-	$.fn._parallax = function(intensity) {
-
-		var	$window = $(window),
-			$this = $(this);
-
-		if (this.length == 0 || intensity === 0)
-			return $this;
-
-		if (this.length > 1) {
-
-			for (var i=0; i < this.length; i++)
-				$(this[i])._parallax(intensity);
-
-			return $this;
-
-		}
-
-		if (!intensity)
-			intensity = 0.25;
-
-		$this.each(function() {
-
-			var $t = $(this),
-				$bg = $('<div class="bg"></div>').appendTo($t),
-				on, off;
-
-			on = function() {
-
-				$bg
-					.removeClass('fixed')
-					.css('transform', 'matrix(1,0,0,1,0,0)');
-
-				$window
-					.on('scroll._parallax', function() {
-
-						var pos = parseInt($window.scrollTop()) - parseInt($t.position().top);
-
-						$bg.css('transform', 'matrix(1,0,0,1,0,' + (pos * intensity) + ')');
-
-					});
-
-			};
-
-			off = function() {
-
-				$bg
-					.addClass('fixed')
-					.css('transform', 'none');
-
-				$window
-					.off('scroll._parallax');
-
-			};
-
-			// Disable parallax on ..
-				if (browser.name == 'ie'			// IE
-				||	browser.name == 'edge'			// Edge
-				||	window.devicePixelRatio > 1		// Retina/HiDPI (= poor performance)
-				||	browser.mobile)					// Mobile devices
-					off();
-
-			// Enable everywhere else.
-				else {
-
-					breakpoints.on('>large', on);
-					breakpoints.on('<=large', off);
-
-				}
-
-		});
-
-		$window
-			.off('load._parallax resize._parallax')
-			.on('load._parallax resize._parallax', function() {
-				$window.trigger('scroll');
-			});
-
-		return $(this);
-
-	};
+	function watchMedia(query, callback) {
+		if (query.addEventListener) query.addEventListener('change', callback);
+		else query.addListener(callback);
+	}
 
 	// Reveal content as soon as its DOM and interaction handlers are ready.
 	// The homepage keeps its load-synchronised intro/scramble choreography;
 	// content pages should not remain under the theme fade while images load.
-		var revealPage = function() {
-			window.setTimeout(function() {
-				$body.removeClass('is-preload');
-			}, 100);
-		};
-		if ($body.hasClass('page-home'))
-			$window.on('load', revealPage);
-		else if (document.readyState === 'loading')
-			document.addEventListener('DOMContentLoaded', revealPage, { once: true });
-		else
-			revealPage();
+	function revealPage() {
+		window.setTimeout(function() {
+			body.classList.remove('is-preload');
+		}, 100);
+	}
+	if (body.classList.contains('page-home')) {
+		if (document.readyState === 'complete') revealPage();
+		else window.addEventListener('load', revealPage, { once: true });
+	}
+	else {
+		revealPage();
+	}
 
-	// Scrolly.
-		$('.scrolly').scrolly();
-
-	// Background.
-		// Parallax drives the backdrop off scroll position, so it is exactly the
-		// kind of motion reduced-motion asks us to drop. The canvas below already
-		// checks the same query.
-		if (!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches))
-			$wrapper._parallax(0.925);
-
-	// Nav Panel.
-
-		// Toggle.
-			$navPanelToggle = $(
-				'<a href="#navPanel" id="navPanelToggle" aria-label="Open navigation menu" aria-controls="navPanel" aria-expanded="false">Menu</a>'
-			)
-				.appendTo($wrapper);
-
-			// Event pages intentionally omit the large masthead. Keep their menu in
-			// the compact contextual bar; pages without either surface use the
-			// contrasting pill from the outset so white content can never hide it.
-				var $mobileContextBar = $('.mobile-context-bar').first();
-				if ($mobileContextBar.length)
-					$navPanelToggle.appendTo($mobileContextBar).addClass('alt');
-				// The homepage hero intentionally sits above the wrapper's load
-				// overlay. Keep its fixed menu outside that lower stacking context
-				// so a touch lands on the control instead of the hero beneath it.
-				else if ($body.hasClass('page-home'))
-					$navPanelToggle.appendTo($body).addClass('alt');
-
-			// Change toggle styling once we've scrolled past a real header.
-				if ($header.length) $header.scrollex({
-					bottom: '5vh',
-					enter: function() {
-						$navPanelToggle.removeClass('alt');
-					},
-					leave: function() {
-						$navPanelToggle.addClass('alt');
-					}
-				});
-				else
-					$navPanelToggle.addClass('alt');
-
-			// The floating pill covers content at reading position, so step it
-			// away on downward scroll and restore it on any upward intent (or
-			// near the top). Only the wrapper-level pill scrolls away: the
-			// mobile context bar and the travel sticky nav re-home the toggle
-			// as a static control, so those parents opt out via the guard.
-				var toggleScrollY = $window.scrollTop();
-				$window.on('scroll', function() {
-					if ($navPanelToggle.parent().get(0) !== $wrapper.get(0)) return;
-					var y = $window.scrollTop();
-					if (Math.abs(y - toggleScrollY) < 8) return;
-					if (y > toggleScrollY && y > 160 && !$body.hasClass('is-navPanel-visible'))
-						$navPanelToggle.addClass('is-scrolled-away');
-					else
-						$navPanelToggle.removeClass('is-scrolled-away');
-					toggleScrollY = y;
-				});
-
-		// Panel.
-			$navPanel = $(
-				'<div id="navPanel" role="dialog" aria-modal="true" aria-label="Site navigation" aria-hidden="true">' +
-					'<span class="nav-panel__handle" aria-hidden="true"></span>' +
-					'<div class="nav-panel__header"><span>Navigate</span></div>' +
-					'<nav>' +
-					'</nav>' +
-					'<a href="#navPanel" class="close" aria-label="Close navigation menu"></a>' +
-				'</div>'
-			)
-				.appendTo($body)
-				.panel({
-					delay: 280,
-					hideOnClick: true,
-					hideOnEscape: true,
-					hideOnSwipe: true,
-					resetScroll: true,
-					resetForms: true,
-					side: 'bottom',
-					target: $body,
-					visibleClass: 'is-navPanel-visible'
-				});
-
-			// Bind the control itself instead of relying solely on the panel
-			// helper's body-level delegation. A direct handler also survives the
-			// toggle being re-homed into contextual/sticky mobile navigation bars.
-			$navPanelToggle.on('click', function(event) {
-				event.preventDefault();
-				event.stopPropagation();
-				$body.toggleClass('is-navPanel-visible');
+	// Retain the theme's smooth in-page links without the old scrolly plugin.
+	Array.prototype.forEach.call(document.querySelectorAll('a.scrolly'), function(link) {
+		link.addEventListener('click', function(event) {
+			var href = link.getAttribute('href');
+			if (!href || href.charAt(0) !== '#' || href.length < 2) return;
+			var target;
+			try { target = document.querySelector(href); }
+			catch (error) { return; }
+			if (!target) return;
+			event.preventDefault();
+			window.scrollTo({
+				top: Math.max(0, target.getBoundingClientRect().top + window.scrollY),
+				behavior: reducedMotion.matches ? 'auto' : 'smooth'
 			});
+		});
+	});
 
-			// Keep the toggle and sheet state available to assistive technology.
-			// The toggle advertises button semantics via aria-expanded, and the
-			// sheet is an aria-modal dialog, so focus has to behave accordingly:
-			// Space activates the toggle (anchors only handle Enter natively),
-			// opening moves focus into the sheet, and closing hands it back.
-				var navPanelWasOpen = false;
-				var syncNavPanelState = function() {
-					var isOpen = $body.hasClass('is-navPanel-visible');
-					$navPanelToggle.attr('aria-expanded', isOpen ? 'true' : 'false');
-					$navPanel.attr('aria-hidden', isOpen ? 'false' : 'true');
-					if (isOpen && !navPanelWasOpen) {
-						// The sheet's visibility flips as its slide-in transition
-						// starts, so a same-tick focus can land on a still-hidden
-						// link; retry briefly until the focus takes.
-						var firstLink = $navPanel.find('nav a').get(0);
-						var focusTries = 0;
-						var focusIntoPanel = function() {
-							if (!firstLink || !$body.hasClass('is-navPanel-visible')) return;
-							firstLink.focus({ preventScroll: true });
-							if (document.activeElement !== firstLink && ++focusTries < 30)
-								window.setTimeout(focusIntoPanel, 20);
-						};
-						focusIntoPanel();
-					}
-					else if (!isOpen && navPanelWasOpen && $navPanel.get(0).contains(document.activeElement))
-						$navPanelToggle.get(0).focus({ preventScroll: true });
-					navPanelWasOpen = isOpen;
-				};
-				new MutationObserver(syncNavPanelState).observe($body.get(0), { attributes: true, attributeFilter: ['class'] });
-				syncNavPanelState();
+	// The background layer always exists, but scroll-linked parallax only runs
+	// on a standard-density desktop pointer and when motion has not been reduced.
+	(function setupParallax(element, intensity) {
+		var background = document.createElement('div');
+		var desktopPointer = window.matchMedia('(min-width: 1281px) and (hover: hover) and (pointer: fine)');
+		var enabled = false;
+		var frame = null;
+		var elementTop = 0;
+		background.className = 'bg fixed';
+		element.appendChild(background);
 
-				$navPanelToggle.on('keydown', function(event) {
-					if (event.key === ' ' || event.key === 'Spacebar') {
-						event.preventDefault();
-						$(this).trigger('click');
-					}
-				});
-
-				$window.on('keydown', function(event) {
-					if (event.key !== 'Tab' || !$body.hasClass('is-navPanel-visible')) return;
-					var focusable = $navPanel.find('a').filter(':visible');
-					if (!focusable.length) return;
-					var first = focusable.get(0);
-					var last = focusable.get(focusable.length - 1);
-					if (!$navPanel.get(0).contains(document.activeElement)) {
-						event.preventDefault();
-						first.focus();
-					}
-					else if (event.shiftKey && document.activeElement === first) {
-						event.preventDefault();
-						last.focus();
-					}
-					else if (!event.shiftKey && document.activeElement === last) {
-						event.preventDefault();
-						first.focus();
-					}
-				});
-
-			// Get inner.
-				$navPanelInner = $navPanel.children('nav');
-
-			// Move nav content on breakpoint change.
-				var $navContent = $nav.children();
-
-				breakpoints.on('>medium', function() {
-
-					// NavPanel -> Nav.
-						$navContent.appendTo($nav);
-
-					// Flip icon classes.
-						$nav.find('.icons, .icon')
-							.removeClass('alt');
-
-				});
-
-				breakpoints.on('<=medium', function() {
-
-					// Nav -> NavPanel.
-						$navContent.appendTo($navPanelInner);
-
-					// Flip icon classes.
-						$navPanelInner.find('.icons, .icon')
-							.addClass('alt');
-
-				});
-
-			// Hack: Disable transitions on WP.
-				if (browser.os == 'wp'
-				&&	browser.osVersion < 10)
-					$navPanel
-						.css('transition', 'none');
-
-	// Intro.
-		var $intro = $('#intro');
-
-		if ($intro.length > 0) {
-
-			// Hack: Fix flex min-height on IE.
-				if (browser.name == 'ie') {
-					$window.on('resize.ie-intro-fix', function() {
-
-						var h = $intro.height();
-
-						if (h > $window.height())
-							$intro.css('height', 'auto');
-						else
-							$intro.css('height', h);
-
-					}).trigger('resize.ie-intro-fix');
-				}
-
-			// Hide intro on scroll (> small).
-				breakpoints.on('>small', function() {
-
-					$main.unscrollex();
-
-					$main.scrollex({
-						mode: 'bottom',
-						top: '25vh',
-						bottom: '-50vh',
-						enter: function() {
-							$intro.addClass('hidden');
-						},
-						leave: function() {
-							$intro.removeClass('hidden');
-						}
-					});
-
-				});
-
-			// Hide intro on scroll (<= small).
-				breakpoints.on('<=small', function() {
-
-					$main.unscrollex();
-
-					$main.scrollex({
-						mode: 'middle',
-						top: '15vh',
-						bottom: '-15vh',
-						enter: function() {
-							$intro.addClass('hidden');
-						},
-						leave: function() {
-							$intro.removeClass('hidden');
-						}
-					});
-
-			});
-
+		function renderParallax() {
+			frame = null;
+			if (!enabled) return;
+			var offset = (window.scrollY - elementTop) * intensity;
+			background.style.transform = 'matrix(1,0,0,1,0,' + offset + ')';
 		}
 
-})(jQuery);
+		function queueParallax() {
+			if (enabled && frame === null) frame = window.requestAnimationFrame(renderParallax);
+		}
+
+		function measureParallax() {
+			elementTop = element.getBoundingClientRect().top + window.scrollY;
+			queueParallax();
+		}
+
+		function syncParallax() {
+			var shouldEnable = desktopPointer.matches && !reducedMotion.matches && window.devicePixelRatio <= 1;
+			if (shouldEnable === enabled) {
+				queueParallax();
+				return;
+			}
+			enabled = shouldEnable;
+			background.classList.toggle('fixed', !enabled);
+			if (enabled) {
+				window.addEventListener('scroll', queueParallax, { passive: true });
+				queueParallax();
+			}
+			else {
+				window.removeEventListener('scroll', queueParallax);
+				if (frame !== null) window.cancelAnimationFrame(frame);
+				frame = null;
+				background.style.transform = 'none';
+			}
+		}
+
+		watchMedia(desktopPointer, syncParallax);
+		watchMedia(reducedMotion, syncParallax);
+		window.addEventListener('resize', measureParallax, { passive: true });
+		window.addEventListener('load', measureParallax, { once: true });
+		measureParallax();
+		syncParallax();
+	})(wrapper, 0.925);
+
+	// Build the mobile navigation sheet.
+	var navPanelToggle = document.createElement('a');
+	navPanelToggle.href = '#navPanel';
+	navPanelToggle.id = 'navPanelToggle';
+	navPanelToggle.setAttribute('aria-label', 'Open navigation menu');
+	navPanelToggle.setAttribute('aria-controls', 'navPanel');
+	navPanelToggle.setAttribute('aria-expanded', 'false');
+	navPanelToggle.textContent = 'Menu';
+	wrapper.appendChild(navPanelToggle);
+
+	var mobileContextBar = document.querySelector('.mobile-context-bar');
+	if (mobileContextBar) {
+		mobileContextBar.appendChild(navPanelToggle);
+		navPanelToggle.classList.add('alt');
+	}
+	else if (body.classList.contains('page-home')) {
+		body.appendChild(navPanelToggle);
+		navPanelToggle.classList.add('alt');
+	}
+
+	var toggleToneFrame = null;
+	function renderToggleTone() {
+		toggleToneFrame = null;
+		if (!header) {
+			navPanelToggle.classList.add('alt');
+			return;
+		}
+		navPanelToggle.classList.toggle('alt', header.getBoundingClientRect().bottom <= window.innerHeight * 0.05);
+	}
+	function queueToggleTone() {
+		if (toggleToneFrame === null) toggleToneFrame = window.requestAnimationFrame(renderToggleTone);
+	}
+	window.addEventListener('scroll', queueToggleTone, { passive: true });
+	window.addEventListener('resize', queueToggleTone, { passive: true });
+	queueToggleTone();
+
+	// The wrapper-level pill steps away on downward reading progress and returns
+	// on upward intent. Context and sticky navigation parents opt out.
+	var toggleScrollY = window.scrollY;
+	window.addEventListener('scroll', function() {
+		if (navPanelToggle.parentElement !== wrapper) return;
+		var y = window.scrollY;
+		if (Math.abs(y - toggleScrollY) < 8) return;
+		if (y > toggleScrollY && y > 160 && !body.classList.contains('is-navPanel-visible'))
+			navPanelToggle.classList.add('is-scrolled-away');
+		else
+			navPanelToggle.classList.remove('is-scrolled-away');
+		toggleScrollY = y;
+	}, { passive: true });
+
+	var navPanel = document.createElement('div');
+	navPanel.id = 'navPanel';
+	navPanel.setAttribute('role', 'dialog');
+	navPanel.setAttribute('aria-modal', 'true');
+	navPanel.setAttribute('aria-label', 'Site navigation');
+	navPanel.setAttribute('aria-hidden', 'true');
+	navPanel.innerHTML =
+		'<span class="nav-panel__handle" aria-hidden="true"></span>' +
+		'<div class="nav-panel__header"><span>Navigate</span></div>' +
+		'<nav></nav>' +
+		'<a href="#navPanel" class="close" aria-label="Close navigation menu"></a>';
+	body.appendChild(navPanel);
+	var navPanelInner = navPanel.querySelector('nav');
+	var navContent = Array.prototype.slice.call(nav.children);
+	var panelDelay = 280;
+
+	function setPanelOpen(open) {
+		body.classList.toggle('is-navPanel-visible', open);
+	}
+
+	function closePanel() {
+		if (!body.classList.contains('is-navPanel-visible')) return;
+		setPanelOpen(false);
+		window.setTimeout(function() {
+			navPanel.scrollTop = 0;
+			Array.prototype.forEach.call(navPanel.querySelectorAll('form'), function(form) {
+				form.reset();
+			});
+		}, panelDelay);
+	}
+
+	navPanelToggle.addEventListener('click', function(event) {
+		event.preventDefault();
+		event.stopPropagation();
+		setPanelOpen(!body.classList.contains('is-navPanel-visible'));
+	});
+	navPanelToggle.addEventListener('keydown', function(event) {
+		if (event.key === ' ' || event.key === 'Spacebar') {
+			event.preventDefault();
+			navPanelToggle.click();
+		}
+	});
+
+	navPanel.addEventListener('click', function(event) {
+		var link = event.target.closest('a');
+		if (!link) return;
+		var href = link.getAttribute('href');
+		if (!href || href === '#' || href === '#navPanel') {
+			event.preventDefault();
+			closePanel();
+			return;
+		}
+		if (link.target === '_blank') {
+			closePanel();
+			return;
+		}
+		event.preventDefault();
+		closePanel();
+		window.setTimeout(function() {
+			window.location.href = href;
+		}, panelDelay + 10);
+	});
+
+	document.addEventListener('click', function(event) {
+		if (!body.classList.contains('is-navPanel-visible')) return;
+		if (navPanel.contains(event.target) || navPanelToggle.contains(event.target)) return;
+		closePanel();
+	});
+
+	var touchStartX = null;
+	var touchStartY = null;
+	navPanel.addEventListener('touchstart', function(event) {
+		if (!event.touches.length) return;
+		touchStartX = event.touches[0].pageX;
+		touchStartY = event.touches[0].pageY;
+	}, { passive: true });
+	navPanel.addEventListener('touchmove', function(event) {
+		if (touchStartX === null || touchStartY === null || !event.touches.length) return;
+		var diffX = touchStartX - event.touches[0].pageX;
+		var diffY = touchStartY - event.touches[0].pageY;
+		if (Math.abs(diffX) < 20 && diffY < -50) {
+			touchStartX = null;
+			touchStartY = null;
+			closePanel();
+		}
+	}, { passive: true });
+
+	var navPanelWasOpen = false;
+	function syncNavPanelState() {
+		var isOpen = body.classList.contains('is-navPanel-visible');
+		navPanelToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+		navPanel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+		if (isOpen && !navPanelWasOpen) {
+			var firstLink = navPanel.querySelector('nav a');
+			var focusTries = 0;
+			(function focusIntoPanel() {
+				if (!firstLink || !body.classList.contains('is-navPanel-visible')) return;
+				firstLink.focus({ preventScroll: true });
+				if (document.activeElement !== firstLink && ++focusTries < 30)
+					window.setTimeout(focusIntoPanel, 20);
+			})();
+		}
+		else if (!isOpen && navPanelWasOpen && navPanel.contains(document.activeElement)) {
+			navPanelToggle.focus({ preventScroll: true });
+		}
+		navPanelWasOpen = isOpen;
+	}
+	new MutationObserver(syncNavPanelState).observe(body, { attributes: true, attributeFilter: ['class'] });
+	syncNavPanelState();
+
+	window.addEventListener('keydown', function(event) {
+		if (event.key === 'Escape' && body.classList.contains('is-navPanel-visible')) {
+			event.preventDefault();
+			closePanel();
+			return;
+		}
+		if (event.key !== 'Tab' || !body.classList.contains('is-navPanel-visible')) return;
+		var focusable = Array.prototype.filter.call(
+			navPanel.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'),
+			function(element) { return element.getClientRects().length > 0; }
+		);
+		if (!focusable.length) return;
+		var first = focusable[0];
+		var last = focusable[focusable.length - 1];
+		if (!navPanel.contains(document.activeElement)) {
+			event.preventDefault();
+			first.focus();
+		}
+		else if (event.shiftKey && document.activeElement === first) {
+			event.preventDefault();
+			last.focus();
+		}
+		else if (!event.shiftKey && document.activeElement === last) {
+			event.preventDefault();
+			first.focus();
+		}
+	});
+
+	function syncNavMode() {
+		var mobile = mobileNav.matches;
+		var destination = mobile ? navPanelInner : nav;
+		if (!mobile) closePanel();
+		navContent.forEach(function(node) {
+			destination.appendChild(node);
+		});
+		Array.prototype.forEach.call(destination.querySelectorAll('.icons, .icon'), function(icon) {
+			icon.classList.toggle('alt', mobile);
+		});
+	}
+	watchMedia(mobileNav, syncNavMode);
+	syncNavMode();
+
+	// The intro fades once the main content crosses the same desktop/mobile
+	// handoff zones formerly managed by Scrollex, and returns when scrolling up.
+	var intro = document.getElementById('intro');
+	if (intro) {
+		var introFrame = null;
+		function syncIntro() {
+			introFrame = null;
+			var threshold = window.innerHeight * (compactIntro.matches ? 0.65 : 0.75);
+			intro.classList.toggle('hidden', main.getBoundingClientRect().top <= threshold);
+		}
+		function queueIntro() {
+			if (introFrame === null) introFrame = window.requestAnimationFrame(syncIntro);
+		}
+		watchMedia(compactIntro, queueIntro);
+		window.addEventListener('scroll', queueIntro, { passive: true });
+		window.addEventListener('resize', queueIntro, { passive: true });
+		queueIntro();
+	}
+
+	// Return-to-top visibility and scrolling no longer require a second script.
+	var returnToTop = document.getElementById('return-to-top');
+	if (returnToTop) {
+		var topFrame = null;
+		function syncReturnToTop() {
+			topFrame = null;
+			returnToTop.classList.toggle('is-visible', window.scrollY >= 50);
+		}
+		function queueReturnToTop() {
+			if (topFrame === null) topFrame = window.requestAnimationFrame(syncReturnToTop);
+		}
+		window.addEventListener('scroll', queueReturnToTop, { passive: true });
+		returnToTop.addEventListener('click', function(event) {
+			event.preventDefault();
+			window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+		});
+		queueReturnToTop();
+	}
+})();
 
 /*Canvas*/
 var canvas = document.getElementById('nokey');

@@ -1421,15 +1421,20 @@ body {
     -webkit-border-radius: 35px;
     -moz-border-radius: 35px;
     border-radius: 35px;
-    display: none;
 	transition: background-color var(--motion-standard) ease,
       opacity var(--motion-standard) ease;
-	opacity: 0.6; /* Standard compliant browsers */
-    -moz-opacity: 0.6; /* Firefox and Mozilla browsers */
-    -webkit-opacity: 0.6; /* WebKit browser e.g. Safari */
-    filter: alpha(opacity=60); /* For IE8 and earlier */
+	opacity: 0;
+	pointer-events: none;
+	visibility: hidden;
 	z-index:3;
 }
+
+#return-to-top.is-visible {
+	opacity: 0.6;
+	pointer-events: auto;
+	visibility: visible;
+}
+
 #return-to-top i {
     color: black;
     margin: 0;
@@ -1442,10 +1447,7 @@ body {
 }
 #return-to-top:hover {
 	background: silver;
-	opacity: 0.85; /* Standard compliant browsers */
-    -moz-opacity: 0.85; /* Firefox and Mozilla browsers */
-    -webkit-opacity: 0.85; /* WebKit browser e.g. Safari */
-    filter: alpha(opacity=85); /* For IE8 and earlier */
+	opacity: 0.85;
 }
 #return-to-top:hover i {
     color: black;

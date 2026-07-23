@@ -664,7 +664,7 @@ foreach ($page in $pages) {
 $shareImageMeta
     <link rel="stylesheet" href="assets/css/icons.css?v=1" />
     <link rel="stylesheet" href="assets/css/main.css?v=3" />
-    <link rel="stylesheet" href="assets/css/custom.css?v=178" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=179" />
 $routeStylesheetMarkup
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
@@ -691,14 +691,7 @@ $navigation
             </section>
         </footer>
     </div>
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/jquery.scrollex.min.js"></script>
-    <script src="assets/js/jquery.scrolly.min.js"></script>
-    <script src="assets/js/browser.min.js"></script>
-    <script src="assets/js/breakpoints.min.js"></script>
-    <script src="assets/js/util.js?v=1"></script>
-    <script src="assets/js/main.js?v=19"></script>
-    <script src="assets/js/arrow.js?v=1"></script>
+    <script src="assets/js/main.js?v=20"></script>
 $optionalScripts
 </body>
 </html>
@@ -719,7 +712,7 @@ if ($imageDimensionCacheDirty) {
 
 # Publish only runtime assets used by the generated Pages site.
 $runtimeCss = @("icons.css", "main.css", "noscript.css")
-$runtimeJs = @("jquery.min.js", "jquery.scrollex.min.js", "jquery.scrolly.min.js", "browser.min.js", "breakpoints.min.js", "util.js", "arrow.js", "game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "personal-timeline.js", "scramble-reveal.js")
+$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "personal-timeline.js", "scramble-reveal.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCss) {
