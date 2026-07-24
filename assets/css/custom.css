@@ -3133,7 +3133,7 @@ body.is-map-fullscreen #return-to-top {
     background: #071315;
   }
 
-  .travel-journal__hero-image--contain-mobile img {
+  .page-travel-journal .travel-journal__hero-image--contain-mobile img {
     height: auto;
     aspect-ratio: auto;
     object-fit: contain;
