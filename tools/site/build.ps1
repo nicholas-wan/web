@@ -680,7 +680,7 @@ foreach ($page in $pages) {
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
     $routeStylesheets = @()
     if ($slug -eq 'travel') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/travel-map-page.css?v=2" />' }
-    if ($tripOrder -contains $slug) { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/travel-journal.css?v=1" />' }
+    if ($tripOrder -contains $slug) { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/travel-journal.css?v=2" />' }
     if ($slug -eq 'experience') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/experience-page.css?v=1" />' }
     if ($slug -eq 'personal') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/personal-page.css?v=1" />' }
     if ($slug -eq 'skills') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/skills-page.css?v=1" />' }
