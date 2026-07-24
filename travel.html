@@ -120,11 +120,36 @@
 										</div>
 									</div>
 									</div>
+									<div class="travel-map__trip-picker">
+										<label for="travel-map-trip">Explore a trip</label>
+										<select id="travel-map-trip" data-map-trip>
+											<option value="">All trips</option>
+											<option value="guangzhou">Guangzhou · 2026</option>
+											<option value="japan">Japan · 2025</option>
+											<option value="australia">Australia · 2024</option>
+											<option value="germany">Germany · 2024</option>
+											<option value="usa-canada">USA &amp; Canada · 2023</option>
+											<option value="perth">Western Australia · 2023</option>
+											<option value="europe">Western Europe · 2022</option>
+											<option value="silicon-valley">California &amp; Nevada · 2019</option>
+											<option value="seoul">South Korea · 2017</option>
+										</select>
+									</div>
 									<div class="travel-map__controls" role="group" aria-label="Map zoom controls">
 										<button type="button" class="travel-map__zoom-btn" data-map-zoom="in" aria-label="Zoom in">+</button>
 										<button type="button" class="travel-map__zoom-btn" data-map-zoom="out" aria-label="Zoom out" disabled>&minus;</button>
 										<button type="button" class="travel-map__zoom-btn travel-map__zoom-btn--reset" data-map-zoom="reset" aria-label="Reset map view" hidden>&#8634;</button>
 									</div>
+									<aside id="travel-map-detail-card" class="travel-map__detail-card" data-map-detail-card aria-live="polite" hidden>
+										<button type="button" class="travel-map__detail-card-close" data-map-detail-close aria-label="Close place details">&times;</button>
+										<img data-map-detail-image alt="Selected travel destination" />
+										<div class="travel-map__detail-card-copy">
+											<p data-map-detail-position>Journal stop</p>
+											<h2 data-map-detail-title>Destination</h2>
+											<p data-map-detail-meta></p>
+											<a class="travel-map__detail-card-link" data-map-detail-link href="travel">Open this journal stop <span aria-hidden="true">&rarr;</span></a>
+										</div>
+									</aside>
 									<button type="button" class="travel-map__close" data-map-close aria-label="Close map">&times;</button>
 									<div class="travel-map__regions" role="group" aria-label="Jump to a region">
 										<button type="button" class="travel-map__region-btn" data-map-region="americas">Americas</button>

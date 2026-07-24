@@ -71,6 +71,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 ## Travel atlas contracts
 
 - The atlas is progressive: the opening view shows broad trip regions, intermediate zoom shows countries or states, and close zoom shows journal stops.
+- The trip selector turns the atlas into a journey explorer: choosing a trip fits its mapped stops, draws one restrained route, and mutes unrelated destinations. Selecting an area or stop reveals the shared journal detail card instead of navigating immediately; the explicit card link performs navigation. On phones the card becomes a bottom sheet above the region controls, and the chosen marker is kept out from underneath it.
 - The desktop zoom-out floor is the intentional cropped opening view; tablets may use the full map, while phones (≤520px) never render the inline world strip — a teaser card fades in a full-screen overlay whose floor is the fit-to-height view, with region jump chips. Closing fades the overlay before teardown; reduced motion and exits from the phone breakpoint tear it down immediately. Preserve the breakpoint-aware rebase.
 - Store marker locations as latitude and longitude and project them with the shared Natural Earth 1 implementation in `assets/js/travel-map.js`. Do not hand-place percentage coordinates or replace the vector map with a raster.
 - Every map link must resolve to a matching `trip-section-*` anchor. Keep separate labelled callouts when the same city appears in more than one journal.
