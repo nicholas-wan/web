@@ -88,7 +88,7 @@
   overlay.setAttribute('aria-hidden', 'true');
   overlay.innerHTML = '<button class="lightbox__close" type="button" aria-label="Close media viewer">&times;</button>' +
     '<button class="lightbox__previous" type="button" aria-label="Previous media">&#8592;</button>' +
-    '<figure class="lightbox__figure"><img class="lightbox__image" alt=""><video class="lightbox__image lightbox__video" controls loop muted playsinline hidden></video><figcaption class="lightbox__caption"></figcaption></figure>' +
+    '<figure class="lightbox__figure"><img class="lightbox__image" alt=""><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video><figcaption class="lightbox__caption"></figcaption></figure>' +
     '<button class="lightbox__next" type="button" aria-label="Next media">&#8594;</button>';
   document.body.appendChild(overlay);
 
@@ -101,6 +101,32 @@
      is up, and land back on the opening photo on close. */
   var lastTrigger = null;
   var closeButton = overlay.querySelector('.lightbox__close');
+  /* The clips are muted GIF-style loops, so native scrub/fullscreen chrome is
+     pure noise. The whole frame is a play/pause button instead: keyboard
+     operable, and labelled with the action it performs. The label tracks real
+     playback state (loop, reduced-motion) so a pause affordance always survives
+     (WCAG pause-stop-hide) — including the reduced-motion case, which opens the
+     clip paused with the toggle as the only way to ever start it. */
+  var syncVideoLabel = function () {
+    viewerVideo.setAttribute('aria-label', viewerVideo.paused ? 'Play animation' : 'Pause animation');
+  };
+  var toggleVideo = function () {
+    if (viewerVideo.paused) {
+      var resume = viewerVideo.play();
+      if (resume && resume.catch) resume.catch(function () {});
+    } else {
+      viewerVideo.pause();
+    }
+  };
+  viewerVideo.addEventListener('click', toggleVideo);
+  viewerVideo.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter' || event.key === ' ' || event.key === 'Spacebar') {
+      event.preventDefault();
+      toggleVideo();
+    }
+  });
+  viewerVideo.addEventListener('play', syncVideoLabel);
+  viewerVideo.addEventListener('pause', syncVideoLabel);
   var close = function () {
     viewerVideo.pause();
     overlay.classList.remove('is-visible');
@@ -124,6 +150,7 @@
         var lightboxPlayback = viewerVideo.play();
         if (lightboxPlayback && lightboxPlayback.catch) lightboxPlayback.catch(function () {});
       }
+      syncVideoLabel();
     } else {
       viewerVideo.pause();
       viewerVideo.hidden = true;
@@ -206,7 +233,7 @@
     if (event.key === 'ArrowLeft') show(current - 1);
     if (event.key === 'ArrowRight') show(current + 1);
     if (event.key === 'Tab') {
-      var focusable = overlay.querySelectorAll('button, video[controls]');
+      var focusable = overlay.querySelectorAll('button, video');
       var first = focusable[0];
       var last = focusable[focusable.length - 1];
       if (!overlay.contains(document.activeElement)) {
