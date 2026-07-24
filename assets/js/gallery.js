@@ -98,7 +98,6 @@
   document.body.appendChild(overlay);
 
   var current = 0;
-  var figure = overlay.querySelector('.lightbox__figure');
   var viewerImage = overlay.querySelector('img.lightbox__image');
   var viewerVideo = overlay.querySelector('.lightbox__video');
   var caption = overlay.querySelector('.lightbox__caption');
@@ -133,12 +132,25 @@
   });
   viewerVideo.addEventListener('play', syncVideoLabel);
   viewerVideo.addEventListener('pause', syncVideoLabel);
+  var lockedScrollY = 0;
+  var lockBackgroundScroll = function () {
+    lockedScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+    document.documentElement.classList.add('lightbox-open');
+    document.body.style.setProperty('--lightbox-scroll-offset', '-' + lockedScrollY + 'px');
+    document.body.classList.add('lightbox-open');
+  };
+  var unlockBackgroundScroll = function () {
+    document.documentElement.classList.remove('lightbox-open');
+    document.body.classList.remove('lightbox-open');
+    document.body.style.removeProperty('--lightbox-scroll-offset');
+    window.scrollTo(0, lockedScrollY);
+  };
   var close = function () {
     viewerVideo.pause();
     overlay.classList.remove('is-visible');
     overlay.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('lightbox-open');
-    if (lastTrigger) { lastTrigger.focus(); lastTrigger = null; }
+    unlockBackgroundScroll();
+    if (lastTrigger) { lastTrigger.focus({ preventScroll: true }); lastTrigger = null; }
   };
   var show = function (index) {
     var opening = !overlay.classList.contains('is-visible');
@@ -184,24 +196,70 @@
     caption.textContent = parts.join(' · ');
     overlay.setAttribute('aria-hidden', 'false');
     overlay.classList.add('is-visible');
-    document.body.classList.add('lightbox-open');
-    if (opening) closeButton.focus();
+    if (opening) {
+      lockBackgroundScroll();
+      closeButton.focus();
+    }
   };
 
   /* Touch and pen users get the same circular previous/next navigation as the
-     buttons and arrow keys. Only a clearly horizontal gesture counts: vertical
-     movement, taps, pinch gestures, and mouse drags are left alone. */
+     buttons and arrow keys. Listen on the full overlay so short landscape media
+     still has a generous gesture surface. Native touch events are the reliable
+     iPhone path; Pointer Events are kept for pens only to avoid double-firing. */
   var SWIPE_THRESHOLD = 48;
   var SWIPE_AXIS_RATIO = 1.25;
+  var SWIPE_CLICK_SLOP = 10;
   var swipePointerId = null;
+  var swipeTouchId = null;
   var swipeStartX = 0;
   var swipeStartY = 0;
   var ignoreClickUntil = 0;
   var cancelSwipe = function () {
     swipePointerId = null;
+    swipeTouchId = null;
   };
-  figure.addEventListener('pointerdown', function (event) {
-    if (!overlay.classList.contains('is-visible') || event.pointerType === 'mouse') return;
+  var startsOnControl = function (target) {
+    return target.closest && target.closest('button');
+  };
+  var completeSwipe = function (endX, endY, event) {
+    var deltaX = endX - swipeStartX;
+    var deltaY = endY - swipeStartY;
+    var horizontalDistance = Math.abs(deltaX);
+    var verticalDistance = Math.abs(deltaY);
+    cancelSwipe();
+    if (Math.max(horizontalDistance, verticalDistance) >= SWIPE_CLICK_SLOP) {
+      ignoreClickUntil = Date.now() + 500;
+    }
+    if (horizontalDistance < SWIPE_THRESHOLD || horizontalDistance <= verticalDistance * SWIPE_AXIS_RATIO) return;
+    if (event.cancelable) event.preventDefault();
+    show(current + (deltaX < 0 ? 1 : -1));
+  };
+
+  overlay.addEventListener('touchstart', function (event) {
+    if (!overlay.classList.contains('is-visible') || event.touches.length !== 1 || startsOnControl(event.target)) {
+      cancelSwipe();
+      return;
+    }
+    var touch = event.touches[0];
+    swipeTouchId = touch.identifier;
+    swipeStartX = touch.clientX;
+    swipeStartY = touch.clientY;
+  }, { passive: true });
+  overlay.addEventListener('touchend', function (event) {
+    if (swipeTouchId === null) return;
+    for (var index = 0; index < event.changedTouches.length; index += 1) {
+      var touch = event.changedTouches[index];
+      if (touch.identifier === swipeTouchId) {
+        completeSwipe(touch.clientX, touch.clientY, event);
+        return;
+      }
+    }
+    cancelSwipe();
+  }, { passive: false });
+  overlay.addEventListener('touchcancel', cancelSwipe, { passive: true });
+
+  overlay.addEventListener('pointerdown', function (event) {
+    if (!overlay.classList.contains('is-visible') || event.pointerType !== 'pen' || startsOnControl(event.target)) return;
     if (!event.isPrimary) {
       cancelSwipe();
       return;
@@ -209,22 +267,14 @@
     swipePointerId = event.pointerId;
     swipeStartX = event.clientX;
     swipeStartY = event.clientY;
-    if (figure.setPointerCapture) figure.setPointerCapture(event.pointerId);
+    if (overlay.setPointerCapture) overlay.setPointerCapture(event.pointerId);
   });
-  figure.addEventListener('pointerup', function (event) {
+  overlay.addEventListener('pointerup', function (event) {
     if (event.pointerId !== swipePointerId) return;
-    var deltaX = event.clientX - swipeStartX;
-    var deltaY = event.clientY - swipeStartY;
-    var horizontalDistance = Math.abs(deltaX);
-    var verticalDistance = Math.abs(deltaY);
-    cancelSwipe();
-    if (horizontalDistance < SWIPE_THRESHOLD || horizontalDistance <= verticalDistance * SWIPE_AXIS_RATIO) return;
-    event.preventDefault();
-    ignoreClickUntil = Date.now() + 500;
-    show(current + (deltaX < 0 ? 1 : -1));
+    completeSwipe(event.clientX, event.clientY, event);
   });
-  figure.addEventListener('pointercancel', cancelSwipe);
-  figure.addEventListener('click', function (event) {
+  overlay.addEventListener('pointercancel', cancelSwipe);
+  overlay.addEventListener('click', function (event) {
     if (Date.now() >= ignoreClickUntil) return;
     event.preventDefault();
     event.stopPropagation();

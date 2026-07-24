@@ -5239,8 +5239,18 @@ a:focus-visible {
   }
 }
 
-.lightbox-open {
+html.lightbox-open,
+body.lightbox-open {
   overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body.lightbox-open {
+  position: fixed;
+  top: var(--lightbox-scroll-offset, 0);
+  right: 0;
+  left: 0;
+  width: 100%;
 }
 
 .lightbox {
@@ -5254,6 +5264,7 @@ a:focus-visible {
   background: rgba(8, 10, 14, 0.96);
   opacity: 0;
   pointer-events: none;
+  touch-action: pan-y pinch-zoom;
   transition: opacity var(--motion-standard) ease,
     visibility 0s linear var(--motion-standard);
   visibility: hidden;
@@ -5272,7 +5283,6 @@ a:focus-visible {
   margin: 0;
   opacity: 0;
   text-align: center;
-  touch-action: pan-y pinch-zoom;
   transform: translateY(0.35rem) scale(0.985);
   transition: opacity var(--motion-slow) ease,
     transform var(--motion-slow) var(--ease-standard);
