@@ -160,8 +160,15 @@
     viewerImage.style.setProperty('--lightbox-scale', fitScale * zoomLevel);
     rotateButton.setAttribute('aria-pressed', rotation ? 'true' : 'false');
     rotateButton.setAttribute('aria-label', rotation ? 'Return to normal view' : 'Use landscape view');
-    zoomOutButton.disabled = zoomLevel <= 1;
-    zoomInButton.disabled = zoomLevel >= 3;
+    var zoomOutDisabled = zoomLevel <= 1;
+    var zoomInDisabled = zoomLevel >= 3;
+    /* A button that disables itself while it holds focus drops keyboard focus to
+       <body>. Hand focus to the opposite zoom button first (it is always enabled
+       at either limit) so keyboard operation and Tab order survive. */
+    if (zoomOutDisabled && document.activeElement === zoomOutButton) zoomInButton.focus();
+    else if (zoomInDisabled && document.activeElement === zoomInButton) zoomOutButton.focus();
+    zoomOutButton.disabled = zoomOutDisabled;
+    zoomInButton.disabled = zoomInDisabled;
     viewport.classList.toggle('is-zoomed', zoomLevel > 1);
   };
   var calculateFitScale = function () {
