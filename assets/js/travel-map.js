@@ -594,7 +594,14 @@
     if (!focusables.length) return;
     var first = focusables[0];
     var last = focusables[focusables.length - 1];
-    if (event.shiftKey && document.activeElement === first) {
+    if (!map.contains(document.activeElement)) {
+      /* Focus can leave the overlay by clicking a non-focusable region (the map
+         canvas), landing on <body>. Without this branch the next Tab escapes to
+         the page behind the modal; pull it back in, matching the lightbox and
+         mobile-nav traps. */
+      event.preventDefault();
+      first.focus();
+    } else if (event.shiftKey && document.activeElement === first) {
       event.preventDefault();
       last.focus();
     } else if (!event.shiftKey && document.activeElement === last) {
