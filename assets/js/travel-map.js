@@ -762,6 +762,10 @@
     /* Overlay layout must settle before the fit-to-height floor is measured. */
     window.requestAnimationFrame(function () {
       resetView();
+      /* A fast selector change can land before this first layout frame on a
+         throttled/mobile browser. Preserve that choice instead of letting the
+         delayed opening reset strand its route outside the viewport. */
+      if (activeTrip) fitTrip(activeTrip);
       if (closeBtn) closeBtn.focus();
       window.requestAnimationFrame(function () {
         map.classList.add('is-fullscreen-visible');
