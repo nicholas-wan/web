@@ -211,6 +211,8 @@
   var activeTrip = '';
   var selectedDetail = null;
   var detailCardHideTimer = 0;
+  var detailImageRequest = 0;
+  var sectionImageCache = {};
 
   var baseCanvasWidth = function () {
     return viewport.clientWidth;
@@ -661,6 +663,48 @@
     }
   };
 
+  var loadSectionImage = function (point) {
+    var targetParts = point[2].split('#');
+    var pageHref = targetParts[0];
+    var sectionId = targetParts[1];
+    var cacheKey = pageHref + '#' + sectionId;
+    if (sectionImageCache[cacheKey]) return sectionImageCache[cacheKey];
+
+    sectionImageCache[cacheKey] = window.fetch(pageHref, { credentials: 'same-origin' })
+      .then(function (response) {
+        if (!response.ok) throw new Error('Unable to load journal section');
+        return response.text().then(function (markup) {
+          return { markup: markup, pageUrl: response.url };
+        });
+      })
+      .then(function (result) {
+        var journal = new window.DOMParser().parseFromString(result.markup, 'text/html');
+        var heading = journal.getElementById(sectionId);
+        var section = heading && heading.closest('.travel-journal__day, .guangzhou-day');
+        var media = section && section.querySelector('img.content-image, video[poster], img');
+        var sibling = heading && heading.nextElementSibling;
+        while (!media && sibling && !sibling.matches('h2[id^="trip-section-"]')) {
+          media = sibling.matches('img.content-image, video[poster], img')
+            ? sibling
+            : sibling.querySelector('img.content-image, video[poster], img');
+          sibling = sibling.nextElementSibling;
+        }
+        if (!media) throw new Error('Journal section has no photograph');
+        var source = media.getAttribute('src') || media.getAttribute('poster');
+        return {
+          src: new URL(source, result.pageUrl).href,
+          alt: media.getAttribute('alt') || media.getAttribute('aria-label') || point[1] + ' travel photograph'
+        };
+      })
+      .catch(function () {
+        return {
+          src: TRIPS[point[5]].image,
+          alt: TRIPS[point[5]].imageAlt
+        };
+      });
+    return sectionImageCache[cacheKey];
+  };
+
   var showPointDetails = function (point, link) {
     if (!detailCard || !TRIPS[point[5]]) return;
     if (detailCardHideTimer) window.clearTimeout(detailCardHideTimer);
@@ -682,8 +726,20 @@
       : 'Region · ' + trip.title;
     detailCardTitle.textContent = point[1];
     detailCardMeta.textContent = trip.dates;
-    detailCardImage.src = trip.image;
-    detailCardImage.alt = trip.imageAlt;
+    detailImageRequest += 1;
+    var imageRequest = detailImageRequest;
+    detailCard.classList.add('is-image-loading');
+    detailCardImage.removeAttribute('src');
+    detailCardImage.alt = point[1] + ' journal photograph';
+    loadSectionImage(point).then(function (image) {
+      if (imageRequest !== detailImageRequest || selectedDetail !== link) return;
+      detailCardImage.onload = function () {
+        detailCard.classList.remove('is-image-loading');
+        detailCardImage.onload = null;
+      };
+      detailCardImage.src = image.src;
+      detailCardImage.alt = image.alt;
+    });
     detailCardLink.href = point[2];
     detailCardLink.firstChild.nodeValue = point[0] === 'stop'
       ? 'Open this journal stop '

@@ -2178,7 +2178,7 @@ body {
 
 .travel-map__status {
   position: absolute;
-  top: 4.65rem;
+  top: 5.5rem;
   left: 1rem;
   z-index: 6;
   margin: 0;
@@ -2285,6 +2285,14 @@ body {
   margin: 0;
   border-radius: 0.38rem;
   object-fit: cover;
+  opacity: 1;
+  transition: opacity var(--motion-standard) ease;
+}
+
+.travel-map__detail-card.is-image-loading > img {
+  background:
+    linear-gradient(110deg, rgba(40, 215, 197, 0.08), rgba(255, 255, 255, 0.08), rgba(40, 215, 197, 0.08));
+  opacity: 0.24;
 }
 
 .travel-map__detail-card-copy {
@@ -2422,7 +2430,7 @@ body.is-map-fullscreen #return-to-top {
 }
 
 .travel-map.is-fullscreen .travel-map__status {
-  top: calc(4.65rem + env(safe-area-inset-top));
+  top: calc(5.35rem + env(safe-area-inset-top));
   left: calc(0.85rem + env(safe-area-inset-left));
 }
 
@@ -2585,6 +2593,7 @@ body.is-map-fullscreen #return-to-top {
   .travel-map__marker,
   .travel-map__detail,
   .travel-map__detail-card,
+  .travel-map__detail-card > img,
   .travel-map.is-fullscreen {
     transition: none;
   }
