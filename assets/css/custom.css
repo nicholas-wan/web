@@ -2178,7 +2178,7 @@ body {
 
 .travel-map__status {
   position: absolute;
-  top: 5.5rem;
+  top: 6.4rem;
   left: 1rem;
   z-index: 6;
   margin: 0;
@@ -2430,7 +2430,7 @@ body.is-map-fullscreen #return-to-top {
 }
 
 .travel-map.is-fullscreen .travel-map__status {
-  top: calc(5.35rem + env(safe-area-inset-top));
+  top: calc(6.1rem + env(safe-area-inset-top));
   left: calc(0.85rem + env(safe-area-inset-left));
 }
 
