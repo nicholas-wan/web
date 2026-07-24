@@ -5351,6 +5351,35 @@ body.lightbox-open {
   font-size: 0.9rem;
 }
 
+.lightbox.is-caption-collapsed .lightbox__caption:not(.is-revealed) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.lightbox.is-caption-collapsed .lightbox__caption.is-revealed {
+  position: absolute;
+  bottom: calc(5rem + env(safe-area-inset-bottom));
+  left: 50%;
+  z-index: 3;
+  width: min(calc(100% - 2rem), 32rem);
+  max-height: min(30vh, 12rem);
+  margin: 0;
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 0.75rem;
+  background: rgba(8, 10, 14, 0.94);
+  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.42);
+  white-space: normal;
+  transform: translateX(-50%);
+}
+
 .lightbox button {
   appearance: none;
   box-sizing: border-box;
@@ -5375,6 +5404,13 @@ body.lightbox-open {
   opacity: 0.72;
   backdrop-filter: blur(0.2rem);
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.lightbox__info {
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
 }
 
 .lightbox button:hover,
@@ -5415,7 +5451,8 @@ body.lightbox-open {
 }
 
 .lightbox__tools[hidden],
-.lightbox__rotate[hidden] {
+.lightbox__rotate[hidden],
+.lightbox__info[hidden] {
   display: none;
 }
 

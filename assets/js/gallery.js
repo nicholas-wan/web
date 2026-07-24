@@ -94,11 +94,12 @@
   overlay.innerHTML = '<button class="lightbox__close" type="button" aria-label="Close media viewer">&times;</button>' +
     '<div class="lightbox__tools" role="group" aria-label="Image controls">' +
       '<button class="lightbox__rotate" type="button" aria-label="Use landscape view" aria-pressed="false" hidden>&#8635;</button>' +
+      '<button class="lightbox__info" type="button" aria-label="Show caption" aria-expanded="false" aria-controls="lightbox-caption" hidden>i</button>' +
       '<button class="lightbox__zoom-out" type="button" aria-label="Zoom out" disabled>&minus;</button>' +
       '<button class="lightbox__zoom-in" type="button" aria-label="Zoom in">&plus;</button>' +
     '</div>' +
     '<button class="lightbox__previous" type="button" aria-label="Previous media">&#8592;</button>' +
-    '<figure class="lightbox__figure"><div class="lightbox__viewport"><img class="lightbox__image" alt="" draggable="false"><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video></div><figcaption class="lightbox__caption"></figcaption></figure>' +
+    '<figure class="lightbox__figure"><div class="lightbox__viewport"><img class="lightbox__image" alt="" draggable="false"><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video></div><figcaption id="lightbox-caption" class="lightbox__caption"></figcaption></figure>' +
     '<button class="lightbox__next" type="button" aria-label="Next media">&#8594;</button>';
   document.body.appendChild(overlay);
 
@@ -109,6 +110,7 @@
   var caption = overlay.querySelector('.lightbox__caption');
   var tools = overlay.querySelector('.lightbox__tools');
   var rotateButton = overlay.querySelector('.lightbox__rotate');
+  var infoButton = overlay.querySelector('.lightbox__info');
   var zoomOutButton = overlay.querySelector('.lightbox__zoom-out');
   var zoomInButton = overlay.querySelector('.lightbox__zoom-in');
   var phonePortrait = window.matchMedia('(max-width: 600px) and (orientation: portrait)');
@@ -119,6 +121,7 @@
   var zoomLevel = 1;
   var panX = 0;
   var panY = 0;
+  var captionOpen = false;
   var lastImageTap = 0;
   var clamp = function (value, minimum, maximum) {
     return Math.min(maximum, Math.max(minimum, value));
@@ -168,13 +171,24 @@
     var rotatedHeight = viewerImage.clientWidth;
     fitScale = Math.min(viewport.clientWidth / rotatedWidth, viewport.clientHeight / rotatedHeight);
   };
+  var renderCaptionState = function () {
+    var collapsed = Boolean(rotation);
+    var revealed = collapsed && captionOpen;
+    overlay.classList.toggle('is-caption-collapsed', collapsed);
+    caption.classList.toggle('is-revealed', revealed);
+    infoButton.hidden = !collapsed || !caption.textContent.trim();
+    infoButton.setAttribute('aria-expanded', revealed ? 'true' : 'false');
+    infoButton.setAttribute('aria-label', revealed ? 'Hide caption' : 'Show caption');
+  };
   var resetMediaTransform = function () {
     rotation = 0;
     fitScale = 1;
     zoomLevel = 1;
     panX = 0;
     panY = 0;
+    captionOpen = false;
     lastImageTap = 0;
+    renderCaptionState();
     renderMediaTransform();
   };
   var syncMediaTools = function () {
@@ -182,6 +196,7 @@
     if (rotation && !canRotate) resetMediaTransform();
     tools.hidden = currentIsVideo;
     rotateButton.hidden = !canRotate;
+    renderCaptionState();
     renderMediaTransform();
   };
   var setZoom = function (nextZoom) {
@@ -200,6 +215,8 @@
     zoomLevel = 1;
     panX = 0;
     panY = 0;
+    captionOpen = false;
+    renderCaptionState();
     calculateFitScale();
     renderMediaTransform();
   };
@@ -484,6 +501,10 @@
   }, true);
 
   rotateButton.addEventListener('click', toggleLandscapeView);
+  infoButton.addEventListener('click', function () {
+    captionOpen = !captionOpen;
+    renderCaptionState();
+  });
   zoomOutButton.addEventListener('click', function () { setZoom(zoomLevel - 0.5); });
   zoomInButton.addEventListener('click', function () { setZoom(zoomLevel + 0.5); });
   viewerImage.addEventListener('click', function () {
