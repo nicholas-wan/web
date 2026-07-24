@@ -5201,6 +5201,17 @@ a:focus-visible {
   outline-offset: 3px;
 }
 
+/* Without this, mobile browsers hold every tap ~300ms on these controls waiting
+   to rule out a double-tap-zoom, so prev/next/close and the video toggle feel
+   laggy. manipulation suppresses only double-tap-zoom on these elements; pinch
+   zoom elsewhere on the page is unaffected. */
+.lightbox button,
+.lightbox__video,
+.journal-lightbox-trigger,
+.content[role="button"] {
+  touch-action: manipulation;
+}
+
 /* Touch-first layouts keep primary controls at a comfortable 44px-or-larger
    target without enlarging their desktop mouse treatment. */
 @media screen and (max-width: 980px) {
