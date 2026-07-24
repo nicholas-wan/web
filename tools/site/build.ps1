@@ -509,6 +509,29 @@ function Convert-MainLandmark([string]$Markup) {
     return $updated.Remove($closingIndex, 6).Insert($closingIndex, '</main>')
 }
 
+function Get-BannerPreloadLink([string]$Markup, [string]$Slug) {
+    # The journal banner is the LCP element on every travel journal. The image
+    # already carries loading="eager" fetchpriority="high", but the browser
+    # cannot start fetching it until it parses the <img> in the body. A
+    # responsive <head> preload begins that download during head parsing, which
+    # is the LCP lever the prior work never took. Mirror the img's own resolved
+    # src/srcset/sizes so the preload matches the resource the browser selects
+    # (imagesrcset/imagesizes are the responsive-preload equivalents).
+    if ($tripOrder -notcontains $Slug) { return '' }
+    $bannerMatch = [regex]::Match($Markup, '<img\b[^>]*\bclass="[^"]*\bjournal-banner\b[^"]*"[^>]*>')
+    if (-not $bannerMatch.Success) { return '' }
+    $tag = $bannerMatch.Value
+    $srcMatch = [regex]::Match($tag, '\ssrc="([^"]+)"')
+    if (-not $srcMatch.Success) { return '' }
+    $attributes = @('rel="preload"', 'as="image"', ('href="{0}"' -f $srcMatch.Groups[1].Value))
+    $srcsetMatch = [regex]::Match($tag, '\ssrcset="([^"]+)"')
+    if ($srcsetMatch.Success) { $attributes += ('imagesrcset="{0}"' -f $srcsetMatch.Groups[1].Value) }
+    $sizesMatch = [regex]::Match($tag, '\ssizes="([^"]+)"')
+    if ($sizesMatch.Success) { $attributes += ('imagesizes="{0}"' -f $sizesMatch.Groups[1].Value) }
+    $attributes += 'fetchpriority="high"'
+    return '    <link ' + ($attributes -join ' ') + ' />'
+}
+
 $webpMap = @{}
 $webpSource = Join-Path $root "images-webp"
 $optimizedAnimatedImages = @()
@@ -613,6 +636,8 @@ foreach ($page in $pages) {
     $main = [regex]::Replace($main, '(<video\b[^>]*?)\sautoplay\b', '$1 data-autoplay')
     $main = [regex]::Replace($main, '(<video\b[^>]*\bdata-autoplay\b[^>]*?)preload="metadata"', '$1preload="none"')
 
+    $bannerPreload = Get-BannerPreloadLink $main $slug
+
     $main = Convert-MainLandmark $main
 
     $navigation = $navigationTemplate
@@ -654,6 +679,8 @@ foreach ($page in $pages) {
     $shareImageMeta = if ($slug -in @('experience', 'skills')) { '' } else { "    <meta property=`"og:image`" content=`"__OGIMAGE__`" />`n    <meta name=`"twitter:card`" content=`"summary_large_image`" />" }
     $introLine = if ($intro) { "    $intro" } else { "" }
     $canvasMarkup = if ($slug -eq 'index') { '    <canvas id="nokey" width="800" height="800" aria-hidden="true"></canvas>' } else { '' }
+    $preloadMarkup = '    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />'
+    if ($bannerPreload) { $preloadMarkup += "`n" + $bannerPreload }
     $template = @"
 <!DOCTYPE HTML>
 <html lang="en">
@@ -669,7 +696,7 @@ foreach ($page in $pages) {
     <meta property="og:description" content="$description" />
     <meta property="og:url" content="__CANONICAL__" />
 $shareImageMeta
-    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />
+$preloadMarkup
     <link rel="stylesheet" href="assets/css/icons.css?v=1" />
     <link rel="stylesheet" href="assets/css/main.css?v=4" />
     <link rel="stylesheet" href="assets/css/custom.css?v=180" />

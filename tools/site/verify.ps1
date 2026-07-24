@@ -91,7 +91,19 @@ foreach ($page in $pages) {
     } elseif ($scan -match 'assets/js/listing-effects\.js') { throw "$($page.Name) must not load the listing effects bundle." }
     if ($journalPageNames -contains $page.Name) {
         if ($scan -notmatch 'assets/js/journal-progress\.js\?v=1') { throw "$($page.Name) is missing its reading-progress bundle." }
+        # The banner is the LCP element; a responsive head preload must start its
+        # download during head parsing rather than waiting for the body <img>.
+        $bannerImg = [regex]::Match($scan, '<img\b[^>]*\bclass="[^"]*\bjournal-banner\b[^"]*"[^>]*>')
+        if (-not $bannerImg.Success) { throw "$($page.Name) is missing its journal banner image." }
+        $bannerSrc = [regex]::Match($bannerImg.Value, '\ssrc="([^"]+)"').Groups[1].Value
+        $bannerPreload = [regex]::Match($scan, '<link\b[^>]*\brel="preload"[^>]*\bas="image"[^>]*>')
+        if (-not $bannerPreload.Success) { throw "$($page.Name) is missing its LCP banner preload." }
+        if ($bannerPreload.Value -notmatch 'fetchpriority="high"') { throw "$($page.Name) banner preload must set fetchpriority high." }
+        if ($bannerPreload.Value -notmatch [regex]::Escape('href="' + $bannerSrc + '"')) { throw "$($page.Name) banner preload must target the banner image." }
+        $headEnd = $scan.IndexOf('</head>')
+        if ($headEnd -lt 0 -or $scan.IndexOf($bannerPreload.Value) -gt $headEnd) { throw "$($page.Name) banner preload must live in the document head." }
     } elseif ($scan -match 'assets/js/journal-progress\.js') { throw "$($page.Name) must not load the journal progress bundle." }
+    if ($journalPageNames -notcontains $page.Name -and [regex]::IsMatch($scan, '<link\b[^>]*\brel="preload"[^>]*\bas="image"')) { throw "$($page.Name) must not preload a banner image it does not render." }
     foreach ($routeCss in $routeCssOwners.Keys) {
         $hasRouteCss = $scan -match [regex]::Escape("assets/css/$routeCss")
         $expectsRouteCss = $routeCssOwners[$routeCss] -contains $page.Name
