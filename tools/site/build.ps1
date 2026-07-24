@@ -605,6 +605,13 @@ foreach ($page in $pages) {
     $main = Add-ImagePerformanceAttributes $main (Join-Path $root "images") $sourceImageIndex
     $main = Add-GalleryAltText $main $slug
     $intro = Add-ImagePerformanceAttributes $intro (Join-Path $root "images") $sourceImageIndex
+    # The autoplay attribute makes the browser download every animation at page
+    # load even under preload="metadata". Rename it to data-autoplay so
+    # gallery.js can start playback only near the viewport, and drop the
+    # metadata preload: every animation carries a poster and explicit
+    # dimensions, so nothing needs the file before playback begins.
+    $main = [regex]::Replace($main, '(<video\b[^>]*?)\sautoplay\b', '$1 data-autoplay')
+    $main = [regex]::Replace($main, '(<video\b[^>]*\bdata-autoplay\b[^>]*?)preload="metadata"', '$1preload="none"')
 
     $main = Convert-MainLandmark $main
 
@@ -624,7 +631,7 @@ foreach ($page in $pages) {
     }
 
     $galleryPages = @("house", "prewed") + $tripOrder
-    $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=15"></script>' } else { "" }
+    $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=16"></script>' } else { "" }
     $travelNavScript = if ($tripOrder -contains $slug) { '<script src="assets/js/travel-nav.js?v=18"></script>' } else { "" }
     $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=14"></script>' } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=20"></script>' } else { "" }
@@ -662,8 +669,9 @@ foreach ($page in $pages) {
     <meta property="og:description" content="$description" />
     <meta property="og:url" content="__CANONICAL__" />
 $shareImageMeta
+    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="assets/css/icons.css?v=1" />
-    <link rel="stylesheet" href="assets/css/main.css?v=3" />
+    <link rel="stylesheet" href="assets/css/main.css?v=4" />
     <link rel="stylesheet" href="assets/css/custom.css?v=179" />
 $routeStylesheetMarkup
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>

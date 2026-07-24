@@ -1,19 +1,38 @@
 (function () {
   var journalAnimations = Array.prototype.slice.call(document.querySelectorAll('video.journal-animation'));
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  /* The build renames each animation's autoplay attribute to data-autoplay,
+     because the attribute makes the browser download every video at page load.
+     Playback starts here instead, and only once the animation is near the
+     viewport; leaving again pauses it so long journals do not keep dozens of
+     offscreen loops decoding. */
+  var syncAnimation = function (video) {
+    if (reducedMotion.matches) {
+      video.pause();
+      video.currentTime = 0;
+    } else if (video.__nearViewport) {
+      var playback = video.play();
+      if (playback && playback.catch) playback.catch(function () {});
+    } else {
+      video.pause();
+    }
+  };
   var syncAnimationPreference = function () {
-    journalAnimations.forEach(function (video) {
-      if (reducedMotion.matches) {
-        video.pause();
-        video.currentTime = 0;
-      } else {
-        var playback = video.play();
-        if (playback && playback.catch) playback.catch(function () {});
-      }
-    });
+    journalAnimations.forEach(syncAnimation);
   };
   if (journalAnimations.length) {
-    syncAnimationPreference();
+    if ('IntersectionObserver' in window) {
+      var animationWarmup = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          entry.target.__nearViewport = entry.isIntersecting;
+          syncAnimation(entry.target);
+        });
+      }, { rootMargin: '600px' });
+      journalAnimations.forEach(function (video) { animationWarmup.observe(video); });
+    } else {
+      journalAnimations.forEach(function (video) { video.__nearViewport = true; });
+      syncAnimationPreference();
+    }
     if (reducedMotion.addEventListener) reducedMotion.addEventListener('change', syncAnimationPreference);
     else if (reducedMotion.addListener) reducedMotion.addListener(syncAnimationPreference);
   }
