@@ -569,9 +569,12 @@
   overlay.querySelector('.lightbox__close').addEventListener('click', close);
   overlay.querySelector('.lightbox__previous').addEventListener('click', function () { show(current - 1); });
   overlay.querySelector('.lightbox__next').addEventListener('click', function () { show(current + 1); });
+  /* The figure now fills most of the screen, so the empty letterbox area beside
+     the image is the viewport rather than the overlay. Close on either, but not
+     on the image, video, caption, or buttons (each is a deeper target). */
   overlay.addEventListener('click', function (event) {
     if (Date.now() < ignoreClickUntil) return;
-    if (event.target === overlay) close();
+    if (event.target === overlay || event.target === viewport) close();
   });
   document.addEventListener('keydown', function (event) {
     if (!overlay.classList.contains('is-visible')) return;
