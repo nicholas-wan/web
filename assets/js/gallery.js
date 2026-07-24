@@ -497,7 +497,12 @@
   overlay.addEventListener('click', function (event) {
     if (Date.now() >= ignoreClickUntil) return;
     event.preventDefault();
-    event.stopPropagation();
+    /* The backdrop-close listener below lives on this same element, so it runs
+       even when the derived click is at-target on the overlay (a mouse/pen pan
+       ends there because setPointerCapture retargets the pointerup). Only
+       stopImmediatePropagation blocks a same-node listener; stopPropagation
+       would let the pan-release close the viewer. */
+    event.stopImmediatePropagation();
   }, true);
 
   rotateButton.addEventListener('click', toggleLandscapeView);
@@ -564,7 +569,10 @@
   overlay.querySelector('.lightbox__close').addEventListener('click', close);
   overlay.querySelector('.lightbox__previous').addEventListener('click', function () { show(current - 1); });
   overlay.querySelector('.lightbox__next').addEventListener('click', function () { show(current + 1); });
-  overlay.addEventListener('click', function (event) { if (event.target === overlay) close(); });
+  overlay.addEventListener('click', function (event) {
+    if (Date.now() < ignoreClickUntil) return;
+    if (event.target === overlay) close();
+  });
   document.addEventListener('keydown', function (event) {
     if (!overlay.classList.contains('is-visible')) return;
     if (event.key === 'Escape') close();
