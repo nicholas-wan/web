@@ -5272,6 +5272,7 @@ a:focus-visible {
   margin: 0;
   opacity: 0;
   text-align: center;
+  touch-action: pan-y pinch-zoom;
   transform: translateY(0.35rem) scale(0.985);
   transition: opacity var(--motion-slow) ease,
     transform var(--motion-slow) var(--ease-standard);

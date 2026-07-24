@@ -98,6 +98,7 @@
   document.body.appendChild(overlay);
 
   var current = 0;
+  var figure = overlay.querySelector('.lightbox__figure');
   var viewerImage = overlay.querySelector('img.lightbox__image');
   var viewerVideo = overlay.querySelector('.lightbox__video');
   var caption = overlay.querySelector('.lightbox__caption');
@@ -186,6 +187,49 @@
     document.body.classList.add('lightbox-open');
     if (opening) closeButton.focus();
   };
+
+  /* Touch and pen users get the same circular previous/next navigation as the
+     buttons and arrow keys. Only a clearly horizontal gesture counts: vertical
+     movement, taps, pinch gestures, and mouse drags are left alone. */
+  var SWIPE_THRESHOLD = 48;
+  var SWIPE_AXIS_RATIO = 1.25;
+  var swipePointerId = null;
+  var swipeStartX = 0;
+  var swipeStartY = 0;
+  var ignoreClickUntil = 0;
+  var cancelSwipe = function () {
+    swipePointerId = null;
+  };
+  figure.addEventListener('pointerdown', function (event) {
+    if (!overlay.classList.contains('is-visible') || event.pointerType === 'mouse') return;
+    if (!event.isPrimary) {
+      cancelSwipe();
+      return;
+    }
+    swipePointerId = event.pointerId;
+    swipeStartX = event.clientX;
+    swipeStartY = event.clientY;
+    if (figure.setPointerCapture) figure.setPointerCapture(event.pointerId);
+  });
+  figure.addEventListener('pointerup', function (event) {
+    if (event.pointerId !== swipePointerId) return;
+    var deltaX = event.clientX - swipeStartX;
+    var deltaY = event.clientY - swipeStartY;
+    var horizontalDistance = Math.abs(deltaX);
+    var verticalDistance = Math.abs(deltaY);
+    cancelSwipe();
+    if (horizontalDistance < SWIPE_THRESHOLD || horizontalDistance <= verticalDistance * SWIPE_AXIS_RATIO) return;
+    event.preventDefault();
+    ignoreClickUntil = Date.now() + 500;
+    show(current + (deltaX < 0 ? 1 : -1));
+  });
+  figure.addEventListener('pointercancel', cancelSwipe);
+  figure.addEventListener('click', function (event) {
+    if (Date.now() >= ignoreClickUntil) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }, true);
+
   galleryMedia.forEach(function (media, index) {
     var trigger = media.closest('.content') || media;
     media.classList.add('journal-lightbox-trigger');
