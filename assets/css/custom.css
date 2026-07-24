@@ -5260,7 +5260,7 @@ body.lightbox-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 2rem 5rem;
+  padding: 4.5rem 5rem 2rem;
   background: rgba(8, 10, 14, 0.96);
   opacity: 0;
   pointer-events: none;
@@ -5278,8 +5278,11 @@ body.lightbox-open {
 }
 
 .lightbox__figure {
-  max-width: min(88vw, 1200px);
-  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  width: min(88vw, 1200px);
+  height: min(calc(100vh - 6.5rem), 900px);
+  height: min(calc(100dvh - 6.5rem), 900px);
   margin: 0;
   opacity: 0;
   text-align: center;
@@ -5293,16 +5296,42 @@ body.lightbox-open {
   transform: none;
 }
 
+.lightbox__viewport {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+
 .lightbox__image {
   display: block;
-  max-width: 90vw;
-  max-height: 80vh;
+  max-width: 100%;
+  max-height: 100%;
   width: auto;
   height: auto;
   margin: 0 auto;
   object-fit: contain;
   border-radius: 0.35rem;
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.45);
+  transform: translate3d(var(--lightbox-pan-x, 0), var(--lightbox-pan-y, 0), 0)
+    rotate(var(--lightbox-rotation, 0deg))
+    scale(var(--lightbox-scale, 1));
+  transform-origin: center;
+  transition: transform var(--motion-standard) var(--ease-standard);
+  will-change: transform;
+}
+
+.lightbox__viewport.is-zoomed .lightbox__image {
+  cursor: grab;
+}
+
+.lightbox__viewport.is-interacting .lightbox__image {
+  cursor: grabbing;
+  transition: none;
 }
 
 /* The image and video share the same sizing class. Keep the inactive medium
@@ -5312,6 +5341,7 @@ body.lightbox-open {
 }
 
 .lightbox__caption {
+  flex: 0 0 auto;
   display: inline-block;
   margin-top: 0.9rem;
   padding: 0.45rem 0.8rem;
@@ -5356,6 +5386,12 @@ body.lightbox-open {
   transform: scale(1.03);
 }
 
+.lightbox button:disabled {
+  cursor: default;
+  opacity: 0.28;
+  transform: none;
+}
+
 /* Keyboard focus needs a real ring on the modal's only controls; the
    hover-style background shift alone is too subtle against photos. */
 .lightbox button:focus-visible {
@@ -5365,9 +5401,22 @@ body.lightbox-open {
 
 .lightbox__close,
 .lightbox__previous,
-.lightbox__next {
+.lightbox__next,
+.lightbox__tools {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
+}
+
+.lightbox__tools {
+  top: 1.25rem;
+  left: 1.25rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.lightbox__tools[hidden],
+.lightbox__rotate[hidden] {
+  display: none;
 }
 
 .lightbox__close { top: 1.25rem; right: 1.25rem; }
@@ -5376,21 +5425,40 @@ body.lightbox-open {
 
 @media screen and (max-width: 600px) {
   .lightbox {
-    padding: 4rem 0.75rem 1rem;
+    padding: calc(4.25rem + env(safe-area-inset-top)) 0.5rem
+      calc(4.75rem + env(safe-area-inset-bottom));
   }
 
-  .lightbox__image {
-    max-width: 82vw;
-    max-height: 75vh;
+  .lightbox__figure {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
   }
 
-  .lightbox__previous { left: 0.5rem; }
-  .lightbox__next { right: 0.5rem; }
+  .lightbox__tools {
+    top: calc(0.75rem + env(safe-area-inset-top));
+    left: 0.75rem;
+  }
+
+  .lightbox__close {
+    top: calc(0.75rem + env(safe-area-inset-top));
+    right: 0.75rem;
+  }
+
+  .lightbox__previous,
+  .lightbox__next {
+    bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  }
+
+  .lightbox__previous { left: calc(50% - 3.4rem); }
+  .lightbox__next { right: calc(50% - 3.4rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .lightbox,
-  .lightbox__figure {
+  .lightbox__figure,
+  .lightbox__image {
     transition: none;
   }
 

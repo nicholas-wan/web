@@ -92,15 +92,117 @@
   overlay.setAttribute('aria-label', 'Media viewer');
   overlay.setAttribute('aria-hidden', 'true');
   overlay.innerHTML = '<button class="lightbox__close" type="button" aria-label="Close media viewer">&times;</button>' +
+    '<div class="lightbox__tools" role="group" aria-label="Image controls">' +
+      '<button class="lightbox__rotate" type="button" aria-label="Use landscape view" aria-pressed="false" hidden>&#8635;</button>' +
+      '<button class="lightbox__zoom-out" type="button" aria-label="Zoom out" disabled>&minus;</button>' +
+      '<button class="lightbox__zoom-in" type="button" aria-label="Zoom in">&plus;</button>' +
+    '</div>' +
     '<button class="lightbox__previous" type="button" aria-label="Previous media">&#8592;</button>' +
-    '<figure class="lightbox__figure"><img class="lightbox__image" alt=""><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video><figcaption class="lightbox__caption"></figcaption></figure>' +
+    '<figure class="lightbox__figure"><div class="lightbox__viewport"><img class="lightbox__image" alt="" draggable="false"><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video></div><figcaption class="lightbox__caption"></figcaption></figure>' +
     '<button class="lightbox__next" type="button" aria-label="Next media">&#8594;</button>';
   document.body.appendChild(overlay);
 
   var current = 0;
+  var viewport = overlay.querySelector('.lightbox__viewport');
   var viewerImage = overlay.querySelector('img.lightbox__image');
   var viewerVideo = overlay.querySelector('.lightbox__video');
   var caption = overlay.querySelector('.lightbox__caption');
+  var tools = overlay.querySelector('.lightbox__tools');
+  var rotateButton = overlay.querySelector('.lightbox__rotate');
+  var zoomOutButton = overlay.querySelector('.lightbox__zoom-out');
+  var zoomInButton = overlay.querySelector('.lightbox__zoom-in');
+  var phonePortrait = window.matchMedia('(max-width: 600px) and (orientation: portrait)');
+  var currentSource = null;
+  var currentIsVideo = false;
+  var rotation = 0;
+  var fitScale = 1;
+  var zoomLevel = 1;
+  var panX = 0;
+  var panY = 0;
+  var lastImageTap = 0;
+  var clamp = function (value, minimum, maximum) {
+    return Math.min(maximum, Math.max(minimum, value));
+  };
+  var sourceDimensions = function () {
+    if (!currentSource) return { width: 0, height: 0 };
+    return {
+      width: currentSource.naturalWidth || Number(currentSource.getAttribute('width')) || viewerImage.naturalWidth || 0,
+      height: currentSource.naturalHeight || Number(currentSource.getAttribute('height')) || viewerImage.naturalHeight || 0
+    };
+  };
+  var canUseLandscapeView = function () {
+    var dimensions = sourceDimensions();
+    return !currentIsVideo && phonePortrait.matches && dimensions.width > dimensions.height * 1.12;
+  };
+  var transformedBounds = function () {
+    var quarterTurn = Math.abs(rotation) % 180 === 90;
+    var scale = fitScale * zoomLevel;
+    return {
+      width: (quarterTurn ? viewerImage.clientHeight : viewerImage.clientWidth) * scale,
+      height: (quarterTurn ? viewerImage.clientWidth : viewerImage.clientHeight) * scale
+    };
+  };
+  var clampPan = function () {
+    var bounds = transformedBounds();
+    var maxX = Math.max(0, (bounds.width - viewport.clientWidth) / 2);
+    var maxY = Math.max(0, (bounds.height - viewport.clientHeight) / 2);
+    panX = clamp(panX, -maxX, maxX);
+    panY = clamp(panY, -maxY, maxY);
+  };
+  var renderMediaTransform = function () {
+    clampPan();
+    viewerImage.style.setProperty('--lightbox-pan-x', panX + 'px');
+    viewerImage.style.setProperty('--lightbox-pan-y', panY + 'px');
+    viewerImage.style.setProperty('--lightbox-rotation', rotation + 'deg');
+    viewerImage.style.setProperty('--lightbox-scale', fitScale * zoomLevel);
+    rotateButton.setAttribute('aria-pressed', rotation ? 'true' : 'false');
+    rotateButton.setAttribute('aria-label', rotation ? 'Return to normal view' : 'Use landscape view');
+    zoomOutButton.disabled = zoomLevel <= 1;
+    zoomInButton.disabled = zoomLevel >= 3;
+    viewport.classList.toggle('is-zoomed', zoomLevel > 1);
+  };
+  var calculateFitScale = function () {
+    fitScale = 1;
+    if (!rotation || !viewerImage.clientWidth || !viewerImage.clientHeight) return;
+    var rotatedWidth = viewerImage.clientHeight;
+    var rotatedHeight = viewerImage.clientWidth;
+    fitScale = Math.min(viewport.clientWidth / rotatedWidth, viewport.clientHeight / rotatedHeight);
+  };
+  var resetMediaTransform = function () {
+    rotation = 0;
+    fitScale = 1;
+    zoomLevel = 1;
+    panX = 0;
+    panY = 0;
+    lastImageTap = 0;
+    renderMediaTransform();
+  };
+  var syncMediaTools = function () {
+    var canRotate = canUseLandscapeView();
+    if (rotation && !canRotate) resetMediaTransform();
+    tools.hidden = currentIsVideo;
+    rotateButton.hidden = !canRotate;
+    renderMediaTransform();
+  };
+  var setZoom = function (nextZoom) {
+    zoomLevel = clamp(nextZoom, 1, 3);
+    if (zoomLevel > 1 && currentSource && currentSource.src && viewerImage.src !== currentSource.src) {
+      viewerImage.src = currentSource.src;
+    }
+    if (zoomLevel === 1) {
+      panX = 0;
+      panY = 0;
+    }
+    renderMediaTransform();
+  };
+  var toggleLandscapeView = function () {
+    rotation = rotation ? 0 : 90;
+    zoomLevel = 1;
+    panX = 0;
+    panY = 0;
+    calculateFitScale();
+    renderMediaTransform();
+  };
   /* aria-modal tells assistive tech the page behind the dialog is gone, so
      focus must actually move into the dialog on open, stay inside it while it
      is up, and land back on the opening photo on close. */
@@ -147,6 +249,7 @@
   };
   var close = function () {
     viewerVideo.pause();
+    resetMediaTransform();
     overlay.classList.remove('is-visible');
     overlay.setAttribute('aria-hidden', 'true');
     unlockBackgroundScroll();
@@ -158,7 +261,11 @@
     var source = galleryMedia[current];
     var isVideo = source.tagName === 'VIDEO';
     var accessibleName = source.alt || source.getAttribute('aria-label') || 'Gallery media';
+    currentSource = source;
+    currentIsVideo = isVideo;
+    resetMediaTransform();
     if (isVideo) {
+      viewerImage.onload = null;
       viewerImage.hidden = true;
       viewerVideo.hidden = false;
       viewerVideo.src = source.currentSrc || source.querySelector('source').src;
@@ -176,6 +283,11 @@
       warmImage(source);
       viewerImage.src = source.currentSrc || source.src;
       viewerImage.alt = accessibleName;
+      viewerImage.onload = function () {
+        syncMediaTools();
+        calculateFitScale();
+        renderMediaTransform();
+      };
     }
     /* Caption = place + detail. `.content-title` is often the city (repeated
        across dozens of photos) and `.content-text` the actual location, so show
@@ -194,6 +306,7 @@
     parts = parts.filter(function (part, index) { return part && parts.indexOf(part) === index; });
     if (!parts.length) parts.push(accessibleName);
     caption.textContent = parts.join(' · ');
+    syncMediaTools();
     overlay.setAttribute('aria-hidden', 'false');
     overlay.classList.add('is-visible');
     if (opening) {
@@ -202,10 +315,10 @@
     }
   };
 
-  /* Touch and pen users get the same circular previous/next navigation as the
-     buttons and arrow keys. Listen on the full overlay so short landscape media
-     still has a generous gesture surface. Native touch events are the reliable
-     iPhone path; Pointer Events are kept for pens only to avoid double-firing. */
+  /* At the fitted scale, one-finger horizontal gestures keep circular
+     previous/next navigation. Once an image is zoomed, that same gesture pans
+     instead. Two fingers always zoom. Native touch events remain the iPhone
+     path; Pointer Events add pen and mouse panning without double-firing touch. */
   var SWIPE_THRESHOLD = 48;
   var SWIPE_AXIS_RATIO = 1.25;
   var SWIPE_CLICK_SLOP = 10;
@@ -213,10 +326,30 @@
   var swipeTouchId = null;
   var swipeStartX = 0;
   var swipeStartY = 0;
+  var gestureMode = null;
+  var pointerMode = null;
+  var startPanX = 0;
+  var startPanY = 0;
+  var pinchStartDistance = 0;
+  var pinchStartZoom = 1;
   var ignoreClickUntil = 0;
-  var cancelSwipe = function () {
+  var touchDistance = function (first, second) {
+    var deltaX = second.clientX - first.clientX;
+    var deltaY = second.clientY - first.clientY;
+    return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+  };
+  var touchById = function (touches, identifier) {
+    for (var index = 0; index < touches.length; index += 1) {
+      if (touches[index].identifier === identifier) return touches[index];
+    }
+    return null;
+  };
+  var cancelGesture = function () {
     swipePointerId = null;
     swipeTouchId = null;
+    gestureMode = null;
+    pointerMode = null;
+    viewport.classList.remove('is-interacting');
   };
   var startsOnControl = function (target) {
     return target.closest && target.closest('button');
@@ -226,7 +359,7 @@
     var deltaY = endY - swipeStartY;
     var horizontalDistance = Math.abs(deltaX);
     var verticalDistance = Math.abs(deltaY);
-    cancelSwipe();
+    cancelGesture();
     if (Math.max(horizontalDistance, verticalDistance) >= SWIPE_CLICK_SLOP) {
       ignoreClickUntil = Date.now() + 500;
     }
@@ -236,17 +369,67 @@
   };
 
   overlay.addEventListener('touchstart', function (event) {
-    if (!overlay.classList.contains('is-visible') || event.touches.length !== 1 || startsOnControl(event.target)) {
-      cancelSwipe();
+    if (!overlay.classList.contains('is-visible') || startsOnControl(event.target)) {
+      cancelGesture();
+      return;
+    }
+    if (!currentIsVideo && event.touches.length === 2 && viewport.contains(event.target)) {
+      gestureMode = 'pinch';
+      pinchStartDistance = touchDistance(event.touches[0], event.touches[1]) || 1;
+      pinchStartZoom = zoomLevel;
+      viewport.classList.add('is-interacting');
+      ignoreClickUntil = Date.now() + 500;
+      if (event.cancelable) event.preventDefault();
+      return;
+    }
+    if (event.touches.length !== 1) {
+      cancelGesture();
       return;
     }
     var touch = event.touches[0];
     swipeTouchId = touch.identifier;
     swipeStartX = touch.clientX;
     swipeStartY = touch.clientY;
-  }, { passive: true });
+    if (!currentIsVideo && zoomLevel > 1 && viewport.contains(event.target)) {
+      gestureMode = 'pan';
+      startPanX = panX;
+      startPanY = panY;
+      viewport.classList.add('is-interacting');
+    } else {
+      gestureMode = 'swipe';
+    }
+  }, { passive: false });
+  overlay.addEventListener('touchmove', function (event) {
+    if (gestureMode === 'pinch' && event.touches.length >= 2) {
+      if (event.cancelable) event.preventDefault();
+      setZoom(pinchStartZoom * touchDistance(event.touches[0], event.touches[1]) / pinchStartDistance);
+      return;
+    }
+    if (gestureMode !== 'pan') return;
+    var touch = touchById(event.touches, swipeTouchId);
+    if (!touch) return;
+    if (event.cancelable) event.preventDefault();
+    panX = startPanX + touch.clientX - swipeStartX;
+    panY = startPanY + touch.clientY - swipeStartY;
+    renderMediaTransform();
+    ignoreClickUntil = Date.now() + 500;
+  }, { passive: false });
   overlay.addEventListener('touchend', function (event) {
-    if (swipeTouchId === null) return;
+    if (gestureMode === 'pinch') {
+      if (event.touches.length < 2) {
+        cancelGesture();
+        renderMediaTransform();
+      }
+      return;
+    }
+    if (gestureMode === 'pan') {
+      if (!touchById(event.touches, swipeTouchId)) {
+        cancelGesture();
+        renderMediaTransform();
+      }
+      return;
+    }
+    if (gestureMode !== 'swipe' || swipeTouchId === null) return;
     for (var index = 0; index < event.changedTouches.length; index += 1) {
       var touch = event.changedTouches[index];
       if (touch.identifier === swipeTouchId) {
@@ -254,31 +437,66 @@
         return;
       }
     }
-    cancelSwipe();
+    cancelGesture();
   }, { passive: false });
-  overlay.addEventListener('touchcancel', cancelSwipe, { passive: true });
+  overlay.addEventListener('touchcancel', cancelGesture, { passive: true });
 
   overlay.addEventListener('pointerdown', function (event) {
-    if (!overlay.classList.contains('is-visible') || event.pointerType !== 'pen' || startsOnControl(event.target)) return;
+    if (!overlay.classList.contains('is-visible') || startsOnControl(event.target)) return;
+    if (event.pointerType === 'touch') return;
+    var canPan = !currentIsVideo && zoomLevel > 1 && viewport.contains(event.target);
+    if (!canPan && event.pointerType !== 'pen') return;
     if (!event.isPrimary) {
-      cancelSwipe();
+      cancelGesture();
       return;
     }
     swipePointerId = event.pointerId;
     swipeStartX = event.clientX;
     swipeStartY = event.clientY;
+    pointerMode = canPan ? 'pan' : 'swipe';
+    startPanX = panX;
+    startPanY = panY;
+    if (canPan) viewport.classList.add('is-interacting');
     if (overlay.setPointerCapture) overlay.setPointerCapture(event.pointerId);
+  });
+  overlay.addEventListener('pointermove', function (event) {
+    if (event.pointerId !== swipePointerId || pointerMode !== 'pan') return;
+    event.preventDefault();
+    panX = startPanX + event.clientX - swipeStartX;
+    panY = startPanY + event.clientY - swipeStartY;
+    renderMediaTransform();
+    ignoreClickUntil = Date.now() + 500;
   });
   overlay.addEventListener('pointerup', function (event) {
     if (event.pointerId !== swipePointerId) return;
-    completeSwipe(event.clientX, event.clientY, event);
+    if (pointerMode === 'pan') {
+      cancelGesture();
+      renderMediaTransform();
+    } else {
+      completeSwipe(event.clientX, event.clientY, event);
+    }
   });
-  overlay.addEventListener('pointercancel', cancelSwipe);
+  overlay.addEventListener('pointercancel', cancelGesture);
   overlay.addEventListener('click', function (event) {
     if (Date.now() >= ignoreClickUntil) return;
     event.preventDefault();
     event.stopPropagation();
   }, true);
+
+  rotateButton.addEventListener('click', toggleLandscapeView);
+  zoomOutButton.addEventListener('click', function () { setZoom(zoomLevel - 0.5); });
+  zoomInButton.addEventListener('click', function () { setZoom(zoomLevel + 0.5); });
+  viewerImage.addEventListener('click', function () {
+    var now = Date.now();
+    if (now - lastImageTap < 320) setZoom(zoomLevel > 1 ? 1 : 2);
+    lastImageTap = now;
+  });
+  window.addEventListener('resize', function () {
+    if (!overlay.classList.contains('is-visible')) return;
+    syncMediaTools();
+    calculateFitScale();
+    renderMediaTransform();
+  });
 
   galleryMedia.forEach(function (media, index) {
     var trigger = media.closest('.content') || media;
