@@ -3140,6 +3140,19 @@ body.is-map-fullscreen #return-to-top {
     object-position: center;
   }
 
+  /* The pale loading-placeholder gradient on .guangzhou-journal__hero-image
+     (later in the file, specificity 0,2,0) otherwise wins the tie against these
+     letterbox backgrounds and shows through the contain-fit bands as pale white.
+     Restate the dark letterbox at (0,3,0) so it wins. The gradient itself stays
+     as the intended placeholder for cover-fit banners. */
+  .page-travel-journal .travel-journal__hero-image.travel-journal__hero-image--contain-mobile {
+    background: #071315;
+  }
+
+  .page-travel-journal .australia-journal .travel-journal__hero-image {
+    background: #071315;
+  }
+
   #main.guangzhou-journal > article {
     padding-right: 1.1rem;
     padding-left: 1.1rem;
