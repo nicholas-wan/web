@@ -3118,7 +3118,6 @@ body.is-map-fullscreen #return-to-top {
 
   .australia-journal .travel-journal__hero-image {
     max-height: none;
-    background: #071315;
   }
 
   .australia-journal .travel-journal__hero-image img {
@@ -3130,7 +3129,6 @@ body.is-map-fullscreen #return-to-top {
 
   .travel-journal__hero-image--contain-mobile {
     max-height: none;
-    background: #071315;
   }
 
   .page-travel-journal .travel-journal__hero-image--contain-mobile img {
@@ -3138,19 +3136,6 @@ body.is-map-fullscreen #return-to-top {
     aspect-ratio: auto;
     object-fit: contain;
     object-position: center;
-  }
-
-  /* The pale loading-placeholder gradient on .guangzhou-journal__hero-image
-     (later in the file, specificity 0,2,0) otherwise wins the tie against these
-     letterbox backgrounds and shows through the contain-fit bands as pale white.
-     Restate the dark letterbox at (0,3,0) so it wins. The gradient itself stays
-     as the intended placeholder for cover-fit banners. */
-  .page-travel-journal .travel-journal__hero-image.travel-journal__hero-image--contain-mobile {
-    background: #071315;
-  }
-
-  .page-travel-journal .australia-journal .travel-journal__hero-image {
-    background: #071315;
   }
 
   #main.guangzhou-journal > article {
@@ -6826,6 +6811,7 @@ body.page-home #intro {
   z-index: 2;
 }
 
+.page-travel-journal .travel-journal__hero-image,
 .page-travel-journal .guangzhou-journal__hero-image,
 .page-travel-journal .image.main.journal-banner {
   background: linear-gradient(135deg, #dce7e6, #edf2f1);
