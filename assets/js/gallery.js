@@ -40,6 +40,11 @@
   var images = Array.prototype.slice.call(document.querySelectorAll('#main img')).filter(function (image, index, candidates) {
     return !image.classList.contains('countrylogo') &&
       !image.hasAttribute('data-lightbox-ignore') &&
+      // The journal banner is a hero, not a gallery photo: it should not get a
+      // zoom cursor or open the lightbox. Exclude it by class, with the hero
+      // container as belt-and-braces in case the class ever moves.
+      !image.classList.contains('journal-banner') &&
+      !image.closest('.travel-journal__hero-image, .guangzhou-journal__hero-image') &&
       !image.closest('.travel-section-nav, .travel-pagination, .site-pager') &&
       candidates.indexOf(image) === index;
   });
