@@ -3377,6 +3377,13 @@ body.is-map-fullscreen #return-to-top {
     margin: 0;
     break-inside: avoid;
     scroll-snap-align: start;
+    /* Undo the desktop dead-space fix's 4/3 brick placeholder here: on phones
+       the caption is a static ~4rem bar below the image, so the brick must be
+       image-height plus that bar. A forced 4/3 box leaves no room and clips the
+       caption. Return to content-driven sizing with the shared 320px intrinsic
+       guess for content-visibility-skipped bricks. */
+    aspect-ratio: auto;
+    contain-intrinsic-size: auto 320px;
   }
 
   .travel-gallery--compact .travel-gallery__item--tall,
