@@ -2960,7 +2960,12 @@ body.is-map-fullscreen #return-to-top {
 .travel-gallery--compact,
 .guangzhou-day--compact .masonry {
   display: grid;
-  grid-auto-rows: 1fr;
+  /* Not 1fr: with content-visibility on the bricks, Chrome sizes grid tracks
+     from each brick's contain-intrinsic-size rather than its rendered images,
+     and 1fr then equalizes every row to that guess, opening a band of dead
+     space under each 4/3 image. Auto rows plus the ratio-based placeholder on
+     the bricks below keep row heights equal to the images at every width. */
+  grid-auto-rows: auto;
   grid-auto-flow: row dense;
   column-count: initial;
   gap: 1rem;
@@ -2990,6 +2995,13 @@ body.is-map-fullscreen #return-to-top {
   display: block;
   width: 100%;
   margin: 0;
+  /* The generic 320px contain-intrinsic-size placeholder feeds grid track
+     sizing even for rendered bricks, and a fixed guess can never match the
+     width-dependent 4/3 image height, so rows gained dead space below every
+     image. A ratio placeholder derives the same height from the track width
+     whether the brick is skipped or rendered. */
+  aspect-ratio: 4 / 3;
+  contain-intrinsic-size: none;
 }
 
 .travel-gallery--compact .content-image,
@@ -3005,6 +3017,9 @@ body.is-map-fullscreen #return-to-top {
 .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall {
   grid-row: span 2;
   min-height: 0;
+  /* Tall collages fill the two rows their neighbours define instead of
+     supplying a ratio of their own. */
+  aspect-ratio: auto;
 }
 
 .travel-gallery--compact .travel-gallery__item--tall .content,

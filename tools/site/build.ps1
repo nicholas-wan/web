@@ -672,7 +672,7 @@ $shareImageMeta
     <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="assets/css/icons.css?v=1" />
     <link rel="stylesheet" href="assets/css/main.css?v=4" />
-    <link rel="stylesheet" href="assets/css/custom.css?v=179" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=180" />
 $routeStylesheetMarkup
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
