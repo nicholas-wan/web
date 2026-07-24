@@ -388,6 +388,11 @@ foreach ($journalName in @('travel_2017_seoul.html', 'travel_2019_siliconvalley.
 }
 if ($guangzhou -notmatch '<main id="main" class="[^"]*travel-journal[^"]*travel-journal--compact[^"]*guangzhou-journal' -or $guangzhou -notmatch 'class="travel-journal__content"' -or $guangzhou -match '<!DOCTYPE HTML>.*<!DOCTYPE HTML>') { throw "Guangzhou must prove the content-only compact journal build path without nesting a legacy document shell." }
 if ($japan -notmatch 'sizes="\(max-width: 736px\) 100vw, 1152px"' -or $customCss -notmatch '(?s)\.page-travel-journal header\.major > \.date::before,\s*\.page-travel-journal header\.major > \.date::after\s*\{[^}]*position:\s*static[^}]*flex:\s*1 1 0') { throw "Journal banners must request full-width sources and date dividers must not overlap their labels." }
+# Gallery photos cap phone density at the -800 tier (250px slot -> 800w at DPR 3);
+# only the LCP banner keeps the full-width 100vw phone slot. This keeps a 3x phone
+# journal near ~12 MB instead of ~33 MB. If the old truthful gallery slot returns,
+# every gallery image re-selects the full source on high-DPR phones.
+if ($japan -notmatch 'sizes="\(max-width: 736px\) 250px, 800px"' -or $japan -match 'sizes="\(max-width: 736px\) 100vw, 800px"') { throw "Journal gallery images must cap the phone slot at the -800 tier, not request full-width phone sources." }
 if ($guangzhou -match '(?i)\b(?:6:40|6 pm|10:40)\b' -or $guangzhou -notmatch 'We left early for the airport and flew home') { throw "Guangzhou notes must avoid fixed timings and retain the departure summary." }
 if ($galleryJs -notmatch "querySelectorAll\('#main img'\)" -or $galleryJs -notmatch 'travel-gallery--compact' -or $galleryJs -notmatch 'journal-lightbox-trigger' -or $galleryJs -notmatch 'journal-scroll-cue' -or $galleryJs -notmatch 'has-scroll-cue' -or $galleryJs -notmatch "rootMargin: '900px'" -or $guangzhou -notmatch 'assets/js/gallery\.js\?v=16') { throw "Journal media must use the shared lightbox, near-viewport image warmup, and a dismissible horizontal-scroll cue." }
 if ($galleryJs -notmatch 'video\.journal-animation' -or $galleryJs -notmatch '__nearViewport' -or $galleryJs -notmatch "rootMargin: '600px'" -or $japan -match '<video\b[^>]*\sautoplay\b') { throw "Journal animations must defer their download via data-autoplay and play only near the viewport." }

@@ -174,7 +174,18 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                 if ($sources.Count -gt 1) {
                     $tag = Add-AttributeToImgTag $tag ('srcset="{0}"' -f ($sources -join ', '))
                     if ($tag -notmatch '\bsizes=') {
-                        $sizes = if ($isJournalBanner) { '(max-width: 736px) 100vw, 1152px' } else { '(max-width: 736px) 100vw, 800px' }
+                        # Cap phone image density at the -800 tier for galleries. A
+                        # truthful 100vw slot makes a DPR-3 phone (~390 CSS px ->
+                        # 1170 device px) select the full 1600 px source for every
+                        # gallery photo, so a journal ships ~33 MB on a 3x phone. A
+                        # 250 px phone slot keeps 800w's effective density (800/250 =
+                        # 3.2) above DPR 3, so phones cap at -800 (~12 MB, -64%) and
+                        # accept a mild upscale on gallery thumbnails. The banner is
+                        # the LCP hero and its dense scenes soften visibly at that
+                        # upscale, so it stays truthful at 100vw and keeps the full
+                        # source. Its <head> preload mirrors this img, so leaving the
+                        # banner slot unchanged keeps the two byte-identical.
+                        $sizes = if ($isJournalBanner) { '(max-width: 736px) 100vw, 1152px' } else { '(max-width: 736px) 250px, 800px' }
                         $tag = Add-AttributeToImgTag $tag ('sizes="{0}"' -f $sizes)
                     }
                 }
