@@ -198,7 +198,9 @@
   var renderSettleTimer = 0;
   var committedScale = 1;
   var status = map.querySelector('.travel-map__status');
-  var tripPicker = map.querySelector('[data-map-trip]');
+  /* Qualified by tag: region markers and generated detail links carry
+     data-map-trip too, and the markers precede the picker in the document. */
+  var tripPicker = map.querySelector('select[data-map-trip]');
   var detailCard = map.querySelector('[data-map-detail-card]');
   var detailCardClose = map.querySelector('[data-map-detail-close]');
   var detailCardImage = map.querySelector('[data-map-detail-image]');
@@ -477,14 +479,25 @@
       : viewLabel;
   };
 
+  var markerMatchesActiveTrip = function (marker) {
+    return !activeTrip || marker.getAttribute('data-map-trip') === activeTrip;
+  };
+
   var syncDetailTabStops = function () {
     detailLinks.forEach(function (link) {
       var matchesLevel = link.getAttribute('data-map-level') === detailLevel;
       var matchesTrip = !activeTrip || link.getAttribute('data-map-trip') === activeTrip;
       link.setAttribute('tabindex', matchesLevel && matchesTrip ? '0' : '-1');
     });
+    /* Focusability must track what is actually shown, not merely whether a trip
+       is selected. Blanking every marker whenever activeTrip was set left all
+       eleven of them opaque and mouse-clickable at region level — the zoom the
+       desktop map opens on — with no keyboard route to any of them, including
+       the selected trip's own. Same predicate as the mute below, so pointer and
+       keyboard can never disagree again. */
     regionMarkers.forEach(function (marker) {
-      marker.setAttribute('tabindex', detailLevel === 'region' && !activeTrip ? '0' : '-1');
+      marker.setAttribute('tabindex',
+        detailLevel === 'region' && markerMatchesActiveTrip(marker) ? '0' : '-1');
     });
   };
 
@@ -493,6 +506,13 @@
     if (nextLevel === detailLevel) return;
     detailLevel = nextLevel;
     canvas.setAttribute('data-map-detail', detailLevel);
+    /* A detail card outlives the marker it describes: zooming out past that
+       marker's level leaves the card reading "Stop 3 of 5" while the marker
+       itself is no longer rendered, and closing it then had nowhere to return
+       focus. Drop the selection when its own level goes away. */
+    if (selectedDetail && selectedDetail.getAttribute('data-map-level') !== detailLevel) {
+      closePointDetails(false, true);
+    }
     syncDetailTabStops();
     updateStatus();
   };
@@ -651,7 +671,16 @@
     };
     if (immediate === true || reducedMotionQuery.matches) finish();
     else detailCardHideTimer = window.setTimeout(finish, 180);
-    if (returnFocus && focusTarget && typeof focusTarget.focus === 'function') focusTarget.focus();
+    /* The link we came from may no longer be rendered — zooming out past its
+       detail level leaves it visibility: hidden, and focus() on such an element
+       is a silent no-op that drops focus to <body>. Fall back to a control that
+       is always present. */
+    if (returnFocus) {
+      var reachable = focusTarget && typeof focusTarget.focus === 'function' && focusTarget.offsetParent !== null;
+      if (reachable) focusTarget.focus();
+      else if (isFullscreen && closeBtn) closeBtn.focus();
+      else if (viewport && typeof viewport.focus === 'function') viewport.focus();
+    }
   };
 
   var setActiveTrip = function (tripKey, shouldFly) {
@@ -662,6 +691,10 @@
     detailLinks.forEach(function (link) {
       link.classList.toggle('is-trip-active', Boolean(activeTrip) &&
         link.getAttribute('data-map-trip') === activeTrip);
+    });
+    regionMarkers.forEach(function (marker) {
+      marker.classList.toggle('is-trip-active',
+        Boolean(activeTrip) && marker.getAttribute('data-map-trip') === activeTrip);
     });
     if (tripPicker && tripPicker.value !== activeTrip) tripPicker.value = activeTrip;
     setActiveRegion('');
@@ -786,10 +819,17 @@
     detailCardImage.alt = point[1] + ' journal photograph';
     loadSectionImage(point).then(function (image) {
       if (imageRequest !== detailImageRequest || selectedDetail !== link) return;
-      detailCardImage.onload = function () {
+      /* Clear the loading state on failure too. Without an error path a 404 —
+         which the journal-page fallback can produce on any host that does not
+         rewrite the extensionless URLs — left the card stuck at opacity 0.24
+         with no way back. */
+      var settleImage = function () {
         detailCard.classList.remove('is-image-loading');
         detailCardImage.onload = null;
+        detailCardImage.onerror = null;
       };
+      detailCardImage.onload = settleImage;
+      detailCardImage.onerror = settleImage;
       detailCardImage.src = image.src;
       detailCardImage.alt = image.alt;
     });
@@ -894,7 +934,18 @@
     setActiveTrip('', false);
     closePointDetails(false, true);
     setActiveRegion('');
-    if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
+    /* lastFocused is normally the teaser button, but the teaser is display:none
+       above 520px — so leaving the phone breakpoint mid-session (a rotation)
+       made this a silent no-op and focus fell to <body> once the close button
+       was hidden. Only restore focus to something still rendered. */
+    if (lastFocused && typeof lastFocused.focus === 'function' && lastFocused.offsetParent !== null) {
+      lastFocused.focus();
+    } else if (map && typeof map.focus === 'function') {
+      /* A plain div is not focusable, so make it programmatically focusable
+         first; -1 keeps it out of the Tab order. */
+      map.setAttribute('tabindex', '-1');
+      map.focus();
+    }
     lastFocused = null;
     if (immediate === true || reducedMotionQuery.matches) finishFullscreenClose();
     else fullscreenCloseTimer = window.setTimeout(finishFullscreenClose, 220);
@@ -922,6 +973,11 @@
   controls.addEventListener('click', function (event) {
     var button = event.target.closest('[data-map-zoom]');
     if (!button) return;
+    /* The controls are a sibling of the viewport, so a zoom press never reaches
+       the viewport's pointerdown handler and never cancelled an in-flight
+       fly-to: zoomAt wrote scale/tx/ty and the animation's next frame overwrote
+       all three from its own interpolation, silently discarding the click. */
+    stopFly();
     var mode = button.getAttribute('data-map-zoom');
     if (mode === 'in') zoomAtCenter(BUTTON_STEP);
     else if (mode === 'out') zoomAtCenter(1 / BUTTON_STEP);
@@ -1013,7 +1069,6 @@
   /* Wheel and trackpad scrolling zoom around the pointer. Once the map reaches
      either limit, that same-direction gesture returns to normal page scroll. */
   viewport.addEventListener('wheel', function (event) {
-    if (event.target.closest('.travel-map__controls')) return;
     var nextScale = Math.min(MAX_SCALE, Math.max(minScale, scale * Math.exp(-event.deltaY * 0.0018)));
     if (Math.abs(nextScale - scale) < 0.001) return;
     event.preventDefault();
@@ -1023,7 +1078,6 @@
   }, { passive: false });
 
   viewport.addEventListener('dblclick', function (event) {
-    if (event.target.closest('.travel-map__controls')) return;
     event.preventDefault();
     var rect = viewport.getBoundingClientRect();
     zoomAt(event.clientX - rect.left, event.clientY - rect.top, scale * 1.6);
@@ -1048,8 +1102,11 @@
      zoom is detected from the pointer stream instead. */
   var lastTap = { time: 0, x: 0, y: 0 };
 
+  /* The controls, close button, region bar and trip picker are all siblings of
+     the viewport, so none of these viewport listeners can ever see them as a
+     target. The guards that used to test for them here were unreachable, and
+     they hid the fact that a zoom press never reaches stopFly. */
   viewport.addEventListener('pointerdown', function (event) {
-    if (event.target.closest('.travel-map__controls, .travel-map__close, .travel-map__regions')) return;
     if (event.pointerType === 'mouse' && event.button !== 0) return;
     stopFly();
     if (event.pointerType === 'touch' && pointers.size === 0) {
@@ -1116,7 +1173,6 @@
   viewport.addEventListener('click', function (event) {
     if (!dragMoved) return;
     dragMoved = false;
-    if (event.target.closest('.travel-map__controls')) return;
     event.preventDefault();
     event.stopPropagation();
   }, true);

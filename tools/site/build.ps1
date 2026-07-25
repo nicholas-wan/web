@@ -669,7 +669,7 @@ foreach ($page in $pages) {
     $galleryPages = @("house", "prewed") + $tripOrder
     $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=27"></script>' } else { "" }
     $travelNavScript = if ($tripOrder -contains $slug) { '<script src="assets/js/travel-nav.js?v=19"></script>' } else { "" }
-    $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=20"></script>' } else { "" }
+    $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=21"></script>' } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=22"></script>' } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { '<script src="assets/js/scramble-reveal.js?v=14"></script>' } else { "" }
     $gameScript = if ($slug -eq 'index') { '<script src="assets/js/game.js?v=17"></script>' } else { "" }
@@ -679,7 +679,7 @@ foreach ($page in $pages) {
     $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
     $routeStylesheets = @()
-    if ($slug -eq 'travel') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/travel-map-page.css?v=6" />' }
+    if ($slug -eq 'travel') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/travel-map-page.css?v=7" />' }
     if ($tripOrder -contains $slug) { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/travel-journal.css?v=2" />' }
     if ($slug -eq 'experience') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/experience-page.css?v=1" />' }
     if ($slug -eq 'personal') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/personal-page.css?v=1" />' }
@@ -710,7 +710,7 @@ $shareImageMeta
 $preloadMarkup
     <link rel="stylesheet" href="assets/css/icons.css?v=1" />
     <link rel="stylesheet" href="assets/css/main.css?v=4" />
-    <link rel="stylesheet" href="assets/css/custom.css?v=196" />
+    <link rel="stylesheet" href="assets/css/custom.css?v=197" />
 $routeStylesheetMarkup
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />

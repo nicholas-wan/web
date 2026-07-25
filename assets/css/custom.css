@@ -1823,6 +1823,15 @@ body {
   pointer-events: none;
 }
 
+/* Region is the level the desktop atlas opens on, so it needs the same muting
+   as area and stop. Without it a selected trip left every unrelated marker
+   fully opaque and clickable while the route line ran across them, and the
+   markers' tabindex said the opposite. */
+.travel-map__canvas.is-trip-selected[data-map-detail="region"] .travel-map__marker:not(.is-trip-active) {
+  opacity: 0.08;
+  pointer-events: none;
+}
+
 .travel-map__detail.is-selected {
   z-index: 9;
 }
@@ -2579,7 +2588,10 @@ body.is-map-fullscreen #return-to-top {
 .travel-map__region-btn {
   display: inline-flex;
   height: auto;
-  min-height: 2.75rem;
+  /* Map controls keep a 3rem touch target at phone and tablet widths. The
+     contract's exemption covers dense pins, not the region controls offered in
+     their place; measured at the 11pt phone root these chips were 40px. */
+  min-height: 3rem;
   align-items: center;
   padding: 0.4rem 0.7rem;
   border: 0;
