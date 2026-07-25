@@ -2088,8 +2088,14 @@ body {
 }
 
 .travel-map__marker--japan .travel-map__place {
-  right: 0.8rem;
-  left: auto;
+  /* Sit BELOW the Japan marker, not to its left: the leftward placement landed
+     the label on the adjacent South Korea dot and clipped "JAPAN" to "AN" at
+     world view. Right of the marker was rejected because it collides with the
+     top-right zoom controls on the narrower tablet full-map width; below the dot
+     pair stays clear of both the Seoul dot and the controls at every width. */
+  top: 1.3rem;
+  left: 0.1rem;
+  right: auto;
 }
 
 .travel-map__marker--seoul .travel-map__place {
