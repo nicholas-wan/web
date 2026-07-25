@@ -309,6 +309,7 @@
     resetMediaTransform();
     if (isVideo) {
       viewerImage.onload = null;
+      handOffFocusBeforeHiding(viewerImage);
       viewerImage.hidden = true;
       viewerVideo.hidden = false;
       viewerVideo.src = source.currentSrc || source.querySelector('source').src;
@@ -321,6 +322,11 @@
       syncVideoLabel();
     } else {
       viewerVideo.pause();
+      /* The video is itself focusable (it is the tap/keyboard play-pause
+         control), so arrowing video-to-still hides the very element holding
+         focus — the same drop the tools handoff covers, on the more common
+         path. This was the case the original finding led with. */
+      handOffFocusBeforeHiding(viewerVideo);
       viewerVideo.hidden = true;
       viewerImage.hidden = false;
       warmImage(source);
@@ -525,6 +531,16 @@
   });
   overlay.addEventListener('pointermove', function (event) {
     if (event.pointerId !== swipePointerId) return;
+    /* Deferring capture opens a hole the old capture-on-pointerdown could not
+       have: release outside the window before reaching the slop and pointerup
+       is never delivered, so the gesture state survives. The next buttonless
+       hover move would then match swipePointerId and pan with no button held,
+       re-arming the click suppression forever. A tracked mouse or pen with no
+       buttons down is by definition not mid-gesture — clear and stop. */
+    if (event.buttons === 0) {
+      cancelGesture();
+      return;
+    }
     var travelled = Math.max(Math.abs(event.clientX - swipeStartX), Math.abs(event.clientY - swipeStartY));
     if (!pointerCaptured && travelled >= SWIPE_CLICK_SLOP) {
       pointerCaptured = true;
@@ -637,12 +653,18 @@
      the image is the viewport rather than the overlay. Close on either, but not
      on the image, video, caption, or buttons (each is a deeper target). */
   overlay.addEventListener('click', function (event) {
+    /* Consume the recorded press: each click should answer for its own
+       pointerdown only. Left in place, a press on a control would also veto a
+       later click that had no pointerdown at all (assistive tech and scripts
+       synthesize clicks directly). */
+    var pressTarget = pointerDownTarget;
+    pointerDownTarget = null;
     if (Date.now() < ignoreClickUntil) return;
     /* Close only when the interaction both began and ended on empty space. The
        click target alone cannot decide this: a drag that starts on the media can
        release anywhere, and while a pointer is captured the click retargets to
        the overlay regardless of where it really landed. */
-    if (pointerDownTarget && pointerDownTarget !== overlay && pointerDownTarget !== viewport) return;
+    if (pressTarget && pressTarget !== overlay && pressTarget !== viewport) return;
     if (event.target === overlay || event.target === viewport) close();
   });
   document.addEventListener('keydown', function (event) {

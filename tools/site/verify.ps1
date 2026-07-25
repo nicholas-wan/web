@@ -12,10 +12,26 @@ $journalStarterPath = Join-Path $root 'journals\_template.html'
 function Get-DistAssetRef([string]$RelativePath) {
     $path = Join-Path $dist ($RelativePath -replace '/', '\')
     if (-not (Test-Path -LiteralPath $path)) { throw "Versioned asset is missing from dist: $RelativePath" }
-    $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes((Get-Content -LiteralPath $path -Raw -Encoding UTF8))
+    # EOL-normalized to match build.ps1's Get-ContentVersion exactly — an
+    # autocrlf difference between checkouts must not change a hash.
+    $content = (Get-Content -LiteralPath $path -Raw -Encoding UTF8).Replace("`r`n", "`n")
+    $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($content)
     $sha = [System.Security.Cryptography.SHA256]::Create()
     try { $hash = $sha.ComputeHash($bytes) } finally { $sha.Dispose() }
     return "$RelativePath`?v=$(-join ($hash[0..3] | ForEach-Object { $_.ToString('x2') }))"
+}
+
+# Recomputing hashes from dist made the standalone verify task self-consistent
+# with a STALE dist: markup and asset drift together, so a forgotten rebuild
+# passed. For the byte-copied runtime assets, source is the truth verify can
+# check against — dist differing from source means dist predates the change.
+function Assert-DistMatchesSource([string]$RelativePath) {
+    $distPath = Join-Path $dist ($RelativePath -replace '/', '\')
+    $sourcePath = Join-Path $root ($RelativePath -replace '/', '\')
+    if (-not (Test-Path -LiteralPath $distPath)) { throw "Runtime asset missing from dist: $RelativePath" }
+    $distContent = (Get-Content -LiteralPath $distPath -Raw -Encoding UTF8).Replace("`r`n", "`n")
+    $sourceContent = (Get-Content -LiteralPath $sourcePath -Raw -Encoding UTF8).Replace("`r`n", "`n")
+    if ($distContent -ne $sourceContent) { throw "dist is stale: $RelativePath differs from its source. Rebuild with tools/site.ps1 build." }
 }
 
 function Assert-FileSizeBudget([string]$RelativePath, [int]$MaximumKB) {
@@ -90,7 +106,7 @@ foreach ($page in $pages) {
     if ([regex]::Matches($scan, '<main\b', 'IgnoreCase').Count -ne 1) { throw "$($page.Name) must contain exactly one <main> landmark." }
     if ([regex]::Matches($scan, '<h1\b', 'IgnoreCase').Count -ne 1) { throw "$($page.Name) must contain exactly one <h1> heading." }
     if ($scan -notmatch '<meta name="viewport" content="width=device-width, initial-scale=1(?:\.0)?') { throw "$($page.Name) is missing the responsive viewport configuration." }
-    foreach ($sharedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'assets/css/custom.css', 'assets/js/main.js')) {
+    foreach ($sharedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'assets/css/custom.css', 'assets/css/noscript.css', 'assets/js/main.js')) {
         if ($scan -notmatch [regex]::Escape((Get-DistAssetRef $sharedAsset))) { throw "$($page.Name) does not reference the current content hash for $sharedAsset." }
     }
     if ($scan -notmatch '<link rel="preload" href="assets/fonts/merriweather-300-latin\.woff2" as="font" type="font/woff2" crossorigin />') { throw "$($page.Name) is missing the body-font preload." }
@@ -177,6 +193,15 @@ $experience = Get-Content -LiteralPath (Join-Path $dist 'experience.html') -Raw 
 $personal = Get-Content -LiteralPath (Join-Path $dist 'personal.html') -Raw -Encoding UTF8
 $house = Get-Content -LiteralPath (Join-Path $dist 'house.html') -Raw -Encoding UTF8
 $prewed = Get-Content -LiteralPath (Join-Path $dist 'prewed.html') -Raw -Encoding UTF8
+# Byte-copied runtime assets must match their sources, or dist predates the
+# working tree and every self-consistent hash check below would tell us nothing.
+foreach ($copiedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'assets/css/noscript.css',
+        'assets/js/game.js', 'assets/js/listing-effects.js', 'assets/js/journal-progress.js',
+        'assets/js/gallery.js', 'assets/js/travel-nav.js', 'assets/js/travel-map.js',
+        'assets/js/personal-timeline.js', 'assets/js/scramble-reveal.js')) {
+    Assert-DistMatchesSource $copiedAsset
+}
+
 $sharedCustomCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\custom.css') -Raw -Encoding UTF8
 $travelMapPageCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\travel-map-page.css') -Raw -Encoding UTF8
 $travelJournalCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\travel-journal.css') -Raw -Encoding UTF8
@@ -437,7 +462,7 @@ if ($galleryJs -notmatch 'lockedScrollY = window\.pageYOffset' -or $galleryJs -n
 # iPhone, pointer events add pen navigation and zoomed mouse/pen panning, and
 # the full overlay remains the gesture surface even for short landscape media.
 if ($galleryJs -notmatch 'SWIPE_THRESHOLD = 48' -or $galleryJs -notmatch 'SWIPE_AXIS_RATIO = 1\.25' -or $galleryJs -notmatch 'SWIPE_CLICK_SLOP = 10' -or $galleryJs -notmatch "overlay\.addEventListener\('touchstart'" -or $galleryJs -notmatch "overlay\.addEventListener\('touchmove'" -or $galleryJs -notmatch "overlay\.addEventListener\('touchend'" -or $galleryJs -notmatch "overlay\.addEventListener\('touchcancel'" -or $galleryJs -notmatch "if \(event\.pointerType === 'touch'\) return" -or $galleryJs -notmatch "if \(!canPan && event\.pointerType !== 'pen'\)" -or $galleryJs -notmatch "overlay\.addEventListener\('pointerdown'" -or $galleryJs -notmatch "overlay\.addEventListener\('pointermove'" -or $galleryJs -notmatch 'horizontalDistance <= verticalDistance \* SWIPE_AXIS_RATIO' -or $galleryJs -notmatch 'show\(current \+ \(deltaX < 0 \? 1 : -1\)\)' -or $galleryJs -notmatch 'ignoreClickUntil = Date\.now\(\) \+ 500' -or $customCss -notmatch '(?s)\.lightbox\s*\{[^}]*touch-action:\s*pan-y pinch-zoom') { throw "Lightbox swipe navigation must remain full-screen, horizontal, thresholded, iPhone-safe, pinch-safe, and distinct from video taps." }
-if ($galleryJs -notmatch '(?s)pointerdown[^;]*?pointerDownTarget = event\.target' -or $galleryJs -notmatch 'if \(!pointerCaptured && travelled >= SWIPE_CLICK_SLOP\)' -or $galleryJs -match "(?s)addEventListener\('pointerdown'.*?setPointerCapture.*?\}\);\s*overlay\.addEventListener\('pointermove'" -or $galleryJs -notmatch 'if \(pointerDownTarget && pointerDownTarget !== overlay && pointerDownTarget !== viewport\) return' -or $galleryJs -notmatch '(?s)if \(Date\.now\(\) >= ignoreClickUntil\) return;.*?if \(startsOnControl\(event\.target\)\) return;.*?stopImmediatePropagation' -or $galleryJs -notmatch 'var handOffFocusBeforeHiding = function' -or $galleryJs -notmatch '(?s)if \(currentIsVideo\) handOffFocusBeforeHiding\(tools\);.*?tools\.hidden = currentIsVideo' -or $galleryJs -notmatch '(?s)var close = function.*?cancelGesture\(\);\s*ignoreClickUntil = 0') { throw "Lightbox pointer capture must be deferred to a real drag, backdrop close must test where the interaction began, gesture suppression must spare controls, hidden tools must hand off focus, and close must reset gesture state." }
+if ($galleryJs -notmatch '(?s)pointerdown[^;]*?pointerDownTarget = event\.target' -or $galleryJs -notmatch 'if \(!pointerCaptured && travelled >= SWIPE_CLICK_SLOP\)' -or $galleryJs -match "(?s)addEventListener\('pointerdown'.*?setPointerCapture.*?\}\);\s*overlay\.addEventListener\('pointermove'" -or $galleryJs -notmatch 'if \(pressTarget && pressTarget !== overlay && pressTarget !== viewport\) return' -or $galleryJs -notmatch '(?s)if \(Date\.now\(\) >= ignoreClickUntil\) return;.*?if \(startsOnControl\(event\.target\)\) return;.*?stopImmediatePropagation' -or $galleryJs -notmatch 'var handOffFocusBeforeHiding = function' -or $galleryJs -notmatch '(?s)if \(currentIsVideo\) handOffFocusBeforeHiding\(tools\);.*?tools\.hidden = currentIsVideo' -or $galleryJs -notmatch '(?s)handOffFocusBeforeHiding\(viewerVideo\);\s*viewerVideo\.hidden = true' -or $galleryJs -notmatch '(?s)handOffFocusBeforeHiding\(viewerImage\);\s*viewerImage\.hidden = true' -or $galleryJs -notmatch '(?s)pointermove.*?if \(event\.buttons === 0\) \{\s*cancelGesture\(\);' -or $galleryJs -notmatch '(?s)var close = function.*?cancelGesture\(\);\s*ignoreClickUntil = 0') { throw "Lightbox pointer capture must be deferred to a real drag, backdrop close must test where its own press began, gesture suppression must spare controls, hiding any focused element must hand off focus, a buttonless move must cancel the gesture, and close must reset gesture state." }
 # Still-image tools follow the established gallery pattern: accessible controls
 # live in a toolbar, only wide portrait-phone images expose landscape view, and
 # a bounded shared transform owns button/double-tap/pinch zoom plus panning.
@@ -455,7 +480,7 @@ if ($travel -notmatch [regex]::Escape((Get-DistAssetRef 'assets/css/custom.css')
 # escaped to the background (e.g. a click on the non-focusable canvas), matching
 # the lightbox and mobile-nav traps. Without this the "trapped Tab" contract leaks.
 if ($travelMapJs -notmatch 'if \(!map\.contains\(document\.activeElement\)\)') { throw "Travel map overlay Tab trap must pull escaped focus back into the dialog." }
-if ($travelMapJs -notmatch "map\.querySelector\('select\[data-map-trip\]'\)" -or [regex]::Matches($travel, 'class="travel-map__marker travel-map__marker--[a-z-]+" data-map-trip="[a-z-]+"').Count -ne 11 -or $travelMapJs -notmatch 'var markerMatchesActiveTrip = function' -or $travelMapJs -notmatch "detailLevel === 'region' && markerMatchesActiveTrip\(marker\)" -or $customCss -notmatch '(?s)\.travel-map__canvas\.is-trip-selected\[data-map-detail="region"\] \.travel-map__marker:not\(\.is-trip-active\)\s*\{[^}]*opacity:\s*0\.08[^}]*pointer-events:\s*none' -or $travelMapJs -notmatch '(?s)var button = event\.target\.closest\(''\[data-map-zoom\]''\);\s*if \(!button\) return;.*?stopFly\(\);' -or $travelMapJs -match "closest\('\.travel-map__controls" -or $travelMapJs -notmatch 'detailCardImage\.onerror = settleImage' -or $travelMapJs -notmatch "selectedDetail\.getAttribute\('data-map-level'\) !== detailLevel" -or $travelMapJs -notmatch 'lastFocused\.offsetParent !== null') { throw "Atlas trip selection must mute and unfocus the same markers, zoom buttons must cancel an in-flight fly-to, a superseded detail card must close, and focus handoffs must target rendered elements." }
+if ($travelMapJs -notmatch "map\.querySelector\('select\[data-map-trip\]'\)" -or [regex]::Matches($travel, 'class="travel-map__marker travel-map__marker--[a-z-]+" data-map-trip="[a-z-]+"').Count -ne 11 -or $travelMapJs -notmatch 'var markerMatchesActiveTrip = function' -or $travelMapJs -notmatch "detailLevel === 'region' && markerMatchesActiveTrip\(marker\)" -or $customCss -notmatch '(?s)\.travel-map__canvas\.is-trip-selected\[data-map-detail="region"\] \.travel-map__marker:not\(\.is-trip-active\)\s*\{[^}]*opacity:\s*0\.08[^}]*pointer-events:\s*none' -or $travelMapJs -notmatch '(?s)var button = event\.target\.closest\(''\[data-map-zoom\]''\);\s*if \(!button\) return;.*?stopFly\(\);' -or $travelMapJs -match "closest\('\.travel-map__controls" -or $travelMapJs -notmatch 'detailCardImage\.onerror = settleImage' -or $travelMapJs -notmatch "selectedDetail\.getAttribute\('data-map-level'\) !== detailLevel" -or $travelMapJs -notmatch '(?s)var canReceiveFocus = function[^}]*offsetParent === null[^}]*visibility[^}]*hidden' -or $travelMapJs -notmatch 'canReceiveFocus\(lastFocused\)' -or $travelMapJs -notmatch 'canReceiveFocus\(focusTarget\)' -or $travelMapJs -match 'offsetParent !== null') { throw "Atlas trip selection must mute and unfocus the same markers, zoom buttons must cancel an in-flight fly-to, a superseded detail card must close, and focus handoffs must detect both display:none and visibility:hidden." }
 if ($travelMapJs -notmatch 'var createRouteLayer = function' -or $travelMapJs -notmatch 'var fitTrip = function' -or $travelMapJs -notmatch 'var showPointDetails = function' -or $travelMapJs -notmatch "link\.setAttribute\('aria-expanded', 'false'\)" -or $travelMapJs -notmatch 'event\.preventDefault\(\);\s*showPointDetails' -or $customCss -notmatch '(?s)\.travel-map__route-path\s*\{[^}]*stroke:\s*#ffb869[^}]*stroke-linecap:\s*round' -or $customCss -notmatch '(?s)\.travel-map\.is-fullscreen \.travel-map__detail-card,[^{]+\{[^}]*bottom:\s*calc\(5rem \+ env\(safe-area-inset-bottom\)\)') { throw "Travel journeys must retain route highlighting, deliberate place selection, and the mobile detail sheet above map controls." }
 if ($travelMapJs -notmatch 'var loadSectionImage = function' -or $travelMapJs -notmatch "window\.fetch\(pageHref, \{ credentials: 'same-origin' \}\)" -or $travelMapJs -notmatch 'new window\.DOMParser\(\)' -or $travelMapJs -notmatch "heading\.closest\('\.travel-journal__day, \.guangzhou-day'\)" -or $travelMapJs -notmatch 'sibling\.matches\(''h2\[id\^="trip-section-"\]''\)' -or $customCss -notmatch '(?s)\.travel-map__status\s*\{[^}]*top:\s*6\.4rem' -or $customCss -notmatch '(?s)\.travel-map\.is-fullscreen \.travel-map__status\s*\{[^}]*top:\s*calc\(6\.1rem \+ env\(safe-area-inset-top\)\)') { throw "Atlas detail cards must load section-specific journal photography and keep status clear of the trip selector." }
 if ($customCss -notmatch '(?s)\.travel-map\.is-fullscreen \.travel-map__detail-card-link,\s*\.travel-map\.is-fullscreen \.travel-map__detail-card-close\s*\{[^}]*min-height:\s*3rem' -or $customCss -notmatch '(?s)\.travel-map\.is-fullscreen \.travel-map__detail-card-close\s*\{[^}]*width:\s*3rem[^}]*height:\s*3rem') { throw "Mobile atlas detail actions must keep the shared three-rem touch target." }

@@ -567,7 +567,11 @@ if (Test-Path -LiteralPath $webpSource) {
 # shipped under an unchanged key, reaching nobody. verify.ps1 could not catch
 # either, because it asserted the same stale number the build emitted.
 function Get-ContentVersion([string]$Content) {
-    $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($Content)
+    # Line endings are normalized before hashing: git's autocrlf gives the same
+    # commit CRLF on one checkout and LF on another, and without this the same
+    # source produced a different ?v= locally than in CI. The hash answers "did
+    # the code change", and an EOL flip is not a code change.
+    $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($Content.Replace("`r`n", "`n"))
     $sha = [System.Security.Cryptography.SHA256]::Create()
     try { $hash = $sha.ComputeHash($bytes) } finally { $sha.Dispose() }
     return -join ($hash[0..3] | ForEach-Object { $_.ToString('x2') })
@@ -632,7 +636,7 @@ $canvasJs = $mainJsSource.Substring($canvasStart, $canvasEnd - $canvasStart).Tri
 $sharedMainJs = ($mainJsSource.Substring(0, $canvasStart).TrimEnd() + "`n`n" + $mainJsSource.Substring($canvasEnd).TrimStart())
 
 $assetVersions = @{}
-foreach ($file in @('icons.css', 'main.css')) {
+foreach ($file in @('icons.css', 'main.css', 'noscript.css')) {
     $assetVersions["assets/css/$file"] = Get-FileContentVersion (Join-Path $root "assets\css\$file")
 }
 foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'personal-timeline.js', 'scramble-reveal.js')) {
@@ -801,7 +805,7 @@ $preloadMarkup
     <link rel="stylesheet" href="$(Get-AssetRef 'assets/css/main.css')" />
     <link rel="stylesheet" href="$(Get-AssetRef 'assets/css/custom.css')" />
 $routeStylesheetMarkup
-    <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+    <noscript><link rel="stylesheet" href="$(Get-AssetRef 'assets/css/noscript.css')" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
     <link rel="manifest" href="site.webmanifest" />

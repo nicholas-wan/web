@@ -483,6 +483,17 @@
     return !activeTrip || marker.getAttribute('data-map-trip') === activeTrip;
   };
 
+  /* focus() on an unrendered element is a silent no-op that leaves focus on
+     <body>. offsetParent alone cannot answer "is this rendered": it goes null
+     for display: none but stays set through visibility: hidden — and the
+     detail links hide via visibility, so a focus fallback gated on
+     offsetParent was dead for exactly the elements it was written for. */
+  var canReceiveFocus = function (element) {
+    if (!element || typeof element.focus !== 'function') return false;
+    if (element.offsetParent === null) return false;
+    return window.getComputedStyle(element).visibility !== 'hidden';
+  };
+
   var syncDetailTabStops = function () {
     detailLinks.forEach(function (link) {
       var matchesLevel = link.getAttribute('data-map-level') === detailLevel;
@@ -676,8 +687,7 @@
        is a silent no-op that drops focus to <body>. Fall back to a control that
        is always present. */
     if (returnFocus) {
-      var reachable = focusTarget && typeof focusTarget.focus === 'function' && focusTarget.offsetParent !== null;
-      if (reachable) focusTarget.focus();
+      if (canReceiveFocus(focusTarget)) focusTarget.focus();
       else if (isFullscreen && closeBtn) closeBtn.focus();
       else if (viewport && typeof viewport.focus === 'function') viewport.focus();
     }
@@ -938,7 +948,7 @@
        above 520px — so leaving the phone breakpoint mid-session (a rotation)
        made this a silent no-op and focus fell to <body> once the close button
        was hidden. Only restore focus to something still rendered. */
-    if (lastFocused && typeof lastFocused.focus === 'function' && lastFocused.offsetParent !== null) {
+    if (canReceiveFocus(lastFocused)) {
       lastFocused.focus();
     } else if (map && typeof map.focus === 'function') {
       /* A plain div is not focusable, so make it programmatically focusable
@@ -1036,9 +1046,13 @@
       return;
     }
     if (event.key !== 'Tab') return;
+    /* canReceiveFocus, not bare offsetParent: the detail links hide via
+       visibility, which offsetParent cannot see, so all ~68 hidden links used
+       to pass this filter and only their DOM position kept the wrap targets
+       visible. Filter on what can actually take focus. */
     var focusables = Array.prototype.filter.call(
       map.querySelectorAll('a[href], button:not([disabled]):not([hidden]), [tabindex="0"]'),
-      function (element) { return element.offsetParent !== null; }
+      canReceiveFocus
     );
     if (!focusables.length) return;
     var first = focusables[0];
