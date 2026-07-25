@@ -1729,6 +1729,30 @@ body {
   box-shadow: 0 0 0 0.1rem rgba(40, 215, 197, 0.45), 0 0.25rem 0.55rem rgba(0, 0, 0, 0.4);
 }
 
+.travel-map__detail-number {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: 800 0.6rem/1 var(--font-display, sans-serif);
+  color: #071315;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* When its trip is active, a stop dot grows just enough to carry a legible
+   sequence number that traces the drawn route; restrained, and the number stays
+   hidden whenever no trip is selected. */
+.travel-map__detail--stop.is-trip-active .travel-map__detail-dot {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.travel-map__detail--stop.is-trip-active .travel-map__detail-number {
+  opacity: 1;
+}
+
 .travel-map__detail-leader {
   position: absolute;
   top: 50%;

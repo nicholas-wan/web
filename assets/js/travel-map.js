@@ -251,6 +251,17 @@
   var createDetailPoints = function () {
     var layer = document.createElement('div');
     layer.className = 'travel-map__detail-layer';
+    // Number each trip's stops in route order (the section-sorted order the
+    // route path is drawn in, which for USA/Canada differs from DETAIL_POINTS
+    // array order) so the badges trace the drawn line. Keyed by point index.
+    var stopSequence = {};
+    var stopTrips = {};
+    DETAIL_POINTS.forEach(function (point) { if (point[0] === 'stop') stopTrips[point[5]] = true; });
+    Object.keys(stopTrips).forEach(function (tripKey) {
+      stopsForTrip(tripKey).forEach(function (stop, order) {
+        stopSequence[DETAIL_POINTS.indexOf(stop)] = order + 1;
+      });
+    });
     DETAIL_POINTS.forEach(function (point, index) {
       var position = projectCoordinate(point[3], point[4]);
       var link = document.createElement('a');
@@ -270,6 +281,13 @@
       var dot = document.createElement('span');
       dot.className = 'travel-map__detail-dot';
       dot.setAttribute('aria-hidden', 'true');
+      if (point[0] === 'stop' && stopSequence[index]) {
+        var number = document.createElement('span');
+        number.className = 'travel-map__detail-number';
+        number.setAttribute('aria-hidden', 'true');
+        number.textContent = stopSequence[index];
+        dot.appendChild(number);
+      }
       var label = document.createElement('span');
       label.className = 'travel-map__detail-label';
       label.textContent = point[1];
