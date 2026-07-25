@@ -25,6 +25,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 ## Homepage contracts
 
 - Keep the scroll animation and background canvas.
+- The hero is `100lvh` so the opening phone screen stays fully black in both URL-bar states, and the root uses mandatory y scroll-snap (`#intro` and `#wrapper` are the snap areas) so a gesture always rests fully on the hero or fully past it, with free scrolling inside the taller `#wrapper`.
 - The hero contains the name, one scrambling headline, one short support line, and the selected-work CTA. The current copy is:
   - Headline: `I build agentic AI products for real-world security operations.`
   - Support: `Product direction · DSTA`

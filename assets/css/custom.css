@@ -7322,11 +7322,30 @@ body.page-event #nav {
   margin-top: 0 !important;
 }
 
+/* 100lvh, not svh: with the iPhone URL bar retracted the visual viewport
+   exceeds svh and a white band of #main entered the opening screen. The
+   large-viewport height keeps the first screen fully black in both bar
+   states; the canvas behind it is already 100vh (= lvh on iOS). */
 body.page-home #intro {
   width: 100%;
   min-height: 100vh;
-  min-height: 100svh;
+  min-height: 100lvh;
   margin: 0;
+}
+
+/* The homepage reads as two screens: the black hero and everything below.
+   Mandatory root snap lands every gesture with the seam fully open or fully
+   closed — never a half-hero rest. #wrapper (nav, About, links, footer) is
+   taller than the viewport, so it is a free-scrolling snap area and all
+   content stays reachable; only the hero boundary is gated. Browsers
+   without :has() simply keep plain scrolling. */
+html:has(body.page-home) {
+  scroll-snap-type: y mandatory;
+}
+
+body.page-home #intro,
+body.page-home #wrapper {
+  scroll-snap-align: start;
 }
 
 /* The identity and CTA are meaningful first-paint content; do not leave an
