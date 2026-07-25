@@ -560,6 +560,95 @@ if (Test-Path -LiteralPath $webpSource) {
     }
 }
 
+# Cache versions are derived from content, never hand-maintained. Hand-kept
+# integers drifted twice in one week: travel-map-page.css sat at v6 across 68
+# lines of new atlas CSS while its JavaScript was correctly bumped, so returning
+# visitors ran new behaviour against stale styling, and a pure-CSS timeline fix
+# shipped under an unchanged key, reaching nobody. verify.ps1 could not catch
+# either, because it asserted the same stale number the build emitted.
+function Get-ContentVersion([string]$Content) {
+    $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($Content)
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    try { $hash = $sha.ComputeHash($bytes) } finally { $sha.Dispose() }
+    return -join ($hash[0..3] | ForEach-Object { $_.ToString('x2') })
+}
+function Get-FileContentVersion([string]$Path) {
+    return Get-ContentVersion (Get-Content -LiteralPath $Path -Raw -Encoding UTF8)
+}
+
+# Computed here, ahead of page generation, because the pages must reference the
+# exact bytes that get written later. The write-out below reuses these values.
+$customCssSource = Get-Content -LiteralPath (Join-Path $root 'assets\css\custom.css') -Raw -Encoding UTF8
+$cssSegments = @(
+    [pscustomobject]@{ Bundle = 'travel-map-page.css'; Start = '/* Travel destination atlas */'; End = '/* Guangzhou journal */'; IncludeEnd = $false },
+    [pscustomobject]@{ Bundle = 'travel-journal.css'; Start = '/* Guangzhou journal */'; End = '/* Portfolio positioning and case-study system. */'; IncludeEnd = $false },
+    [pscustomobject]@{ Bundle = 'experience-page.css'; Start = '/* Route bundle: experience-base:start */'; End = '/* Route bundle: experience-base:end */'; IncludeEnd = $true },
+    [pscustomobject]@{ Bundle = 'travel-journal.css'; Start = '/* Travel journal navigation.'; End = '/* Route bundle: journal-nav:end */'; IncludeEnd = $true },
+    [pscustomobject]@{ Bundle = 'personal-page.css'; Start = '/* Route bundle: personal-base:start */'; End = '/* Route bundle: personal-base:end */'; IncludeEnd = $true },
+    [pscustomobject]@{ Bundle = 'travel-journal.css'; Start = '/* Japan editorial title and lower banner crop. */'; End = '/* Route bundle: journal-japan:end */'; IncludeEnd = $true },
+    [pscustomobject]@{ Bundle = 'personal-page.css'; Start = '/* Route bundle: personal-responsive:start */'; End = '/* Route bundle: personal-responsive:end */'; IncludeEnd = $true },
+    [pscustomobject]@{ Bundle = 'skills-page.css'; Start = '/* Quiet Skills-card treatment:'; End = '/* Route bundle: skills-polish:end */'; IncludeEnd = $true }
+)
+$resolvedCssSegments = foreach ($segment in $cssSegments) {
+    $start = $customCssSource.IndexOf($segment.Start)
+    $endMarkerStart = $customCssSource.IndexOf($segment.End, $start + $segment.Start.Length)
+    if ($start -lt 0 -or $endMarkerStart -le $start) {
+        throw "Could not locate CSS bundle boundaries for $($segment.Bundle): $($segment.Start)"
+    }
+    $end = if ($segment.IncludeEnd) { $endMarkerStart + $segment.End.Length } else { $endMarkerStart }
+    [pscustomobject]@{ Bundle = $segment.Bundle; Start = $start; End = $end }
+}
+$resolvedCssSegments = @($resolvedCssSegments | Sort-Object Start)
+$sharedCssParts = [System.Collections.Generic.List[string]]::new()
+$routeCssParts = @{}
+$cssCursor = 0
+foreach ($segment in $resolvedCssSegments) {
+    if ($segment.Start -lt $cssCursor) { throw "CSS bundle boundaries overlap near $($segment.Bundle)." }
+    if ($segment.Start -gt $cssCursor) {
+        $sharedCssParts.Add($customCssSource.Substring($cssCursor, $segment.Start - $cssCursor))
+    }
+    if (-not $routeCssParts.ContainsKey($segment.Bundle)) {
+        $routeCssParts[$segment.Bundle] = [System.Collections.Generic.List[string]]::new()
+    }
+    $routeCssParts[$segment.Bundle].Add($customCssSource.Substring($segment.Start, $segment.End - $segment.Start).Trim())
+    $cssCursor = $segment.End
+}
+if ($cssCursor -lt $customCssSource.Length) {
+    $sharedCssParts.Add($customCssSource.Substring($cssCursor))
+}
+$sharedCustomCss = (($sharedCssParts -join '') -replace '(\r?\n){3,}', "`n`n").Trim() + "`n"
+$routeCssBundles = @{}
+foreach ($bundle in $routeCssParts.Keys) {
+    $routeCssBundles[$bundle] = (($routeCssParts[$bundle] -join "`n`n").Trim() + "`n")
+}
+
+$mainJsSource = Get-Content -LiteralPath (Join-Path $root 'assets\js\main.js') -Raw -Encoding UTF8
+$canvasStartMarker = '/*Canvas*/'
+$canvasEndMarker = '// Shared progressive enhancement'
+$canvasStart = $mainJsSource.IndexOf($canvasStartMarker)
+$canvasEnd = $mainJsSource.IndexOf($canvasEndMarker)
+if ($canvasStart -lt 0 -or $canvasEnd -le $canvasStart) { throw 'Could not locate the homepage canvas JavaScript boundaries.' }
+$canvasJs = $mainJsSource.Substring($canvasStart, $canvasEnd - $canvasStart).Trim() + "`n"
+$sharedMainJs = ($mainJsSource.Substring(0, $canvasStart).TrimEnd() + "`n`n" + $mainJsSource.Substring($canvasEnd).TrimStart())
+
+$assetVersions = @{}
+foreach ($file in @('icons.css', 'main.css')) {
+    $assetVersions["assets/css/$file"] = Get-FileContentVersion (Join-Path $root "assets\css\$file")
+}
+foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'personal-timeline.js', 'scramble-reveal.js')) {
+    $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
+}
+$assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
+foreach ($bundle in $routeCssBundles.Keys) {
+    $assetVersions["assets/css/$bundle"] = Get-ContentVersion $routeCssBundles[$bundle]
+}
+$assetVersions['assets/js/main.js'] = Get-ContentVersion $sharedMainJs
+$assetVersions['assets/js/canvas-background.js'] = Get-ContentVersion $canvasJs
+function Get-AssetRef([string]$Path) {
+    if (-not $script:assetVersions.ContainsKey($Path)) { throw "No content version computed for $Path" }
+    return "$Path`?v=$($script:assetVersions[$Path])"
+}
+
 $eventPages = @('house', 'prewed')
 $modularJournalSlugs = @($journalManifest | Where-Object { $_.contentOnly } | ForEach-Object { $_.slug })
 $pages = @(
@@ -667,23 +756,23 @@ foreach ($page in $pages) {
     }
 
     $galleryPages = @("house", "prewed") + $tripOrder
-    $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=27"></script>' } else { "" }
-    $travelNavScript = if ($tripOrder -contains $slug) { '<script src="assets/js/travel-nav.js?v=19"></script>' } else { "" }
-    $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=21"></script>' } else { "" }
-    $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=22"></script>' } else { "" }
-    $scrambleRevealScript = if ($slug -in @('index', 'experience')) { '<script src="assets/js/scramble-reveal.js?v=14"></script>' } else { "" }
-    $gameScript = if ($slug -eq 'index') { '<script src="assets/js/game.js?v=17"></script>' } else { "" }
-    $listingEffectsScript = if ($slug -in @('skills', 'travel')) { '<script src="assets/js/listing-effects.js?v=2"></script>' } else { "" }
-    $journalProgressScript = if ($tripOrder -contains $slug) { '<script src="assets/js/journal-progress.js?v=1"></script>' } else { "" }
-    $canvasScript = if ($slug -eq 'index') { '<script src="assets/js/canvas-background.js?v=1"></script>' } else { "" }
+    $galleryScript = if ($galleryPages -contains $slug) { "<script src=`"$(Get-AssetRef 'assets/js/gallery.js')`"></script>" } else { "" }
+    $travelNavScript = if ($tripOrder -contains $slug) { "<script src=`"$(Get-AssetRef 'assets/js/travel-nav.js')`"></script>" } else { "" }
+    $travelMapScript = if ($slug -eq 'travel') { "<script src=`"$(Get-AssetRef 'assets/js/travel-map.js')`"></script>" } else { "" }
+    $personalTimelineScript = if ($slug -eq 'personal') { "<script src=`"$(Get-AssetRef 'assets/js/personal-timeline.js')`"></script>" } else { "" }
+    $scrambleRevealScript = if ($slug -in @('index', 'experience')) { "<script src=`"$(Get-AssetRef 'assets/js/scramble-reveal.js')`"></script>" } else { "" }
+    $gameScript = if ($slug -eq 'index') { "<script src=`"$(Get-AssetRef 'assets/js/game.js')`"></script>" } else { "" }
+    $listingEffectsScript = if ($slug -in @('skills', 'travel')) { "<script src=`"$(Get-AssetRef 'assets/js/listing-effects.js')`"></script>" } else { "" }
+    $journalProgressScript = if ($tripOrder -contains $slug) { "<script src=`"$(Get-AssetRef 'assets/js/journal-progress.js')`"></script>" } else { "" }
+    $canvasScript = if ($slug -eq 'index') { "<script src=`"$(Get-AssetRef 'assets/js/canvas-background.js')`"></script>" } else { "" }
     $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
     $routeStylesheets = @()
-    if ($slug -eq 'travel') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/travel-map-page.css?v=7" />' }
-    if ($tripOrder -contains $slug) { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/travel-journal.css?v=2" />' }
-    if ($slug -eq 'experience') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/experience-page.css?v=1" />' }
-    if ($slug -eq 'personal') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/personal-page.css?v=1" />' }
-    if ($slug -eq 'skills') { $routeStylesheets += '    <link rel="stylesheet" href="assets/css/skills-page.css?v=1" />' }
+    if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-map-page.css')`" />" }
+    if ($tripOrder -contains $slug) { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-journal.css')`" />" }
+    if ($slug -eq 'experience') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/experience-page.css')`" />" }
+    if ($slug -eq 'personal') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/personal-page.css')`" />" }
+    if ($slug -eq 'skills') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/skills-page.css')`" />" }
     $routeStylesheetMarkup = $routeStylesheets -join "`n"
     # The professional pages opt out of a share-preview image (owner decision,
     # Jul 2026): scrapers show a text-only card rather than the travel default.
@@ -708,9 +797,9 @@ foreach ($page in $pages) {
     <meta property="og:url" content="__CANONICAL__" />
 $shareImageMeta
 $preloadMarkup
-    <link rel="stylesheet" href="assets/css/icons.css?v=1" />
-    <link rel="stylesheet" href="assets/css/main.css?v=4" />
-    <link rel="stylesheet" href="assets/css/custom.css?v=197" />
+    <link rel="stylesheet" href="$(Get-AssetRef 'assets/css/icons.css')" />
+    <link rel="stylesheet" href="$(Get-AssetRef 'assets/css/main.css')" />
+    <link rel="stylesheet" href="$(Get-AssetRef 'assets/css/custom.css')" />
 $routeStylesheetMarkup
     <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
@@ -737,7 +826,7 @@ $navigation
             </section>
         </footer>
     </div>
-    <script src="assets/js/main.js?v=20"></script>
+    <script src="$(Get-AssetRef 'assets/js/main.js')"></script>
 $optionalScripts
 </body>
 </html>
@@ -764,57 +853,12 @@ New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Nul
 foreach ($file in $runtimeCss) {
     Copy-Item -LiteralPath (Join-Path $root "assets\css\$file") -Destination (Join-Path $out "assets\css\$file") -Force
 }
-$customCssSource = Get-Content -LiteralPath (Join-Path $root 'assets\css\custom.css') -Raw -Encoding UTF8
-$cssSegments = @(
-    [pscustomobject]@{ Bundle = 'travel-map-page.css'; Start = '/* Travel destination atlas */'; End = '/* Guangzhou journal */'; IncludeEnd = $false },
-    [pscustomobject]@{ Bundle = 'travel-journal.css'; Start = '/* Guangzhou journal */'; End = '/* Portfolio positioning and case-study system. */'; IncludeEnd = $false },
-    [pscustomobject]@{ Bundle = 'experience-page.css'; Start = '/* Route bundle: experience-base:start */'; End = '/* Route bundle: experience-base:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'travel-journal.css'; Start = '/* Travel journal navigation.'; End = '/* Route bundle: journal-nav:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'personal-page.css'; Start = '/* Route bundle: personal-base:start */'; End = '/* Route bundle: personal-base:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'travel-journal.css'; Start = '/* Japan editorial title and lower banner crop. */'; End = '/* Route bundle: journal-japan:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'personal-page.css'; Start = '/* Route bundle: personal-responsive:start */'; End = '/* Route bundle: personal-responsive:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'skills-page.css'; Start = '/* Quiet Skills-card treatment:'; End = '/* Route bundle: skills-polish:end */'; IncludeEnd = $true }
-)
-$resolvedCssSegments = foreach ($segment in $cssSegments) {
-    $start = $customCssSource.IndexOf($segment.Start)
-    $endMarkerStart = $customCssSource.IndexOf($segment.End, $start + $segment.Start.Length)
-    if ($start -lt 0 -or $endMarkerStart -le $start) {
-        throw "Could not locate CSS bundle boundaries for $($segment.Bundle): $($segment.Start)"
-    }
-    $end = if ($segment.IncludeEnd) { $endMarkerStart + $segment.End.Length } else { $endMarkerStart }
-    [pscustomobject]@{ Bundle = $segment.Bundle; Start = $start; End = $end }
-}
-$resolvedCssSegments = @($resolvedCssSegments | Sort-Object Start)
-$sharedCssParts = [System.Collections.Generic.List[string]]::new()
-$routeCssParts = @{}
-$cssCursor = 0
-foreach ($segment in $resolvedCssSegments) {
-    if ($segment.Start -lt $cssCursor) { throw "CSS bundle boundaries overlap near $($segment.Bundle)." }
-    if ($segment.Start -gt $cssCursor) {
-        $sharedCssParts.Add($customCssSource.Substring($cssCursor, $segment.Start - $cssCursor))
-    }
-    if (-not $routeCssParts.ContainsKey($segment.Bundle)) {
-        $routeCssParts[$segment.Bundle] = [System.Collections.Generic.List[string]]::new()
-    }
-    $routeCssParts[$segment.Bundle].Add($customCssSource.Substring($segment.Start, $segment.End - $segment.Start).Trim())
-    $cssCursor = $segment.End
-}
-if ($cssCursor -lt $customCssSource.Length) {
-    $sharedCssParts.Add($customCssSource.Substring($cssCursor))
-}
-$sharedCustomCss = (($sharedCssParts -join '') -replace '(\r?\n){3,}', "`n`n").Trim() + "`n"
+# Bundle contents were computed before page generation so the pages could
+# reference their content hashes; write those exact strings out here.
 Write-Utf8 (Join-Path $out 'assets\css\custom.css') $sharedCustomCss
-foreach ($bundle in $routeCssParts.Keys) {
-    Write-Utf8 (Join-Path $out "assets\css\$bundle") (($routeCssParts[$bundle] -join "`n`n").Trim() + "`n")
+foreach ($bundle in $routeCssBundles.Keys) {
+    Write-Utf8 (Join-Path $out "assets\css\$bundle") $routeCssBundles[$bundle]
 }
-$mainJsSource = Get-Content -LiteralPath (Join-Path $root 'assets\js\main.js') -Raw -Encoding UTF8
-$canvasStartMarker = '/*Canvas*/'
-$canvasEndMarker = '// Shared progressive enhancement'
-$canvasStart = $mainJsSource.IndexOf($canvasStartMarker)
-$canvasEnd = $mainJsSource.IndexOf($canvasEndMarker)
-if ($canvasStart -lt 0 -or $canvasEnd -le $canvasStart) { throw 'Could not locate the homepage canvas JavaScript boundaries.' }
-$canvasJs = $mainJsSource.Substring($canvasStart, $canvasEnd - $canvasStart).Trim() + "`n"
-$sharedMainJs = ($mainJsSource.Substring(0, $canvasStart).TrimEnd() + "`n`n" + $mainJsSource.Substring($canvasEnd).TrimStart())
 Write-Utf8 (Join-Path $out 'assets\js\main.js') $sharedMainJs
 Write-Utf8 (Join-Path $out 'assets\js\canvas-background.js') $canvasJs
 foreach ($file in $runtimeJs) {
