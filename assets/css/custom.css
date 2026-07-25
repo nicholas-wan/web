@@ -2392,21 +2392,31 @@ body {
   margin: 0.4rem 0 0.1rem;
 }
 
+/* Bare chevrons read as ambiguous zoom or close affordances, so each step
+   button carries a visible Prev/Next word beside its arrow. */
 .travel-map__detail-step {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
+  gap: 0.3rem;
   height: 2rem;
-  padding: 0;
+  padding: 0 0.7rem;
   border: 1px solid rgba(152, 201, 198, 0.3);
   border-radius: 0.5rem;
   background: rgba(16, 41, 44, 0.72);
   color: #d7eceb;
-  font-size: 1.15rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   line-height: 1;
+  text-transform: uppercase;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.travel-map__detail-step span {
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 .travel-map__detail-step:hover:not(:disabled),
@@ -2424,9 +2434,13 @@ body {
 /* Comfortable touch targets on the phone overlay where the card is used by tap. */
 @media (max-width: 600px) {
   .travel-map__detail-step {
-    width: 3rem;
     height: 3rem;
-    font-size: 1.35rem;
+    padding: 0 1rem;
+    font-size: 0.7rem;
+  }
+
+  .travel-map__detail-step span {
+    font-size: 1.25rem;
   }
 }
 
@@ -4848,8 +4862,7 @@ body.is-map-fullscreen #return-to-top {
     padding: 2.25rem 1rem !important;
   }
 
-  .case-study-grid,
-  .earlier-work__grid {
+  .case-study-grid {
     grid-template-columns: 1fr;
   }
 
@@ -4889,36 +4902,27 @@ body.is-map-fullscreen #return-to-top {
     font-size: 1.35rem;
   }
 
-  #main > .earlier-work {
-    margin: 0 1.15rem 2.5rem;
-  }
-
-  .earlier-work summary {
-    padding: 1rem 1.15rem;
-  }
-
-  .earlier-work__grid {
-    padding: 0 1rem 1rem;
-  }
-
   .section-intro__title {
     font-size: 1.25rem;
   }
 }
 
+/* Earlier-work selectors carry .page-experience so they out-rank the
+   route bundle (experience-page.css), which loads after this shared file;
+   bare equal-specificity overrides of bundle rules silently lose. */
 @media (prefers-reduced-motion: reduce) {
-  .earlier-work__grid article,
-  .earlier-project-card__image img,
-  .earlier-work summary .icon,
+  .page-experience .earlier-work__grid article,
+  .page-experience .earlier-project-card__image img,
+  .page-experience .earlier-work summary .icon,
   .homepage-link__icon--personal {
     transition: none;
     transform: none;
   }
 
-  .earlier-work__grid article:hover,
-  .earlier-work__grid article:focus-within,
-  .earlier-project-card:hover .earlier-project-card__image img,
-  .earlier-project-card:focus-within .earlier-project-card__image img {
+  .page-experience .earlier-work__grid article:hover,
+  .page-experience .earlier-work__grid article:focus-within,
+  .page-experience .earlier-project-card:hover .earlier-project-card__image img,
+  .page-experience .earlier-project-card:focus-within .earlier-project-card__image img {
     transform: none;
   }
 }
@@ -6474,6 +6478,55 @@ body.lightbox-open {
     min-height: 0;
   }
 
+  /* Earlier-projects box: .page-experience out-ranks the route bundle's
+     desktop rules, which load after this shared file and otherwise win the
+     tie. The 1.15rem side margin sits on the same gutter as the compact
+     .portfolio-overview padding above. */
+  .page-experience #main > .earlier-work {
+    /* main.css's phone-width `#main > *` pads every direct child 2rem;
+       inside this bordered box that double-pads the summary and shrinks
+       the grid, so reset it and let summary/grid carry their own padding. */
+    padding: 0;
+    margin: 0 1.15rem 2.5rem;
+  }
+
+  .page-experience .earlier-work summary {
+    padding: 1rem 1.15rem;
+  }
+
+  .page-experience .earlier-work__grid {
+    grid-template-columns: 1fr;
+    padding: 0 1rem 1rem;
+  }
+
+  /* Phones read these as compact horizontal rows — thumbnail left, copy
+     beside it — instead of three tall stacked image-first cards. */
+  .page-experience .earlier-work__grid article {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .page-experience .earlier-work__grid .earlier-project-card__image {
+    position: relative;
+    flex: 0 0 7rem;
+    width: 7rem;
+    min-height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .page-experience .earlier-project-card__image img {
+    position: absolute;
+    inset: 0;
+  }
+
+  .page-experience .earlier-project-card__body {
+    padding: 0.9rem 0.95rem;
+  }
+
+  .page-experience .earlier-work__grid p {
+    margin-bottom: 0.55rem;
+  }
+
   .page-skills #main > .post {
     padding: 1.5rem 1.15rem 2rem;
   }
@@ -7143,9 +7196,17 @@ body.lightbox-open {
   box-shadow: var(--shadow-card-hover) !important;
 }
 
+/* Out-of-focus cards recede firmly — the mild 0.74 fade read as a rendering
+   accident rather than a reading cue. Opacity only: it stays compositor-safe
+   and the card revives under deliberate pointer or keyboard attention. */
 .personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card {
   --card-scale: 0.995;
-  opacity: 0.74;
+  opacity: 0.55;
+}
+
+.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card:hover,
+.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card:focus-visible {
+  opacity: 1;
 }
 
 @media screen and (min-width: 521px) {
