@@ -63,6 +63,7 @@
   ready(function () {
     restoreDate();
     initIntroSwipe();
+    initHeroSnap();
     initCardScrub();
     initReveal();
     initCounters();
@@ -163,6 +164,78 @@
       measure();
     }
     update();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 1b. Phone hero gate: a scroll settling partway across the black     */
+  /*     hero seam glides the rest of the way. JS, not CSS snap, so the  */
+  /*     move stays slow and cannot fight the About swipe. Desktop and   */
+  /*     reduced motion scroll plainly; a new touch cancels the glide.   */
+  /* ------------------------------------------------------------------ */
+  function initHeroSnap() {
+    if (!document.body.classList.contains('page-home') || reduce) { return; }
+    var intro = document.getElementById('intro');
+    if (!intro) { return; }
+    var mobile = window.matchMedia('(max-width: 736px)');
+    var glideFrame = null;
+    var settleTimer = 0;
+    var touching = false;
+    var lastY = window.scrollY;
+    var direction = 0;
+
+    function cancelGlide() {
+      if (glideFrame !== null) { cancelAnimationFrame(glideFrame); glideFrame = null; }
+    }
+
+    function glide(target) {
+      cancelGlide();
+      var from = window.scrollY;
+      var delta = target - from;
+      if (!delta) { return; }
+      var DURATION = 900;
+      var start = null;
+      function step(now) {
+        if (start === null) { start = now; }
+        var t = Math.min(1, (now - start) / DURATION);
+        var eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+        window.scrollTo(0, from + delta * eased);
+        if (t < 1) { glideFrame = requestAnimationFrame(step); }
+        else { glideFrame = null; lastY = window.scrollY; }
+      }
+      glideFrame = requestAnimationFrame(step);
+    }
+
+    function armSettle() {
+      if (settleTimer) { clearTimeout(settleTimer); }
+      settleTimer = setTimeout(settle, 90);
+    }
+
+    function settle() {
+      settleTimer = 0;
+      if (touching || glideFrame !== null || !mobile.matches) { return; }
+      var edge = intro.getBoundingClientRect().height;
+      var y = window.scrollY;
+      if (y <= 1 || y >= edge - 1) { return; }
+      glide(direction > 0 ? edge : 0);
+    }
+
+    window.addEventListener('scroll', function () {
+      if (glideFrame !== null) { return; }
+      var y = window.scrollY;
+      if (y !== lastY) { direction = y > lastY ? 1 : -1; lastY = y; }
+      armSettle();
+    }, { passive: true });
+
+    window.addEventListener('touchstart', function () {
+      touching = true;
+      cancelGlide();
+    }, { passive: true });
+    var release = function (event) {
+      touching = event.touches && event.touches.length > 0;
+      if (!touching) { armSettle(); }
+    };
+    window.addEventListener('touchend', release, { passive: true });
+    window.addEventListener('touchcancel', release, { passive: true });
   }
 
   /* ------------------------------------------------------------------ */

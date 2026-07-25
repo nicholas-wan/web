@@ -1019,11 +1019,16 @@
 
   if (teaser) teaser.addEventListener('click', openFullscreen);
   if (closeBtn) closeBtn.addEventListener('click', closeFullscreen);
-  if (detailCardClose) {
-    detailCardClose.addEventListener('click', function () {
-      closePointDetails(true);
-    });
-  }
+  /* Dismissing the card is also how a visitor leaves the trip: while a trip
+     is selected every unrelated pin sits at 8% opacity with pointer-events
+     off, so keeping activeTrip after the X made the rest of the map look —
+     and act — locked. Clear the trip so all destinations are selectable
+     again; the view stays where they left it. */
+  var dismissDetailCard = function () {
+    closePointDetails(true);
+    setActiveTrip('', false);
+  };
+  if (detailCardClose) detailCardClose.addEventListener('click', dismissDetailCard);
   if (detailCardPrev) detailCardPrev.addEventListener('click', function () { stepDetail(-1); });
   if (detailCardNext) detailCardNext.addEventListener('click', function () { stepDetail(1); });
   if (tripPicker) {
@@ -1038,16 +1043,20 @@
     });
   }
   /* Region pins enter their trip on activation; links inside the hover
-     popover keep navigating to their journal sections. */
+     popover keep navigating to their journal sections. pointerup, not
+     click: revealing the popover on :hover makes iOS treat the first tap
+     as hover-only and swallow the click, which left the pin looking
+     inert on phones. The dragMoved guard keeps a pan release from
+     activating the pin underneath. */
   regionMarkers.forEach(function (marker) {
     var enterMarkerTrip = function (event) {
-      if (event.target.closest('a')) return;
+      if (dragMoved || event.target.closest('a')) return;
       var tripKey = marker.getAttribute('data-map-trip');
       if (!TRIPS[tripKey]) return;
       event.preventDefault();
       selectTripAndEnter(tripKey);
     };
-    marker.addEventListener('click', enterMarkerTrip);
+    marker.addEventListener('pointerup', enterMarkerTrip);
     marker.addEventListener('keydown', function (event) {
       if (event.key === 'Enter' || event.key === ' ') enterMarkerTrip(event);
     });
@@ -1070,7 +1079,7 @@
     var isEscape = event.key === 'Escape' || event.key === 'Esc';
     if (isEscape && selectedDetail) {
       event.preventDefault();
-      closePointDetails(true);
+      dismissDetailCard();
       return;
     }
     if (!isFullscreen) return;

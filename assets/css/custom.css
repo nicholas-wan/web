@@ -2401,12 +2401,12 @@ body {
   gap: 0.3rem;
   height: 2rem;
   padding: 0 0.7rem;
-  /* Enabled steps read as actionable teal chips; only the disabled end of the
-     route fades. The old grey-on-dark treatment looked disabled while live. */
-  border: 1px solid rgba(40, 215, 197, 0.5);
+  /* Enabled steps are solid accent-teal chips with dark text — translucent
+     teal and grey both read as disabled against the dark card. */
+  border: 1px solid #28d7c5;
   border-radius: 0.5rem;
-  background: rgba(40, 215, 197, 0.14);
-  color: #eafffb;
+  background: #28d7c5;
+  color: #06282c;
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -2423,13 +2423,15 @@ body {
 
 .travel-map__detail-step:hover:not(:disabled),
 .travel-map__detail-step:focus-visible {
-  background: rgba(40, 215, 197, 0.18);
-  border-color: rgba(40, 215, 197, 0.55);
-  color: #fff;
+  background: #4ae6d6;
+  border-color: #4ae6d6;
+  color: #04211f;
 }
 
 .travel-map__detail-step:disabled {
-  opacity: 0.3;
+  background: rgba(16, 41, 44, 0.5);
+  border-color: rgba(152, 201, 198, 0.22);
+  color: rgba(215, 236, 235, 0.38);
   cursor: default;
 }
 
@@ -7333,20 +7335,10 @@ body.page-home #intro {
   margin: 0;
 }
 
-/* The homepage reads as two screens: the black hero and everything below.
-   Mandatory root snap lands every gesture with the seam fully open or fully
-   closed — never a half-hero rest. #wrapper (nav, About, links, footer) is
-   taller than the viewport, so it is a free-scrolling snap area and all
-   content stays reachable; only the hero boundary is gated. Browsers
-   without :has() simply keep plain scrolling. */
-html:has(body.page-home) {
-  scroll-snap-type: y mandatory;
-}
-
-body.page-home #intro,
-body.page-home #wrapper {
-  scroll-snap-align: start;
-}
+/* The phone hero seam is gated by the slow glide in game.js (initHeroSnap),
+   not CSS scroll-snap: native mandatory snapping cannot be slowed down and
+   interferes with the scroll-driven About swipe below. Desktop scrolls
+   plainly. */
 
 /* The identity and CTA are meaningful first-paint content; do not leave an
    entirely black screen while the load handler removes the preload class. */
