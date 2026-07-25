@@ -221,7 +221,8 @@ $listingEffectsJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\listing
 $journalProgressJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\journal-progress.js') -Raw -Encoding UTF8
 $scrambleRevealJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\scramble-reveal.js') -Raw -Encoding UTF8
 Assert-FileSizeBudget 'assets\css\custom.css' 90
-Assert-FileSizeBudget 'assets\css\travel-map-page.css' 40
+# 40 -> 42: phone-overlay legibility pass (Jul 2026) added overlay-scoped type sizes.
+Assert-FileSizeBudget 'assets\css\travel-map-page.css' 42
 Assert-FileSizeBudget 'assets\css\travel-journal.css' 30
 Assert-FileSizeBudget 'assets\css\experience-page.css' 12
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32

@@ -799,6 +799,25 @@
     if (targetLink) showPointDetails(stops[nextIndex], targetLink);
   };
 
+  /* Tapping a trip's region pin enters the trip like the picker does: fly to
+     fit its stops, then reveal the first stop's detail card once the flight
+     lands at stop level (showing it earlier would be closed by the detail-
+     level change mid-flight). The activeTrip guard drops the deferred card if
+     the visitor has reset, closed the overlay, or chosen another trip. */
+  var tripEntryTimer = 0;
+  var selectTripAndEnter = function (tripKey) {
+    var stops = stopsForTrip(tripKey);
+    closePointDetails(false, true);
+    setActiveTrip(tripKey, true);
+    if (!stops.length) return;
+    window.clearTimeout(tripEntryTimer);
+    tripEntryTimer = window.setTimeout(function () {
+      if (activeTrip !== tripKey) return;
+      var firstStopLink = linkForPoint(stops[0]);
+      if (firstStopLink) showPointDetails(stops[0], firstStopLink);
+    }, reducedMotionQuery.matches ? 0 : 560);
+  };
+
   var showPointDetails = function (point, link) {
     if (!detailCard || !TRIPS[point[5]]) return;
     if (detailCardHideTimer) window.clearTimeout(detailCardHideTimer);
@@ -1018,6 +1037,21 @@
       setActiveTrip(tripPicker.value, true);
     });
   }
+  /* Region pins enter their trip on activation; links inside the hover
+     popover keep navigating to their journal sections. */
+  regionMarkers.forEach(function (marker) {
+    var enterMarkerTrip = function (event) {
+      if (event.target.closest('a')) return;
+      var tripKey = marker.getAttribute('data-map-trip');
+      if (!TRIPS[tripKey]) return;
+      event.preventDefault();
+      selectTripAndEnter(tripKey);
+    };
+    marker.addEventListener('click', enterMarkerTrip);
+    marker.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') enterMarkerTrip(event);
+    });
+  });
   if (regionsBar) {
     regionsBar.addEventListener('click', function (event) {
       var button = event.target.closest('[data-map-region]');
