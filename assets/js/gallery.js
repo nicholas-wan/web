@@ -198,9 +198,22 @@
     renderCaptionState();
     renderMediaTransform();
   };
+  /* Hiding an element that holds focus drops keyboard focus to <body> just as
+     disabling one does, and it is the more common transition: arrowing from a
+     zoomed photo to a video hides the whole tools group, and rotating a phone
+     hides the landscape toggle. Hand focus to the close button, which is the
+     one control present for every kind of media. */
+  var handOffFocusBeforeHiding = function (element) {
+    if (!element || element.hidden) return;
+    if (element === document.activeElement || element.contains(document.activeElement)) {
+      closeButton.focus();
+    }
+  };
   var syncMediaTools = function () {
     var canRotate = canUseLandscapeView();
     if (rotation && !canRotate) resetMediaTransform();
+    if (currentIsVideo) handOffFocusBeforeHiding(tools);
+    if (!canRotate) handOffFocusBeforeHiding(rotateButton);
     tools.hidden = currentIsVideo;
     rotateButton.hidden = !canRotate;
     renderCaptionState();
@@ -274,6 +287,12 @@
   var close = function () {
     viewerVideo.pause();
     resetMediaTransform();
+    /* Leave no gesture state behind for the next open: escaping mid-drag used to
+       keep is-interacting (and its transition: none) applied, and an unexpired
+       suppression window made the reopened viewer ignore its first click. */
+    cancelGesture();
+    ignoreClickUntil = 0;
+    pointerDownTarget = null;
     overlay.classList.remove('is-visible');
     overlay.setAttribute('aria-hidden', 'true');
     unlockBackgroundScroll();
@@ -352,6 +371,8 @@
   var swipeStartY = 0;
   var gestureMode = null;
   var pointerMode = null;
+  var pointerCaptured = false;
+  var pointerDownTarget = null;
   var startPanX = 0;
   var startPanY = 0;
   var pinchStartDistance = 0;
@@ -373,6 +394,7 @@
     swipeTouchId = null;
     gestureMode = null;
     pointerMode = null;
+    pointerCaptured = false;
     viewport.classList.remove('is-interacting');
   };
   var startsOnControl = function (target) {
@@ -438,7 +460,12 @@
     panX = startPanX + touch.clientX - swipeStartX;
     panY = startPanY + touch.clientY - swipeStartY;
     renderMediaTransform();
-    ignoreClickUntil = Date.now() + 500;
+    /* Match completeSwipe's slop. Rewriting this on every move with no distance
+       floor meant a finger resting mid-pan kept the suppression window alive,
+       which swallowed the next deliberate tap — including double-tap-to-unzoom. */
+    if (Math.max(Math.abs(touch.clientX - swipeStartX), Math.abs(touch.clientY - swipeStartY)) >= SWIPE_CLICK_SLOP) {
+      ignoreClickUntil = Date.now() + 500;
+    }
   }, { passive: false });
   overlay.addEventListener('touchend', function (event) {
     if (gestureMode === 'pinch') {
@@ -468,6 +495,10 @@
   overlay.addEventListener('touchcancel', cancelGesture, { passive: true });
 
   overlay.addEventListener('pointerdown', function (event) {
+    /* Recorded for every pointer type, including the touch path that returns
+       just below: the backdrop-close test needs to know where the interaction
+       began, not only where its click landed. */
+    pointerDownTarget = event.target;
     if (!overlay.classList.contains('is-visible') || startsOnControl(event.target)) return;
     if (event.pointerType === 'touch') return;
     var canPan = !currentIsVideo && zoomLevel > 1 && viewport.contains(event.target);
@@ -483,15 +514,37 @@
     startPanX = panX;
     startPanY = panY;
     if (canPan) viewport.classList.add('is-interacting');
-    if (overlay.setPointerCapture) overlay.setPointerCapture(event.pointerId);
+    /* Capture is deliberately NOT taken here. While it is active the
+       compatibility mouse events retarget to the overlay, so a press that never
+       moved still produced a click at the overlay: on a zoomed image that
+       matched the backdrop-close test and shut the viewer, and it starved the
+       image's own double-click zoom-out handler, which only ever sees clicks
+       targeted at the image. Pen was worse — it captured on every press, so any
+       pen tap on a photo or video closed the viewer. Defer capture to the first
+       movement past the click slop, below. */
   });
   overlay.addEventListener('pointermove', function (event) {
-    if (event.pointerId !== swipePointerId || pointerMode !== 'pan') return;
+    if (event.pointerId !== swipePointerId) return;
+    var travelled = Math.max(Math.abs(event.clientX - swipeStartX), Math.abs(event.clientY - swipeStartY));
+    if (!pointerCaptured && travelled >= SWIPE_CLICK_SLOP) {
+      pointerCaptured = true;
+      /* Capture is an enhancement — it keeps a drag alive outside the window —
+         so it must never be able to take the gesture down with it. It throws
+         NotFoundError when the pointer is no longer active, and now that the
+         call sits mid-gesture rather than at pointerdown, an unguarded throw
+         would abandon the pan and the click suppression for the rest of it. */
+      try {
+        if (overlay.setPointerCapture) overlay.setPointerCapture(event.pointerId);
+      } catch (error) { /* capture unavailable; the gesture still works */ }
+    }
+    if (pointerMode !== 'pan') return;
     event.preventDefault();
     panX = startPanX + event.clientX - swipeStartX;
     panY = startPanY + event.clientY - swipeStartY;
     renderMediaTransform();
-    ignoreClickUntil = Date.now() + 500;
+    /* Only a real drag should suppress the click it produces. Arming this on
+       sub-slop jitter made a steady hand's second tap vanish. */
+    if (travelled >= SWIPE_CLICK_SLOP) ignoreClickUntil = Date.now() + 500;
   });
   overlay.addEventListener('pointerup', function (event) {
     if (event.pointerId !== swipePointerId) return;
@@ -505,12 +558,14 @@
   overlay.addEventListener('pointercancel', cancelGesture);
   overlay.addEventListener('click', function (event) {
     if (Date.now() >= ignoreClickUntil) return;
+    /* Scoped to non-controls. This runs in the capture phase, so
+       stopImmediatePropagation here ends the propagation path outright rather
+       than merely blocking the same-node backdrop listener it was aimed at:
+       unscoped, it left the close, previous, next and zoom buttons dead for half
+       a second after any pan, pinch or swipe — exactly when a visitor who has
+       just finished a gesture reaches for them. */
+    if (startsOnControl(event.target)) return;
     event.preventDefault();
-    /* The backdrop-close listener below lives on this same element, so it runs
-       even when the derived click is at-target on the overlay (a mouse/pen pan
-       ends there because setPointerCapture retargets the pointerup). Only
-       stopImmediatePropagation blocks a same-node listener; stopPropagation
-       would let the pan-release close the viewer. */
     event.stopImmediatePropagation();
   }, true);
 
@@ -583,6 +638,11 @@
      on the image, video, caption, or buttons (each is a deeper target). */
   overlay.addEventListener('click', function (event) {
     if (Date.now() < ignoreClickUntil) return;
+    /* Close only when the interaction both began and ended on empty space. The
+       click target alone cannot decide this: a drag that starts on the media can
+       release anywhere, and while a pointer is captured the click retargets to
+       the overlay regardless of where it really landed. */
+    if (pointerDownTarget && pointerDownTarget !== overlay && pointerDownTarget !== viewport) return;
     if (event.target === overlay || event.target === viewport) close();
   });
   document.addEventListener('keydown', function (event) {

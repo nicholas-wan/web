@@ -667,7 +667,7 @@ foreach ($page in $pages) {
     }
 
     $galleryPages = @("house", "prewed") + $tripOrder
-    $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=26"></script>' } else { "" }
+    $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=27"></script>' } else { "" }
     $travelNavScript = if ($tripOrder -contains $slug) { '<script src="assets/js/travel-nav.js?v=19"></script>' } else { "" }
     $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=20"></script>' } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=22"></script>' } else { "" }
