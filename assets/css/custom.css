@@ -2365,11 +2365,11 @@ body {
   margin-top: 0.3rem;
   border-bottom: 0 !important;
   color: #ffb869 !important;
-  font-size: 0.6rem;
-  font-weight: 900;
-  letter-spacing: 0.035em;
+  /* Quiet, sentence-case call to action: the all-caps 900-weight treatment read
+     as shouty next to the calm card. Keep the amber colour for emphasis. */
+  font-size: 0.72rem;
+  font-weight: 700;
   line-height: 1.2;
-  text-transform: uppercase;
 }
 
 .travel-map__detail-card-link:hover,
