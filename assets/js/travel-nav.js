@@ -80,6 +80,16 @@
       cancel();
     };
     var cleanup = function () {
+      /* Tearing down must also disarm. correct() is reachable from two async
+         entry points that were queued before teardown — the double rAF below and
+         document.fonts.ready — and its only guard is this flag. A landing torn
+         down by a later startAnchorLanding() (fonts still pending at load, or
+         pageshow landing within two frames of load) used to resurrect itself
+         here: it re-armed its own 160ms timer with every cancel listener already
+         removed, so nothing the visitor did could stop it, and it scrolled them
+         back to the anchor minutes into reading. That is the self-scrolling
+         report the landing correction exists to prevent. */
+      cancelled = true;
       if (timer) window.clearTimeout(timer);
       if (observer) observer.disconnect();
       manualEvents.forEach(function (name) { window.removeEventListener(name, cancel, true); });
@@ -117,10 +127,21 @@
       lastScrollY = scrollY;
       lastTargetTop = targetTop;
       if (settled) {
-        var delta = targetTop - scrollY - offset;
+        /* A heading near the end of the document cannot reach the top of the
+           viewport — scrollTo clamps at the end of the scroll range. Measured
+           unclamped overshoot on the last section: Guangzhou +292px, Germany
+           +164px, Silicon Valley +92px. delta never fell to 0, so stableTicks
+           never reached 2 and the loop held the viewport for the full deadline;
+           worse, the clamped scroll landed away from expectedScrollY, so the
+           correction read its own movement back as visitor input and cancelled
+           itself. Recompute the ceiling every tick — the document is still
+           growing in exactly this window. */
+        var maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        var wanted = Math.max(0, Math.min(targetTop - offset, maxScroll));
+        var delta = wanted - scrollY;
         if (Math.abs(delta) > 1) {
           stableTicks = 0;
-          expectedScrollY = Math.max(0, scrollY + delta);
+          expectedScrollY = wanted;
           scrollArmed = true;
           window.scrollTo(0, expectedScrollY);
           lastScrollY = window.pageYOffset;
@@ -167,15 +188,13 @@
 
   var activeSectionId = '';
   var centreActiveLink = function (activeLink) {
+    /* No strip means no horizontal overflow to centre within, so there is
+       nothing to do. The previous scrollIntoView fallback here was the exact
+       call the scrolling contract forbids: on a child of the sticky strip
+       iPhone Safari transfers it to the root page. It survived only because
+       every generated journal happens to render the strip. */
     var strip = nav.querySelector('.travel-jump-groups');
-    if (!strip) {
-      activeLink.scrollIntoView({
-        block: 'nearest',
-        inline: 'center',
-        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
-      });
-      return;
-    }
+    if (!strip) return;
 
     /* iPhone Safari may move the root page when scrollIntoView is called on a
        child of a sticky horizontal strip. Scroll only the strip so changing

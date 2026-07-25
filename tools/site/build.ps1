@@ -668,9 +668,9 @@ foreach ($page in $pages) {
 
     $galleryPages = @("house", "prewed") + $tripOrder
     $galleryScript = if ($galleryPages -contains $slug) { '<script src="assets/js/gallery.js?v=26"></script>' } else { "" }
-    $travelNavScript = if ($tripOrder -contains $slug) { '<script src="assets/js/travel-nav.js?v=18"></script>' } else { "" }
+    $travelNavScript = if ($tripOrder -contains $slug) { '<script src="assets/js/travel-nav.js?v=19"></script>' } else { "" }
     $travelMapScript = if ($slug -eq 'travel') { '<script src="assets/js/travel-map.js?v=20"></script>' } else { "" }
-    $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=21"></script>' } else { "" }
+    $personalTimelineScript = if ($slug -eq 'personal') { '<script src="assets/js/personal-timeline.js?v=22"></script>' } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { '<script src="assets/js/scramble-reveal.js?v=14"></script>' } else { "" }
     $gameScript = if ($slug -eq 'index') { '<script src="assets/js/game.js?v=17"></script>' } else { "" }
     $listingEffectsScript = if ($slug -in @('skills', 'travel')) { '<script src="assets/js/listing-effects.js?v=2"></script>' } else { "" }

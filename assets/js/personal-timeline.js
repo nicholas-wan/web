@@ -22,6 +22,7 @@
   var lastScrollY = window.scrollY;
   var lastScrollTime = Date.now();
   var scrollVelocity = 0;
+  var velocityDecayTimer = null;
   var touchTime = null;
   var MAX_FOCUS_ANIMATION_VELOCITY = 0.85;
   var MAX_FOLD_ANIMATION_VELOCITY = 0.85;
@@ -107,10 +108,23 @@
     var folded = events.filter(function (event) {
       return event.classList.contains('is-condensed');
     });
+    /* --detail-height is a max-height cap, and is-focus grows --image-col, which
+       narrows the text column: a description wraps to more lines focused than it
+       does at rest. Measuring at rest capped six of nine cards below their
+       focused height, so overflow: hidden ate the last line of whichever card the
+       visitor was being asked to read. Measure every card in the focused
+       geometry instead — that is the narrowest column any card ever gets, so the
+       cap becomes a worst case and a card needing less simply never reaches it. */
+    var focused = events.filter(function (event) {
+      return event.classList.contains('is-focus');
+    });
 
     timeline.classList.add('is-measuring');
     folded.forEach(function (event) {
       event.classList.remove('is-condensed');
+    });
+    events.forEach(function (event) {
+      event.classList.add('is-focus');
     });
     details.forEach(function (detail) {
       detail.style.removeProperty('--detail-height');
@@ -124,9 +138,19 @@
       detail.style.setProperty('--detail-height', detailHeights[index] + 'px');
     });
 
+    events.forEach(function (event) {
+      if (focused.indexOf(event) === -1) event.classList.remove('is-focus');
+    });
     folded.forEach(function (event) {
       event.classList.add('is-condensed');
     });
+    /* Commit the restored folded geometry while transitions are still
+       suppressed. Without this read the before-change style is the fully open
+       one measured above, and CSS Transitions takes transition-* from the
+       after-change style — so is-measuring's transition: none could not stop it
+       and every foldable property animated back down from open on each load and
+       on every frame of a resize drag. */
+    timeline.offsetHeight;
     timeline.classList.remove('is-measuring');
   }
 
@@ -292,6 +316,17 @@
     scrollVelocity = Math.max(measuredVelocity, scrollVelocity * 0.72);
     lastScrollY = nextScrollY;
     lastScrollTime = now;
+    /* Velocity decays per scroll event, so a movement that ends abruptly with no
+       further events — a keyboard End/Home jump, a scrollbar release — left the
+       last high reading latched and is-resnapping with it, holding
+       transition: none !important over the whole timeline until the visitor
+       scrolled again. Settle it once the page actually stops moving. */
+    if (velocityDecayTimer !== null) window.clearTimeout(velocityDecayTimer);
+    velocityDecayTimer = window.setTimeout(function () {
+      velocityDecayTimer = null;
+      scrollVelocity = 0;
+      requestProgressUpdate();
+    }, 180);
     requestProgressUpdate();
   }
 
