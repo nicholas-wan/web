@@ -559,7 +559,7 @@ foreach ($distPage in Get-ChildItem -LiteralPath $dist -Filter '*.html') {
     if ((Get-Content -LiteralPath $distPage.FullName -Raw -Encoding UTF8) -match 'target="_blank"(?![^>]*rel=)') { throw "$($distPage.Name) opens a tab without rel=noopener noreferrer." }
 }
 if ($experience -notmatch '<body class="is-preload page-experience">') { throw "Work layout scope is missing." }
-if ($experience -notmatch 'id="selected-work" class="section-intro section-intro--experience"' -or $experience -notmatch 'Product &amp; AI portfolio' -or $experience -notmatch 'Product leadership and outcomes across AI, cybersecurity, and data\.' -or $experience -notmatch 'class="internship-group') { throw "Work banner or portfolio layout is missing." }
+if ($experience -notmatch 'id="selected-work" class="portfolio-headline"' -or $experience -notmatch 'Agentic AI Product Lead for Threat Hunting' -or $experience -match 'section-intro' -or $experience -notmatch 'class="internship-group') { throw "Work headline line or portfolio layout is missing." }
 if ([regex]::Matches($experience, 'class="case-study case-study--work"').Count -ne 2) { throw "The two DSTA cards must use the same work-card format." }
 if ($experience -match 'case-study--compact' -or $experience -match 'case-study--lead' -or $experience -match 'case-study--wide') { throw "Retired work-card variants are still present." }
 if ([regex]::Matches($experience, 'class="case-study case-study--internship"').Count -ne 3) { throw "Internships must be presented as three compact cards in one row." }

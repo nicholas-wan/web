@@ -481,7 +481,7 @@ function Add-PageNavigation([string]$Markup, [string]$Slug) {
 
 function Add-SectionIntro([string]$Markup, [string]$Slug) {
     $intro = switch ($Slug) {
-        'experience' { '<div id="selected-work" class="section-intro section-intro--experience"><span class="section-intro__eyebrow">Selected work</span><h1 class="section-intro__title" id="portfolio-title">Product &amp; AI portfolio</h1><p>Product leadership and outcomes across AI, cybersecurity, and data.</p></div>' }
+        'experience' { '<div id="selected-work" class="portfolio-headline"><h1 id="portfolio-title">Agentic AI Product Lead for Threat Hunting</h1></div>' }
         default { $null }
     }
     if (-not $intro) { return $Markup }

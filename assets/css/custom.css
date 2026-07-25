@@ -4020,17 +4020,21 @@ body.is-map-fullscreen #return-to-top {
   line-height: 1.45;
 }
 
-.section-intro__title {
-  position: relative;
-  z-index: 1;
-  margin: 0 0 0.25rem;
+/* Route bundle: experience-base:start */
+/* Single-line page headline replacing the boxed Selected-work banner.
+   #main > out-ranks main.css's ID-weighted `#main > *` spacing. */
+#main > .portfolio-headline {
+  margin: 0;
+  padding: 1.75rem 2rem 0;
+}
+
+.portfolio-headline h1 {
+  margin: 0;
   color: var(--color-ink-900);
   font-size: 1.45rem;
   line-height: 1.2;
   text-align: left;
 }
-
-/* Route bundle: experience-base:start */
 .portfolio-overview {
   padding: 2rem !important;
 }
@@ -4902,9 +4906,6 @@ body.is-map-fullscreen #return-to-top {
     font-size: 1.35rem;
   }
 
-  .section-intro__title {
-    font-size: 1.25rem;
-  }
 }
 
 /* Earlier-work selectors carry .page-experience so they out-rank the
@@ -5457,62 +5458,6 @@ a.travel-jump-group__label {
 }
 
 /* Compact page introductions keep the main sections visually consistent. */
-.section-intro {
-  position: relative;
-  margin: 0;
-  padding: 1.35rem 5.5rem 1.35rem 2rem;
-  border-left: 0.35rem solid var(--color-brand-600);
-  border-bottom: 1px solid var(--color-brand-border);
-  background: linear-gradient(110deg, var(--color-brand-wash), var(--color-brand-faint) 58%, rgba(255, 255, 255, 0));
-  overflow: hidden;
-}
-
-.section-intro::after {
-  position: absolute;
-  top: 50%;
-  right: 2rem;
-  width: 3rem;
-  height: 3rem;
-  background-color: currentColor;
-  color: var(--color-brand-icon);
-  content: "";
-  -webkit-mask: var(--section-intro-icon) center / contain no-repeat;
-  mask: var(--section-intro-icon) center / contain no-repeat;
-  transform: translateY(-50%);
-}
-
-.section-intro--experience::after { --section-intro-icon: url("../icons/fontawesome/solid/briefcase.svg"); }
-.section-intro--gallery::after { --section-intro-icon: url("../icons/fontawesome/solid/house.svg"); }
-
-.section-intro__eyebrow {
-  display: block;
-  margin-bottom: 0.35rem;
-  color: var(--color-brand-700);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.section-intro p {
-  position: relative;
-  z-index: 1;
-  max-width: 46rem;
-  margin: 0;
-  color: var(--color-ink-600);
-  text-align: left;
-}
-
-@media screen and (max-width: 600px) {
-  .section-intro {
-    padding: 1.1rem 4rem 1.1rem 1.25rem;
-  }
-
-  .section-intro::after {
-    right: 1rem;
-    font-size: 2.3rem;
-  }
-}
 
 a:focus-visible {
   outline: 3px solid rgba(18, 138, 134, 0.55);
@@ -6499,32 +6444,15 @@ body.lightbox-open {
     padding: 0 1rem 1rem;
   }
 
-  /* Phones read these as compact horizontal rows — thumbnail left, copy
-     beside it — instead of three tall stacked image-first cards. */
-  .page-experience .earlier-work__grid article {
-    flex-direction: row;
-    align-items: stretch;
+  /* Thumbnails stay on top at full width: the BrainHack and showcase
+     artwork carries lettering that a narrow side crop makes illegible. */
+
+  .page-experience #main > .portfolio-headline {
+    padding: 1.25rem 1.15rem 0;
   }
 
-  .page-experience .earlier-work__grid .earlier-project-card__image {
-    position: relative;
-    flex: 0 0 7rem;
-    width: 7rem;
-    min-height: 100%;
-    aspect-ratio: auto;
-  }
-
-  .page-experience .earlier-project-card__image img {
-    position: absolute;
-    inset: 0;
-  }
-
-  .page-experience .earlier-project-card__body {
-    padding: 0.9rem 0.95rem;
-  }
-
-  .page-experience .earlier-work__grid p {
-    margin-bottom: 0.55rem;
+  .page-experience .portfolio-headline h1 {
+    font-size: 1.25rem;
   }
 
   .page-skills #main > .post {
