@@ -6692,7 +6692,7 @@ body.lightbox-open {
   appearance: none;
   text-decoration: none;
   overflow: hidden;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.28s ease, transform 0.28s ease, grid-template-columns 0.32s ease !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.28s ease, transform 0.28s ease, grid-template-columns 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
 }
 
 .personal-timeline-event--left .personal-event-card {
@@ -6724,7 +6724,10 @@ body.lightbox-open {
   min-height: 100%;
   background: #edf2f2;
   overflow: hidden;
-  transition: min-height 0.32s ease;
+  /* No min-height transition here: the frame drives card height, and below the
+     737px single-rail breakpoint the focus handoff must change height in one
+     atomic pass (Safari lurches otherwise). The desktop smoothing transition is
+     scoped to min-width: 737px alongside the focus/condensed min-height rules. */
 }
 
 /* Desktop tiles are portrait and mobile tiles are 16/9, so a single crop cannot
@@ -6943,13 +6946,13 @@ body.lightbox-open {
   align-items: flex-start;
   justify-content: center;
   padding: 0.85rem;
-  transition: padding-block 0.32s ease;
+  transition: padding-block 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .personal-timeline.is-enhanced .personal-event-card__body > span:not(.personal-event-card__meta) {
   max-height: var(--detail-height, none);
   overflow: hidden;
-  transition: max-height 0.32s ease, padding-top 0.32s ease, opacity 0.22s ease;
+  transition: max-height 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), padding-top 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.22s ease;
 }
 
 .personal-event-card__meta {
@@ -6969,7 +6972,7 @@ body.lightbox-open {
   font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.2;
-  transition: margin 0.32s ease;
+  transition: margin 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .personal-event-card__body > span:not(.personal-event-card__meta):not(.personal-event-card__open) {
@@ -7027,7 +7030,13 @@ body.lightbox-open {
 
 .personal-timeline.is-measuring .personal-timeline-event,
 .personal-timeline.is-measuring .personal-event-card,
-.personal-timeline.is-measuring .personal-event-card * {
+.personal-timeline.is-measuring .personal-event-card *,
+/* Fast desktop scrolling piles half-finished fold transitions across many
+   cards. is-resnapping suppresses those transitions so the folds snap in one
+   pass; personal-timeline.js keeps the focused card fixed while it does and
+   drops the class as scroll velocity decays so the settle frame animates. */
+.personal-timeline.is-resnapping .personal-event-card,
+.personal-timeline.is-resnapping .personal-event-card * {
   transition: none !important;
 }
 
@@ -7080,6 +7089,14 @@ body.lightbox-open {
    the picture by more than height alone did, while still leaving the card
    taller than its neighbours. */
 @media screen and (min-width: 737px) {
+  /* Desktop-only: the frame's min-height sets card height, so easing it on the
+     shared resize curve makes the height grow in step with the width instead of
+     snapping while the column glides. Scoped above the single-rail breakpoint so
+     the atomic phone/tablet-narrow handoff keeps its instant height change. */
+  .personal-timeline.is-enhanced .personal-event-card__image {
+    transition: min-height 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
   /* The focused card grows in height, which squares its frame up again and
      crops the 3:2 photos harder than any other state — so its width has to grow
      further still to keep pace. */
@@ -7465,6 +7482,7 @@ body.page-home #nav {
   .personal-timeline__line span,
   .personal-timeline-event::before,
   .personal-event-card,
+  .personal-event-card__image,
   .personal-event-card__image img {
     transition: none !important;
     animation: none !important;

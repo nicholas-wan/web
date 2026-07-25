@@ -24,6 +24,8 @@
   var scrollVelocity = 0;
   var touchTime = null;
   var MAX_FOCUS_ANIMATION_VELOCITY = 0.85;
+  var MAX_FOLD_ANIMATION_VELOCITY = 0.85;
+  var resnapping = false;
 
   function cancelFocusAnimations() {
     if (focusAnimationFrame !== null) window.cancelAnimationFrame(focusAnimationFrame);
@@ -192,6 +194,31 @@
     var previousFocusedEvent = focusedEvent;
     focusedEvent = focusEvent;
 
+    /* Fast desktop scrolling piles half-finished fold transitions across many
+       cards. Above reading speed, snap the folds in one atomic pass (the
+       is-measuring pattern) instead of smearing; the class drops as velocity
+       decays so the next slow frame animates the settle. The single rail is
+       exempt — its handoff is already atomic with a compositor FLIP. */
+    var desktopFold = !singleRail.matches && !reducedMotion.matches;
+    var suppressFolds = desktopFold && scrollVelocity > MAX_FOLD_ANIMATION_VELOCITY;
+    if (suppressFolds !== resnapping) {
+      timeline.classList.toggle('is-resnapping', suppressFolds);
+      resnapping = suppressFolds;
+    }
+
+    /* When a fold is applied atomically it changes card heights in one frame,
+       and any height change above the card being read drags it up or down. Pin
+       the focused card: note where it sits before the fold pass, then correct
+       the scroll by however far the fold moved it. Reading the post-fold
+       position back forces layout first, so a browser whose native scroll
+       anchoring already held the card reports ~0 here and this stays a no-op;
+       it only takes over where anchoring is absent, never double-compensating.
+       Slow (animated) frames are left to native anchoring — the synchronous
+       read sees the not-yet-advanced transition, so there is nothing to cancel
+       and no scroll is written mid-read. */
+    var anchorIndex = suppressFolds && focusEvent ? events.indexOf(focusEvent) : -1;
+    var anchorBefore = anchorIndex !== -1 ? eventBounds[anchorIndex].top : null;
+
     events.forEach(function (event, index) {
       var folded;
 
@@ -207,6 +234,19 @@
       event.classList.toggle('is-focus', event === focusEvent);
       event.classList.toggle('is-condensed', folded && !reducedMotion.matches);
     });
+
+    if (anchorBefore !== null) {
+      var foldShift = focusEvent.getBoundingClientRect().top - anchorBefore;
+      /* Sub-pixel noise is not worth a scroll write, and a shift near a whole
+         viewport means focus jumped to a distant card rather than a fold nudging
+         the current one — a deliberate move, not drift to cancel. */
+      if (Math.abs(foldShift) > 0.5 && Math.abs(foldShift) < viewport * 0.9) {
+        window.scrollBy(0, foldShift);
+        /* Absorb the correction so trackScroll does not read it back as user
+           scroll velocity on the next event. */
+        lastScrollY = window.scrollY;
+      }
+    }
 
     animateMobileFocusHandoff(eventBounds, previousFocusedEvent, focusEvent);
 
