@@ -6721,6 +6721,13 @@ body.lightbox-open {
 
 .personal-event-card__image {
   display: block;
+  /* WebKit derives a frame's inline size from its height through the folded
+     card's aspect-ratio instead of stretching it to the grid column, so a
+     condensed phone card leaves a white band to its right (and collapses to
+     zero width before its lazy image loads). Chromium stretches to the grid
+     area, which equals this, so width: 100% is a no-op there and the fix on
+     WebKit. */
+  width: 100%;
   min-height: 100%;
   background: #edf2f2;
   overflow: hidden;
