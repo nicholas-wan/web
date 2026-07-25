@@ -376,7 +376,9 @@
     viewport.classList.remove('is-interacting');
   };
   var startsOnControl = function (target) {
-    return target.closest && target.closest('button');
+    /* Also treat the revealed, scrollable caption as a control so a horizontal
+       drag inside it scrolls the panel instead of triggering prev/next. */
+    return target.closest && target.closest('button, .lightbox__caption');
   };
   var completeSwipe = function (endX, endY, event) {
     var deltaX = endX - swipeStartX;
@@ -589,7 +591,7 @@
     if (event.key === 'ArrowLeft') show(current - 1);
     if (event.key === 'ArrowRight') show(current + 1);
     if (event.key === 'Tab') {
-      var focusable = overlay.querySelectorAll('button, video');
+      var focusable = overlay.querySelectorAll('button:not([hidden]):not(:disabled), video:not([hidden])');
       var first = focusable[0];
       var last = focusable[focusable.length - 1];
       if (!overlay.contains(document.activeElement)) {
