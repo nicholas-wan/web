@@ -2377,6 +2377,50 @@ body {
   color: #fff !important;
 }
 
+.travel-map__detail-card-steps {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.4rem 0 0.1rem;
+}
+
+.travel-map__detail-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 1px solid rgba(152, 201, 198, 0.3);
+  border-radius: 0.5rem;
+  background: rgba(16, 41, 44, 0.72);
+  color: #d7eceb;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.travel-map__detail-step:hover:not(:disabled),
+.travel-map__detail-step:focus-visible {
+  background: rgba(40, 215, 197, 0.18);
+  border-color: rgba(40, 215, 197, 0.55);
+  color: #fff;
+}
+
+.travel-map__detail-step:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
+/* Comfortable touch targets on the phone overlay where the card is used by tap. */
+@media (max-width: 600px) {
+  .travel-map__detail-step {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.35rem;
+  }
+}
+
 .travel-map__detail-card-close {
   position: absolute;
   top: 0.35rem;

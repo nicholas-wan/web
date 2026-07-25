@@ -206,10 +206,13 @@
   var detailCardTitle = map.querySelector('[data-map-detail-title]');
   var detailCardMeta = map.querySelector('[data-map-detail-meta]');
   var detailCardLink = map.querySelector('[data-map-detail-link]');
+  var detailCardPrev = map.querySelector('[data-map-detail-prev]');
+  var detailCardNext = map.querySelector('[data-map-detail-next]');
   var routeLayer = null;
   var routePath = null;
   var activeTrip = '';
   var selectedDetail = null;
+  var selectedPoint = null;
   var detailCardHideTimer = 0;
   var detailImageRequest = 0;
   var sectionImageCache = {};
@@ -639,6 +642,7 @@
       selectedDetail.setAttribute('aria-expanded', 'false');
     }
     selectedDetail = null;
+    selectedPoint = null;
     if (!detailCard || detailCard.hidden) return;
     detailCard.classList.remove('is-visible');
     var finish = function () {
@@ -723,6 +727,35 @@
     return sectionImageCache[cacheKey];
   };
 
+  var linkForPoint = function (point) {
+    var pointIndex = DETAIL_POINTS.indexOf(point);
+    for (var i = 0; i < detailLinks.length; i += 1) {
+      if (parseInt(detailLinks[i].getAttribute('data-map-point'), 10) === pointIndex) return detailLinks[i];
+    }
+    return null;
+  };
+
+  /* Clamp at the route ends rather than wrapping: a trip is a linear sequence,
+     so disabled controls read more clearly than a jump from last back to first.
+     From a region (not itself a stop) forward still enters the route at stop 1. */
+  var updateStepControls = function (stops, stopIndex) {
+    if (!detailCardPrev || !detailCardNext) return;
+    var hasSteps = stops.length > 1;
+    detailCardPrev.disabled = !hasSteps || stopIndex <= 0;
+    detailCardNext.disabled = !hasSteps || (stopIndex >= 0 && stopIndex >= stops.length - 1);
+  };
+
+  var stepDetail = function (delta) {
+    if (!selectedPoint) return;
+    var stops = stopsForTrip(selectedPoint[5]);
+    if (stops.length < 2) return;
+    var index = stops.indexOf(selectedPoint);
+    var nextIndex = index < 0 ? (delta > 0 ? 0 : -1) : index + delta;
+    if (nextIndex < 0 || nextIndex >= stops.length) return;
+    var targetLink = linkForPoint(stops[nextIndex]);
+    if (targetLink) showPointDetails(stops[nextIndex], targetLink);
+  };
+
   var showPointDetails = function (point, link) {
     if (!detailCard || !TRIPS[point[5]]) return;
     if (detailCardHideTimer) window.clearTimeout(detailCardHideTimer);
@@ -733,12 +766,14 @@
     }
     if (activeTrip !== point[5]) setActiveTrip(point[5], false);
     selectedDetail = link;
+    selectedPoint = point;
     link.classList.add('is-selected');
     link.setAttribute('aria-expanded', 'true');
 
     var trip = TRIPS[point[5]];
     var stops = stopsForTrip(point[5]);
     var stopIndex = stops.indexOf(point);
+    updateStepControls(stops, stopIndex);
     detailCardPosition.textContent = point[0] === 'stop'
       ? 'Stop ' + (stopIndex + 1) + ' of ' + stops.length + ' · ' + trip.title
       : 'Region · ' + trip.title;
@@ -904,6 +939,8 @@
       closePointDetails(true);
     });
   }
+  if (detailCardPrev) detailCardPrev.addEventListener('click', function () { stepDetail(-1); });
+  if (detailCardNext) detailCardNext.addEventListener('click', function () { stepDetail(1); });
   if (tripPicker) {
     tripPicker.addEventListener('change', function () {
       closePointDetails(false, true);
