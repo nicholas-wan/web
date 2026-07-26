@@ -2942,24 +2942,52 @@ body.is-map-fullscreen #return-to-top {
     text-transform: uppercase;
   }
 
-  /* The whole poster is the button; this compact arrow is its visual cue. */
+  /* The whole poster is the button; this quiet route cue echoes the map. */
   .travel-map-teaser__cta {
     display: flex;
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    width: 2.75rem;
-    height: 2.75rem;
+    width: 3.4rem;
+    height: 2.35rem;
     margin-left: 1rem;
-    border: 1px solid rgba(40, 215, 197, 0.5);
-    border-radius: 50%;
-    background: rgba(40, 215, 197, 0.14);
+    border: 1px solid rgba(152, 201, 198, 0.3);
+    border-radius: 999px;
+    background: rgba(7, 19, 21, 0.28);
     color: #28d7c5;
   }
 
-  .travel-map-teaser__cta-arrow {
-    font-size: 1.1rem;
-    line-height: 1;
+  .travel-map-teaser__cta-route {
+    position: relative;
+    width: 1.65rem;
+    height: 1px;
+    background: currentColor;
+    box-shadow: 0 0 0.32rem rgba(40, 215, 197, 0.42);
+  }
+
+  .travel-map-teaser__cta-route::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 0.32rem;
+    height: 0.32rem;
+    border: 1px solid #071315;
+    border-radius: 50%;
+    background: currentColor;
+    transform: translate(-50%, -50%);
+  }
+
+  .travel-map-teaser__cta-route::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 0.42rem;
+    height: 0.42rem;
+    border-top: 1.5px solid currentColor;
+    border-right: 1.5px solid currentColor;
+    transform: translateY(-50%) rotate(45deg);
   }
 
   @keyframes travel-teaser-route {

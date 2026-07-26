@@ -1,7 +1,4 @@
-/* Travel map zoom + pan. The wheel zooms whenever the pointer is over the map;
-   at either zoom limit the page is allowed to continue scrolling. Buttons,
-   double-click, drag, and touch pinch remain available. Markers counter-scale
-   so pins and popups keep their screen size. */
+/* Travel map zoom, pan, progressive detail, and phone overlay. */
 (function () {
   var viewport = document.querySelector('.travel-map__viewport');
   if (!viewport || typeof window.PointerEvent !== 'function') return;
@@ -80,9 +77,7 @@
     }
   };
 
-  /* Semantic zoom keeps the world view calm, then progressively reveals
-     map-scale destinations. Latitude/longitude is projected with the same
-     Natural Earth 1 projection used by tools/maps/generate-world-map.ps1. */
+  /* Projected destinations appear progressively with semantic zoom. */
   var DETAIL_POINTS = [
     /* Countries, states and larger areas. */
     ['area', 'California', 'travel_2019_siliconvalley#trip-section-1', 36.7783, -119.4179, 'silicon-valley'],
@@ -1059,10 +1054,7 @@
   controls.addEventListener('click', function (event) {
     var button = event.target.closest('[data-map-zoom]');
     if (!button) return;
-    /* The controls are a sibling of the viewport, so a zoom press never reaches
-       the viewport's pointerdown handler and never cancelled an in-flight
-       fly-to: zoomAt wrote scale/tx/ty and the animation's next frame overwrote
-       all three from its own interpolation, silently discarding the click. */
+    /* A manual zoom must not be overwritten by an in-flight fly-to. */
     stopFly();
     // A manual zoom invalidates the pending return-glide.
     returnView = null;
@@ -1080,15 +1072,32 @@
     teaser.addEventListener('click', openFullscreen);
     setTeaserRoute(teaser);
     if (!reducedMotionQuery.matches) {
+      var teaserReplayTimer = 0;
+      var teaserInView = false;
+      var playTeaser = function () {
+        window.clearTimeout(teaserReplayTimer);
+        teaser.classList.remove('is-previewing');
+        void teaser.offsetWidth;
+        if (teaserInView) teaser.classList.add('is-previewing');
+      };
+      var setTeaserVisibility = function (visible) {
+        if (visible === teaserInView) return;
+        teaserInView = visible;
+        window.clearTimeout(teaserReplayTimer);
+        if (visible) playTeaser();
+        else teaser.classList.remove('is-previewing');
+      };
+      teaser.addEventListener('animationend', function (event) {
+        if (event.target !== teaser || event.animationName !== 'travel-teaser-lift' || !teaserInView) return;
+        teaserReplayTimer = window.setTimeout(playTeaser, 5000);
+      });
       if ('IntersectionObserver' in window) {
         var teaserObserver = new window.IntersectionObserver(function (entries) {
-          if (!entries[0].isIntersecting) return;
-          teaser.classList.add('is-previewing');
-          teaserObserver.disconnect();
-        }, { threshold: 0.55 });
+          setTeaserVisibility(entries[0].intersectionRatio >= 0.55);
+        }, { threshold: [0, 0.55] });
         teaserObserver.observe(teaser);
       } else {
-        teaser.classList.add('is-previewing');
+        setTeaserVisibility(true);
       }
     }
   }
@@ -1116,12 +1125,7 @@
       setActiveTrip(tripPicker.value, true);
     });
   }
-  /* Region pins enter their trip on activation; links inside the hover
-     popover keep navigating to their journal sections. pointerup, not
-     click: revealing the popover on :hover makes iOS treat the first tap
-     as hover-only and swallow the click, which left the pin looking
-     inert on phones. The dragMoved guard keeps a pan release from
-     activating the pin underneath. */
+  /* pointerup avoids iOS hover-only first taps; dragMoved protects pans. */
   regionMarkers.forEach(function (marker) {
     var enterMarkerTrip = function (event) {
       if (dragMoved || event.target.closest('a')) return;
