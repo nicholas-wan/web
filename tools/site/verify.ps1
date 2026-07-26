@@ -34,13 +34,26 @@ function Assert-DistMatchesSource([string]$RelativePath) {
     if ($distContent -ne $sourceContent) { throw "dist is stale: $RelativePath differs from its source. Rebuild with tools/site.ps1 build." }
 }
 
+# Non-fatal early warning. Budgets stay hard ceilings, but a file creeping toward
+# one should surface in a *green* build so the pressure is visible before it
+# becomes a red deploy. Writes to the warning stream (CI logs it; exit stays 0),
+# so "red" only ever means an actual breach.
+$script:BudgetWarnRatio = 0.9
+function Warn-BudgetHeadroom([string]$Label, [long]$Size, [long]$Limit) {
+    if ($Limit -le 0 -or $Size -le [long]($Limit * $script:BudgetWarnRatio)) { return }
+    $pct = [math]::Round($Size / $Limit * 100, 1)
+    Write-Warning "Budget headroom low: $Label at $pct% ($Size of $Limit bytes)."
+}
+
 function Assert-FileSizeBudget([string]$RelativePath, [int]$MaximumKB) {
     $path = Join-Path $dist $RelativePath
     if (-not (Test-Path -LiteralPath $path)) { throw "Performance budget target is missing: $RelativePath" }
     $size = (Get-Item -LiteralPath $path).Length
-    if ($size -gt ($MaximumKB * 1KB)) {
+    $limit = $MaximumKB * 1KB
+    if ($size -gt $limit) {
         throw "$RelativePath exceeds its $MaximumKB KB performance budget ($([math]::Round($size / 1KB, 1)) KB)."
     }
+    Warn-BudgetHeadroom $RelativePath $size $limit
 }
 
 if (-not (Test-Path -LiteralPath $dist)) { throw "Missing dist directory. Run tools/site.ps1 build first." }
@@ -181,8 +194,13 @@ foreach ($page in $pages) {
         $scriptPath = Join-Path $dist ($scriptMatch.Groups[1].Value -replace '/', '\')
         $scriptBytes += (Get-Item -LiteralPath $scriptPath).Length
     }
+    # The 80 KB JS ceiling is a real page-weight limit, held at point-of-need and
+    # never bumped on spec — see docs/project-context.md "Dead ends" (the travel
+    # page already sits at ~99%). The warning below flags that in green builds.
     if ($scriptBytes -gt 80KB) { throw "$($page.Name) exceeds the 80 KB raw JavaScript budget." }
+    Warn-BudgetHeadroom "$($page.Name) JS" $scriptBytes 80KB
     if ($page.Length -gt 225KB) { throw "$($page.Name) exceeds the 225 KB generated-HTML budget." }
+    Warn-BudgetHeadroom "$($page.Name) HTML" $page.Length 225KB
 }
 
 if ($navSignatures.Count -ne 1) { throw "Generated pages do not share one consistent navigation block." }
@@ -262,6 +280,9 @@ if ([regex]::Matches($travel, 'class="travel-map__marker travel-map__marker--').
 if ([regex]::Matches($travel, 'class="travel-map__marker-label"').Count -ne 11) { throw "Travel atlas must contain eleven thumbnail popovers." }
 if ([regex]::Matches($travel, 'class="travel-map__place"').Count -ne 11) { throw "Travel atlas must contain eleven persistent, non-overlapping place labels." }
 if ($travel -notmatch 'class="travel-map-teaser" data-map-open' -or $travel -notmatch 'class="travel-map__close" data-map-close' -or [regex]::Matches($travel, 'data-map-region="').Count -ne 4 -or $travel -match 'travel-mobile-destination') { throw "Travel must provide the mobile map teaser, close control, and four region jump chips instead of the retired accordion." }
+# The phone teaser is the only entry to the atlas, so it must read as a tappable
+# poster card: a full-width map hero and an explicit call to action, not a row.
+if ($travel -notmatch 'class="travel-map-teaser__cta">Open the interactive map' -or $customCss -notmatch '(?s)\.travel-map-teaser\s*\{[^}]*flex-direction:\s*column' -or $customCss -notmatch '(?s)\.travel-map-teaser__media\s*\{[^}]*height:\s*10rem') { throw "The phone map teaser must be a full-width poster card with an explicit open-the-map call to action." }
 if ($travel -notmatch 'class="travel-map__trip-picker"' -or $travel -notmatch 'id="travel-map-trip" data-map-trip' -or $travel -notmatch 'id="travel-map-detail-card" class="travel-map__detail-card" data-map-detail-card' -or $travel -notmatch 'class="travel-map__detail-card-link" data-map-detail-link') { throw "Travel atlas must provide its trip selector and shared place detail card." }
 foreach ($tripKey in @('guangzhou', 'japan', 'australia', 'germany', 'usa-canada', 'perth', 'europe', 'silicon-valley', 'seoul')) {
     if ($travel -notmatch ('<option value="' + [regex]::Escape($tripKey) + '">')) { throw "Travel atlas trip selector is missing: $tripKey" }
