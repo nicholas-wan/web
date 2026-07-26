@@ -594,7 +594,7 @@ foreach ($distPage in Get-ChildItem -LiteralPath $dist -Filter '*.html') {
     if ((Get-Content -LiteralPath $distPage.FullName -Raw -Encoding UTF8) -match 'target="_blank"(?![^>]*rel=)') { throw "$($distPage.Name) opens a tab without rel=noopener noreferrer." }
 }
 if ($experience -notmatch '<body class="is-preload page-experience">') { throw "Work layout scope is missing." }
-if ($experience -notmatch 'id="selected-work" class="portfolio-headline"' -or $experience -notmatch 'Agentic AI Product Lead for Threat Hunting' -or $experience -match 'section-intro' -or $experience -notmatch 'class="internship-group') { throw "Work headline line or portfolio layout is missing." }
+if ($experience -notmatch 'id="selected-work" class="portfolio-headline"' -or [regex]::Matches($experience, 'Agentic AI Product Lead for Threat Hunting').Count -ne 2 -or $experience -match 'Agentic AI for Threat Hunting' -or $experience -match 'section-intro' -or $experience -notmatch 'class="internship-group' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?\.page-experience #main > \.portfolio-headline\s*\{[^}]*display:\s*none') { throw "Desktop must retain its Work headline while the phone card owns the consolidated Agentic AI Product Lead title." }
 if ([regex]::Matches($experience, 'class="case-study case-study--work"').Count -ne 2) { throw "The two DSTA cards must use the same work-card format." }
 if ($experience -match 'case-study--compact' -or $experience -match 'case-study--lead' -or $experience -match 'case-study--wide') { throw "Retired work-card variants are still present." }
 if ([regex]::Matches($experience, 'class="case-study case-study--internship"').Count -ne 3) { throw "Internships must be presented as three compact cards in one row." }
@@ -604,6 +604,11 @@ if ($experience -notmatch 'id="clinical-data-science"' -or $experience -notmatch
 if ($experience -match 'Guco Consulting' -or $experience -match 'Professional timeline' -or $experience -match 'career-timeline') { throw "Retired Guco or professional timeline content is still present." }
 if ($experience -match 'case-study__visual' -or $experience -match 'case-study__facts' -or $experience -match 'case-study__decisions' -or $experience -match 'R&amp;D') { throw "Verbose or retired case-study content is still present." }
 if ([regex]::Matches($experience, 'class="case-study__highlights"').Count -ne 2) { throw "Main work cards should use concise challenge, leadership, and impact highlights." }
+foreach ($workCardId in @('agentic-ai', 'cloud-analytics')) {
+    $workCard = [regex]::Match($experience, '(?s)<article class="case-study case-study--work" id="' + $workCardId + '">(.*?)</article>').Groups[1].Value
+    if ($workCard -notmatch '(?s)<li><span>Problem</span>.*?<li><span>My role</span>.*?<li><span>Outcome</span>') { throw "$workCardId must keep the Problem, My role, Outcome sequence." }
+}
+if ($customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?#agentic-ai > \.case-study__highlights,[^{]+#cloud-analytics > \.case-study__highlights\s*\{[^}]*grid-row:\s*3' -or $customCss -notmatch '(?s)#cloud-analytics > header\s*\{[^}]*display:\s*contents' -or $customCss -notmatch '(?s)#agentic-ai > \.case-study__writeup,[^{]+#cloud-analytics > header > \.case-study__lede\s*\{[^}]*grid-row:\s*4') { throw "Both DSTA cards must use the same mobile title, timeline, supporting-copy order." }
 if ($experience -notmatch 'images/company/dsta\.svg' -or $experience -notmatch 'images/company/the-league\.png' -or $experience -notmatch 'images/company/shopee\.svg' -or $experience -notmatch 'images/company/nuhs\.png') { throw "Portfolio company logos are missing." }
 if ($experience -match 'case-study__icon') { throw "Standalone work-card icons should not consume a separate row." }
 if ($customCss -notmatch '(?s)\.company-logo--shopee\s*\{[^}]*background:\s*transparent' -or $customCss -notmatch '(?s)\.company-logo--nuhs\s*\{[^}]*background:\s*transparent') { throw "Shopee and NUHS logos must not sit on white tiles." }

@@ -6690,12 +6690,56 @@ body.lightbox-open {
 }
 
 @media screen and (max-width: 736px) {
+  .page-experience #main > .portfolio-headline {
+    display: none;
+  }
+
   .page-experience .portfolio-overview {
     padding: 1.15rem !important;
   }
 
   .page-experience #agentic-ai {
     padding: 1.35rem;
+  }
+
+  /* Both DSTA cards use the same phone reading order: identity, title,
+     Problem/Role/Outcome rail, supporting copy, then capabilities. */
+  .page-experience #agentic-ai > .case-study__company,
+  .page-experience #cloud-analytics > .case-study__company-context {
+    grid-row: 1;
+  }
+
+  .page-experience #agentic-ai > header,
+  .page-experience #cloud-analytics > header > h2 {
+    grid-row: 2;
+  }
+
+  .page-experience #agentic-ai > .case-study__highlights,
+  .page-experience #cloud-analytics > .case-study__highlights {
+    grid-row: 3;
+  }
+
+  .page-experience #agentic-ai > .case-study__writeup,
+  .page-experience #cloud-analytics > header > .case-study__lede {
+    grid-row: 4;
+  }
+
+  .page-experience #agentic-ai > .case-study__tags,
+  .page-experience #cloud-analytics > .case-study__tags {
+    grid-row: 5;
+  }
+
+  .page-experience #cloud-analytics > header {
+    display: contents;
+  }
+
+  .page-experience #cloud-analytics > header > h2,
+  .page-experience #cloud-analytics > header > .case-study__lede {
+    grid-column: 1;
+  }
+
+  .page-experience #cloud-analytics > header > .case-study__lede {
+    margin: 0;
   }
 
   .page-experience #agentic-ai .case-study__highlights {
@@ -6748,14 +6792,6 @@ body.lightbox-open {
 
   /* Thumbnails stay on top at full width: the BrainHack and showcase
      artwork carries lettering that a narrow side crop makes illegible. */
-
-  .page-experience #main > .portfolio-headline {
-    padding: 1.25rem 1.15rem 0;
-  }
-
-  .page-experience .portfolio-headline h1 {
-    font-size: 1.25rem;
-  }
 
   .page-skills #main > .post {
     padding: 1.5rem 1.15rem 2rem;

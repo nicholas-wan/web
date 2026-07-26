@@ -35,6 +35,10 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 - The theme’s load fade can cover the hero. Preserve the homepage intro stacking fix when changing hero layers or entrance effects.
 - On mobile, the About photo remains low and bottom-anchored because `game.js` derives swipe progress from its settled position. The phone scene occupies exactly one `svh` viewport and is not sticky: its photo-driven entry reaches the settled layout at the About section top, so the following cards move with the very next scroll instead of sitting behind a completed 22vh pin. Desktop retains the taller sticky scrub and centers the About cluster. Do not normalize those layouts into one shared vertical alignment.
 
+## Experience page contracts
+
+- The generated `Agentic AI Product Lead for Threat Hunting` page headline remains visible on desktop but is hidden on phones, where the first DSTA card owns that full title. Both DSTA cards use the same phone reading order: company context, title, Problem/My role/Outcome rail, supporting copy, then capability tags. Cloud Analytics uses `display: contents` for its header only at the phone breakpoint so its lede can follow the rail without changing the established two-column desktop composition.
+
 ## Travel journal contracts
 
 - Guangzhou is the compact reference implementation. New and structurally updated journals remain content-only fragments; the build supplies the document shell, navigation, footer, styles, and scripts.
