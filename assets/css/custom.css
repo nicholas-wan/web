@@ -2796,8 +2796,8 @@ body.is-map-fullscreen #return-to-top {
   .travel-map-teaser__projection {
     position: absolute;
     top: 42%;
-    left: 0;
-    width: 100%;
+    left: -4%;
+    width: 108%;
     aspect-ratio: 1200 / 624;
     background-image: url("../../images/travel/world-map.svg");
     background-position: center;
@@ -2907,47 +2907,54 @@ body.is-map-fullscreen #return-to-top {
   }
 
   .travel-map-teaser__copy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
     min-width: 0;
-    padding: 0.9rem 1rem 1rem;
+    min-height: 5.4rem;
+    padding: 0.72rem 1rem;
     font-family: var(--font-display);
+  }
+
+  .travel-map-teaser__copy-text {
+    min-width: 0;
   }
 
   .travel-map-teaser__copy strong {
     display: block;
     color: #fff;
-    font-size: 1.18rem;
+    font-size: 1.08rem;
     line-height: 1.25;
   }
 
   .travel-map-teaser__copy small {
     display: block;
-    margin-top: 0.3rem;
+    margin-top: 0.2rem;
     color: rgba(255, 255, 255, 0.62);
-    font-size: 0.72rem;
-    letter-spacing: 0.04em;
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
     text-transform: uppercase;
   }
 
-  /* Explicit, obviously tappable affordance in the teal grammar of the atlas
-     controls; the whole card is the target, so this only has to read as a button. */
+  /* The whole poster is the button; this compact arrow is its visual cue. */
   .travel-map-teaser__cta {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 0.4rem;
-    margin-top: 0.9rem;
-    padding: 0.62rem 1.1rem;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-left: 1rem;
     border: 1px solid rgba(40, 215, 197, 0.5);
-    border-radius: 999px;
+    border-radius: 50%;
     background: rgba(40, 215, 197, 0.14);
     color: #28d7c5;
-    font-size: 0.82rem;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
   }
 
   .travel-map-teaser__cta-arrow {
-    font-size: 1rem;
+    font-size: 1.1rem;
+    line-height: 1;
   }
 
   @keyframes travel-teaser-route {
