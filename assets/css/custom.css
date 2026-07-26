@@ -2795,9 +2795,9 @@ body.is-map-fullscreen #return-to-top {
      pins still use real atlas coordinates and remain attached to land. */
   .travel-map-teaser__projection {
     position: absolute;
-    top: 1.65rem;
-    left: -56.2%;
-    width: 155%;
+    top: 0;
+    left: -78.8%;
+    width: 188%;
     aspect-ratio: 1200 / 624;
     background-image: url("../../images/travel/world-map.svg");
     background-position: center;
