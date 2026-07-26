@@ -1,0 +1,35 @@
+# Force LF for text sources on every checkout, including GitHub's Windows CI
+# runners (which set core.autocrlf=true). Without this, LF sources are smudged
+# to CRLF on CI checkout, inflating the byte-copied JS assets and the extracted
+# CSS bundles past their verify.ps1 size budgets even though local builds pass.
+# See docs/project-context.md "Dead ends and hidden dependencies".
+*.js    text eol=lf
+*.mjs   text eol=lf
+*.css   text eol=lf
+*.scss  text eol=lf
+*.html  text eol=lf
+*.svg   text eol=lf
+*.json  text eol=lf
+*.md    text eol=lf
+*.ps1   text eol=lf
+*.psm1  text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.txt   text eol=lf
+
+# Binary assets must never be line-ending normalized.
+*.jpg   binary
+*.jpeg  binary
+*.png   binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
+*.ttf   binary
+*.otf   binary
+*.eot   binary
+*.mp4   binary
+*.webm  binary
+*.mov   binary
+*.pdf   binary
