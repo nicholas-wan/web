@@ -2791,18 +2791,18 @@ body.is-map-fullscreen #return-to-top {
   }
 
   /* Match the map artwork's 1200:624 projection surface before cropping it.
-     Pins can then use the atlas' real projected coordinates and remain attached
-     to land as the poster changes width. */
+     This closer Europe-to-Asia frame centres the route as the card's subject;
+     pins still use real atlas coordinates and remain attached to land. */
   .travel-map-teaser__projection {
     position: absolute;
-    top: 42%;
-    left: -4%;
-    width: 108%;
+    top: 1.65rem;
+    left: -56.2%;
+    width: 155%;
     aspect-ratio: 1200 / 624;
     background-image: url("../../images/travel/world-map.svg");
     background-position: center;
     background-size: 100% 100%;
-    transform: translateY(-42%);
+    transform: none;
   }
 
   /* JS aligns the chord between two Natural Earth projected locations; the
@@ -2814,14 +2814,19 @@ body.is-map-fullscreen #return-to-top {
     z-index: 1;
     height: 1.55rem;
     margin-top: -1.55rem;
+    transform-origin: left bottom;
+  }
+
+  .travel-map-teaser__route-line {
+    position: absolute;
+    inset: 0;
     border-top: 3px solid #ffc278;
     border-radius: 50% 50% 0 0 / 100% 100% 0 0;
     filter: drop-shadow(0 0 0.34rem rgba(255, 184, 105, 0.92));
     opacity: 0;
-    transform-origin: left bottom;
   }
 
-  .travel-map-teaser__route::before {
+  .travel-map-teaser__route-line::before {
     content: "";
     position: absolute;
     top: -0.32rem;
@@ -2886,12 +2891,12 @@ body.is-map-fullscreen #return-to-top {
     animation: travel-teaser-lift var(--teaser-preview-cycle) ease-in-out 2;
   }
 
-  .travel-map-teaser.is-previewing .travel-map-teaser__route {
-    animation: travel-teaser-route var(--teaser-preview-cycle) ease-in-out 2;
+  .travel-map-teaser.is-previewing .travel-map-teaser__route-line {
+    animation: travel-teaser-route var(--teaser-preview-cycle) linear 2;
   }
 
   .travel-map-teaser.is-previewing .travel-map-teaser__tracer {
-    animation: travel-teaser-tracer var(--teaser-preview-cycle) cubic-bezier(0.45, 0, 0.25, 1) 2;
+    animation: travel-teaser-tracer var(--teaser-preview-cycle) linear 2;
   }
 
   .travel-map-teaser.is-previewing .travel-map-teaser__pin--start {
@@ -2958,9 +2963,17 @@ body.is-map-fullscreen #return-to-top {
   }
 
   @keyframes travel-teaser-route {
-    0%, 14%, 88%, 100% { clip-path: inset(0 100% 0 0); opacity: 0; }
-    19% { opacity: 1; }
-    48%, 78% { clip-path: inset(-0.6rem 0); opacity: 1; }
+    0%, 20% { clip-path: inset(-0.6rem 100% -0.6rem 0); opacity: 0; }
+    21% { clip-path: inset(-0.6rem 100% -0.6rem 0); opacity: 1; }
+    25% { clip-path: inset(-0.6rem 87.5% -0.6rem 0); opacity: 1; }
+    29% { clip-path: inset(-0.6rem 75% -0.6rem 0); opacity: 1; }
+    33% { clip-path: inset(-0.6rem 62.5% -0.6rem 0); opacity: 1; }
+    37% { clip-path: inset(-0.6rem 50% -0.6rem 0); opacity: 1; }
+    41% { clip-path: inset(-0.6rem 37.5% -0.6rem 0); opacity: 1; }
+    45% { clip-path: inset(-0.6rem 25% -0.6rem 0); opacity: 1; }
+    49% { clip-path: inset(-0.6rem 12.5% -0.6rem 0); opacity: 1; }
+    53%, 78% { clip-path: inset(-0.6rem 0); opacity: 1; }
+    88%, 100% { clip-path: inset(-0.6rem 0); opacity: 0; }
   }
 
   @keyframes travel-teaser-tracer {
@@ -3000,7 +3013,7 @@ body.is-map-fullscreen #return-to-top {
 
   @media (prefers-reduced-motion: reduce) {
     .travel-map-teaser.is-previewing,
-    .travel-map-teaser.is-previewing .travel-map-teaser__route,
+    .travel-map-teaser.is-previewing .travel-map-teaser__route-line,
     .travel-map-teaser.is-previewing .travel-map-teaser__tracer,
     .travel-map-teaser.is-previewing .travel-map-teaser__pin,
     .travel-map-teaser.is-previewing .travel-map-teaser__tap {
