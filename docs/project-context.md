@@ -92,6 +92,11 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
   reclaims it, and `git filter-branch` was tried and abandoned (clone still 2.4GB). If
   retried, use `git filter-repo` and prove a smaller clone before force-pushing. Pipeline
   details in [`build.md`](build.md).
+- **`travel-map-page.css` sits 11 bytes under its 42 KB budget (Jul 2026).** The generated
+  atlas bundle measures 42,997 of 43,008 allowed bytes, so nearly any travel/atlas CSS
+  addition will trip `verify.ps1`. When it does, bump the budget deliberately with a dated
+  rationale comment (the existing 40 → 42 note beside the assertion is the pattern) rather
+  than stripping the explanatory comments in `custom.css` to bank bytes.
 - **`.travel-gallery__item--tall` looks unused, isn't.** It pairs with the
   `guangzhou-gallery__brick--tall` compat class; the markup carries only the compat class
   today, so the generic half scans as dead — but SKILL.md mandates the pairing, and
