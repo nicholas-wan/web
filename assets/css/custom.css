@@ -2966,9 +2966,13 @@ body.is-map-fullscreen #return-to-top {
   @keyframes travel-teaser-tracer {
     0%, 18%, 56%, 100% { left: 0; top: 100%; opacity: 0; }
     21% { left: 0; top: 100%; opacity: 1; }
-    29% { left: 25%; top: 44%; opacity: 1; }
-    38% { left: 50%; top: 0; opacity: 1; }
-    47% { left: 75%; top: 44%; opacity: 1; }
+    25% { left: 12.5%; top: 34%; opacity: 1; }
+    29% { left: 25%; top: 13.4%; opacity: 1; }
+    33% { left: 37.5%; top: 3.2%; opacity: 1; }
+    37% { left: 50%; top: 0; opacity: 1; }
+    41% { left: 62.5%; top: 3.2%; opacity: 1; }
+    45% { left: 75%; top: 13.4%; opacity: 1; }
+    49% { left: 87.5%; top: 34%; opacity: 1; }
     53% { left: 100%; top: 100%; opacity: 1; }
   }
 
