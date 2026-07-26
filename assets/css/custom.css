@@ -771,11 +771,11 @@
   opacity: 1 !important;
 }
 
-/* Mobile keeps the pinned swipe, stacked: the photo sweeps in from the
-   left and the text from the right as the scene scrubs. */
+/* Mobile uses one viewport: the photo and text sweep in while the scene enters,
+   then the following cards move immediately with the next scroll. */
 @media screen and (max-width: 736px) {
   .intro-swipe {
-    height: 122vh;
+    height: 100svh;
     margin-bottom: 0;
   }
 
@@ -785,6 +785,8 @@
      the cluster the rhythm is fixed: 1rem heading→photo, 1rem photo→text,
      0.75rem h3→paragraph, 3vh below the paragraph. */
   .intro-swipe__stage {
+    position: relative;
+    top: auto;
     justify-content: flex-end;
   }
 

@@ -90,12 +90,8 @@
     }
   }
 
-  /* iPhone-style swipe intro: the section is taller than the viewport and
-     its stage pins while scroll progress (--p, 0 to 1) swipes the profile
-     photo from center to its left slot and slides the intro text in from
-     the right. Reversible; scrolling back re-centers the photo. Without JS
-     --p defaults to 1 (settled layout); small screens and reduced motion
-     use the static layout. */
+  /* The desktop scene pins while it scrubs; phones use the portrait's entry
+     through one viewport so no completed scene retains a dead scroll tail. */
   function initIntroSwipe() {
     var section = document.querySelector('.intro-swipe');
     if (!section) { return; }
@@ -126,9 +122,10 @@
     }
 
     function update() {
+      var phone = window.innerWidth <= 736;
       var scrollable = section.offsetHeight - window.innerHeight;
       var sectionTop = section.getBoundingClientRect().top;
-      var p = scrollable > 0
+      var p = phone ? 0 : scrollable > 0
         ? Math.min(1, Math.max(0, -sectionTop / scrollable))
         : 1;
       var textProgress = p;
@@ -136,7 +133,7 @@
          enters the bottom of the viewport. Waiting for the sticky section to
          reach the top made a visible sliver sit still for too long. */
       var photoProgress = p;
-      if (window.innerWidth <= 736) {
+      if (phone) {
         var photoTop = photo.getBoundingClientRect().top;
         var settledPhotoTop = photoTop - Math.max(sectionTop, 0);
         var visibleTravel = Math.max(window.innerHeight - settledPhotoTop, 1);
