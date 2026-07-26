@@ -173,6 +173,18 @@
     return { x: (rawX + X_MAX) / (2 * X_MAX) * 100, y: (Y_MAX - rawY) / (2 * Y_MAX) * 100 };
   };
 
+  var setTeaserRoute = function (teaser) {
+    var p = teaser.querySelector('[data-map-teaser-projection]');
+    var r = p.firstElementChild;
+    var a = projectCoordinate(48.8566, 2.3522);
+    var b = projectCoordinate(35.6762, 139.6503);
+    var x = b.x - a.x;
+    var y = (b.y - a.y) * 0.52;
+    p.style.cssText += '--x1:' + a.x + '%;--y1:' + a.y +
+      '%;--x2:' + b.x + '%;--y2:' + b.y + '%';
+    r.style.cssText += ';width:' + Math.hypot(x,y) + '%;transform:rotate(' + Math.atan2(y,x) + 'rad)';
+  };
+
   var scale = 1;
   var tx = 0;
   var ty = 0;
@@ -1064,7 +1076,22 @@
     }
   });
 
-  if (teaser) teaser.addEventListener('click', openFullscreen);
+  if (teaser) {
+    teaser.addEventListener('click', openFullscreen);
+    setTeaserRoute(teaser);
+    if (!reducedMotionQuery.matches) {
+      if ('IntersectionObserver' in window) {
+        var teaserObserver = new window.IntersectionObserver(function (entries) {
+          if (!entries[0].isIntersecting) return;
+          teaser.classList.add('is-previewing');
+          teaserObserver.disconnect();
+        }, { threshold: 0.55 });
+        teaserObserver.observe(teaser);
+      } else {
+        teaser.classList.add('is-previewing');
+      }
+    }
+  }
   if (closeBtn) closeBtn.addEventListener('click', closeFullscreen);
   /* Dismissing the card is also how a visitor leaves the trip: while a trip
      is selected every unrelated pin sits at 8% opacity with pointer-events

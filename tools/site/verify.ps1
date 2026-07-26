@@ -240,7 +240,8 @@ $journalProgressJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\journa
 $scrambleRevealJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\scramble-reveal.js') -Raw -Encoding UTF8
 Assert-FileSizeBudget 'assets\css\custom.css' 90
 # 40 -> 42: phone-overlay legibility pass (Jul 2026) added overlay-scoped type sizes.
-Assert-FileSizeBudget 'assets\css\travel-map-page.css' 42
+# 42 -> 46: two-pass mobile teaser route/tap preview (Jul 2026).
+Assert-FileSizeBudget 'assets\css\travel-map-page.css' 46
 Assert-FileSizeBudget 'assets\css\travel-journal.css' 30
 Assert-FileSizeBudget 'assets\css\experience-page.css' 12
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32
@@ -283,6 +284,7 @@ if ($travel -notmatch 'class="travel-map-teaser" data-map-open' -or $travel -not
 # The phone teaser is the only entry to the atlas, so it must read as a tappable
 # poster card: a full-width map hero and an explicit call to action, not a row.
 if ($travel -notmatch 'class="travel-map-teaser__cta">Open the interactive map' -or $customCss -notmatch '(?s)\.travel-map-teaser\s*\{[^}]*flex-direction:\s*column' -or $customCss -notmatch '(?s)\.travel-map-teaser__media\s*\{[^}]*height:\s*10rem') { throw "The phone map teaser must be a full-width poster card with an explicit open-the-map call to action." }
+if ($travel -notmatch 'data-map-teaser-projection' -or $travel -notmatch 'data-map-teaser-start' -or $travel -notmatch 'data-map-teaser-end' -or $travelMapJs -notmatch 'projectCoordinate\(48\.8566, 2\.3522\)' -or $travelMapJs -notmatch 'projectCoordinate\(35\.6762, 139\.6503\)' -or $travelMapJs -notmatch 'Math\.atan2\(y,x\)' -or $travelMapJs -notmatch 'teaserObserver\.observe\(teaser\)' -or $customCss -notmatch '(?s)\.travel-map-teaser__projection\s*\{[^}]*aspect-ratio:\s*1200 / 624' -or $customCss -notmatch '(?s)\.travel-map-teaser__pin\s*\{[^}]*z-index:\s*3' -or $customCss -notmatch '(?s)\.travel-map-teaser__tap\s*\{[^}]*z-index:\s*2' -or $customCss -notmatch '@keyframes travel-teaser-route' -or $customCss -notmatch '@keyframes travel-teaser-tap' -or $customCss -notmatch '(?s)@media \(prefers-reduced-motion: reduce\).*?\.travel-map-teaser__route\s*\{[^}]*display:\s*none') { throw "The phone map teaser must preview a projected Paris-to-Tokyo route with an unobstructed destination pin, two-pass tap hint, and static reduced-motion fallback." }
 if ($travel -notmatch 'class="travel-map__trip-picker"' -or $travel -notmatch 'id="travel-map-trip" data-map-trip' -or $travel -notmatch 'id="travel-map-detail-card" class="travel-map__detail-card" data-map-detail-card' -or $travel -notmatch 'class="travel-map__detail-card-link" data-map-detail-link') { throw "Travel atlas must provide its trip selector and shared place detail card." }
 foreach ($tripKey in @('guangzhou', 'japan', 'australia', 'germany', 'usa-canada', 'perth', 'europe', 'silicon-valley', 'seoul')) {
     if ($travel -notmatch ('<option value="' + [regex]::Escape($tripKey) + '">')) { throw "Travel atlas trip selector is missing: $tripKey" }
