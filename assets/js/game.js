@@ -179,9 +179,12 @@
     var mobile = window.matchMedia('(max-width: 736px)');
     var glideFrame = null;
     var settleTimer = 0;
+    var settleDirection = 0;
     var touching = false;
     var lastY = window.scrollY;
     var direction = 0;
+    var FORWARD_SETTLE_MS = 90;
+    var REVERSE_SETTLE_MS = 32;
 
     function cancelGlide() {
       if (glideFrame !== null) {
@@ -220,12 +223,20 @@
     }
 
     function armSettle() {
-      if (settleTimer) { clearTimeout(settleTimer); }
-      settleTimer = setTimeout(settle, 90);
+      var reversing = direction < 0;
+      /* Keep the first reverse timer so momentum cannot postpone it; replace
+         a pending forward timer when the direction turns upward. */
+      if (settleTimer) {
+        if (reversing && settleDirection < 0) { return; }
+        clearTimeout(settleTimer);
+      }
+      settleDirection = reversing ? -1 : 1;
+      settleTimer = setTimeout(settle, reversing ? REVERSE_SETTLE_MS : FORWARD_SETTLE_MS);
     }
 
     function settle() {
       settleTimer = 0;
+      settleDirection = 0;
       if (touching || glideFrame !== null || !mobile.matches) { return; }
       var edge = farEdge();
       var y = window.scrollY;
