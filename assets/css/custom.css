@@ -1588,7 +1588,9 @@ body {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 58rem;
+  /* Fill the atlas card so the map is the section's dominant element; the fixed
+     1200/624 ratio grows it taller in step. */
+  max-width: 64rem;
   margin: 0 auto;
 }
 
@@ -2401,21 +2403,21 @@ body {
   gap: 0.3rem;
   height: 2rem;
   padding: 0 0.7rem;
-  /* Enabled steps are tinted teal chips: bright enough to read as enabled
-     against the dark card, without the solid neon fill that overpowered it. */
-  border: 1px solid rgba(40, 215, 197, 0.55);
+  /* Quiet ghost chips: near-transparent fill and a soft teal hairline, with
+     bright teal reserved for hover/focus (the old solid fill was too loud). */
+  border: 1px solid rgba(152, 201, 198, 0.3);
   border-radius: 0.5rem;
-  background: rgba(40, 215, 197, 0.22);
+  background: rgba(255, 255, 255, 0.04);
   /* !important: main.css paints every <button> #212931 !important, which
      left this label near-invisible dark-on-dark whatever colour we set. */
-  color: #c9f5ef !important;
+  color: #d7ecea !important;
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   line-height: 1;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
 }
 
 .travel-map__detail-step span {
@@ -2425,15 +2427,15 @@ body {
 
 .travel-map__detail-step:hover:not(:disabled),
 .travel-map__detail-step:focus-visible {
-  background: rgba(40, 215, 197, 0.34);
-  border-color: rgba(40, 215, 197, 0.8);
-  color: #fff !important;
+  background: rgba(40, 215, 197, 0.12);
+  border-color: rgba(40, 215, 197, 0.7);
+  color: #28d7c5 !important;
 }
 
 .travel-map__detail-step:disabled {
-  background: rgba(16, 41, 44, 0.5);
-  border-color: rgba(152, 201, 198, 0.22);
-  color: rgba(215, 236, 235, 0.38) !important;
+  background: transparent;
+  border-color: rgba(152, 201, 198, 0.18);
+  color: rgba(215, 236, 235, 0.55) !important;
   cursor: default;
 }
 
@@ -2613,26 +2615,36 @@ body.is-map-fullscreen #return-to-top {
      their place; measured at the 11pt phone root these chips were 40px. */
   min-height: 3rem;
   align-items: center;
-  padding: 0.4rem 0.7rem;
-  border: 0;
+  padding: 0.4rem 0.85rem;
+  /* Each chip carries its own pill so it reads as a button, not bare text. */
+  border: 1px solid rgba(152, 201, 198, 0.28);
   border-radius: 999px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.07);
   box-shadow: none;
-  color: rgba(255, 255, 255, 0.78);
+  /* !important: main.css paints every <button> #212931 !important, which
+     otherwise left these chips dark-on-dark and nearly invisible. */
+  color: #fff !important;
   cursor: pointer;
   font-family: var(--font-display);
-  font-size: 0.7rem;
+  font-size: 0.74rem;
   font-weight: 800;
   letter-spacing: 0.05em;
   line-height: 1;
   text-transform: uppercase;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
   white-space: nowrap;
 }
 
+.travel-map__region-btn:hover:not(.is-active) {
+  border-color: rgba(40, 215, 197, 0.5);
+  background: rgba(40, 215, 197, 0.16);
+}
+
 .travel-map__region-btn.is-active {
-  background: rgba(40, 215, 197, 0.18);
-  color: #28d7c5;
+  /* The chosen region reads as a solid teal chip, ahead of the resting pills. */
+  border-color: transparent;
+  background: rgba(40, 215, 197, 0.9);
+  color: #04211f !important;
 }
 
 .travel-map__region-btn:focus-visible {

@@ -215,6 +215,11 @@
   var activeTrip = '';
   var selectedDetail = null;
   var selectedPoint = null;
+  /* The view to glide back to when an open detail card is dismissed by a click
+     on empty map space. Captured before the first auto-zoom of a selection
+     session; invalidated by any manual zoom so a deliberate zoom is never
+     silently undone. */
+  var returnView = null;
   var detailCardHideTimer = 0;
   var detailImageRequest = 0;
   var sectionImageCache = {};
@@ -624,12 +629,11 @@
     }
   };
 
-  var flyTo = function (lat, lon, targetScale, tyOffset) {
+  /* Glide to an explicit scale/tx/ty. apply() clamps every frame, so a caller
+     may bias the destination (e.g. clear of the detail card) without pushing
+     the canvas past its bounds. Reduced motion resolves instantly. */
+  var animateView = function (target) {
     stopFly();
-    var target = viewFor(lat, lon, targetScale);
-    // Nudge the destination vertically; apply() clamps every frame, so the
-    // offset cannot push the canvas past its bounds.
-    target.ty += tyOffset || 0;
     if (reducedMotionQuery.matches) {
       scale = target.scale;
       tx = target.tx;
@@ -651,6 +655,15 @@
       flyFrame = t < 1 ? window.requestAnimationFrame(step) : 0;
     };
     flyFrame = window.requestAnimationFrame(step);
+  };
+
+  var flyTo = function (lat, lon, targetScale, tyOffset, txOffset) {
+    var target = viewFor(lat, lon, targetScale);
+    // Nudge the destination; apply() clamps every frame, so the offset cannot
+    // push the canvas past its bounds.
+    target.tx += txOffset || 0;
+    target.ty += tyOffset || 0;
+    animateView(target);
   };
 
   var fitTrip = function (tripKey) {
@@ -676,6 +689,9 @@
   };
 
   var closePointDetails = function (returnFocus, immediate) {
+    /* Ending a selection also ends its return-glide contract. Callers that want
+       to glide back (an outside click) read returnView into a local first. */
+    returnView = null;
     if (detailCardHideTimer) window.clearTimeout(detailCardHideTimer);
     detailCardHideTimer = 0;
     var focusTarget = selectedDetail;
@@ -818,9 +834,15 @@
   var tripEntryTimer = 0;
   var selectTripAndEnter = function (tripKey) {
     var stops = stopsForTrip(tripKey);
+    // Record the pre-entry view before the fit begins so a later outside click
+    // can glide back to it. setActiveTrip's own close clears returnView, so
+    // re-establish it afterwards; the deferred first-stop card then keeps this
+    // value rather than overwriting it with the post-fit view.
+    var entryView = { scale: scale, tx: tx, ty: ty };
     closePointDetails(false, true);
     setActiveTrip(tripKey, true);
     if (!stops.length) return;
+    returnView = entryView;
     window.clearTimeout(tripEntryTimer);
     tripEntryTimer = window.setTimeout(function () {
       if (activeTrip !== tripKey) return;
@@ -878,7 +900,19 @@
       ? 'Open this journal stop '
       : 'Open this journal section ';
     detailCardLink.setAttribute('aria-label', 'Open ' + point[1] + ' in the ' + trip.title + ' journal');
-    detailCard.classList.toggle('is-left', parseFloat(link.style.left) > 50);
+    var showsOnLeft = parseFloat(link.style.left) > 50;
+    detailCard.classList.toggle('is-left', showsOnLeft);
+    /* A selected stop glides to maximum zoom, centred in the space the card
+       does not occupy: raised above the phone bottom sheet, or pushed to the
+       side opposite the desktop card. The session's first stop records the
+       view to glide back to when an outside click dismisses the card. */
+    if (point[0] === 'stop') {
+      if (returnView === null) returnView = { scale: scale, tx: tx, ty: ty };
+      var clearOffsetY = isFullscreen ? -Math.min(viewport.clientHeight * 0.22, 150) : 0;
+      var clearOffsetX = isFullscreen ? 0
+        : (showsOnLeft ? 1 : -1) * Math.min(viewport.clientWidth * 0.2, 180);
+      flyTo(point[3], point[4], MAX_SCALE, clearOffsetY, clearOffsetX);
+    }
     detailCard.hidden = false;
     window.requestAnimationFrame(function () {
       detailCard.classList.add('is-visible');
@@ -1018,6 +1052,8 @@
        fly-to: zoomAt wrote scale/tx/ty and the animation's next frame overwrote
        all three from its own interpolation, silently discarding the click. */
     stopFly();
+    // A manual zoom invalidates the pending return-glide.
+    returnView = null;
     var mode = button.getAttribute('data-map-zoom');
     if (mode === 'in') zoomAtCenter(BUTTON_STEP);
     else if (mode === 'out') zoomAtCenter(1 / BUTTON_STEP);
@@ -1141,12 +1177,14 @@
     if (Math.abs(nextScale - scale) < 0.001) return;
     event.preventDefault();
     stopFly();
+    returnView = null;
     var rect = viewport.getBoundingClientRect();
     zoomAt(event.clientX - rect.left, event.clientY - rect.top, nextScale);
   }, { passive: false });
 
   viewport.addEventListener('dblclick', function (event) {
     event.preventDefault();
+    returnView = null;
     var rect = viewport.getBoundingClientRect();
     zoomAt(event.clientX - rect.left, event.clientY - rect.top, scale * 1.6);
   });
@@ -1182,6 +1220,7 @@
       if (tapGap > 0 && tapGap < 350 &&
           Math.hypot(event.clientX - lastTap.x, event.clientY - lastTap.y) < 30) {
         lastTap.time = 0;
+        returnView = null;
         var tapRect = viewport.getBoundingClientRect();
         zoomAt(event.clientX - tapRect.left, event.clientY - tapRect.top, scale * 1.8);
       } else {
@@ -1206,6 +1245,7 @@
     var next = { x: event.clientX, y: event.clientY };
 
     if (pointers.size === 2 && pinchStart) {
+      returnView = null;
       pointers.set(event.pointerId, next);
       var info = pinchInfo();
       var rect = viewport.getBoundingClientRect();
@@ -1244,6 +1284,20 @@
     event.preventDefault();
     event.stopPropagation();
   }, true);
+
+  /* A non-drag click on empty map space dismisses an open detail card and, if
+     the visitor has not manually zoomed since the auto-zoom, glides back to the
+     pre-selection view. Clicks on a marker, detail dot, or their popup links
+     run their own select/navigate handlers instead. The capture-phase guard
+     above has already swallowed a pan-release click before this fires. */
+  viewport.addEventListener('click', function (event) {
+    if (dragMoved || !selectedDetail) return;
+    if (event.target.closest('.travel-map__detail, .travel-map__marker')) return;
+    var restore = returnView;
+    closePointDetails(false);
+    setActiveTrip('', false);
+    if (restore) animateView(restore);
+  });
 
   /* Keyboard focus moving to an off-screen marker: the browser nudges
      scrollLeft/scrollTop on the overflow-hidden viewport, which desyncs the
