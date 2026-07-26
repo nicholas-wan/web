@@ -304,6 +304,12 @@
       link.appendChild(label);
       link.addEventListener('click', function (event) {
         event.preventDefault();
+        // Area dots are what phones actually see at the overlay's opening zoom,
+        // so they must enter the trip like the region pins do.
+        if (point[0] !== 'stop' && stopsForTrip(point[5]).length) {
+          selectTripAndEnter(point[5]);
+          return;
+        }
         showPointDetails(point, link);
       });
       layer.appendChild(link);
@@ -618,9 +624,12 @@
     }
   };
 
-  var flyTo = function (lat, lon, targetScale) {
+  var flyTo = function (lat, lon, targetScale, tyOffset) {
     stopFly();
     var target = viewFor(lat, lon, targetScale);
+    // Nudge the destination vertically; apply() clamps every frame, so the
+    // offset cannot push the canvas past its bounds.
+    target.ty += tyOffset || 0;
     if (reducedMotionQuery.matches) {
       scale = target.scale;
       tx = target.tx;
@@ -661,7 +670,9 @@
     var targetScale = Math.min(9, Math.max(STOP_SCALE + 0.45, Math.min(widthScale, heightScale)));
     var centreLatitude = stops.reduce(function (total, stop) { return total + stop[3]; }, 0) / stops.length;
     var centreLongitude = stops.reduce(function (total, stop) { return total + stop[4]; }, 0) / stops.length;
-    flyTo(centreLatitude, centreLongitude, targetScale);
+    // In the phone overlay the bottom sheet occupies the lower band, so centre
+    // the route on the region above it; low stops (Australia) were being buried.
+    flyTo(centreLatitude, centreLongitude, targetScale, isFullscreen ? -95 : 0);
   };
 
   var closePointDetails = function (returnFocus, immediate) {

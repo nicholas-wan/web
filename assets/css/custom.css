@@ -2401,12 +2401,14 @@ body {
   gap: 0.3rem;
   height: 2rem;
   padding: 0 0.7rem;
-  /* Enabled steps are solid accent-teal chips with dark text — translucent
-     teal and grey both read as disabled against the dark card. */
-  border: 1px solid #28d7c5;
+  /* Enabled steps are tinted teal chips: bright enough to read as enabled
+     against the dark card, without the solid neon fill that overpowered it. */
+  border: 1px solid rgba(40, 215, 197, 0.55);
   border-radius: 0.5rem;
-  background: #28d7c5;
-  color: #06282c;
+  background: rgba(40, 215, 197, 0.22);
+  /* !important: main.css paints every <button> #212931 !important, which
+     left this label near-invisible dark-on-dark whatever colour we set. */
+  color: #c9f5ef !important;
   font-size: 0.6rem;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -2423,15 +2425,15 @@ body {
 
 .travel-map__detail-step:hover:not(:disabled),
 .travel-map__detail-step:focus-visible {
-  background: #4ae6d6;
-  border-color: #4ae6d6;
-  color: #04211f;
+  background: rgba(40, 215, 197, 0.34);
+  border-color: rgba(40, 215, 197, 0.8);
+  color: #fff !important;
 }
 
 .travel-map__detail-step:disabled {
   background: rgba(16, 41, 44, 0.5);
   border-color: rgba(152, 201, 198, 0.22);
-  color: rgba(215, 236, 235, 0.38);
+  color: rgba(215, 236, 235, 0.38) !important;
   cursor: default;
 }
 
@@ -7333,6 +7335,17 @@ body.page-home #intro {
   min-height: 100vh;
   min-height: 100lvh;
   margin: 0;
+}
+
+/* With the iPhone URL bar shown the visible window is svh, so hero content
+   centred inside the taller lvh box sits below the optical centre. Shrink the
+   centring region back to the visible window with padding (border-box), while
+   keeping the base 4rem bottom padding as the constant term. lvh == svh on
+   desktop, so this resolves to the base padding there. */
+@media screen and (max-width: 736px) {
+  body.page-home #intro {
+    padding-bottom: calc(100lvh - 100svh + 4rem);
+  }
 }
 
 /* The phone hero seam is gated by the slow glide in game.js (initHeroSnap),
