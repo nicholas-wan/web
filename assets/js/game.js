@@ -167,13 +167,10 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 1b. Hero gate: a scroll settling partway across the gated band      */
-  /*     glides the rest of the way. JS, not CSS snap, so the move stays */
-  /*     slow and cannot fight the About swipe. Phones gate the black    */
-  /*     hero seam; desktop extends to where the About swipe finishes,   */
-  /*     so the glide lands with the photo settled and the reverse glide */
-  /*     is armed across the whole band. Reduced motion scrolls plainly; */
-  /*     new touch or wheel input cancels an in-flight glide.            */
+  /* 1b. Phone hero gate: a scroll settling partway across the gated     */
+  /*     band glides to the About section's true top, where the portrait */
+  /*     finishes its rightward sweep. Desktop and reduced motion scroll */
+  /*     plainly; new touch or wheel input cancels an in-flight glide.   */
   /* ------------------------------------------------------------------ */
   function initHeroSnap() {
     if (!document.body.classList.contains('page-home') || reduce) { return; }
@@ -194,16 +191,14 @@
       }
     }
 
-    /* Far edge of the gated band, measured at settle time because images
-       still shift layout after first paint: the hero seam on phones, and on
-       desktop where initIntroSwipe's progress reaches 1 (photo in its slot). */
+    /* Measure the About section itself rather than assuming the hero's height
+       is its document offset: the nav/main/article spacing between them left
+       the mobile glide short, with the portrait still partly translated. */
     function farEdge() {
       var introHeight = intro.getBoundingClientRect().height;
-      if (mobile.matches) { return introHeight; }
       var section = document.querySelector('.intro-swipe');
       if (!section) { return introHeight; }
-      return section.getBoundingClientRect().top + window.scrollY +
-        section.offsetHeight - window.innerHeight;
+      return section.getBoundingClientRect().top + window.scrollY;
     }
 
     function glide(target) {
@@ -231,7 +226,7 @@
 
     function settle() {
       settleTimer = 0;
-      if (touching || glideFrame !== null) { return; }
+      if (touching || glideFrame !== null || !mobile.matches) { return; }
       var edge = farEdge();
       var y = window.scrollY;
       if (y <= 1 || y >= edge - 1) { return; }
@@ -245,7 +240,7 @@
       armSettle();
     }, { passive: true });
 
-    // Desktop equivalent of the touch cancel; the settle timer re-gates after.
+    // Also cancel on wheel for narrow pointer-driven viewports.
     window.addEventListener('wheel', cancelGlide, { passive: true });
 
     window.addEventListener('touchstart', function () {
