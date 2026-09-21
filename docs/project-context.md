@@ -96,15 +96,16 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
   `20vw` journal slot plus 676 new `-480` tiles (+32 MB tracked, but ~60% fewer image
   bytes per tile on 1x desktops and no more full originals on 2x), deferred animation
   posters, the simplified world map, and the circus globe's animated WebP (1.77 MB, the
-  largest file on the site) re-encoded as a 457 KB MP4. The real weight is `.git` (~2.5GB): ~1GB tracked `dist/` history (now
-  `.gitignore`d; CI rebuilds it) and ~283MB superseded GIFs — only a history rewrite
-  reclaims it, and `git filter-branch` was tried and abandoned (clone still 2.4GB). If
-  retried, use `git filter-repo` and prove a smaller clone before force-pushing. Measured on
-  a throwaway bare clone (Sep 2026, 2,455 MB today): dropping `dist/` history and GIFs alone
-  gives 1,963 MB; also dropping every path no longer in HEAD (`images/sv`, `images/perth`,
-  the moved folders) lands near 900 MB; only a squash reaches the ~350 MB floor, because
-  ~430 MB is superseded versions of images that still exist. Pipeline details in
-  [`build.md`](build.md).
+  largest file on the site) re-encoded as a 457 KB MP4.
+- **History was squashed to one commit on 22 Sep 2026.** The clone was 2.4 GB against a
+  344 MB tree (~1 GB of tracked `dist/` history, ~280 MB superseded GIFs, moved image
+  folders and pre-cap photo versions). Partial `git filter-repo` rewrites were measured
+  first: dropping `dist/` and GIFs gave 1.96 GB, also dropping every path absent from HEAD
+  about 900 MB, so only a squash reached the ~350 MB floor. The complete pre-squash history
+  (all refs, including a July `backup/pre-force-update` branch and Codex checkpoint refs)
+  is in `C:/Users/nicho/Projects/web-before-squash.bundle`; restore with `git clone` on the
+  bundle if it is ever needed, otherwise it can be deleted. Do not track `dist/` or GIFs
+  again; the pipeline details are in [`build.md`](build.md).
 - **Text sources are pinned to LF by `.gitattributes`; do not remove it (Jul 2026).**
   GitHub's Windows CI runner checks out with `core.autocrlf=true`, so before this file
   existed, LF sources were smudged to CRLF on CI only. That added ~1 byte per line to the
