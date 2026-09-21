@@ -1,0 +1,15 @@
+# dist/ is generated. GitHub Actions runs tools/site.ps1 check and uploads
+# the freshly built directory as the Pages artifact. Tracking dist duplicated
+# every image and rewrote generated pages on each commit.
+# Build and verify locally with:  .\tools\site.ps1 check
+dist/
+
+# Local build metadata used to avoid decoding every image on incremental builds.
+.cache/
+
+# Python bytecode from the image tooling.
+__pycache__/
+*.pyc
+
+# Local-only private documents retained outside the published source tree.
+.private/
