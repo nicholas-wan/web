@@ -40,10 +40,12 @@ WEBP_QUALITY = 72
 parser = argparse.ArgumentParser()
 parser.add_argument("--mobile-cards-only", action="store_true")
 parser.add_argument("--coverage-gaps-only", action="store_true")
+parser.add_argument("--banners-only", action="store_true")
 args = parser.parse_args()
 
 
-def make_variant(path: Path, target_width: int, keep_only_if_smaller: bool = False) -> None:
+def make_variant(path: Path, target_width: int, keep_only_if_smaller: bool = False,
+                 quality: int = QUALITY) -> None:
     with Image.open(path) as image:
         if image.size[0] <= target_width:
             return
@@ -52,7 +54,7 @@ def make_variant(path: Path, target_width: int, keep_only_if_smaller: bool = Fal
         resized = image.convert("RGB").resize(
             (target_width, round(image.size[1] * ratio)), Image.LANCZOS
         )
-        resized.save(target, "JPEG", quality=QUALITY, optimize=True, progressive=True)
+        resized.save(target, "JPEG", quality=quality, optimize=True, progressive=True)
     if keep_only_if_smaller and target.stat().st_size >= path.stat().st_size:
         target.unlink()
         print(f"Skipping non-beneficial variant: {path.name} at {target_width}px")
@@ -63,7 +65,8 @@ def make_variant(path: Path, target_width: int, keep_only_if_smaller: bool = Fal
     )
 
 
-def make_webp_variant(path: Path, target_width: int, keep_only_if_smaller: bool = False) -> None:
+def make_webp_variant(path: Path, target_width: int, keep_only_if_smaller: bool = False,
+                      quality: int = WEBP_QUALITY) -> None:
     with Image.open(path) as image:
         if image.size[0] <= target_width or getattr(image, "n_frames", 1) > 1:
             return
@@ -72,7 +75,7 @@ def make_webp_variant(path: Path, target_width: int, keep_only_if_smaller: bool 
         resized = image.convert("RGB").resize(
             (target_width, round(image.size[1] * ratio)), Image.LANCZOS
         )
-        resized.save(target, "WEBP", quality=WEBP_QUALITY, method=6)
+        resized.save(target, "WEBP", quality=quality, method=6)
     if keep_only_if_smaller and target.stat().st_size >= path.stat().st_size:
         target.unlink()
         print(f"Skipping non-beneficial variant: {path.name} at {target_width}px")
@@ -146,6 +149,41 @@ def generate_gallery_480_variants() -> None:
             make_variant(source, 480, keep_only_if_smaller=True)
 
 
+def generate_banner_1200_variants() -> None:
+    """Journal banners keep a truthful 100vw phone slot, so a DPR-3 phone
+    (~1170 device px) skipped -800 and fetched the 1470-1920px original, up to
+    463 KB for the LCP image. A -1200 tier still covers 1170 device px without
+    upscaling. Encoded at the banners' own q82 (WebP q80) so the hero does not
+    soften, and kept only when it saves at least a fifth of the bytes."""
+    for page in ALL_JOURNAL_PAGES:
+        html = page.read_text(encoding="utf-8")
+        banner = re.search(r'<img\b[^>]*class="[^"]*\bjournal-banner\b[^"]*"[^>]*>', html)
+        if not banner:
+            continue
+        reference = re.search(r'src="(images/[^"]+)"', banner.group(0)).group(1)
+        source = next((s for r, s in referenced_journal_sources([page]) if r == reference), None)
+        if source is None:
+            continue
+        webp = source.suffix.lower() == ".webp"
+        target = source.with_name(source.stem + ("-1200.webp" if webp else "-1200.jpg"))
+        if target.exists():
+            continue
+        with Image.open(source) as image:
+            if image.size[0] <= 1400:
+                continue
+        if webp:
+            make_webp_variant(source, 1200, quality=80)
+        else:
+            make_variant(source, 1200, quality=82)
+        if target.exists() and target.stat().st_size > source.stat().st_size * 0.8:
+            target.unlink()
+            print(f"Skipping low-value banner variant: {target.name}")
+
+
+if args.banners_only:
+    generate_banner_1200_variants()
+    raise SystemExit
+
 generate_missing_responsive_sets()
 generate_gallery_480_variants()
 
@@ -174,3 +212,7 @@ for page in PAGES:
             if image.size[0] <= MIN_WIDTH:
                 continue
         make_variant(path, TARGET_WIDTH)
+
+# Last, so --coverage-gaps-only and --mobile-cards-only stay limited to their
+# own outputs. A banner whose tier saves too little is re-evaluated each run.
+generate_banner_1200_variants()

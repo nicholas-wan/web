@@ -1129,8 +1129,10 @@
 .read-progress__fill {
   display: block;
   height: 100%;
-  width: 0;
+  width: 100%;
   background: linear-gradient(90deg, #11807d, #2fd7cf);
+  transform: scaleX(0);
+  transform-origin: left;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1203,10 +1205,42 @@ canvas {
     display: block;
   }
 }
+/* Pre-wedding wordmark: Joseph Sophia subset to the wordmark's letters and its
+   private-use swash glyphs (82 KB OTF to 12 KB WOFF2; source and command in
+   tools/fonts/README.md). block keeps fallback glyphs from flashing in place of
+   the private-use characters. Declared here instead of an inline <style> in
+   the page body; it downloads only on the page that renders it. */
+@font-face {
+  font-family: Wedding;
+  src: url("../fonts/josephsophia-wordmark.woff2") format("woff2");
+  font-display: block;
+}
+
 html,
 body {
   max-width: 100%;
   overflow-x: clip;
+}
+
+/* Phone text floor. Small labels use font-size: max(var(--text-floor), <rem>),
+   so phones never render them below 12px while wider screens keep their
+   authored sizes (the 11pt root at <=1280px would otherwise enlarge them too). */
+:root {
+  --text-floor: 0px;
+}
+
+@media screen and (max-width: 736px) {
+  :root {
+    --text-floor: 12px;
+  }
+}
+
+/* With overflow-x: clip on html, body's overflow no longer reaches the
+   viewport, so the modal nav sheet and map overlay must lock the root. */
+html:has(> body.is-navPanel-visible),
+html:has(> body.is-map-fullscreen) {
+  overflow: hidden;
+  scrollbar-gutter: stable;
 }
 
 /* The template sets overflow: hidden here, which breaks position: sticky
@@ -1501,7 +1535,7 @@ body {
 .travel-atlas__eyebrow {
   color: var(--color-brand-600);
   font-family: var(--font-display);
-  font-size: 0.7rem;
+  font-size: max(var(--text-floor), 0.7rem);
   font-weight: 900;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -2213,7 +2247,7 @@ body {
 .travel-map__trip-picker label {
   color: rgba(255, 255, 255, 0.58);
   font-family: var(--font-display);
-  font-size: 0.48rem;
+  font-size: max(var(--text-floor), 0.48rem);
   font-weight: 800;
   letter-spacing: 0.08em;
   line-height: 1;
@@ -2230,7 +2264,7 @@ body {
   background-color: #10292c;
   color: #fff;
   font-family: var(--font-display);
-  font-size: 0.66rem;
+  font-size: max(var(--text-floor), 0.66rem);
   font-weight: 800;
   letter-spacing: 0.02em;
   line-height: 1;
@@ -2583,7 +2617,7 @@ body.is-map-fullscreen #return-to-top {
   color: #fff !important;
   cursor: pointer;
   font-family: var(--font-display);
-  font-size: 0.74rem;
+  font-size: max(var(--text-floor), 0.74rem);
   font-weight: 800;
   letter-spacing: 0.05em;
   line-height: 1;
@@ -2894,7 +2928,7 @@ body.is-map-fullscreen #return-to-top {
     display: block;
     margin-top: 0.2rem;
     color: rgba(255, 255, 255, 0.62);
-    font-size: 0.7rem;
+    font-size: max(var(--text-floor), 0.7rem);
     letter-spacing: 0.06em;
     text-transform: uppercase;
   }
@@ -3131,7 +3165,7 @@ body.is-map-fullscreen #return-to-top {
 
   .travel-map.is-fullscreen .travel-map__status,
   .travel-map.is-fullscreen .travel-map__detail-number {
-    font-size: 0.66rem;
+    font-size: max(var(--text-floor), 0.66rem);
   }
 
   .travel-map.is-fullscreen .travel-map__detail-label {
@@ -3152,6 +3186,17 @@ body.is-map-fullscreen #return-to-top {
 
   .travel-map.is-fullscreen .travel-map__place {
     font-size: 0.46rem;
+  }
+
+  /* iOS zooms the page when a focused control's text is under 16px. */
+  .travel-map__trip-picker select {
+    height: 3rem;
+    font-size: 16px;
+  }
+
+  /* The taller picker ends ~1.65rem lower; keep the pill clear below it. */
+  .travel-map.is-fullscreen .travel-map__status {
+    top: calc(7.75rem + env(safe-area-inset-top));
   }
 }
 
@@ -3178,7 +3223,7 @@ body.is-map-fullscreen #return-to-top {
   display: block;
   color: var(--color-brand-600);
   font-family: var(--font-display);
-  font-size: 0.68rem;
+  font-size: max(var(--text-floor), 0.68rem);
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -3199,7 +3244,7 @@ body.is-map-fullscreen #return-to-top {
   margin: 0;
   color: var(--color-ink-500);
   font-family: var(--font-display);
-  font-size: 0.7rem;
+  font-size: max(var(--text-floor), 0.7rem);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -3269,7 +3314,7 @@ body.is-map-fullscreen #return-to-top {
 .travel-grid .travel-card header p {
   margin: 0;
   color: var(--color-ink-500);
-  font-size: 0.7rem;
+  font-size: max(var(--text-floor), 0.7rem);
   line-height: 1.3;
   text-align: left !important;
 }
@@ -3292,13 +3337,6 @@ body.is-map-fullscreen #return-to-top {
   object-fit: cover;
   object-position: center;
   transition: transform var(--motion-slow) var(--ease-standard);
-}
-
-.travel-grid .travel-card .travel-card__image picture,
-.travel-grid .travel-card > .image picture {
-  display: block;
-  width: 100%;
-  height: 100%;
 }
 
 .travel-grid .travel-card:hover .travel-card__image img,
@@ -3330,7 +3368,7 @@ body.is-map-fullscreen #return-to-top {
 .travel-grid .travel-card .actions.special .button {
   height: 2.25rem;
   padding: 0 1rem;
-  font-size: 0.62rem;
+  font-size: max(var(--text-floor), 0.62rem);
   line-height: 2.25rem;
 }
 
@@ -3485,7 +3523,7 @@ body.is-map-fullscreen #return-to-top {
   margin-bottom: 0.35rem;
   color: var(--color-brand-700);
   font-family: var(--font-display);
-  font-size: 0.72rem;
+  font-size: max(var(--text-floor), 0.72rem);
   font-weight: 900;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -3512,7 +3550,7 @@ body.is-map-fullscreen #return-to-top {
 .guangzhou-day__route strong {
   color: var(--color-brand-700);
   font-family: var(--font-display);
-  font-size: 0.68rem;
+  font-size: max(var(--text-floor), 0.68rem);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -3535,7 +3573,7 @@ body.is-map-fullscreen #return-to-top {
 
 .guangzhou-route__stop small {
   color: var(--color-ink-500);
-  font-size: 0.7rem;
+  font-size: max(var(--text-floor), 0.7rem);
   font-weight: 400;
   letter-spacing: 0.01em;
 }
@@ -3895,7 +3933,7 @@ body.is-map-fullscreen #return-to-top {
     background: #fff;
     color: var(--color-brand-700);
     font-family: var(--font-display);
-    font-size: 0.68rem;
+    font-size: max(var(--text-floor), 0.68rem);
     font-weight: 800;
     letter-spacing: 0.04em;
   }
@@ -4064,12 +4102,12 @@ body.is-map-fullscreen #return-to-top {
 
   .guangzhou-journal .content-details h3 {
     margin-bottom: 0.3rem;
-    font-size: 0.72rem;
+    font-size: max(var(--text-floor), 0.72rem);
     letter-spacing: 0.08em;
   }
 
   .guangzhou-journal .content-details p {
-    font-size: 0.67rem;
+    font-size: max(var(--text-floor), 0.67rem);
   }
 }
 
@@ -4332,7 +4370,7 @@ body.is-map-fullscreen #return-to-top {
 .internship-group__label span {
   margin-right: 0.45rem;
   color: #11807d;
-  font-size: 0.7rem;
+  font-size: max(var(--text-floor), 0.7rem);
   letter-spacing: 0.1em;
 }
 
@@ -4451,7 +4489,7 @@ body.is-map-fullscreen #return-to-top {
   margin: 0;
   color: var(--color-ink-500);
   font-family: var(--font-display);
-  font-size: 0.72rem;
+  font-size: max(var(--text-floor), 0.72rem);
   font-weight: 800;
   letter-spacing: 0.08em;
   line-height: 1.6;
@@ -4509,7 +4547,7 @@ body.is-map-fullscreen #return-to-top {
   margin-bottom: 0.25rem;
   color: var(--color-brand-600);
   font-family: var(--font-display);
-  font-size: 0.72rem;
+  font-size: max(var(--text-floor), 0.72rem);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -4551,7 +4589,7 @@ body.is-map-fullscreen #return-to-top {
 
 .case-study--internship .case-study__tags li {
   padding: 0.28rem 0.5rem;
-  font-size: 0.7rem;
+  font-size: max(var(--text-floor), 0.7rem);
 }
 
 .case-study__tags {
@@ -4676,7 +4714,7 @@ body.is-map-fullscreen #return-to-top {
 
 .earlier-project-card__body > span {
   color: #11807d;
-  font-size: 0.72rem;
+  font-size: max(var(--text-floor), 0.72rem);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -4886,6 +4924,7 @@ body.is-map-fullscreen #return-to-top {
     background: rgba(255, 255, 255, 0.98);
     box-shadow: none;
     overflow-y: auto;
+    overscroll-behavior: contain;
     transform: translateY(calc(100% + 2rem));
     transition: transform 0.28s cubic-bezier(0.22, 0.8, 0.32, 1), box-shadow 0.28s ease, visibility 0.28s;
   }
@@ -6905,7 +6944,7 @@ body.lightbox-open {
   background: #fff;
   color: var(--color-brand-700);
   font-family: var(--font-display);
-  font-size: 0.68rem;
+  font-size: max(var(--text-floor), 0.68rem);
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -7169,6 +7208,15 @@ body.lightbox-open {
    Keep the delays as longhands: the animation shorthand would reset the
    stagger and collapse every image onto the same frame. */
 @media (hover: none) {
+  /* Only the active gallery rotates on touch, so its later frames stay out of
+     layout until the gallery is warm: a display:none lazy image never
+     downloads. The stacked frames otherwise all load as each card nears
+     (~1 MB before any scroll). personal-timeline.js warms a gallery once its
+     card is on screen, ahead of the first crossfade two seconds after activation. */
+  .personal-timeline-event:not(.is-gallery-active):not([data-gallery-warm="true"]) .personal-event-card__image--slideshow img:not(:first-child) {
+    display: none;
+  }
+
   .personal-timeline-event.is-gallery-active .personal-event-card__image--slideshow img {
     animation-name: personal-card-slideshow;
     animation-duration: 20s;
@@ -7621,7 +7669,7 @@ body.page-home #intro {
 .japan-journal .japan-journal__eyebrow {
   margin: 0 0 0.65rem;
   color: var(--color-brand-600);
-  font: 900 0.72rem/1.2 var(--font-display);
+  font: 900 max(var(--text-floor), 0.72rem)/1.2 var(--font-display);
   letter-spacing: 0.18em;
   text-transform: uppercase;
 }
@@ -7952,7 +8000,7 @@ body.page-home #nav {
   }
 
   .portfolio-hero__scramble-support {
-    font-size: clamp(0.6rem, 2.5vw, 0.7rem);
+    font-size: max(var(--text-floor), clamp(0.6rem, 2.5vw, 0.7rem));
     letter-spacing: 0.045em;
   }
 }

@@ -600,16 +600,27 @@ function initCanvas(){
     can_w = parseInt(canvas.getAttribute('width'));
     can_h = parseInt(canvas.getAttribute('height'));
 }
+// A phone URL-bar show/hide resizes only the height by about a toolbar, and
+// resetting the bitmap then clears the canvas mid-scroll for nothing visible.
+// Desktop windows have no URL-bar resizes, so they always re-init.
 window.addEventListener('resize', function(e){
+    var docEl = document.documentElement;
+    if(compactCanvas && docEl.clientWidth === can_w && Math.abs(docEl.clientHeight - can_h) < 160){
+        return;
+    }
     initCanvas();
 });
+
+// The canvas sits behind the hero only; once the reader scrolls past it,
+// stop repainting an unseen layer every frame.
+var canvasOnScreen = true;
 
 function goMovie(){
     initCanvas();
     if(!balls.length){
         initBalls(compactCanvas ? 11 : 20);
     }
-    if(!document.hidden && !canvasRunning){
+    if(!document.hidden && canvasOnScreen && !canvasRunning){
         canvasRunning = true;
         animationFrameId = window.requestAnimationFrame(render);
     }
@@ -622,6 +633,17 @@ function stopMovie(){
     }
 }
 goMovie();
+
+if('IntersectionObserver' in window){
+    new IntersectionObserver(function(entries){
+        canvasOnScreen = entries[entries.length - 1].isIntersecting;
+        if(canvasOnScreen){
+            goMovie();
+        } else {
+            stopMovie();
+        }
+    }).observe(canvas);
+}
 
 document.addEventListener('visibilitychange', function(){
     if(document.hidden){

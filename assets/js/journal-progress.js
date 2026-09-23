@@ -12,7 +12,9 @@
     scheduled = false;
     var maximum = document.documentElement.scrollHeight - window.innerHeight;
     var progress = maximum > 0 ? Math.min(window.scrollY / maximum, 1) : 1;
-    fill.style.width = (progress * 100) + '%';
+    // A transform repaints on the compositor; animating width re-ran layout
+    // on every scroll frame.
+    fill.style.transform = 'scaleX(' + progress + ')';
   }
 
   function scheduleUpdate() {

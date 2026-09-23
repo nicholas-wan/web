@@ -281,6 +281,13 @@
       galleryEvents.forEach(function (event) {
         var cardBounds = event.querySelector('.personal-event-card').getBoundingClientRect();
         var isInReadingBand = cardBounds.bottom > viewport * 0.15 && cardBounds.top < viewport * 0.9;
+        /* On touch, later frames stay out of layout (so unloaded) until a
+           gallery is warm. Warm each as soon as its card is on screen, ahead of
+           activation in the reading band and its first crossfade two seconds
+           later. Measured on slow 4G at reading pace, every gallery had all its
+           frames by activation; a two-viewport lead restored ~400 KB of the
+           first-load saving for no visible gain. */
+        if (cardBounds.top < viewport && cardBounds.bottom > 0) warmGallery(event);
         var distance = event === focusEvent
           ? -1
           : Math.abs((cardBounds.top + cardBounds.bottom) / 2 - readingFocus);
@@ -356,7 +363,17 @@
     if (event.key === 'ArrowUp' || event.key === 'PageUp' || event.key === 'Home') scrollDirection = -1;
     else if (event.key === 'ArrowDown' || event.key === 'PageDown' || event.key === 'End' || event.key === ' ') scrollDirection = 1;
   });
-  window.addEventListener('resize', remeasureAndUpdate);
+  /* Card heights depend on width alone. A phone URL-bar show/hide resizes only
+     the height, so it refreshes the reading focus without re-measuring every
+     card, which unfolds all nine and forces two full-page layouts. */
+  var measuredWidth = window.innerWidth;
+  window.addEventListener('resize', function () {
+    if (window.innerWidth !== measuredWidth) {
+      measuredWidth = window.innerWidth;
+      needsMeasure = true;
+    }
+    requestProgressUpdate();
+  });
   if (singleRail.addEventListener) singleRail.addEventListener('change', remeasureAndUpdate);
   window.addEventListener('load', remeasureAndUpdate);
 

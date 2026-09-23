@@ -627,6 +627,7 @@
   /* Compact mobile journals are horizontal. A fading edge plus one short cue
      makes that interaction discoverable, then gets out of the way after the
      visitor actually scrolls each gallery. */
+  var cueRefreshers = [];
   Array.prototype.forEach.call(document.querySelectorAll('.travel-gallery--compact, .guangzhou-day--compact .masonry'), function (gallery) {
     var shell = document.createElement('div');
     var cue = document.createElement('div');
@@ -640,10 +641,15 @@
     cue.innerHTML = '<span>Swipe to browse</span><i aria-hidden="true">&#8596;</i>';
     shell.appendChild(cue);
 
-    var refreshCue = function () {
+    /* Split so a resize can read every gallery before writing any: alternating
+       reads and writes forced one layout per gallery (up to 36 per journal). */
+    var measureCue = function () {
       var scrollable = gallery.scrollWidth > gallery.clientWidth + 4;
-      cue.hidden = !scrollable;
-      gallery.classList.toggle('has-scroll-cue', scrollable && gallery.scrollLeft < 6);
+      var atStart = gallery.scrollLeft < 6;
+      return function () {
+        cue.hidden = !scrollable;
+        gallery.classList.toggle('has-scroll-cue', scrollable && atStart);
+      };
     };
     var dismissCue = function () {
       if (gallery.scrollLeft < 6) return;
@@ -652,8 +658,19 @@
     };
 
     gallery.addEventListener('scroll', dismissCue, { passive: true });
-    window.addEventListener('resize', refreshCue);
-    requestAnimationFrame(refreshCue);
+    cueRefreshers.push(measureCue);
+  });
+  var refreshCues = function () {
+    cueRefreshers.map(function (measure) { return measure(); }).forEach(function (apply) { apply(); });
+  };
+  if (cueRefreshers.length) requestAnimationFrame(refreshCues);
+  /* Gallery overflow depends on width alone, so a phone URL-bar resize
+     (height only) leaves the cues as they are. */
+  var cueWidth = window.innerWidth;
+  window.addEventListener('resize', function () {
+    if (!cueRefreshers.length || window.innerWidth === cueWidth) return;
+    cueWidth = window.innerWidth;
+    requestAnimationFrame(refreshCues);
   });
 
   overlay.querySelector('.lightbox__close').addEventListener('click', close);

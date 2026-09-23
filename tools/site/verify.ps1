@@ -313,7 +313,7 @@ if ($travel -notmatch '<div class="travel-archive-heading">' -or $travel -notmat
 foreach ($archiveImage in @('2025_japan/day14_hakone/fuji1.jpg', '2024_australia/melbourne_12apostles/apostles3.jpg', '2024_germany/cologne/cologne-card.jpg', '2023_usa_canada/day2/empire_state1.jpg', '2023_perth/day1/bathers_bay_02.jpg', '2022_europe/day2/paris3-card.jpg')) {
     if ($travel -notmatch [regex]::Escape("images/travel/$archiveImage")) { throw "Travel archive is missing in-journal thumbnail: $archiveImage" }
 }
-if ($travel -notmatch 'travel_2026_guangzhou' -or [regex]::Matches($travel, '2026_guangzhou/day5/pearl-river-view\.webp').Count -lt 2 -or $travel -notmatch 'alt="Guangzhou skyline beside the Pearl River"') { throw "Guangzhou journal card must use the scenery-based Pearl River thumbnail at desktop and mobile sizes." }
+if ($travel -notmatch 'travel_2026_guangzhou' -or $travel -notmatch '<img class="citc" src="images/travel/2026_guangzhou/day5/pearl-river-view\.webp"[^>]*srcset="[^"]*pearl-river-view-480\.webp 480w' -or $travel -match '<source[^>]*pearl-river-view' -or $travel -notmatch 'alt="Guangzhou skyline beside the Pearl River"') { throw "Guangzhou journal card must use the scenery-based Pearl River thumbnail through its responsive srcset; a <source> override would pin phones to the full image." }
 $travelMapMarkup = [regex]::Match($travel, '(?s)<div class="travel-map__canvas">(.*?)<p class="travel-map__hint">').Groups[1].Value
 if ([regex]::Matches($travelMapMarkup, 'class="travel-map__journal-link"').Count -ne 11 -or $travelMapMarkup -match 'class="travel-map__journal-link"[^>]*href="[^"]+#') { throw "Every travel map popup must link to the top of its journal without a section fragment." }
 foreach ($mapLabel in @('US West', 'US East', 'Canada', 'Western Europe', 'Germany', 'Japan', 'South Korea', 'China', 'Western Australia', 'Melbourne', 'Sydney')) {
@@ -733,4 +733,23 @@ foreach ($retiredPage in @('experience_captqr', 'experience_guco', 'experience_n
     if (Test-Path -LiteralPath (Join-Path $dist "$retiredPage.html")) { throw "Retired page is still published: $retiredPage" }
     if ($sitemap -match [regex]::Escape("https://nicholaswan.me/$retiredPage")) { throw "Sitemap still exposes retired page: $retiredPage" }
 }
+# Phone optimizations (Sep 2026). html's overflow-x: clip stops body overflow
+# reaching the viewport, so the nav sheet and map overlay lock the root.
+if ($sharedCustomCss -notmatch '(?s)html:has\(> body\.is-navPanel-visible\),\s*html:has\(> body\.is-map-fullscreen\)\s*\{[^}]*overflow:\s*hidden' -or $sharedCustomCss -notmatch '(?s)#navPanel\s*\{[^}]*overscroll-behavior:\s*contain') { throw "The phone nav sheet and map overlay must lock the root scroller, not only body." }
+if ($travelMapPageCss -notmatch '(?s)@media screen and \(max-width: 520px\).*?\.travel-map__trip-picker select\s*\{[^}]*height:\s*3rem[^}]*font-size:\s*16px') { throw "The phone atlas trip picker must keep 16px text (iOS focus zoom) and a 3rem target." }
+foreach ($floorRule in @('\.guangzhou-journal \.content-details h3', '\.guangzhou-journal \.content-details p', '\.guangzhou-route__stop small', '\.travel-grid \.travel-card \.actions\.special \.button', '\.case-study__highlights li > span')) {
+    if ($customCss -notmatch "(?s)$floorRule\s*\{[^}]*font-size:\s*max\(var\(--text-floor\),") { throw "Phone text must keep its 12px floor: $floorRule" }
+}
+if ($sharedCustomCss -notmatch '(?s):root\s*\{\s*--text-floor:\s*0px;\s*\}\s*@media screen and \(max-width: 736px\)\s*\{\s*:root\s*\{\s*--text-floor:\s*12px;') { throw "The phone text floor must be 12px at phone widths and off on wider screens." }
+foreach ($bannerJournal in @('travel_2024_germany', 'travel_2025_japan', 'travel_2023_perth')) {
+    $bannerHtml = Get-Content -LiteralPath (Join-Path $dist "$bannerJournal.html") -Raw -Encoding UTF8
+    if ($bannerHtml -notmatch '<link rel="preload" as="image"[^>]*imagesrcset="[^"]*-1200\.jpg 1200w' -or $bannerHtml -notmatch 'class="journal-banner"[^>]*srcset="[^"]*-1200\.jpg 1200w') { throw "$bannerJournal banner must offer its -1200 tier so DPR-3 phones skip the full original." }
+}
+if ($prewed -match '<style>' -or $house -match '<style>' -or $sharedCustomCss -notmatch '(?s)@font-face\s*\{\s*font-family:\s*Wedding;\s*src:\s*url\("\.\./fonts/josephsophia-wordmark\.woff2"\)' -or (Test-Path -LiteralPath (Join-Path $dist 'assets\fonts\josephsophia.otf'))) { throw "The pre-wedding wordmark must use the subset WOFF2 from shared CSS, not the 82 KB OTF or an inline style block." }
+Assert-FileSizeBudget 'assets\fonts\josephsophia-wordmark.woff2' 16
+if ($personalPageCss -notmatch '(?s)@media \(hover: none\).*?\.personal-timeline-event:not\(\.is-gallery-active\):not\(\[data-gallery-warm="true"\]\) \.personal-event-card__image--slideshow img:not\(:first-child\)\s*\{\s*display:\s*none') { throw "Touch galleries must keep later frames out of layout until their card activates." }
+if ($canvasJs -notmatch 'new IntersectionObserver' -or $canvasJs -notmatch 'canvasOnScreen && !canvasRunning') { throw "The homepage canvas must stop drawing once it leaves the viewport." }
+if ($journalProgressJs -notmatch "fill\.style\.transform = 'scaleX\('" -or $sharedCustomCss -notmatch '(?s)\.read-progress__fill\s*\{[^}]*transform-origin:\s*left') { throw "Journal progress must animate a transform, not width." }
+if ($galleryJs -match "window\.addEventListener\('resize', refreshCue\)" -or $personalTimelineJs -match "window\.addEventListener\('resize', remeasureAndUpdate\)") { throw "Phone URL-bar resizes must not re-run width-only layout work." }
+
 Write-Output "Verified $($pages.Count) generated pages, landmarks, headings, assets, and portfolio content."

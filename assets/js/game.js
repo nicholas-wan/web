@@ -86,7 +86,21 @@
       ticking = true;
       requestAnimationFrame(function () { ticking = false; update(); });
     }, { passive: true });
-    window.addEventListener('resize', function () { measure(); update(); });
+    /* A phone URL-bar resize changes only the height, and the phone photo's
+       42vh cap tracks the large viewport, which the URL bar never moves, so
+       those resizes skip measure()'s forced layouts. Desktop sizes the photo
+       by 62vh of a real window, so every desktop resize re-measures. update()
+       reads the viewport height and always runs, batched into the next frame. */
+    var measuredWidth = window.innerWidth;
+    window.addEventListener('resize', function () {
+      if (window.innerWidth !== measuredWidth || window.innerWidth > 736) {
+        measuredWidth = window.innerWidth;
+        measure();
+      }
+      if (ticking) { return; }
+      ticking = true;
+      requestAnimationFrame(function () { ticking = false; update(); });
+    });
     if (document.readyState === 'complete') {
       measure();
     } else {

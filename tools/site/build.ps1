@@ -174,12 +174,20 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                 $variant800 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-800' + $variantSuffix))
                 $has480 = $dimensions.Width -gt 480 -and [bool](Get-SourceImageInfo $variant480 $SourceIndex)
                 $has800 = $dimensions.Width -gt 800 -and [bool](Get-SourceImageInfo $variant800 $SourceIndex)
+                # Journal banners carry a -1200 tier: their truthful 100vw phone
+                # slot needs ~1170 device px on a DPR-3 phone, which skipped -800
+                # and fetched the full 1470-1920 px original (make-responsive-variants.py).
+                $variant1200 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-1200' + $variantSuffix))
+                $has1200 = $has800 -and $dimensions.Width -gt 1200 -and [bool](Get-SourceImageInfo $variant1200 $SourceIndex)
                 if ($has480) {
                     $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-480' + $variantSuffix)) 480w"
                 }
                 if (-not $has480) { $sources += $originalSource }
                 if ($has800) {
                     $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-800' + $variantSuffix)) 800w"
+                }
+                if ($has1200) {
+                    $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-1200' + $variantSuffix)) 1200w"
                 }
                 if ($has480) { $sources += $originalSource }
                 if ($sources.Count -gt 1) {
@@ -193,8 +201,8 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                         # 3.2) above DPR 3, so phones cap at -800 (~12 MB, -64%) and
                         # accept a mild upscale on gallery thumbnails. The banner is
                         # the LCP hero and its dense scenes soften visibly at that
-                        # upscale, so it stays truthful at 100vw and keeps the full
-                        # source. Its <head> preload mirrors this img, so leaving the
+                        # upscale, so it stays truthful at 100vw and DPR-3 phones take
+                        # its -1200 tier, never less. Its <head> preload mirrors this img, so leaving the
                         # banner slot unchanged keeps the two byte-identical.
                         #
                         # Journal gallery tiles are five-up on desktop and were
