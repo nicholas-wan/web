@@ -5,7 +5,14 @@ param(
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$out = Join-Path $root $Output
+$out = [IO.Path]::GetFullPath((Join-Path $root $Output))
+# -Clean empties this directory, so it must be a generated folder inside the
+# repository and never the root, .git or a source tree.
+$outRelative = $out.Substring([Math]::Min($root.Length, $out.Length)).TrimStart('\', '/')
+if (-not $out.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+        ($outRelative -split '[\\/]')[0] -in @('.git', '.github', '.private', 'assets', 'docs', 'images', 'images-webp', 'journals', 'partials', 'tools', 'vendor')) {
+    throw "Refusing to build into '$Output': the output must be a generated folder inside the repository, not the root or a source folder."
+}
 Add-Type -AssemblyName System.Drawing
 $navigationPartialPath = Join-Path $root "partials\site-navigation.html"
 if (-not (Test-Path -LiteralPath $navigationPartialPath)) { throw "Missing shared navigation partial: $navigationPartialPath" }
@@ -26,8 +33,12 @@ foreach ($imageSourceRoot in @((Join-Path $root 'images'), (Join-Path $root 'ima
 }
 if (Test-Path -LiteralPath $imageDimensionCachePath) {
     try {
-        foreach ($entry in @(Get-Content -LiteralPath $imageDimensionCachePath -Raw -Encoding UTF8 | ConvertFrom-Json)) {
-            $imageDimensionCache[$entry.Path] = $entry
+        # Assign before iterating: Windows PowerShell 5.1 emits a parsed JSON
+        # array as one pipeline object, so @(... | ConvertFrom-Json) would wrap
+        # the whole list as a single entry and every lookup would miss.
+        $cachedEntries = Get-Content -LiteralPath $imageDimensionCachePath -Raw -Encoding UTF8 | ConvertFrom-Json
+        foreach ($entry in $cachedEntries) {
+            if ($entry.Path -is [string]) { $imageDimensionCache[$entry.Path] = $entry }
         }
     } catch {
         Write-Warning "Ignoring invalid image dimension cache: $imageDimensionCachePath"
@@ -266,6 +277,7 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
         $publishedImageIndex[$publishedFile.FullName.ToLowerInvariant()] = $publishedFile
     }
     $copied = 0
+    $missing = [System.Collections.Generic.List[string]]::new()
 
     foreach ($reference in ($references | Sort-Object)) {
         $relative = $reference.Substring('images/'.Length) -replace '/', '\\'
@@ -275,7 +287,7 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
         if ($webpCandidate -and (Get-SourceImageInfo $webpCandidate $SourceIndex)) { $source = $webpCandidate }
         elseif (Get-SourceImageInfo $imageCandidate $SourceIndex) { $source = $imageCandidate }
         if (-not $source) {
-            Write-Warning "Skipping stale image reference: $reference"
+            $missing.Add($reference)
             continue
         }
 
@@ -292,6 +304,12 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
             Copy-Item -LiteralPath $source -Destination $destination -Force
             $copied++
         }
+    }
+    # This scan is the only check that sees CSS url(), script strings and
+    # data-poster; verify.ps1 checks HTML attributes alone. A missing image here
+    # would otherwise ship as a production 404 behind a green build.
+    if ($missing.Count -gt 0) {
+        throw "Generated output references missing images (use -Clean if a removed page left stale output):`n  $($missing -join "`n  ")"
     }
     Write-Output "Published $($references.Count) referenced images ($copied copied)."
 }

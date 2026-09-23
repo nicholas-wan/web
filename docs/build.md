@@ -20,7 +20,9 @@ Builds are incremental by default. Use a clean build after removing files or whe
 .\tools\site.ps1 verify
 ```
 
-Incremental builds retain unchanged published images and cache source-image dimensions in the ignored `.cache/` directory. Clean builds reset `dist/` but may reuse valid dimension metadata.
+Incremental builds retain unchanged published images and cache source-image dimensions in the ignored `.cache/` directory. Clean builds reset `dist/` but may reuse valid dimension metadata. `-Output` must name a generated folder inside the repository; the build refuses the root and source folders because `-Clean` empties it.
+
+The build fails when generated HTML, CSS, script or manifest output references an `images/` path that exists in neither `images/` nor `images-webp/`. That scan is the only check covering CSS `url()`, script strings and `data-poster`; `verify.ps1` checks HTML attributes and also fails on any `<img>` without an `alt` attribute.
 
 The build adds intrinsic image dimensions, native lazy loading, first-image priority, responsive `srcset` markup, and the controlled `images-webp/` overlay. Source originals remain in `images/`; only referenced runtime assets are copied to `dist/`.
 

@@ -4776,6 +4776,13 @@ body.is-map-fullscreen #return-to-top {
     letter-spacing: 0.065em;
   }
 
+  /* main.css strips the outline with an ID selector that outranks the
+     site-wide a:focus-visible ring, so restore one inside the bar. */
+  #nav ul.links li a:focus-visible {
+    outline: 2px solid rgba(40, 215, 197, 0.9);
+    outline-offset: -4px;
+  }
+
   #nav ul.links li.active {
     background: rgba(255, 255, 255, 0.08);
     box-shadow: inset 0 -2px 0 rgba(40, 215, 197, 0.72);

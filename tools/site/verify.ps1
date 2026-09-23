@@ -167,6 +167,10 @@ foreach ($page in $pages) {
     $navSignature = (($sharedNav.Value -replace ' class="active"', '') -replace '\s+', ' ').Trim()
     [void]$navSignatures.Add($navSignature)
     if ([regex]::IsMatch($scan, '<img\b(?=[^>]*\balt="")[^>]*>', 'IgnoreCase')) { throw "$($page.Name) contains an image with empty alt text." }
+    # gallery.js backfills alt from captions at runtime, which leaves no-script
+    # readers with nothing, so the source must carry it.
+    $altlessImage = [regex]::Match($scan, '<img\b(?![^>]*\balt=)[^>]*>', 'IgnoreCase')
+    if ($altlessImage.Success) { throw "$($page.Name) contains an image with no alt attribute: $($altlessImage.Value)" }
     if ([regex]::IsMatch($scan, '<a\b(?=[^>]*\bhref="#!")[^>]*>', 'IgnoreCase')) { throw "$($page.Name) contains a dead #! link." }
     $nonTopDeadLink = [regex]::Matches($scan, '<a\b(?=[^>]*\bhref="#")[^>]*>', 'IgnoreCase') | Where-Object { $_.Value -notmatch '\bid="return-to-top"' }
     if ($nonTopDeadLink.Count -gt 0) { throw "$($page.Name) contains a dead # link." }

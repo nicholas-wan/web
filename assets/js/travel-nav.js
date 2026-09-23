@@ -280,7 +280,12 @@
       button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     });
 
+    // Phone URL-bar show/hide fires resize with only the height changed;
+    // collapsing then would snap an open route shut mid-read.
+    var lastWidth = window.innerWidth;
     window.addEventListener('resize', function () {
+      if (window.innerWidth === lastWidth) return;
+      lastWidth = window.innerWidth;
       group.classList.remove('is-expanded');
       button.textContent = 'View full route';
       button.setAttribute('aria-expanded', 'false');

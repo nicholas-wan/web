@@ -630,6 +630,8 @@
   };
 
   var stopFly = function () {
+    // Also drop a pending trip-entry card.
+    window.clearTimeout(tripEntryTimer);
     if (flyFrame) {
       window.cancelAnimationFrame(flyFrame);
       flyFrame = 0;
