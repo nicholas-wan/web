@@ -18,7 +18,7 @@ Other commands:
 .\tools\site.ps1 verify
 ```
 
-Preview the generated site with the existing `dist` launch configuration or any static HTTP server.
+Preview the generated site with `node tools/preview-server.mjs` (port 4321, also the `dist` launch configuration). Plain static servers such as `python -m http.server` do not resolve the extensionless page URLs, so navigation links 404 there.
 
 ## Repository map
 

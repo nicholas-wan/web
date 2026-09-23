@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "dist",
-      "runtimeExecutable": "python",
-      "runtimeArgs": ["-m", "http.server", "4321", "--directory", "dist"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["tools/preview-server.mjs", "4321"],
       "port": 4321
     }
   ]

@@ -680,6 +680,17 @@
   document.addEventListener('keydown', function (event) {
     if (!overlay.classList.contains('is-visible')) return;
     if (event.key === 'Escape') close();
+    /* Once zoomed, the arrows pan the photo as a drag does; otherwise a
+       keyboard user could only ever see the centre of a zoomed image. */
+    var panStep = !currentIsVideo && zoomLevel > 1 &&
+      { ArrowLeft: [1, 0], ArrowRight: [-1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] }[event.key];
+    if (panStep) {
+      event.preventDefault();
+      panX += panStep[0] * viewport.clientWidth * 0.2;
+      panY += panStep[1] * viewport.clientHeight * 0.2;
+      renderMediaTransform();
+      return;
+    }
     if (event.key === 'ArrowLeft') show(current - 1);
     if (event.key === 'ArrowRight') show(current + 1);
     if (event.key === 'Tab') {

@@ -525,7 +525,7 @@
        the selected trip's own. Same predicate as the mute below, so pointer and
        keyboard can never disagree again. */
     regionMarkers.forEach(function (marker) {
-      marker.setAttribute('tabindex',
+      marker.firstElementChild.setAttribute('tabindex',
         detailLevel === 'region' && markerMatchesActiveTrip(marker) ? '0' : '-1');
     });
   };

@@ -32,7 +32,7 @@ Journal gallery tiles advertise a `20vw` desktop `sizes` slot (measured five-up 
 
 `assets/js/main.js` also remains the authored theme source. Its shared shell is dependency-free and owns navigation, focus management, the page reveal, optional parallax, and return-to-top behavior. The build extracts its marked canvas block into `canvas-background.js` for the homepage only. Homepage interactions stay in `game.js`; Skills and Travel use `listing-effects.js`, and journals use `journal-progress.js`. Verification enforces route ownership, rejects the retired jQuery/theme-helper runtime, and caps per-page JavaScript payloads.
 
-Preview `dist/` with any static web server. The `.claude/launch.json` configuration serves it on port 4321.
+Preview `dist/` with `node tools/preview-server.mjs [port]`, which the `.claude/launch.json` configuration runs on port 4321. It resolves extensionless URLs such as `/experience` to their `.html` files the way GitHub Pages does; a plain static server such as `python -m http.server` does not, so every navigation link 404s there.
 
 ## Theme stylesheet
 

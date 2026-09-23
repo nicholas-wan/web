@@ -129,16 +129,6 @@
 .education-highlights strong {
   color: var(--color-ink-800);
 }
-.cv {
-  margin-bottom: 60px;
-}
-.workbutton {
-  margin-bottom: 20px;
-}
-#more {
-  display: none;
-}
-
 .image.main img {
   display: block;
   height: auto;
@@ -153,15 +143,6 @@
   }
   .aboutblock {
     text-align: left !important;
-  }
-  .rowpad {
-    padding-left: 0 !important;
-  }
-}
-
-@media screen and (min-width: 800px) {
-  .rowpad {
-    padding: 4rem 4rem 2rem 3rem;
   }
 }
 
@@ -1266,12 +1247,7 @@ body {
     filter var(--motion-slow) ease-in-out;
   backface-visibility: hidden; /* Remove Image flickering on hover */
   object-fit: cover;
-  /* max-height: 450px; */
 }
-
-/* .masonry .brick:hover img {
-	opacity: .90;
-  } */
 
 /* Masonry on tablets */
 @media only screen and (min-width: 768px) and (max-width: 1023px) {
@@ -1285,13 +1261,6 @@ body {
   .masonry {
     column-count: 3;
   }
-}
-
-.svimg {
-  height: 400px;
-  object-fit: cover;
-  width: 100%;
-  border: 0px !important;
 }
 
 @media all and (max-width: 600px) {
@@ -1395,20 +1364,12 @@ body {
   line-height: 1.4 !important;
 }
 
-.fadeIn-bottom {
-  top: 80%;
-}
-
 .fadeIn-top {
   top: 20%;
 }
 
 .fadeIn-left {
   left: 20%;
-}
-
-.fadeIn-right {
-  left: 80%;
 }
 
 #return-to-top {
@@ -1495,14 +1456,6 @@ body {
   flex:0 0 auto;
   vertical-align:middle;
   margin-bottom:-10px;
-}
-
-.textlogo {
-  width: 25px !important;
-  height: 25px;
-  max-width: 25px;
-  object-fit: contain;
-  margin-bottom: -5px;
 }
 
 /* Travel destination atlas */
@@ -2080,7 +2033,9 @@ body {
   opacity: 0;
 }
 
-.travel-map__marker:focus-visible {
+/* The dot, not the marker, is the button: a role="button" wrapper would hide
+   the journal links inside the marker's popover from assistive technology. */
+.travel-map__marker-dot:focus-visible {
   border-radius: 50%;
   outline: 0.16rem solid #fff;
   outline-offset: 0.25rem;
@@ -6176,8 +6131,7 @@ body.lightbox-open {
 
   iframe,
   video,
-  canvas,
-  blockquote.instagram-media {
+  canvas {
     max-width: 100% !important;
   }
 }
@@ -6890,17 +6844,6 @@ body.lightbox-open {
   max-width: 48rem;
   margin: 0 auto 2rem;
   text-align: center;
-}
-
-.personal-timeline__eyebrow {
-  display: block;
-  margin-bottom: 0.45rem;
-  color: var(--color-brand-700);
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
 }
 
 .personal-timeline__intro h1 {
@@ -7764,11 +7707,6 @@ body.page-home #nav {
 
   .personal-timeline__intro p {
     text-align: left;
-  }
-
-  .personal-timeline__guide {
-    justify-content: flex-start;
-    margin-bottom: 0;
   }
 
   .personal-timeline__years {

@@ -8,50 +8,6 @@
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* Fire callback once per element when it scrolls into view. Uses a
-     rAF-throttled scroll/resize check instead of IntersectionObserver so it
-     also works in throttled/embedded renderers where IO never delivers. */
-  var watchers = [];
-  var watchScheduled = false;
-
-  function inViewport(el, ratio) {
-    var r = el.getBoundingClientRect();
-    if (!r.width || !r.height) { return false; }
-    var vh = window.innerHeight || document.documentElement.clientHeight;
-    var visible = Math.min(r.bottom, vh) - Math.max(r.top, 0);
-    return visible > r.height * (ratio || 0.15);
-  }
-
-  function checkWatchers() {
-    watchScheduled = false;
-    for (var i = watchers.length - 1; i >= 0; i--) {
-      var w = watchers[i];
-      if (inViewport(w.el, w.ratio)) {
-        watchers.splice(i, 1);
-        w.cb(w.el);
-      }
-    }
-    if (!watchers.length) {
-      window.removeEventListener('scroll', scheduleWatch);
-      window.removeEventListener('resize', scheduleWatch);
-    }
-  }
-
-  function scheduleWatch() {
-    if (watchScheduled) { return; }
-    watchScheduled = true;
-    requestAnimationFrame(checkWatchers);
-  }
-
-  function onVisible(el, cb, ratio) {
-    if (!watchers.length) {
-      window.addEventListener('scroll', scheduleWatch, { passive: true });
-      window.addEventListener('resize', scheduleWatch);
-    }
-    watchers.push({ el: el, cb: cb, ratio: ratio });
-    scheduleWatch();
-  }
-
   function ready(fn) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', fn);
@@ -61,34 +17,12 @@
   }
 
   ready(function () {
-    restoreDate();
     initIntroSwipe();
     initHeroSnap();
     initCardScrub();
-    initReveal();
-    initCounters();
-    initTilt();
     initHeroBurst();
     initKonami();
-    initReadProgress();
   });
-
-  /* ------------------------------------------------------------------ */
-  /* 1. Date + analog clock                                              */
-  /*    These ran as inline scripts in the source index.html but sit     */
-  /*    after </footer>, so the static build dropped them and the        */
-  /*    deployed home page shipped an empty date + frozen clock. Restore. */
-  /* ------------------------------------------------------------------ */
-  function restoreDate() {
-    var para = document.getElementById('para1');
-    if (para && !para.textContent.trim()) {
-      var d = new Date();
-      var months = ['January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'];
-      var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-      para.textContent = days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate();
-    }
-  }
 
   /* The desktop scene pins while it scrubs; phones use the portrait's entry
      through one viewport so no completed scene retains a dead scroll tail. */
@@ -264,44 +198,6 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 2. Scroll reveal (staggered)                                        */
-  /* ------------------------------------------------------------------ */
-  function initReveal() {
-    var groups = [
-      '.hero-badges .hero-badge',
-      '.homepage-links .homepage-link',
-      '.education-grid .education-card',
-      '.posts > article',
-      '.travel-grid .travel-card'
-    ];
-    var all = [];
-    groups.forEach(function (sel) {
-      var items = document.querySelectorAll(sel);
-      for (var i = 0; i < items.length; i++) {
-        var el = items[i];
-        if (el.hasAttribute('data-reveal') || el.hasAttribute('data-scrub')) { continue; }
-        el.setAttribute('data-reveal', '');
-        el.style.setProperty('--reveal-delay', (Math.min(i, 8) * 70) + 'ms');
-        all.push(el);
-      }
-    });
-    // Any elements authored with data-reveal directly.
-    var authored = document.querySelectorAll('[data-reveal]:not(.is-revealed)');
-    for (var j = 0; j < authored.length; j++) {
-      if (all.indexOf(authored[j]) === -1) { all.push(authored[j]); }
-    }
-    if (!all.length) { return; }
-
-    if (reduce) {
-      all.forEach(function (el) { el.classList.add('is-revealed'); });
-      return;
-    }
-    all.forEach(function (el) {
-      onVisible(el, function (target) { target.classList.add('is-revealed'); }, 0.12);
-    });
-  }
-
-  /* ------------------------------------------------------------------ */
   /* 2b. Homepage cards: scroll-scrubbed entrance                        */
   /* ------------------------------------------------------------------ */
   function initCardScrub() {
@@ -346,112 +242,6 @@
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', schedule);
     update();
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* 3. Count-up stat numbers                                            */
-  /* ------------------------------------------------------------------ */
-  function initCounters() {
-    var els = document.querySelectorAll('[data-count]');
-    if (!els.length) { return; }
-
-    function run(el) {
-      if (el.getAttribute('data-counted') === 'true') { return; }
-      el.setAttribute('data-counted', 'true');
-      var target = parseFloat(el.getAttribute('data-count')) || 0;
-      if (reduce) { el.textContent = String(target); return; }
-      var dur = 1400;
-      var startTs = null;
-      function step(ts) {
-        if (startTs === null) { startTs = ts; }
-        var p = Math.min((ts - startTs) / dur, 1);
-        var eased = 1 - Math.pow(1 - p, 3);
-        el.textContent = String(Math.round(target * eased));
-        if (p < 1) { requestAnimationFrame(step); }
-        else { el.textContent = String(target); }
-      }
-      requestAnimationFrame(step);
-    }
-
-    if (reduce) {
-      for (var i = 0; i < els.length; i++) { run(els[i]); }
-      return;
-    }
-
-    var cardCounters = [];
-    for (var k = 0; k < els.length; k++) {
-      var card = els[k].closest ? els[k].closest('.homepage-link[data-scrub]') : null;
-      if (card) { cardCounters.push({ el: els[k], card: card }); }
-      else { onVisible(els[k], run, 0.5); }
-    }
-
-    if (cardCounters.length) {
-      var counterTicking = false;
-      function checkCardCounters() {
-        counterTicking = false;
-        var remaining = 0;
-        for (var i = 0; i < cardCounters.length; i++) {
-          var item = cardCounters[i];
-          if (item.el.getAttribute('data-counted') === 'true') { continue; }
-          var progress = parseFloat(item.card.style.getPropertyValue('--ip')) || 0;
-          if (progress >= 0.78) { run(item.el); }
-          else { remaining++; }
-        }
-        if (!remaining) {
-          window.removeEventListener('scroll', scheduleCounterCheck);
-          window.removeEventListener('resize', scheduleCounterCheck);
-        }
-      }
-      function scheduleCounterCheck() {
-        if (counterTicking) { return; }
-        counterTicking = true;
-        requestAnimationFrame(checkCardCounters);
-      }
-      window.addEventListener('scroll', scheduleCounterCheck, { passive: true });
-      window.addEventListener('resize', scheduleCounterCheck);
-      scheduleCounterCheck();
-    }
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* 4. Pointer tilt (3D) with cursor glow                               */
-  /* ------------------------------------------------------------------ */
-  function initTilt() {
-    if (reduce) { return; }
-    if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) { return; }
-    var sel = '.travel-grid .travel-card, .education-grid .education-card';
-    var els = document.querySelectorAll(sel);
-    for (var i = 0; i < els.length; i++) {
-      var el = els[i];
-      el.classList.add('js-tilt');
-      bindTilt(el);
-    }
-  }
-
-  function bindTilt(el) {
-    var max = 8;
-    var frame = null;
-    el.addEventListener('pointermove', function (ev) {
-      if (frame) { return; }
-      frame = requestAnimationFrame(function () {
-        frame = null;
-        var r = el.getBoundingClientRect();
-        var px = (ev.clientX - r.left) / r.width - 0.5;
-        var py = (ev.clientY - r.top) / r.height - 0.5;
-        el.style.transform = 'perspective(760px) rotateX(' + (-py * max).toFixed(2) +
-          'deg) rotateY(' + (px * max).toFixed(2) + 'deg) translateY(-4px)';
-        el.style.setProperty('--gx', (px * 100 + 50) + '%');
-        el.style.setProperty('--gy', (py * 100 + 50) + '%');
-        el.style.setProperty('--icon-x', (px * 12).toFixed(2) + 'px');
-        el.style.setProperty('--icon-y', (py * 12).toFixed(2) + 'px');
-      });
-    });
-    el.addEventListener('pointerleave', function () {
-      if (frame) { cancelAnimationFrame(frame); frame = null; }
-      el.style.transform = '';
-      el.style.removeProperty('--icon-x');
-      el.style.removeProperty('--icon-y');
-    });
   }
 
   /* ------------------------------------------------------------------ */
@@ -570,49 +360,5 @@
         nextToast();
       }, 400);
     }, 3200);
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* 8. Journal reading progress bar                                     */
-  /* ------------------------------------------------------------------ */
-  var TRIPS = {
-    travel_2017_seoul: 'Seoul',
-    travel_2019_siliconvalley: 'Silicon Valley',
-    travel_2022_europe: 'Europe',
-    travel_2023_perth: 'Perth',
-    travel_2023_usacanada: 'USA & Canada',
-    travel_2024_australia: 'Australia',
-    travel_2024_germany: 'Germany',
-    travel_2025_japan: 'Japan',
-    travel_2026_guangzhou: 'Guangzhou'
-  };
-
-  function pageSlug() {
-    var p = window.location.pathname.split('/').pop() || 'index';
-    return p.replace(/\.html$/, '') || 'index';
-  }
-
-  function initReadProgress() {
-    if (!TRIPS[pageSlug()]) { return; }
-
-    var bar = document.createElement('div');
-    bar.className = 'read-progress';
-    bar.innerHTML = '<span class="read-progress__fill"></span>';
-    document.body.appendChild(bar);
-    var fill = bar.firstChild;
-
-    function update() {
-      var max = document.documentElement.scrollHeight - window.innerHeight;
-      var pct = max > 0 ? Math.min(window.scrollY / max, 1) : 1;
-      fill.style.width = (pct * 100) + '%';
-    }
-
-    var ticking = false;
-    window.addEventListener('scroll', function () {
-      if (ticking) { return; }
-      ticking = true;
-      requestAnimationFrame(function () { ticking = false; update(); });
-    }, { passive: true });
-    update();
   }
 })();
