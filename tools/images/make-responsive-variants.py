@@ -1,10 +1,12 @@
 """Generate responsive image variants used by the static-site build.
 
-tools/site/build.ps1 advertises matching -480.jpg and -800.jpg siblings in srcset.
-This script generates the broader 800px set for page images wider than 1000px,
-plus a small, curated set of 480px travel-card banners. It also closes complete
-journal responsive-coverage gaps when a smaller variant reduces transferred
-bytes. Animated WebPs are intentionally left unchanged.
+tools/site/build.ps1 advertises matching -480, -800 and (journal banners only)
+-1200 siblings in srcset. This script generates the broader 800px set for page
+images wider than 1000px, plus a small, curated set of 480px travel-card
+banners. It also closes complete journal responsive-coverage gaps when a
+smaller variant reduces transferred bytes, and adds the -1200 journal-banner
+tier (--banners-only runs just that step). Animated WebPs are intentionally
+left unchanged.
 """
 import argparse
 import json
@@ -149,6 +151,11 @@ def generate_gallery_480_variants() -> None:
             make_variant(source, 480, keep_only_if_smaller=True)
 
 
+# 2:1 banners that phones crop with object-fit: cover into a ~1.58:1 box: a
+# DPR-3 phone needs ~1364 device px of width, so a 1200 tier would upscale them.
+BANNER_1200_SKIP = {"seoul-winter-banner", "canton-tower-sunset-banner"}
+
+
 def generate_banner_1200_variants() -> None:
     """Journal banners keep a truthful 100vw phone slot, so a DPR-3 phone
     (~1170 device px) skipped -800 and fetched the 1470-1920px original, up to
@@ -163,6 +170,8 @@ def generate_banner_1200_variants() -> None:
         reference = re.search(r'src="(images/[^"]+)"', banner.group(0)).group(1)
         source = next((s for r, s in referenced_journal_sources([page]) if r == reference), None)
         if source is None:
+            continue
+        if source.stem in BANNER_1200_SKIP:
             continue
         webp = source.suffix.lower() == ".webp"
         target = source.with_name(source.stem + ("-1200.webp" if webp else "-1200.jpg"))

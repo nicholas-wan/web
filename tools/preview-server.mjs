@@ -29,7 +29,15 @@ const types = {
 };
 
 createServer(async (request, response) => {
-  const pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+  let pathname;
+  try {
+    pathname = decodeURIComponent(new URL(request.url, 'http://localhost').pathname);
+  } catch {
+    // A malformed escape such as /%E0%A4%A throws; left unhandled inside this
+    // async handler it would terminate the whole server.
+    response.writeHead(400, { 'Content-Type': 'text/plain; charset=utf-8' }).end('Bad request');
+    return;
+  }
   const relative = pathname === '/' ? 'index.html' : pathname.replace(/^\/+/, '');
   let file = normalize(join(root, relative));
   if (file !== root && !file.startsWith(root + sep)) {
@@ -48,7 +56,7 @@ createServer(async (request, response) => {
       'Content-Type': types[extname(file).toLowerCase()] || 'application/octet-stream',
       'Content-Length': info.size
     });
-    createReadStream(file).pipe(response);
+    createReadStream(file).on('error', () => response.destroy()).pipe(response);
   } catch {
     const notFound = join(root, '404.html');
     response.writeHead(404, { 'Content-Type': 'text/html; charset=utf-8' });

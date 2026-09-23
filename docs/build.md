@@ -20,13 +20,13 @@ Builds are incremental by default. Use a clean build after removing files or whe
 .\tools\site.ps1 verify
 ```
 
-Incremental builds retain unchanged published images and cache source-image dimensions in the ignored `.cache/` directory. Clean builds reset `dist/` but may reuse valid dimension metadata. `-Output` must name a generated folder inside the repository; the build refuses the root and source folders because `-Clean` empties it.
+Incremental builds retain unchanged published images and cache source-image dimensions in the ignored `.cache/` directory. Clean builds reset `dist/` but may reuse valid dimension metadata. `-Output` must name a `dist*` folder directly inside the repository (for example `dist` or `dist-test`); anything else is refused because `-Clean` empties it. Incremental builds mirror `assets/fonts` and `assets/icons`, so a file removed from source also leaves `dist`.
 
 The build fails when generated HTML, CSS, script or manifest output references an `images/` path that exists in neither `images/` nor `images-webp/`. That scan is the only check covering CSS `url()`, script strings and `data-poster`; `verify.ps1` checks HTML attributes and also fails on any `<img>` without an `alt` attribute.
 
 The build adds intrinsic image dimensions, native lazy loading, first-image priority, responsive `srcset` markup, and the controlled `images-webp/` overlay. Source originals remain in `images/`; only referenced runtime assets are copied to `dist/`.
 
-Journal banners keep a truthful `100vw` phone slot and add a `-1200` tier (`make-responsive-variants.py --banners-only`, q82 JPEG / q80 WebP, kept only when it saves a fifth of the bytes): a DPR-3 phone needs ~1170 device pixels, so without it phones skipped `-800` and fetched the 1470–1920px original, up to 463 KB for the LCP image.
+Journal banners advertise their measured layout width as `sizes`: `100vw` on phones, `calc(100vw - 176px)` up to 1024px, `1024px` up to 1680px and `1366px` above, where the 16pt root widens the column. They add a `-1200` tier (`make-responsive-variants.py --banners-only`, q82 JPEG / q80 WebP, kept only when it saves a fifth of the bytes): a DPR-3 phone needs ~1170 device pixels, so without it phones skipped `-800` and fetched the 1470–1920px original, up to 463 KB for the LCP image. Seoul and Guangzhou are excluded: their 2:1 artwork is cover-cropped into the ~1.58:1 phone box, which needs ~1364 device pixels.
 
 Journal gallery tiles advertise a `20vw` desktop `sizes` slot (measured five-up tile widths, 129–325px between 737px and 1920px viewports) so 1x screens select `-480` and 2x screens `-800`; non-journal galleries keep the `800px` slot. Journal animations have their `poster` renamed to `data-poster`, because a poster attribute downloads at page load even with `preload="none"`; `gallery.js` attaches it as the animation nears the viewport and `travel-map.js` reads either attribute for the atlas detail card.
 

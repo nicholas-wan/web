@@ -1866,7 +1866,6 @@ html:has(> body.is-map-fullscreen) {
 }
 
 .travel-map__marker:hover,
-.travel-map__marker:focus,
 .travel-map__marker:focus-within {
   z-index: 5;
 }
@@ -2041,7 +2040,6 @@ html:has(> body.is-map-fullscreen) {
 }
 
 .travel-map__marker:hover .travel-map__marker-dot,
-.travel-map__marker:focus .travel-map__marker-dot,
 .travel-map__marker:focus-within .travel-map__marker-dot {
   background: #ffb869;
   box-shadow:
@@ -2051,7 +2049,6 @@ html:has(> body.is-map-fullscreen) {
 }
 
 .travel-map__marker:hover .travel-map__marker-label,
-.travel-map__marker:focus .travel-map__marker-label,
 .travel-map__marker:focus-within .travel-map__marker-label {
   border-color: rgba(255, 184, 105, 0.55);
   background: #10292c;
@@ -2062,7 +2059,6 @@ html:has(> body.is-map-fullscreen) {
 }
 
 .travel-map__marker:hover .travel-map__place,
-.travel-map__marker:focus .travel-map__place,
 .travel-map__marker:focus-within .travel-map__place {
   opacity: 0;
 }
@@ -3163,9 +3159,14 @@ body.is-map-fullscreen #return-to-top {
     font-size: 0.82rem;
   }
 
-  .travel-map.is-fullscreen .travel-map__status,
-  .travel-map.is-fullscreen .travel-map__detail-number {
+  .travel-map.is-fullscreen .travel-map__status {
     font-size: max(var(--text-floor), 0.66rem);
+  }
+
+  /* Stop numbers sit inside a 1.2rem map dot, so they keep their canvas size
+     like the place labels rather than take the 12px text floor. */
+  .travel-map.is-fullscreen .travel-map__detail-number {
+    font-size: 0.66rem;
   }
 
   .travel-map.is-fullscreen .travel-map__detail-label {

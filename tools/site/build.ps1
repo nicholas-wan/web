@@ -5,13 +5,13 @@ param(
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
-$out = [IO.Path]::GetFullPath((Join-Path $root $Output))
-# -Clean empties this directory, so it must be a generated folder inside the
-# repository and never the root, .git or a source tree.
-$outRelative = $out.Substring([Math]::Min($root.Length, $out.Length)).TrimStart('\', '/')
-if (-not $out.StartsWith($root + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
-        ($outRelative -split '[\\/]')[0] -in @('.git', '.github', '.private', 'assets', 'docs', 'images', 'images-webp', 'journals', 'partials', 'tools', 'vendor')) {
-    throw "Refusing to build into '$Output': the output must be a generated folder inside the repository, not the root or a source folder."
+$out = [IO.Path]::GetFullPath((Join-Path $root $Output)).TrimEnd('\', '/')
+# -Clean empties this directory, so accept only a dist* folder directly inside
+# the repository. An allow-list: the old block-list let '.\' (the root plus a
+# trailing separator) and every unlisted top-level folder or file through.
+if ((Split-Path -Parent $out) -ne $root -or (Split-Path -Leaf $out) -notmatch '^dist[\w.-]*$' -or
+        (Test-Path -LiteralPath $out -PathType Leaf)) {
+    throw "Refusing to build into '$Output': the output must be a dist* folder directly inside the repository."
 }
 Add-Type -AssemblyName System.Drawing
 $navigationPartialPath = Join-Path $root "partials\site-navigation.html"
@@ -102,7 +102,10 @@ function Get-CachedImageDimensions([string]$Path, [hashtable]$SourceIndex) {
     if (-not $info) { return $null }
     $key = $info.FullName.ToLowerInvariant()
     $cached = $script:imageDimensionCache[$key]
-    if ($cached -and $cached.Length -eq $info.Length -and $cached.LastWriteTicks -eq $info.LastWriteTimeUtc.Ticks) {
+    # A hand-edited or corrupted entry must fall through to a fresh read, not
+    # throw on the [int] cast or emit width="0".
+    if ($cached -and $cached.Length -eq $info.Length -and $cached.LastWriteTicks -eq $info.LastWriteTimeUtc.Ticks -and
+            "$($cached.Width)" -match '^[1-9]\d*$' -and "$($cached.Height)" -match '^[1-9]\d*$') {
         return @{ Width = [int]$cached.Width; Height = [int]$cached.Height }
     }
 
@@ -201,9 +204,12 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                         # 3.2) above DPR 3, so phones cap at -800 (~12 MB, -64%) and
                         # accept a mild upscale on gallery thumbnails. The banner is
                         # the LCP hero and its dense scenes soften visibly at that
-                        # upscale, so it stays truthful at 100vw and DPR-3 phones take
-                        # its -1200 tier, never less. Its <head> preload mirrors this img, so leaving the
-                        # banner slot unchanged keeps the two byte-identical.
+                        # upscale, so its slot stays truthful: 100vw on phones, and on
+                        # desktop the measured width (vw - 176px up to 1024px, then
+                        # 848-1024px up to 1680px, then 1365px once the 16pt root
+                        # widens the column). The old flat 1152px understated 1920px
+                        # screens, which then took -1200 for a 1365px banner. Its
+                        # <head> preload mirrors this img attribute for attribute.
                         #
                         # Journal gallery tiles are five-up on desktop and were
                         # measured at 129px (737px viewport), 197px (1024px),
@@ -212,7 +218,7 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                         # and 2x desktops the full ~1536px original for a
                         # ~220px tile. A 20vw slot selects -480 on 1x and -800
                         # on 2x screens up to 1920px wide (Sep 2026).
-                        $sizes = if ($isJournalBanner) { '(max-width: 736px) 100vw, 1152px' } elseif ($JournalGallery) { '(max-width: 736px) 250px, 20vw' } else { '(max-width: 736px) 250px, 800px' }
+                        $sizes = if ($isJournalBanner) { '(max-width: 736px) 100vw, (max-width: 1024px) calc(100vw - 176px), (max-width: 1680px) 1024px, 1366px' } elseif ($JournalGallery) { '(max-width: 736px) 250px, 20vw' } else { '(max-width: 736px) 250px, 800px' }
                         $tag = Add-AttributeToImgTag $tag ('sizes="{0}"' -f $sizes)
                     }
                 }
@@ -253,8 +259,13 @@ function Sync-Directory([string]$Source, [string]$Destination) {
     if ($Clean) {
         Get-ChildItem -LiteralPath $Source -Force | Copy-Item -Destination $Destination -Recurse -Force
     } else {
-        & robocopy $Source $Destination /E /XO /FFT /NFL /NDL /NJH /NJS /NP | Out-Null
+        # /MIR also purges files the source no longer has (a moved font or a
+        # retired icon), which /E left behind in an incremental dist.
+        & robocopy $Source $Destination /MIR /XO /FFT /NFL /NDL /NJH /NJS /NP | Out-Null
         if ($LASTEXITCODE -gt 7) { throw "Failed to sync $Source to $Destination (robocopy exit $LASTEXITCODE)." }
+        # robocopy reports copies (1) and purges (2) as non-zero successes; left
+        # in place, that code would become the script's exit status.
+        $global:LASTEXITCODE = 0
     }
 }
 

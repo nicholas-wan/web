@@ -169,7 +169,7 @@ foreach ($page in $pages) {
     if ([regex]::IsMatch($scan, '<img\b(?=[^>]*\balt="")[^>]*>', 'IgnoreCase')) { throw "$($page.Name) contains an image with empty alt text." }
     # gallery.js backfills alt from captions at runtime, which leaves no-script
     # readers with nothing, so the source must carry it.
-    $altlessImage = [regex]::Match($scan, '<img\b(?![^>]*\balt=)[^>]*>', 'IgnoreCase')
+    $altlessImage = [regex]::Match($scan, '<img\b(?![^>]*\salt=)[^>]*>', 'IgnoreCase')
     if ($altlessImage.Success) { throw "$($page.Name) contains an image with no alt attribute: $($altlessImage.Value)" }
     if ([regex]::IsMatch($scan, '<a\b(?=[^>]*\bhref="#!")[^>]*>', 'IgnoreCase')) { throw "$($page.Name) contains a dead #! link." }
     $nonTopDeadLink = [regex]::Matches($scan, '<a\b(?=[^>]*\bhref="#")[^>]*>', 'IgnoreCase') | Where-Object { $_.Value -notmatch '\bid="return-to-top"' }
@@ -476,7 +476,7 @@ foreach ($journalName in @('travel_2017_seoul.html', 'travel_2019_siliconvalley.
     if ($journalMarkup -notmatch '<main id="main"[^>]*data-journal-template="v2"' -or [regex]::Matches($journalMarkup, 'class="travel-section-nav').Count -ne 1 -or [regex]::Matches($journalMarkup, 'class="travel-pagination"').Count -ne 1 -or $journalMarkup -notmatch [regex]::Escape((Get-DistAssetRef 'assets/css/travel-journal.css')) -or $journalMarkup -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/travel-nav.js')) -or $journalMarkup -match '{{[A-Z_]+}}') { throw "$journalName is not rendered exactly once through the shared travel journal template and scroll guard." }
 }
 if ($guangzhou -notmatch '<main id="main" class="[^"]*travel-journal[^"]*travel-journal--compact[^"]*guangzhou-journal' -or $guangzhou -notmatch 'class="travel-journal__content"' -or $guangzhou -match '<!DOCTYPE HTML>.*<!DOCTYPE HTML>') { throw "Guangzhou must prove the content-only compact journal build path without nesting a legacy document shell." }
-if ($japan -notmatch 'sizes="\(max-width: 736px\) 100vw, 1152px"' -or $customCss -notmatch '(?s)\.page-travel-journal header\.major > \.date::before,\s*\.page-travel-journal header\.major > \.date::after\s*\{[^}]*position:\s*static[^}]*flex:\s*1 1 0') { throw "Journal banners must request full-width sources and date dividers must not overlap their labels." }
+if ($japan -notmatch 'sizes="\(max-width: 736px\) 100vw, \(max-width: 1024px\) calc\(100vw - 176px\), \(max-width: 1680px\) 1024px, 1366px"' -or $customCss -notmatch '(?s)\.page-travel-journal header\.major > \.date::before,\s*\.page-travel-journal header\.major > \.date::after\s*\{[^}]*position:\s*static[^}]*flex:\s*1 1 0') { throw "Journal banners must request full-width sources and date dividers must not overlap their labels." }
 # Gallery photos cap phone density at the -800 tier (250px slot -> 800w at DPR 3);
 # only the LCP banner keeps the full-width 100vw phone slot. This keeps a 3x phone
 # journal near ~12 MB instead of ~33 MB. If the old truthful gallery slot returns,
@@ -741,6 +741,12 @@ foreach ($floorRule in @('\.guangzhou-journal \.content-details h3', '\.guangzho
     if ($customCss -notmatch "(?s)$floorRule\s*\{[^}]*font-size:\s*max\(var\(--text-floor\),") { throw "Phone text must keep its 12px floor: $floorRule" }
 }
 if ($sharedCustomCss -notmatch '(?s):root\s*\{\s*--text-floor:\s*0px;\s*\}\s*@media screen and \(max-width: 736px\)\s*\{\s*:root\s*\{\s*--text-floor:\s*12px;') { throw "The phone text floor must be 12px at phone widths and off on wider screens." }
+# Seoul and Guangzhou are 2:1 banners cover-cropped into the ~1.58:1 phone box, so
+# a DPR-3 phone needs ~1364 device px and a 1200 tier would upscale them.
+foreach ($fullBannerJournal in @('travel_2017_seoul', 'travel_2026_guangzhou')) {
+    $fullBannerHtml = Get-Content -LiteralPath (Join-Path $dist "$fullBannerJournal.html") -Raw -Encoding UTF8
+    if ($fullBannerHtml -match '-1200\.webp 1200w') { throw "$fullBannerJournal banner must not offer a -1200 tier; its phone crop needs more pixels." }
+}
 foreach ($bannerJournal in @('travel_2024_germany', 'travel_2025_japan', 'travel_2023_perth')) {
     $bannerHtml = Get-Content -LiteralPath (Join-Path $dist "$bannerJournal.html") -Raw -Encoding UTF8
     if ($bannerHtml -notmatch '<link rel="preload" as="image"[^>]*imagesrcset="[^"]*-1200\.jpg 1200w' -or $bannerHtml -notmatch 'class="journal-banner"[^>]*srcset="[^"]*-1200\.jpg 1200w') { throw "$bannerJournal banner must offer its -1200 tier so DPR-3 phones skip the full original." }
