@@ -32,6 +32,12 @@ Journal gallery tiles advertise a `20vw` desktop `sizes` slot (measured five-up 
 
 Preview `dist/` with any static web server. The `.claude/launch.json` configuration serves it on port 4321.
 
+## Theme stylesheet
+
+`assets/css/main.css` is the Massively theme stylesheet with its unused rules removed (Sep 2026: 848 rules down to 366, 79 KB to 46 KB, about 10 KB to 7 KB gzipped). A rule was removed only when a class, id or element in its selector exists nowhere on the built site: not in the generated HTML, not in any script string literal, and not in the DOM captured after scripts ran at desktop, tablet and phone widths in several interaction states. Base styles for plain content elements that journals may use later (`h4`–`h6`, `em`, `b`, `ol`, `blockquote`, `code`, `pre`, `hr`, `sub`, `sup`, `mark`, tables, `dl`, `iframe`) were kept on purpose; form controls and the theme's grid, box, feature and pagination components were not, so reintroducing those needs their rules restored from `vendor/massively/`.
+
+The tooling lives in `tools/css/`: `computed-style-check.py` hashes the computed style and box of every element on every page and state (needs `pip install playwright` and Microsoft Edge), and `prune-main-css.py` performs the removal from that baseline. The prune was accepted after a side-by-side run of that check (17 pages, 3 viewports, 172 states, ~123,000 elements) found no differences other than the timing noise its old-versus-old control run also shows: mid-crossfade photo opacities on the personal timeline and the phone atlas teaser's replaying animation.
+
 ## Deployment
 
 GitHub Pages does not execute PowerShell when publishing directly from a branch. `.github/workflows/pages.yml` checks out `master`, runs `tools/site.ps1 check`, and deploys the resulting `dist/` artifact.
