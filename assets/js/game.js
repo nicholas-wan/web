@@ -182,6 +182,7 @@
     function settle() {
       settleTimer = 0;
       settleDirection = 0;
+      if (!direction) { return; }
       if (touching || glideFrame !== null || !mobile.matches) { return; }
       var edge = farEdge();
       var y = window.scrollY;
@@ -364,9 +365,9 @@
     var t = document.createElement('div');
     t.className = 'game-toast';
     t.setAttribute('role', 'status');
-    t.textContent = toastQueue.shift();
+    var msg = toastQueue.shift();
     document.body.appendChild(t);
-    setTimeout(function () { t.classList.add('is-visible'); }, 20);
+    setTimeout(function () { t.textContent = msg; t.classList.add('is-visible'); }, 20);
     setTimeout(function () {
       t.classList.remove('is-visible');
       setTimeout(function () {

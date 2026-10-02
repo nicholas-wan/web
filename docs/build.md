@@ -24,7 +24,7 @@ Incremental builds retain unchanged published images and cache source-image dime
 
 The build fails when generated HTML, CSS, script or manifest output references an `images/` path that exists in neither `images/` nor `images-webp/`. That scan is the only check covering CSS `url()`, script strings and `data-poster`; `verify.ps1` checks HTML attributes and also fails on any `<img>` without an `alt` attribute.
 
-The build adds intrinsic image dimensions, native lazy loading, first-image priority, responsive `srcset` markup, and the controlled `images-webp/` overlay. Source originals remain in `images/`; only referenced runtime assets are copied to `dist/`.
+The build adds intrinsic image dimensions, native lazy loading, first-image priority, responsive `srcset` markup, and the controlled `images-webp/` overlay. Source originals remain in `images/`; only referenced runtime assets are copied to `dist/`, together with the root files `CNAME`, `robots.txt`, `sitemap.xml`, `site.webmanifest` and `favicon.ico` (Chromium requests `/favicon.ico` on every page regardless of the declared PNG icon).
 
 Journal banners advertise their measured layout width as `sizes`: `100vw` on phones, `calc(100vw - 176px)` up to 1024px, `1024px` up to 1680px and `1366px` above, where the 16pt root widens the column. They add a `-1200` tier (`make-responsive-variants.py --banners-only`, q82 JPEG / q80 WebP, kept only when it saves a fifth of the bytes): a DPR-3 phone needs ~1170 device pixels, so without it phones skipped `-800` and fetched the 1470–1920px original, up to 463 KB for the LCP image. Seoul and Guangzhou are excluded: their 2:1 artwork is cover-cropped into the ~1.58:1 phone box, which needs ~1364 device pixels.
 
@@ -32,7 +32,7 @@ Journal gallery tiles advertise a `20vw` desktop `sizes` slot (measured five-up 
 
 `assets/css/custom.css` remains the authored source of truth. The build extracts marker-bounded route blocks into `travel-map-page.css`, `travel-journal.css`, `experience-page.css`, `personal-page.css`, and `skills-page.css`. Generated pages load only their matching route bundle; shared rules remain in the generated `custom.css`.
 
-`assets/js/main.js` also remains the authored theme source. Its shared shell is dependency-free and owns navigation, focus management, the page reveal, optional parallax, and return-to-top behavior. The build extracts its marked canvas block into `canvas-background.js` for the homepage only. Homepage interactions stay in `game.js`; Skills and Travel use `listing-effects.js`, and journals use `journal-progress.js`. Verification enforces route ownership, rejects the retired jQuery/theme-helper runtime, and caps per-page JavaScript payloads.
+`assets/js/main.js` also remains the authored theme source. Its shared shell is dependency-free and owns navigation, focus management, the page reveal, and return-to-top behavior. The build extracts its marked canvas block into `canvas-background.js` for the homepage only. Homepage interactions stay in `game.js`; Skills and Travel use `listing-effects.js`, and journals use `journal-progress.js`. Verification enforces route ownership, rejects the retired jQuery/theme-helper runtime, and caps per-page JavaScript payloads.
 
 Preview `dist/` with `node tools/preview-server.mjs [port]`, which the `.claude/launch.json` configuration runs on port 4321. It resolves extensionless URLs such as `/experience` to their `.html` files the way GitHub Pages does; a plain static server such as `python -m http.server` does not, so every navigation link 404s there.
 
@@ -44,7 +44,7 @@ The tooling lives in `tools/css/`: `computed-style-check.py` hashes the computed
 
 ## Deployment
 
-GitHub Pages does not execute PowerShell when publishing directly from a branch. `.github/workflows/pages.yml` checks out `master`, runs `tools/site.ps1 check`, and deploys the resulting `dist/` artifact.
+GitHub Pages does not execute PowerShell when publishing directly from a branch. `.github/workflows/pages.yml` checks out `master`, runs `tools/site.ps1 check`, and deploys the resulting `dist/` artifact. The build step runs under Windows PowerShell 5.1 (`shell: powershell`), the same engine as every local check, so a local `site.ps1 check` pass is representative of CI.
 
 The Pages source must remain **GitHub Actions**. The custom domain is configured in Pages settings; the committed `CNAME` is copied into the artifact but does not replace that setting.
 
@@ -57,7 +57,7 @@ python .\tools\images\make-responsive-variants.py
 python .\tools\images\convert-curated-webp.py
 ```
 
-`make-responsive-variants.py` emits the controlled `-480` and `-800` JPEG set, gives every journal gallery source with an `-800` sibling a `-480` one (the 1x desktop source for the `20vw` slot), and closes responsive-coverage gaps for journal JPEGs and WebPs when the result is smaller; animated WebPs are excluded. Animations ship as an H.264 MP4 tile plus a static `-poster.webp`; do not add animated WebP or GIF tiles. `convert-curated-webp.py` regenerates the selected deterministic WebP overlay.
+`make-responsive-variants.py` emits the controlled `-480` and `-800` JPEG set, gives every journal gallery source with an `-800` sibling a `-480` one (the 1x desktop source for the `20vw` slot), and closes responsive-coverage gaps for journal JPEGs and WebPs when the result is smaller; animated WebPs are excluded. Animations ship as an H.264 MP4 tile plus a static `-poster.webp`; do not add animated WebP or GIF tiles. `convert-curated-webp.py` regenerates the selected deterministic WebP overlay. `make-touch-icons.py` regenerates the home-screen icons (`images/apple-touch-icon.png`, `icon-192.png` and `icon-512.png`) from the owner-approved dark-field "NW" monogram polygons, rendered at 8x supersample and downscaled for clean edges.
 
 The map generator lives at `tools/maps/generate-world-map.ps1` and downloads Natural Earth data before replacing `images/travel/world-map.svg`. It simplifies every ring with Douglas–Peucker at `-Tolerance 0.25` canvas pixels (45,965 points and 218 KB gzipped down to ~17,500 points and ~90 KB) while keeping every feature, including sub-pixel islets.
 

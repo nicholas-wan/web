@@ -6,6 +6,7 @@ For every images/*.gif referenced by the root HTML pages:
 - rewrites the HTML reference from .gif to .webp
 - prints the gif relative paths (backslash form) for tools/site/build.ps1's
   $optimizedAnimatedImages list, which removes the legacy .gif from dist
+  (That list has since been emptied; this script is retained for reference only.)
 
 Also caps static WebPs in images-webp/ to 1600px on the longest side
 (they were converted from full-resolution camera JPGs).

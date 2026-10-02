@@ -1,13 +1,10 @@
 :root {
   --color-brand-700: #0c6663;
   --color-brand-600: #11807d;
-  --color-brand-400: #55a7a3;
   --color-brand-200: #98c9c6;
   --color-brand-100: #e9f6f5;
   --color-brand-wash: rgba(18, 138, 134, 0.1);
   --color-brand-faint: rgba(18, 138, 134, 0.025);
-  --color-brand-border: rgba(18, 138, 134, 0.12);
-  --color-brand-icon: rgba(18, 138, 134, 0.16);
   --color-ink-900: #20343d;
   --color-ink-800: #243640;
   --color-ink-700: #34474f;
@@ -129,18 +126,7 @@
 .education-highlights strong {
   color: var(--color-ink-800);
 }
-.image.main img {
-  display: block;
-  height: auto;
-}
-
 @media only screen and (max-width: 600px) {
-  .image.main {
-    width: 100% !important;
-  }
-  .blank {
-    display: none;
-  }
   .aboutblock {
     text-align: left !important;
   }
@@ -350,9 +336,9 @@
 }
 
 /* Details ship expanded; main.js adds toolkit-card--js and collapses them,
-   so the content stays reachable without JS. Hover-expansion lives in the
-   JS mouseenter path only — a CSS :hover rule here would fight the click-
-   to-collapse state (visually open, aria-expanded=false). */
+   so the content stays reachable without JS. Expansion is click/keyboard
+   only (main.js) — a CSS :hover rule here would fight the click-to-collapse
+   state (visually open, aria-expanded=false). */
 .toolkit-card__detail {
   overflow: hidden;
 }
@@ -837,7 +823,7 @@
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 0.5rem;
   background:
-    radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgba(18, 138, 134, 0.07), transparent 55%),
+    radial-gradient(circle at 50% 0%, rgba(18, 138, 134, 0.07), transparent 55%),
     #ffffff;
   color: #596273;
   overflow: hidden;
@@ -865,10 +851,6 @@
   border-color: rgba(18, 138, 134, 0.55);
   box-shadow: 0 0.9rem 2rem rgba(0, 0, 0, 0.14);
   outline: none;
-}
-
-.homepage-link:not(.js-tilt):hover,
-.homepage-link:not(.js-tilt):focus-visible {
   transform: translateY(-4px);
 }
 
@@ -903,10 +885,6 @@
 .homepage-link:focus-visible::before {
   transform: scale(1.18) rotate(-6deg);
 }
-
-.homepage-link:nth-child(1)::before { --homepage-card-icon: url("../icons/fontawesome/solid/briefcase.svg"); }
-.homepage-link:nth-child(2)::before { --homepage-card-icon: url("../icons/fontawesome/solid/graduation-cap.svg"); }
-.homepage-link:nth-child(3)::before { --homepage-card-icon: url("../icons/fontawesome/solid/plane.svg"); }
 
 /* Homepage cards use real icon elements so their motion can be tied to the
    same reversible scroll progress as the card entrance. */
@@ -950,7 +928,6 @@
   z-index: 1;
   font-size: 1.65rem;
   line-height: 1;
-  transform: translate(var(--icon-x, 0), var(--icon-y, 0));
   transition: transform var(--motion-fast) ease;
 }
 
@@ -970,7 +947,7 @@
 
 .homepage-link:hover .homepage-link__icon > .icon,
 .homepage-link:focus-visible .homepage-link__icon > .icon {
-  transform: translate(var(--icon-x, 0), var(--icon-y, 0)) scale(1.12) rotate(-5deg);
+  transform: scale(1.12) rotate(-5deg);
 }
 
 .homepage-link__desc {
@@ -988,45 +965,6 @@
 .notfound .homepage-link:nth-child(1)::before { --homepage-card-icon: url("../icons/fontawesome/solid/house.svg"); }
 .notfound .homepage-link:nth-child(2)::before { --homepage-card-icon: url("../icons/fontawesome/solid/briefcase.svg"); }
 .notfound .homepage-link:nth-child(3)::before { --homepage-card-icon: url("../icons/fontawesome/solid/plane.svg"); }
-
-/* Hero highlight badges */
-.hero-badges {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.55rem;
-  max-width: 48rem;
-  margin: 0 auto 1.75rem;
-  padding: 0;
-  list-style: none;
-}
-
-.hero-badges .hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.4rem 0.85rem;
-  border: 1px solid rgba(0, 0, 0, 0.14);
-  border-radius: 999px;
-  background: #ffffff;
-  color: #444;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  transition: transform var(--motion-standard) var(--ease-standard),
-    box-shadow var(--motion-standard) ease,
-    border-color var(--motion-standard) ease;
-}
-
-.hero-badges .hero-badge .icon {
-  color: #11807d;
-}
-
-.hero-badges .hero-badge:hover {
-  transform: translateY(-2px);
-  border-color: rgba(18, 138, 134, 0.7);
-  box-shadow: 0 0.4rem 1rem rgba(18, 138, 134, 0.2);
-}
 
 /* Scroll reveal */
 [data-reveal] {
@@ -1165,9 +1103,6 @@
   }
 }
 @media all and (max-width: 600px) {
-  html, body {
-    overflow-x: clip;
-  }
   body {
     position: relative
   }
@@ -1181,7 +1116,7 @@
 h3 {
   color: grey !important;
 }
-canvas {
+canvas#nokey {
   background-color: #000;
   position: absolute;
   top: 0;
@@ -1478,18 +1413,6 @@ html:has(> body.is-map-fullscreen) {
 	.mason4{
     column-count:4;
   }
-}
-
-.countrylogo{
-  height:45px;
-  width:auto;
-  width:auto !important;
-  max-width:45px;
-  max-height:45px;
-  object-fit:contain;
-  flex:0 0 auto;
-  vertical-align:middle;
-  margin-bottom:-10px;
 }
 
 /* Travel destination atlas */
@@ -3070,12 +2993,9 @@ body.is-map-fullscreen #return-to-top {
 
   /* Perth/Melbourne/Sydney cluster tightly on a phone-width world map, so their
      enlarged tap halos overlapped and a tap on one opened another's journal.
-     Nudge them apart and trim these three halos just enough to separate the hit
-     areas; the map's zoom handles finer selection. */
-  .travel-map__marker--perth { top: 81%; left: 74%; }
-  .travel-map__marker--melbourne { top: 86%; left: 84%; }
-  .travel-map__marker--sydney { top: 77%; left: 93%; }
-
+     Trim these three halos just enough to separate the hit areas; the map's
+     zoom handles finer selection. (travel-map.js projects every marker from
+     its data-map-lat/lon, so percentage nudges here would be overridden.) */
   .travel-map__marker--perth::before,
   .travel-map__marker--melbourne::before,
   .travel-map__marker--sydney::before {
@@ -4132,7 +4052,6 @@ body.is-map-fullscreen #return-to-top {
 }
 
 #intro .portfolio-hero__summary {
-  max-width: 43rem;
   margin: 0;
   color: rgba(255, 255, 255, 0.86);
   font-size: 1.15rem;
@@ -4174,7 +4093,7 @@ body.is-map-fullscreen #return-to-top {
   white-space: nowrap;
   overflow: hidden;
   isolation: isolate;
-  transition: width 0.26s cubic-bezier(0.22, 0.8, 0.32, 1),
+  transition: width 0.26s var(--ease-emphasized),
     background-color 0.2s ease,
     box-shadow 0.2s ease;
 }
@@ -4209,7 +4128,7 @@ body.is-map-fullscreen #return-to-top {
   justify-content: center;
   font-size: 0.92rem;
   line-height: 1;
-  transition: color 0.2s ease, transform 0.26s cubic-bezier(0.22, 0.8, 0.32, 1),
+  transition: color 0.2s ease, transform 0.26s var(--ease-emphasized),
     background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -4289,8 +4208,8 @@ body.is-map-fullscreen #return-to-top {
   display: none;
 }
 
-.homepage .homepage-link:not(.js-tilt):hover,
-.homepage .homepage-link:not(.js-tilt):focus-visible {
+.homepage .homepage-link:hover,
+.homepage .homepage-link:focus-visible {
   transform: translateY(-2px);
 }
 
@@ -4927,7 +4846,7 @@ body.is-map-fullscreen #return-to-top {
     overflow-y: auto;
     overscroll-behavior: contain;
     transform: translateY(calc(100% + 2rem));
-    transition: transform 0.28s cubic-bezier(0.22, 0.8, 0.32, 1), box-shadow 0.28s ease, visibility 0.28s;
+    transition: transform 0.28s var(--ease-emphasized), box-shadow 0.28s ease, visibility 0.28s;
   }
 
   body.is-navPanel-visible #navPanel {
@@ -6448,209 +6367,6 @@ body.lightbox-open {
   text-align: left !important;
 }
 
-@media screen and (min-width: 981px) {
-  .page-skills #main > .post {
-    display: grid;
-    grid-template-columns: minmax(18rem, 0.78fr) minmax(0, 1.42fr);
-    grid-template-rows: auto auto;
-    align-items: start;
-    gap: 1.25rem 2.5rem;
-    padding: 3.5rem 4rem;
-  }
-
-  .page-skills .education-heading,
-  .page-skills .skills-heading {
-    align-self: start;
-    margin: 0;
-    text-align: left;
-  }
-
-  .page-skills .education-heading {
-    grid-column: 1;
-    grid-row: 1;
-  }
-
-  .page-skills .skills-heading {
-    grid-column: 2;
-    grid-row: 1;
-  }
-
-  .page-skills .education-heading h2,
-  .page-skills .skills-heading h2 {
-    margin: 0;
-    font-size: 2rem !important;
-    text-align: left;
-  }
-
-  .page-skills .skills-heading p {
-    margin: 0.45rem 0 0;
-    font-size: 0.88rem;
-    text-align: left;
-  }
-
-  .page-skills .education-grid {
-    grid-column: 1;
-    grid-row: 2;
-    grid-template-columns: 1fr;
-    align-self: start;
-    gap: 0.8rem;
-    margin: 0;
-  }
-
-  .page-skills .education-card {
-    display: grid;
-    min-height: 8.5rem;
-    grid-template-columns: 7.5rem minmax(0, 1fr);
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-  }
-
-  .page-skills .education-logo-column {
-    min-height: 6.35rem;
-    margin: 0;
-  }
-
-  .page-skills .education-logo,
-  .page-skills #stanford,
-  .page-skills #nus,
-  .page-skills #njc {
-    width: 6.6rem;
-    height: 3.2rem;
-    max-height: 3.2rem;
-  }
-
-  .page-skills .education-program,
-  .page-skills .education-period,
-  .page-skills .education-highlights {
-    font-size: 0.75rem;
-  }
-
-  .page-skills .education-highlights {
-    min-height: 0;
-    margin-top: 0.55rem !important;
-    padding-top: 0.55rem;
-  }
-
-  .page-skills #main > .post > hr {
-    display: none;
-  }
-
-  .page-skills .skills-grid {
-    grid-column: 2;
-    grid-row: 2;
-    grid-template-columns: 1fr;
-    align-self: start;
-    gap: 0.75rem;
-    margin: 0;
-  }
-
-  .page-skills .toolkit-card {
-    display: grid;
-    min-height: 0;
-    grid-template-columns: minmax(11.5rem, 0.72fr) minmax(0, 1.28fr);
-    align-items: center;
-    gap: 1rem;
-    padding: 0.75rem 1rem;
-  }
-
-  .page-skills .toolkit-card__summary {
-    min-height: 0;
-    gap: 0.7rem;
-  }
-
-  .page-skills .toolkit-card__logo {
-    flex-basis: 2.5rem;
-    width: 2.5rem;
-    height: 2.5rem;
-    border-radius: 0.7rem;
-    font-size: 1rem;
-  }
-
-  .page-skills .toolkit-card__title {
-    font-size: 1.02rem;
-  }
-
-  .page-skills .toolkit-card__eyebrow {
-    margin-bottom: 0.18rem;
-    font-size: 0.64rem;
-  }
-
-  .page-skills .toolkit-card__detail,
-  .page-skills .toolkit-card--js .toolkit-card__detail,
-  .page-skills .toolkit-card--js.is-expanded .toolkit-card__detail {
-    max-height: none;
-    overflow: visible;
-    opacity: 1;
-    transform: none;
-    transition: none;
-  }
-
-  .page-skills .toolkit-card__detail > p {
-    margin: 0 0 0.42rem;
-    font-size: 0.75rem;
-    line-height: 1.35;
-  }
-
-  .page-skills .toolkit-tags {
-    gap: 0.18rem 0.65rem;
-  }
-
-  .page-skills .toolkit-tags li {
-    padding-left: 0.55rem;
-    font-size: 0.67rem;
-    line-height: 1.35;
-  }
-
-  .page-skills .tool-logo-list {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.15rem 0.35rem;
-    margin-top: 0.35rem;
-  }
-
-  .page-skills .tool-logo-list li {
-    min-height: 1.55rem;
-    gap: 0.25rem;
-    padding: 0;
-    font-size: 0.57rem;
-  }
-
-  .page-skills .tool-logo-frame {
-    flex-basis: 1.25rem;
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
-  .page-skills .tool-logo-frame img {
-    max-width: 1.05rem;
-    max-height: 1rem;
-  }
-
-  .page-skills .tool-logo-frame img.tool-logo--wide {
-    max-width: 1.15rem;
-    max-height: 0.8rem;
-  }
-
-  .page-skills .toolkit-card:hover,
-  .page-skills .toolkit-card:focus-within,
-  .page-skills .toolkit-card.is-expanded {
-    border-color: var(--color-border);
-    box-shadow: var(--shadow-card);
-    transform: none;
-  }
-
-  .page-skills .toolkit-card__toggle,
-  .page-skills .toolkit-card__hint,
-  .page-skills .toolkit-card__summary::after {
-    display: none;
-  }
-
-  .page-skills .tech-stack {
-    grid-column: 1 / -1;
-    grid-row: 3;
-  }
-}
-
 @media screen and (max-width: 980px) {
   .page-experience #agentic-ai,
   .page-experience #cloud-analytics {
@@ -8026,6 +7742,7 @@ body.page-home #nav {
   .page-skills #main > .post {
     display: grid;
     grid-template-columns: 1fr;
+    align-items: start;
     gap: 0;
     padding: 3rem;
   }
@@ -8041,7 +7758,9 @@ body.page-home #nav {
 
   .page-skills .education-heading,
   .page-skills .skills-heading {
+    align-self: start;
     padding: 0;
+    text-align: left;
   }
 
   .page-skills .education-heading {
@@ -8074,13 +7793,16 @@ body.page-home #nav {
 
   .page-skills .education-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-self: start;
     gap: 0.75rem;
     margin: 0;
   }
 
   .page-skills .education-card {
+    display: grid;
     min-height: 7.5rem;
     grid-template-columns: 6.5rem minmax(0, 1fr);
+    align-items: center;
     gap: 0.8rem;
     padding: 0.85rem;
     border-color: #d7dddd;
@@ -8091,6 +7813,28 @@ body.page-home #nav {
 
   .page-skills .education-logo-column {
     min-height: 5.6rem;
+    margin: 0;
+  }
+
+  .page-skills .education-logo,
+  .page-skills #stanford,
+  .page-skills #nus,
+  .page-skills #njc {
+    width: 6.6rem;
+    height: 3.2rem;
+    max-height: 3.2rem;
+  }
+
+  .page-skills .education-program,
+  .page-skills .education-period,
+  .page-skills .education-highlights {
+    font-size: 0.75rem;
+  }
+
+  .page-skills .education-highlights {
+    min-height: 0;
+    margin-top: 0.55rem !important;
+    padding-top: 0.55rem;
   }
 
   .page-skills #main > .post > hr {
@@ -8099,6 +7843,7 @@ body.page-home #nav {
 
   .page-skills .skills-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-self: start;
     align-items: stretch;
     gap: 0.7rem;
     margin: 0 0 2rem;
@@ -8108,6 +7853,7 @@ body.page-home #nav {
     display: flex;
     min-height: 8rem;
     flex-direction: column;
+    align-items: center;
     gap: 0.55rem;
     padding: 0.8rem;
     border: 1px solid #d7dddd;
@@ -8184,6 +7930,7 @@ body.page-home #nav {
   }
 
   .page-skills .tech-stack {
+    grid-column: 1 / -1;
     margin-top: 0;
   }
 }

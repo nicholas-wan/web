@@ -26,7 +26,7 @@ Preview the generated site with `node tools/preview-server.mjs` (port 4321, also
 - `images/` contains source media; `images-webp/` contains the curated deterministic WebP overlay used by the build.
 - `journals/` contains content-only travel journals, their manifest, and canonical template.
 - `partials/` contains shared generated-page fragments.
-- `tools/` contains build, verification, image, map, and retired migration tooling.
+- `tools/` contains build, verification, image, map, CSS-audit, font-subset, and retired migration tooling.
 - `docs/` contains architecture, preserved UX decisions, and build notes.
 - `dist/` is generated output and must not be edited or committed.
 

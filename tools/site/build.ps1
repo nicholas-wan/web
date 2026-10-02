@@ -927,5 +927,7 @@ Copy-ReferencedImages $out (Join-Path $root "images") $(if (Test-Path -LiteralPa
 Copy-Item -LiteralPath (Join-Path $root "CNAME") -Destination (Join-Path $out "CNAME")
 Copy-Item -LiteralPath (Join-Path $root "robots.txt") -Destination (Join-Path $out "robots.txt")
 Copy-Item -LiteralPath (Join-Path $root "sitemap.xml") -Destination (Join-Path $out "sitemap.xml")
+# Chromium requests /favicon.ico on every page regardless of the declared PNG icon.
+Copy-Item -LiteralPath (Join-Path $root "favicon.ico") -Destination (Join-Path $out "favicon.ico")
 
 Write-Output "Built $($pages.Count) pages into $out"

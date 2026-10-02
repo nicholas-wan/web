@@ -51,61 +51,6 @@
 		});
 	});
 
-	// The background layer always exists, but scroll-linked parallax only runs
-	// on a standard-density desktop pointer and when motion has not been reduced.
-	(function setupParallax(element, intensity) {
-		var background = document.createElement('div');
-		var desktopPointer = window.matchMedia('(min-width: 1281px) and (hover: hover) and (pointer: fine)');
-		var enabled = false;
-		var frame = null;
-		var elementTop = 0;
-		background.className = 'bg fixed';
-		element.appendChild(background);
-
-		function renderParallax() {
-			frame = null;
-			if (!enabled) return;
-			var offset = (window.scrollY - elementTop) * intensity;
-			background.style.transform = 'matrix(1,0,0,1,0,' + offset + ')';
-		}
-
-		function queueParallax() {
-			if (enabled && frame === null) frame = window.requestAnimationFrame(renderParallax);
-		}
-
-		function measureParallax() {
-			elementTop = element.getBoundingClientRect().top + window.scrollY;
-			queueParallax();
-		}
-
-		function syncParallax() {
-			var shouldEnable = desktopPointer.matches && !reducedMotion.matches && window.devicePixelRatio <= 1;
-			if (shouldEnable === enabled) {
-				queueParallax();
-				return;
-			}
-			enabled = shouldEnable;
-			background.classList.toggle('fixed', !enabled);
-			if (enabled) {
-				window.addEventListener('scroll', queueParallax, { passive: true });
-				queueParallax();
-			}
-			else {
-				window.removeEventListener('scroll', queueParallax);
-				if (frame !== null) window.cancelAnimationFrame(frame);
-				frame = null;
-				background.style.transform = 'none';
-			}
-		}
-
-		watchMedia(desktopPointer, syncParallax);
-		watchMedia(reducedMotion, syncParallax);
-		window.addEventListener('resize', measureParallax, { passive: true });
-		window.addEventListener('load', measureParallax, { once: true });
-		measureParallax();
-		syncParallax();
-	})(wrapper, 0.925);
-
 	// Build the mobile navigation sheet.
 	var navPanelToggle = document.createElement('a');
 	navPanelToggle.href = '#navPanel';
@@ -348,6 +293,7 @@
 })();
 
 /*Canvas*/
+(function() {
 var canvas = document.getElementById('nokey');
 var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var compactCanvas = window.matchMedia && window.matchMedia('(max-width: 736px)').matches;
@@ -676,6 +622,7 @@ canvas.addEventListener('mousemove', function(e){
 });
 
 }
+})();
 
 // Shared progressive enhancement: keep gallery pages fast and external links safe.
 (function() {
@@ -747,7 +694,12 @@ canvas.addEventListener('mousemove', function(e){
 		});
 	});
 
+	// Re-measure the expanded detail heights when the width changes; a phone
+	// URL-bar resize (height only) does not reflow the text.
+	var cardWidth = window.innerWidth;
 	function syncCardMode() {
+		if (window.innerWidth === cardWidth) return;
+		cardWidth = window.innerWidth;
 		cards.forEach(function(card) {
 			setExpanded(card, desktopCards.matches ? true : card.classList.contains('is-expanded'));
 		});

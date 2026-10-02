@@ -199,8 +199,9 @@ foreach ($page in $pages) {
         $scriptBytes += (Get-Item -LiteralPath $scriptPath).Length
     }
     # The 80 KB JS ceiling is a real page-weight limit, held at point-of-need and
-    # never bumped on spec — see docs/project-context.md "Dead ends" (the travel
-    # page already sits at ~99%). The warning below flags that in green builds.
+    # never bumped on spec — see the "80 KB per-page JavaScript ceiling" bullet under
+    # "Dead ends" in docs/project-context.md (the travel page sits essentially at
+    # it). The warning below flags that headroom in green builds.
     if ($scriptBytes -gt 80KB) { throw "$($page.Name) exceeds the 80 KB raw JavaScript budget." }
     Warn-BudgetHeadroom "$($page.Name) JS" $scriptBytes 80KB
     if ($page.Length -gt 225KB) { throw "$($page.Name) exceeds the 225 KB generated-HTML budget." }
@@ -596,7 +597,7 @@ if ([regex]::Matches($experience, 'class="case-study__company"').Count -ne 4) { 
 if ($homeHtml -notmatch 'id="about-me"') { throw "Homepage About section anchor is missing." }
 if ($homeHtml -notmatch '<canvas id="nokey"') { throw "Homepage background animation canvas is missing." }
 if ($homeHtml -notmatch '<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon\.png" />' -or $homeHtml -notmatch '<link rel="manifest" href="site\.webmanifest" />') { throw "Home-screen icon or manifest link is missing." }
-foreach ($iconAsset in @('site.webmanifest', 'images\apple-touch-icon.png', 'images\icon-192.png', 'images\icon-512.png')) {
+foreach ($iconAsset in @('site.webmanifest', 'favicon.ico', 'images\apple-touch-icon.png', 'images\icon-192.png', 'images\icon-512.png')) {
     if (-not (Test-Path -LiteralPath (Join-Path $dist $iconAsset))) { throw "Missing published home-screen icon asset: $iconAsset" }
 }
 if ($homeHtml -match 'href=["'']resume["'']') { throw "Homepage still exposes the Resume page." }

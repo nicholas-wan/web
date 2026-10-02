@@ -84,18 +84,12 @@
         var y = (event.clientY - rect.top) / rect.height - 0.5;
         element.style.transform = 'perspective(760px) rotateX(' + (-y * 8).toFixed(2) +
           'deg) rotateY(' + (x * 8).toFixed(2) + 'deg) translateY(-4px)';
-        element.style.setProperty('--gx', (x * 100 + 50) + '%');
-        element.style.setProperty('--gy', (y * 100 + 50) + '%');
-        element.style.setProperty('--icon-x', (x * 12).toFixed(2) + 'px');
-        element.style.setProperty('--icon-y', (y * 12).toFixed(2) + 'px');
       });
     });
     element.addEventListener('pointerleave', function () {
       if (frame) window.cancelAnimationFrame(frame);
       frame = null;
       element.style.transform = '';
-      element.style.removeProperty('--icon-x');
-      element.style.removeProperty('--icon-y');
     });
   }
 

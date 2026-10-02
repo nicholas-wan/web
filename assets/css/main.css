@@ -1889,12 +1889,6 @@ table.alt tbody tr td {
 	overflow: hidden;
 }
 
-#wrapper > .bg.fixed {
-	position: fixed;
-	width: 100%;
-	height: 100vh;
-}
-
 #wrapper.fade-in:before {
 	pointer-events: none;
 	-moz-transition: opacity 1s ease-in-out;
@@ -1918,14 +1912,6 @@ table.alt tbody tr td {
 
 body.is-preload #wrapper.fade-in:before {
 	opacity: 1;
-}
-
-@media screen and (orientation: portrait) {
-
-	#wrapper > .bg {
-		background-size: auto,								auto,														auto 175%;
-	}
-
 }
 
 /* Intro */

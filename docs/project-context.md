@@ -116,11 +116,19 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
   `verify.ps1` size budgets on CI even though local builds passed — so a green local check
   shipped nothing and the deploy silently stayed on stale assets. `.gitattributes` forces
   `eol=lf` for every text extension; the size budgets are calibrated against LF bytes.
-- **`travel-map-page.css` runs ~0.65 KB under its 48 KB budget (Jul 2026).** The generated
-  atlas bundle measures 48,483 of 49,152 allowed LF bytes after adding the teaser's route cue and timed replay, so a large travel/atlas CSS
-  addition can still trip `verify.ps1`. When it does, bump the budget deliberately with a
-  dated rationale comment (the existing 40 → 42 note beside the assertion is the pattern)
-  rather than stripping the explanatory comments in `custom.css` to bank bytes.
+- **`travel-map-page.css` sits within a few hundred bytes of its 48 KB budget (Oct 2026).**
+  `verify.ps1` allows the generated atlas bundle 49,152 LF bytes and it runs close to that
+  line (within about 1 KB of it as of Oct 2026), so even a modest travel/atlas CSS
+  addition can trip the check. Do not add large CSS to the travel/atlas route. When a
+  needed addition does trip it, bump the budget deliberately with a dated rationale
+  comment (the existing 40 → 42 note beside the assertion is the pattern) rather than
+  stripping the explanatory comments in `custom.css` to bank bytes.
+- **The 80 KB per-page JavaScript ceiling is full on the travel page (Oct 2026).**
+  `verify.ps1` fails any generated page whose `<script src>` assets total more than
+  81,920 LF bytes. Travel (`travel-map.js` + `listing-effects.js` + `main.js`) measured
+  81,900 before the Oct 2026 cleanup — essentially at the ceiling — so any net-positive
+  edit to those scripts must be paid for by a removal of at least the same size. The
+  ceiling is a real page-weight limit held at point of need; do not bump it on spec.
 - **`.travel-gallery__item--tall` looks unused, isn't.** It pairs with the
   `guangzhou-gallery__brick--tall` compat class; the markup carries only the compat class
   today, so the generic half scans as dead — but SKILL.md mandates the pairing, and

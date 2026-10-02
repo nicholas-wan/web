@@ -13,6 +13,7 @@
   }
 
   var mobileNav = window.matchMedia('(max-width: 980px)');
+  var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   /* Publish the toolbar's real height as --travel-nav-offset so the CSS
      scroll-margin-top on trip sections clears it even when the link row wraps
      (USA/Canada reaches ~5 rows at desktop). This makes the native hash jump
@@ -205,7 +206,7 @@
       (stripRect.width - linkRect.width) / 2;
     strip.scrollTo({
       left: Math.max(0, targetLeft),
-      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+      behavior: reducedMotion.matches ? 'auto' : 'smooth'
     });
   };
 
@@ -252,6 +253,7 @@
 (function () {
   var routeGroups = document.querySelectorAll('.guangzhou-day__route--collapsible');
   if (!routeGroups.length) return;
+  var phoneNav = window.matchMedia('(max-width: 600px)');
 
   Array.prototype.forEach.call(routeGroups, function (group) {
     var button = group.querySelector('.guangzhou-route__more');
@@ -263,7 +265,7 @@
 
     var updateDesktopWrap = function () {
       group.classList.remove('is-desktop-wrapped');
-      if (window.matchMedia('(max-width: 600px)').matches) return;
+      if (phoneNav.matches) return;
 
       var stops = route.querySelectorAll('.guangzhou-route__stop');
       var firstTop = stops.length ? stops[0].offsetTop : 0;
