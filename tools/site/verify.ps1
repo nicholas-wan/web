@@ -284,7 +284,8 @@ Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
 # photo-search.js is injected on demand by the travel page's inline loader, so
 # it is outside the per-page <script src> ceiling and carries its own budget.
 # 12 -> 14: quick-fill Try/Recent chips, Oct 2026.
-Assert-FileSizeBudget 'assets\js\photo-search.js' 14
+# 14 -> 15: fuzzy matching as a fallback only, entity-safe highlights, Oct 2026.
+Assert-FileSizeBudget 'assets\js\photo-search.js' 15
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8
@@ -351,6 +352,10 @@ if ($indexedTags.Count -ne $vocabularyTags.Count) { throw 'assets/data/photo-ind
 foreach ($indexedTag in $indexedTags) {
     if (-not $vocabularyTags.Contains($indexedTag.tag) -or [int]$indexedTag.count -ne [int]$indexedTagCounts[$indexedTag.tag]) { throw "Photo index tag '$($indexedTag.tag)' is not in the vocabulary or has the wrong count." }
 }
+# Tagging is a manual pass, so the build is where a gap gets noticed: a tag with
+# no photos is either untagged photos (the search cannot find them) or dead vocabulary.
+$unusedTags = @($indexedTags | Where-Object { [int]$_.count -eq 0 } | ForEach-Object { $_.tag })
+if ($unusedTags.Count) { Write-Warning "$($unusedTags.Count) vocabulary tags have no photos (tag them or prune them): $($unusedTags -join ', ')." }
 if ($listingEffectsJs -notmatch 'prefers-reduced-motion: reduce' -or $listingEffectsJs -notmatch '\.education-grid \.education-card' -or $listingEffectsJs -notmatch '\.travel-grid \.travel-card' -or $listingEffectsJs -notmatch "classList\.add\('js-tilt'\)") { throw 'Listing effects must preserve reduced-motion reveals and pointer tilt for skills and travel cards.' }
 if ($listingEffectsJs -notmatch 'REVEAL_DURATION = 480' -or $listingEffectsJs -notmatch 'REVEAL_STAGGER = 60' -or $listingEffectsJs -notmatch "removeProperty\('--reveal-delay'\)" -or $listingEffectsJs -notmatch "classList\.add\('is-reveal-settled'\)") { throw 'Listing reveals must use the compact 480ms motion with a temporary 60ms stagger, then restore immediate hover feedback.' }
 if ($mainJs -match '\bjQuery\b|\$\(|\bbreakpoints\s*\(|\.scrollex\b|\bbrowser\.' -or $mainJs -notmatch "window\.matchMedia\('\(max-width: 980px\)'\)" -or $mainJs -notmatch 'new MutationObserver\(syncNavPanelState\)' -or $mainJs -notmatch "navPanelToggle\.addEventListener\('click'" -or $mainJs -notmatch "event\.key === 'Escape'" -or $mainJs -notmatch "returnToTop\.classList\.toggle\('is-visible'" -or $mainJs -notmatch "window\.scrollTo\(\{ top: 0") { throw 'Shared interactions must remain dependency-free while preserving responsive navigation, modal focus, and return-to-top behavior.' }

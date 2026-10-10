@@ -323,7 +323,7 @@
 						     main-to-footer markup; it injects photo-search.js on first interaction with
 						     the field (or at once for a ?q= link) so the script stays off the travel
 						     page's 80 KB <script src> budget. -->
-						<script>(function(){var D=document,f=D.getElementById('photo-search'),i=f&&f.q,d;function l(){d||(d=D.createElement('script'),d.src=f.dataset.searchScript,D.body.appendChild(d))}if(i){/[?&]q=/.test(location.search)&&l();i.onfocus=i.onpointerdown=i.onkeydown=l;D.addEventListener('keydown',function(e){e.key!='/'||/^(INP|TEX|SEL)/.test(e.target.tagName)||(e.preventDefault(),i.focus())})}}());</script>
+						<script>(function(){var D=document,f=D.getElementById('photo-search'),i=f&&f.q,d;function l(){d||(d=D.createElement('script'),d.src=f.dataset.searchScript,d.onerror=function(){D.getElementById('photo-search-status').textContent='Photo search is unavailable right now.'},D.body.appendChild(d))}if(i){/[?&]q=/.test(location.search)&&l();i.onfocus=i.onpointerdown=i.onkeydown=l;D.addEventListener('keydown',function(e){e.key!='/'||/^(INP|TEX|SEL)/.test(e.target.tagName)||(e.preventDefault(),i.focus())})}}());</script>
 
 								</div>
 								<footer id="footer">

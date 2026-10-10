@@ -55,19 +55,19 @@
 	}
 
 	// 3 exact, 2 prefix, 1 fuzzy (terms of 5+ letters); fuzzy scores as prefix - 0.5.
-	function kind(word, term) {
+	function kind(word, term, fuzzy) {
 		if (word === term) return 3;
 		if (word.lastIndexOf(term, 0) === 0) return 2;
-		return term.length > 4 && near(word, term) ? 1 : 0;
+		return fuzzy && term.length > 4 && near(word, term) ? 1 : 0;
 	}
 
 	// [best score, its field]; hidden fields (alt + section, trip) count half,
 	// so they never outrank a tag, place or caption hit for the same term.
-	function termScore(photo, term) {
+	function termScore(photo, term, fuzzy) {
 		var best = [0, 0];
 		photo.f.forEach(function(words, field) {
 			words.forEach(function(word) {
-				var match = kind(word, term);
+				var match = kind(word, term, fuzzy);
 				var score = (match === 3 ? EXACT[field] : match && PREFIX[field] - (match === 1 ? 0.5 : 0)) / (field > 1 ? 2 : 1);
 				if (score > best[0]) best = [score, field];
 			});
@@ -85,7 +85,8 @@
 		});
 		photos = data.photos.map(function(photo, order) {
 			var trip = trips[photo.trip] || {};
-			photo.order = order;
+			// Newest trip first, journal order within it (the archive is newest first).
+		photo.order = order - trip.order * 1e4;
 			photo.f = [
 				(photo.tags || []).map(function(name) { return expanded[name] || name; }).join(' '),
 				photo.place + ' ' + photo.caption,
@@ -96,7 +97,7 @@
 		});
 	}
 
-	// Score, then journal order, so one trip's hits still sit together.
+	// Score, then trip order, so one trip's hits still sit together.
 	function rank(hits) {
 		return hits.sort(function(a, b) {
 			return b.why.length - a.why.length || b.score - a.score || a.photo.order - b.photo.order;
@@ -109,6 +110,10 @@
 		var tier = [[], []];
 		var rows = photos.map(function(photo) {
 			return terms.map(function(term) { return termScore(photo, term); });
+		});
+		// Fuzzy matches only stand in for a term with no exact or prefix hit at all.
+		terms.forEach(function(term, t) {
+			if (!rows.some(function(row) { return row[t][0]; })) rows.forEach(function(row, i) { row[t] = termScore(photos[i], term, 1); });
 		});
 		var weight = terms.map(function(term, t) {
 			return Math.log(1 + photos.length / rows.filter(function(row) { return row[t][0]; }).length);
@@ -125,12 +130,13 @@
 		return tier.map(rank);
 	}
 
+	// Marks go in before escaping, so an entity's digits are never a segment.
 	function highlight(text, terms) {
-		return escape(text).replace(SEGMENT, function(segment) {
+		return escape(String(text).replace(SEGMENT, function(segment) {
 			return tokens(segment).some(function(word) {
-				return terms.some(function(term) { return kind(word, term); });
-			}) ? '<mark>' + segment + '</mark>' : segment;
-		});
+				return terms.some(function(term) { return kind(word, term, 1); });
+			}) ? '\x01' + segment + '\x02' : segment;
+		})).replace(/\x01/g, '<mark>').replace(/\x02/g, '</mark>');
 	}
 
 	// title adds a muted leading label and a --try/--recent modifier.
@@ -186,13 +192,13 @@
 	var list = results.querySelector('.photo-results__list');
 	var more = results.querySelector('.photo-results__more');
 
-	// Up to six tags whose name or synonym starts with the last term.
+	// Up to six tags with photos whose name or synonym starts with the last term.
 	function suggest(value) {
 		var tail = /\S+$/.exec(value);
 		var current = tail ? tokens(tail[0]).pop() : '';
 		var earlier = tokens(value.slice(0, tail ? tail.index : value.length));
 		var found = !current || !photos ? [] : tags.filter(function(tag) {
-			return tag.keys[0] !== current && tag.keys.some(function(key) { return key.lastIndexOf(current, 0) === 0; }) &&
+			return tag.count && tag.keys[0] !== current && tag.keys.some(function(key) { return key.lastIndexOf(current, 0) === 0; }) &&
 				!tokens(tag.tag).every(function(word) { return earlier.indexOf(word) >= 0; });
 		}).slice(0, 6);
 		chips.innerHTML = found.length ? chipList(found, 'Suggested tags') : value.trim() || !photos ? '' : starters();
