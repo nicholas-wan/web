@@ -1,254 +1,2325 @@
 {
-  "airport": { "facet": "subject", "synonyms": ["terminal"] },
-  "akihabara": { "facet": "place", "parent": "tokyo", "synonyms": [] },
-  "alcatraz": { "facet": "place", "parent": "san francisco", "synonyms": ["alcatraz island"] },
-  "alpaca": { "facet": "animal", "synonyms": [] },
-  "amanohashidate": { "facet": "place", "parent": "kansai", "synonyms": [] },
-  "amsterdam": { "facet": "place", "parent": "netherlands", "synonyms": [] },
-  "anniversary": { "facet": "event", "synonyms": [] },
-  "aquarium": { "facet": "subject", "synonyms": ["sea life", "suizokukan", "kaiyukan", "dolphinarium"] },
-  "architecture": { "facet": "subject", "synonyms": ["building", "buildings", "facade", "old town", "altstadt", "heritage", "historic"] },
-  "art": { "facet": "subject", "synonyms": ["artwork", "street art", "mural", "installation", "calligraphy", "illusion", "auction"] },
-  "asakusa": { "facet": "place", "parent": "tokyo", "synonyms": [] },
-  "asia": { "facet": "place", "synonyms": [] },
-  "australia": { "facet": "place", "parent": "oceania", "synonyms": [] },
-  "autumn": { "facet": "season", "synonyms": ["fall", "autumn leaves", "autumn foliage", "fall foliage", "momiji"] },
-  "baden-wurttemberg": { "facet": "place", "parent": "germany", "synonyms": ["baden-württemberg"] },
-  "baiyun mountain": { "facet": "place", "parent": "guangzhou", "synonyms": ["baiyun", "moxing summit"] },
-  "bbq": { "facet": "food", "synonyms": ["barbecue", "yakiniku", "grill", "chargrill", "hot plate"] },
-  "beach": { "facet": "subject", "synonyms": ["bathing boxes", "seaside"] },
-  "beef": { "facet": "food", "synonyms": ["wagyu", "kobe beef", "gyukatsu"] },
-  "belgium": { "facet": "place", "parent": "europe", "synonyms": [] },
-  "big sur": { "facet": "place", "parent": "california", "synonyms": ["bixby creek"] },
-  "bird": { "facet": "animal", "synonyms": ["toucan", "owl", "seagull", "parrot", "turkey"] },
-  "birthday": { "facet": "event", "synonyms": [] },
-  "black forest": { "facet": "place", "parent": "baden-wurttemberg", "synonyms": [] },
-  "blue mountains": { "facet": "place", "parent": "australia", "synonyms": [] },
-  "bondi": { "facet": "place", "parent": "sydney", "synonyms": ["bondi beach"] },
-  "boston": { "facet": "place", "parent": "massachusetts", "synonyms": [] },
-  "bridge": { "facet": "subject", "synonyms": ["hohenzollernbrucke", "hohenzollernbrücke", "cliff walk"] },
-  "brooklyn": { "facet": "place", "parent": "new york", "synonyms": ["dumbo"] },
-  "brussels": { "facet": "place", "parent": "belgium", "synonyms": ["atomium", "manneken pis", "grand-place"] },
-  "buffalo": { "facet": "place", "parent": "usa", "synonyms": [] },
-  "cable car": { "facet": "activity", "synonyms": ["gondola", "ropeway", "rotair", "ice flyer", "ski lift"] },
-  "california": { "facet": "place", "parent": "usa", "synonyms": [] },
-  "cambridge": { "facet": "place", "parent": "massachusetts", "synonyms": ["harvard"] },
-  "canada": { "facet": "place", "parent": "north america", "synonyms": [] },
-  "cantonese food": { "facet": "food", "synonyms": ["cantonese", "dim sum"] },
-  "castle": { "facet": "subject", "synonyms": ["nagoya-jo"] },
-  "cat": { "facet": "animal", "synonyms": ["kitten"] },
-  "cave": { "facet": "subject", "synonyms": ["caves"] },
-  "caversham": { "facet": "place", "parent": "western australia", "synonyms": [] },
-  "cervantes": { "facet": "place", "parent": "western australia", "synonyms": ["lake thetis"] },
-  "chicken": { "facet": "food", "synonyms": ["parmigiana", "teriyaki"] },
-  "china": { "facet": "place", "parent": "asia", "synonyms": [] },
-  "chuncheon": { "facet": "place", "parent": "south korea", "synonyms": ["soyanggang", "gangchon"] },
-  "church": { "facet": "subject", "synonyms": ["cathedral", "chapel"] },
-  "clifton hill": { "facet": "place", "parent": "ontario", "synonyms": [] },
-  "cloudy": { "facet": "weather", "synonyms": ["overcast"] },
-  "coast": { "facet": "subject", "synonyms": ["coastline", "coastal", "ocean", "blowhole"] },
-  "coffee": { "facet": "food", "synonyms": ["cafe", "café", "espresso", "starbucks"] },
-  "colmar": { "facet": "place", "parent": "france", "synonyms": ["petite venise"] },
-  "cologne": { "facet": "place", "parent": "germany", "synonyms": ["koln", "köln"] },
-  "cooking": { "facet": "activity", "synonyms": ["cookhouse", "home cooking"] },
-  "cruise": { "facet": "activity", "synonyms": ["boat", "ferry", "river cruise", "boat ride", "bateaux mouches"] },
-  "curry": { "facet": "food", "synonyms": ["tikka masala"] },
-  "deer": { "facet": "animal", "synonyms": [] },
-  "desert": { "facet": "subject", "synonyms": ["sand dunes", "dunes", "pinnacles desert"] },
-  "dessert": { "facet": "food", "synonyms": ["desserts", "ice cream", "scones", "cake"] },
-  "dog": { "facet": "animal", "synonyms": ["puppy"] },
-  "dolphin": { "facet": "animal", "synonyms": ["dolphinarium"] },
-  "dongshankou": { "facet": "place", "parent": "guangzhou", "synonyms": [] },
-  "duck": { "facet": "food", "synonyms": ["roast duck", "peking duck", "kaoya"] },
-  "duisburg": { "facet": "place", "parent": "germany", "synonyms": [] },
-  "dusseldorf": { "facet": "place", "parent": "germany", "synonyms": ["düsseldorf"] },
-  "enoshima": { "facet": "place", "parent": "japan", "synonyms": [] },
-  "essen": { "facet": "place", "parent": "germany", "synonyms": ["zollverein"] },
-  "europe": { "facet": "place", "synonyms": [] },
-  "family": { "facet": "people", "synonyms": ["relatives"] },
-  "farm": { "facet": "subject", "synonyms": ["farm show", "berry farm"] },
-  "feeding": { "facet": "activity", "synonyms": ["feed the", "feeding time"] },
-  "ferris wheel": { "facet": "subject", "synonyms": ["wheel", "skywheel", "observation wheel", "bubble tram"] },
-  "fish": { "facet": "animal", "synonyms": ["jellyfish", "shark", "sharks"] },
-  "flight": { "facet": "activity", "synonyms": ["airlines", "plane", "in-flight", "flying"] },
-  "flowers": { "facet": "subject", "synonyms": ["flower", "blossom", "lotus"] },
-  "fog": { "facet": "weather", "synonyms": ["mist", "misty", "foggy"] },
-  "food": { "facet": "food", "synonyms": ["meal", "lunch", "dinner", "breakfast", "supper", "buffet", "restaurant", "brunch", "bento", "dishes"] },
-  "fountain": { "facet": "subject", "synonyms": ["brunnen"] },
-  "france": { "facet": "place", "parent": "europe", "synonyms": [] },
-  "fremantle": { "facet": "place", "parent": "western australia", "synonyms": [] },
-  "friends": { "facet": "people", "synonyms": ["friend", "colleagues"] },
-  "fruit": { "facet": "food", "synonyms": ["fruits", "apples", "pears"] },
-  "games": { "facet": "activity", "synonyms": ["gaming", "arcade", "nintendo", "game zone", "chess", "video games"] },
-  "garden": { "facet": "subject", "synonyms": ["gardens", "botanic", "botanical"] },
-  "georgetown": { "facet": "place", "parent": "washington dc", "synonyms": [] },
-  "geraldton": { "facet": "place", "parent": "western australia", "synonyms": [] },
-  "germany": { "facet": "place", "parent": "europe", "synonyms": ["deutschland"] },
-  "giraffe": { "facet": "animal", "synonyms": [] },
-  "glacier": { "facet": "subject", "synonyms": ["glacier park", "glacier cave"] },
-  "grampians": { "facet": "place", "parent": "australia", "synonyms": ["halls gap"] },
-  "great ocean road": { "facet": "place", "parent": "australia", "synonyms": ["12 apostles", "twelve apostles", "loch ard gorge"] },
-  "greenough": { "facet": "place", "parent": "western australia", "synonyms": [] },
-  "guangzhou": { "facet": "place", "parent": "china", "synonyms": ["canton"] },
-  "gwacheon": { "facet": "place", "parent": "south korea", "synonyms": [] },
-  "hakone": { "facet": "place", "parent": "japan", "synonyms": ["owakudani", "lake ashi", "hakone shrine"] },
-  "harajuku": { "facet": "place", "parent": "tokyo", "synonyms": [] },
-  "harbour": { "facet": "subject", "synonyms": ["harbor", "pier", "quay", "wharf", "marina", "fishing village", "boathouse"] },
-  "heidelberg": { "facet": "place", "parent": "germany", "synonyms": [] },
-  "hiking": { "facet": "activity", "synonyms": ["hike", "trail", "climb", "trek"] },
-  "hippo": { "facet": "animal", "synonyms": ["hippopotamus"] },
-  "hiroshima": { "facet": "place", "parent": "japan", "synonyms": [] },
-  "honeymoon": { "facet": "event", "synonyms": [] },
-  "hongdae": { "facet": "place", "parent": "seoul", "synonyms": ["trickeye"] },
-  "horse": { "facet": "animal", "synonyms": [] },
-  "hotel": { "facet": "subject", "synonyms": ["inn", "apartment", "airbnb", "hotel room", "suites", "accommodation", "onsen hotel"] },
-  "hutt lagoon": { "facet": "place", "parent": "western australia", "synonyms": ["pink lake"] },
-  "hyden": { "facet": "place", "parent": "western australia", "synonyms": ["wave rock"] },
-  "ikebukuro": { "facet": "place", "parent": "tokyo", "synonyms": [] },
-  "ine": { "facet": "place", "parent": "kansai", "synonyms": ["ine fishing village"] },
-  "island": { "facet": "subject", "synonyms": ["islands"] },
-  "japan": { "facet": "place", "parent": "asia", "synonyms": [] },
-  "japanese alps": { "facet": "place", "parent": "japan", "synonyms": ["hida"] },
-  "jersey city": { "facet": "place", "parent": "new jersey", "synonyms": ["liberty state park"] },
-  "kalbarri": { "facet": "place", "parent": "western australia", "synonyms": [] },
-  "kalkar": { "facet": "place", "parent": "germany", "synonyms": ["grieth", "wunderland"] },
-  "kamakura": { "facet": "place", "parent": "japan", "synonyms": [] },
-  "kamikochi": { "facet": "place", "parent": "japanese alps", "synonyms": [] },
-  "kangaroo": { "facet": "animal", "synonyms": ["wallaby"] },
-  "kansai": { "facet": "place", "parent": "japan", "synonyms": [] },
-  "kawaguchiko": { "facet": "place", "parent": "mount fuji", "synonyms": ["lake kawaguchiko", "lake kawaguchi"] },
-  "kiama": { "facet": "place", "parent": "australia", "synonyms": [] },
-  "kings park": { "facet": "place", "parent": "perth", "synonyms": [] },
-  "kleve": { "facet": "place", "parent": "germany", "synonyms": [] },
-  "koala": { "facet": "animal", "synonyms": [] },
-  "korean food": { "facet": "food", "synonyms": ["koreatown", "bibimix", "buk chang dong soo"] },
-  "kyoto": { "facet": "place", "parent": "kansai", "synonyms": ["kiyomizu-dera"] },
-  "lake": { "facet": "subject", "synonyms": ["lagoon"] },
-  "lancelin": { "facet": "place", "parent": "western australia", "synonyms": [] },
-  "las vegas": { "facet": "place", "parent": "usa", "synonyms": ["vegas", "fremont street", "bellagio", "caesars palace", "the venetian"] },
-  "lighthouse": { "facet": "subject", "synonyms": [] },
-  "los angeles": { "facet": "place", "parent": "california", "synonyms": ["santa monica", "little tokyo"] },
-  "lucerne": { "facet": "place", "parent": "switzerland", "synonyms": ["luzern"] },
-  "manhattan": { "facet": "place", "parent": "new york", "synonyms": ["midtown", "times square", "chelsea", "hudson yards"] },
-  "marin headlands": { "facet": "place", "parent": "california", "synonyms": ["hawk hill"] },
-  "market": { "facet": "subject", "synonyms": ["markets", "marche", "marché", "food hall"] },
-  "massachusetts": { "facet": "place", "parent": "usa", "synonyms": [] },
-  "massage": { "facet": "activity", "synonyms": ["spa"] },
-  "melbourne": { "facet": "place", "parent": "australia", "synonyms": [] },
-  "memorial": { "facet": "subject", "synonyms": ["monument", "cenotaph", "peace memorial"] },
-  "menlo park": { "facet": "place", "parent": "silicon valley", "synonyms": [] },
-  "miyajima": { "facet": "place", "parent": "hiroshima", "synonyms": ["itsukushima"] },
-  "monkey": { "facet": "animal", "synonyms": [] },
-  "monterey": { "facet": "place", "parent": "california", "synonyms": ["monterey bay", "point lobos"] },
-  "mount fuji": { "facet": "place", "parent": "japan", "synonyms": ["fuji", "mt fuji", "fujisan", "arakurayama", "chureito"] },
-  "mount titlis": { "facet": "place", "parent": "switzerland", "synonyms": ["titlis", "engelberg"] },
-  "mountain": { "facet": "subject", "synonyms": ["mountains", "mount", "summit", "peak", "alps"] },
-  "museum": { "facet": "subject", "synonyms": ["museums", "gallery", "madame tussauds"] },
-  "nagoya": { "facet": "place", "parent": "japan", "synonyms": [] },
-  "nami island": { "facet": "place", "parent": "south korea", "synonyms": ["namiseom"] },
-  "nara": { "facet": "place", "parent": "kansai", "synonyms": ["todaiji", "todai-ji"] },
-  "netherlands": { "facet": "place", "parent": "europe", "synonyms": ["holland", "the netherlands"] },
-  "new jersey": { "facet": "place", "parent": "usa", "synonyms": [] },
-  "new york": { "facet": "place", "parent": "usa", "synonyms": ["new york city", "nyc"] },
-  "niagara falls": { "facet": "place", "parent": "north america", "synonyms": ["niagara"] },
-  "nicholas": { "facet": "people", "synonyms": ["nic", "nick"] },
-  "night": { "facet": "time", "synonyms": ["nighttime", "at night", "evening", "night view", "lit up", "illuminated", "lights"] },
-  "north america": { "facet": "place", "synonyms": ["americas"] },
-  "oceania": { "facet": "place", "synonyms": ["australasia"] },
-  "okonomiyaki": { "facet": "food", "synonyms": [] },
-  "oman": { "facet": "place", "parent": "asia", "synonyms": ["muscat"] },
-  "omelette": { "facet": "food", "synonyms": ["eggs"] },
-  "onsen": { "facet": "activity", "synonyms": ["hot spring", "hot springs"] },
-  "ontario": { "facet": "place", "parent": "canada", "synonyms": [] },
-  "osaka": { "facet": "place", "parent": "kansai", "synonyms": ["namba", "dotonbori", "shinsaibashi", "shinsekai", "tsutenkaku"] },
-  "otter": { "facet": "animal", "synonyms": ["sea otter"] },
-  "panda": { "facet": "animal", "synonyms": [] },
-  "panyu": { "facet": "place", "parent": "guangzhou", "synonyms": ["chimelong"] },
-  "paris": { "facet": "place", "parent": "france", "synonyms": ["eiffel tower", "louvre", "champs-elysees", "seine"] },
-  "park": { "facet": "subject", "synonyms": ["national park"] },
-  "party": { "facet": "event", "synonyms": ["happy hour", "celebration", "silent disco"] },
-  "penguin": { "facet": "animal", "synonyms": ["penguin parade"] },
-  "perth": { "facet": "place", "parent": "western australia", "synonyms": ["elizabeth quay", "yagan square"] },
-  "phillip island": { "facet": "place", "parent": "australia", "synonyms": [] },
-  "pigeon": { "facet": "food", "synonyms": ["roast pigeon"] },
-  "pinnacles": { "facet": "place", "parent": "western australia", "synonyms": ["the pinnacles", "nambung"] },
-  "pizza": { "facet": "food", "synonyms": [] },
-  "protest": { "facet": "event", "synonyms": ["rally"] },
-  "quokka": { "facet": "animal", "synonyms": [] },
-  "rain": { "facet": "weather", "synonyms": ["rainy", "raining"] },
-  "ramen": { "facet": "food", "synonyms": ["noodles"] },
-  "rees": { "facet": "place", "parent": "germany", "synonyms": [] },
-  "rhine falls": { "facet": "place", "parent": "switzerland", "synonyms": ["schaffhausen"] },
-  "river": { "facet": "subject", "synonyms": ["canal"] },
-  "road trip": { "facet": "activity", "synonyms": ["drive", "scenic drive"] },
-  "rock formation": { "facet": "subject", "synonyms": ["wave rock", "natural bridge", "hippo's yawn", "limestone", "gorge"] },
-  "rottnest island": { "facet": "place", "parent": "western australia", "synonyms": ["rottnest", "wadjemup", "rotto"] },
-  "san francisco": { "facet": "place", "parent": "california", "synonyms": ["sf", "golden gate", "presidio", "lombard street", "sutro baths"] },
-  "sandboarding": { "facet": "activity", "synonyms": ["sandboard"] },
-  "sandwich": { "facet": "food", "synonyms": ["sandwiches", "toast"] },
-  "science": { "facet": "subject", "synonyms": ["science centre", "science center", "science museum", "scitech", "mathematics"] },
-  "seafood": { "facet": "food", "synonyms": ["lobster", "mussels", "prawns", "oysters", "crab"] },
-  "seoul": { "facet": "place", "parent": "south korea", "synonyms": ["namsan", "namsan tower", "n seoul tower"] },
-  "shamian island": { "facet": "place", "parent": "guangzhou", "synonyms": ["shamian"] },
-  "shibuya": { "facet": "place", "parent": "tokyo", "synonyms": [] },
-  "shirakawa-go": { "facet": "place", "parent": "japanese alps", "synonyms": ["shirakawa"] },
-  "shopping": { "facet": "activity", "synonyms": ["shop", "shops", "mall", "outlet", "store", "galeries lafayette", "co-op"] },
-  "show": { "facet": "event", "synonyms": ["circus", "broadway", "theatre", "theater", "performance", "stage show"] },
-  "shrine": { "facet": "subject", "synonyms": ["torii", "jinja"] },
-  "shuzenji": { "facet": "place", "parent": "japan", "synonyms": [] },
-  "silicon valley": { "facet": "place", "parent": "california", "synonyms": ["bay area"] },
-  "singapore": { "facet": "place", "parent": "asia", "synonyms": ["sg"] },
-  "skiing": { "facet": "activity", "synonyms": ["ski", "ski resort", "snowboarding"] },
-  "skyscraper": { "facet": "subject", "synonyms": ["empire state building", "one world observatory", "top of the rock", "world trade center", "rockefeller center"] },
-  "snow": { "facet": "weather", "synonyms": ["snowy", "snowfall", "snowman", "snowmen", "first snow"] },
-  "south korea": { "facet": "place", "parent": "asia", "synonyms": ["korea"] },
-  "spring": { "facet": "season", "synonyms": [] },
-  "station": { "facet": "subject", "synonyms": ["train station", "railway station", "hauptbahnhof", "central station", "union station"] },
-  "statue": { "facet": "subject", "synonyms": ["sculpture", "statues"] },
-  "steak": { "facet": "food", "synonyms": ["sous vide"] },
-  "summer": { "facet": "season", "synonyms": [] },
-  "sunny": { "facet": "weather", "synonyms": ["blue sky", "clear sky", "clear winter day"] },
-  "sunrise": { "facet": "time", "synonyms": ["dawn"] },
-  "sunset": { "facet": "time", "synonyms": ["dusk", "golden hour", "sundown"] },
-  "swan valley": { "facet": "place", "parent": "western australia", "synonyms": [] },
-  "switzerland": { "facet": "place", "parent": "europe", "synonyms": ["swiss"] },
-  "sydney": { "facet": "place", "parent": "australia", "synonyms": [] },
-  "takayama": { "facet": "place", "parent": "japanese alps", "synonyms": ["hida takayama"] },
-  "tea": { "facet": "food", "synonyms": ["bubble tea", "matcha", "macha", "chagee", "tapioca"] },
-  "temple": { "facet": "subject", "synonyms": ["pagoda", "daisho-in", "kofuku-ji"] },
-  "thai food": { "facet": "food", "synonyms": ["thai"] },
-  "theme park": { "facet": "subject", "synonyms": ["universal studios", "usj", "amusement park", "funfair", "midway"] },
-  "tianhe": { "facet": "place", "parent": "guangzhou", "synonyms": [] },
-  "tiger": { "facet": "animal", "synonyms": [] },
-  "titisee": { "facet": "place", "parent": "baden-wurttemberg", "synonyms": ["lake titisee"] },
-  "tokyo": { "facet": "place", "parent": "japan", "synonyms": [] },
-  "toronto": { "facet": "place", "parent": "ontario", "synonyms": ["scarborough", "markham"] },
-  "tower": { "facet": "subject", "synonyms": ["towers", "tsutenkaku"] },
-  "train": { "facet": "subject", "synonyms": ["amtrak", "shinkansen", "subway", "tram", "railway", "metro"] },
-  "ueno": { "facet": "place", "parent": "tokyo", "synonyms": [] },
-  "uji": { "facet": "place", "parent": "kansai", "synonyms": ["byodo-in"] },
-  "university": { "facet": "subject", "synonyms": ["college", "campus"] },
-  "us": { "facet": "people", "synonyms": ["couple", "together", "the two of us", "both of us"] },
-  "usa": { "facet": "place", "parent": "north america", "synonyms": ["united states", "america", "u.s."] },
-  "view": { "facet": "subject", "synonyms": ["viewpoint", "lookout", "observatory", "skyline", "panorama", "overlooking", "skywalk", "from the top"] },
-  "volendam": { "facet": "place", "parent": "netherlands", "synonyms": [] },
-  "washington dc": { "facet": "place", "parent": "usa", "synonyms": ["washington d.c.", "washington", "d.c."] },
-  "waterfall": { "facet": "subject", "synonyms": ["falls", "cascade"] },
-  "werribee": { "facet": "place", "parent": "australia", "synonyms": [] },
-  "western australia": { "facet": "place", "parent": "australia", "synonyms": ["wa"] },
-  "windmill": { "facet": "subject", "synonyms": ["windmills"] },
-  "winter": { "facet": "season", "synonyms": ["wintry"] },
-  "wollongong": { "facet": "place", "parent": "australia", "synonyms": ["port kembla"] },
-  "wombat": { "facet": "animal", "synonyms": [] },
-  "work": { "facet": "event", "synonyms": ["office", "internship", "the league", "office visit", "work trip"] },
-  "xanten": { "facet": "place", "parent": "germany", "synonyms": [] },
-  "xiguan": { "facet": "place", "parent": "guangzhou", "synonyms": ["shangxiajiu"] },
-  "yongqingfang": { "facet": "place", "parent": "guangzhou", "synonyms": [] },
-  "yongsan": { "facet": "place", "parent": "seoul", "synonyms": ["yongsan-gu"] },
-  "york": { "facet": "place", "parent": "western australia", "synonyms": [] },
-  "yuexiu": { "facet": "place", "parent": "guangzhou", "synonyms": ["yuexiu park", "zhenhai tower"] },
-  "yx": { "facet": "people", "synonyms": ["yingxian", "xian", "wife", "my wife"] },
-  "zaanse schans": { "facet": "place", "parent": "netherlands", "synonyms": ["zaandam"] },
-  "zoo": { "facet": "subject", "synonyms": ["zoological park", "wildlife park", "safari park", "open range zoo", "sanctuary", "aquazoo"] },
-  "zurich": { "facet": "place", "parent": "switzerland", "synonyms": ["zürich", "lindenhof"] }
+  "aeroplane": {
+    "facet": "subject",
+    "synonyms": [
+      "plane",
+      "aircraft",
+      "airplane"
+    ]
+  },
+  "airline meal": {
+    "facet": "food",
+    "synonyms": [
+      "in-flight meal",
+      "plane food"
+    ]
+  },
+  "airport": {
+    "facet": "subject",
+    "synonyms": [
+      "terminal"
+    ]
+  },
+  "akihabara": {
+    "facet": "place",
+    "parent": "tokyo",
+    "synonyms": []
+  },
+  "alcatraz": {
+    "facet": "place",
+    "parent": "san francisco",
+    "synonyms": [
+      "alcatraz island"
+    ]
+  },
+  "alpaca": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "amanohashidate": {
+    "facet": "place",
+    "parent": "kansai",
+    "synonyms": []
+  },
+  "amsterdam": {
+    "facet": "place",
+    "parent": "netherlands",
+    "synonyms": []
+  },
+  "anniversary": {
+    "facet": "event",
+    "synonyms": []
+  },
+  "aquarium": {
+    "facet": "subject",
+    "synonyms": [
+      "sea life",
+      "suizokukan",
+      "kaiyukan",
+      "dolphinarium",
+      "oceanarium"
+    ]
+  },
+  "architecture": {
+    "facet": "subject",
+    "synonyms": [
+      "building",
+      "buildings",
+      "facade",
+      "altstadt",
+      "heritage",
+      "historic"
+    ]
+  },
+  "art": {
+    "facet": "subject",
+    "synonyms": [
+      "artwork",
+      "mural",
+      "installation",
+      "calligraphy",
+      "illusion",
+      "auction"
+    ]
+  },
+  "art gallery": {
+    "facet": "subject",
+    "synonyms": [
+      "painting",
+      "art museum"
+    ]
+  },
+  "asakusa": {
+    "facet": "place",
+    "parent": "tokyo",
+    "synonyms": []
+  },
+  "asia": {
+    "facet": "place",
+    "synonyms": []
+  },
+  "australia": {
+    "facet": "place",
+    "parent": "oceania",
+    "synonyms": []
+  },
+  "autumn": {
+    "facet": "season",
+    "synonyms": [
+      "fall",
+      "autumn foliage",
+      "fall foliage",
+      "momiji"
+    ]
+  },
+  "autumn leaves": {
+    "facet": "subject",
+    "synonyms": [
+      "foliage",
+      "momiji",
+      "fall colours",
+      "fall colors"
+    ]
+  },
+  "baden-wurttemberg": {
+    "facet": "place",
+    "parent": "germany",
+    "synonyms": [
+      "baden-württemberg"
+    ]
+  },
+  "baiyun mountain": {
+    "facet": "place",
+    "parent": "guangzhou",
+    "synonyms": [
+      "baiyun",
+      "moxing summit"
+    ]
+  },
+  "bakery": {
+    "facet": "food",
+    "synonyms": [
+      "bread",
+      "pretzel",
+      "pastry",
+      "croissant"
+    ]
+  },
+  "bbq": {
+    "facet": "food",
+    "synonyms": [
+      "barbecue",
+      "yakiniku",
+      "grill",
+      "chargrill",
+      "hot plate"
+    ]
+  },
+  "beach": {
+    "facet": "subject",
+    "synonyms": [
+      "bathing boxes",
+      "seaside",
+      "shore"
+    ]
+  },
+  "bear": {
+    "facet": "animal",
+    "synonyms": [
+      "polar bear",
+      "grizzly"
+    ]
+  },
+  "beef": {
+    "facet": "food",
+    "synonyms": [
+      "wagyu",
+      "kobe beef",
+      "gyukatsu"
+    ]
+  },
+  "belgium": {
+    "facet": "place",
+    "parent": "europe",
+    "synonyms": []
+  },
+  "big sur": {
+    "facet": "place",
+    "parent": "california",
+    "synonyms": [
+      "bixby creek"
+    ]
+  },
+  "bird": {
+    "facet": "animal",
+    "synonyms": [
+      "toucan",
+      "owl",
+      "seagull",
+      "turkey"
+    ]
+  },
+  "birthday": {
+    "facet": "event",
+    "synonyms": []
+  },
+  "black forest": {
+    "facet": "place",
+    "parent": "baden-wurttemberg",
+    "synonyms": []
+  },
+  "blue mountains": {
+    "facet": "place",
+    "parent": "australia",
+    "synonyms": []
+  },
+  "blue sky": {
+    "facet": "weather",
+    "synonyms": [
+      "clear sky",
+      "clear"
+    ]
+  },
+  "boat": {
+    "facet": "subject",
+    "synonyms": [
+      "ship",
+      "cruise ship"
+    ]
+  },
+  "boat ride": {
+    "facet": "activity",
+    "synonyms": [
+      "ferry ride",
+      "kayak"
+    ]
+  },
+  "bondi": {
+    "facet": "place",
+    "parent": "sydney",
+    "synonyms": [
+      "bondi beach"
+    ]
+  },
+  "boston": {
+    "facet": "place",
+    "parent": "massachusetts",
+    "synonyms": []
+  },
+  "breakfast": {
+    "facet": "food",
+    "synonyms": [
+      "brunch",
+      "buffet"
+    ]
+  },
+  "bridge": {
+    "facet": "subject",
+    "synonyms": [
+      "hohenzollernbrucke",
+      "hohenzollernbrücke",
+      "cliff walk",
+      "footbridge"
+    ]
+  },
+  "brooklyn": {
+    "facet": "place",
+    "parent": "new york",
+    "synonyms": [
+      "dumbo"
+    ]
+  },
+  "brussels": {
+    "facet": "place",
+    "parent": "belgium",
+    "synonyms": [
+      "atomium",
+      "manneken pis",
+      "grand-place"
+    ]
+  },
+  "buffalo": {
+    "facet": "place",
+    "parent": "usa",
+    "synonyms": []
+  },
+  "burger": {
+    "facet": "food",
+    "synonyms": [
+      "hamburger"
+    ]
+  },
+  "butterfly": {
+    "facet": "animal",
+    "synonyms": [
+      "insect"
+    ]
+  },
+  "cable car": {
+    "facet": "activity",
+    "synonyms": [
+      "gondola",
+      "ropeway",
+      "rotair",
+      "ice flyer",
+      "ski lift"
+    ]
+  },
+  "cafe": {
+    "facet": "subject",
+    "synonyms": [
+      "coffee shop"
+    ]
+  },
+  "cake": {
+    "facet": "food",
+    "synonyms": [
+      "tart"
+    ]
+  },
+  "california": {
+    "facet": "place",
+    "parent": "usa",
+    "synonyms": []
+  },
+  "cambridge": {
+    "facet": "place",
+    "parent": "massachusetts",
+    "synonyms": [
+      "harvard"
+    ]
+  },
+  "canada": {
+    "facet": "place",
+    "parent": "north america",
+    "synonyms": []
+  },
+  "cantonese food": {
+    "facet": "food",
+    "synonyms": [
+      "cantonese"
+    ]
+  },
+  "car": {
+    "facet": "subject",
+    "synonyms": [
+      "vehicle",
+      "bus",
+      "tram"
+    ]
+  },
+  "castle": {
+    "facet": "subject",
+    "synonyms": [
+      "nagoya-jo",
+      "palace",
+      "fort"
+    ]
+  },
+  "cat": {
+    "facet": "animal",
+    "synonyms": [
+      "kitten"
+    ]
+  },
+  "cave": {
+    "facet": "subject",
+    "synonyms": [
+      "caves"
+    ]
+  },
+  "caversham": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": []
+  },
+  "cervantes": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": [
+      "lake thetis"
+    ]
+  },
+  "chicken": {
+    "facet": "food",
+    "synonyms": [
+      "parmigiana",
+      "teriyaki"
+    ]
+  },
+  "china": {
+    "facet": "place",
+    "parent": "asia",
+    "synonyms": []
+  },
+  "christmas": {
+    "facet": "event",
+    "synonyms": [
+      "xmas",
+      "festive",
+      "christmas market"
+    ]
+  },
+  "chuncheon": {
+    "facet": "place",
+    "parent": "south korea",
+    "synonyms": [
+      "soyanggang",
+      "gangchon"
+    ]
+  },
+  "church": {
+    "facet": "subject",
+    "synonyms": [
+      "cathedral",
+      "chapel",
+      "basilica"
+    ]
+  },
+  "city street": {
+    "facet": "subject",
+    "synonyms": [
+      "downtown",
+      "avenue",
+      "street"
+    ]
+  },
+  "clifton hill": {
+    "facet": "place",
+    "parent": "ontario",
+    "synonyms": []
+  },
+  "cloudy": {
+    "facet": "weather",
+    "synonyms": [
+      "overcast"
+    ]
+  },
+  "coast": {
+    "facet": "subject",
+    "synonyms": [
+      "coastline",
+      "coastal",
+      "ocean",
+      "blowhole",
+      "cliff"
+    ]
+  },
+  "coffee": {
+    "facet": "food",
+    "synonyms": [
+      "café",
+      "espresso",
+      "starbucks",
+      "latte"
+    ]
+  },
+  "colmar": {
+    "facet": "place",
+    "parent": "france",
+    "synonyms": [
+      "petite venise"
+    ]
+  },
+  "cologne": {
+    "facet": "place",
+    "parent": "germany",
+    "synonyms": [
+      "koln",
+      "köln"
+    ]
+  },
+  "conference": {
+    "facet": "event",
+    "synonyms": [
+      "office",
+      "meeting"
+    ]
+  },
+  "cooking": {
+    "facet": "activity",
+    "synonyms": [
+      "cookhouse",
+      "home cooking"
+    ]
+  },
+  "costumed character": {
+    "facet": "subject",
+    "synonyms": [
+      "mascot",
+      "character"
+    ]
+  },
+  "cow": {
+    "facet": "animal",
+    "synonyms": [
+      "cattle"
+    ]
+  },
+  "crab": {
+    "facet": "animal",
+    "synonyms": [
+      "lobster"
+    ]
+  },
+  "crowd": {
+    "facet": "people",
+    "synonyms": [
+      "queue"
+    ]
+  },
+  "cruise": {
+    "facet": "activity",
+    "synonyms": [
+      "river cruise",
+      "bateaux mouches"
+    ]
+  },
+  "curry": {
+    "facet": "food",
+    "synonyms": [
+      "tikka masala"
+    ]
+  },
+  "cycling": {
+    "facet": "activity",
+    "synonyms": [
+      "bike",
+      "bicycle"
+    ]
+  },
+  "deer": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "desert": {
+    "facet": "subject",
+    "synonyms": [
+      "sand dunes",
+      "dunes",
+      "pinnacles desert"
+    ]
+  },
+  "dessert": {
+    "facet": "food",
+    "synonyms": [
+      "desserts",
+      "scones",
+      "sweets",
+      "pudding"
+    ]
+  },
+  "dim sum": {
+    "facet": "food",
+    "synonyms": [
+      "yum cha",
+      "dumplings"
+    ]
+  },
+  "dining": {
+    "facet": "activity",
+    "synonyms": [
+      "meal",
+      "eating"
+    ]
+  },
+  "dinosaur": {
+    "facet": "subject",
+    "synonyms": [
+      "fossil",
+      "skeleton",
+      "t-rex"
+    ]
+  },
+  "dog": {
+    "facet": "animal",
+    "synonyms": [
+      "puppy"
+    ]
+  },
+  "dolphin": {
+    "facet": "animal",
+    "synonyms": [
+      "dolphinarium"
+    ]
+  },
+  "dongshankou": {
+    "facet": "place",
+    "parent": "guangzhou",
+    "synonyms": []
+  },
+  "drinks": {
+    "facet": "food",
+    "synonyms": [
+      "beer",
+      "wine",
+      "cocktail",
+      "bubble tea"
+    ]
+  },
+  "driving": {
+    "facet": "activity",
+    "synonyms": [
+      "car ride"
+    ]
+  },
+  "duck": {
+    "facet": "food",
+    "synonyms": [
+      "roast duck",
+      "peking duck",
+      "kaoya"
+    ]
+  },
+  "duisburg": {
+    "facet": "place",
+    "parent": "germany",
+    "synonyms": []
+  },
+  "dusk": {
+    "facet": "time",
+    "synonyms": [
+      "blue hour",
+      "twilight",
+      "evening"
+    ]
+  },
+  "dusseldorf": {
+    "facet": "place",
+    "parent": "germany",
+    "synonyms": [
+      "düsseldorf"
+    ]
+  },
+  "elephant": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "emu": {
+    "facet": "animal",
+    "synonyms": [
+      "cassowary"
+    ]
+  },
+  "enoshima": {
+    "facet": "place",
+    "parent": "japan",
+    "synonyms": []
+  },
+  "essen": {
+    "facet": "place",
+    "parent": "germany",
+    "synonyms": [
+      "zollverein"
+    ]
+  },
+  "europe": {
+    "facet": "place",
+    "synonyms": []
+  },
+  "family": {
+    "facet": "people",
+    "synonyms": [
+      "relatives"
+    ]
+  },
+  "farm": {
+    "facet": "subject",
+    "synonyms": [
+      "farm show",
+      "berry farm"
+    ]
+  },
+  "feeding": {
+    "facet": "activity",
+    "synonyms": [
+      "feed the",
+      "feeding time"
+    ]
+  },
+  "ferris wheel": {
+    "facet": "subject",
+    "synonyms": [
+      "wheel",
+      "skywheel",
+      "observation wheel",
+      "bubble tram"
+    ]
+  },
+  "ferry": {
+    "facet": "subject",
+    "synonyms": [
+      "ferry terminal"
+    ]
+  },
+  "festival": {
+    "facet": "event",
+    "synonyms": [
+      "fair"
+    ]
+  },
+  "fish": {
+    "facet": "animal",
+    "synonyms": [
+      "sharks"
+    ]
+  },
+  "flamingo": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "flight": {
+    "facet": "activity",
+    "synonyms": [
+      "airlines",
+      "plane",
+      "in-flight",
+      "flying"
+    ]
+  },
+  "flowers": {
+    "facet": "subject",
+    "synonyms": [
+      "flower",
+      "blossom",
+      "lotus",
+      "bloom",
+      "sakura",
+      "cherry blossom"
+    ]
+  },
+  "fog": {
+    "facet": "weather",
+    "synonyms": [
+      "mist",
+      "misty",
+      "foggy"
+    ]
+  },
+  "food": {
+    "facet": "food",
+    "synonyms": [
+      "meal",
+      "lunch",
+      "dinner",
+      "supper",
+      "buffet",
+      "brunch",
+      "bento",
+      "dishes"
+    ]
+  },
+  "forest": {
+    "facet": "subject",
+    "synonyms": [
+      "woods",
+      "trail"
+    ]
+  },
+  "fountain": {
+    "facet": "subject",
+    "synonyms": [
+      "brunnen"
+    ]
+  },
+  "france": {
+    "facet": "place",
+    "parent": "europe",
+    "synonyms": []
+  },
+  "fremantle": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": []
+  },
+  "fried chicken": {
+    "facet": "food",
+    "synonyms": [
+      "kfc"
+    ]
+  },
+  "friends": {
+    "facet": "people",
+    "synonyms": [
+      "friend",
+      "colleagues"
+    ]
+  },
+  "fruit": {
+    "facet": "food",
+    "synonyms": [
+      "fruits",
+      "apples",
+      "pears"
+    ]
+  },
+  "fruit picking": {
+    "facet": "activity",
+    "synonyms": [
+      "pick-your-own"
+    ]
+  },
+  "games": {
+    "facet": "activity",
+    "synonyms": [
+      "gaming",
+      "arcade",
+      "nintendo",
+      "game zone",
+      "chess"
+    ]
+  },
+  "garden": {
+    "facet": "subject",
+    "synonyms": [
+      "gardens",
+      "botanic",
+      "botanical",
+      "botanic garden"
+    ]
+  },
+  "georgetown": {
+    "facet": "place",
+    "parent": "washington dc",
+    "synonyms": []
+  },
+  "geraldton": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": []
+  },
+  "germany": {
+    "facet": "place",
+    "parent": "europe",
+    "synonyms": [
+      "deutschland"
+    ]
+  },
+  "giraffe": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "glacier": {
+    "facet": "subject",
+    "synonyms": [
+      "glacier park",
+      "glacier cave"
+    ]
+  },
+  "goat": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "gorilla": {
+    "facet": "animal",
+    "synonyms": [
+      "ape"
+    ]
+  },
+  "grampians": {
+    "facet": "place",
+    "parent": "australia",
+    "synonyms": [
+      "halls gap"
+    ]
+  },
+  "great ocean road": {
+    "facet": "place",
+    "parent": "australia",
+    "synonyms": [
+      "12 apostles",
+      "twelve apostles",
+      "loch ard gorge"
+    ]
+  },
+  "greenough": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": []
+  },
+  "group": {
+    "facet": "people",
+    "synonyms": [
+      "colleagues"
+    ]
+  },
+  "guangzhou": {
+    "facet": "place",
+    "parent": "china",
+    "synonyms": [
+      "canton"
+    ]
+  },
+  "gwacheon": {
+    "facet": "place",
+    "parent": "south korea",
+    "synonyms": []
+  },
+  "hakone": {
+    "facet": "place",
+    "parent": "japan",
+    "synonyms": [
+      "owakudani",
+      "lake ashi",
+      "hakone shrine"
+    ]
+  },
+  "halloween": {
+    "facet": "event",
+    "synonyms": []
+  },
+  "harajuku": {
+    "facet": "place",
+    "parent": "tokyo",
+    "synonyms": []
+  },
+  "harbour": {
+    "facet": "subject",
+    "synonyms": [
+      "harbor",
+      "pier",
+      "quay",
+      "wharf",
+      "marina",
+      "fishing village",
+      "boathouse",
+      "waterfront"
+    ]
+  },
+  "heidelberg": {
+    "facet": "place",
+    "parent": "germany",
+    "synonyms": []
+  },
+  "hiking": {
+    "facet": "activity",
+    "synonyms": [
+      "hike",
+      "trail",
+      "climb",
+      "trek",
+      "walk"
+    ]
+  },
+  "hippo": {
+    "facet": "animal",
+    "synonyms": [
+      "hippopotamus"
+    ]
+  },
+  "hiroshima": {
+    "facet": "place",
+    "parent": "japan",
+    "synonyms": []
+  },
+  "honeymoon": {
+    "facet": "event",
+    "synonyms": []
+  },
+  "hongdae": {
+    "facet": "place",
+    "parent": "seoul",
+    "synonyms": [
+      "trickeye"
+    ]
+  },
+  "horse": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "hotel": {
+    "facet": "subject",
+    "synonyms": [
+      "inn",
+      "apartment",
+      "airbnb",
+      "hotel room",
+      "suites",
+      "accommodation",
+      "onsen hotel"
+    ]
+  },
+  "hotpot": {
+    "facet": "food",
+    "synonyms": [
+      "hot pot",
+      "shabu"
+    ]
+  },
+  "hutt lagoon": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": [
+      "pink lake"
+    ]
+  },
+  "hyden": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": [
+      "wave rock"
+    ]
+  },
+  "ice cream": {
+    "facet": "food",
+    "synonyms": [
+      "gelato",
+      "soft serve"
+    ]
+  },
+  "ikebukuro": {
+    "facet": "place",
+    "parent": "tokyo",
+    "synonyms": []
+  },
+  "illuminations": {
+    "facet": "subject",
+    "synonyms": [
+      "night lights",
+      "lanterns",
+      "light show"
+    ]
+  },
+  "ine": {
+    "facet": "place",
+    "parent": "kansai",
+    "synonyms": [
+      "ine fishing village"
+    ]
+  },
+  "interior": {
+    "facet": "subject",
+    "synonyms": [
+      "indoor",
+      "indoors",
+      "hall"
+    ]
+  },
+  "island": {
+    "facet": "subject",
+    "synonyms": [
+      "islands"
+    ]
+  },
+  "japan": {
+    "facet": "place",
+    "parent": "asia",
+    "synonyms": []
+  },
+  "japanese alps": {
+    "facet": "place",
+    "parent": "japan",
+    "synonyms": [
+      "hida"
+    ]
+  },
+  "jellyfish": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "jersey city": {
+    "facet": "place",
+    "parent": "new jersey",
+    "synonyms": [
+      "liberty state park"
+    ]
+  },
+  "kalbarri": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": []
+  },
+  "kalkar": {
+    "facet": "place",
+    "parent": "germany",
+    "synonyms": [
+      "grieth",
+      "wunderland"
+    ]
+  },
+  "kamakura": {
+    "facet": "place",
+    "parent": "japan",
+    "synonyms": []
+  },
+  "kamikochi": {
+    "facet": "place",
+    "parent": "japanese alps",
+    "synonyms": []
+  },
+  "kangaroo": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "kansai": {
+    "facet": "place",
+    "parent": "japan",
+    "synonyms": []
+  },
+  "kawaguchiko": {
+    "facet": "place",
+    "parent": "mount fuji",
+    "synonyms": [
+      "lake kawaguchiko",
+      "lake kawaguchi"
+    ]
+  },
+  "kiama": {
+    "facet": "place",
+    "parent": "australia",
+    "synonyms": []
+  },
+  "kings park": {
+    "facet": "place",
+    "parent": "perth",
+    "synonyms": []
+  },
+  "kleve": {
+    "facet": "place",
+    "parent": "germany",
+    "synonyms": []
+  },
+  "koala": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "korean food": {
+    "facet": "food",
+    "synonyms": [
+      "koreatown",
+      "bibimix",
+      "buk chang dong soo"
+    ]
+  },
+  "kyoto": {
+    "facet": "place",
+    "parent": "kansai",
+    "synonyms": [
+      "kiyomizu-dera"
+    ]
+  },
+  "lake": {
+    "facet": "subject",
+    "synonyms": [
+      "lagoon"
+    ]
+  },
+  "lancelin": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": []
+  },
+  "las vegas": {
+    "facet": "place",
+    "parent": "usa",
+    "synonyms": [
+      "vegas",
+      "fremont street",
+      "bellagio",
+      "caesars palace",
+      "the venetian"
+    ]
+  },
+  "lighthouse": {
+    "facet": "subject",
+    "synonyms": []
+  },
+  "lion": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "los angeles": {
+    "facet": "place",
+    "parent": "california",
+    "synonyms": [
+      "santa monica",
+      "little tokyo"
+    ]
+  },
+  "lucerne": {
+    "facet": "place",
+    "parent": "switzerland",
+    "synonyms": [
+      "luzern"
+    ]
+  },
+  "manhattan": {
+    "facet": "place",
+    "parent": "new york",
+    "synonyms": [
+      "midtown",
+      "times square",
+      "chelsea",
+      "hudson yards"
+    ]
+  },
+  "marin headlands": {
+    "facet": "place",
+    "parent": "california",
+    "synonyms": [
+      "hawk hill"
+    ]
+  },
+  "market": {
+    "facet": "subject",
+    "synonyms": [
+      "markets",
+      "marche",
+      "marché",
+      "food hall"
+    ]
+  },
+  "massachusetts": {
+    "facet": "place",
+    "parent": "usa",
+    "synonyms": []
+  },
+  "massage": {
+    "facet": "activity",
+    "synonyms": [
+      "spa"
+    ]
+  },
+  "meerkat": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "melbourne": {
+    "facet": "place",
+    "parent": "australia",
+    "synonyms": []
+  },
+  "memorial": {
+    "facet": "subject",
+    "synonyms": [
+      "monument",
+      "cenotaph",
+      "peace memorial",
+      "war memorial"
+    ]
+  },
+  "menlo park": {
+    "facet": "place",
+    "parent": "silicon valley",
+    "synonyms": []
+  },
+  "miniature": {
+    "facet": "subject",
+    "synonyms": [
+      "model",
+      "diorama",
+      "wunderland"
+    ]
+  },
+  "miyajima": {
+    "facet": "place",
+    "parent": "hiroshima",
+    "synonyms": [
+      "itsukushima"
+    ]
+  },
+  "monkey": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "monterey": {
+    "facet": "place",
+    "parent": "california",
+    "synonyms": [
+      "monterey bay",
+      "point lobos"
+    ]
+  },
+  "mount fuji": {
+    "facet": "place",
+    "parent": "japan",
+    "synonyms": [
+      "fuji",
+      "mt fuji",
+      "fujisan",
+      "arakurayama",
+      "chureito"
+    ]
+  },
+  "mount titlis": {
+    "facet": "place",
+    "parent": "switzerland",
+    "synonyms": [
+      "titlis",
+      "engelberg"
+    ]
+  },
+  "mountain": {
+    "facet": "subject",
+    "synonyms": [
+      "mountains",
+      "mount",
+      "summit",
+      "peak",
+      "alps"
+    ]
+  },
+  "museum": {
+    "facet": "subject",
+    "synonyms": [
+      "museums",
+      "gallery",
+      "madame tussauds",
+      "exhibit"
+    ]
+  },
+  "nagoya": {
+    "facet": "place",
+    "parent": "japan",
+    "synonyms": []
+  },
+  "nami island": {
+    "facet": "place",
+    "parent": "south korea",
+    "synonyms": [
+      "namiseom"
+    ]
+  },
+  "nara": {
+    "facet": "place",
+    "parent": "kansai",
+    "synonyms": [
+      "todaiji",
+      "todai-ji"
+    ]
+  },
+  "netherlands": {
+    "facet": "place",
+    "parent": "europe",
+    "synonyms": [
+      "holland",
+      "the netherlands"
+    ]
+  },
+  "new jersey": {
+    "facet": "place",
+    "parent": "usa",
+    "synonyms": []
+  },
+  "new york": {
+    "facet": "place",
+    "parent": "usa",
+    "synonyms": [
+      "new york city",
+      "nyc"
+    ]
+  },
+  "niagara falls": {
+    "facet": "place",
+    "parent": "north america",
+    "synonyms": [
+      "niagara"
+    ]
+  },
+  "nicholas": {
+    "facet": "people",
+    "synonyms": [
+      "nic",
+      "nick"
+    ]
+  },
+  "night": {
+    "facet": "time",
+    "synonyms": [
+      "nighttime",
+      "at night",
+      "evening",
+      "night view",
+      "lit up",
+      "illuminated",
+      "lights"
+    ]
+  },
+  "noodles": {
+    "facet": "food",
+    "synonyms": [
+      "udon",
+      "soba",
+      "pasta"
+    ]
+  },
+  "north america": {
+    "facet": "place",
+    "synonyms": [
+      "americas"
+    ]
+  },
+  "observation deck": {
+    "facet": "subject",
+    "synonyms": [
+      "tower view",
+      "lookout",
+      "viewpoint"
+    ]
+  },
+  "oceania": {
+    "facet": "place",
+    "synonyms": [
+      "australasia"
+    ]
+  },
+  "okonomiyaki": {
+    "facet": "food",
+    "synonyms": []
+  },
+  "old town": {
+    "facet": "subject",
+    "synonyms": [
+      "historic street",
+      "village"
+    ]
+  },
+  "oman": {
+    "facet": "place",
+    "parent": "asia",
+    "synonyms": [
+      "muscat"
+    ]
+  },
+  "omelette": {
+    "facet": "food",
+    "synonyms": [
+      "eggs"
+    ]
+  },
+  "onsen": {
+    "facet": "activity",
+    "synonyms": [
+      "hot spring",
+      "hot springs"
+    ]
+  },
+  "ontario": {
+    "facet": "place",
+    "parent": "canada",
+    "synonyms": []
+  },
+  "osaka": {
+    "facet": "place",
+    "parent": "kansai",
+    "synonyms": [
+      "namba",
+      "dotonbori",
+      "shinsaibashi",
+      "shinsekai",
+      "tsutenkaku"
+    ]
+  },
+  "otter": {
+    "facet": "animal",
+    "synonyms": [
+      "sea otter"
+    ]
+  },
+  "panda": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "panyu": {
+    "facet": "place",
+    "parent": "guangzhou",
+    "synonyms": [
+      "chimelong"
+    ]
+  },
+  "paris": {
+    "facet": "place",
+    "parent": "france",
+    "synonyms": [
+      "eiffel tower",
+      "louvre",
+      "champs-elysees",
+      "seine"
+    ]
+  },
+  "park": {
+    "facet": "subject",
+    "synonyms": [
+      "national park"
+    ]
+  },
+  "parrot": {
+    "facet": "animal",
+    "synonyms": [
+      "cockatoo",
+      "toucan",
+      "lorikeet"
+    ]
+  },
+  "party": {
+    "facet": "event",
+    "synonyms": [
+      "happy hour",
+      "celebration",
+      "silent disco"
+    ]
+  },
+  "penguin": {
+    "facet": "animal",
+    "synonyms": [
+      "penguin parade"
+    ]
+  },
+  "performer": {
+    "facet": "people",
+    "synonyms": [
+      "actor",
+      "dancer",
+      "busker"
+    ]
+  },
+  "perth": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": [
+      "elizabeth quay",
+      "yagan square"
+    ]
+  },
+  "phillip island": {
+    "facet": "place",
+    "parent": "australia",
+    "synonyms": []
+  },
+  "photo spot": {
+    "facet": "activity",
+    "synonyms": [
+      "photo op",
+      "posing"
+    ]
+  },
+  "pigeon": {
+    "facet": "food",
+    "synonyms": [
+      "roast pigeon"
+    ]
+  },
+  "pinnacles": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": [
+      "the pinnacles",
+      "nambung"
+    ]
+  },
+  "pizza": {
+    "facet": "food",
+    "synonyms": []
+  },
+  "poster": {
+    "facet": "subject",
+    "synonyms": [
+      "advertisement",
+      "billboard"
+    ]
+  },
+  "protest": {
+    "facet": "event",
+    "synonyms": [
+      "rally"
+    ]
+  },
+  "quokka": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "rain": {
+    "facet": "weather",
+    "synonyms": [
+      "rainy",
+      "raining",
+      "wet"
+    ]
+  },
+  "ramen": {
+    "facet": "food",
+    "synonyms": [
+      "noodle soup"
+    ]
+  },
+  "rees": {
+    "facet": "place",
+    "parent": "germany",
+    "synonyms": []
+  },
+  "reptile": {
+    "facet": "animal",
+    "synonyms": [
+      "crocodile",
+      "lizard",
+      "snake",
+      "alligator"
+    ]
+  },
+  "restaurant": {
+    "facet": "subject",
+    "synonyms": [
+      "diner",
+      "eatery"
+    ]
+  },
+  "rhine falls": {
+    "facet": "place",
+    "parent": "switzerland",
+    "synonyms": [
+      "schaffhausen"
+    ]
+  },
+  "rhino": {
+    "facet": "animal",
+    "synonyms": [
+      "rhinoceros"
+    ]
+  },
+  "ride": {
+    "facet": "activity",
+    "synonyms": [
+      "roller coaster",
+      "attraction",
+      "carousel"
+    ]
+  },
+  "river": {
+    "facet": "subject",
+    "synonyms": [
+      "canal"
+    ]
+  },
+  "road trip": {
+    "facet": "activity",
+    "synonyms": [
+      "drive",
+      "scenic drive"
+    ]
+  },
+  "rock formation": {
+    "facet": "subject",
+    "synonyms": [
+      "wave rock",
+      "natural bridge",
+      "hippo's yawn",
+      "limestone",
+      "gorge"
+    ]
+  },
+  "rottnest island": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": [
+      "rottnest",
+      "wadjemup",
+      "rotto"
+    ]
+  },
+  "san francisco": {
+    "facet": "place",
+    "parent": "california",
+    "synonyms": [
+      "sf",
+      "golden gate",
+      "presidio",
+      "lombard street",
+      "sutro baths"
+    ]
+  },
+  "sandboarding": {
+    "facet": "activity",
+    "synonyms": [
+      "sandboard"
+    ]
+  },
+  "sandwich": {
+    "facet": "food",
+    "synonyms": [
+      "sandwiches",
+      "toast"
+    ]
+  },
+  "sausage": {
+    "facet": "food",
+    "synonyms": [
+      "bratwurst",
+      "hot dog"
+    ]
+  },
+  "science": {
+    "facet": "subject",
+    "synonyms": [
+      "science center",
+      "science museum",
+      "scitech",
+      "mathematics"
+    ]
+  },
+  "science centre": {
+    "facet": "subject",
+    "synonyms": [
+      "science museum",
+      "scitech"
+    ]
+  },
+  "sculpture": {
+    "facet": "subject",
+    "synonyms": [
+      "installation"
+    ]
+  },
+  "seafood": {
+    "facet": "food",
+    "synonyms": [
+      "lobster",
+      "mussels",
+      "prawns",
+      "oysters"
+    ]
+  },
+  "seal": {
+    "facet": "animal",
+    "synonyms": [
+      "sea lion"
+    ]
+  },
+  "selfie": {
+    "facet": "people",
+    "synonyms": []
+  },
+  "seoul": {
+    "facet": "place",
+    "parent": "south korea",
+    "synonyms": [
+      "namsan",
+      "namsan tower",
+      "n seoul tower"
+    ]
+  },
+  "shamian island": {
+    "facet": "place",
+    "parent": "guangzhou",
+    "synonyms": [
+      "shamian"
+    ]
+  },
+  "shark": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "sheep": {
+    "facet": "animal",
+    "synonyms": [
+      "lamb"
+    ]
+  },
+  "shibuya": {
+    "facet": "place",
+    "parent": "tokyo",
+    "synonyms": []
+  },
+  "shirakawa-go": {
+    "facet": "place",
+    "parent": "japanese alps",
+    "synonyms": [
+      "shirakawa"
+    ]
+  },
+  "shopping": {
+    "facet": "activity",
+    "synonyms": [
+      "shop",
+      "shops",
+      "mall",
+      "outlet",
+      "store",
+      "galeries lafayette",
+      "co-op"
+    ]
+  },
+  "show": {
+    "facet": "event",
+    "synonyms": [
+      "circus",
+      "broadway",
+      "theatre",
+      "theater",
+      "performance",
+      "stage show"
+    ]
+  },
+  "shrine": {
+    "facet": "subject",
+    "synonyms": [
+      "torii",
+      "jinja"
+    ]
+  },
+  "shuzenji": {
+    "facet": "place",
+    "parent": "japan",
+    "synonyms": []
+  },
+  "sign": {
+    "facet": "subject",
+    "synonyms": [
+      "signboard",
+      "neon"
+    ]
+  },
+  "silicon valley": {
+    "facet": "place",
+    "parent": "california",
+    "synonyms": [
+      "bay area"
+    ]
+  },
+  "singapore": {
+    "facet": "place",
+    "parent": "asia",
+    "synonyms": [
+      "sg"
+    ]
+  },
+  "ski resort": {
+    "facet": "subject",
+    "synonyms": [
+      "slope",
+      "ski slope"
+    ]
+  },
+  "skiing": {
+    "facet": "activity",
+    "synonyms": [
+      "ski",
+      "snowboarding",
+      "snowboard"
+    ]
+  },
+  "skyline": {
+    "facet": "subject",
+    "synonyms": [
+      "cityscape"
+    ]
+  },
+  "skyscraper": {
+    "facet": "subject",
+    "synonyms": [
+      "empire state building",
+      "one world observatory",
+      "top of the rock",
+      "world trade center",
+      "rockefeller center",
+      "high-rise"
+    ]
+  },
+  "snack": {
+    "facet": "food",
+    "synonyms": [
+      "street food"
+    ]
+  },
+  "snow": {
+    "facet": "weather",
+    "synonyms": [
+      "snowy",
+      "snowfall",
+      "snowmen",
+      "first snow"
+    ]
+  },
+  "snowman": {
+    "facet": "subject",
+    "synonyms": []
+  },
+  "solo": {
+    "facet": "people",
+    "synonyms": [
+      "portrait"
+    ]
+  },
+  "south korea": {
+    "facet": "place",
+    "parent": "asia",
+    "synonyms": [
+      "korea"
+    ]
+  },
+  "spring": {
+    "facet": "season",
+    "synonyms": []
+  },
+  "squirrel": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "station": {
+    "facet": "subject",
+    "synonyms": [
+      "train station",
+      "railway station",
+      "hauptbahnhof",
+      "central station",
+      "union station",
+      "subway"
+    ]
+  },
+  "statue": {
+    "facet": "subject",
+    "synonyms": [
+      "statues",
+      "monument"
+    ]
+  },
+  "steak": {
+    "facet": "food",
+    "synonyms": [
+      "sous vide",
+      "wagyu",
+      "yakiniku"
+    ]
+  },
+  "stingray": {
+    "facet": "animal",
+    "synonyms": [
+      "ray"
+    ]
+  },
+  "street art": {
+    "facet": "subject",
+    "synonyms": [
+      "mural",
+      "graffiti"
+    ]
+  },
+  "summer": {
+    "facet": "season",
+    "synonyms": []
+  },
+  "sunny": {
+    "facet": "weather",
+    "synonyms": [
+      "clear sky",
+      "clear winter day",
+      "sunshine"
+    ]
+  },
+  "sunrise": {
+    "facet": "time",
+    "synonyms": [
+      "dawn"
+    ]
+  },
+  "sunset": {
+    "facet": "time",
+    "synonyms": [
+      "golden hour",
+      "sundown"
+    ]
+  },
+  "sushi": {
+    "facet": "food",
+    "synonyms": [
+      "sashimi"
+    ]
+  },
+  "swan": {
+    "facet": "animal",
+    "synonyms": [
+      "goose"
+    ]
+  },
+  "swan valley": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": []
+  },
+  "swimming": {
+    "facet": "activity",
+    "synonyms": [
+      "pool",
+      "snorkelling"
+    ]
+  },
+  "switzerland": {
+    "facet": "place",
+    "parent": "europe",
+    "synonyms": [
+      "swiss"
+    ]
+  },
+  "sydney": {
+    "facet": "place",
+    "parent": "australia",
+    "synonyms": []
+  },
+  "takayama": {
+    "facet": "place",
+    "parent": "japanese alps",
+    "synonyms": [
+      "hida takayama"
+    ]
+  },
+  "tea": {
+    "facet": "food",
+    "synonyms": [
+      "bubble tea",
+      "matcha",
+      "macha",
+      "chagee",
+      "tapioca"
+    ]
+  },
+  "temple": {
+    "facet": "subject",
+    "synonyms": [
+      "pagoda",
+      "daisho-in",
+      "kofuku-ji"
+    ]
+  },
+  "thai food": {
+    "facet": "food",
+    "synonyms": [
+      "thai"
+    ]
+  },
+  "theme park": {
+    "facet": "subject",
+    "synonyms": [
+      "universal studios",
+      "usj",
+      "amusement park",
+      "funfair",
+      "midway"
+    ]
+  },
+  "tianhe": {
+    "facet": "place",
+    "parent": "guangzhou",
+    "synonyms": []
+  },
+  "tiger": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "titisee": {
+    "facet": "place",
+    "parent": "baden-wurttemberg",
+    "synonyms": [
+      "lake titisee"
+    ]
+  },
+  "tokyo": {
+    "facet": "place",
+    "parent": "japan",
+    "synonyms": []
+  },
+  "toronto": {
+    "facet": "place",
+    "parent": "ontario",
+    "synonyms": [
+      "scarborough",
+      "markham"
+    ]
+  },
+  "tower": {
+    "facet": "subject",
+    "synonyms": [
+      "towers",
+      "tsutenkaku",
+      "landmark tower",
+      "skytree"
+    ]
+  },
+  "train": {
+    "facet": "subject",
+    "synonyms": [
+      "amtrak",
+      "shinkansen",
+      "subway",
+      "tram",
+      "railway",
+      "metro"
+    ]
+  },
+  "train ride": {
+    "facet": "activity",
+    "synonyms": [
+      "rail"
+    ]
+  },
+  "turtle": {
+    "facet": "animal",
+    "synonyms": [
+      "tortoise"
+    ]
+  },
+  "ueno": {
+    "facet": "place",
+    "parent": "tokyo",
+    "synonyms": []
+  },
+  "uji": {
+    "facet": "place",
+    "parent": "kansai",
+    "synonyms": [
+      "byodo-in"
+    ]
+  },
+  "university": {
+    "facet": "subject",
+    "synonyms": [
+      "college",
+      "campus"
+    ]
+  },
+  "us": {
+    "facet": "people",
+    "synonyms": [
+      "couple",
+      "together",
+      "the two of us",
+      "both of us"
+    ]
+  },
+  "usa": {
+    "facet": "place",
+    "parent": "north america",
+    "synonyms": [
+      "united states",
+      "america",
+      "u.s."
+    ]
+  },
+  "video games": {
+    "facet": "subject",
+    "synonyms": [
+      "nintendo",
+      "arcade",
+      "gaming"
+    ]
+  },
+  "view": {
+    "facet": "subject",
+    "synonyms": [
+      "viewpoint",
+      "lookout",
+      "observatory",
+      "panorama",
+      "overlooking",
+      "skywalk",
+      "from the top",
+      "scenery",
+      "vista"
+    ]
+  },
+  "volendam": {
+    "facet": "place",
+    "parent": "netherlands",
+    "synonyms": []
+  },
+  "walking": {
+    "facet": "activity",
+    "synonyms": [
+      "stroll"
+    ]
+  },
+  "wallaby": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "washington dc": {
+    "facet": "place",
+    "parent": "usa",
+    "synonyms": [
+      "washington d.c.",
+      "washington",
+      "d.c."
+    ]
+  },
+  "waterfall": {
+    "facet": "subject",
+    "synonyms": [
+      "falls",
+      "cascade"
+    ]
+  },
+  "wax figure": {
+    "facet": "subject",
+    "synonyms": [
+      "madame tussauds",
+      "waxwork"
+    ]
+  },
+  "wedding": {
+    "facet": "event",
+    "synonyms": [
+      "pre-wedding",
+      "engagement"
+    ]
+  },
+  "werribee": {
+    "facet": "place",
+    "parent": "australia",
+    "synonyms": []
+  },
+  "western australia": {
+    "facet": "place",
+    "parent": "australia",
+    "synonyms": [
+      "wa"
+    ]
+  },
+  "windmill": {
+    "facet": "subject",
+    "synonyms": [
+      "windmills"
+    ]
+  },
+  "winter": {
+    "facet": "season",
+    "synonyms": [
+      "wintry"
+    ]
+  },
+  "wollongong": {
+    "facet": "place",
+    "parent": "australia",
+    "synonyms": [
+      "port kembla"
+    ]
+  },
+  "wombat": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "work": {
+    "facet": "event",
+    "synonyms": [
+      "office",
+      "internship",
+      "the league",
+      "office visit",
+      "work trip"
+    ]
+  },
+  "xanten": {
+    "facet": "place",
+    "parent": "germany",
+    "synonyms": []
+  },
+  "xiguan": {
+    "facet": "place",
+    "parent": "guangzhou",
+    "synonyms": [
+      "shangxiajiu"
+    ]
+  },
+  "yongqingfang": {
+    "facet": "place",
+    "parent": "guangzhou",
+    "synonyms": []
+  },
+  "yongsan": {
+    "facet": "place",
+    "parent": "seoul",
+    "synonyms": [
+      "yongsan-gu"
+    ]
+  },
+  "york": {
+    "facet": "place",
+    "parent": "western australia",
+    "synonyms": []
+  },
+  "yuexiu": {
+    "facet": "place",
+    "parent": "guangzhou",
+    "synonyms": [
+      "yuexiu park",
+      "zhenhai tower"
+    ]
+  },
+  "yx": {
+    "facet": "people",
+    "synonyms": [
+      "yingxian",
+      "xian",
+      "wife",
+      "my wife"
+    ]
+  },
+  "zaanse schans": {
+    "facet": "place",
+    "parent": "netherlands",
+    "synonyms": [
+      "zaandam"
+    ]
+  },
+  "zebra": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "zoo": {
+    "facet": "subject",
+    "synonyms": [
+      "zoological park",
+      "wildlife park",
+      "safari park",
+      "open range zoo",
+      "sanctuary",
+      "aquazoo",
+      "safari"
+    ]
+  },
+  "zurich": {
+    "facet": "place",
+    "parent": "switzerland",
+    "synonyms": [
+      "zürich",
+      "lindenhof"
+    ]
+  }
 }

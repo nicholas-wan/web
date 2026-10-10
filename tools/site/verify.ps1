@@ -237,6 +237,9 @@ $customCss = @($sharedCustomCss, $travelMapPageCss, $travelJournalCss, $experien
 $personalTimelineJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\personal-timeline.js') -Raw -Encoding UTF8
 $galleryJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\gallery.js') -Raw -Encoding UTF8
 $travelNavJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\travel-nav.js') -Raw -Encoding UTF8
+# Photo deep links (#photo=<id>, Oct 2026): travel-nav.js lands the tile through its settle-and-stop
+# loop and opens it through gallery.js's travelGallery hook so the lightbox contract stays in one place.
+if ($galleryJs -notmatch 'window\.travelGallery\s*=' -or $galleryJs -notmatch 'afterClose' -or $galleryJs -notmatch "media\.tagName === 'VIDEO'" -or $travelNavJs -notmatch '#photo=' -or $travelNavJs -notmatch "classList\.add\('is-deep-linked'\)" -or $travelNavJs -notmatch 'gallery\.open\(media') { throw "Journal #photo= deep links must land through travel-nav.js and open through gallery.js's travelGallery hook." }
 $travelMapJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\travel-map.js') -Raw -Encoding UTF8
 $mainJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\main.js') -Raw -Encoding UTF8
 $canvasJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\canvas-background.js') -Raw -Encoding UTF8

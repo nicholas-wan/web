@@ -735,8 +735,15 @@
   window.travelGallery = {
     find: function (id) {
       try { id = decodeURIComponent(id); } catch (error) { return null; }
-      var tail = new RegExp('/' + id.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&') + '(-poster)?\\.\\w+(?=[?#\\s]|$)');
+      /* Photo ids drop the extension, animation ids keep `.mp4` (a still and
+         an animation can share a basename, e.g. SF_sutro). Match the id's
+         basename against authored paths, then let the extension decide which
+         kind of tile is wanted. */
+      var isVideo = /\.mp4$/i.test(id);
+      var base = isVideo ? id.slice(0, -4) : id;
+      var tail = new RegExp('/' + base.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&') + '(-poster)?\\.\\w+(?=[?#\\s]|$)');
       return galleryMedia.filter(function (media) {
+        if ((media.tagName === 'VIDEO') !== isVideo) return false;
         var source = media.querySelector('source');
         return tail.test([media.getAttribute('src'), media.getAttribute('srcset'), source && source.getAttribute('src'), media.getAttribute('data-poster')].join(' '));
       })[0] || null;
