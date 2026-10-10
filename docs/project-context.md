@@ -62,6 +62,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 - Any wheel, touch, pointer, keyboard, or otherwise unexpected document scroll cancels the bounded landing correction. This includes movement immediately after `load`, before an image-heavy journal has produced its first correction sample. The correction records its own expected `scrollTo` destination so its one intentional movement is not mistaken for user input. `load` and `pageshow` must not re-land an old hash after the visitor has started reading; a deliberate new section-tab selection re-arms the correction through `hashchange`.
 - On mobile, scrollspy centres the active section tab by calling `scrollTo` on `.travel-jump-groups` itself. Do not use `scrollIntoView` for a child of the sticky strip: iPhone Safari can transfer that movement to the root page and create a vertical jump.
 - The mobile rail and its embedded hamburger remain dark before and after the rail becomes sticky. Hide the wrapper-level hamburger until `travel-nav.js` moves it into the rail; otherwise the generic white floating style can flash against the black journal header.
+- `#photo=<path under images/travel, no extension; animations keep .mp4>` (for example `#photo=2023_usa_canada/day12/zoo_gif1.mp4`) is a photo deep link, the target of every search hit. `travel-nav.js` lands the tile's `.brick` through the same bounded, settle-and-stop correction as section anchors, then opens it through `window.travelGallery` from `gallery.js` (loaded first), so focus, caption, zoom and sequence behaviour stay the lightbox's own. Visitor input during the landing cancels the auto-open too. Matching uses authored `src`/`srcset`/`<source>`/`data-poster` paths, never `currentSrc`, and the id's extension decides whether a still or an animation is wanted because the two can share a basename (`SF_sutro`). When the viewer closes, the tile carries `is-deep-linked` for 1.5s; its ring is static under reduced motion. Closing never touches history.
 - All journal pages add `is-travel-journal-scroll-guard`; at the phone breakpoint it sets `overscroll-behavior-y: none` on the root and body so an upward fling at the top cannot become pull-to-refresh.
 - Regression checks cover every generated journal at desktop and phone widths: no root horizontal overflow, the shared navigation script and guard are present, section anchors exist, the sticky strip owns its horizontal overflow, and user input is never followed by an automatic re-landing.
 
@@ -140,6 +141,9 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
   81,900 before the Oct 2026 cleanup — essentially at the ceiling — so any net-positive
   edit to those scripts must be paid for by a removal of at least the same size. The
   ceiling is a real page-weight limit held at point of need; do not bump it on spec.
+  The photo search module (`photo-search.js`, Oct 2026) is deliberately outside this
+  count: it is injected on first interaction, holds its own 12 KB budget, and `verify.ps1`
+  fails the build if it ever becomes a static `<script src>` on the travel page.
 - **`.travel-gallery__item--tall` looks unused, isn't.** It pairs with the
   `guangzhou-gallery__brick--tall` compat class; the markup carries only the compat class
   today, so the generic half scans as dead — but SKILL.md mandates the pairing, and

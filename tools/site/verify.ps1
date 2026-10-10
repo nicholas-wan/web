@@ -285,6 +285,13 @@ Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
 Assert-FileSizeBudget 'assets\js\photo-search.js' 12
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
+$photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8
+$searchLoader = [regex]::Match($travel, '(?s)<script>(.*?dataset\.searchScript.*?)</script>')
+if (-not $searchLoader.Success -or $searchLoader.Groups[1].Value.Length -gt 512 -or $searchLoader.Groups[1].Value -notmatch '\[\?&\]q=') { throw 'The travel page must carry its small inline photo-search loader (data-search-script, ?q= early load) inside #main.' }
+if ($travel -notmatch 'id="photo-results"[^>]*aria-labelledby="photo-results-title"' -or $travel -notmatch 'id="photo-search-status"[^>]*aria-live="polite"') { throw 'The travel page must ship the photo results landmark and its live status line before the search module loads.' }
+if ($photoSearchJs -notmatch 'history\.replaceState' -or $photoSearchJs -notmatch 'data-search-index' -or $photoSearchJs -notmatch 'DEBOUNCE = 120') { throw 'photo-search.js must keep URL state in ?q=, read the index from data-search-index, and debounce input at 120ms.' }
+$travelSearchCss = Get-Content -LiteralPath (Join-Path $dist 'assets/css/travel-search.css') -Raw -Encoding UTF8
+if ($travelSearchCss -notmatch '(?s)\.travel-atlas__layout\[hidden\]\s*\{[^}]*height:\s*0[^}]*visibility:\s*hidden' -or $travelSearchCss -match '(?s)\.travel-atlas__layout\[hidden\]\s*\{[^}]*display:\s*none') { throw 'A collapsed atlas must keep its width (zero height, hidden), never display: none; travel-map.js measures it on resize.' }
 # The photo search index is fetched by photo-search.js on first use, never at
 # page load. 448 KB, not the planned 320: the full schema measured 387 KB raw
 # (33 KB gzipped) for 840 photos, about 470 bytes each (Oct 2026).

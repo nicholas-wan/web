@@ -41,6 +41,14 @@
     "parent": "kansai",
     "synonyms": []
   },
+  "amphibian": {
+    "facet": "animal",
+    "synonyms": [
+      "axolotl",
+      "frog",
+      "salamander"
+    ]
+  },
   "amsterdam": {
     "facet": "place",
     "parent": "netherlands",
@@ -50,14 +58,25 @@
     "facet": "event",
     "synonyms": []
   },
+  "anteater": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "antelope": {
+    "facet": "animal",
+    "synonyms": [
+      "eland"
+    ]
+  },
   "aquarium": {
     "facet": "subject",
     "synonyms": [
-      "sea life",
-      "suizokukan",
-      "kaiyukan",
       "dolphinarium",
-      "oceanarium"
+      "kaiyukan",
+      "oceanarium",
+      "sea life",
+      "squid",
+      "suizokukan"
     ]
   },
   "architecture": {
@@ -170,6 +189,10 @@
       "grizzly"
     ]
   },
+  "beaver": {
+    "facet": "animal",
+    "synonyms": []
+  },
   "beef": {
     "facet": "food",
     "synonyms": [
@@ -223,8 +246,9 @@
   "boat": {
     "facet": "subject",
     "synonyms": [
+      "cruise ship",
       "ship",
-      "cruise ship"
+      "submarine"
     ]
   },
   "boat ride": {
@@ -298,10 +322,11 @@
   "cable car": {
     "facet": "activity",
     "synonyms": [
+      "chairlift",
       "gondola",
+      "ice flyer",
       "ropeway",
       "rotair",
-      "ice flyer",
       "ski lift"
     ]
   },
@@ -329,10 +354,22 @@
       "harvard"
     ]
   },
+  "camel": {
+    "facet": "animal",
+    "synonyms": []
+  },
   "canada": {
     "facet": "place",
     "parent": "north america",
     "synonyms": []
+  },
+  "candy": {
+    "facet": "food",
+    "synonyms": [
+      "m&m",
+      "chocolate",
+      "lollies"
+    ]
   },
   "cantonese food": {
     "facet": "food",
@@ -344,8 +381,7 @@
     "facet": "subject",
     "synonyms": [
       "vehicle",
-      "bus",
-      "tram"
+      "bus"
     ]
   },
   "castle": {
@@ -379,6 +415,10 @@
     "synonyms": [
       "lake thetis"
     ]
+  },
+  "cheese": {
+    "facet": "food",
+    "synonyms": []
   },
   "chicken": {
     "facet": "food",
@@ -428,6 +468,12 @@
     "facet": "place",
     "parent": "ontario",
     "synonyms": []
+  },
+  "clock": {
+    "facet": "subject",
+    "synonyms": [
+      "cuckoo clock"
+    ]
   },
   "cloudy": {
     "facet": "weather",
@@ -486,8 +532,19 @@
   "costumed character": {
     "facet": "subject",
     "synonyms": [
+      "anime",
+      "character",
       "mascot",
-      "character"
+      "totoro"
+    ]
+  },
+  "countryside": {
+    "facet": "subject",
+    "synonyms": [
+      "fields",
+      "rural",
+      "rice field",
+      "rice paddy"
     ]
   },
   "cow": {
@@ -518,6 +575,7 @@
   "curry": {
     "facet": "food",
     "synonyms": [
+      "katsu",
       "tikka masala"
     ]
   },
@@ -629,6 +687,12 @@
     "parent": "germany",
     "synonyms": [
       "düsseldorf"
+    ]
+  },
+  "eel": {
+    "facet": "animal",
+    "synonyms": [
+      "moray"
     ]
   },
   "elephant": {
@@ -952,6 +1016,14 @@
     "parent": "japan",
     "synonyms": []
   },
+  "home": {
+    "facet": "subject",
+    "synonyms": [
+      "house",
+      "apartment",
+      "desk"
+    ]
+  },
   "honeymoon": {
     "facet": "event",
     "synonyms": []
@@ -1160,6 +1232,16 @@
       "the venetian"
     ]
   },
+  "lemur": {
+    "facet": "animal",
+    "synonyms": []
+  },
+  "library": {
+    "facet": "subject",
+    "synonyms": [
+      "reading room"
+    ]
+  },
   "lighthouse": {
     "facet": "subject",
     "synonyms": []
@@ -1209,6 +1291,14 @@
       "food hall"
     ]
   },
+  "martial arts": {
+    "facet": "activity",
+    "synonyms": [
+      "wing chun",
+      "kung fu",
+      "bruce lee"
+    ]
+  },
   "massachusetts": {
     "facet": "place",
     "parent": "usa",
@@ -1246,8 +1336,9 @@
   "miniature": {
     "facet": "subject",
     "synonyms": [
-      "model",
       "diorama",
+      "lego",
+      "model",
       "wunderland"
     ]
   },
@@ -1268,6 +1359,13 @@
     "synonyms": [
       "monterey bay",
       "point lobos"
+    ]
+  },
+  "motorcycle": {
+    "facet": "subject",
+    "synonyms": [
+      "motorbike",
+      "scooter"
     ]
   },
   "mount fuji": {
@@ -1375,6 +1473,14 @@
       "lights"
     ]
   },
+  "night sky": {
+    "facet": "subject",
+    "synonyms": [
+      "stars",
+      "milky way",
+      "starry"
+    ]
+  },
   "noodles": {
     "facet": "food",
     "synonyms": [
@@ -1402,6 +1508,10 @@
     "synonyms": [
       "australasia"
     ]
+  },
+  "octopus": {
+    "facet": "animal",
+    "synonyms": []
   },
   "okonomiyaki": {
     "facet": "food",
@@ -1437,6 +1547,16 @@
   "ontario": {
     "facet": "place",
     "parent": "canada",
+    "synonyms": []
+  },
+  "opera house": {
+    "facet": "subject",
+    "synonyms": [
+      "sydney opera house"
+    ]
+  },
+  "orangutan": {
+    "facet": "animal",
     "synonyms": []
   },
   "osaka": {
@@ -1499,6 +1619,10 @@
       "silent disco"
     ]
   },
+  "peacock": {
+    "facet": "animal",
+    "synonyms": []
+  },
   "penguin": {
     "facet": "animal",
     "synonyms": [
@@ -1533,6 +1657,13 @@
       "posing"
     ]
   },
+  "pig": {
+    "facet": "animal",
+    "synonyms": [
+      "piglet",
+      "boar"
+    ]
+  },
   "pigeon": {
     "facet": "food",
     "synonyms": [
@@ -1551,11 +1682,31 @@
     "facet": "food",
     "synonyms": []
   },
+  "plants": {
+    "facet": "subject",
+    "synonyms": [
+      "sundew",
+      "cactus",
+      "greenery",
+      "moss"
+    ]
+  },
+  "possum": {
+    "facet": "animal",
+    "synonyms": []
+  },
   "poster": {
     "facet": "subject",
     "synonyms": [
       "advertisement",
       "billboard"
+    ]
+  },
+  "prison": {
+    "facet": "subject",
+    "synonyms": [
+      "jail",
+      "gaol"
     ]
   },
   "protest": {
@@ -1581,6 +1732,10 @@
     "synonyms": [
       "noodle soup"
     ]
+  },
+  "red panda": {
+    "facet": "animal",
+    "synonyms": []
   },
   "rees": {
     "facet": "place",
@@ -1637,6 +1792,12 @@
       "scenic drive"
     ]
   },
+  "robot": {
+    "facet": "subject",
+    "synonyms": [
+      "robot dog"
+    ]
+  },
   "rock formation": {
     "facet": "subject",
     "synonyms": [
@@ -1690,10 +1851,11 @@
   "science": {
     "facet": "subject",
     "synonyms": [
+      "mathematics",
+      "planetarium",
       "science center",
       "science museum",
-      "scitech",
-      "mathematics"
+      "scitech"
     ]
   },
   "science centre": {
@@ -1717,6 +1879,10 @@
       "prawns",
       "oysters"
     ]
+  },
+  "seahorse": {
+    "facet": "animal",
+    "synonyms": []
   },
   "seal": {
     "facet": "animal",
@@ -1854,6 +2020,10 @@
       "high-rise"
     ]
   },
+  "sloth": {
+    "facet": "animal",
+    "synonyms": []
+  },
   "snack": {
     "facet": "food",
     "synonyms": [
@@ -1884,6 +2054,33 @@
     "parent": "asia",
     "synonyms": [
       "korea"
+    ]
+  },
+  "souvenir": {
+    "facet": "subject",
+    "synonyms": [
+      "merchandise",
+      "gift shop",
+      "plush"
+    ]
+  },
+  "space": {
+    "facet": "subject",
+    "synonyms": [
+      "space shuttle",
+      "rocket",
+      "astronaut",
+      "apollo"
+    ]
+  },
+  "sports": {
+    "facet": "activity",
+    "synonyms": [
+      "football",
+      "soccer",
+      "basketball",
+      "archery",
+      "bowling"
     ]
   },
   "spring": {
@@ -2090,6 +2287,12 @@
       "rail"
     ]
   },
+  "tree": {
+    "facet": "subject",
+    "synonyms": [
+      "leaning tree"
+    ]
+  },
   "turtle": {
     "facet": "animal",
     "synonyms": [
@@ -2155,6 +2358,14 @@
       "vista"
     ]
   },
+  "volcano": {
+    "facet": "subject",
+    "synonyms": [
+      "volcanic",
+      "owakudani",
+      "sulphur"
+    ]
+  },
   "volendam": {
     "facet": "place",
     "parent": "netherlands",
@@ -2210,6 +2421,13 @@
     "parent": "australia",
     "synonyms": [
       "wa"
+    ]
+  },
+  "whale": {
+    "facet": "animal",
+    "synonyms": [
+      "beluga",
+      "blue whale"
     ]
   },
   "windmill": {
