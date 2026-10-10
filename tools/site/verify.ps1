@@ -282,6 +282,63 @@ Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
 Assert-FileSizeBudget 'assets\js\photo-search.js' 12
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
+# The photo search index is fetched by photo-search.js on first use, never at
+# page load. 448 KB, not the planned 320: the full schema measured 387 KB raw
+# (33 KB gzipped) for 840 photos, about 470 bytes each (Oct 2026).
+Assert-FileSizeBudget 'assets\data\photo-index.json' 448
+if ($travel -notmatch ('data-search-index="' + [regex]::Escape((Get-DistAssetRef 'assets/data/photo-index.json')) + '"')) { throw 'The travel page must carry the versioned photo-index.json URL in data-search-index.' }
+try {
+    $photoIndex = Get-Content -LiteralPath (Join-Path $dist 'assets\data\photo-index.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+} catch {
+    throw "assets/data/photo-index.json does not parse: $($_.Exception.Message)"
+}
+if ($photoIndex.version -ne 1) { throw 'assets/data/photo-index.json must declare version 1.' }
+$tagVocabulary = Get-Content -LiteralPath (Join-Path $root 'journals\tag-vocabulary.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$vocabularyTags = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+foreach ($property in $tagVocabulary.PSObject.Properties) { [void]$vocabularyTags.Add($property.Name) }
+# Count gallery tiles on the generated journal pages independently of the build,
+# recording the trip-section h2 each follows, so a drift between the index and
+# the pages (a missed tile, a renumbered section) fails here.
+$journalTiles = [System.Collections.Generic.List[object]]::new()
+foreach ($journal in $journalManifest) {
+    $journalHtml = [regex]::Replace((Get-Content -LiteralPath (Join-Path $dist "$($journal.slug).html") -Raw -Encoding UTF8), '<!--.*?-->', '', 'Singleline')
+    $sectionId = ''
+    foreach ($token in [regex]::Matches($journalHtml, '<h2\b[^>]*>|<(?:img|video)\b[^>]*>', 'IgnoreCase')) {
+        if ($token.Value -match '^<h2') {
+            $sectionId = [regex]::Match($token.Value, '\sid="(trip-section-\d+)"').Groups[1].Value
+            continue
+        }
+        $classes = @([regex]::Match($token.Value, '\sclass="([^"]*)"').Groups[1].Value -split '\s+')
+        if ($classes -notcontains 'content-image' -or $classes -contains 'journal-banner') { continue }
+        $isVideo = $token.Value -match '^<video'
+        $tileSrc = if ($isVideo) { [regex]::Match($journalHtml.Substring($token.Index), '<source\b[^>]*\ssrc="([^"]+)"').Groups[1].Value } else { [regex]::Match($token.Value, '\ssrc="([^"]+)"').Groups[1].Value }
+        $journalTiles.Add([pscustomobject]@{ Trip = $journal.slug; Section = $sectionId; Src = $tileSrc; Video = $isVideo })
+    }
+}
+$indexedPhotos = @($photoIndex.photos)
+if ($indexedPhotos.Count -ne $journalTiles.Count) { throw "assets/data/photo-index.json lists $($indexedPhotos.Count) photos but the journal pages have $($journalTiles.Count) gallery tiles." }
+$indexedTagCounts = @{}
+for ($i = 0; $i -lt $indexedPhotos.Count; $i++) {
+    $photo = $indexedPhotos[$i]
+    $tile = $journalTiles[$i]
+    if ($photo.trip -cne $tile.Trip -or $photo.src -cne $tile.Src -or $photo.section -cne $tile.Section -or [bool]$photo.video -ne $tile.Video) {
+        throw "Photo index entry $($photo.id) does not match tile $($i + 1) of the journals ($($tile.Trip) $($tile.Section) $($tile.Src))."
+    }
+    foreach ($asset in @($photo.src, $photo.thumb)) {
+        if (-not $asset -or -not (Test-Path -LiteralPath (Join-Path $dist ($asset -replace '/', '\')))) { throw "Photo index entry $($photo.id) references a file missing from dist: $asset" }
+    }
+    $photoTagList = @($photo.tags)
+    if ($photoTagList.Count -eq 0) { throw "Photo index entry $($photo.id) has no tags; run python -I tools/photos/seed_photo_tags.py." }
+    foreach ($tag in $photoTagList) {
+        if (-not $vocabularyTags.Contains($tag)) { throw "Photo index entry $($photo.id) has tag '$tag', which is not in journals/tag-vocabulary.json." }
+        $indexedTagCounts[$tag] = 1 + [int]$indexedTagCounts[$tag]
+    }
+}
+$indexedTags = @($photoIndex.tags)
+if ($indexedTags.Count -ne $vocabularyTags.Count) { throw 'assets/data/photo-index.json must list every vocabulary tag exactly once.' }
+foreach ($indexedTag in $indexedTags) {
+    if (-not $vocabularyTags.Contains($indexedTag.tag) -or [int]$indexedTag.count -ne [int]$indexedTagCounts[$indexedTag.tag]) { throw "Photo index tag '$($indexedTag.tag)' is not in the vocabulary or has the wrong count." }
+}
 if ($listingEffectsJs -notmatch 'prefers-reduced-motion: reduce' -or $listingEffectsJs -notmatch '\.education-grid \.education-card' -or $listingEffectsJs -notmatch '\.travel-grid \.travel-card' -or $listingEffectsJs -notmatch "classList\.add\('js-tilt'\)") { throw 'Listing effects must preserve reduced-motion reveals and pointer tilt for skills and travel cards.' }
 if ($listingEffectsJs -notmatch 'REVEAL_DURATION = 480' -or $listingEffectsJs -notmatch 'REVEAL_STAGGER = 60' -or $listingEffectsJs -notmatch "removeProperty\('--reveal-delay'\)" -or $listingEffectsJs -notmatch "classList\.add\('is-reveal-settled'\)") { throw 'Listing reveals must use the compact 480ms motion with a temporary 60ms stagger, then restore immediate hover feedback.' }
 if ($mainJs -match '\bjQuery\b|\$\(|\bbreakpoints\s*\(|\.scrollex\b|\bbrowser\.' -or $mainJs -notmatch "window\.matchMedia\('\(max-width: 980px\)'\)" -or $mainJs -notmatch 'new MutationObserver\(syncNavPanelState\)' -or $mainJs -notmatch "navPanelToggle\.addEventListener\('click'" -or $mainJs -notmatch "event\.key === 'Escape'" -or $mainJs -notmatch "returnToTop\.classList\.toggle\('is-visible'" -or $mainJs -notmatch "window\.scrollTo\(\{ top: 0") { throw 'Shared interactions must remain dependency-free while preserving responsive navigation, modal focus, and return-to-top behavior.' }

@@ -65,6 +65,14 @@ The map generator lives at `tools/maps/generate-world-map.ps1` and downloads Nat
 
 The pre-wedding wordmark font ships as a 12 KB WOFF2 subset of `tools/fonts/josephsophia.otf`; `tools/fonts/README.md` has the regeneration command, which must list every character the wordmark uses.
 
+The travel photo search reads `assets/data/photo-index.json`, which the build generates from the journals and two tracked sidecars (Oct 2026). `journals/tag-vocabulary.json` is the controlled vocabulary: each tag has a facet (place, subject, activity, food, people, animal, season, weather, time, event), search synonyms and, for places, an optional `parent` (city, region, country, continent). `journals/photo-tags.json` maps each gallery tile id to its tags. The id is the tile's path under `images/travel/` without the extension (`2025_japan/day14_hakone/fuji1`), so a JPEG-to-WebP swap keeps it; animations keep `.mp4` (`2019_sv/SF_sutro.mp4`), because some share a base name with a still. The index lists every tile in journal order with its section anchor (`trip-section-N`), caption, dimensions, `-480` thumb (or poster) and tags, plus every vocabulary tag with its photo count. The travel page's `data-search-index` attribute carries its content-hashed URL; `verify.ps1` checks it tile by tile against the generated journals and holds it to a 448 KB budget (387 KB raw, 33 KB gzipped at 840 photos).
+
+```powershell
+python -I .\tools\photos\seed_photo_tags.py
+```
+
+`seed_photo_tags.py` (stdlib only) seeds tags from the vocabulary: names and synonyms found as whole words in each tile's caption title and text, alt text, and image folder and file name, with the section heading and a per-trip fallback supplying the place when the tile names none, and parents added for every place. Its `TRIPS` table holds per-trip facts the captions do not repeat (season from the journal dates, honeymoon), and `STOP_PHRASES` keeps false matches out (New York is not York, WA). It merges rather than overwrites: hand-added tags survive reruns, ids whose tile has gone are kept and reported for re-keying, and a second run changes nothing. When adding a journal, add its `TRIPS` row and any new places (with `parent`) or terms to the vocabulary, run the script, then hand-correct the new entries in `photo-tags.json`; the check fails while any tile has no tags or a tag outside the vocabulary.
+
 `tools/legacy/` contains destructive or one-time migration utilities retained only for provenance. Do not run them during normal builds. In particular, `cap-original-images.py` has already been run; re-encoding those originals was measured and rejected.
 
 ## Source-of-truth rules
