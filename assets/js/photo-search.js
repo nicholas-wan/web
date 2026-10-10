@@ -92,17 +92,9 @@
 		});
 	}
 
-	// Score, then journal order; trips group in the order of their best hit.
+	// Score, then journal order, so one trip's hits still sit together.
 	function rank(hits) {
-		var groups = [], byTrip = {};
-		hits.sort(function(a, b) { return b.score - a.score || a.photo.order - b.photo.order; });
-		hits.forEach(function(hit) {
-			var trip = hit.photo.trip;
-			if (!byTrip[trip]) groups.push(byTrip[trip] = { trip: trip, hits: [] });
-			byTrip[trip].hits.push(hit);
-		});
-		groups.count = hits.length;
-		return groups;
+		return hits.sort(function(a, b) { return b.score - a.score || a.photo.order - b.photo.order; });
 	}
 
 	function search(terms) {
@@ -134,16 +126,17 @@
 		}).join('') + '</ul>';
 	}
 
+	// A tile: thumbnail with its trip chip, then one clamped caption line.
 	function card(photo, terms) {
+		var trip = trips[photo.trip];
 		var caption = photo.caption && photo.caption !== photo.place ? ' \u00b7 ' + highlight(photo.caption, terms) : '';
 		return '<li><a class="photo-hit" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '">' +
 			'<span class="photo-hit__media"><img loading="lazy" decoding="async" src="' + escape(photo.thumb) +
-			'" alt="' + escape(photo.alt) + '" width="' + photo.w + '" height="' + photo.h + '"></span>' +
-			'<span class="photo-hit__body"><span class="photo-hit__title"><strong>' + highlight(photo.place, terms) +
-			'</strong>' + caption + '</span><span class="photo-hit__meta">' +
-			(photo.sectionTitle ? '<span class="photo-hit__pill">' + escape(photo.sectionTitle) + '</span>' : '') +
-			(photo.video ? '<span class="photo-hit__pill photo-hit__pill--video">Animation</span>' : '') +
-			'</span></span></a></li>';
+			'" alt="' + escape(photo.alt) + '" width="' + photo.w + '" height="' + photo.h + '">' +
+			'<span class="photo-hit__trip">' + escape(trip.label + ' \u00b7 ' + String(trip.year).slice(-2)) + '</span>' +
+			(photo.video ? '<span class="photo-hit__video">Animation</span>' : '') +
+			'</span><span class="photo-hit__title"><strong>' + highlight(photo.place, terms) +
+			'</strong>' + caption + '</span></a></li>';
 	}
 
 	var chips = form.querySelector('.photo-search__suggest');
@@ -186,21 +179,14 @@
 
 	function render(terms, query) {
 		var shown = 0, html = '', sentence = [];
-		var full = tiers[0].count, total = full + tiers[1].count;
-		tiers.forEach(function(groups, tier) {
-			if (tier && groups.length && shown < limit) html += '<h3 class="photo-results__tier">Partial matches</h3>';
-			groups.forEach(function(group) {
-				if (shown >= limit) return;
-				var trip = trips[group.trip];
-				var heading = tier ? 'h4' : 'h3';
-				html += '<' + heading + ' class="photo-results__trip">' +
-					escape(trip.label + ' \u00b7 ' + trip.year) +
-					'</' + heading + '><ul class="photo-results__grid">' +
-					group.hits.slice(0, limit - shown).map(function(hit) {
-						shown++;
-						return card(hit.photo, terms);
-					}).join('') + '</ul>';
-			});
+		var full = tiers[0].length, total = full + tiers[1].length;
+		// Each tier is one continuous grid; the trip rides on each tile.
+		tiers.forEach(function(hits, tier) {
+			hits = hits.slice(0, limit - shown);
+			if (!hits.length) return;
+			shown += hits.length;
+			html += (tier ? '<h3 class="photo-results__tier">Partial matches</h3>' : '') +
+				'<ul class="photo-results__grid">' + hits.map(function(hit) { return card(hit.photo, terms); }).join('') + '</ul>';
 		});
 		if (full) sentence.push(plural(full, 'photo matches', 'photos match') + (terms.length > 1 ? ' all terms' : ''));
 		if (total > full) sentence.push(plural(total - full, 'partial match', 'partial matches'));
