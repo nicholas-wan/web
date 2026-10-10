@@ -186,9 +186,9 @@
 		return '<li><a class="photo-hit" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '">' +
 			'<span class="photo-hit__media"><img loading="lazy" decoding="async" src="' + escape(photo.thumb) +
 			'" alt="' + escape(photo.alt) + '" width="' + photo.w + '" height="' + photo.h + '"' + focal + '>' +
-			'<span class="photo-hit__trip">' + tripLabel(photo.trip) + '</span>' +
 			(photo.video ? '<span class="photo-hit__video">Animation</span>' : '') +
-			'</span><span class="photo-hit__title"><strong>' + highlight(photo.place, terms) +
+			'</span><span class="photo-hit__trip">' + tripLabel(photo.trip) + '</span>' +
+			'<span class="photo-hit__title"><strong>' + highlight(photo.place, terms) +
 			'</strong>' + caption + '</span>' +
 			(why ? '<span class="photo-hit__why">matches: ' + escape(why.join(', ')) + '</span>' : '') + '</a></li>';
 	}

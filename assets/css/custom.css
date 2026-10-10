@@ -8431,35 +8431,31 @@ body.page-home #nav {
   object-fit: cover;
 }
 
-/* Trip chip bottom-left, animation badge top-right, over the image. */
-.photo-hit__trip,
-.photo-hit__video {
-  position: absolute;
-  bottom: 0.4rem;
-  left: 0.4rem;
-  max-width: calc(100% - 0.8rem);
-  padding: 0.12rem 0.45rem;
-  border-radius: 999px;
-  background: rgba(3, 14, 30, 0.72);
-  color: #fff;
-  font: 700 max(var(--text-floor), 0.75rem)/1.35 var(--font-display);
-  letter-spacing: 0.02em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.photo-hit__trip {
+  display: block;
+  margin-top: 0.48rem;
+  color: var(--color-brand-700);
+  font: 700 max(var(--text-floor), 0.7rem)/1.25 var(--font-display);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
 .photo-hit__video {
+  position: absolute;
   top: 0.4rem;
   right: 0.4rem;
-  bottom: auto;
-  left: auto;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
   background: var(--color-brand-700);
+  color: #fff;
+  font: 700 max(var(--text-floor), 0.75rem)/1.35 var(--font-display);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
 }
 
 .photo-hit__title {
   display: -webkit-box;
-  margin-top: 0.45rem;
+  margin-top: 0.12rem;
   overflow: hidden;
   color: var(--color-ink-600);
   font: 500 max(var(--text-floor), 0.85rem)/1.35 "Raleway", sans-serif;
