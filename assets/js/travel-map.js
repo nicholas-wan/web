@@ -63,6 +63,12 @@
       image: 'images/travel/2026_guangzhou/day5/canton-tower-couple.webp',
       imageAlt: 'Nicholas and his wife at Canton Tower'
     },
+    'chengdu-zhangjiajie': {
+      title: 'Sichuan & Hunan',
+      dates: '3 – 9 October 2026',
+      image: 'images/travel/2026_chengdu_zhangjiajie/day2/red-panda-family.webp',
+      imageAlt: 'Four red pandas gathered on a wooden platform in Dujiangyan'
+    },
     perth: {
       title: 'Western Australia',
       dates: '28 June – 8 July 2023',
@@ -95,6 +101,8 @@
     ['area', 'Japan', 'travel_2025_japan#trip-section-1', 36.5, 138.0, 'japan'],
     ['area', 'South Korea', 'travel_2017_seoul#trip-section-1', 36.5, 127.8, 'seoul'],
     ['area', 'Guangdong', 'travel_2026_guangzhou#trip-section-1', 23.379, 113.763, 'guangzhou'],
+    ['area', 'Sichuan', 'travel_2026_chengdu_zhangjiajie#trip-section-1', 30.6517, 104.0759, 'chengdu-zhangjiajie'],
+    ['area', 'Hunan', 'travel_2026_chengdu_zhangjiajie#trip-section-4', 29.1170, 110.4792, 'chengdu-zhangjiajie'],
     ['area', 'Western Australia', 'travel_2023_perth#trip-section-2', -25.2744, 122.2983, 'perth'],
     ['area', 'Victoria', 'travel_2024_australia#trip-section-1', -37.4713, 144.7852, 'australia'],
     ['area', 'New South Wales', 'travel_2024_australia#trip-section-6', -31.2532, 146.9211, 'australia'],
@@ -134,6 +142,9 @@
     ['stop', 'Nami Island', 'travel_2017_seoul#trip-section-2', 37.7914, 127.5255, 'seoul'],
     ['stop', 'Chuncheon', 'travel_2017_seoul#trip-section-3', 37.8813, 127.7300, 'seoul'],
     ['stop', 'Guangzhou', 'travel_2026_guangzhou#trip-section-1', 23.1291, 113.2644, 'guangzhou'],
+    ['stop', 'Dujiangyan', 'travel_2026_chengdu_zhangjiajie#trip-section-1', 31.0010, 103.6194, 'chengdu-zhangjiajie'],
+    ['stop', 'Chengdu', 'travel_2026_chengdu_zhangjiajie#trip-section-3', 30.5728, 104.0668, 'chengdu-zhangjiajie'],
+    ['stop', 'Zhangjiajie', 'travel_2026_chengdu_zhangjiajie#trip-section-4', 29.1170, 110.4792, 'chengdu-zhangjiajie'],
     ['stop', 'Fremantle', 'travel_2023_perth#trip-section-2', -32.0569, 115.7439, 'perth'],
     ['stop', 'Rottnest Island', 'travel_2023_perth#trip-section-3', -32.0069, 115.5393, 'perth'],
     ['stop', 'Caversham', 'travel_2023_perth#trip-section-4', -31.875, 115.97, 'perth'],

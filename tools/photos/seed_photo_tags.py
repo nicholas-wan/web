@@ -46,6 +46,7 @@ TRIPS = {
     "travel_2024_australia": {"place": "australia", "tags": ["winter", "honeymoon"]},
     "travel_2025_japan": {"place": "japan", "tags": ["autumn"]},
     "travel_2026_guangzhou": {"place": "guangzhou", "tags": ["spring"]},
+    "travel_2026_chengdu_zhangjiajie": {"place": "china", "tags": ["autumn"]},
 }
 
 # (phrase, tag): the tag must not match inside the phrase. "New York" is not

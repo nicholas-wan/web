@@ -92,5 +92,16 @@
     "title": "Nicholas Wan - Guangzhou Trip",
     "description": "Nicholas Wan's six-day Guangzhou travel journal from May 2026, covering Old Guangzhou, Chimelong, Baiyun Mountain, and Canton Tower.",
     "ogImage": "images/travel/2026_guangzhou/day5/canton-tower-couple.webp"
+  },
+  {
+    "order": 10,
+    "slug": "travel_2026_chengdu_zhangjiajie",
+    "label": "Chengdu & Zhangjiajie",
+    "source": "journals/travel_2026_chengdu_zhangjiajie.html",
+    "contentOnly": true,
+    "mainClass": "chengdu-zhangjiajie-2026-journal",
+    "title": "Nicholas Wan - Chengdu & Zhangjiajie Trip",
+    "description": "Nicholas Wan's seven-day Chengdu, Dujiangyan, and Zhangjiajie travel journal from October 2026.",
+    "ogImage": "images/travel/2026_chengdu_zhangjiajie/day2/red-panda-family.webp"
   }
 ]

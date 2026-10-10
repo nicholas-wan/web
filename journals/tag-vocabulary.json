@@ -410,6 +410,15 @@
     "facet": "food",
     "synonyms": []
   },
+  "chengdu": {
+    "facet": "place",
+    "parent": "sichuan",
+    "synonyms": [
+      "taikoo li",
+      "tianfu airport",
+      "dongmen wharf"
+    ]
+  },
   "chicken": {
     "facet": "food",
     "synonyms": [
@@ -641,6 +650,15 @@
     "facet": "activity",
     "synonyms": [
       "car ride"
+    ]
+  },
+  "dujiangyan": {
+    "facet": "place",
+    "parent": "sichuan",
+    "synonyms": [
+      "south bridge",
+      "panda base",
+      "red panda forest"
     ]
   },
   "duck": {
@@ -1018,6 +1036,11 @@
       "shabu"
     ]
   },
+  "hunan": {
+    "facet": "place",
+    "parent": "china",
+    "synonyms": []
+  },
   "hutt lagoon": {
     "facet": "place",
     "parent": "western australia",
@@ -1306,7 +1329,9 @@
   },
   "monkey": {
     "facet": "animal",
-    "synonyms": []
+    "synonyms": [
+      "macaque"
+    ]
   },
   "monterey": {
     "facet": "place",
@@ -1674,6 +1699,16 @@
     "facet": "animal",
     "synonyms": []
   },
+  "rabbit": {
+    "facet": "animal",
+    "synonyms": [
+      "bunny"
+    ]
+  },
+  "raccoon": {
+    "facet": "animal",
+    "synonyms": []
+  },
   "rain": {
     "facet": "weather",
     "synonyms": [
@@ -1917,6 +1952,11 @@
       "signboard",
       "neon"
     ]
+  },
+  "sichuan": {
+    "facet": "place",
+    "parent": "china",
+    "synonyms": []
   },
   "silicon valley": {
     "facet": "place",
@@ -2442,6 +2482,19 @@
   "zebra": {
     "facet": "animal",
     "synonyms": []
+  },
+  "zhangjiajie": {
+    "facet": "place",
+    "parent": "hunan",
+    "synonyms": [
+      "wulingyuan",
+      "yuanjiajie",
+      "tianzi mountain",
+      "tianmen mountain",
+      "tianmen cave",
+      "72 wonder tower",
+      "seventy-two wonder tower"
+    ]
   },
   "zoo": {
     "facet": "subject",
