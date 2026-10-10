@@ -785,6 +785,10 @@ function Get-JournalPhotoEntries([string]$Markup, $Journal, [hashtable]$PhotoTag
             $source = [regex]::Match($match.Value, '\ssrc="([^"]+)"').Groups[1].Value
             $alt = [regex]::Match($match.Value, '\salt="([^"]*)"').Groups[1].Value
         }
+        $focusXMatch = [regex]::Match($match.Value, '--focus-x:\s*([0-9]+(?:\.[0-9]+)?)%')
+        $focusYMatch = [regex]::Match($match.Value, '--focus-y:\s*([0-9]+(?:\.[0-9]+)?)%')
+        $focusX = if ($focusXMatch.Success) { [double]$focusXMatch.Groups[1].Value } else { 50.0 }
+        $focusY = if ($focusYMatch.Success) { [double]$focusYMatch.Groups[1].Value } else { 50.0 }
         if ($source -notmatch '^images/') { throw "Photo index: $($Journal.slug) has a gallery tile without a local source: $($match.Value)" }
         $id = Get-PhotoIndexId $source
         $src = Get-PublishedImageReference $source
@@ -826,6 +830,8 @@ function Get-JournalPhotoEntries([string]$Markup, $Journal, [hashtable]$PhotoTag
             Alt = [System.Net.WebUtility]::HtmlDecode($alt).Trim()
             Tags = $entryTags
             Video = $isVideo
+            FocusX = $focusX
+            FocusY = $focusY
         })
     }
     return $entries
@@ -855,10 +861,11 @@ $photoIndexTags = foreach ($property in $tagVocabulary.PSObject.Properties) {
 $photoIndexPhotos = foreach ($entry in $photoEntries) {
     $tags = @($entry.Tags | ForEach-Object { ConvertTo-JsonString $_ }) -join ','
     $video = if ($entry.Video) { 'true' } else { 'false' }
+    $focus = if ($entry.FocusX -ne 50 -or $entry.FocusY -ne 50) { ',"fx":' + $entry.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + ',"fy":' + $entry.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) } else { '' }
     '{"id":' + (ConvertTo-JsonString $entry.Id) + ',"src":' + (ConvertTo-JsonString $entry.Src) + ',"thumb":' + (ConvertTo-JsonString $entry.Thumb) +
         ',"w":' + $entry.Width + ',"h":' + $entry.Height + ',"trip":' + (ConvertTo-JsonString $entry.Trip) + ',"section":' + (ConvertTo-JsonString $entry.Section) +
         ',"sectionTitle":' + (ConvertTo-JsonString $entry.SectionTitle) + ',"place":' + (ConvertTo-JsonString $entry.Place) + ',"caption":' + (ConvertTo-JsonString $entry.Caption) +
-        ',"alt":' + (ConvertTo-JsonString $entry.Alt) + ',"tags":[' + $tags + '],"video":' + $video + '}'
+        ',"alt":' + (ConvertTo-JsonString $entry.Alt) + ',"tags":[' + $tags + '],"video":' + $video + $focus + '}'
 }
 $photoIndexJson = '{"version":1,"trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + "]}`n"
 $assetVersions['assets/data/photo-index.json'] = Get-ContentVersion $photoIndexJson

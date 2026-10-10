@@ -293,7 +293,7 @@ $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-sear
 $searchLoader = [regex]::Match($travel, '(?s)<script>(.*?dataset\.searchScript.*?)</script>')
 if (-not $searchLoader.Success -or $searchLoader.Groups[1].Value.Length -gt 512 -or $searchLoader.Groups[1].Value -notmatch '\[\?&\]q=') { throw 'The travel page must carry its small inline photo-search loader (data-search-script, ?q= early load) inside #main.' }
 if ($travel -notmatch 'id="photo-results"[^>]*aria-labelledby="photo-results-title"' -or $travel -notmatch 'id="photo-search-status"[^>]*aria-live="polite"') { throw 'The travel page must ship the photo results landmark and its live status line before the search module loads.' }
-if ($photoSearchJs -notmatch 'history\.replaceState' -or $photoSearchJs -notmatch 'data-search-index' -or $photoSearchJs -notmatch 'DEBOUNCE = 120') { throw 'photo-search.js must keep URL state in ?q=, read the index from data-search-index, and debounce input at 120ms.' }
+if ($photoSearchJs -notmatch 'history\.replaceState' -or $photoSearchJs -notmatch 'data-search-index' -or $photoSearchJs -notmatch 'DEBOUNCE = 120' -or $photoSearchJs -notmatch 'object-position:' -or $photoSearchJs -notmatch 'photo\.fx') { throw 'photo-search.js must keep URL state in ?q=, read the index from data-search-index, debounce input at 120ms, and preserve authored focal points in result thumbnails.' }
 $travelSearchCss = Get-Content -LiteralPath (Join-Path $dist 'assets/css/travel-search.css') -Raw -Encoding UTF8
 if ($travelSearchCss -notmatch '(?s)\.travel-atlas__layout\[hidden\]\s*\{[^}]*height:\s*0[^}]*visibility:\s*hidden' -or $travelSearchCss -match '(?s)\.travel-atlas__layout\[hidden\]\s*\{[^}]*display:\s*none') { throw 'A collapsed atlas must keep its width (zero height, hidden), never display: none; travel-map.js measures it on resize.' }
 # The photo search index is fetched by photo-search.js on first use, never at
@@ -326,7 +326,12 @@ foreach ($journal in $journalManifest) {
         if ($classes -notcontains 'content-image' -or $classes -contains 'journal-banner') { continue }
         $isVideo = $token.Value -match '^<video'
         $tileSrc = if ($isVideo) { [regex]::Match($journalHtml.Substring($token.Index), '<source\b[^>]*\ssrc="([^"]+)"').Groups[1].Value } else { [regex]::Match($token.Value, '\ssrc="([^"]+)"').Groups[1].Value }
-        $journalTiles.Add([pscustomobject]@{ Trip = $journal.slug; Section = $sectionId; Src = $tileSrc; Video = $isVideo })
+        $style = [regex]::Match($token.Value, '\sstyle="([^"]*)"').Groups[1].Value
+        $focusXMatch = [regex]::Match($style, '--focus-x:\s*([0-9.]+)%')
+        $focusYMatch = [regex]::Match($style, '--focus-y:\s*([0-9.]+)%')
+        $focusX = if ($focusXMatch.Success) { [double]$focusXMatch.Groups[1].Value } else { 50 }
+        $focusY = if ($focusYMatch.Success) { [double]$focusYMatch.Groups[1].Value } else { 50 }
+        $journalTiles.Add([pscustomobject]@{ Trip = $journal.slug; Section = $sectionId; Src = $tileSrc; Video = $isVideo; FocusX = $focusX; FocusY = $focusY })
     }
 }
 $indexedPhotos = @($photoIndex.photos)
@@ -337,6 +342,11 @@ for ($i = 0; $i -lt $indexedPhotos.Count; $i++) {
     $tile = $journalTiles[$i]
     if ($photo.trip -cne $tile.Trip -or $photo.src -cne $tile.Src -or $photo.section -cne $tile.Section -or [bool]$photo.video -ne $tile.Video) {
         throw "Photo index entry $($photo.id) does not match tile $($i + 1) of the journals ($($tile.Trip) $($tile.Section) $($tile.Src))."
+    }
+    $indexedFocusX = if ($null -ne $photo.fx) { [double]$photo.fx } else { 50 }
+    $indexedFocusY = if ($null -ne $photo.fy) { [double]$photo.fy } else { 50 }
+    if ($indexedFocusX -ne $tile.FocusX -or $indexedFocusY -ne $tile.FocusY) {
+        throw "Photo index entry $($photo.id) does not preserve its journal focal point ($($tile.FocusX)%, $($tile.FocusY)%)."
     }
     foreach ($asset in @($photo.src, $photo.thumb)) {
         if (-not $asset -or -not (Test-Path -LiteralPath (Join-Path $dist ($asset -replace '/', '\')))) { throw "Photo index entry $($photo.id) references a file missing from dist: $asset" }
@@ -508,7 +518,7 @@ if ([regex]::Matches($europe, '<source src="images/travel/2022_europe/(?:day3/br
 foreach ($europeAnimation in @('day3\brusselsgif1', 'day4\netherlands1', 'day7\switzerlandgif1', 'day7\switzerlandgif2', 'day7\switzerlandgif3', 'day7\switzerlandgif5', 'day8\zurichgif1')) { Assert-FileSizeBudget "images\travel\2022_europe\$europeAnimation.mp4" 2048 }
 if ([regex]::Matches($perth, '<video class="content-image journal-animation" data-autoplay loop muted playsinline preload="none"').Count -ne 9 -or [regex]::Matches($perth, '<source src="images/travel/2023_perth/[^\"]+\.mp4" type="video/mp4">').Count -ne 9 -or [regex]::Matches($perth, 'data-poster="images/travel/2023_perth/[^\"]+-poster\.webp"').Count -ne 9 -or $perth -match '(?:cycling_gif_01|quokka_gif_0[12]|caversham_gif_0[1-4]|nesuto_geraldton_01_gif|greenough_gif_01)\.webp') { throw "Perth animations must use MP4 tiles and lightboxes with static WebP posters." }
 foreach ($perthAnimation in @('day2\cycling_gif_01', 'day2\quokka_gif_01', 'day2\quokka_gif_02', 'day3\caversham_gif_01', 'day3\caversham_gif_02', 'day3\caversham_gif_03', 'day3\caversham_gif_04', 'day5\nesuto_geraldton_01_gif', 'day7\greenough_gif_01')) { Assert-FileSizeBudget "images\travel\2023_perth\$perthAnimation.mp4" 2048 }
-if ([regex]::Matches($siliconValley, 'class="travel-journal__day travel-journal__day--compact guangzhou-day guangzhou-day--compact"').Count -ne 9 -or [regex]::Matches($siliconValley, 'class="travel-gallery travel-gallery--compact[^\"]* masonry mason[234]"').Count -ne 9 -or [regex]::Matches($siliconValley, '<img class="content-image"[^>]+alt="[^"]+"[^>]+--focus-x:').Count -ne 53 -or [regex]::Matches($siliconValley, 'travel-gallery--sparse').Count -ne 2 -or $siliconValley -match 'travel-journal__route|travel-gallery__item--tall' -or $siliconValley -notmatch 'MONTEREY_bigsby\.jpg[^>]+--hero-focus-x: 44%; --hero-focus-y: 55%') { throw "Silicon Valley must use nine route-free compact chapters, two bounded sparse galleries, and accessible focal crops." }
+if ([regex]::Matches($siliconValley, 'class="travel-journal__day travel-journal__day--compact guangzhou-day guangzhou-day--compact"').Count -ne 9 -or [regex]::Matches($siliconValley, 'class="travel-gallery travel-gallery--compact[^\"]* masonry mason[234]"').Count -ne 9 -or [regex]::Matches($siliconValley, '<img class="content-image"[^>]+alt="[^"]+"[^>]+--focus-x:').Count -ne 52 -or [regex]::Matches($siliconValley, 'travel-gallery--sparse').Count -ne 2 -or $siliconValley -match 'travel-journal__route|travel-gallery__item--tall' -or $siliconValley -notmatch 'MONTEREY_bigsby\.jpg[^>]+--hero-focus-x: 44%; --hero-focus-y: 55%') { throw "Silicon Valley must use nine route-free compact chapters, two bounded sparse galleries, and accessible focal crops." }
 if ($siliconValley -notmatch '<video class="content-image journal-animation" data-autoplay loop muted playsinline preload="none"[^>]+LV_lights1-poster\.webp' -or $siliconValley -notmatch '<source src="images/travel/2019_sv/LV_lights1\.mp4" type="video/mp4"' -or $siliconValley -match 'LV_lights1\.webp' -or $galleryJs -notmatch "querySelectorAll\('video\.journal-animation'\)" -or $galleryJs -notmatch 'galleryMedia' -or $galleryJs -notmatch 'lightbox__video' -or $galleryJs -notmatch 'prefers-reduced-motion: reduce' -or $customCss -notmatch '(?s)\.lightbox__image\[hidden\]\s*\{[^}]*display:\s*none') { throw "The Silicon Valley video pilot must use MP4 for both its tile and lightbox, keep inactive media out of layout, retain a poster, and respect reduced motion." }
 Assert-FileSizeBudget 'images\travel\2019_sv\LV_lights1.mp4' 1024
 if ([regex]::Matches($siliconValley, '<video class="content-image journal-animation" data-autoplay loop muted playsinline preload="none"').Count -ne 10 -or [regex]::Matches($siliconValley, '<source src="images/travel/2019_sv/(?:SF_lombard|SF_silver|MONTEREY_aqua[1-3]|GOT_archery|GOT_dance|SF_sutro|LV_fountain)\.mp4" type="video/mp4">').Count -ne 9 -or [regex]::Matches($siliconValley, 'data-poster="images/travel/2019_sv/(?:SF_lombard|SF_silver|MONTEREY_aqua[1-3]|GOT_archery|GOT_dance|SF_sutro|LV_fountain)-poster\.webp"').Count -ne 9 -or $siliconValley -match '(?:SF_lombard|SF_silver|MONTEREY_aqua[1-3]|GOT_archery|GOT_dance|SF_sutro|LV_fountain)\.webp') { throw "All Silicon Valley animations must use MP4 tiles and lightboxes with static WebP posters." }
