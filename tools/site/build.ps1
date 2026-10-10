@@ -271,7 +271,9 @@ function Sync-Directory([string]$Source, [string]$Destination) {
 
 function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]$WebpRoot, [hashtable]$SourceIndex) {
     $references = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
-    $scanFiles = Get-ChildItem -LiteralPath $OutputRoot -Recurse -File | Where-Object { $_.Extension -in @('.html', '.css', '.js', '.webmanifest') }
+    # .json covers the photo search index, so every src and thumb it names is
+    # published even when no generated page happens to reference that file.
+    $scanFiles = Get-ChildItem -LiteralPath $OutputRoot -Recurse -File | Where-Object { $_.Extension -in @('.html', '.css', '.js', '.webmanifest', '.json') }
     $patterns = @(
         '(?i)(?:src|href|content)=["''][^"'']*(images/[^"''?#]+)["'']',
         '(?i)url\(["'']?[^\)"'']*(images/[^\)"''?#]+)',
@@ -699,6 +701,168 @@ function Get-AssetRef([string]$Path) {
     return "$Path`?v=$($script:assetVersions[$Path])"
 }
 
+# Travel photo search index. Built from the journal fragments ahead of page
+# generation so the travel page can carry its content hash. Tile ids and the
+# tile scan match tools/photos/seed_photo_tags.py; section ids must match the h2
+# ids Add-TravelNavigation assigns, which verify.ps1 checks against the pages.
+function ConvertTo-JsonString([string]$Value) {
+    $escaped = $Value.Replace('\', '\\').Replace('"', '\"')
+    $escaped = [regex]::Replace($escaped, '[\x00-\x1f]', { param($m) '\u{0:x4}' -f [int][char]$m.Value })
+    return '"' + $escaped + '"'
+}
+
+function ConvertTo-PlainText([string]$Markup) {
+    $text = [regex]::Replace($Markup, '<[^>]+>', '')
+    return [System.Net.WebUtility]::HtmlDecode(($text -replace '\s+', ' ').Trim())
+}
+
+function Resolve-SourceImagePath([string]$Reference) {
+    $bare = ($Reference -replace '^images/', '') -replace '/', '\'
+    foreach ($imageSourceRoot in @((Join-Path $root 'images'), (Join-Path $root 'images-webp'))) {
+        $candidate = Join-Path $imageSourceRoot $bare
+        if (Get-SourceImageInfo $candidate $script:sourceImageIndex) { return $candidate }
+    }
+    return $null
+}
+
+function Get-PhotoIndexId([string]$Source) {
+    # Images drop their extension so an id survives a JPEG -> WebP swap; videos
+    # keep .mp4 because some share a base name with a still (SF_sutro.jpg/.mp4).
+    $path = $Source -replace '^images/(travel/)?', ''
+    if ($path -match '(?i)\.mp4$') { return $path }
+    return $path -replace '\.[A-Za-z0-9]+$', ''
+}
+
+function Get-PublishedImageReference([string]$Reference) {
+    # Mirrors Normalize-MissingJpegReferences and the $webpMap rewrite, so src
+    # and thumb name the files the generated pages actually reference.
+    if ($Reference -match '\.jpeg$') {
+        $jpegPath = Join-Path $root ($Reference -replace '/', '\')
+        $jpgPath = [IO.Path]::ChangeExtension($jpegPath, '.jpg')
+        if (-not (Test-Path -LiteralPath $jpegPath) -and (Test-Path -LiteralPath $jpgPath)) { $Reference = $Reference -replace '\.jpeg$', '.jpg' }
+    }
+    if ($script:webpMap.ContainsKey($Reference)) { return $script:webpMap[$Reference] }
+    return $Reference
+}
+
+function Get-JournalPhotoEntries([string]$Markup, $Journal, [hashtable]$PhotoTags) {
+    # Comments are blanked rather than removed so offsets still line up with the
+    # h2 positions; the build numbers h2s even inside comments, so headings are
+    # read from the raw markup.
+    $blanked = [regex]::Replace($Markup, '(?s)<!--.*?-->', { param($m) ' ' * $m.Length })
+    $headings = @()
+    $isFirstHeading = $true
+    $sectionCount = 0
+    foreach ($heading in [regex]::Matches($Markup, '(?is)<h2\b[^>]*>(.*?)</h2>')) {
+        $title = ConvertTo-PlainText $heading.Groups[1].Value
+        $id = ''
+        if (-not ($isFirstHeading -and $title -match '(?i)(trip$|silicon valley$)')) {
+            $sectionCount++
+            $id = "trip-section-$sectionCount"
+        }
+        $isFirstHeading = $false
+        $headings += [pscustomobject]@{ Index = $heading.Index; Id = $id; Title = $title }
+    }
+    $media = @([regex]::Matches($blanked, '(?i)<(img|video)\b[^>]*>') | Where-Object {
+        $classes = @([regex]::Match($_.Value, '\sclass="([^"]*)"').Groups[1].Value -split '\s+')
+        # Australia's banner also carries content-image; banners are not tiles.
+        $classes -contains 'content-image' -and $classes -notcontains 'journal-banner'
+    })
+    $entries = [System.Collections.Generic.List[object]]::new()
+    for ($i = 0; $i -lt $media.Count; $i++) {
+        $match = $media[$i]
+        $segmentStart = $match.Index + $match.Length
+        $segmentEnd = if ($i + 1 -lt $media.Count) { $media[$i + 1].Index } else { $blanked.Length }
+        $segment = $blanked.Substring($segmentStart, $segmentEnd - $segmentStart)
+        $isVideo = $match.Groups[1].Value -eq 'video'
+        if ($isVideo) {
+            $videoEnd = $segment.IndexOf('</video>')
+            $videoBody = if ($videoEnd -ge 0) { $segment.Substring(0, $videoEnd) } else { $segment }
+            $source = [regex]::Match($videoBody, '<source\b[^>]*\ssrc="([^"]+)"').Groups[1].Value
+            $poster = Get-PublishedImageReference ([regex]::Match($match.Value, '\s(?:data-)?poster="([^"]+)"').Groups[1].Value)
+            $alt = [regex]::Match($match.Value, '\saria-label="([^"]*)"').Groups[1].Value
+        } else {
+            $source = [regex]::Match($match.Value, '\ssrc="([^"]+)"').Groups[1].Value
+            $alt = [regex]::Match($match.Value, '\salt="([^"]*)"').Groups[1].Value
+        }
+        if ($source -notmatch '^images/') { throw "Photo index: $($Journal.slug) has a gallery tile without a local source: $($match.Value)" }
+        $id = Get-PhotoIndexId $source
+        $src = Get-PublishedImageReference $source
+        if ($isVideo) {
+            if (-not $poster) { throw "Photo index: $id has no poster." }
+            $thumb = $poster
+            $dimensionSource = $poster
+        } else {
+            $thumb = $src
+            $variantSuffix = if ($src -match '\.webp$') { '.webp' } else { '.jpg' }
+            $variant480 = ($src -replace '\.[A-Za-z0-9]+$', '') + '-480' + $variantSuffix
+            if (Resolve-SourceImagePath $variant480) { $thumb = $variant480 }
+            $dimensionSource = $src
+        }
+        $dimensionPath = Resolve-SourceImagePath $dimensionSource
+        $dimensions = if ($dimensionPath) { Get-CachedImageDimensions $dimensionPath $script:sourceImageIndex } else { $null }
+        if (-not $dimensions) { throw "Photo index: could not read the dimensions of $dimensionSource ($id)." }
+        $entryTags = @()
+        if ($PhotoTags.ContainsKey($id)) { $entryTags = @($PhotoTags[$id]) }
+        $section = ''
+        $sectionTitle = ''
+        foreach ($heading in $headings) {
+            if ($heading.Index -lt $match.Index) {
+                $section = $heading.Id
+                $sectionTitle = $heading.Title
+            }
+        }
+        $entries.Add([pscustomobject]@{
+            Id = $id
+            Src = $src
+            Thumb = $thumb
+            Width = [int]$dimensions.Width
+            Height = [int]$dimensions.Height
+            Trip = $Journal.slug
+            Section = $section
+            SectionTitle = $sectionTitle
+            Place = ConvertTo-PlainText ([regex]::Match($segment, '(?is)<(\w+)\b[^>]*\bclass="[^"]*\bcontent-title\b[^"]*"[^>]*>(.*?)</\1>').Groups[2].Value)
+            Caption = ConvertTo-PlainText ([regex]::Match($segment, '(?is)<(\w+)\b[^>]*\bclass="[^"]*\bcontent-text\b[^"]*"[^>]*>(.*?)</\1>').Groups[2].Value)
+            Alt = [System.Net.WebUtility]::HtmlDecode($alt).Trim()
+            Tags = $entryTags
+            Video = $isVideo
+        })
+    }
+    return $entries
+}
+
+$tagVocabulary = Get-Content -LiteralPath (Join-Path $root 'journals\tag-vocabulary.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$photoTagsData = Get-Content -LiteralPath (Join-Path $root 'journals\photo-tags.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$photoTags = @{}
+foreach ($property in $photoTagsData.PSObject.Properties) { $photoTags[$property.Name] = @($property.Value) }
+$photoEntries = [System.Collections.Generic.List[object]]::new()
+foreach ($journal in $journalManifest) {
+    $journalFragment = Get-Content -LiteralPath (Join-Path $root $journal.source) -Raw -Encoding UTF8
+    foreach ($entry in (Get-JournalPhotoEntries $journalFragment $journal $photoTags)) { $photoEntries.Add($entry) }
+}
+$photoTagCounts = @{}
+foreach ($entry in $photoEntries) {
+    foreach ($tag in $entry.Tags) { $photoTagCounts[$tag] = 1 + [int]$photoTagCounts[$tag] }
+}
+$photoIndexTrips = foreach ($journal in $journalManifest) {
+    $year = if ($journal.slug -match '_(\d{4})_') { $Matches[1] } else { '0' }
+    '{"slug":' + (ConvertTo-JsonString $journal.slug) + ',"label":' + (ConvertTo-JsonString $journal.label) + ',"order":' + [int]$journal.order + ',"year":' + $year + '}'
+}
+$photoIndexTags = foreach ($property in $tagVocabulary.PSObject.Properties) {
+    $synonyms = @($property.Value.synonyms | ForEach-Object { ConvertTo-JsonString $_ }) -join ','
+    '{"tag":' + (ConvertTo-JsonString $property.Name) + ',"facet":' + (ConvertTo-JsonString $property.Value.facet) + ',"count":' + [int]$photoTagCounts[$property.Name] + ',"synonyms":[' + $synonyms + ']}'
+}
+$photoIndexPhotos = foreach ($entry in $photoEntries) {
+    $tags = @($entry.Tags | ForEach-Object { ConvertTo-JsonString $_ }) -join ','
+    $video = if ($entry.Video) { 'true' } else { 'false' }
+    '{"id":' + (ConvertTo-JsonString $entry.Id) + ',"src":' + (ConvertTo-JsonString $entry.Src) + ',"thumb":' + (ConvertTo-JsonString $entry.Thumb) +
+        ',"w":' + $entry.Width + ',"h":' + $entry.Height + ',"trip":' + (ConvertTo-JsonString $entry.Trip) + ',"section":' + (ConvertTo-JsonString $entry.Section) +
+        ',"sectionTitle":' + (ConvertTo-JsonString $entry.SectionTitle) + ',"place":' + (ConvertTo-JsonString $entry.Place) + ',"caption":' + (ConvertTo-JsonString $entry.Caption) +
+        ',"alt":' + (ConvertTo-JsonString $entry.Alt) + ',"tags":[' + $tags + '],"video":' + $video + '}'
+}
+$photoIndexJson = '{"version":1,"trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + "]}`n"
+$assetVersions['assets/data/photo-index.json'] = Get-ContentVersion $photoIndexJson
+
 $eventPages = @('house', 'prewed')
 $modularJournalSlugs = @($journalManifest | Where-Object { $_.contentOnly } | ForEach-Object { $_.slug })
 $pages = @(
@@ -755,6 +919,7 @@ foreach ($page in $pages) {
         # needed once a visitor focuses the field. An inline loader reads the
         # versioned URL from this attribute and injects the script on demand.
         $main = $main.Replace('data-search-script="assets/js/photo-search.js"', "data-search-script=`"$(Get-AssetRef 'assets/js/photo-search.js')`"")
+        $main = $main.Replace('data-search-index="assets/data/photo-index.json"', "data-search-index=`"$(Get-AssetRef 'assets/data/photo-index.json')`"")
     }
     if ($journalBySlug.ContainsKey($slug)) {
         $title = $journalBySlug[$slug].title
@@ -928,6 +1093,8 @@ Write-Utf8 (Join-Path $out 'assets\js\canvas-background.js') $canvasJs
 foreach ($file in $runtimeJs) {
     Copy-Item -LiteralPath (Join-Path $root "assets\js\$file") -Destination (Join-Path $out "assets\js\$file") -Force
 }
+New-Item -ItemType Directory -Path (Join-Path $out "assets\data") -Force | Out-Null
+Write-Utf8 (Join-Path $out 'assets\data\photo-index.json') $photoIndexJson
 Sync-Directory (Join-Path $root "assets\fonts") (Join-Path $out "assets\fonts")
 Sync-Directory (Join-Path $root "assets\icons") (Join-Path $out "assets\icons")
 # Copied before the image scan so the manifest's icon references get published.
