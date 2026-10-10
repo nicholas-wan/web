@@ -20,11 +20,6 @@
       "terminal"
     ]
   },
-  "akihabara": {
-    "facet": "place",
-    "parent": "tokyo",
-    "synonyms": []
-  },
   "alcatraz": {
     "facet": "place",
     "parent": "san francisco",
@@ -107,11 +102,6 @@
       "painting",
       "art museum"
     ]
-  },
-  "asakusa": {
-    "facet": "place",
-    "parent": "tokyo",
-    "synonyms": []
   },
   "asia": {
     "facet": "place",
@@ -406,7 +396,7 @@
   },
   "caversham": {
     "facet": "place",
-    "parent": "western australia",
+    "parent": "swan valley",
     "synonyms": []
   },
   "cervantes": {
@@ -431,14 +421,6 @@
     "facet": "place",
     "parent": "asia",
     "synonyms": []
-  },
-  "christmas": {
-    "facet": "event",
-    "synonyms": [
-      "xmas",
-      "festive",
-      "christmas market"
-    ]
   },
   "chuncheon": {
     "facet": "place",
@@ -705,11 +687,6 @@
       "cassowary"
     ]
   },
-  "enoshima": {
-    "facet": "place",
-    "parent": "japan",
-    "synonyms": []
-  },
   "essen": {
     "facet": "place",
     "parent": "germany",
@@ -857,12 +834,6 @@
       "pears"
     ]
   },
-  "fruit picking": {
-    "facet": "activity",
-    "synonyms": [
-      "pick-your-own"
-    ]
-  },
   "games": {
     "facet": "activity",
     "synonyms": [
@@ -914,12 +885,6 @@
     "facet": "animal",
     "synonyms": []
   },
-  "gorilla": {
-    "facet": "animal",
-    "synonyms": [
-      "ape"
-    ]
-  },
   "grampians": {
     "facet": "place",
     "parent": "australia",
@@ -970,11 +935,6 @@
   },
   "halloween": {
     "facet": "event",
-    "synonyms": []
-  },
-  "harajuku": {
-    "facet": "place",
-    "parent": "tokyo",
     "synonyms": []
   },
   "harbour": {
@@ -1148,11 +1108,6 @@
       "grieth",
       "wunderland"
     ]
-  },
-  "kamakura": {
-    "facet": "place",
-    "parent": "japan",
-    "synonyms": []
   },
   "kamikochi": {
     "facet": "place",
@@ -1828,12 +1783,6 @@
       "sutro baths"
     ]
   },
-  "sandboarding": {
-    "facet": "activity",
-    "synonyms": [
-      "sandboard"
-    ]
-  },
   "sandwich": {
     "facet": "food",
     "synonyms": [
@@ -1919,11 +1868,6 @@
     "synonyms": [
       "lamb"
     ]
-  },
-  "shibuya": {
-    "facet": "place",
-    "parent": "tokyo",
-    "synonyms": []
   },
   "shirakawa-go": {
     "facet": "place",
@@ -2087,10 +2031,6 @@
     "facet": "season",
     "synonyms": []
   },
-  "squirrel": {
-    "facet": "animal",
-    "synonyms": []
-  },
   "station": {
     "facet": "subject",
     "synonyms": [
@@ -2130,10 +2070,6 @@
       "graffiti"
     ]
   },
-  "summer": {
-    "facet": "season",
-    "synonyms": []
-  },
   "sunny": {
     "facet": "weather",
     "synonyms": [
@@ -2155,12 +2091,6 @@
       "sundown"
     ]
   },
-  "sushi": {
-    "facet": "food",
-    "synonyms": [
-      "sashimi"
-    ]
-  },
   "swan": {
     "facet": "animal",
     "synonyms": [
@@ -2171,13 +2101,6 @@
     "facet": "place",
     "parent": "western australia",
     "synonyms": []
-  },
-  "swimming": {
-    "facet": "activity",
-    "synonyms": [
-      "pool",
-      "snorkelling"
-    ]
   },
   "switzerland": {
     "facet": "place",
