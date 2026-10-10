@@ -7,7 +7,9 @@
 	var input = form && form.q;
 	if (!input) return;
 
-	var PAGE = 48, DEBOUNCE = 120;
+	var PAGE = 48, DEBOUNCE = 120, STORE = 'photo-search-recent';
+	// Quick-fill searches across facets; only tags with hits are offered.
+	var TRY = ['mount fuji', 'penguin', 'ramen', 'snow', 'sunset', 'zoo', 'temple', 'beach', 'night', 'kangaroo', 'castle', 'sushi', 'autumn leaves', 'museum'];
 	// Field weights: tags + synonyms, place + caption, alt + section, trip.
 	var EXACT = [3, 2, 1, 1], PREFIX = [2, 2, 1, 1];
 	var CJK = '\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f';
@@ -19,7 +21,7 @@
 	var clearButton = form.querySelector('.photo-search__clear');
 	var collapsible = document.querySelectorAll('.travel-atlas__layout, #main > .travel-archive-heading, #main > .travel-grid');
 	var trips = {}, tags = [], photos = null, failed = false, tiers;
-	var timer = 0, limit = PAGE, collapsed = false;
+	var timer = 0, saveTimer = 0, limit = PAGE, collapsed = false;
 
 	function fold(value) {
 		return String(value).toLowerCase().normalize('NFD')
@@ -119,11 +121,38 @@
 		});
 	}
 
-	function chipList(list, label, replaceAll) {
-		return '<ul class="photo-search__chips" aria-label="' + label + '">' + list.map(function(tag) {
-			return '<li><button type="button" class="photo-search__chip" data-tag="' + escape(tag.tag) + '"' +
-				(replaceAll ? ' data-replace' : '') + '>' + escape(tag.tag) + ' <span>' + tag.count + '</span></button></li>';
-		}).join('') + '</ul>';
+	// title adds a muted leading label and a --try/--recent modifier.
+	function chipList(list, label, replaceAll, title, extra) {
+		return '<ul class="photo-search__chips' + (title ? ' photo-search__chips--' + title.toLowerCase() : '') +
+			'" aria-label="' + label + '">' + (title ? '<li class="photo-search__label" aria-hidden="true">' + title + '</li>' : '') +
+			list.map(function(tag) {
+				return '<li><button type="button" class="photo-search__chip" data-tag="' + escape(tag.tag) + '"' +
+					(replaceAll ? ' data-replace' : '') + '>' + escape(tag.tag) + (tag.count ? ' <span>' + tag.count + '</span>' : '') + '</button></li>';
+			}).join('') + (extra || '') + '</ul>';
+	}
+
+	// The last four searches, kept only in this browser; a blocked store reads empty.
+	function recent(list) {
+		try {
+			if (list) localStorage.setItem(STORE, JSON.stringify(list));
+			return JSON.parse(localStorage.getItem(STORE)) || [];
+		} catch (error) {
+			return [];
+		}
+	}
+
+	function remember(query) {
+		recent([query].concat(recent().filter(function(past) { return past !== query; })).slice(0, 4));
+	}
+
+	// Before any typing: Recent (when kept) then Try.
+	function starters() {
+		var past = recent().map(function(query) { return { tag: query }; });
+		return (past.length ? chipList(past, 'Recent searches', true, 'Recent',
+			'<li><button type="button" class="photo-search__chip photo-search__forget" data-forget aria-label="Clear recent searches">Clear</button></li>') : '') +
+			chipList(TRY.map(function(name) {
+				return tags.filter(function(tag) { return tag.tag === name && tag.count; })[0];
+			}).filter(Boolean).slice(0, 8), 'Suggested searches', true, 'Try');
 	}
 
 	// A tile: thumbnail with its trip chip, then one clamped caption line.
@@ -153,7 +182,7 @@
 			return tag.keys[0] !== current && tag.keys.some(function(key) { return key.lastIndexOf(current, 0) === 0; }) &&
 				!tokens(tag.tag).every(function(word) { return earlier.indexOf(word) >= 0; });
 		}).slice(0, 6);
-		chips.innerHTML = found.length ? chipList(found, 'Suggested tags') : '';
+		chips.innerHTML = found.length ? chipList(found, 'Suggested tags') : value.trim() || !photos ? '' : starters();
 	}
 
 	function closeAtlasOverlay() {
@@ -205,6 +234,7 @@
 
 	function run() {
 		clearTimeout(timer);
+		clearTimeout(saveTimer);
 		var value = input.value, query = value.trim();
 		var terms = unique(tokens(value));
 		clearButton.hidden = !value;
@@ -222,6 +252,8 @@
 		limit = PAGE;
 		tiers = search(terms);
 		render(terms, query);
+		// A query with hits that the visitor pauses on becomes a recent search.
+		if (tiers[0].length + tiers[1].length) saveTimer = setTimeout(remember, 1000, query);
 	}
 
 	function clearSearch() {
@@ -237,6 +269,7 @@
 	// A suggestion replaces the last term; a popular tag (data-replace) the query.
 	function onClick(event) {
 		var button = event.target.closest('button');
+		if (event.target.closest('.photo-hit')) remember(input.value.trim());
 		if (!button) return;
 		var tag = button.getAttribute('data-tag');
 		var tail = /\S+$/.exec(input.value);
@@ -251,6 +284,10 @@
 			hits()[from].focus();
 		} else if (button.hasAttribute('data-clear')) {
 			clearSearch();
+		} else if (button.hasAttribute('data-forget')) {
+			recent([]);
+			suggest('');
+			input.focus();
 		}
 	}
 

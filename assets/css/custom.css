@@ -8224,7 +8224,7 @@ body.page-home #nav {
   flex: 1 0 100%;
   color: var(--color-ink-700);
   font-family: var(--font-display);
-  font-size: max(var(--text-floor), 0.82rem);
+  font-size: max(var(--text-floor), 0.88rem);
   font-weight: 700;
   letter-spacing: 0.02em;
 }
@@ -8253,6 +8253,36 @@ body.page-home #nav {
 
 .photo-search__chips li {
   padding: 0;
+}
+
+/* Quick-fill rows before any typing: an eyebrow label, teal Try chips,
+   outlined Recent chips and a quiet Clear. */
+.photo-search__chips + .photo-search__chips {
+  margin-top: 0.4rem;
+}
+
+.photo-search__label {
+  align-self: center;
+  min-width: 3.6rem;
+  color: var(--color-ink-500);
+  font: 800 max(var(--text-floor), 0.62rem)/1 var(--font-display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.photo-search__chips--try .photo-search__chip {
+  border-color: var(--color-brand-200);
+  background: var(--color-brand-wash);
+}
+
+.photo-search__chips--recent .photo-search__chip {
+  background: none;
+}
+
+.photo-search .photo-search__forget {
+  border-color: transparent;
+  color: var(--color-ink-500) !important;
+  text-decoration: underline;
 }
 
 .photo-search__chip {
@@ -8414,7 +8444,7 @@ body.page-home #nav {
   margin-top: 0.45rem;
   overflow: hidden;
   color: var(--color-ink-600);
-  font: 500 max(var(--text-floor), 0.78rem)/1.4 "Raleway", sans-serif;
+  font: 500 max(var(--text-floor), 0.85rem)/1.35 "Raleway", sans-serif;
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -8489,6 +8519,15 @@ body.page-home #nav {
 
   .photo-search__chip {
     min-height: 2.5rem;
+  }
+
+  /* Six Try chips and a bare label keep the row to two lines on phones. */
+  .photo-search__chips--try li:nth-child(n+8) {
+    display: none;
+  }
+
+  .photo-search__label {
+    min-width: 0;
   }
 
   .photo-results__grid {

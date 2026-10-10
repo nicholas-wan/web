@@ -282,7 +282,8 @@ Assert-FileSizeBudget 'assets\js\listing-effects.js' 8
 Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
 # photo-search.js is injected on demand by the travel page's inline loader, so
 # it is outside the per-page <script src> ceiling and carries its own budget.
-Assert-FileSizeBudget 'assets\js\photo-search.js' 12
+# 12 -> 14: quick-fill Try/Recent chips, Oct 2026.
+Assert-FileSizeBudget 'assets\js\photo-search.js' 14
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8
