@@ -331,7 +331,8 @@ foreach ($journal in $journalManifest) {
         $focusYMatch = [regex]::Match($style, '--focus-y:\s*([0-9.]+)%')
         $focusX = if ($focusXMatch.Success) { [double]$focusXMatch.Groups[1].Value } else { 50 }
         $focusY = if ($focusYMatch.Success) { [double]$focusYMatch.Groups[1].Value } else { 50 }
-        $journalTiles.Add([pscustomobject]@{ Trip = $journal.slug; Section = $sectionId; Src = $tileSrc; Video = $isVideo; FocusX = $focusX; FocusY = $focusY })
+        $searchFit = [regex]::Match($token.Value, '\sdata-search-fit="(contain)"').Groups[1].Value
+        $journalTiles.Add([pscustomobject]@{ Trip = $journal.slug; Section = $sectionId; Src = $tileSrc; Video = $isVideo; FocusX = $focusX; FocusY = $focusY; SearchFit = $searchFit })
     }
 }
 $indexedPhotos = @($photoIndex.photos)
@@ -348,6 +349,7 @@ for ($i = 0; $i -lt $indexedPhotos.Count; $i++) {
     if ($indexedFocusX -ne $tile.FocusX -or $indexedFocusY -ne $tile.FocusY) {
         throw "Photo index entry $($photo.id) does not preserve its journal focal point ($($tile.FocusX)%, $($tile.FocusY)%)."
     }
+    if ([string]$photo.fit -cne $tile.SearchFit) { throw "Photo index entry $($photo.id) does not preserve its search fit mode." }
     foreach ($asset in @($photo.src, $photo.thumb)) {
         if (-not $asset -or -not (Test-Path -LiteralPath (Join-Path $dist ($asset -replace '/', '\')))) { throw "Photo index entry $($photo.id) references a file missing from dist: $asset" }
     }
