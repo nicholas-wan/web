@@ -30,4 +30,8 @@ Preview the generated site with `node tools/preview-server.mjs` (port 4321, also
 - `docs/` contains architecture, preserved UX decisions, and build notes.
 - `dist/` is generated output and must not be edited or committed.
 
+## Editing photos
+
+Edit the original under `images/` (or its `images-webp/` overlay), delete that photo's `-480`/`-800`/`-1200` siblings, run `python .\tools\images\make-responsive-variants.py`, then restore any sibling of an unedited photo that the tool re-encoded. Gallery tiles crop every photo to a fixed shape, so adjust the tile's `--focus-x`/`--focus-y` before cropping pixels. Keep near-duplicate photos; they are deliberate. Details are in [docs/build.md](docs/build.md#asset-tooling).
+
 See [docs/build.md](docs/build.md) for build and deployment details and [docs/project-context.md](docs/project-context.md) for the site's maintained behavior contracts.
