@@ -103,6 +103,7 @@ $eventPageNames = @('house.html', 'prewed.html')
 $journalPageNames = @($journalManifest | ForEach-Object { "$($_.slug).html" })
 $routeCssOwners = @{
     'travel-map-page.css' = @('travel.html')
+    'travel-search.css' = @('travel.html')
     'travel-journal.css' = $journalPageNames
     'experience-page.css' = @('experience.html')
     'personal-page.css' = @('personal.html')
@@ -249,6 +250,9 @@ Assert-FileSizeBudget 'assets\css\custom.css' 90
 # 46 -> 48: ellipse-matched mobile route tracer (Jul 2026).
 Assert-FileSizeBudget 'assets\css\travel-map-page.css' 48
 Assert-FileSizeBudget 'assets\css\travel-journal.css' 30
+# Photo search styles live in their own route bundle because travel-map-page.css
+# sits within a few hundred bytes of its cap (Oct 2026).
+Assert-FileSizeBudget 'assets\css\travel-search.css' 10
 Assert-FileSizeBudget 'assets\css\experience-page.css' 12
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 Assert-FileSizeBudget 'assets\css\skills-page.css' 10
@@ -273,6 +277,11 @@ Assert-FileSizeBudget 'assets\js\canvas-background.js' 14
 Assert-FileSizeBudget 'assets\js\game.js' 24
 Assert-FileSizeBudget 'assets\js\listing-effects.js' 8
 Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
+# photo-search.js is injected on demand by the travel page's inline loader, so
+# it is outside the per-page <script src> ceiling and carries its own budget.
+Assert-FileSizeBudget 'assets\js\photo-search.js' 12
+if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
+if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 if ($listingEffectsJs -notmatch 'prefers-reduced-motion: reduce' -or $listingEffectsJs -notmatch '\.education-grid \.education-card' -or $listingEffectsJs -notmatch '\.travel-grid \.travel-card' -or $listingEffectsJs -notmatch "classList\.add\('js-tilt'\)") { throw 'Listing effects must preserve reduced-motion reveals and pointer tilt for skills and travel cards.' }
 if ($listingEffectsJs -notmatch 'REVEAL_DURATION = 480' -or $listingEffectsJs -notmatch 'REVEAL_STAGGER = 60' -or $listingEffectsJs -notmatch "removeProperty\('--reveal-delay'\)" -or $listingEffectsJs -notmatch "classList\.add\('is-reveal-settled'\)") { throw 'Listing reveals must use the compact 480ms motion with a temporary 60ms stagger, then restore immediate hover feedback.' }
 if ($mainJs -match '\bjQuery\b|\$\(|\bbreakpoints\s*\(|\.scrollex\b|\bbrowser\.' -or $mainJs -notmatch "window\.matchMedia\('\(max-width: 980px\)'\)" -or $mainJs -notmatch 'new MutationObserver\(syncNavPanelState\)' -or $mainJs -notmatch "navPanelToggle\.addEventListener\('click'" -or $mainJs -notmatch "event\.key === 'Escape'" -or $mainJs -notmatch "returnToTop\.classList\.toggle\('is-visible'" -or $mainJs -notmatch "window\.scrollTo\(\{ top: 0") { throw 'Shared interactions must remain dependency-free while preserving responsive navigation, modal focus, and return-to-top behavior.' }

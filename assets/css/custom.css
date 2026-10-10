@@ -8057,3 +8057,8 @@ body.page-home #nav {
   }
 }
 /* Route bundle: skills-polish:end */
+
+/* Route bundle: travel-search:start */
+/* Travel photo search (travel page only). Extracted into travel-search.css by
+   the build; travel-map-page.css has no headroom left for it. */
+/* Route bundle: travel-search:end */

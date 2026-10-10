@@ -55,6 +55,13 @@
 									<p>Select a destination to browse trip stories and photos.</p>
 								</div>
 								<p class="travel-atlas__summary"><strong>9</strong> journals <span aria-hidden="true">&middot;</span> <strong>4</strong> continents</p>
+								<!-- Photo search root. The build swaps data-search-script for the versioned URL;
+								     the inline loader at the end of this page injects photo-search.js on demand. -->
+								<form class="photo-search" id="photo-search" role="search" data-search-script="assets/js/photo-search.js" data-search-index="assets/data/photo-index.json" autocomplete="off">
+									<label class="sr-only" for="photo-search-input">Search travel photos</label>
+									<input class="photo-search__input" id="photo-search-input" type="search" name="q" placeholder="Search photos" aria-describedby="photo-search-hint" />
+									<p class="photo-search__hint" id="photo-search-hint">Search every journal photo by place, subject or caption.</p>
+								</form>
 							</header>
 
 							<div class="travel-atlas__layout">

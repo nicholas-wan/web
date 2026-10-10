@@ -636,7 +636,8 @@ $cssSegments = @(
     [pscustomobject]@{ Bundle = 'personal-page.css'; Start = '/* Route bundle: personal-base:start */'; End = '/* Route bundle: personal-base:end */'; IncludeEnd = $true },
     [pscustomobject]@{ Bundle = 'travel-journal.css'; Start = '/* Japan editorial title and lower banner crop. */'; End = '/* Route bundle: journal-japan:end */'; IncludeEnd = $true },
     [pscustomobject]@{ Bundle = 'personal-page.css'; Start = '/* Route bundle: personal-responsive:start */'; End = '/* Route bundle: personal-responsive:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'skills-page.css'; Start = '/* Quiet Skills-card treatment:'; End = '/* Route bundle: skills-polish:end */'; IncludeEnd = $true }
+    [pscustomobject]@{ Bundle = 'skills-page.css'; Start = '/* Quiet Skills-card treatment:'; End = '/* Route bundle: skills-polish:end */'; IncludeEnd = $true },
+    [pscustomobject]@{ Bundle = 'travel-search.css'; Start = '/* Route bundle: travel-search:start */'; End = '/* Route bundle: travel-search:end */'; IncludeEnd = $true }
 )
 $resolvedCssSegments = foreach ($segment in $cssSegments) {
     $start = $customCssSource.IndexOf($segment.Start)
@@ -684,7 +685,7 @@ $assetVersions = @{}
 foreach ($file in @('icons.css', 'main.css', 'noscript.css')) {
     $assetVersions["assets/css/$file"] = Get-FileContentVersion (Join-Path $root "assets\css\$file")
 }
-foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'personal-timeline.js', 'scramble-reveal.js')) {
+foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js')) {
     $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
 }
 $assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
@@ -747,6 +748,13 @@ foreach ($page in $pages) {
             continue
         }
         $main = $html.Substring($mainStart, $footerStart - $mainStart).Trim()
+    }
+    if ($slug -eq 'travel') {
+        # The photo search script is not a <script src> on the travel page: that
+        # page sits at its 80 KB JavaScript ceiling, and the search is only
+        # needed once a visitor focuses the field. An inline loader reads the
+        # versioned URL from this attribute and injects the script on demand.
+        $main = $main.Replace('data-search-script="assets/js/photo-search.js"', "data-search-script=`"$(Get-AssetRef 'assets/js/photo-search.js')`"")
     }
     if ($journalBySlug.ContainsKey($slug)) {
         $title = $journalBySlug[$slug].title
@@ -824,6 +832,7 @@ foreach ($page in $pages) {
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
     $routeStylesheets = @()
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-map-page.css')`" />" }
+    if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-search.css')`" />" }
     if ($tripOrder -contains $slug) { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-journal.css')`" />" }
     if ($slug -eq 'experience') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/experience-page.css')`" />" }
     if ($slug -eq 'personal') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/personal-page.css')`" />" }
@@ -902,7 +911,7 @@ if ($imageDimensionCacheDirty) {
 
 # Publish only runtime assets used by the generated Pages site.
 $runtimeCss = @("icons.css", "main.css", "noscript.css")
-$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "personal-timeline.js", "scramble-reveal.js")
+$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCss) {

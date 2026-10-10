@@ -1,0 +1,1 @@
+/* Travel photo search. Placeholder until the search module lands. */
