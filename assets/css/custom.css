@@ -7412,7 +7412,7 @@ body.page-home #intro {
 .japan-journal .guangzhou-journal__hero-image img.journal-banner {
   height: clamp(16rem, 28vw, 22rem);
   object-fit: cover;
-  object-position: 50% 100%;
+  object-position: 50% 52%;
 }
 
 @media screen and (max-width: 600px) {
