@@ -51,9 +51,20 @@
     if (landingCleanup) landingCleanup();
     if (manualSinceNav && !force) return;
     var hash = window.location.hash;
-    if (!/^#trip-section-\d+$/.test(hash)) return;
-    var target = document.getElementById(hash.slice(1));
+    /* #photo=<id> lands its tile the same way; gallery.js (loaded first)
+       resolves and opens it. */
+    var gallery = window.travelGallery;
+    var photo = /^#photo=(.+)$/.exec(hash);
+    var media = photo && gallery ? gallery.find(photo[1]) : null;
+    var target = media ? media.closest('.brick') || media :
+      /^#trip-section-\d+$/.test(hash) && document.getElementById(hash.slice(1));
     if (!target) return;
+    /* Viewer up (back/forward): re-land after close()'s scroll restore,
+       which would otherwise read as visitor input. */
+    if (media && gallery.close()) {
+      window.requestAnimationFrame(function () { startAnchorLanding(true); });
+      return;
+    }
 
     var cancelled = false;
     var observer = null;
@@ -111,9 +122,28 @@
     var lastScrollY = null;
     var lastTargetTop = null;
     var stableTicks = 0;
+    /* Only a landing that no visitor input ended opens the photo. */
+    var finish = function () {
+      cleanup();
+      if (!media) return;
+      /* Centre it in a sideways phone row; flash it once the viewer, whose
+         backdrop hides it, closes. */
+      var row = target.parentNode;
+      row.scrollLeft += target.getBoundingClientRect().left - row.getBoundingClientRect().left -
+        (row.clientWidth - target.offsetWidth) / 2;
+      gallery.open(media, function () {
+        target.classList.add('is-deep-linked');
+        window.setTimeout(function () { target.classList.remove('is-deep-linked'); }, 1500);
+      });
+    };
     var correct = function () {
-      if (cancelled || Date.now() > deadline || window.location.hash !== hash) {
+      if (cancelled || window.location.hash !== hash) {
         cleanup();
+        return;
+      }
+      if (Date.now() > deadline) {
+        /* Before load, the load restart opens it instead. */
+        (document.readyState === 'complete' ? finish : cleanup)();
         return;
       }
       /* Apply the sticky visual state before measuring: its compact mobile
@@ -150,7 +180,7 @@
                    (!document.fonts || document.fonts.status === 'loaded')) {
           stableTicks += 1;
           if (stableTicks >= 2) {
-            cleanup();
+            finish();
             return;
           }
         }

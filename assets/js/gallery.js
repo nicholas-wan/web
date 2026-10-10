@@ -253,6 +253,7 @@
      focus must actually move into the dialog on open, stay inside it while it
      is up, and land back on the opening photo on close. */
   var lastTrigger = null;
+  var afterClose = null;
   var closeButton = overlay.querySelector('.lightbox__close');
   /* The clips are muted GIF-style loops, so native scrub/fullscreen chrome is
      pure noise. The whole frame is a play/pause button instead: keyboard
@@ -306,6 +307,8 @@
     overlay.setAttribute('aria-hidden', 'true');
     unlockBackgroundScroll();
     if (lastTrigger) { lastTrigger.focus({ preventScroll: true }); lastTrigger = null; }
+    if (afterClose) afterClose();
+    afterClose = null;
   };
   var show = function (index) {
     var opening = !overlay.classList.contains('is-visible');
@@ -726,4 +729,27 @@
       }
     }
   });
+
+  /* #photo=<path under images/travel, no extension>: travel-nav.js lands
+     the tile, then opens it here. Match authored paths, not currentSrc. */
+  window.travelGallery = {
+    find: function (id) {
+      try { id = decodeURIComponent(id); } catch (error) { return null; }
+      var tail = new RegExp('/' + id.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&') + '(-poster)?\\.\\w+(?=[?#\\s]|$)');
+      return galleryMedia.filter(function (media) {
+        var source = media.querySelector('source');
+        return tail.test([media.getAttribute('src'), media.getAttribute('srcset'), source && source.getAttribute('src'), media.getAttribute('data-poster')].join(' '));
+      })[0] || null;
+    },
+    open: function (media, onClose) {
+      lastTrigger = media.closest('.content') || media;
+      show(galleryMedia.indexOf(media));
+      afterClose = onClose;
+    },
+    close: function () {
+      var open = overlay.classList.contains('is-visible');
+      if (open) close();
+      return open;
+    }
+  };
 }());
