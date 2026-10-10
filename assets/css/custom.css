@@ -8060,5 +8060,463 @@ body.page-home #nav {
 
 /* Route bundle: travel-search:start */
 /* Travel photo search (travel page only). Extracted into travel-search.css by
-   the build; travel-map-page.css has no headroom left for it. */
+   the build; travel-map-page.css has no headroom left for it. The field is
+   its own row of the atlas header. */
+.travel-atlas__header {
+  flex-wrap: wrap;
+  row-gap: 1.25rem;
+}
+
+.photo-search {
+  display: flex;
+  flex: 1 0 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1.1rem;
+  margin: 0;
+}
+
+.photo-search__field {
+  position: relative;
+  flex: 0 1 26rem;
+  min-width: 0;
+  color: var(--color-ink-500);
+}
+
+/* Magnifier lens and handle, drawn rather than shipped as an icon file. */
+.photo-search__field::before,
+.photo-search__field::after {
+  position: absolute;
+  top: 50%;
+  content: "";
+  pointer-events: none;
+}
+
+.photo-search__field::before {
+  left: 0.95rem;
+  width: 0.78rem;
+  height: 0.78rem;
+  margin-top: -0.5rem;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.photo-search__field::after {
+  left: 1.6rem;
+  width: 2px;
+  height: 0.4rem;
+  margin-top: 0.12rem;
+  border-radius: 1px;
+  background: currentColor;
+  transform: rotate(-45deg);
+}
+
+.photo-search__field:focus-within {
+  color: var(--color-brand-600);
+}
+
+.photo-search__input {
+  display: block;
+  width: 100%;
+  height: 2.75rem;
+  margin: 0;
+  padding: 0 2.75rem 0 2.55rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-compact);
+  background: var(--color-surface);
+  box-shadow: 0 0.2rem 0.6rem rgba(3, 14, 30, 0.04);
+  color: var(--color-ink-900);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  outline: 0;
+  -webkit-appearance: none;
+  appearance: none;
+  transition: border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease;
+}
+
+.photo-search__input::-webkit-search-cancel-button,
+.photo-search__input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  display: none;
+}
+
+.photo-search__input:focus {
+  border-color: var(--color-brand-600);
+  box-shadow: 0 0 0 3px var(--color-brand-wash);
+}
+
+.photo-search__key {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  padding: 0 0.4rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.3rem;
+  color: var(--color-ink-500);
+  font: 700 max(var(--text-floor), 0.7rem)/1.45 var(--font-display);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.photo-search__input:focus ~ .photo-search__key,
+.photo-search__input:not(:placeholder-shown) ~ .photo-search__key {
+  display: none;
+}
+
+/* Reset the theme's button ring, caps and fixed height. */
+.photo-search__clear,
+.photo-search__chip {
+  height: auto;
+  padding: 0;
+  box-shadow: none;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-transform: none;
+}
+
+.photo-search__clear {
+  position: absolute;
+  top: 50%;
+  right: 0.3rem;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  color: var(--color-ink-500) !important;
+  font-size: 1.35rem;
+  font-weight: 400;
+  transform: translateY(-50%);
+}
+
+.photo-search__clear[hidden] {
+  display: none;
+}
+
+.photo-search__clear:hover,
+.photo-search__clear:focus-visible {
+  background: var(--color-brand-100);
+  box-shadow: none;
+  color: var(--color-brand-700) !important;
+}
+
+.photo-search .photo-search__hint {
+  flex: 1 1 14rem;
+  font-size: max(var(--text-floor), 0.8rem);
+}
+
+.photo-search .photo-search__status {
+  flex: 1 0 100%;
+  color: var(--color-ink-700);
+  font-family: var(--font-display);
+  font-size: max(var(--text-floor), 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.photo-search.is-active .photo-search__hint,
+.photo-search__status:empty {
+  display: none;
+}
+
+.photo-search__suggest {
+  flex: 1 0 100%;
+}
+
+.photo-search__suggest:empty {
+  display: none;
+}
+
+.photo-search__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.photo-search__chips li {
+  padding: 0;
+}
+
+.photo-search__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2rem;
+  padding: 0 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-ink-700) !important;
+  font-size: max(var(--text-floor), 0.74rem);
+  font-weight: 700;
+  transition: border-color var(--motion-fast) ease, background-color var(--motion-fast) ease;
+}
+
+.photo-search__chip span {
+  color: var(--color-ink-500);
+  font-weight: 600;
+}
+
+.photo-search__chip:hover,
+.photo-search__chip:focus-visible {
+  border-color: var(--color-brand-200);
+  background: var(--color-brand-100);
+  box-shadow: none;
+  color: var(--color-brand-700) !important;
+}
+
+.photo-search__clear:focus-visible,
+.photo-search__chip:focus-visible,
+.photo-hit:focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+}
+
+/* While a query is active the map, teaser and archive collapse. The atlas
+   keeps its width so travel-map.js never measures a zero-width viewport. */
+.travel-atlas__layout[hidden] {
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+#main > .travel-archive-heading[hidden],
+#main > .travel-grid[hidden] {
+  display: none !important;
+}
+
+.photo-results {
+  position: relative;
+  z-index: 1;
+}
+
+.photo-results[hidden] {
+  display: none;
+}
+
+.photo-results__trip {
+  margin: 1.5rem 0 0.65rem;
+  color: var(--color-brand-600);
+  font-size: max(var(--text-floor), 0.68rem);
+  letter-spacing: 0.12em;
+  line-height: 1.3;
+}
+
+.photo-results__list > :first-child {
+  margin-top: 0;
+}
+
+.photo-results__tier {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 2.25rem 0 0;
+  color: var(--color-ink-900);
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+  line-height: 1.3;
+  text-transform: none;
+}
+
+.photo-results__tier::after {
+  flex: 1;
+  height: 1px;
+  background: var(--color-border-soft);
+  content: "";
+}
+
+.photo-results__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11.5rem, 1fr));
+  gap: 0.85rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.photo-results__grid li {
+  min-width: 0;
+  padding: 0;
+}
+
+.photo-hit {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0.65rem;
+  background: var(--color-surface);
+  box-shadow: 0 0.35rem 1rem rgba(0, 0, 0, 0.06);
+  color: var(--color-ink-800) !important;
+  overflow: hidden;
+  transition: border-color var(--motion-standard) ease,
+    transform var(--motion-standard) var(--ease-standard),
+    box-shadow var(--motion-standard) ease;
+}
+
+.photo-hit:hover,
+.photo-hit:focus-visible {
+  border-color: rgba(18, 138, 134, 0.38);
+  box-shadow: 0 0.8rem 1.6rem rgba(0, 0, 0, 0.12);
+  color: var(--color-ink-800) !important;
+  transform: translateY(-3px);
+}
+
+.photo-hit__media {
+  display: block;
+  aspect-ratio: 4 / 3;
+  background: var(--color-surface-subtle);
+  overflow: hidden;
+}
+
+.photo-hit__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-hit__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.65rem 0.75rem 0.75rem;
+}
+
+.photo-hit__title {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-ink-600);
+  font: 500 max(var(--text-floor), 0.78rem)/1.45 "Raleway", sans-serif;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.photo-hit__title strong {
+  color: var(--color-ink-900);
+  font-weight: 700;
+}
+
+.photo-hit mark {
+  padding: 0 0.08em;
+  border-radius: 0.2em;
+  background: var(--color-brand-100);
+  color: var(--color-brand-700);
+}
+
+.photo-hit__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: auto;
+}
+
+.photo-hit__pill {
+  padding: 0.18rem 0.5rem;
+  border: 1px solid var(--color-border-soft);
+  border-radius: 999px;
+  background: var(--color-surface-subtle);
+  color: var(--color-ink-600);
+  font: 700 max(var(--text-floor), 0.6rem)/1.3 var(--font-display);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.photo-hit__pill--video {
+  border-color: var(--color-brand-200);
+  background: var(--color-brand-100);
+  color: var(--color-brand-700);
+}
+
+.photo-results__more,
+.photo-results__clear {
+  height: 2.25rem;
+  padding: 0 1.1rem;
+  font-size: max(var(--text-floor), 0.62rem);
+  line-height: 2.25rem;
+}
+
+.photo-results__more {
+  display: block;
+  margin: 1.5rem auto 0;
+}
+
+.photo-results__more[hidden] {
+  display: none;
+}
+
+.photo-results__empty p {
+  margin: 0 0 0.75rem;
+  color: var(--color-ink-500);
+  font-size: 0.88rem;
+}
+
+.photo-results__empty .photo-search__chips {
+  margin-bottom: 1.25rem;
+}
+
+@media (hover: none), screen and (max-width: 736px) {
+  .photo-search__key {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 736px) {
+  .photo-search {
+    margin-top: 1rem;
+  }
+
+  .photo-search__field {
+    flex-basis: 100%;
+  }
+
+  /* 3rem touch targets; 16px input text stops iOS zooming on focus. */
+  .photo-search__input {
+    height: 3rem;
+    padding-right: 3rem;
+    font-size: max(16px, 1rem);
+  }
+
+  .photo-search__clear {
+    right: 0;
+    width: 3rem;
+    height: 3rem;
+  }
+
+  .photo-search__chip {
+    min-height: 2.5rem;
+  }
+
+  .photo-results__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  .photo-hit__body {
+    padding: 0.55rem 0.6rem 0.65rem;
+  }
+
+  .photo-results__more,
+  .photo-results__clear {
+    height: 3rem;
+    line-height: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-search__input,
+  .photo-search__chip,
+  .photo-hit {
+    transition: none;
+  }
+
+  .photo-hit:hover,
+  .photo-hit:focus-visible {
+    transform: none;
+  }
+}
 /* Route bundle: travel-search:end */

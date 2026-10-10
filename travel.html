@@ -55,14 +55,28 @@
 									<p>Select a destination to browse trip stories and photos.</p>
 								</div>
 								<p class="travel-atlas__summary"><strong>9</strong> journals <span aria-hidden="true">&middot;</span> <strong>4</strong> continents</p>
-								<!-- Photo search root. The build swaps data-search-script for the versioned URL;
-								     the inline loader at the end of this page injects photo-search.js on demand. -->
+								<!-- Photo search. The build swaps data-search-script (and data-search-index) for
+								     versioned URLs; the inline loader at the end of #main injects
+								     photo-search.js on demand, which adds the tag chips and the results section. -->
 								<form class="photo-search" id="photo-search" role="search" data-search-script="assets/js/photo-search.js" data-search-index="assets/data/photo-index.json" autocomplete="off">
 									<label class="sr-only" for="photo-search-input">Search travel photos</label>
-									<input class="photo-search__input" id="photo-search-input" type="search" name="q" placeholder="Search photos" aria-describedby="photo-search-hint" />
+									<div class="photo-search__field">
+										<input class="photo-search__input" id="photo-search-input" type="search" name="q" placeholder="Search photos" aria-describedby="photo-search-hint" aria-controls="photo-results" enterkeyhint="search" spellcheck="false" />
+										<kbd class="photo-search__key" aria-hidden="true">/</kbd>
+										<button type="button" class="photo-search__clear" aria-label="Clear search" data-clear hidden>&times;</button>
+									</div>
 									<p class="photo-search__hint" id="photo-search-hint">Search every journal photo by place, subject or caption.</p>
+									<div class="photo-search__suggest"></div>
+									<p class="photo-search__status" id="photo-search-status" role="status" aria-live="polite"></p>
 								</form>
 							</header>
+
+							<!-- Photo search results; the map and archive are hidden while they show. -->
+							<section class="photo-results" id="photo-results" aria-labelledby="photo-results-title" hidden>
+								<h2 class="sr-only" id="photo-results-title">Photo search results</h2>
+								<div class="photo-results__list"></div>
+								<button type="button" class="button photo-results__more" hidden></button>
+							</section>
 
 							<div class="travel-atlas__layout">
 								<div class="travel-map">
@@ -304,6 +318,12 @@
 							</article>
 
 						</section>
+
+						<!-- Photo search loader. It lives inside #main because the build carries only
+						     main-to-footer markup; it injects photo-search.js on first interaction with
+						     the field (or at once for a ?q= link) so the script stays off the travel
+						     page's 80 KB <script src> budget. -->
+						<script>(function(){var D=document,f=D.getElementById('photo-search'),i=f&&f.q,d;function l(){d||(d=D.createElement('script'),d.src=f.dataset.searchScript,D.body.appendChild(d))}if(i){/[?&]q=/.test(location.search)&&l();i.onfocus=i.onpointerdown=i.onkeydown=l;D.addEventListener('keydown',function(e){e.key!='/'||/^(INP|TEX|SEL)/.test(e.target.tagName)||(e.preventDefault(),i.focus())})}}());</script>
 
 								</div>
 								<footer id="footer">
