@@ -61,13 +61,15 @@
 		return term.length > 4 && near(word, term) ? 1 : 0;
 	}
 
+	// [best score, its field]; hidden fields (alt + section, trip) count half,
+	// so they never outrank a tag, place or caption hit for the same term.
 	function termScore(photo, term) {
-		var best = 0;
+		var best = [0, 0];
 		photo.f.forEach(function(words, field) {
 			words.forEach(function(word) {
 				var match = kind(word, term);
-				var score = match === 3 ? EXACT[field] : match && PREFIX[field] - (match === 1 ? 0.5 : 0);
-				if (score > best) best = score;
+				var score = (match === 3 ? EXACT[field] : match && PREFIX[field] - (match === 1 ? 0.5 : 0)) / (field > 1 ? 2 : 1);
+				if (score > best[0]) best = [score, field];
 			});
 		});
 		return best;
@@ -96,19 +98,29 @@
 
 	// Score, then journal order, so one trip's hits still sit together.
 	function rank(hits) {
-		return hits.sort(function(a, b) { return b.score - a.score || a.photo.order - b.photo.order; });
+		return hits.sort(function(a, b) {
+			return b.why.length - a.why.length || b.score - a.score || a.photo.order - b.photo.order;
+		});
 	}
 
+	// Rarer terms weigh more: log(1 + N / df), df = photos the term matches.
+	// Partial hits sort by terms matched first; why lists them for the tile.
 	function search(terms) {
 		var tier = [[], []];
-		photos.forEach(function(photo) {
-			var score = 0, matched = 0;
-			terms.forEach(function(term) {
-				var value = termScore(photo, term);
-				score += value;
-				if (value) matched++;
+		var rows = photos.map(function(photo) {
+			return terms.map(function(term) { return termScore(photo, term); });
+		});
+		var weight = terms.map(function(term, t) {
+			return Math.log(1 + photos.length / rows.filter(function(row) { return row[t][0]; }).length);
+		});
+		rows.forEach(function(row, i) {
+			var score = 0, why = [];
+			row.forEach(function(best, t) {
+				if (!best[0]) return;
+				score += best[0] * weight[t];
+				why.push(terms[t] + (best[1] > 1 ? ' (in description)' : ''));
 			});
-			if (matched) tier[matched === terms.length ? 0 : 1].push({ photo: photo, score: score });
+			if (why.length) tier[why.length === terms.length ? 0 : 1].push({ photo: photos[i], score: score, why: why });
 		});
 		return tier.map(rank);
 	}
@@ -155,8 +167,8 @@
 			}).filter(Boolean).slice(0, 8), 'Suggested searches', true, 'Try');
 	}
 
-	// A tile: thumbnail with its trip chip, then one clamped caption line.
-	function card(photo, terms) {
+	// A tile: thumbnail with its trip chip, a clamped caption, and why a partial hit matched.
+	function card(photo, terms, why) {
 		var trip = trips[photo.trip];
 		var caption = photo.caption && photo.caption !== photo.place ? ' \u00b7 ' + highlight(photo.caption, terms) : '';
 		return '<li><a class="photo-hit" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '">' +
@@ -165,7 +177,8 @@
 			'<span class="photo-hit__trip">' + escape(trip.label + ' \u00b7 ' + String(trip.year).slice(-2)) + '</span>' +
 			(photo.video ? '<span class="photo-hit__video">Animation</span>' : '') +
 			'</span><span class="photo-hit__title"><strong>' + highlight(photo.place, terms) +
-			'</strong>' + caption + '</span></a></li>';
+			'</strong>' + caption + '</span>' +
+			(why ? '<span class="photo-hit__why">matches: ' + escape(why.join(', ')) + '</span>' : '') + '</a></li>';
 	}
 
 	var chips = form.querySelector('.photo-search__suggest');
@@ -215,7 +228,7 @@
 			if (!hits.length) return;
 			shown += hits.length;
 			html += (tier ? '<h3 class="photo-results__tier">Partial matches</h3>' : '') +
-				'<ul class="photo-results__grid">' + hits.map(function(hit) { return card(hit.photo, terms); }).join('') + '</ul>';
+				'<ul class="photo-results__grid">' + hits.map(function(hit) { return card(hit.photo, terms, tier && hit.why); }).join('') + '</ul>';
 		});
 		if (full) sentence.push(plural(full, 'photo matches', 'photos match') + (terms.length > 1 ? ' all terms' : ''));
 		if (total > full) sentence.push(plural(total - full, 'partial match', 'partial matches'));

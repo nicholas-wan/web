@@ -255,7 +255,8 @@ Assert-FileSizeBudget 'assets\css\travel-map-page.css' 48
 Assert-FileSizeBudget 'assets\css\travel-journal.css' 30
 # Photo search styles live in their own route bundle because travel-map-page.css
 # sits within a few hundred bytes of its cap (Oct 2026).
-Assert-FileSizeBudget 'assets\css\travel-search.css' 10
+# 10 -> 11: partial-match reason line, Oct 2026.
+Assert-FileSizeBudget 'assets\css\travel-search.css' 11
 Assert-FileSizeBudget 'assets\css\experience-page.css' 12
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 Assert-FileSizeBudget 'assets\css\skills-page.css' 10

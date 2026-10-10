@@ -8455,6 +8455,16 @@ body.page-home #nav {
   font-weight: 700;
 }
 
+/* Partial hits only: the terms that matched, one muted line. */
+.photo-hit__why {
+  display: block;
+  overflow: hidden;
+  color: var(--color-ink-500);
+  font: 500 max(var(--text-floor), 0.75rem)/1.4 "Raleway", sans-serif;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .photo-hit mark {
   padding: 0 0.08em;
   border-radius: 0.2em;
