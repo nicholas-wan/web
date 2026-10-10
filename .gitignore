@@ -13,3 +13,9 @@ __pycache__/
 
 # Local-only private documents retained outside the published source tree.
 .private/
+
+# Local photo-tagging scratch (video frames, agent output); never published.
+tools/photos/work/
+
+# Worktrees the Claude desktop app creates for parallel agents.
+.claude/worktrees/

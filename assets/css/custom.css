@@ -3601,6 +3601,23 @@ body.is-map-fullscreen #return-to-top {
   object-position: var(--focus-x, 50%) var(--focus-y, 50%);
 }
 
+/* A tile reached through a #photo= deep link (search result) carries
+   is-deep-linked for 1.5s after its lightbox closes, so the visitor can see
+   which photo they arrived at once the viewer is gone. The ring stays static
+   under reduced motion; travel-nav.js toggles the class either way. */
+.masonry .brick.is-deep-linked {
+  outline: 3px solid var(--color-brand-600);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 6px var(--color-brand-100);
+  transition: outline-color var(--motion-slow) ease, box-shadow var(--motion-slow) ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .masonry .brick.is-deep-linked {
+    transition: none;
+  }
+}
+
 .travel-gallery--compact .travel-gallery__item--tall,
 .guangzhou-day--compact .masonry .guangzhou-gallery__brick--tall {
   grid-row: span 2;
