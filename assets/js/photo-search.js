@@ -181,7 +181,6 @@
 		var caption = photo.caption && photo.caption !== photo.place ? ' \u00b7 ' + highlight(photo.caption, terms) : '';
 		var focal = photo.fx == null && photo.fy == null ? '' : 'object-position:' +
 			(photo.fx == null ? 50 : photo.fx) + '% ' + (photo.fy == null ? 50 : photo.fy) + '%;';
-		if (photo.fit) focal += 'object-fit:' + photo.fit;
 		focal = focal ? ' style="' + focal + '"' : '';
 		return '<li><a class="photo-hit" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '">' +
 			'<span class="photo-hit__media"><img loading="lazy" decoding="async" src="' + escape(photo.thumb) +
