@@ -21,7 +21,7 @@
 	var clearButton = form.querySelector('.photo-search__clear');
 	var collapsible = document.querySelectorAll('.travel-atlas__layout, #main > .travel-archive-heading, #main > .travel-grid');
 	var trips = {}, tags = [], photos = null, failed = false, tiers;
-	var timer = 0, saveTimer = 0, limit = PAGE, collapsed = false;
+	var timer = 0, saveTimer = 0, limit = PAGE, collapsed = false, tripFilter = '';
 
 	function fold(value) {
 		return String(value).toLowerCase().normalize('NFD')
@@ -97,11 +97,19 @@
 		});
 	}
 
-	// Score, then trip order, so one trip's hits still sit together.
+	// Runs per trip: trips by their best hit, newest first on a tie; within a
+	// trip, terms matched, score, then journal order.
 	function rank(hits) {
+		var best = {};
+		hits.forEach(function(hit) { best[hit.photo.trip] = Math.max(best[hit.photo.trip] || 0, hit.score); });
 		return hits.sort(function(a, b) {
-			return b.why.length - a.why.length || b.score - a.score || a.photo.order - b.photo.order;
+			return best[b.photo.trip] - best[a.photo.trip] || trips[b.photo.trip].order - trips[a.photo.trip].order ||
+				b.why.length - a.why.length || b.score - a.score || a.photo.order - b.photo.order;
 		});
+	}
+
+	function tripLabel(slug) {
+		return escape(trips[slug].label + ' · ' + String(trips[slug].year).slice(-2));
 	}
 
 	// Rarer terms weigh more: log(1 + N / df), df = photos the term matches.
@@ -175,12 +183,11 @@
 
 	// A tile: thumbnail with its trip chip, a clamped caption, and why a partial hit matched.
 	function card(photo, terms, why) {
-		var trip = trips[photo.trip];
 		var caption = photo.caption && photo.caption !== photo.place ? ' \u00b7 ' + highlight(photo.caption, terms) : '';
 		return '<li><a class="photo-hit" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '">' +
 			'<span class="photo-hit__media"><img loading="lazy" decoding="async" src="' + escape(photo.thumb) +
 			'" alt="' + escape(photo.alt) + '" width="' + photo.w + '" height="' + photo.h + '">' +
-			'<span class="photo-hit__trip">' + escape(trip.label + ' \u00b7 ' + String(trip.year).slice(-2)) + '</span>' +
+			'<span class="photo-hit__trip">' + tripLabel(photo.trip) + '</span>' +
 			(photo.video ? '<span class="photo-hit__video">Animation</span>' : '') +
 			'</span><span class="photo-hit__title"><strong>' + highlight(photo.place, terms) +
 			'</strong>' + caption + '</span>' +
@@ -226,10 +233,25 @@
 	}
 
 	function render(terms, query) {
-		var shown = 0, html = '', sentence = [];
-		var full = tiers[0].length, total = full + tiers[1].length;
+		var shown = 0, html = '', sentence = [], runs = [], counts = {};
+		// Legend chips, one per trip in run order; a pressed one narrows the grid.
+		tiers.forEach(function(hits) {
+			hits.forEach(function(hit) {
+				var trip = hit.photo.trip;
+				if (!counts[trip]) runs.push(trip);
+				counts[trip] = ~~counts[trip] + 1;
+			});
+		});
+		if (runs.length > 1) html = '<ul class="photo-search__chips photo-results__trips" aria-label="Journals with matches">' + runs.map(function(trip) {
+			return '<li><button type="button" class="photo-search__chip" data-trip="' + escape(trip) + '" aria-pressed="' + (trip === tripFilter) + '">' +
+				tripLabel(trip) + ' <span>' + counts[trip] + '</span></button></li>';
+		}).join('') + '</ul>';
+		var visible = tiers.map(function(hits) {
+			return hits.filter(function(hit) { return !tripFilter || hit.photo.trip === tripFilter; });
+		});
+		var full = visible[0].length, total = full + visible[1].length;
 		// Each tier is one continuous grid; the trip rides on each tile.
-		tiers.forEach(function(hits, tier) {
+		visible.forEach(function(hits, tier) {
 			hits = hits.slice(0, limit - shown);
 			if (!hits.length) return;
 			shown += hits.length;
@@ -238,6 +260,7 @@
 		});
 		if (full) sentence.push(plural(full, 'photo matches', 'photos match') + (terms.length > 1 ? ' all terms' : ''));
 		if (total > full) sentence.push(plural(total - full, 'partial match', 'partial matches'));
+		if (tripFilter) sentence.push(tripLabel(tripFilter) + ' only');
 		if (!total) {
 			sentence.push('No photos for \u2018' + query + '\u2019');
 			html = '<div class="photo-results__empty"><p>Try a popular subject instead:</p>' +
@@ -269,6 +292,7 @@
 			return;
 		}
 		limit = PAGE;
+		tripFilter = '';
 		tiers = search(terms);
 		render(terms, query);
 		// A query with hits that the visitor pauses on becomes a recent search.
@@ -290,8 +314,9 @@
 		var button = event.target.closest('button');
 		if (event.target.closest('.photo-hit')) remember(input.value.trim());
 		if (!button) return;
-		var tag = button.getAttribute('data-tag');
+		var tag = button.getAttribute('data-tag'), trip = button.getAttribute('data-trip');
 		var tail = /\S+$/.exec(input.value);
+		var redraw = function() { render(unique(tokens(input.value)), input.value.trim()); };
 		if (tag) {
 			input.value = button.hasAttribute('data-replace') || !tail ? tag + ' ' : input.value.slice(0, tail.index) + tag + ' ';
 			run();
@@ -299,8 +324,15 @@
 		} else if (button === more) {
 			var from = hits().length;
 			limit += PAGE;
-			render(unique(tokens(input.value)), input.value.trim());
+			redraw();
 			hits()[from].focus();
+		} else if (trip) {
+			// The legend is rebuilt, so refocus the same chip.
+			var at = [].indexOf.call(results.querySelectorAll('[data-trip]'), button);
+			tripFilter = trip === tripFilter ? '' : trip;
+			limit = PAGE;
+			redraw();
+			results.querySelectorAll('[data-trip]')[at].focus();
 		} else if (button.hasAttribute('data-clear')) {
 			clearSearch();
 		} else if (button.hasAttribute('data-forget')) {

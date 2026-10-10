@@ -8366,6 +8366,24 @@ body.page-home #nav {
   content: "";
 }
 
+/* Journal legend: one chip per trip in the grid's run order, with its count.
+   A pressed chip narrows the grid to that journal. Grouping is the runs plus
+   this row; per-trip headings stay out of the grid (whitespace, Oct 2026). */
+.photo-results__trips {
+  margin-top: 0.85rem;
+}
+
+.photo-results__trips .photo-search__chip[aria-pressed="true"] {
+  border-color: var(--color-brand-700);
+  background: var(--color-brand-700);
+  color: #fff !important;
+}
+
+.photo-results__trips .photo-search__chip[aria-pressed="true"] span {
+  color: inherit;
+  opacity: 0.8;
+}
+
 /* One continuous grid per tier: tiles keep one size and the last row stays
    left-aligned, so a trip with one hit never claims a whole row. */
 .photo-results__grid {
