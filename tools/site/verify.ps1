@@ -297,7 +297,7 @@ if ($photoSearchJs -notmatch 'history\.replaceState' -or $photoSearchJs -notmatc
 $travelSearchCss = Get-Content -LiteralPath (Join-Path $dist 'assets/css/travel-search.css') -Raw -Encoding UTF8
 if ($travelSearchCss -notmatch '(?s)\.travel-atlas__layout\[hidden\]\s*\{[^}]*height:\s*0[^}]*visibility:\s*hidden' -or $travelSearchCss -match '(?s)\.travel-atlas__layout\[hidden\]\s*\{[^}]*display:\s*none') { throw 'A collapsed atlas must keep its width (zero height, hidden), never display: none; travel-map.js measures it on resize.' }
 # The photo search index is fetched by photo-search.js on first use, never at
-# page load. The full schema is 456 KB raw for 886 photos after the October
+# page load. The full schema is 468 KB raw for 898 photos after the October
 # 2026 Chengdu and Zhangjiajie journal; it remains compact when transferred.
 Assert-FileSizeBudget 'assets\data\photo-index.json' 480
 if ($travel -notmatch ('data-search-index="' + [regex]::Escape((Get-DistAssetRef 'assets/data/photo-index.json')) + '"')) { throw 'The travel page must carry the versioned photo-index.json URL in data-search-index.' }

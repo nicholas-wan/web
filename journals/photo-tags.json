@@ -9736,28 +9736,29 @@
     "bridge",
     "china",
     "dujiangyan",
+    "illuminations",
     "night",
     "river",
     "sichuan"
   ],
-  "2026_chengdu_zhangjiajie/day2/dujiangyan-dinner": [
+  "2026_chengdu_zhangjiajie/day2/glazed-rolls-dinner": [
     "asia",
     "autumn",
     "china",
     "dining",
-    "dujiangyan",
     "food",
+    "restaurant",
     "sichuan"
   ],
   "2026_chengdu_zhangjiajie/day2/panda-bamboo.mp4": [
     "asia",
     "autumn",
-    "breakfast",
     "china",
-    "dining",
     "dujiangyan",
+    "forest",
     "panda",
-    "sichuan"
+    "sichuan",
+    "zoo"
   ],
   "2026_chengdu_zhangjiajie/day2/panda-base-couple": [
     "asia",
@@ -9765,52 +9766,79 @@
     "china",
     "dujiangyan",
     "forest",
-    "hiking",
     "nicholas",
-    "panda",
     "sichuan",
     "us",
-    "yx"
+    "walking",
+    "yx",
+    "zoo"
   ],
   "2026_chengdu_zhangjiajie/day2/panda-in-bamboo": [
     "asia",
     "autumn",
-    "breakfast",
     "china",
     "dujiangyan",
+    "forest",
     "panda",
     "rain",
-    "sichuan"
+    "sichuan",
+    "zoo"
   ],
   "2026_chengdu_zhangjiajie/day2/rabbit-feeding": [
     "asia",
     "autumn",
     "china",
+    "dujiangyan",
     "feeding",
     "park",
     "rabbit",
+    "sichuan",
+    "solo",
     "yx"
+  ],
+  "2026_chengdu_zhangjiajie/day2/raccoon-crowd": [
+    "asia",
+    "autumn",
+    "china",
+    "dujiangyan",
+    "feeding",
+    "nicholas",
+    "park",
+    "raccoon",
+    "sichuan",
+    "solo"
   ],
   "2026_chengdu_zhangjiajie/day2/raccoon-feeding.mp4": [
     "asia",
     "autumn",
     "china",
+    "dujiangyan",
     "feeding",
-    "forest",
     "park",
     "raccoon",
-    "snack",
+    "sichuan",
+    "solo",
     "yx"
+  ],
+  "2026_chengdu_zhangjiajie/day2/red-panda-bamboo": [
+    "asia",
+    "autumn",
+    "china",
+    "dujiangyan",
+    "forest",
+    "red panda",
+    "sichuan",
+    "snack",
+    "zoo"
   ],
   "2026_chengdu_zhangjiajie/day2/red-panda-closeup": [
     "asia",
     "autumn",
     "china",
-    "nicholas",
-    "panda",
+    "dujiangyan",
+    "park",
     "red panda",
-    "us",
-    "yx"
+    "sichuan"
   ],
   "2026_chengdu_zhangjiajie/day2/red-panda-family": [
     "asia",
@@ -9818,21 +9846,45 @@
     "china",
     "dujiangyan",
     "forest",
-    "panda",
+    "park",
     "red panda",
     "sichuan"
   ],
-  "2026_chengdu_zhangjiajie/day2/red-panda-forest": [
+  "2026_chengdu_zhangjiajie/day2/red-panda-friend": [
+    "asia",
+    "autumn",
+    "china",
+    "dujiangyan",
+    "nicholas",
+    "park",
+    "photo spot",
+    "red panda",
+    "sichuan",
+    "solo"
+  ],
+  "2026_chengdu_zhangjiajie/day2/red-panda-log": [
     "asia",
     "autumn",
     "china",
     "dujiangyan",
     "forest",
-    "panda",
+    "park",
     "red panda",
     "sichuan"
   ],
-  "2026_chengdu_zhangjiajie/day3/brick-hotpot-chef": [
+  "2026_chengdu_zhangjiajie/day3/bakery-cupcake": [
+    "asia",
+    "autumn",
+    "bakery",
+    "cake",
+    "chengdu",
+    "china",
+    "dessert",
+    "sichuan",
+    "solo",
+    "yx"
+  ],
+  "2026_chengdu_zhangjiajie/day3/brick-hotpot-diner": [
     "asia",
     "autumn",
     "chengdu",
@@ -9840,7 +9892,36 @@
     "food",
     "hotpot",
     "miniature",
+    "sculpture",
+    "shopping",
     "sichuan"
+  ],
+  "2026_chengdu_zhangjiajie/day3/brick-panda-display": [
+    "asia",
+    "autumn",
+    "chengdu",
+    "china",
+    "miniature",
+    "panda",
+    "sculpture",
+    "shopping",
+    "sichuan",
+    "solo",
+    "yx"
+  ],
+  "2026_chengdu_zhangjiajie/day3/brick-panda-giant": [
+    "asia",
+    "autumn",
+    "chengdu",
+    "china",
+    "night",
+    "panda",
+    "photo spot",
+    "sculpture",
+    "shopping",
+    "sichuan",
+    "solo",
+    "yx"
   ],
   "2026_chengdu_zhangjiajie/day3/dongmen-wharf-night": [
     "asia",
@@ -9859,6 +9940,7 @@
     "autumn",
     "chengdu",
     "china",
+    "interior",
     "massage",
     "sichuan"
   ],
@@ -9880,9 +9962,11 @@
     "autumn",
     "chengdu",
     "china",
+    "illuminations",
     "night",
+    "shopping",
     "sichuan",
-    "temple",
+    "skyscraper",
     "tower"
   ],
   "2026_chengdu_zhangjiajie/day4/airport-panda-sculptures": [
@@ -9895,25 +9979,29 @@
     "photo spot",
     "sculpture",
     "sichuan",
+    "solo",
     "yx"
   ],
-  "2026_chengdu_zhangjiajie/day4/ancient-town-dragon": [
-    "asia",
-    "autumn",
-    "china",
-    "hunan",
-    "old town",
-    "sculpture",
-    "zhangjiajie"
-  ],
-  "2026_chengdu_zhangjiajie/day4/courtyard-lotus": [
+  "2026_chengdu_zhangjiajie/day4/carved-courtyard": [
+    "architecture",
     "asia",
     "autumn",
     "china",
     "dusk",
-    "flowers",
     "hunan",
+    "interior",
+    "old town",
+    "zhangjiajie"
+  ],
+  "2026_chengdu_zhangjiajie/day4/city-gate-night": [
+    "architecture",
+    "asia",
+    "autumn",
+    "china",
+    "hunan",
+    "illuminations",
     "night",
+    "old town",
     "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day4/fish-lantern-walk": [
@@ -9923,25 +10011,42 @@
     "fish",
     "hunan",
     "illuminations",
+    "night",
+    "solo",
     "walking",
     "yx",
     "zhangjiajie"
   ],
-  "2026_chengdu_zhangjiajie/day4/old-town-gate-night": [
+  "2026_chengdu_zhangjiajie/day4/old-town-pavilion-night": [
+    "architecture",
     "asia",
     "autumn",
     "china",
-    "dusk",
     "hunan",
+    "illuminations",
     "night",
     "old town",
+    "zhangjiajie"
+  ],
+  "2026_chengdu_zhangjiajie/day4/river-skyline-night": [
+    "asia",
+    "autumn",
+    "china",
+    "hunan",
+    "illuminations",
+    "night",
+    "river",
+    "skyline",
+    "view",
     "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day4/river-view-homestay": [
     "asia",
     "autumn",
     "china",
+    "hotel",
     "hunan",
+    "interior",
     "river",
     "view",
     "zhangjiajie"
@@ -9951,17 +10056,19 @@
     "asia",
     "autumn",
     "china",
+    "dusk",
     "hunan",
     "skyline",
-    "sunset",
     "tower",
     "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day4/seventy-two-tower-night": [
+    "architecture",
     "asia",
     "autumn",
     "china",
     "hunan",
+    "illuminations",
     "night",
     "tower",
     "zhangjiajie"
@@ -9972,13 +10079,27 @@
     "autumn",
     "chengdu",
     "china",
+    "interior",
     "sichuan",
+    "solo",
     "walking",
     "yx"
+  ],
+  "2026_chengdu_zhangjiajie/day4/wonder-tower-dragon": [
+    "architecture",
+    "asia",
+    "autumn",
+    "china",
+    "dusk",
+    "hunan",
+    "old town",
+    "sculpture",
+    "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day4/zhangjiajie-river-view": [
     "asia",
     "autumn",
+    "blue sky",
     "china",
     "hunan",
     "river",
@@ -9991,6 +10112,10 @@
     "autumn",
     "china",
     "hunan",
+    "mountain",
+    "park",
+    "rock formation",
+    "view",
     "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day5/mountain-sea": [
@@ -9999,17 +10124,18 @@
     "china",
     "hunan",
     "mountain",
+    "rock formation",
     "view",
     "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day5/national-forest-gate": [
+    "architecture",
     "asia",
     "autumn",
+    "blue sky",
     "china",
-    "forest",
     "hunan",
     "park",
-    "temple",
     "tower",
     "zhangjiajie"
   ],
@@ -10020,16 +10146,46 @@
     "forest",
     "hiking",
     "hunan",
-    "tower",
+    "mountain",
+    "park",
+    "rock formation",
+    "zhangjiajie"
+  ],
+  "2026_chengdu_zhangjiajie/day5/qilin-float": [
+    "asia",
+    "autumn",
+    "china",
+    "costumed character",
+    "hunan",
+    "illuminations",
+    "night",
+    "performer",
+    "sculpture",
+    "show",
     "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day5/sandstone-peaks": [
     "asia",
     "autumn",
+    "blue sky",
     "china",
     "forest",
     "hunan",
     "mountain",
+    "park",
+    "rock formation",
+    "zhangjiajie"
+  ],
+  "2026_chengdu_zhangjiajie/day5/ten-mile-gallery": [
+    "asia",
+    "autumn",
+    "blue sky",
+    "china",
+    "hunan",
+    "mountain",
+    "park",
+    "rock formation",
+    "sign",
     "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day5/tianzi-couple": [
@@ -10053,14 +10209,14 @@
     "china",
     "hunan",
     "mountain",
+    "rock formation",
     "view",
     "zhangjiajie"
   ],
-  "2026_chengdu_zhangjiajie/day5/wild-macaque": [
+  "2026_chengdu_zhangjiajie/day5/wild-macaques": [
     "asia",
     "autumn",
     "china",
-    "forest",
     "hiking",
     "hunan",
     "monkey",
@@ -10070,9 +10226,12 @@
   "2026_chengdu_zhangjiajie/day5/yuanjiajie-couple": [
     "asia",
     "autumn",
+    "blue sky",
     "china",
     "hunan",
+    "mountain",
     "nicholas",
+    "rock formation",
     "us",
     "view",
     "yx",
@@ -10085,6 +10244,7 @@
     "bridge",
     "china",
     "hunan",
+    "mountain",
     "view",
     "zhangjiajie"
   ],
@@ -10095,16 +10255,16 @@
     "dining",
     "food",
     "hunan",
-    "mountain",
     "snack",
     "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day6/old-town-gate": [
+    "architecture",
     "asia",
     "autumn",
     "china",
     "hunan",
-    "mountain",
+    "illuminations",
     "night",
     "old town",
     "zhangjiajie"
@@ -10116,6 +10276,21 @@
     "hunan",
     "mountain",
     "nicholas",
+    "observation deck",
+    "us",
+    "view",
+    "yx",
+    "zhangjiajie"
+  ],
+  "2026_chengdu_zhangjiajie/day6/skywalk-selfie": [
+    "asia",
+    "autumn",
+    "china",
+    "hunan",
+    "mountain",
+    "nicholas",
+    "observation deck",
+    "selfie",
     "us",
     "view",
     "yx",
@@ -10136,7 +10311,10 @@
     "autumn",
     "cave",
     "china",
+    "hiking",
     "hunan",
+    "mountain",
+    "rock formation",
     "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day6/tianmen-cliff": [
@@ -10145,13 +10323,26 @@
     "china",
     "hunan",
     "mountain",
+    "rock formation",
     "view",
     "zhangjiajie"
   ],
   "2026_chengdu_zhangjiajie/day6/tianmen-panorama": [
     "asia",
     "autumn",
+    "blue sky",
     "china",
+    "hunan",
+    "mountain",
+    "view",
+    "zhangjiajie"
+  ],
+  "2026_chengdu_zhangjiajie/day6/tianmen-stairway-view": [
+    "asia",
+    "autumn",
+    "blue sky",
+    "china",
+    "hiking",
     "hunan",
     "mountain",
     "view",
@@ -10162,31 +10353,11 @@
     "autumn",
     "bridge",
     "china",
-    "dusk",
     "hunan",
+    "illuminations",
     "night",
     "river",
     "zhangjiajie"
-  ],
-  "2026_chengdu_zhangjiajie/day7/airport-coffee": [
-    "airport",
-    "asia",
-    "autumn",
-    "chengdu",
-    "china",
-    "coffee",
-    "sichuan",
-    "yx"
-  ],
-  "2026_chengdu_zhangjiajie/day7/airport-lunch": [
-    "airport",
-    "asia",
-    "autumn",
-    "chengdu",
-    "china",
-    "flight",
-    "food",
-    "sichuan"
   ],
   "2026_chengdu_zhangjiajie/day7/final-morning-view": [
     "asia",
@@ -10199,6 +10370,28 @@
     "view",
     "zhangjiajie"
   ],
+  "2026_chengdu_zhangjiajie/day7/korean-lunch": [
+    "asia",
+    "autumn",
+    "beef",
+    "chengdu",
+    "china",
+    "dining",
+    "food",
+    "korean food",
+    "restaurant",
+    "sichuan"
+  ],
+  "2026_chengdu_zhangjiajie/day7/layover-drink": [
+    "asia",
+    "autumn",
+    "chengdu",
+    "china",
+    "drinks",
+    "sichuan",
+    "solo",
+    "yx"
+  ],
   "2026_chengdu_zhangjiajie/day7/terminal-mural": [
     "airport",
     "art",
@@ -10207,7 +10400,6 @@
     "chengdu",
     "china",
     "city street",
-    "sichuan",
-    "street art"
+    "sichuan"
   ]
 }

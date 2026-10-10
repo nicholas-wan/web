@@ -67,7 +67,7 @@
       title: 'Sichuan & Hunan',
       dates: '3 – 9 October 2026',
       image: 'images/travel/2026_chengdu_zhangjiajie/day2/red-panda-family.webp',
-      imageAlt: 'Four red pandas gathered on a wooden platform in Dujiangyan'
+      imageAlt: 'Four red pandas leaning over a wooden rail in Dujiangyan'
     },
     perth: {
       title: 'Western Australia',
