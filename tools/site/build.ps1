@@ -864,7 +864,9 @@ foreach ($entry in $photoEntries) {
 }
 # Search tags include contextual subjects that may be outside a thumbnail crop.
 # Discovery is stricter: only manually reviewed image/topic/crop pairs qualify.
-$exploreReviews = @(Get-Content -LiteralPath (Join-Path $root 'journals\explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json)
+# Assign before iterating: Windows PowerShell 5.1 emits a root JSON array as a
+# single pipeline object; wrapping the pipeline in @() nests the whole list.
+$exploreReviews = Get-Content -LiteralPath (Join-Path $root 'journals\explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $exploreCoverPhotos = [System.Collections.Generic.List[object]]::new()
 $exploreIds = @{}
 foreach ($review in $exploreReviews) {

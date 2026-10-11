@@ -314,7 +314,7 @@ try {
     throw "assets/data/photo-index.json does not parse: $($_.Exception.Message)"
 }
 if ($photoIndex.version -ne 2) { throw 'assets/data/photo-index.json must declare version 2 (compact reviewed covers).' }
-$coverReviews = @(Get-Content -LiteralPath (Join-Path $root 'journals/explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json)
+$coverReviews = Get-Content -LiteralPath (Join-Path $root 'journals/explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 if (@($photoIndex.covers).Count -ne $coverReviews.Count) { throw 'The photo index must include every reviewed discovery cover.' }
 $publishedCovers = @{}
 foreach ($row in $photoIndex.covers) {

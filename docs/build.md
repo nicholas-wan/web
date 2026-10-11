@@ -12,6 +12,8 @@ Run the complete CI-equivalent workflow:
 .\tools\site.ps1 check
 ```
 
+On Windows, invoke `powershell.exe -NoProfile -File tools/site.ps1 check` explicitly to use the same Windows PowerShell 5.1 engine as CI. PowerShell 7 alone can miss compatibility failures: in 5.1, wrapping a root-array `ConvertFrom-Json` pipeline in `@(...)` nests the whole array. Assign its result directly before iterating or counting reviews.
+
 Builds are incremental by default. Use a clean build after removing files or when the output must be reset:
 
 ```powershell
