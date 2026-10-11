@@ -80,6 +80,11 @@
       // Horizontal gallery/section-strip scrolling is not a visitor moving the
       // document. Capturing those events used to cancel photo deep links.
       if (event.target !== document && event.target !== window) return;
+      // A photo has no native anchor element. Font/layout scroll anchoring can
+      // still move the document while it lands, especially on a cold phone.
+      // Let the settling loop observe that movement; manualEvents above retain
+      // ownership for real visitor input and cancel the pending viewer.
+      if (media) return;
       /* A visitor can move the page after load but before the first delayed
          correction sample on image-heavy journals. Treat that as ownership
          of the viewport too. Native pre-load hash movement is still allowed. */

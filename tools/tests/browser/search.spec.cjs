@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+test.use({ actionTimeout: 10000 });
 
 for (const width of [390, 1280]) {
   test(`search and discovery at ${width}px`, async ({ page }) => {
@@ -71,12 +72,14 @@ test('corrupt recent storage, IME composition and restored URL queries', async (
   await expect(page.locator('.photo-hit').first()).toBeVisible();
 });
 
-test('child scrolls cannot cancel a photo landing; visitor input still can', async ({ page }) => {
+test('layout and child scrolls cannot cancel a photo landing; visitor input still can', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(() => {
     const timer = setInterval(() => {
       const strip = document.querySelector('.travel-jump-groups');
       if (strip) strip.dispatchEvent(new Event('scroll'));
+      // Simulate browser scroll anchoring while a cold layout is settling.
+      window.scrollBy(0, 1);
     }, 50);
     setTimeout(() => clearInterval(timer), 6000);
   });
