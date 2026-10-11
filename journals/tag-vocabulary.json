@@ -292,6 +292,14 @@
       "grand-place"
     ]
   },
+  "bubble tea": {
+    "facet": "food",
+    "synonyms": [
+      "boba",
+      "pearl milk tea",
+      "tapioca"
+    ]
+  },
   "buffalo": {
     "facet": "place",
     "parent": "usa",
@@ -547,7 +555,13 @@
   "crab": {
     "facet": "animal",
     "synonyms": [
-      "lobster"
+      "crabs"
+    ]
+  },
+  "crayfish": {
+    "facet": "animal",
+    "synonyms": [
+      "crawfish"
     ]
   },
   "crowd": {
@@ -652,15 +666,6 @@
       "car ride"
     ]
   },
-  "dujiangyan": {
-    "facet": "place",
-    "parent": "sichuan",
-    "synonyms": [
-      "south bridge",
-      "panda base",
-      "red panda forest"
-    ]
-  },
   "duck": {
     "facet": "food",
     "synonyms": [
@@ -673,6 +678,15 @@
     "facet": "place",
     "parent": "germany",
     "synonyms": []
+  },
+  "dujiangyan": {
+    "facet": "place",
+    "parent": "sichuan",
+    "synonyms": [
+      "south bridge",
+      "panda base",
+      "red panda forest"
+    ]
   },
   "dusk": {
     "facet": "time",
@@ -842,6 +856,13 @@
     "synonyms": [
       "friend",
       "colleagues"
+    ]
+  },
+  "fries": {
+    "facet": "food",
+    "synonyms": [
+      "french fries",
+      "chips"
     ]
   },
   "fruit": {
@@ -1228,6 +1249,12 @@
     "facet": "animal",
     "synonyms": []
   },
+  "lobster": {
+    "facet": "animal",
+    "synonyms": [
+      "lobsters"
+    ]
+  },
   "los angeles": {
     "facet": "place",
     "parent": "california",
@@ -1583,14 +1610,6 @@
       "national park"
     ]
   },
-  "parrot": {
-    "facet": "animal",
-    "synonyms": [
-      "cockatoo",
-      "toucan",
-      "lorikeet"
-    ]
-  },
   "party": {
     "facet": "event",
     "synonyms": [
@@ -1715,6 +1734,12 @@
       "rainy",
       "raining",
       "wet"
+    ]
+  },
+  "rainbow": {
+    "facet": "weather",
+    "synonyms": [
+      "rainbows"
     ]
   },
   "ramen": {
@@ -1946,17 +1971,17 @@
     "parent": "japan",
     "synonyms": []
   },
+  "sichuan": {
+    "facet": "place",
+    "parent": "china",
+    "synonyms": []
+  },
   "sign": {
     "facet": "subject",
     "synonyms": [
       "signboard",
       "neon"
     ]
-  },
-  "sichuan": {
-    "facet": "place",
-    "parent": "china",
-    "synonyms": []
   },
   "silicon valley": {
     "facet": "place",
@@ -2071,6 +2096,12 @@
     "facet": "season",
     "synonyms": []
   },
+  "squid": {
+    "facet": "animal",
+    "synonyms": [
+      "squids"
+    ]
+  },
   "station": {
     "facet": "subject",
     "synonyms": [
@@ -2164,11 +2195,9 @@
   "tea": {
     "facet": "food",
     "synonyms": [
-      "bubble tea",
       "matcha",
       "macha",
-      "chagee",
-      "tapioca"
+      "chagee"
     ]
   },
   "temple": {
@@ -2222,6 +2251,12 @@
     "synonyms": [
       "scarborough",
       "markham"
+    ]
+  },
+  "toucan": {
+    "facet": "animal",
+    "synonyms": [
+      "toucans"
     ]
   },
   "tower": {

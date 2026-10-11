@@ -24,7 +24,7 @@
 	document.getElementById('photo-explore-seeds').content.querySelectorAll('[data-tag]').forEach(function(a) {
 		titles[a.dataset.tag] = a.dataset.title;
 	});
-	var trips = {}, tags = [], photos = null, covers = [], failed = false, tiers;
+	var trips = {}, tags = [], photos = null, coverTopics = {}, failed = false, tiers;
 	var timer = 0, saveTimer = 0, limit = PAGE, collapsed = false, tripFilter = '';
 
 	function fold(value) {
@@ -101,11 +101,18 @@
 			].map(function(text) { return unique(tokens(text)); });
 			return photo;
 		});
-		// Never fall back to contextual search tags for a discovery cover.
-		covers = (data.covers || []).map(function(cover) {
-			var photo = photos.find(function(p) { return p.id === cover.id; });
-			return photo && Object.assign({}, photo, { tags: cover.tags, fx: cover.fx, fy: cover.fy });
-		}).filter(Boolean);
+		// Tuples reference this index's photos and their tags, avoiding repeated
+		// paths/words. Omitted crop coordinates mean 50%, not the search crop.
+		// Group once: shuffling must not rescan every photo for every topic.
+		coverTopics = {};
+		(data.covers || []).forEach(function(row) {
+			var photo = photos[row[0]];
+			var cover = Object.assign({}, photo, {
+				tags: row[1].map(function(i) { return photo.tags[i]; }),
+				fx: row.length > 2 ? row[2] : 50, fy: row.length > 2 ? row[3] : 50
+			});
+			cover.tags.forEach(function(tag) { (coverTopics[tag] || (coverTopics[tag] = [])).push(cover); });
+		});
 	}
 
 	function rank(hits) {
@@ -197,7 +204,7 @@
 		var previous = explore.map(function(tag) { return tag.tag; }), groups = {};
 		try { if (!previous.length) previous = JSON.parse(sessionStorage.getItem('photo-search-explore')) || []; } catch (e) {}
 		if (!Array.isArray(previous)) previous = [];
-		var reviewed = tags.filter(function(tag) { return covers.some(function(photo) { return photo.tags.indexOf(tag.tag) >= 0; }); });
+		var reviewed = tags.filter(function(tag) { return coverTopics[tag.tag]; });
 		var pool = reviewed.filter(function(tag) { return previous.indexOf(tag.tag) < 0; });
 		if (pool.length < 6) pool = reviewed;
 		shuffle(pool).forEach(function(tag) { (groups[tag.facet] || (groups[tag.facet] = [])).push(tag); });
@@ -206,7 +213,7 @@
 		while (facets.length && explore.length < 6) {
 			var facet = facets.shift();
 			var tag = groups[facet].pop().tag;
-			var candidates = shuffle(covers.filter(function(photo) { return photo.tags.indexOf(tag) >= 0; }));
+			var candidates = shuffle(coverTopics[tag].slice());
 			var unused = candidates.filter(function(photo) { return !explore.some(function(item) { return item.photo.id === photo.id; }); });
 			if (!unused.length) { if (groups[facet].length) facets.push(facet); continue; }
 			var varied = unused.filter(function(photo) { return !explore.some(function(item) { return item.photo.trip === photo.trip; }); });

@@ -366,6 +366,7 @@
   "2019_sv/MARIN_cliff_jump": [
     "blue sky",
     "california",
+    "cloudy",
     "hiking",
     "marin headlands",
     "north america",
@@ -446,6 +447,7 @@
     "north america",
     "shopping",
     "solo",
+    "souvenir",
     "usa"
   ],
   "2019_sv/MONTEREY_point_lobos": [
@@ -522,6 +524,7 @@
     "architecture",
     "blue sky",
     "california",
+    "city street",
     "north america",
     "san francisco",
     "skyscraper",
@@ -1815,6 +1818,7 @@
     "zurich"
   ],
   "2022_europe/day8/zurich9": [
+    "architecture",
     "autumn",
     "autumn leaves",
     "blue sky",
@@ -2699,8 +2703,8 @@
   "2023_perth/day5/lobster_shack_02": [
     "australia",
     "cervantes",
-    "crab",
     "interior",
+    "lobster",
     "oceania",
     "photo spot",
     "seafood",
@@ -2753,6 +2757,7 @@
   "2023_perth/day5/pinnacles_05": [
     "australia",
     "blue sky",
+    "cloudy",
     "desert",
     "oceania",
     "pinnacles",
@@ -2867,6 +2872,7 @@
   "2023_perth/day6/kalbarri_06": [
     "australia",
     "blue sky",
+    "cloudy",
     "kalbarri",
     "oceania",
     "park",
@@ -2972,6 +2978,7 @@
     "oceania",
     "old town",
     "solo",
+    "tree",
     "western australia",
     "winter"
   ],
@@ -3755,8 +3762,8 @@
   "2023_usa_canada/day12/zoo10": [
     "autumn",
     "canada",
-    "crab",
     "interior",
+    "lobster",
     "north america",
     "ontario",
     "toronto",
@@ -3787,7 +3794,7 @@
   "2023_usa_canada/day12/zoo13": [
     "autumn",
     "canada",
-    "crab",
+    "crayfish",
     "interior",
     "north america",
     "ontario",
@@ -4881,6 +4888,7 @@
     "architecture",
     "autumn",
     "blue sky",
+    "clock",
     "manhattan",
     "new york",
     "north america",
@@ -5506,6 +5514,7 @@
     "manhattan",
     "new york",
     "north america",
+    "selfie",
     "show",
     "us",
     "usa"
@@ -5618,9 +5627,9 @@
     "aquarium",
     "autumn",
     "boston",
-    "crab",
     "fish",
     "interior",
+    "lobster",
     "massachusetts",
     "north america",
     "usa"
@@ -5803,6 +5812,7 @@
     "boston",
     "dining",
     "food",
+    "fries",
     "massachusetts",
     "north america",
     "sandwich",
@@ -6463,6 +6473,7 @@
   "2024_australia/melbourne_grampians/mackenzie2": [
     "australia",
     "blue sky",
+    "cloudy",
     "grampians",
     "hiking",
     "honeymoon",
@@ -6544,6 +6555,7 @@
     "burger",
     "dining",
     "food",
+    "fries",
     "honeymoon",
     "melbourne",
     "oceania",
@@ -7056,6 +7068,7 @@
     "wollongong"
   ],
   "2024_australia/sydney_wollongong/kembla1": [
+    "art",
     "australia",
     "cloudy",
     "coast",
@@ -7521,7 +7534,8 @@
     "europe",
     "germany",
     "river",
-    "spring"
+    "spring",
+    "tree"
   ],
   "2024_germany/dusseldorf/dusseldorf5": [
     "architecture",
@@ -7779,6 +7793,7 @@
     "japanese alps",
     "mountain",
     "old town",
+    "rainbow",
     "shirakawa-go"
   ],
   "2025_japan/day10_shirakawa/shirakawa2": [
@@ -7993,9 +8008,9 @@
     "aquarium",
     "asia",
     "autumn",
-    "fish",
     "ikebukuro",
     "japan",
+    "squid",
     "tokyo"
   ],
   "2025_japan/day13_tokyo/tokyo4": [
@@ -8506,6 +8521,7 @@
   "2025_japan/day4_nara/osaka3": [
     "asia",
     "autumn",
+    "bubble tea",
     "city street",
     "drinks",
     "japan",
@@ -8513,8 +8529,7 @@
     "nara",
     "osaka",
     "shopping",
-    "solo",
-    "tea"
+    "solo"
   ],
   "2025_japan/day4_nara/osaka5": [
     "asia",
@@ -8979,6 +8994,7 @@
     "cafe",
     "coffee",
     "curry",
+    "dining",
     "food",
     "japan",
     "kansai",
@@ -9372,6 +9388,7 @@
     "guangzhou",
     "panyu",
     "park",
+    "sculpture",
     "spring",
     "zoo"
   ],
@@ -9392,8 +9409,8 @@
     "guangzhou",
     "panyu",
     "park",
-    "parrot",
     "spring",
+    "toucan",
     "zoo"
   ],
   "2026_guangzhou/day3/yuexiu-cat": [
@@ -9618,6 +9635,7 @@
     "asia",
     "breakfast",
     "china",
+    "drinks",
     "food",
     "fruit",
     "guangzhou",
@@ -10358,6 +10376,7 @@
     "chengdu",
     "china",
     "city street",
-    "sichuan"
+    "sichuan",
+    "street art"
   ]
 }

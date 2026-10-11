@@ -887,9 +887,17 @@ foreach ($review in $exploreReviews) {
     $cover.FocusY = [double]$review.fy
     $exploreCoverPhotos.Add($cover)
 }
+# Compact tuples: [photo index, positions in that photo's tags, optional fx, fy].
+# All references are generated together; the source review retains stable ids,
+# thumbnail hashes and explicit crops. Missing coordinates mean 50% / 50%.
+$photoPositions = @{}
+for ($i = 0; $i -lt $photoEntries.Count; $i++) { $photoPositions[$photoEntries[$i].Id] = $i }
 $photoIndexCovers = foreach ($cover in $exploreCoverPhotos) {
-    $coverTags = @($cover.Tags | ForEach-Object { ConvertTo-JsonString $_ }) -join ','
-    '{"id":' + (ConvertTo-JsonString $cover.Id) + ',"fx":' + $cover.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + ',"fy":' + $cover.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) + ',"tags":[' + $coverTags + ']}'
+    $position = $photoPositions[$cover.Id]
+    $photo = $photoEntries[$position]
+    $coverTags = @($cover.Tags | ForEach-Object { [Array]::IndexOf($photo.Tags, $_) }) -join ','
+    $focus = if ($cover.FocusX -ne 50 -or $cover.FocusY -ne 50) { ',' + $cover.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + ',' + $cover.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) } else { '' }
+    '[' + $position + ',[' + $coverTags + ']' + $focus + ']'
 }
 $photoIndexTrips = foreach ($journal in $journalManifest) {
     $year = if ($journal.slug -match '_(\d{4})_') { $Matches[1] } else { '0' }
@@ -908,7 +916,7 @@ $photoIndexPhotos = foreach ($entry in $photoEntries) {
         ',"sectionTitle":' + (ConvertTo-JsonString $entry.SectionTitle) + ',"place":' + (ConvertTo-JsonString $entry.Place) + ',"caption":' + (ConvertTo-JsonString $entry.Caption) +
         ',"alt":' + (ConvertTo-JsonString $entry.Alt) + ',"tags":[' + $tags + '],"video":' + $video + $focus + '}'
 }
-$photoIndexJson = '{"version":1,"trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + '],"covers":[' + ($photoIndexCovers -join ',') + "]}`n"
+$photoIndexJson = '{"version":2,"trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + '],"covers":[' + ($photoIndexCovers -join ',') + "]}`n"
 $assetVersions['assets/data/photo-index.json'] = Get-ContentVersion $photoIndexJson
 
 # Small, inert postcard seeds make discovery available without fetching the

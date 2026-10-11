@@ -313,12 +313,22 @@ try {
 } catch {
     throw "assets/data/photo-index.json does not parse: $($_.Exception.Message)"
 }
-if ($photoIndex.version -ne 1) { throw 'assets/data/photo-index.json must declare version 1.' }
+if ($photoIndex.version -ne 2) { throw 'assets/data/photo-index.json must declare version 2 (compact reviewed covers).' }
 $coverReviews = @(Get-Content -LiteralPath (Join-Path $root 'journals/explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json)
 if (@($photoIndex.covers).Count -ne $coverReviews.Count) { throw 'The photo index must include every reviewed discovery cover.' }
-foreach ($cover in $photoIndex.covers) {
+$publishedCovers = @{}
+foreach ($row in $photoIndex.covers) {
+    if ($row.Count -notin @(2, 4) -or ($row[0] -isnot [int] -and $row[0] -isnot [long]) -or $row[0] -lt 0 -or $row[0] -ge $photoIndex.photos.Count -or @($row[1]).Count -eq 0) { throw 'Invalid compact discovery cover.' }
+    $photo = $photoIndex.photos[$row[0]]
+    $topics = @(foreach ($position in $row[1]) {
+        if (($position -isnot [int] -and $position -isnot [long]) -or $position -lt 0 -or $position -ge $photo.tags.Count) { throw "Invalid discovery topic reference: $($photo.id)" }
+        $photo.tags[$position]
+    })
+    $cover = [pscustomobject]@{ id = $photo.id; tags = $topics; fx = 50; fy = 50 }
+    if ($row.Count -eq 4) { $cover.fx = $row[2]; $cover.fy = $row[3] }
+    if ($publishedCovers.ContainsKey($cover.id)) { throw "Duplicate discovery cover: $($cover.id)" }
+    $publishedCovers[$cover.id] = $cover
     $review = $coverReviews | Where-Object { $_.id -ceq $cover.id } | Select-Object -First 1
-    $photo = $photoIndex.photos | Where-Object { $_.id -ceq $cover.id } | Select-Object -First 1
     if (-not $review -or -not $photo -or $photo.video -or $review.thumb -cne $photo.thumb -or $cover.fx -ne $review.fx -or $cover.fy -ne $review.fy -or ($cover.tags -join '|') -cne ($review.tags -join '|')) {
         throw "Discovery cover no longer matches its visual review: $($cover.id)"
     }
@@ -328,7 +338,7 @@ $coverTemplate = [regex]::Match($travel, '(?s)<template id="photo-explore-seeds"
 foreach ($card in [regex]::Matches($coverTemplate, '(?s)<a\b.*?</a>')) {
     $id = [System.Net.WebUtility]::HtmlDecode([regex]::Match($card.Value, 'data-cover-id="([^"]+)"').Groups[1].Value)
     $tag = [System.Net.WebUtility]::HtmlDecode([regex]::Match($card.Value, 'data-tag="([^"]+)"').Groups[1].Value)
-    $cover = $photoIndex.covers | Where-Object { $_.id -ceq $id } | Select-Object -First 1
+    $cover = $publishedCovers[$id]
     if (-not $cover -or $cover.tags -cnotcontains $tag) { throw "Initial postcard has no visual review for its topic: $id / $tag" }
 }
 $tagVocabulary = Get-Content -LiteralPath (Join-Path $root 'journals\tag-vocabulary.json') -Raw -Encoding UTF8 | ConvertFrom-Json

@@ -5,6 +5,7 @@ const vm = require('node:vm');
 const path = require('node:path');
 const root = path.resolve(__dirname, '../..');
 const index = JSON.parse(fs.readFileSync(path.join(root, 'dist/assets/data/photo-index.json'), 'utf8'));
+const reviews = JSON.parse(fs.readFileSync(path.join(root, 'journals/explore-covers.json'), 'utf8'));
 
 function setup(saved = {}) {
   const node = () => ({ value: '', hidden: false, innerHTML: '', textContent: '', dataset: {},
@@ -66,7 +67,7 @@ test('every exploration candidate has at least one full-match photo', () => {
 
 test('discovery only uses visually reviewed topic/crop pairs, including after repeated shuffles', () => {
   const api = setup();
-  const reviewed = new Map(index.covers.map(c => [c.id, c]));
+  const reviewed = new Map(reviews.map(c => [c.id, c]));
   for (let i = 0; i < 150; i++) {
     api.exploreMore();
     assert.equal(api.getExplore().length, 6);
@@ -80,10 +81,44 @@ test('discovery only uses visually reviewed topic/crop pairs, including after re
   // The original has tea cups, but its search thumbnail crops them out.
   const ramen = index.photos.find(p => p.id === '2023_perth/day3/bariuma_ramen');
   assert.ok(ramen.tags.includes('tea'));
-  assert.ok(!index.covers.some(c => c.id === ramen.id && c.tags.includes('tea')));
-  const tea = index.covers.filter(c => c.tags.includes('tea'));
+  assert.ok(!reviews.some(c => c.id === ramen.id && c.tags.includes('tea')));
+  const tea = reviews.filter(c => c.tags.includes('tea'));
   assert.ok(tea.length > 0);
   assert.ok(tea.every(c => c.id !== ramen.id));
+});
+
+test('compact cover references round-trip every reviewed topic and focal point', () => {
+  assert.equal(index.version, 2);
+  const decoded = index.covers.map(([position, topics, fx = 50, fy = 50]) => {
+    const photo = index.photos[position];
+    assert.ok(photo && !photo.video);
+    return { id: photo.id, tags: topics.map(i => photo.tags[i]), fx, fy };
+  });
+  assert.deepEqual(decoded, reviews.map(({ id, tags, fx, fy }) => ({ id, tags, fx, fy })));
+  assert.equal(new Set(decoded.map(c => c.id)).size, decoded.length);
+  assert.ok(fs.statSync(path.join(root, 'dist/assets/data/photo-index.json')).size <= 480 * 1024);
+});
+
+test('bubble tea is its own topic and misidentified animals are corrected', () => {
+  const bubble = reviews.find(c => c.id === '2025_japan/day4_nara/osaka3');
+  assert.ok(bubble.tags.includes('bubble tea'));
+  assert.ok(!bubble.tags.includes('tea'));
+  const api = setup();
+  assert.ok(api.search(api.tokens('bubble tea'))[0].some(h => h.photo.id === bubble.id));
+  assert.ok(api.search(api.tokens('boba'))[0].some(h => h.photo.id === bubble.id));
+  assert.ok(api.search(api.tokens('bubble tea'))[0].every(h => h.photo.tags.includes('bubble tea')));
+  for (const [id, correct, wrong] of [
+    ['2023_perth/day5/lobster_shack_02', 'lobster', 'crab'],
+    ['2025_japan/day13_tokyo/tokyo3', 'squid', 'fish'],
+    ['2026_guangzhou/day3/toucan', 'toucan', 'parrot']
+  ]) {
+    const cover = reviews.find(c => c.id === id);
+    assert.ok(cover.tags.includes(correct));
+    assert.ok(!index.photos.find(p => p.id === id).tags.includes(wrong));
+  }
+  const model = reviews.find(c => c.id === '2026_chengdu_zhangjiajie/day3/brick-hotpot-diner');
+  assert.ok(model && model.tags.includes('miniature'));
+  assert.ok(!model.tags.includes('hotpot'));
 });
 
 test('phrase completion preserves earlier context and does not repeat words', () => {

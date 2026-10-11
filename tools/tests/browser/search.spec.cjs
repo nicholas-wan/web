@@ -127,7 +127,8 @@ test('initial and shuffled postcards render the reviewed thumbnail and crop for 
     })));
     expect(rendered).toHaveLength(6);
     for (const card of rendered) {
-      const cover = data.covers.find(c => c.id === card.id);
+      const row = data.covers.find(c => data.photos[c[0]].id === card.id);
+      const cover = { tags: row[1].map(i => data.photos[row[0]].tags[i]), fx: row[2] ?? 50, fy: row[3] ?? 50 };
       expect(cover.tags).toContain(card.tag);
       expect(card.src).toBe(data.photos.find(p => p.id === card.id).thumb);
       expect(card.crop).toBe(`${cover.fx}% ${cover.fy}%`);
