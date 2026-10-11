@@ -3573,7 +3573,7 @@ body.is-map-fullscreen #return-to-top {
 /* A day with one photo shows it as a feature image instead of one quarter-width
    tile beside three empty columns (Oct 2026). */
 .travel-gallery--compact.travel-gallery--single {
-  max-width: 34rem;
+  max-width: 24rem;
   grid-template-columns: minmax(0, 1fr);
 }
 
