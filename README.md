@@ -5,7 +5,7 @@ Static personal site. `tools/site/build.ps1` generates `dist/` from the root pag
 ## Commands
 
 ```powershell
-.\tools\site.ps1 check          # clean build + verification, same as CI
+powershell.exe -NoProfile -File tools/site.ps1 check  # clean build + verification, CI's PowerShell 5.1
 .\tools\site.ps1 build          # build only (-Clean to start fresh)
 .\tools\site.ps1 verify         # verify an existing dist/
 node tools/preview-server.mjs   # preview dist/ at http://localhost:4321
@@ -22,6 +22,8 @@ Use the preview server, not a plain static server: the site's extensionless page
 - `tools/` build, verification, image, map and font tooling
 - `docs/` build notes, UX contracts and the photo-edit register
 - `dist/` generated output; never edit or commit it
+
+Travel discovery shows six postcards at a time from visually reviewed photos; the full search index loads only on interaction. See [journals/README.md](journals/README.md) for journal and postcard editing.
 
 ## Editing photos
 

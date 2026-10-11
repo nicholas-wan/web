@@ -16,3 +16,9 @@ To add a journal:
 8. Run the normal clean build and verification workflow.
 
 All current travel journals now live in this directory and use the `contentOnly` contract. The build still supports the retired full-page source format for compatibility, but new and updated journals should remain content fragments. Guangzhou is the reference compact implementation. Every generated journal is rendered through the shared journal partial.
+
+## Discovery postcards
+
+`photo-tags.json` and `tag-vocabulary.json` power search; only reviewed photo/topic pairs in `explore-covers.json` qualify as postcard covers. Check that each named subject is visible in the actual 8:5 crop, use specific labels such as **bubble tea**, and record the thumbnail hash and focal point. Re-review any changed image before updating its hash.
+
+`explore-themes.json` supplies the small starter set; Another mix uses the full reviewed pool. Keep six cards per batch and the existing lazy-loading and size budgets. See [the build guide](../docs/build.md) for validation and index details.
