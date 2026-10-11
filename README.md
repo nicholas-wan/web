@@ -34,4 +34,6 @@ Preview the generated site with `node tools/preview-server.mjs` (port 4321, also
 
 Edit the original under `images/` (or its `images-webp/` overlay), delete that photo's `-480`/`-800`/`-1200` siblings, run `python .\tools\images\make-responsive-variants.py`, then restore any sibling of an unedited photo that the tool re-encoded. Gallery tiles crop every photo to a fixed shape, so adjust the tile's `--focus-x`/`--focus-y` before cropping pixels. Keep near-duplicate photos; they are deliberate. Details are in [docs/build.md](docs/build.md#asset-tooling).
 
+Travel-journal colour grades and AI removals are done journal by journal (newest first) and tracked per photo in [docs/photo-edits.csv](docs/photo-edits.csv). Each row records the colour and removal state and the commit it shipped in. Colour and removals ship as separate commits. Removals change only the masked area and never touch the people in the photo; any removal that won't fill cleanly is skipped.
+
 See [docs/build.md](docs/build.md) for build and deployment details and [docs/project-context.md](docs/project-context.md) for the site's maintained behavior contracts.
