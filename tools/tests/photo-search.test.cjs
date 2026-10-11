@@ -64,6 +64,28 @@ test('every exploration candidate has at least one full-match photo', () => {
   }
 });
 
+test('discovery only uses visually reviewed topic/crop pairs, including after repeated shuffles', () => {
+  const api = setup();
+  const reviewed = new Map(index.covers.map(c => [c.id, c]));
+  for (let i = 0; i < 150; i++) {
+    api.exploreMore();
+    assert.equal(api.getExplore().length, 6);
+    for (const { tag, photo } of api.getExplore()) {
+      const cover = reviewed.get(photo.id);
+      assert.ok(cover && cover.tags.includes(tag), `${tag}: ${photo.id}`);
+      assert.equal(photo.fx, cover.fx);
+      assert.equal(photo.fy, cover.fy);
+    }
+  }
+  // The original has tea cups, but its search thumbnail crops them out.
+  const ramen = index.photos.find(p => p.id === '2023_perth/day3/bariuma_ramen');
+  assert.ok(ramen.tags.includes('tea'));
+  assert.ok(!index.covers.some(c => c.id === ramen.id && c.tags.includes('tea')));
+  const tea = index.covers.filter(c => c.tags.includes('tea'));
+  assert.ok(tea.length > 0);
+  assert.ok(tea.every(c => c.id !== ramen.id));
+});
+
 test('phrase completion preserves earlier context and does not repeat words', () => {
   const api = setup(), fuji = api.getTags().find(t => t.tag === 'mount fuji');
   assert.equal(api.completeTag('mount f', fuji).value, 'mount fuji');

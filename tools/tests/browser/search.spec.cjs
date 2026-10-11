@@ -109,6 +109,37 @@ test('postcards and journal links remain available without JavaScript', async ({
   await context.close();
 });
 
+test('initial and shuffled postcards render the reviewed thumbnail and crop for their topic', async ({ page }) => {
+  await page.addInitScript(() => { Math.random = () => 0; sessionStorage.removeItem('photo-search-explore'); });
+  await page.goto('/travel');
+  const indexUrl = await page.locator('#photo-search').getAttribute('data-search-index');
+  const data = await (await page.request.get('/' + indexUrl)).json();
+  const cards = page.locator('.photo-explore__cards .photo-explore__card');
+  await expect(cards).toHaveCount(6);
+  const tea = page.locator('.photo-explore__cards [data-tag="tea"]');
+  await expect(tea).toHaveCount(1);
+  await expect(tea).not.toHaveAttribute('data-cover-id', '2023_perth/day3/bariuma_ramen');
+  for (let batch = 0; batch < 2; batch++) {
+    const rendered = await cards.evaluateAll(es => es.map(e => ({
+      id: e.dataset.coverId, tag: e.dataset.tag, src: e.querySelector('img').getAttribute('src'),
+      crop: getComputedStyle(e.querySelector('img')).objectPosition,
+      caption: e.querySelector('.photo-explore__caption').textContent
+    })));
+    expect(rendered).toHaveLength(6);
+    for (const card of rendered) {
+      const cover = data.covers.find(c => c.id === card.id);
+      expect(cover.tags).toContain(card.tag);
+      expect(card.src).toBe(data.photos.find(p => p.id === card.id).thumb);
+      expect(card.crop).toBe(`${cover.fx}% ${cover.fy}%`);
+      expect(card.caption).not.toContain('Photo:');
+    }
+    if (!batch) {
+      await page.getByRole('button', { name: 'Another mix' }).click();
+      await expect(page.locator('#photo-search-status')).toHaveText('Six new photo topics to explore.');
+    }
+  }
+});
+
 test('corrupt recent storage, IME composition and restored URL queries', async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('photo-search-recent', '{}'));
   await page.goto('/travel?q=penguin');

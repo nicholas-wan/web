@@ -862,6 +862,35 @@ $photoTagCounts = @{}
 foreach ($entry in $photoEntries) {
     foreach ($tag in $entry.Tags) { $photoTagCounts[$tag] = 1 + [int]$photoTagCounts[$tag] }
 }
+# Search tags include contextual subjects that may be outside a thumbnail crop.
+# Discovery is stricter: only manually reviewed image/topic/crop pairs qualify.
+$exploreReviews = @(Get-Content -LiteralPath (Join-Path $root 'journals\explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json)
+$exploreCoverPhotos = [System.Collections.Generic.List[object]]::new()
+$exploreIds = @{}
+foreach ($review in $exploreReviews) {
+    $photo = $photoEntries | Where-Object { $_.Id -ceq $review.id } | Select-Object -First 1
+    if (-not $photo -or $photo.Video -or $exploreIds[$review.id]) { throw "Invalid or duplicate reviewed postcard: $($review.id)" }
+    $exploreIds[$review.id] = $true
+    $source = Resolve-SourceImagePath $photo.Thumb
+    if ($review.thumb -cne $photo.Thumb -or -not $source -or (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -ine $review.sha256) {
+        throw "Postcard image changed; visually review its crop before updating explore-covers.json: $($review.id)"
+    }
+    if ($null -eq $review.fx -or $null -eq $review.fy -or $review.fx -lt 0 -or $review.fx -gt 100 -or $review.fy -lt 0 -or $review.fy -gt 100 -or -not @($review.tags).Count) {
+        throw "Invalid reviewed postcard crop or topics: $($review.id)"
+    }
+    foreach ($tag in $review.tags) {
+        if ($photo.Tags -cnotcontains $tag) { throw "Reviewed postcard topic no longer matches the photo index: $($review.id) / $tag" }
+    }
+    $cover = $photo.PSObject.Copy()
+    $cover.Tags = @($review.tags)
+    $cover.FocusX = [double]$review.fx
+    $cover.FocusY = [double]$review.fy
+    $exploreCoverPhotos.Add($cover)
+}
+$photoIndexCovers = foreach ($cover in $exploreCoverPhotos) {
+    $coverTags = @($cover.Tags | ForEach-Object { ConvertTo-JsonString $_ }) -join ','
+    '{"id":' + (ConvertTo-JsonString $cover.Id) + ',"fx":' + $cover.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + ',"fy":' + $cover.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) + ',"tags":[' + $coverTags + ']}'
+}
 $photoIndexTrips = foreach ($journal in $journalManifest) {
     $year = if ($journal.slug -match '_(\d{4})_') { $Matches[1] } else { '0' }
     '{"slug":' + (ConvertTo-JsonString $journal.slug) + ',"label":' + (ConvertTo-JsonString $journal.label) + ',"order":' + [int]$journal.order + ',"year":' + $year + '}'
@@ -879,7 +908,7 @@ $photoIndexPhotos = foreach ($entry in $photoEntries) {
         ',"sectionTitle":' + (ConvertTo-JsonString $entry.SectionTitle) + ',"place":' + (ConvertTo-JsonString $entry.Place) + ',"caption":' + (ConvertTo-JsonString $entry.Caption) +
         ',"alt":' + (ConvertTo-JsonString $entry.Alt) + ',"tags":[' + $tags + '],"video":' + $video + $focus + '}'
 }
-$photoIndexJson = '{"version":1,"trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + "]}`n"
+$photoIndexJson = '{"version":1,"trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + '],"covers":[' + ($photoIndexCovers -join ',') + "]}`n"
 $assetVersions['assets/data/photo-index.json'] = Get-ContentVersion $photoIndexJson
 
 # Small, inert postcard seeds make discovery available without fetching the
@@ -891,18 +920,18 @@ $exploreFallback = [System.Collections.Generic.List[string]]::new()
 $exploreCards = @(foreach ($theme in $exploreThemes.PSObject.Properties) {
     $tag = $theme.Name
     if (-not $photoTagCounts[$tag]) { throw "Explore theme has no photos: $tag" }
-    $photo = $photoEntries | Where-Object { $_.Tags -contains $tag -and -not $_.Video -and -not $exploreUsedPhotos[$_.Id] } |
+    $photo = $exploreCoverPhotos | Where-Object { $_.Tags -contains $tag -and -not $exploreUsedPhotos[$_.Id] } |
         Sort-Object @{ Expression = { [int]$exploreTripCounts[$_.Trip] } }, @{ Expression = { if ($_.Width -ge $_.Height) { 0 } else { 1 } } } | Select-Object -First 1
-    if (-not $photo) { throw "Explore theme needs a distinct still photo: $tag" }
+    if (-not $photo) { throw "Explore theme needs a distinct visually reviewed cover: $tag" }
     $exploreUsedPhotos[$photo.Id] = $true
     $exploreTripCounts[$photo.Trip] = 1 + [int]$exploreTripCounts[$photo.Trip]
     $name = [System.Net.WebUtility]::HtmlEncode($tag)
     $title = [System.Net.WebUtility]::HtmlEncode($theme.Value)
     $alt = [System.Net.WebUtility]::HtmlEncode($photo.Alt)
     $photoYear = if ($photo.Trip -match '_(\d{4})_') { $Matches[1] } else { '' }
-    $photoContext = [System.Net.WebUtility]::HtmlEncode('Photo: ' + $photo.Place + ' · ' + $photoYear)
+    $photoContext = [System.Net.WebUtility]::HtmlEncode($photo.Place + ' · ' + $photoYear)
     $focus = $photo.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + '% ' + $photo.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) + '%'
-    $card = '<a class="photo-explore__card" data-explore-action="tag" data-tag="' + $name + '" data-title="' + $title + '" href="travel?q=' + [uri]::EscapeDataString($tag) + '">' +
+    $card = '<a class="photo-explore__card" data-cover-id="' + [System.Net.WebUtility]::HtmlEncode($photo.Id) + '" data-explore-action="tag" data-tag="' + $name + '" data-title="' + $title + '" href="travel?q=' + [uri]::EscapeDataString($tag) + '">' +
         '<img src="' + $photo.Thumb + '" alt="' + $alt + '" width="' + $photo.Width + '" height="' + $photo.Height + '" loading="lazy" decoding="async" style="object-position:' + $focus + '">' +
         '<span class="photo-explore__caption"><strong>' + $title + '</strong><span><span>' + $photoContext + '</span><span aria-hidden="true">&#8599;</span></span></span></a>'
     $exploreFallback.Add(($card -replace 'href="[^"]+"', ('href="' + $photo.Trip + '#' + $photo.Section + '"')))

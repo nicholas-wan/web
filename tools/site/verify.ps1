@@ -314,6 +314,23 @@ try {
     throw "assets/data/photo-index.json does not parse: $($_.Exception.Message)"
 }
 if ($photoIndex.version -ne 1) { throw 'assets/data/photo-index.json must declare version 1.' }
+$coverReviews = @(Get-Content -LiteralPath (Join-Path $root 'journals/explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json)
+if (@($photoIndex.covers).Count -ne $coverReviews.Count) { throw 'The photo index must include every reviewed discovery cover.' }
+foreach ($cover in $photoIndex.covers) {
+    $review = $coverReviews | Where-Object { $_.id -ceq $cover.id } | Select-Object -First 1
+    $photo = $photoIndex.photos | Where-Object { $_.id -ceq $cover.id } | Select-Object -First 1
+    if (-not $review -or -not $photo -or $photo.video -or $review.thumb -cne $photo.thumb -or $cover.fx -ne $review.fx -or $cover.fy -ne $review.fy -or ($cover.tags -join '|') -cne ($review.tags -join '|')) {
+        throw "Discovery cover no longer matches its visual review: $($cover.id)"
+    }
+    if ((Get-FileHash -LiteralPath (Join-Path $dist $photo.thumb) -Algorithm SHA256).Hash -ine $review.sha256) { throw "Published discovery thumbnail changed since visual review: $($cover.id)" }
+}
+$coverTemplate = [regex]::Match($travel, '(?s)<template id="photo-explore-seeds">(.*?)</template>').Groups[1].Value
+foreach ($card in [regex]::Matches($coverTemplate, '(?s)<a\b.*?</a>')) {
+    $id = [System.Net.WebUtility]::HtmlDecode([regex]::Match($card.Value, 'data-cover-id="([^"]+)"').Groups[1].Value)
+    $tag = [System.Net.WebUtility]::HtmlDecode([regex]::Match($card.Value, 'data-tag="([^"]+)"').Groups[1].Value)
+    $cover = $photoIndex.covers | Where-Object { $_.id -ceq $id } | Select-Object -First 1
+    if (-not $cover -or $cover.tags -cnotcontains $tag) { throw "Initial postcard has no visual review for its topic: $id / $tag" }
+}
 $tagVocabulary = Get-Content -LiteralPath (Join-Path $root 'journals\tag-vocabulary.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $vocabularyTags = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
 foreach ($property in $tagVocabulary.PSObject.Properties) { [void]$vocabularyTags.Add($property.Name) }

@@ -24,7 +24,7 @@
 	document.getElementById('photo-explore-seeds').content.querySelectorAll('[data-tag]').forEach(function(a) {
 		titles[a.dataset.tag] = a.dataset.title;
 	});
-	var trips = {}, tags = [], photos = null, failed = false, tiers;
+	var trips = {}, tags = [], photos = null, covers = [], failed = false, tiers;
 	var timer = 0, saveTimer = 0, limit = PAGE, collapsed = false, tripFilter = '';
 
 	function fold(value) {
@@ -101,6 +101,11 @@
 			].map(function(text) { return unique(tokens(text)); });
 			return photo;
 		});
+		// Never fall back to contextual search tags for a discovery cover.
+		covers = (data.covers || []).map(function(cover) {
+			var photo = photos.find(function(p) { return p.id === cover.id; });
+			return photo && Object.assign({}, photo, { tags: cover.tags, fx: cover.fx, fy: cover.fy });
+		}).filter(Boolean);
 	}
 
 	function rank(hits) {
@@ -192,15 +197,16 @@
 		var previous = explore.map(function(tag) { return tag.tag; }), groups = {};
 		try { if (!previous.length) previous = JSON.parse(sessionStorage.getItem('photo-search-explore')) || []; } catch (e) {}
 		if (!Array.isArray(previous)) previous = [];
-		var pool = tags.filter(function(tag) { return tag.count > 0 && previous.indexOf(tag.tag) < 0; });
-		if (pool.length < 6) pool = tags.filter(function(tag) { return tag.count > 0; });
+		var reviewed = tags.filter(function(tag) { return covers.some(function(photo) { return photo.tags.indexOf(tag.tag) >= 0; }); });
+		var pool = reviewed.filter(function(tag) { return previous.indexOf(tag.tag) < 0; });
+		if (pool.length < 6) pool = reviewed;
 		shuffle(pool).forEach(function(tag) { (groups[tag.facet] || (groups[tag.facet] = [])).push(tag); });
 		var facets = shuffle(Object.keys(groups));
 		explore = [];
 		while (facets.length && explore.length < 6) {
 			var facet = facets.shift();
 			var tag = groups[facet].pop().tag;
-			var candidates = shuffle(photos.filter(function(photo) { return photo.tags.indexOf(tag) >= 0; }));
+			var candidates = shuffle(covers.filter(function(photo) { return photo.tags.indexOf(tag) >= 0; }));
 			var unused = candidates.filter(function(photo) { return !explore.some(function(item) { return item.photo.id === photo.id; }); });
 			if (!unused.length) { if (groups[facet].length) facets.push(facet); continue; }
 			var varied = unused.filter(function(photo) { return !explore.some(function(item) { return item.photo.trip === photo.trip; }); });
@@ -219,8 +225,8 @@
 	function renderExplore() {
 		discovery.querySelector('.photo-explore__cards').innerHTML = explore.map(function(item) {
 			var title = titles[item.tag] || item.tag.replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); });
-			var context = 'Photo: ' + item.photo.place + ' · ' + trips[item.photo.trip].year;
-			return '<a class="photo-explore__card" data-explore-action="tag" data-tag="' + escape(item.tag) +
+			var context = item.photo.place + ' · ' + trips[item.photo.trip].year;
+			return '<a class="photo-explore__card" data-cover-id="' + escape(item.photo.id) + '" data-explore-action="tag" data-tag="' + escape(item.tag) +
 				'" href="travel?q=' + encodeURIComponent(item.tag) + '">' + thumbnail(item.photo) +
 				'<span class="photo-explore__caption"><strong>' + escape(title) + '</strong><span><span>' + escape(context) +
 				'</span><span aria-hidden="true">&#8599;</span></span></span></a>';
