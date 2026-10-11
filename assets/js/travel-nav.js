@@ -211,6 +211,21 @@
   });
   startAnchorLanding(true);
 
+  /* The strip's scrollbar is hidden, so flag the edges that hide more tabs;
+     the desktop CSS fades those edges. */
+  var edgeStrip = nav.querySelector('.travel-jump-groups');
+  if (edgeStrip) {
+    var markStripEdges = function () {
+      var hidden = edgeStrip.scrollWidth - edgeStrip.clientWidth;
+      edgeStrip.classList.toggle('has-more-start', edgeStrip.scrollLeft > 2);
+      edgeStrip.classList.toggle('has-more-end', edgeStrip.scrollLeft < hidden - 2);
+    };
+    edgeStrip.addEventListener('scroll', markStripEdges, { passive: true });
+    window.addEventListener('resize', markStripEdges);
+    if (document.fonts) document.fonts.ready.then(markStripEdges);
+    markStripEdges();
+  }
+
   var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#trip-section-"]'));
   var sections = links.map(function (link) {
     return document.getElementById(link.getAttribute('href').slice(1));
@@ -248,7 +263,7 @@
       else link.removeAttribute('aria-current');
     });
 
-    if (mobileNav.matches && activeSectionId !== section.id) {
+    if (activeSectionId !== section.id) {
       var activeLink = nav.querySelector('a[href="#' + section.id + '"]');
       if (activeLink) centreActiveLink(activeLink);
     }

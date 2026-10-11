@@ -3367,6 +3367,7 @@ body.is-map-fullscreen #return-to-top {
   display: flex;
   align-items: center;
   gap: 1rem;
+  margin-bottom: 1.5rem;
   white-space: nowrap;
 }
 
@@ -3390,12 +3391,18 @@ body.is-map-fullscreen #return-to-top {
   text-align: center;
 }
 
+/* Journals open closer to the section tabs than the theme's 4rem (Oct 2026);
+   phones keep main.css's own 2rem. */
+.travel-journal > .travel-journal__content {
+  padding-top: 2.5rem;
+}
+
 .travel-journal__title,
 .guangzhou-journal__location {
   margin: 0.85rem 0 0.35rem;
   color: var(--color-ink-900);
   font-family: var(--font-display);
-  font-size: clamp(2.25rem, 6vw, 4.5rem);
+  font-size: clamp(2.25rem, 6vw, 3.5rem);
   font-weight: 900;
   letter-spacing: 0.035em;
   line-height: 1;
@@ -5215,6 +5222,26 @@ body.is-map-fullscreen #return-to-top {
 
 .travel-jump-groups::-webkit-scrollbar {
   display: none;
+}
+
+/* The desktop strip hides its scrollbar, so travel-nav.js marks each edge
+   that hides more tabs and it fades there instead of cutting a tab mid-word.
+   Phones keep their own right-edge fade. */
+@media screen and (min-width: 981px) {
+  .travel-jump-groups.has-more-end {
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 3rem), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 3rem), transparent);
+  }
+
+  .travel-jump-groups.has-more-start {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 3rem);
+    mask-image: linear-gradient(90deg, transparent, #000 3rem);
+  }
+
+  .travel-jump-groups.has-more-start.has-more-end {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 3rem, #000 calc(100% - 3rem), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 3rem, #000 calc(100% - 3rem), transparent);
+  }
 }
 
 .travel-jump-group a {
