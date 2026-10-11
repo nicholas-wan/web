@@ -3413,7 +3413,7 @@ body.is-map-fullscreen #return-to-top {
 .travel-journal__hero-image,
 .guangzhou-journal__hero-image {
   position: relative;
-  max-height: 27rem;
+  max-height: 22rem;
   border-radius: var(--radius-card);
   overflow: hidden;
   box-shadow: var(--shadow-card);
@@ -3423,7 +3423,7 @@ body.is-map-fullscreen #return-to-top {
 .guangzhou-journal__hero-image img {
   display: block;
   width: 100%;
-  height: clamp(16rem, 34vw, 27rem);
+  height: clamp(16rem, 28vw, 22rem);
   margin: 0;
   object-fit: cover;
   object-position: var(--hero-focus-x, 50%) var(--hero-focus-y, 58%);
