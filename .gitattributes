@@ -5,6 +5,7 @@
 # See docs/project-context.md "Dead ends and hidden dependencies".
 *.js    text eol=lf
 *.mjs   text eol=lf
+*.cjs   text eol=lf
 *.css   text eol=lf
 *.scss  text eol=lf
 *.html  text eol=lf

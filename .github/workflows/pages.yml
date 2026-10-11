@@ -24,6 +24,29 @@ jobs:
         shell: powershell
         run: .\tools\site.ps1 check
 
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install rendered layout checks
+        working-directory: tools/tests/browser
+        run: |
+          npm ci
+          npx playwright install chromium
+
+      - name: Check travel layouts before publishing
+        working-directory: tools/tests/browser
+        run: npm test
+
+      - name: Save failed layout screenshots and traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: travel-layout-failures
+          path: tools/tests/browser/test-results
+          if-no-files-found: ignore
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 

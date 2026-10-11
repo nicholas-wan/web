@@ -346,12 +346,6 @@
       first.top < second.bottom + padding && first.bottom + padding > second.top;
   };
 
-  var overlapArea = function (first, second, padding) {
-    var width = Math.min(first.right, second.right + padding) - Math.max(first.left, second.left - padding);
-    var height = Math.min(first.bottom, second.bottom + padding) - Math.max(first.top, second.top - padding);
-    return Math.max(0, width) * Math.max(0, height);
-  };
-
   var LABEL_DIRECTIONS = [
     { x: 1, y: 0 }, { x: -1, y: 0 }, { x: 0, y: -1 }, { x: 0, y: 1 },
     { x: 1, y: -1 }, { x: -1, y: -1 }, { x: 1, y: 1 }, { x: -1, y: 1 }
@@ -382,74 +376,91 @@
     link.classList.remove('is-label-offscreen');
   };
 
-  /* Labels remain readable callouts while their dots retain true coordinates.
-     Try progressively wider placements and draw a thin leader back to each
-     marker instead of silently hiding later labels in a dense cluster. */
+  var labelList = document.createElement('div');
+  labelList.className = 'travel-map__label-list';
+  labelList.setAttribute('role', 'group');
+  labelList.setAttribute('aria-label', 'Destinations in this view');
+  labelList.hidden = true;
+  map.appendChild(labelList);
+
+  /* Use real rendered boxes, including controls. Never accept an overlap:
+     search the remaining free space, then offer a scrollable list if full. */
   var layoutLabels = function () {
-    labelLayoutFrame = 0;
-    labelLayoutTimer = 0;
-    var occupied = [];
-    detailLinks.forEach(function (link) { link.classList.remove('is-label-hidden', 'is-label-offscreen'); });
+    labelLayoutFrame = labelLayoutTimer = 0;
+    labelList.hidden = true;
+    labelList.replaceChildren();
+    map.classList.remove('is-label-list');
+    detailLinks.forEach(function (link) { link.classList.remove('is-label-offscreen'); });
     if (detailLevel === 'region' || (mobileMapQuery.matches && !isFullscreen)) return;
-
-    var viewportRect = viewport.getBoundingClientRect();
-    var viewportPadding = 5;
-
+    var bounds = viewport.getBoundingClientRect();
+    var occupied = Array.from(map.querySelectorAll('.travel-map__trip-picker, .travel-map__controls, .travel-map__close, .travel-map__regions, .travel-map__status, .travel-map__hint, .travel-map__detail-card')).filter(function (el) {
+      return !el.hidden && el.getBoundingClientRect().width && getComputedStyle(el).visibility !== 'hidden';
+    }).map(function (el) { return el.getBoundingClientRect(); });
+    var obstacles = occupied.slice();
+    var visible = [];
+    var failed = false;
     detailLinks.forEach(function (link) {
-      if (link.getAttribute('data-map-level') !== detailLevel) return;
-      if (activeTrip && link.getAttribute('data-map-trip') !== activeTrip) return;
+      if (link.getAttribute('data-map-level') !== detailLevel ||
+          (activeTrip && link.getAttribute('data-map-trip') !== activeTrip)) return;
       var label = link.querySelector('.travel-map__detail-label');
       var leader = link.querySelector('.travel-map__detail-leader');
-      var dot = link.querySelector('.travel-map__detail-dot');
-      if (!label || !leader || !dot) return;
-
-      var dotRect = dot.getBoundingClientRect();
-      var markerX = dotRect.left + dotRect.width / 2;
-      var markerY = dotRect.top + dotRect.height / 2;
-      if (markerX < viewportRect.left || markerX > viewportRect.right ||
-          markerY < viewportRect.top || markerY > viewportRect.bottom) {
+      // CSS positions labels from the link centre, not the larger selected dot.
+      var rect = link.getBoundingClientRect();
+      var x = rect.left + rect.width / 2, y = rect.top + rect.height / 2;
+      if (x < bounds.left || x > bounds.right || y < bounds.top || y > bounds.bottom) {
         link.classList.add('is-label-offscreen');
         return;
       }
-
-      var width = label.offsetWidth;
-      var height = label.offsetHeight;
-      var order = parseInt(link.getAttribute('data-label-order'), 10) || 0;
-      var candidates = [];
-      LABEL_DISTANCES.forEach(function (distance) {
-        LABEL_DIRECTIONS.forEach(function (_, directionIndex) {
-          var direction = LABEL_DIRECTIONS[(directionIndex + order) % LABEL_DIRECTIONS.length];
-          candidates.push(makeLabelCandidate(markerX, markerY, width, height, direction, distance));
+      visible.push(link);
+      var size = label.getBoundingClientRect();
+      var width = Math.ceil(size.width), height = Math.ceil(size.height);
+      var clear = function (box) {
+        return box.left >= bounds.left + 6 && box.right <= bounds.right - 6 &&
+          box.top >= bounds.top + 6 && box.bottom <= bounds.bottom - 6 &&
+          !occupied.some(function (other) { return boxesOverlap(box, other, 5); });
+      };
+      var selected;
+      LABEL_DISTANCES.some(function (distance) {
+        return LABEL_DIRECTIONS.some(function (direction) {
+          var box = makeLabelCandidate(x, y, width, height, direction, distance);
+          if (!clear(box)) return false;
+          selected = box;
+          return true;
         });
       });
-
-      var selected = candidates.find(function (candidate) {
-        var insideViewport = candidate.left >= viewportRect.left + viewportPadding &&
-          candidate.right <= viewportRect.right - viewportPadding &&
-          candidate.top >= viewportRect.top + viewportPadding &&
-          candidate.bottom <= viewportRect.bottom - viewportPadding;
-        return insideViewport && !occupied.some(function (accepted) {
-          return boxesOverlap(candidate, accepted, 4);
-        });
-      });
-
-      if (!selected) {
-        selected = candidates.reduce(function (best, candidate) {
-          var outside = Math.max(0, viewportRect.left + viewportPadding - candidate.left) +
-            Math.max(0, candidate.right - viewportRect.right + viewportPadding) +
-            Math.max(0, viewportRect.top + viewportPadding - candidate.top) +
-            Math.max(0, candidate.bottom - viewportRect.bottom + viewportPadding);
-          var collision = occupied.reduce(function (total, accepted) {
-            return total + overlapArea(candidate, accepted, 4);
-          }, 0);
-          var score = outside * 1000 + collision;
-          return !best || score < best.score ? { candidate: candidate, score: score } : best;
-        }, null).candidate;
+      // A finite local search can fail while distant space is still available.
+      for (var top = bounds.top + 6; !selected && top + height <= bounds.bottom - 6; top += 6) {
+        for (var left = bounds.left + 6; left + width <= bounds.right - 6; left += 6) {
+          var box = { left: left, top: top, right: left + width, bottom: top + height,
+            offsetX: left - x, offsetY: top - y };
+          if (clear(box)) { selected = box; break; }
+        }
       }
-
+      if (!selected) { failed = true; return; }
       applyLabelCandidate(link, label, leader, selected, width, height);
       occupied.push(selected);
     });
+    if (!failed) return;
+    // Keep the geographic dots. List every in-view destination in the largest
+    // control-free vertical band; scrolling preserves access in short windows.
+    var start = bounds.top + 6, best = { top: start, height: 0 };
+    obstacles.concat([{ top: bounds.bottom - 6, bottom: bounds.bottom }]).sort(function (a, b) {
+      return a.top - b.top;
+    }).forEach(function (box) {
+      if (box.top - start - 6 > best.height) best = { top: start, height: box.top - start - 6 };
+      start = Math.max(start, box.bottom + 6);
+    });
+    labelList.style.top = (best.top - map.getBoundingClientRect().top) + 'px';
+    labelList.style.maxHeight = Math.max(24, best.height) + 'px';
+    visible.forEach(function (link) {
+      var item = document.createElement('a');
+      item.href = link.href;
+      item.textContent = link.querySelector('.travel-map__detail-label').textContent;
+      item.addEventListener('click', function (event) { event.preventDefault(); link.click(); });
+      labelList.appendChild(item);
+    });
+    labelList.hidden = false;
+    map.classList.add('is-label-list');
   };
 
   var scheduleLabelLayout = function () {
@@ -725,6 +736,7 @@
     detailCard.classList.remove('is-visible');
     var finish = function () {
       detailCard.hidden = true;
+      scheduleLabelLayout();
       detailCardHideTimer = 0;
     };
     if (immediate === true || reducedMotionQuery.matches) finish();
@@ -935,6 +947,7 @@
       flyTo(point[3], point[4], MAX_SCALE, clearOffsetY, clearOffsetX);
     }
     detailCard.hidden = false;
+    scheduleLabelLayout();
     window.requestAnimationFrame(function () {
       detailCard.classList.add('is-visible');
       keepSelectedClearOfCard(link);
@@ -1351,7 +1364,7 @@
     viewport.scrollLeft = 0;
     viewport.scrollTop = 0;
     var marker = event.target.closest('.travel-map__marker, .travel-map__detail');
-    if (!marker || scale <= 1.001) return;
+    if (!marker || scale <= 1.001 || pointers.size) return;
     var transientScale = scale / committedScale;
     var markerX = marker.offsetLeft * transientScale + tx;
     var markerY = marker.offsetTop * transientScale + ty;
@@ -1379,5 +1392,7 @@
   createRouteLayer();
   createDetailPoints();
   resetView();
+  var labelObserver = new ResizeObserver(scheduleLabelLayout);
+  [map, detailCard].forEach(function (el) { labelObserver.observe(el); });
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleLabelLayout);
 }());
