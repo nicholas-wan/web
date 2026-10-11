@@ -157,6 +157,8 @@
   var current = 0;
   var viewport = overlay.querySelector('.lightbox__viewport');
   var viewerImage = overlay.querySelector('img.lightbox__image');
+  viewerImage.fetchPriority = 'high';
+  viewerImage.decoding = 'async';
   var viewerVideo = overlay.querySelector('.lightbox__video');
   var caption = overlay.querySelector('.lightbox__caption');
   var tools = overlay.querySelector('.lightbox__tools');
@@ -177,25 +179,94 @@
   var swapCount = 0;
   var imageRequest = 0;
   var upgradeTimer;
-  /* Keep arrow navigation immediate; fetch the fitted resolution only for the
-     settled current image, and never let a late response replace a newer one. */
+  var navigationDirection = 1;
+  /* Keep a bounded decoded working set, not full originals or the whole trip. */
+  var fittedImages = [];
+  var fittedSource = function (source) {
+    var width = Number(source.getAttribute('width')) || source.naturalWidth || 1;
+    var height = Number(source.getAttribute('height')) || source.naturalHeight || 1;
+    var slot = Math.min(viewport.clientWidth, viewport.clientHeight * width / height);
+    return responsiveCandidate(source, slot * Math.min(window.devicePixelRatio || 1, 2));
+  };
+  var findFitted = function (url) {
+    return fittedImages.filter(function (entry) { return entry.url === url; })[0];
+  };
+  var prepareFitted = function (source, priority) {
+    var url = fittedSource(source);
+    var entry = findFitted(url);
+    if (entry) {
+      fittedImages.splice(fittedImages.indexOf(entry), 1);
+      fittedImages.push(entry);
+      if (priority === 'high') entry.image.fetchPriority = 'high';
+      return entry;
+    }
+    var image = new Image();
+    entry = { url: url, image: image, ready: false };
+    entry.promise = new Promise(function (resolve) {
+      var cancelled = false;
+      entry.dispose = function () {
+        cancelled = true;
+        image.onload = image.onerror = null;
+        image.removeAttribute('src');
+        resolve(null);
+      };
+      var failed = function () {
+        var index = fittedImages.indexOf(entry);
+        if (index !== -1) fittedImages.splice(index, 1);
+        entry.dispose();
+      };
+      image.onload = function () {
+        var decoded = image.decode ? image.decode() : Promise.resolve();
+        decoded.then(function () {
+          if (cancelled) return;
+          entry.ready = true;
+          image.onload = image.onerror = null;
+          resolve(entry);
+        }, failed);
+      };
+      image.onerror = failed;
+    });
+    fittedImages.push(entry);
+    while (fittedImages.length > 5) fittedImages.shift().dispose();
+    image.decoding = 'async';
+    image.fetchPriority = priority;
+    image.src = url;
+    return entry;
+  };
+  var clearFittedImages = function () {
+    fittedImages.forEach(function (entry) { entry.dispose(); });
+    fittedImages = [];
+  };
+  /* A prepared photo bypasses the settling delay. Cold swipes retain the tile
+     fallback and avoid fetching a large image for every briefly passed photo. */
   var fitUpgrade = function () {
     window.clearTimeout(upgradeTimer);
     var request = ++imageRequest;
-    if (currentIsVideo || !currentSource) return;
+    if (!currentSource || zoomLevel > 1) return;
     var source = currentSource;
-    upgradeTimer = window.setTimeout(function () {
-      if (request !== imageRequest || zoomLevel > 1) return;
-      var dimensions = sourceDimensions();
-      var width = Math.min(viewport.clientWidth, viewport.clientHeight * dimensions.width / dimensions.height);
-      var url = responsiveCandidate(source, width * Math.min(window.devicePixelRatio || 1, 2));
-      var loader = new Image();
-      loader.onload = function () {
-        if (request !== imageRequest || currentSource !== source || zoomLevel > 1 || !overlay.classList.contains('is-visible')) return;
-        viewerImage.src = loader.src;
-      };
-      loader.src = url;
-    }, 180);
+    var valid = function () {
+      return request === imageRequest && currentSource === source && zoomLevel === 1 && overlay.classList.contains('is-visible');
+    };
+    var neighbours = function () {
+      [navigationDirection, 2 * navigationDirection, -navigationDirection].forEach(function (offset) {
+        var media = galleryMedia[(current + offset + galleryMedia.length) % galleryMedia.length];
+        if (media !== source && media.tagName !== 'VIDEO') prepareFitted(media, 'low');
+      });
+    };
+    var present = function (entry) {
+      if (!valid()) return;
+      if (entry && viewerImage.src !== entry.image.src) viewerImage.src = entry.image.src;
+      neighbours();
+    };
+    var start = function () {
+      if (!valid()) return;
+      if (currentIsVideo) { neighbours(); return; }
+      var entry = prepareFitted(source, 'high');
+      if (entry.ready) present(entry);
+      else entry.promise.then(present);
+    };
+    if (!currentIsVideo && findFitted(fittedSource(source))) start();
+    else upgradeTimer = window.setTimeout(start, 180);
   };
   var clamp = function (value, minimum, maximum) {
     return Math.min(maximum, Math.max(minimum, value));
@@ -364,6 +435,7 @@
   var close = function () {
     ++imageRequest;
     window.clearTimeout(upgradeTimer);
+    clearFittedImages();
     viewerVideo.pause();
     resetMediaTransform();
     /* Leave no gesture state behind for the next open: escaping mid-drag used to
@@ -383,6 +455,7 @@
     ++imageRequest;
     window.clearTimeout(upgradeTimer);
     var opening = !overlay.classList.contains('is-visible');
+    navigationDirection = opening || index > current ? 1 : -1;
     current = (index + galleryMedia.length) % galleryMedia.length;
     var source = galleryMedia[current];
     var isVideo = source.tagName === 'VIDEO';
@@ -430,7 +503,8 @@
         renderMediaTransform();
         requestAnimationFrame(function () { requestAnimationFrame(function () { viewerImage.style.transition = ''; }); });
       };
-      viewerImage.src = lightboxSource(source);
+      var prepared = isJournal && findFitted(fittedSource(source));
+      viewerImage.src = prepared && prepared.ready ? prepared.image.src : lightboxSource(source);
     }
     /* Caption = place + detail. `.content-title` is often the city (repeated
        across dozens of photos) and `.content-text` the actual location, so show

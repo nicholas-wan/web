@@ -865,4 +865,7 @@ if ($galleryJs -match "window\.addEventListener\('resize', refreshCue\)" -or $pe
 # Oct 2026: explicit phone gallery navigation replaces the animated swipe hint.
 if ($galleryJs -notmatch 'journal-gallery-controls' -or $galleryJs -notmatch 'Previous photo' -or $galleryJs -notmatch 'Next photo' -or $galleryJs -notmatch "counter.setAttribute\('role', 'status'\)" -or $galleryJs -notmatch "behavior: reducedMotion.matches \? 'instant' : 'smooth'" -or $customCss -notmatch 'grid-auto-columns: min\(18rem, calc\(100% - 3.5rem\)\)' -or $customCss -match 'journal-scroll-cue|has-scroll-cue') { throw "Phone galleries must retain live progress, accessible arrows, native swiping, an unfaded next-photo preview, and reduced-motion support." }
 
+# Viewing-size preparation must stay bounded and respect stale request guards.
+if ($galleryJs -notmatch 'image.decode\(\)' -or $galleryJs -notmatch 'fittedImages.length > 5' -or $galleryJs -notmatch '2 \* navigationDirection' -or $galleryJs -notmatch "prepareFitted\(source, 'high'\)" -or $galleryJs -notmatch 'request === imageRequest && currentSource === source && zoomLevel === 1' -or $galleryJs -notmatch '(?s)var close = function.*?clearFittedImages\(\)') { throw "Lightbox preparation must decode nearby viewing-size images in a bounded cache and protect zoom, navigation and close from stale loads." }
+
 Write-Output "Verified $($pages.Count) generated pages, landmarks, headings, assets, and portfolio content."
