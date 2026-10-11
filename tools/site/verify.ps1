@@ -287,7 +287,8 @@ Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
 # 12 -> 14: quick-fill Try/Recent chips, Oct 2026.
 # 14 -> 15: fuzzy matching as a fallback only, entity-safe highlights, Oct 2026.
 # 15 -> 16: per-journal runs and the journal legend/filter row, Oct 2026.
-Assert-FileSizeBudget 'assets\js\photo-search.js' 16
+# 16 -> 19: randomized Explore plus relevance, input and storage safeguards (Oct 2026).
+Assert-FileSizeBudget 'assets\js\photo-search.js' 19
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8

@@ -76,7 +76,10 @@
     var expectedScrollY = null;
     var manualEvents = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
     var cancel = function () { cancelled = true; cleanup(); };
-    var cancelUnexpectedScroll = function () {
+    var cancelUnexpectedScroll = function (event) {
+      // Horizontal gallery/section-strip scrolling is not a visitor moving the
+      // document. Capturing those events used to cancel photo deep links.
+      if (event.target !== document && event.target !== window) return;
       /* A visitor can move the page after load but before the first delayed
          correction sample on image-heavy journals. Treat that as ownership
          of the viewport too. Native pre-load hash movement is still allowed. */

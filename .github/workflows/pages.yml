@@ -35,7 +35,11 @@ jobs:
           npm ci
           npx playwright install chromium
 
-      - name: Check travel layouts before publishing
+      - name: Check search and lightbox logic
+        working-directory: tools/tests/browser
+        run: node --test ../photo-search.test.cjs ../lightbox-cache.test.cjs
+
+      - name: Check travel search and layouts before publishing
         working-directory: tools/tests/browser
         run: npm test
 

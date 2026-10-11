@@ -8261,6 +8261,7 @@ body.page-home #nav {
 }
 
 .photo-search__suggest {
+  min-width: 0;
   flex: 1 0 100%;
 }
 
@@ -8278,10 +8279,11 @@ body.page-home #nav {
 }
 
 .photo-search__chips li {
+  max-width: 100%;
   padding: 0;
 }
 
-/* Quick-fill rows before any typing: an eyebrow label, teal Try chips,
+/* Quick-fill rows before any typing: an eyebrow label, teal Explore chips,
    outlined Recent chips and a quiet Clear. */
 .photo-search__chips + .photo-search__chips {
   margin-top: 0.4rem;
@@ -8296,12 +8298,16 @@ body.page-home #nav {
   text-transform: uppercase;
 }
 
-.photo-search__chips--try .photo-search__chip {
+.photo-search__chips--explore .photo-search__chip {
   border-color: var(--color-brand-200);
   background: var(--color-brand-wash);
 }
 
 .photo-search__chips--recent .photo-search__chip {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   background: none;
 }
 
@@ -8572,8 +8578,8 @@ body.page-home #nav {
     min-height: 2.5rem;
   }
 
-  /* Six Try chips and a bare label keep the row to two lines on phones. */
-  .photo-search__chips--try li:nth-child(n+8) {
+  /* Six exploration chips; keep Shuffle available at every width. */
+  .photo-search__chips--explore li:nth-child(n+8):not(.photo-search__shuffle) {
     display: none;
   }
 

@@ -8,10 +8,9 @@
 	if (!input) return;
 
 	var PAGE = 48, DEBOUNCE = 120, STORE = 'photo-search-recent';
-	// Quick-fill searches across facets; only tags with hits are offered.
-	var TRY = ['mount fuji', 'penguin', 'ramen', 'snow', 'sunset', 'zoo', 'temple', 'beach', 'night', 'kangaroo', 'castle', 'sushi', 'autumn leaves', 'museum'];
-	// Field weights: tags + synonyms, place + caption, alt + section, trip.
-	var EXACT = [3, 2, 1, 1], PREFIX = [2, 2, 1, 1];
+	var explore = [], fuzzyTerms = [], renderedQuery = '', composing = false;
+	// Field weights: tags, visible copy, description, trip, fallback aliases.
+	var EXACT = [3, 2, 1, 1, 3], PREFIX = [2, 2, 1, 1, 2];
 	var CJK = '\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f';
 	// One token per CJK character, otherwise letter/digit runs.
 	var WORD = new RegExp('[' + CJK + ']|[a-z0-9\u00df-\u024f\uac00-\ud7af]+', 'g');
@@ -63,9 +62,10 @@
 
 	// [best score, its field]; hidden fields (alt + section, trip) count half,
 	// so they never outrank a tag, place or caption hit for the same term.
-	function termScore(photo, term, fuzzy) {
+	function termScore(photo, term, fuzzy, aliases) {
 		var best = [0, 0];
 		photo.f.forEach(function(words, field) {
+			if ((field === 4) !== !!aliases) return;
 			words.forEach(function(word) {
 				var match = kind(word, term, fuzzy);
 				var score = (match === 3 ? EXACT[field] : match && PREFIX[field] - (match === 1 ? 0.5 : 0)) / (field > 1 ? 2 : 1);
@@ -81,17 +81,18 @@
 		tags = data.tags.sort(function(a, b) { return b.count - a.count; });
 		tags.forEach(function(tag) {
 			tag.keys = [fold(tag.tag)].concat((tag.synonyms || []).map(fold));
-			expanded[tag.tag] = tag.keys.join(' ');
+			expanded[tag.tag] = tag.keys.slice(1).join(' ');
 		});
 		photos = data.photos.map(function(photo, order) {
 			var trip = trips[photo.trip] || {};
 			// Newest trip first, journal order within it (the archive is newest first).
 		photo.order = order - trip.order * 1e4;
 			photo.f = [
-				(photo.tags || []).map(function(name) { return expanded[name] || name; }).join(' '),
+				(photo.tags || []).join(' '),
 				photo.place + ' ' + photo.caption,
 				photo.alt + ' ' + photo.sectionTitle,
-				trip.label + ' ' + trip.year
+				trip.label + ' ' + trip.year,
+				(photo.tags || []).map(function(name) { return expanded[name] || ''; }).join(' ')
 			].map(function(text) { return unique(tokens(text)); });
 			return photo;
 		});
@@ -107,17 +108,22 @@
 	}
 
 	function tripLabel(slug) {
-		return escape(trips[slug].label + ' · ' + String(trips[slug].year).slice(-2));
+		return trips[slug].label + ' · ' + String(trips[slug].year).slice(-2);
 	}
 
 	function search(terms) {
 		var tier = [[], []];
+		fuzzyTerms = [];
 		var rows = photos.map(function(photo) {
 			return terms.map(function(term) { return termScore(photo, term); });
 		});
 		// Fuzzy matches only stand in for a term with no exact or prefix hit at all.
 		terms.forEach(function(term, t) {
-			if (!rows.some(function(row) { return row[t][0]; })) rows.forEach(function(row, i) { row[t] = termScore(photos[i], term, 1); });
+			if (!rows.some(function(row) { return row[t][0]; })) rows.forEach(function(row, i) { row[t] = termScore(photos[i], term, false, true); });
+			if (!rows.some(function(row) { return row[t][0]; })) {
+				fuzzyTerms.push(term);
+				rows.forEach(function(row, i) { row[t] = termScore(photos[i], term, 1); });
+			}
 		});
 		var weight = terms.map(function(term, t) {
 			return Math.log(1 + photos.length / rows.filter(function(row) { return row[t][0]; }).length);
@@ -127,7 +133,7 @@
 			row.forEach(function(best, t) {
 				if (!best[0]) return;
 				score += best[0] * weight[t];
-				why.push(terms[t] + (best[1] > 1 ? ' (in description)' : ''));
+				why.push(terms[t] + (best[1] === 4 ? ' (related tag)' : best[1] > 1 ? ' (in description)' : ''));
 			});
 			if (why.length) tier[why.length === terms.length ? 0 : 1].push({ photo: photos[i], score: score, why: why });
 		});
@@ -138,7 +144,7 @@
 	function highlight(text, terms) {
 		return escape(String(text).replace(SEGMENT, function(segment) {
 			return tokens(segment).some(function(word) {
-				return terms.some(function(term) { return kind(word, term, 1); });
+				return terms.some(function(term) { return kind(word, term, fuzzyTerms.indexOf(term) >= 0); });
 			}) ? '\x01' + segment + '\x02' : segment;
 		})).replace(/\x01/g, '<mark>').replace(/\x02/g, '</mark>');
 	}
@@ -157,7 +163,8 @@
 	function recent(list) {
 		try {
 			if (list) localStorage.setItem(STORE, JSON.stringify(list));
-			return JSON.parse(localStorage.getItem(STORE)) || [];
+			var saved = JSON.parse(localStorage.getItem(STORE));
+			return Array.isArray(saved) ? saved.filter(function(q) { return typeof q === 'string' && q.trim(); }).slice(0, 4) : [];
 		} catch (error) {
 			return [];
 		}
@@ -167,14 +174,49 @@
 		recent([query].concat(recent().filter(function(past) { return past !== query; })).slice(0, 4));
 	}
 
-	// Before any typing: Recent (when kept) then Try.
+	function shuffle(list) {
+		for (var i = list.length - 1; i > 0; i--) {
+			var j = Math.floor(Math.random() * (i + 1)), item = list[i];
+			list[i] = list[j]; list[j] = item;
+		}
+		return list;
+	}
+
+	// Sample facets equally so large place/subject vocabularies cannot dominate.
+	function exploreMore() {
+		var previous = explore.map(function(tag) { return tag.tag; }), groups = {};
+		try { if (!previous.length) previous = JSON.parse(sessionStorage.getItem('photo-search-explore')) || []; } catch (e) {}
+		if (!Array.isArray(previous)) previous = [];
+		var pool = tags.filter(function(tag) { return tag.count > 0 && previous.indexOf(tag.tag) < 0; });
+		if (pool.length < 8) pool = tags.filter(function(tag) { return tag.count > 0; });
+		shuffle(pool).forEach(function(tag) { (groups[tag.facet] || (groups[tag.facet] = [])).push(tag); });
+		var facets = shuffle(Object.keys(groups));
+		explore = [];
+		while (facets.length && explore.length < 8) {
+			var facet = facets.shift();
+			explore.push({ tag: groups[facet].pop().tag });
+			if (groups[facet].length) facets.push(facet);
+		}
+		try { sessionStorage.setItem('photo-search-explore', JSON.stringify(explore.map(function(tag) { return tag.tag; }))); } catch (e) {}
+	}
+
 	function starters() {
+		if (!explore.length) exploreMore();
 		var past = recent().map(function(query) { return { tag: query }; });
 		return (past.length ? chipList(past, 'Recent searches', true, 'Recent',
 			'<li><button type="button" class="photo-search__chip photo-search__forget" data-forget aria-label="Clear recent searches">Clear</button></li>') : '') +
-			chipList(TRY.map(function(name) {
-				return tags.filter(function(tag) { return tag.tag === name && tag.count; })[0];
-			}).filter(Boolean).slice(0, 8), 'Suggested searches', true, 'Try');
+			chipList(explore, 'Explore your photos', true, 'Explore',
+				'<li class="photo-search__shuffle"><button type="button" class="photo-search__chip" data-shuffle aria-label="Shuffle exploration suggestions">Shuffle &#8635;</button></li>');
+	}
+
+	// Complete a matching phrase (including a synonym), without duplicating it.
+	function completeTag(value, tag) {
+		var words = value.trim().split(/\s+/), keys = tag.keys;
+		for (var i = 0; i < words.length; i++) {
+			var tail = fold(words.slice(i).join(' '));
+			if (keys.some(function(key) { return key.indexOf(tail) === 0; })) return { value: words.slice(0, i).concat(tag.tag).join(' '), start: i };
+		}
+		return null;
 	}
 
 	function card(photo, terms, why) {
@@ -186,7 +228,7 @@
 			'<span class="photo-hit__media"><img loading="lazy" decoding="async" src="' + escape(photo.thumb) +
 			'" alt="' + escape(photo.alt) + '" width="' + photo.w + '" height="' + photo.h + '"' + focal + '>' +
 			(photo.video ? '<span class="photo-hit__video">Animation</span>' : '') +
-			'</span><span class="photo-hit__trip">' + tripLabel(photo.trip) + '</span>' +
+			'</span><span class="photo-hit__trip">' + escape(tripLabel(photo.trip)) + '</span>' +
 			'<span class="photo-hit__title"><strong>' + highlight(photo.place, terms) +
 			'</strong>' + caption + '</span>' +
 			(why ? '<span class="photo-hit__why">matches: ' + escape(why.join(', ')) + '</span>' : '') + '</a></li>';
@@ -203,8 +245,10 @@
 		var current = tail ? tokens(tail[0]).pop() : '';
 		var earlier = tokens(value.slice(0, tail ? tail.index : value.length));
 		var found = !current || !photos ? [] : tags.filter(function(tag) {
-			return tag.count && tag.keys[0] !== current && tag.keys.some(function(key) { return key.lastIndexOf(current, 0) === 0; }) &&
+			return tag.count && tag.keys[0] !== fold(value.trim()) && completeTag(value, tag) &&
 				!tokens(tag.tag).every(function(word) { return earlier.indexOf(word) >= 0; });
+		}).sort(function(a, b) {
+			return completeTag(value, a).start - completeTag(value, b).start;
 		}).slice(0, 6);
 		chips.innerHTML = found.length ? chipList(found, 'Suggested tags') : value.trim() || !photos ? '' : starters();
 	}
@@ -219,7 +263,7 @@
 		if (active === collapsed) return;
 		collapsed = active;
 		if (active) closeAtlasOverlay();
-		collapsible.forEach(function(node) { node.hidden = active; });
+		collapsible.forEach(function(node) { node.hidden = active; node.inert = active; });
 		form.classList.toggle('is-active', active);
 	}
 
@@ -231,6 +275,7 @@
 	}
 
 	function render(terms, query) {
+		renderedQuery = input.value;
 		var shown = 0, html = '', sentence = [], runs = [], counts = {};
 		// Legend chips, one per trip in run order; a pressed one narrows the grid.
 		tiers.forEach(function(hits) {
@@ -242,7 +287,7 @@
 		});
 		if (runs.length > 1) html = '<ul class="photo-search__chips photo-results__trips" aria-label="Journals with matches">' + runs.map(function(trip) {
 			return '<li><button type="button" class="photo-search__chip" data-trip="' + escape(trip) + '" aria-pressed="' + (trip === tripFilter) + '">' +
-				tripLabel(trip) + ' <span>' + counts[trip] + '</span></button></li>';
+				escape(tripLabel(trip)) + ' <span>' + counts[trip] + '</span></button></li>';
 		}).join('') + '</ul>';
 		var visible = tiers.map(function(hits) {
 			return hits.filter(function(hit) { return !tripFilter || hit.photo.trip === tripFilter; });
@@ -273,9 +318,11 @@
 	}
 
 	function run() {
+		results.inert = false;
 		clearTimeout(timer);
 		clearTimeout(saveTimer);
 		var value = input.value, query = value.trim();
+		if (!query && renderedQuery) { exploreMore(); renderedQuery = ''; }
 		var terms = unique(tokens(value));
 		clearButton.hidden = !value;
 		syncUrl(query);
@@ -284,9 +331,8 @@
 		if (!query || failed || !photos) {
 			results.hidden = true;
 			list.innerHTML = '';
-			status.textContent = !query ? '' : failed ?
-				'Photo search is unavailable right now.' :
-				'Loading photos\u2026';
+			status.textContent = failed ?
+				'Photo search is unavailable right now.' : !query ? '' : 'Loading photos\u2026';
 			return;
 		}
 		limit = PAGE;
@@ -313,10 +359,11 @@
 		if (event.target.closest('.photo-hit')) remember(input.value.trim());
 		if (!button) return;
 		var tag = button.getAttribute('data-tag'), trip = button.getAttribute('data-trip');
-		var tail = /\S+$/.exec(input.value);
+		if ((button === more || trip) && input.value !== renderedQuery) { run(); input.focus(); return; }
 		var redraw = function() { render(unique(tokens(input.value)), input.value.trim()); };
 		if (tag) {
-			input.value = button.hasAttribute('data-replace') || !tail ? tag + ' ' : input.value.slice(0, tail.index) + tag + ' ';
+			var match = tags.find(function(item) { return item.tag === tag; });
+			input.value = (button.hasAttribute('data-replace') || !match ? tag : (completeTag(input.value, match) || { value: tag }).value) + ' ';
 			run();
 			input.focus();
 		} else if (button === more) {
@@ -333,6 +380,9 @@
 			results.querySelectorAll('[data-trip]')[at].focus();
 		} else if (button.hasAttribute('data-clear')) {
 			clearSearch();
+		} else if (button.hasAttribute('data-shuffle')) {
+			exploreMore(); suggest('');
+			chips.querySelector('[data-shuffle]').focus();
 		} else if (button.hasAttribute('data-forget')) {
 			recent([]);
 			suggest('');
@@ -341,13 +391,18 @@
 	}
 
 	input.addEventListener('input', function() {
+		results.inert = true;
 		clearButton.hidden = !input.value;
 		clearTimeout(timer);
-		timer = setTimeout(run, DEBOUNCE);
+		if (!composing) timer = setTimeout(run, DEBOUNCE);
 	});
+
+	input.addEventListener('compositionstart', function() { composing = true; clearTimeout(timer); });
+	input.addEventListener('compositionend', function() { composing = false; run(); });
 
 	form.addEventListener('submit', function(event) {
 		event.preventDefault();
+		if (composing) return;
 		run();
 		if (matchMedia('(pointer: coarse)').matches) input.blur();
 	});
@@ -357,6 +412,7 @@
 
 	// Escape clears; arrows move from the field into the hits and between them.
 	results.parentNode.addEventListener('keydown', function(event) {
+		if (event.isComposing || composing) return;
 		var key = event.key, all = hits(), index = all.indexOf(event.target);
 		var step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 1, ArrowUp: -1 }[key];
 		if (key === 'Escape' && input.value) {
