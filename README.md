@@ -1,39 +1,32 @@
 # Nicholas Wan's website
 
-Static personal website built from legacy root-page sources and modular travel-journal fragments. GitHub Actions generates and verifies `dist/` before deploying it to GitHub Pages.
+Static personal site. `tools/site/build.ps1` generates `dist/` from the root pages and the travel-journal fragments; GitHub Actions builds, verifies and deploys it to GitHub Pages.
 
-## Common commands
-
-Run the complete CI-equivalent check:
+## Commands
 
 ```powershell
-.\tools\site.ps1 check
+.\tools\site.ps1 check          # clean build + verification, same as CI
+.\tools\site.ps1 build          # build only (-Clean to start fresh)
+.\tools\site.ps1 verify         # verify an existing dist/
+node tools/preview-server.mjs   # preview dist/ at http://localhost:4321
 ```
 
-Other commands:
+Use the preview server, not a plain static server: the site's extensionless page URLs 404 elsewhere.
 
-```powershell
-.\tools\site.ps1 build
-.\tools\site.ps1 build -Clean
-.\tools\site.ps1 verify
-```
+## Layout
 
-Preview the generated site with `node tools/preview-server.mjs` (port 4321, also the `dist` launch configuration). Plain static servers such as `python -m http.server` do not resolve the extensionless page URLs, so navigation links 404 there.
-
-## Repository map
-
-- `assets/` contains published styles, scripts, fonts, and downloadable public assets.
-- `images/` contains source media; `images-webp/` contains the curated deterministic WebP overlay used by the build.
-- `journals/` contains content-only travel journals, their manifest, and canonical template.
-- `partials/` contains shared generated-page fragments.
-- `tools/` contains build, verification, image, map, CSS-audit, font-subset, and retired migration tooling.
-- `docs/` contains architecture, preserved UX decisions, and build notes.
-- `dist/` is generated output and must not be edited or committed.
+- `assets/` styles, scripts, fonts and public downloads
+- `images/` source media; `images-webp/` the WebP overlay the build prefers
+- `journals/` travel-journal fragments, their manifest, photo tags and template
+- `partials/` shared page fragments
+- `tools/` build, verification, image, map and font tooling
+- `docs/` build notes, UX contracts and the photo-edit register
+- `dist/` generated output; never edit or commit it
 
 ## Editing photos
 
-Edit the original under `images/` (or its `images-webp/` overlay), delete that photo's `-480`/`-800`/`-1200` siblings, run `python .\tools\images\make-responsive-variants.py`, then restore any sibling of an unedited photo that the tool re-encoded. Gallery tiles crop every photo to a fixed shape, so adjust the tile's `--focus-x`/`--focus-y` before cropping pixels. Keep near-duplicate photos; they are deliberate. Details are in [docs/build.md](docs/build.md#asset-tooling).
+Edit the file under `images/` (or `images-webp/`), delete its `-480`/`-800`/`-1200` siblings, run `python .\tools\images\make-responsive-variants.py`, then `git checkout --` any sibling the tool re-encoded for a photo you did not touch. Tiles crop to a fixed shape, so prefer the tile's `--focus-x`/`--focus-y` over cropping pixels.
 
-Travel-journal colour grades and AI removals are done journal by journal (newest first) and tracked per photo in [docs/photo-edits.csv](docs/photo-edits.csv). Each row records the colour and removal state and the commit it shipped in. Colour and removals ship as separate commits. Removals change only the masked area and never touch the people in the photo; any removal that won't fill cleanly is skipped.
+Colour grades, crops and removals are logged per photo in [docs/photo-edits.csv](docs/photo-edits.csv) with the commit they shipped in. Removals never touch the people in a photo.
 
-See [docs/build.md](docs/build.md) for build and deployment details and [docs/project-context.md](docs/project-context.md) for the site's maintained behavior contracts.
+See [docs/build.md](docs/build.md) for the build and image pipeline and [docs/project-context.md](docs/project-context.md) for the behaviour contracts.
