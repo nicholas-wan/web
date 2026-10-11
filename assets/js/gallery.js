@@ -1,6 +1,7 @@
 (function () {
   var journalAnimations = Array.prototype.slice.call(document.querySelectorAll('video.journal-animation'));
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  var isJournal = document.body.classList.contains('page-travel-journal');
   /* The build renames each animation's autoplay attribute to data-autoplay,
      because the attribute makes the browser download every video at page load.
      Playback starts here instead, and only once the animation is near the
@@ -61,6 +62,14 @@
     return left.compareDocumentPosition(right) & 4 ? -1 : 1;
   });
   if (!galleryMedia.length) return;
+  var journalHeadings = isJournal ? Array.prototype.slice.call(document.querySelectorAll('#main h2[id^="trip-section-"]')) : [];
+  var mediaSections = galleryMedia.map(function (media) {
+    var heading = null;
+    journalHeadings.forEach(function (candidate) {
+      if (candidate.compareDocumentPosition(media) & 4) heading = candidate;
+    });
+    return heading;
+  });
 
   /* Native lazy loading is deliberately conservative, which can leave a
      blank tile after a quick journal scroll or horizontal swipe. Warm only
@@ -166,6 +175,28 @@
   var captionOpen = false;
   var lastImageTap = 0;
   var swapCount = 0;
+  var imageRequest = 0;
+  var upgradeTimer;
+  /* Keep arrow navigation immediate; fetch the fitted resolution only for the
+     settled current image, and never let a late response replace a newer one. */
+  var fitUpgrade = function () {
+    window.clearTimeout(upgradeTimer);
+    var request = ++imageRequest;
+    if (currentIsVideo || !currentSource) return;
+    var source = currentSource;
+    upgradeTimer = window.setTimeout(function () {
+      if (request !== imageRequest || zoomLevel > 1) return;
+      var dimensions = sourceDimensions();
+      var width = Math.min(viewport.clientWidth, viewport.clientHeight * dimensions.width / dimensions.height);
+      var url = responsiveCandidate(source, width * Math.min(window.devicePixelRatio || 1, 2));
+      var loader = new Image();
+      loader.onload = function () {
+        if (request !== imageRequest || currentSource !== source || zoomLevel > 1 || !overlay.classList.contains('is-visible')) return;
+        viewerImage.src = loader.src;
+      };
+      loader.src = url;
+    }, 180);
+  };
   var clamp = function (value, minimum, maximum) {
     return Math.min(maximum, Math.max(minimum, value));
   };
@@ -216,9 +247,10 @@
   };
   var calculateFitScale = function () {
     fitScale = 1;
-    if (!rotation || !viewerImage.clientWidth || !viewerImage.clientHeight) return;
-    var rotatedWidth = viewerImage.clientHeight;
-    var rotatedHeight = viewerImage.clientWidth;
+    if (!rotation && !isJournal) return;
+    if (!viewerImage.clientWidth || !viewerImage.clientHeight) return;
+    var rotatedWidth = rotation ? viewerImage.clientHeight : viewerImage.clientWidth;
+    var rotatedHeight = rotation ? viewerImage.clientWidth : viewerImage.clientHeight;
     fitScale = Math.min(viewport.clientWidth / rotatedWidth, viewport.clientHeight / rotatedHeight);
   };
   var renderCaptionState = function () {
@@ -264,6 +296,7 @@
   };
   var setZoom = function (nextZoom) {
     zoomLevel = clamp(nextZoom, 1, 3);
+    if (zoomLevel > 1) { ++imageRequest; window.clearTimeout(upgradeTimer); }
     if (zoomLevel > 1 && currentSource && currentSource.src && viewerImage.src !== currentSource.src) {
       viewerImage.src = currentSource.src;
     }
@@ -329,6 +362,8 @@
     window.scrollTo(0, lockedScrollY);
   };
   var close = function () {
+    ++imageRequest;
+    window.clearTimeout(upgradeTimer);
     viewerVideo.pause();
     resetMediaTransform();
     /* Leave no gesture state behind for the next open: escaping mid-drag used to
@@ -345,6 +380,8 @@
     afterClose = null;
   };
   var show = function (index) {
+    ++imageRequest;
+    window.clearTimeout(upgradeTimer);
     var opening = !overlay.classList.contains('is-visible');
     current = (index + galleryMedia.length) % galleryMedia.length;
     var source = galleryMedia[current];
@@ -385,13 +422,15 @@
       viewerVideo.hidden = true;
       viewerImage.hidden = false;
       warmImage(source);
-      viewerImage.src = lightboxSource(source);
       viewerImage.alt = accessibleName;
       viewerImage.onload = function () {
+        viewerImage.style.transition = 'none';
         syncMediaTools();
         calculateFitScale();
         renderMediaTransform();
+        requestAnimationFrame(function () { requestAnimationFrame(function () { viewerImage.style.transition = ''; }); });
       };
+      viewerImage.src = lightboxSource(source);
     }
     /* Caption = place + detail. `.content-title` is often the city (repeated
        across dozens of photos) and `.content-text` the actual location, so show
@@ -410,10 +449,21 @@
     parts = parts.filter(function (part, index) { return part && parts.indexOf(part) === index; });
     if (!parts.length) parts.push(accessibleName);
     caption.textContent = parts.join(' · ');
+    var heading = mediaSections[current];
+    if (heading) {
+      var sectionMedia = galleryMedia.filter(function (item, index) { return mediaSections[index] === heading; });
+      var day = /^Day\s+\d+/i.exec(heading.textContent.trim());
+      var context = document.createElement('span');
+      context.className = 'lightbox__context';
+      context.textContent = ' ' + (day ? day[0] : heading.textContent.trim().replace(/^#\d+\s*-\s*/, '')) +
+        ' · ' + (sectionMedia.indexOf(source) + 1) + ' of ' + sectionMedia.length;
+      caption.appendChild(context);
+    }
     syncMediaTools();
     warmNeighbours(current);
     overlay.setAttribute('aria-hidden', 'false');
     overlay.classList.add('is-visible');
+    if (isJournal) fitUpgrade();
     if (opening) {
       lockBackgroundScroll();
       closeButton.focus();
@@ -658,6 +708,7 @@
     syncMediaTools();
     calculateFitScale();
     renderMediaTransform();
+    if (isJournal) fitUpgrade();
   });
 
   galleryMedia.forEach(function (media, index) {
@@ -677,6 +728,8 @@
   Array.prototype.forEach.call(document.querySelectorAll('.travel-gallery--compact, .guangzhou-day--compact .masonry'), function (gallery) {
     var shell = document.createElement('div');
     var cue = document.createElement('div');
+    var counter = document.createElement('div');
+    var tiles = Array.prototype.slice.call(gallery.querySelectorAll('.brick'));
 
     shell.className = 'journal-gallery-shell';
     gallery.parentNode.insertBefore(shell, gallery);
@@ -686,6 +739,18 @@
     cue.setAttribute('aria-hidden', 'true');
     cue.innerHTML = '<span>Swipe to browse</span><i aria-hidden="true">&#8596;</i>';
     shell.appendChild(cue);
+    counter.className = 'journal-gallery-count';
+    shell.appendChild(counter);
+    var updateCounter = function () {
+      var left = gallery.getBoundingClientRect().left;
+      var nearest = 0;
+      var distance = Infinity;
+      tiles.forEach(function (tile, index) {
+        var delta = Math.abs(tile.getBoundingClientRect().left - left);
+        if (delta < distance) { distance = delta; nearest = index; }
+      });
+      counter.textContent = (nearest + 1) + ' / ' + tiles.length;
+    };
 
     /* Split so a resize can read every gallery before writing any: alternating
        reads and writes forced one layout per gallery (up to 36 per journal). */
@@ -695,9 +760,11 @@
       return function () {
         cue.hidden = !scrollable;
         gallery.classList.toggle('has-scroll-cue', scrollable && atStart);
+        updateCounter();
       };
     };
     var dismissCue = function () {
+      updateCounter();
       if (gallery.scrollLeft < 6) return;
       cue.classList.add('is-dismissed');
       gallery.classList.remove('has-scroll-cue');

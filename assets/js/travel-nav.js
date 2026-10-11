@@ -14,11 +14,12 @@
 
   var mobileNav = window.matchMedia('(max-width: 980px)');
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  /* Publish the toolbar's real height as --travel-nav-offset so the CSS
-     scroll-margin-top on trip sections clears it even when the link row wraps
-     (USA/Canada reaches ~5 rows at desktop). This makes the native hash jump
-     land correctly on its own; the bounded landing correction below stays as
-     the safety net for late layout shifts. */
+  var sectionStart = function (heading) {
+    var previous = heading && heading.previousElementSibling;
+    return previous && previous.matches('.guangzhou-day__date, .travel-journal__date') ? previous : heading;
+  };
+  /* Publish the real single-row toolbar height for native anchor jumps;
+     the bounded correction also clears the date above each heading. */
   var lastNavOffset = 0;
   var publishNavOffset = function () {
     var offset = Math.ceil(nav.getBoundingClientRect().height) + 12;
@@ -58,6 +59,7 @@
     var media = photo && gallery ? gallery.find(photo[1]) : null;
     var target = media ? media.closest('.brick') || media :
       /^#trip-section-\d+$/.test(hash) && document.getElementById(hash.slice(1));
+    if (!media) target = sectionStart(target);
     if (!target) return;
     /* Viewer up (back/forward): re-land after close()'s scroll restore,
        which would otherwise read as visitor input. */
@@ -211,21 +213,33 @@
   });
   startAnchorLanding(true);
 
-  /* The strip's scrollbar is hidden, so flag the edges that hide more tabs;
-     the desktop CSS fades those edges. */
+  /* Explicit desktop controls make the horizontally scrollable row discoverable. */
   var edgeStrip = nav.querySelector('.travel-jump-groups');
   if (edgeStrip) {
+    var back = document.createElement('button');
+    var forward = document.createElement('button');
+    back.className = forward.className = 'travel-strip-arrow';
+    back.type = forward.type = 'button';
+    back.textContent = '\u2190';
+    forward.textContent = '\u2192';
+    back.setAttribute('aria-label', 'Earlier trip sections');
+    forward.setAttribute('aria-label', 'Later trip sections');
+    nav.insertBefore(back, edgeStrip);
+    nav.appendChild(forward);
+    [back, forward].forEach(function (button, index) {
+      button.addEventListener('click', function () {
+        edgeStrip.scrollBy({ left: (index ? 1 : -1) * edgeStrip.clientWidth * 0.75,
+          behavior: reducedMotion.matches ? 'auto' : 'smooth' });
+      });
+    });
     var markStripEdges = function () {
       var hidden = edgeStrip.scrollWidth - edgeStrip.clientWidth;
       var moreStart = edgeStrip.scrollLeft > 2;
       var moreEnd = edgeStrip.scrollLeft < hidden - 2;
-      edgeStrip.classList.toggle('has-more-start', moreStart);
-      edgeStrip.classList.toggle('has-more-end', moreEnd);
-      /* The desktop fades are painted by the nav over the strip's edges, so
-         the nav carries the same flags and learns where the strip starts. */
-      nav.classList.toggle('has-more-start', moreStart);
-      nav.classList.toggle('has-more-end', moreEnd);
-      nav.style.setProperty('--strip-left', Math.max(0, Math.round(edgeStrip.getBoundingClientRect().left - nav.getBoundingClientRect().left)) + 'px');
+      if (!moreStart && document.activeElement === back && moreEnd) forward.focus({ preventScroll: true });
+      if (!moreEnd && document.activeElement === forward && moreStart) back.focus({ preventScroll: true });
+      back.disabled = !moreStart;
+      forward.disabled = !moreEnd;
     };
     edgeStrip.addEventListener('scroll', markStripEdges, { passive: true });
     window.addEventListener('resize', markStripEdges);
@@ -245,6 +259,11 @@
   }
 
   var links = Array.prototype.slice.call(nav.querySelectorAll('a[href^="#trip-section-"]'));
+  links.forEach(function (link) {
+    link.addEventListener('click', function () {
+      requestAnimationFrame(function () { manualSinceNav = false; startAnchorLanding(true); });
+    });
+  });
   var sections = links.map(function (link) {
     return document.getElementById(link.getAttribute('href').slice(1));
   }).filter(Boolean);
@@ -297,7 +316,7 @@
     var line = window.innerHeight * 0.3;
     var current = sections[0];
     for (var i = 0; i < sections.length; i++) {
-      if (sections[i].getBoundingClientRect().top <= line) current = sections[i];
+      if (sectionStart(sections[i]).getBoundingClientRect().top <= line) current = sections[i];
       else break;
     }
     setActive(current);
@@ -314,25 +333,46 @@
 }());
 
 (function () {
-  var routeGroups = document.querySelectorAll('.guangzhou-day__route--collapsible');
+  var routeGroups = document.querySelectorAll('.guangzhou-day__route');
   if (!routeGroups.length) return;
   var phoneNav = window.matchMedia('(max-width: 600px)');
 
-  Array.prototype.forEach.call(routeGroups, function (group) {
+  Array.prototype.forEach.call(routeGroups, function (group, index) {
     var button = group.querySelector('.guangzhou-route__more');
     var route = group.querySelector('.guangzhou-route');
-    if (!button || !route) return;
+    if (!route) return;
+    var stops = route.querySelectorAll('.guangzhou-route__stop');
+    if (!stops.length) return;
+    if (!button) {
+      button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'guangzhou-route__more';
+      group.appendChild(button);
+    }
+    group.classList.add('guangzhou-day__route--collapsible');
+    var summary = document.createElement('p');
+    summary.className = 'travel-route-summary';
+    var place = function (stop) { return stop.querySelector('span').textContent.trim(); };
+    summary.textContent = place(stops[0]) + (stops.length > 1 ? ' \u2192 ' + place(stops[stops.length - 1]) : '');
+    group.insertBefore(summary, route);
+    route.id = 'journal-route-' + index;
+    button.removeAttribute('aria-haspopup');
+    button.setAttribute('aria-controls', route.id);
+    var collapsedLabel = 'View all ' + stops.length + (stops.length === 1 ? ' stop' : ' stops');
+    var syncRoute = function () {
+      var expanded = group.classList.contains('is-expanded');
+      button.textContent = expanded ? 'Hide route' : collapsedLabel;
+      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      route.hidden = phoneNav.matches && !expanded;
+    };
 
     group.classList.add('is-truncated');
-    // Phones list the first four stops; the button is only offered when it reveals more.
-    group.classList.toggle('has-hidden-stops', route.querySelectorAll('.guangzhou-route__stop').length > 4);
-    button.setAttribute('aria-expanded', 'false');
+    syncRoute();
 
     var updateDesktopWrap = function () {
       group.classList.remove('is-desktop-wrapped');
       if (phoneNav.matches) return;
 
-      var stops = route.querySelectorAll('.guangzhou-route__stop');
       var firstTop = stops.length ? stops[0].offsetTop : 0;
       var wrapped = Array.prototype.some.call(stops, function (stop) {
         return stop.offsetTop > firstTop + 2;
@@ -342,9 +382,8 @@
 
     requestAnimationFrame(updateDesktopWrap);
     button.addEventListener('click', function () {
-      var expanded = group.classList.toggle('is-expanded');
-      button.textContent = expanded ? 'Show less' : 'View full route';
-      button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+      group.classList.toggle('is-expanded');
+      syncRoute();
     });
 
     // Phone URL-bar show/hide fires resize with only the height changed;
@@ -354,8 +393,7 @@
       if (window.innerWidth === lastWidth) return;
       lastWidth = window.innerWidth;
       group.classList.remove('is-expanded');
-      button.textContent = 'View full route';
-      button.setAttribute('aria-expanded', 'false');
+      syncRoute();
       requestAnimationFrame(updateDesktopWrap);
     });
   });

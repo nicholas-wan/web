@@ -362,6 +362,10 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
     foreach ($heading in $headings) {
         $label = [regex]::Replace($heading.Groups[1].Value, '<[^>]+>', '')
         $label = [System.Net.WebUtility]::HtmlDecode(($label -replace '\s+', ' ').Trim())
+        $fullLabel = $label
+        $day = if ($label -match '(?i)^Day\s+(\d+)\b') { $Matches[1] } else { '' }
+        $shortMatch = [regex]::Match($heading.Value, 'data-nav-label="([^"]+)"')
+        $shortLabel = if ($shortMatch.Success) { [System.Net.WebUtility]::HtmlDecode($shortMatch.Groups[1].Value) } else { '' }
         $label = $label -replace '(?i)^Day\s+\d+\s*[^\w\s]\s*', ''
         $label = $label -replace '^#\d+\s*-\s*', ''
         if ($label -eq 'Hutt Lagoon & Kalbarri National Park') { $label = 'Hutt Lagoon & Kalbarri' }
@@ -394,17 +398,17 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
             $headingIndex++
             continue
         }
-        $sections += @{ Id = "trip-section-$($sections.Count + 1)"; Label = $label }
+        $sections += @{ Id = "trip-section-$($sections.Count + 1)"; Label = $label; Day = $day; Short = $shortLabel; Full = $fullLabel }
         $headingIndex++
     }
 
-    # Keep only meaningful location changes in the jump navigation. Departure is
-    # not a destination, and repeated day headings should not become duplicate pills.
+    # Numbered days are individually reachable, including departures. Legacy
+    # destination-only sections still collapse adjacent duplicate place names.
     $dedupedSections = @()
     $previousPlainLabel = ""
     foreach ($section in $sections) {
         $plainLabel = [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($section.Label, '&#x[0-9A-Fa-f]+;', '') -replace '\s+', ' ').Trim())
-        if ($plainLabel -eq 'Departure' -or $plainLabel -eq $previousPlainLabel) { continue }
+        if (-not $section.Day -and ($plainLabel -eq 'Departure' -or $plainLabel -eq $previousPlainLabel)) { continue }
         $dedupedSections += $section
         $previousPlainLabel = $plainLabel
     }
@@ -469,14 +473,16 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
             }
         }
         $links = ($groupItems | ForEach-Object {
-            if ($firstPlainLabel -eq $group -and $_.Id -eq $firstItem.Id) { return }
+            if ($groups.Keys.Count -gt 1 -and $firstPlainLabel -eq $group -and $_.Id -eq $firstItem.Id) { return }
             $displayLabel = $_.Label
             $plainLabel = [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($displayLabel, '&#x[0-9A-Fa-f]+;', '') -replace '\s+', ' ').Trim())
             if ($plainLabel.Contains('&middot;') -or $plainLabel.Contains([char]0xB7)) { return }
             if ($plainLabel -match '^(Melbourne|Sydney)\s*[\u00B7]\s*(.+)$') { $displayLabel = $Matches[2] }
             elseif ($plainLabel -eq $group) { $displayLabel = 'Overview' }
             $displayLabel = ([regex]::Replace($displayLabel, '&#x[0-9A-Fa-f]+;', '') -replace '^\s+|\s+$', '')
-            '<a href="#' + $_.Id + '">' + $displayLabel + '</a>'
+            if ($_.Short) { $displayLabel = [System.Net.WebUtility]::HtmlEncode($_.Short) }
+            if ($_.Day -ne '') { $displayLabel = 'D' + $_.Day + ' &middot; ' + $displayLabel }
+            '<a href="#' + $_.Id + '" aria-label="' + [System.Net.WebUtility]::HtmlEncode($_.Full) + '">' + $displayLabel + '</a>'
         }) -join ""
         '<div class="travel-jump-group">' + $groupHeading + '<div>' + $links + '</div></div>'
     }

@@ -1,5 +1,7 @@
 # Travel journal sources
 
+Use `data-nav-label` on a long section heading to supply a short pill label. The build retains the full heading as its accessible name and prefixes numbered days automatically. Shared scripts provide phone route summaries with an inline full-route disclosure, gallery counts, and section-aware lightbox counters.
+
 `partials/travel-journal.html` is the shared journal shell. `_template.html` is the canonical compact-journal content contract. Together they supply the responsive hero, day structure, routes, compact desktop masonry, two-row collage option, horizontal mobile galleries and swipe cue, lightbox, trip navigation, pagination, mobile menu, scripts, and footer.
 
 To add a journal:

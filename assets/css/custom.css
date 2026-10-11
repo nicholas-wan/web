@@ -3401,12 +3401,16 @@ body.is-map-fullscreen #return-to-top {
 .guangzhou-journal__location {
   margin: 0.85rem 0 0.35rem;
   color: var(--color-ink-900);
-  font-family: var(--font-display);
+  font-family: "Raleway", sans-serif;
   font-size: clamp(2.25rem, 6vw, 3.5rem);
-  font-weight: 900;
-  letter-spacing: 0.035em;
-  line-height: 1;
-  text-transform: uppercase;
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-transform: none;
+}
+
+.page-travel-journal header.major .travel-journal__title {
+  font-style: normal;
 }
 
 .travel-journal__lede,
@@ -3515,6 +3519,15 @@ body.is-map-fullscreen #return-to-top {
   display: none;
 }
 
+.travel-route-summary,
+.journal-gallery-count {
+  display: none;
+}
+
+.guangzhou-route[hidden] {
+  display: none;
+}
+
 @media screen and (min-width: 601px) {
   .guangzhou-day__route--collapsible.is-desktop-wrapped.is-truncated:not(.is-expanded) .guangzhou-route {
     max-height: 2.45rem;
@@ -3541,11 +3554,15 @@ body.is-map-fullscreen #return-to-top {
 
 .guangzhou-day__note {
   width: 100%;
-  max-width: none;
+  max-width: 70ch;
   margin-bottom: 1.4rem;
   color: var(--color-ink-600);
   line-height: 1.75;
   text-align: left;
+}
+
+.australia-journal .col-12 > p {
+  max-width: 70ch;
 }
 
 .guangzhou-day .masonry {
@@ -3863,17 +3880,19 @@ body.is-map-fullscreen #return-to-top {
     display: none;
   }
 
-  .guangzhou-day__route--collapsible.is-truncated:not(.is-expanded) .guangzhou-route > .guangzhou-route__stop:nth-of-type(n + 5),
-  .guangzhou-day__route--collapsible.is-truncated:not(.is-expanded) .guangzhou-route > i:nth-of-type(n + 4) {
-    display: none;
+  .travel-route-summary {
+    display: block;
+    margin: 0.4rem 0 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
   }
 
-  .guangzhou-day__route--collapsible.has-hidden-stops .guangzhou-route__more {
+  .guangzhou-day__route--collapsible .guangzhou-route__more {
     display: inline-flex;
-    min-height: 2.35rem;
+    min-height: 3rem;
     align-items: center;
     justify-content: center;
-    margin: 0.65rem 0 0 1.85rem;
+    margin: 0.45rem 0 0;
     padding: 0.45rem 0.75rem;
     border: 1px solid color-mix(in srgb, var(--color-brand-600) 35%, #fff);
     border-radius: 999px;
@@ -3917,6 +3936,15 @@ body.is-map-fullscreen #return-to-top {
     display: flex;
     min-width: 0;
     flex-direction: column;
+  }
+
+  .journal-gallery-count {
+    display: block;
+    order: 3;
+    align-self: flex-end;
+    color: var(--color-ink-600);
+    font: 600 max(var(--text-floor), 0.8rem)/1.5 var(--font-display);
+    margin-top: 0.25rem;
   }
 
   .journal-gallery-shell > .travel-gallery--compact,
@@ -5229,36 +5257,21 @@ body.is-map-fullscreen #return-to-top {
   display: none;
 }
 
-/* The strip's scrollbar is hidden, so when it hides more tabs the nav paints
-   a gradient in its own background colour over the strip's edge: has-more-end
-   on the right, has-more-start at the strip's left edge (travel-nav.js reports
-   that offset as --strip-left). Masking the scrolling strip itself was tried
-   first (Oct 2026) and still left a tab cut mid-word on the owner's screen, so
-   the fade no longer depends on a mask on a scroll container. Phones keep
-   their own right-edge fade below. */
-@media screen and (min-width: 981px) {
-  .travel-section-nav.has-more-end::after,
-  .travel-section-nav.has-more-start::before {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    z-index: 3;
-    width: 3.5rem;
-    content: "";
-    pointer-events: none;
-  }
-
-  .travel-section-nav.has-more-end::after {
-    right: 0;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.96) 65%);
-  }
-
-  .travel-section-nav.has-more-start::before {
-    left: var(--strip-left, 0px);
-    background: linear-gradient(270deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.96) 65%);
-  }
+.travel-strip-arrow {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  line-height: 1;
+  font-size: 1rem;
 }
-
+.travel-strip-arrow:disabled { opacity: 0.3; }
+@media screen and (max-width: 980px) {
+  .travel-strip-arrow { display: none; }
+}
 
 .travel-jump-group a {
   display: inline-flex;
@@ -5939,6 +5952,13 @@ body.lightbox-open {
   background: rgba(0, 0, 0, 0.55);
   color: #fff;
   font-size: 0.9rem;
+}
+
+.lightbox__context {
+  display: block;
+  color: #d4dce0;
+  font-size: 0.8em;
+  line-height: 1.5;
 }
 
 .lightbox.is-caption-collapsed .lightbox__caption:not(.is-revealed) {
