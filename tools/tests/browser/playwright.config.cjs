@@ -5,6 +5,7 @@ module.exports = defineConfig({
   timeout: 120000,
   workers: 1,
   retries: 0,
+  reporter: process.env.CI ? [['line'], ['github']] : 'list',
   use: {
     baseURL: 'http://127.0.0.1:4321',
     reducedMotion: 'reduce',
