@@ -84,6 +84,39 @@
     });
   }
 
+  /* Arrowing through the lightbox used to stall on any photo whose tile had
+     not loaded yet: with no currentSrc to reuse, the viewer fell back to the
+     full original (250-600 KB) and waited for it. Instead, warm the tiles on
+     either side of the shown photo so their responsive file is already in
+     cache, and when a tile has not chosen a source yet pick the same candidate
+     the browser would (rendered width times device pixels) from its srcset. */
+  var responsiveCandidate = function (media, targetWidth) {
+    var fallback = media.getAttribute('src');
+    var srcset = media.getAttribute('srcset');
+    if (!srcset) return fallback;
+    var fit = null;
+    var largest = null;
+    srcset.split(',').forEach(function (entry) {
+      var parts = entry.trim().split(/\s+/);
+      var candidate = { url: parts[0], width: parseInt(parts[1], 10) || 0 };
+      if (!largest || candidate.width > largest.width) largest = candidate;
+      if (candidate.width >= targetWidth && (!fit || candidate.width < fit.width)) fit = candidate;
+    });
+    return (fit || largest || { url: fallback }).url;
+  };
+  var lightboxSource = function (media) {
+    if (media.currentSrc) return media.currentSrc;
+    var pixelRatio = Math.min(window.devicePixelRatio || 1, 3);
+    return responsiveCandidate(media, (media.clientWidth || 320) * pixelRatio);
+  };
+  var warmNeighbours = function (index) {
+    [1, -1, 2, -2].forEach(function (offset) {
+      var media = galleryMedia[(index + offset + galleryMedia.length) % galleryMedia.length];
+      if (media.tagName === 'VIDEO') revealPoster(media);
+      else warmImage(media);
+    });
+  };
+
   /* Backfill alt text from each photo's caption so screen readers (and the
      lightbox trigger's aria-label below) announce the real place instead of a
      filename. Journal images carry .content-text / .content-title captions. */
@@ -132,6 +165,7 @@
   var panY = 0;
   var captionOpen = false;
   var lastImageTap = 0;
+  var swapCount = 0;
   var clamp = function (value, minimum, maximum) {
     return Math.min(maximum, Math.max(minimum, value));
   };
@@ -318,6 +352,14 @@
     var accessibleName = source.alt || source.getAttribute('aria-label') || 'Gallery media';
     currentSource = source;
     currentIsVideo = isVideo;
+    /* Moving between photos must not animate the outgoing zoom or pan down to
+       the incoming fit: the 220ms transform transition read as the viewer
+       dragging its feet. Opening keeps its fade. */
+    if (!opening) {
+      viewerImage.style.transition = 'none';
+      var swap = ++swapCount;
+      setTimeout(function () { if (swap === swapCount) viewerImage.style.transition = ''; }, 80);
+    }
     resetMediaTransform();
     if (isVideo) {
       viewerImage.onload = null;
@@ -343,7 +385,7 @@
       viewerVideo.hidden = true;
       viewerImage.hidden = false;
       warmImage(source);
-      viewerImage.src = source.currentSrc || source.src;
+      viewerImage.src = lightboxSource(source);
       viewerImage.alt = accessibleName;
       viewerImage.onload = function () {
         syncMediaTools();
@@ -369,6 +411,7 @@
     if (!parts.length) parts.push(accessibleName);
     caption.textContent = parts.join(' · ');
     syncMediaTools();
+    warmNeighbours(current);
     overlay.setAttribute('aria-hidden', 'false');
     overlay.classList.add('is-visible');
     if (opening) {
