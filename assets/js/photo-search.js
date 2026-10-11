@@ -18,7 +18,12 @@
 
 	var status = document.getElementById('photo-search-status');
 	var clearButton = form.querySelector('.photo-search__clear');
-	var collapsible = document.querySelectorAll('.travel-atlas__layout, #main > .travel-archive-heading, #main > .travel-grid');
+	var collapsible = document.querySelectorAll('.travel-atlas__layout, .photo-explore__map-heading, #main > .travel-archive-heading, #main > .travel-grid');
+	var discovery = document.getElementById('photo-explore'), moment = document.getElementById('photo-moment');
+	var titles = {}, seenMoments = [];
+	document.getElementById('photo-explore-seeds').content.querySelectorAll('[data-tag]').forEach(function(a) {
+		titles[a.dataset.tag] = a.dataset.title;
+	});
 	var trips = {}, tags = [], photos = null, failed = false, tiers;
 	var timer = 0, saveTimer = 0, limit = PAGE, collapsed = false, tripFilter = '';
 
@@ -188,25 +193,94 @@
 		try { if (!previous.length) previous = JSON.parse(sessionStorage.getItem('photo-search-explore')) || []; } catch (e) {}
 		if (!Array.isArray(previous)) previous = [];
 		var pool = tags.filter(function(tag) { return tag.count > 0 && previous.indexOf(tag.tag) < 0; });
-		if (pool.length < 8) pool = tags.filter(function(tag) { return tag.count > 0; });
+		if (pool.length < 6) pool = tags.filter(function(tag) { return tag.count > 0; });
 		shuffle(pool).forEach(function(tag) { (groups[tag.facet] || (groups[tag.facet] = [])).push(tag); });
 		var facets = shuffle(Object.keys(groups));
 		explore = [];
-		while (facets.length && explore.length < 8) {
+		while (facets.length && explore.length < 6) {
 			var facet = facets.shift();
-			explore.push({ tag: groups[facet].pop().tag });
+			var tag = groups[facet].pop().tag;
+			var candidates = shuffle(photos.filter(function(photo) { return photo.tags.indexOf(tag) >= 0; }));
+			var unused = candidates.filter(function(photo) { return !explore.some(function(item) { return item.photo.id === photo.id; }); });
+			if (!unused.length) { if (groups[facet].length) facets.push(facet); continue; }
+			var varied = unused.filter(function(photo) { return !explore.some(function(item) { return item.photo.trip === photo.trip; }); });
+			explore.push({ tag: tag, photo: (varied.length ? varied : unused)[0] });
 			if (groups[facet].length) facets.push(facet);
 		}
 		try { sessionStorage.setItem('photo-search-explore', JSON.stringify(explore.map(function(tag) { return tag.tag; }))); } catch (e) {}
 	}
 
+	function thumbnail(photo) {
+		return '<img loading="lazy" decoding="async" src="' + escape(photo.thumb) + '" alt="' + escape(photo.alt) +
+			'" width="' + photo.w + '" height="' + photo.h + '" style="object-position:' +
+			(photo.fx == null ? 50 : photo.fx) + '% ' + (photo.fy == null ? 50 : photo.fy) + '%">';
+	}
+
+	function renderExplore() {
+		discovery.querySelector('.photo-explore__cards').innerHTML = explore.map(function(item) {
+			var title = titles[item.tag] || item.tag.replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); });
+			return '<a class="photo-explore__card" data-explore-action="tag" data-tag="' + escape(item.tag) +
+				'" href="travel?q=' + encodeURIComponent(item.tag) + '">' + thumbnail(item.photo) +
+				'<span class="photo-explore__caption"><strong>' + escape(title) + '</strong><span>' + escape(item.tag) +
+				' <span aria-hidden="true">&#8599;</span></span></span></a>';
+		}).join('');
+	}
+
+	// Choose a trip first so the longest journal cannot dominate. Do not repeat
+	// a photo until the collection is exhausted; blocked storage still works.
+	function pickMoment() {
+		if (!seenMoments.length) {
+			try { seenMoments = JSON.parse(sessionStorage.getItem('photo-explore-moments')) || []; } catch (e) {}
+			if (!Array.isArray(seenMoments)) seenMoments = [];
+			seenMoments = seenMoments.filter(function(id) { return typeof id === 'string' && photos.some(function(p) { return p.id === id; }); });
+		}
+		var last = photos.find(function(p) { return p.id === seenMoments[seenMoments.length - 1]; });
+		var available = photos.filter(function(p) { return seenMoments.indexOf(p.id) < 0; });
+		if (!available.length) { seenMoments = []; available = photos; }
+		var tripPool = unique(available.map(function(p) { return p.trip; }));
+		if (last && tripPool.length > 1) tripPool = tripPool.filter(function(trip) { return trip !== last.trip; });
+		var trip = shuffle(tripPool)[0];
+		var photo = shuffle(available.filter(function(p) { return p.trip === trip; }))[0];
+		seenMoments.push(photo.id);
+		try { sessionStorage.setItem('photo-explore-moments', JSON.stringify(seenMoments)); } catch (e) {}
+		return photo;
+	}
+
+	function consumeIntent() {
+		var action = form.dataset.exploreIntent;
+		if (!action || !photos && !failed) return;
+		delete form.dataset.exploreIntent;
+		if (failed) { status.textContent = 'Photo search is unavailable right now.'; return; }
+		if (action.indexOf('tag:') === 0) {
+			input.value = action.slice(4);
+			run();
+			results.querySelector('.photo-hit').focus();
+		} else if (action === 'shuffle') {
+			exploreMore(); renderExplore();
+			status.textContent = 'Six new photo topics to explore.';
+		} else if (action === 'surprise') {
+			var photo = pickMoment(), first = moment.hidden;
+			input.value = ''; run();
+			discovery.hidden = true;
+			moment.hidden = false;
+			moment.querySelector('.photo-moment__content').innerHTML =
+				'<a class="photo-moment__image" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '" aria-label="Open photo: ' + escape(photo.place) + '">' + thumbnail(photo) + '</a>' +
+				'<div class="photo-moment__copy"><span class="travel-atlas__eyebrow">A moment from the journals</span>' +
+				'<h2 id="photo-moment-title" tabindex="-1">' + escape(photo.place) + '</h2><p>' + escape(trips[photo.trip].label + ' · ' + trips[photo.trip].year) +
+				'</p><p>' + escape(photo.sectionTitle) + '</p><a class="photo-moment__read" href="' + escape(photo.trip + '#' + photo.section) + '">Read this day <span aria-hidden="true">&#8599;</span></a></div>';
+			status.textContent = photo.place + ' · ' + tripLabel(photo.trip);
+			if (first) document.getElementById('photo-moment-title').focus();
+		} else if (action === 'back') {
+			moment.hidden = true; discovery.hidden = false; status.textContent = '';
+			form.querySelector('[data-explore-action="surprise"]').focus();
+		}
+	}
+	form.addEventListener('explore', consumeIntent);
+
 	function starters() {
-		if (!explore.length) exploreMore();
 		var past = recent().map(function(query) { return { tag: query }; });
-		return (past.length ? chipList(past, 'Recent searches', true, 'Recent',
-			'<li><button type="button" class="photo-search__chip photo-search__forget" data-forget aria-label="Clear recent searches">Clear</button></li>') : '') +
-			chipList(explore, 'Explore your photos', true, 'Explore',
-				'<li class="photo-search__shuffle"><button type="button" class="photo-search__chip" data-shuffle aria-label="Shuffle exploration suggestions">Shuffle &#8635;</button></li>');
+		return past.length ? chipList(past, 'Recent searches', true, 'Recent',
+			'<li><button type="button" class="photo-search__chip photo-search__forget" data-forget aria-label="Clear recent searches">Clear</button></li>') : '';
 	}
 
 	// Complete a matching phrase (including a synonym), without duplicating it.
@@ -322,7 +396,9 @@
 		clearTimeout(timer);
 		clearTimeout(saveTimer);
 		var value = input.value, query = value.trim();
-		if (!query && renderedQuery) { exploreMore(); renderedQuery = ''; }
+		if (!query && renderedQuery) { exploreMore(); renderExplore(); renderedQuery = ''; }
+		discovery.hidden = !!query && !failed;
+		moment.hidden = true;
 		var terms = unique(tokens(value));
 		clearButton.hidden = !value;
 		syncUrl(query);
@@ -380,9 +456,6 @@
 			results.querySelectorAll('[data-trip]')[at].focus();
 		} else if (button.hasAttribute('data-clear')) {
 			clearSearch();
-		} else if (button.hasAttribute('data-shuffle')) {
-			exploreMore(); suggest('');
-			chips.querySelector('[data-shuffle]').focus();
 		} else if (button.hasAttribute('data-forget')) {
 			recent([]);
 			suggest('');
@@ -391,6 +464,7 @@
 	}
 
 	input.addEventListener('input', function() {
+		delete form.dataset.exploreIntent;
 		results.inert = true;
 		clearButton.hidden = !input.value;
 		clearTimeout(timer);
@@ -442,5 +516,5 @@
 		})
 		.then(prepare)
 		.catch(function() { failed = true; })
-		.then(run);
+		.then(function() { run(); consumeIntent(); });
 })();

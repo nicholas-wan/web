@@ -257,7 +257,8 @@ Assert-FileSizeBudget 'assets\css\travel-journal.css' 30
 # Photo search styles live in their own route bundle because travel-map-page.css
 # sits within a few hundred bytes of its cap (Oct 2026).
 # 10 -> 11: partial-match reason line, Oct 2026.
-Assert-FileSizeBudget 'assets\css\travel-search.css' 11
+# 11 -> 16: approved photo postcards and random-moment preview (Oct 2026).
+Assert-FileSizeBudget 'assets\css\travel-search.css' 16
 Assert-FileSizeBudget 'assets\css\experience-page.css' 12
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 Assert-FileSizeBudget 'assets\css\skills-page.css' 10
@@ -288,12 +289,16 @@ Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
 # 14 -> 15: fuzzy matching as a fallback only, entity-safe highlights, Oct 2026.
 # 15 -> 16: per-journal runs and the journal legend/filter row, Oct 2026.
 # 16 -> 19: randomized Explore plus relevance, input and storage safeguards (Oct 2026).
-Assert-FileSizeBudget 'assets\js\photo-search.js' 19
+# 19 -> 25: real photo postcards, trip-balanced Surprise me and lazy intent handoff (Oct 2026).
+Assert-FileSizeBudget 'assets\js\photo-search.js' 25
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8
 $searchLoader = [regex]::Match($travel, '(?s)<script>(.*?dataset\.searchScript.*?)</script>')
-if (-not $searchLoader.Success -or $searchLoader.Groups[1].Value.Length -gt 512 -or $searchLoader.Groups[1].Value -notmatch '\[\?&\]q=') { throw 'The travel page must carry its small inline photo-search loader (data-search-script, ?q= early load) inside #main.' }
+# 512 -> 2048: randomize six inert thumbnail seeds without fetching the index;
+# queue the first discovery action while the lazy module/index arrive (Oct 2026).
+if (-not $searchLoader.Success -or $searchLoader.Groups[1].Value.Length -gt 2048 -or $searchLoader.Groups[1].Value -notmatch '\[\?&\]q=') { throw 'The travel page must carry its small inline photo-search loader (data-search-script, ?q= early load) inside #main.' }
+if ($travel -notmatch '<template id="photo-explore-seeds">' -or [regex]::Matches($travel, 'class="photo-explore__card"').Count -ne 30 -or $travel -match '<!-- PHOTO_EXPLORE_') { throw 'Travel must ship 24 inert postcards and six no-JS fallback cards, all expanded by the build.' }
 if ($travel -notmatch 'id="photo-results"[^>]*aria-labelledby="photo-results-title"' -or $travel -notmatch 'id="photo-search-status"[^>]*aria-live="polite"') { throw 'The travel page must ship the photo results landmark and its live status line before the search module loads.' }
 if ($photoSearchJs -notmatch 'history\.replaceState' -or $photoSearchJs -notmatch 'data-search-index' -or $photoSearchJs -notmatch 'DEBOUNCE = 120' -or $photoSearchJs -notmatch 'object-position:' -or $photoSearchJs -notmatch 'photo\.fx') { throw 'photo-search.js must keep URL state in ?q=, read the index from data-search-index, debounce input at 120ms, and preserve authored focal points in result thumbnails.' }
 $travelSearchCss = Get-Content -LiteralPath (Join-Path $dist 'assets/css/travel-search.css') -Raw -Encoding UTF8

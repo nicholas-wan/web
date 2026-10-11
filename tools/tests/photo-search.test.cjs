@@ -7,34 +7,54 @@ const root = path.resolve(__dirname, '../..');
 const index = JSON.parse(fs.readFileSync(path.join(root, 'dist/assets/data/photo-index.json'), 'utf8'));
 
 function setup(saved = {}) {
-  const node = () => ({ value: '', hidden: false, innerHTML: '', textContent: '',
+  const node = () => ({ value: '', hidden: false, innerHTML: '', textContent: '', dataset: {},
     addEventListener() {}, querySelector() { return node(); }, querySelectorAll() { return []; },
     classList: { toggle() {} }, focus() {} });
   const form = node(), input = form.q = node(), results = node();
   results.parentNode = node();
-  const nodes = { 'photo-search': form, 'photo-results': results, 'photo-search-status': node() };
+  const nodes = { 'photo-search': form, 'photo-results': results, 'photo-search-status': node(),
+    'photo-explore': node(), 'photo-moment': node(), 'photo-explore-seeds': { content: node() } };
   const storage = { getItem: key => saved[key] || null, setItem: (key, value) => { saved[key] = value; } };
   const context = { document: { getElementById: id => nodes[id], querySelectorAll: () => [] },
     localStorage: storage, sessionStorage: storage, setTimeout: () => 1, clearTimeout() {},
     URLSearchParams, location: { search: '', pathname: '/travel', hash: '' }, history: { replaceState() {} } };
   let source = fs.readFileSync(path.join(root, 'assets/js/photo-search.js'), 'utf8');
-  source = source.replace('\tvar initial =', '\tglobalThis.api = { prepare, search, tokens, highlight, completeTag, exploreMore, recent, run, tripLabel, getExplore: () => explore, getTags: () => tags }; return;\n\tvar initial =');
+  source = source.replace('\tvar initial =', '\tglobalThis.api = { prepare, search, tokens, highlight, completeTag, exploreMore, pickMoment, recent, run, tripLabel, getExplore: () => explore, getTags: () => tags }; return;\n\tvar initial =');
   vm.runInNewContext(source, context);
   context.api.prepare(structuredClone(index));
   return { ...context.api, input, status: nodes['photo-search-status'], saved };
 }
 
-test('exploration samples eight populated facets without repeating the preceding batch', () => {
+test('exploration samples six populated facets with matching, distinct photos and fresh topics', () => {
   const api = setup();
   api.exploreMore();
   const first = api.getExplore().map(t => t.tag);
-  assert.equal(new Set(first).size, 8);
-  assert.equal(new Set(first.map(name => index.tags.find(t => t.tag === name).facet)).size, 8);
+  assert.equal(new Set(first).size, 6);
+  assert.equal(new Set(first.map(name => index.tags.find(t => t.tag === name).facet)).size, 6);
+  assert.equal(new Set(api.getExplore().map(t => t.photo.id)).size, 6);
+  assert.ok(api.getExplore().every(t => t.photo.tags.includes(t.tag)));
   api.exploreMore();
   assert.ok(api.getExplore().every(t => !first.includes(t.tag)));
   const reloaded = setup(api.saved);
   reloaded.exploreMore();
   assert.ok(reloaded.getExplore().every(t => !api.getExplore().some(p => p.tag === t.tag)));
+});
+
+test('Surprise me visits every photo before repeating, varies trips and survives reload', () => {
+  const api = setup(), seen = new Set();
+  let last;
+  for (let i = 0; i < index.photos.length; i++) {
+    const photo = api.pickMoment();
+    assert.ok(!seen.has(photo.id));
+    const remainingTrips = new Set(index.photos.filter(p => !seen.has(p.id)).map(p => p.trip));
+    if (last && remainingTrips.size > 1) assert.notEqual(photo.trip, last.trip);
+    seen.add(photo.id); last = photo;
+  }
+  assert.equal(seen.size, index.photos.length);
+  const next = api.pickMoment();
+  assert.notEqual(next.trip, last.trip);
+  const reloaded = setup(api.saved);
+  assert.notEqual(reloaded.pickMoment().id, next.id);
 });
 
 test('every exploration candidate has at least one full-match photo', () => {

@@ -51,8 +51,8 @@
 							<header class="travel-atlas__header">
 								<div>
 									<span class="travel-atlas__eyebrow">Travel journals</span>
-									<h1 id="travel-atlas-title">Explore by destination</h1>
-									<p>Select a destination to browse trip stories and photos.</p>
+									<h1 id="travel-atlas-title">Wander through the journals.</h1>
+									<p>Places, meals and little moments from the road.</p>
 								</div>
 								<p class="travel-atlas__summary"><strong>10</strong> journals <span aria-hidden="true">&middot;</span> <strong>4</strong> continents</p>
 								<!-- Photo search. The build swaps data-search-script (and data-search-index) for
@@ -61,15 +61,26 @@
 								<form class="photo-search" id="photo-search" role="search" data-search-script="assets/js/photo-search.js" data-search-index="assets/data/photo-index.json" autocomplete="off">
 									<label class="sr-only" for="photo-search-input">Search travel photos</label>
 									<div class="photo-search__field">
-										<input class="photo-search__input" id="photo-search-input" type="search" name="q" placeholder="Search photos" aria-describedby="photo-search-hint" aria-controls="photo-results" enterkeyhint="search" spellcheck="false" />
+										<input class="photo-search__input" id="photo-search-input" type="search" name="q" placeholder="Search places, food, moments…" aria-describedby="photo-search-hint" aria-controls="photo-results" enterkeyhint="search" spellcheck="false" />
 										<kbd class="photo-search__key" aria-hidden="true">/</kbd>
 										<button type="button" class="photo-search__clear" aria-label="Clear search" data-clear hidden>&times;</button>
 									</div>
-									<p class="photo-search__hint" id="photo-search-hint">Search every journal photo by place, subject or caption.</p>
+									<button type="button" class="photo-explore__button photo-explore__surprise" data-explore-action="surprise" hidden>Surprise me <span aria-hidden="true">&#8599;</span></button>
+									<p class="sr-only" id="photo-search-hint">Search every journal photo by place, subject or caption.</p>
 									<div class="photo-search__suggest"></div>
 									<p class="photo-search__status" id="photo-search-status" role="status" aria-live="polite"></p>
 								</form>
 							</header>
+
+							<section class="photo-explore" id="photo-explore" aria-labelledby="photo-explore-title">
+								<div class="photo-explore__heading"><h2 id="photo-explore-title">Follow your curiosity</h2><button type="button" class="photo-explore__button" data-explore-action="shuffle" hidden>Another mix <span aria-hidden="true">&#8635;</span></button></div>
+								<div class="photo-explore__cards"><noscript><!-- PHOTO_EXPLORE_FALLBACK --></noscript></div>
+								<template id="photo-explore-seeds"><!-- PHOTO_EXPLORE_SEEDS --></template>
+							</section>
+							<section class="photo-moment" id="photo-moment" aria-labelledby="photo-moment-title" hidden>
+								<div class="photo-moment__content"></div>
+								<div class="photo-moment__actions"><button type="button" class="photo-explore__button" data-explore-action="surprise">Another moment <span aria-hidden="true">&#8635;</span></button><button type="button" class="photo-explore__button" data-explore-action="back">Back to exploring</button></div>
+							</section>
 
 							<!-- Photo search results; the map and archive are hidden while they show. -->
 							<section class="photo-results" id="photo-results" aria-labelledby="photo-results-title" hidden>
@@ -78,6 +89,7 @@
 								<button type="button" class="button photo-results__more" hidden></button>
 							</section>
 
+							<div class="photo-explore__map-heading"><h2>Explore by destination</h2><p>Select a destination to browse trip stories and photos.</p></div>
 							<div class="travel-atlas__layout">
 								<div class="travel-map">
 								<div class="travel-map__viewport" role="region" tabindex="0" aria-label="Interactive travel map. Scroll to zoom and drag to move around the map.">
@@ -341,7 +353,7 @@
 						     main-to-footer markup; it injects photo-search.js on first interaction with
 						     the field (or at once for a ?q= link) so the script stays off the travel
 						     page's 80 KB <script src> budget. -->
-						<script>(function(){var D=document,f=D.getElementById('photo-search'),i=f&&f.q,d;function l(){d||(d=D.createElement('script'),d.src=f.dataset.searchScript,d.onerror=function(){D.getElementById('photo-search-status').textContent='Photo search is unavailable right now.'},D.body.appendChild(d))}if(i){/[?&]q=/.test(location.search)&&l();i.onfocus=i.onpointerdown=i.onkeydown=l;D.addEventListener('keydown',function(e){e.key!='/'||/^(INP|TEX|SEL)/.test(e.target.tagName)||(e.preventDefault(),i.focus())})}}());</script>
+						<script>(function(){var D=document,f=D.getElementById('photo-search'),i=f.q,d,ready=false,s=D.getElementById('photo-search-status'),key='photo-search-explore',old=[],seeds=[].slice.call(D.getElementById('photo-explore-seeds').content.children);try{old=JSON.parse(sessionStorage.getItem(key))||[]}catch(e){}if(!Array.isArray(old))old=[];old=old.slice(0,6);var pool=seeds.filter(function(a){return old.indexOf(a.dataset.tag)<0}),cards=[];while(pool.length&&cards.length<6){cards.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0].cloneNode(true))}D.querySelector('.photo-explore__cards').replaceChildren.apply(D.querySelector('.photo-explore__cards'),cards);try{sessionStorage.setItem(key,JSON.stringify(cards.map(function(a){return a.dataset.tag})))}catch(e){}D.querySelectorAll('[data-explore-action]').forEach(function(b){b.hidden=false});function send(){f.dispatchEvent(new Event('explore'))}function l(){if(d)return;d=D.createElement('script');d.src=f.dataset.searchScript;d.onload=function(){ready=true;send()};d.onerror=function(){s.textContent='Photo search is unavailable right now.';d=null};D.body.appendChild(d)}D.addEventListener('click',function(e){var b=e.target.closest('[data-explore-action]');if(!b||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();f.dataset.exploreIntent=b.dataset.exploreAction==='tag'?'tag:'+b.dataset.tag:b.dataset.exploreAction;s.textContent='Loading photos…';if(ready)send();else l()});/[?&]q=/.test(location.search)&&l();i.onfocus=i.onpointerdown=i.onkeydown=l;i.oninput=function(){delete f.dataset.exploreIntent};D.addEventListener('keydown',function(e){e.key!='/'||/^(INP|TEX|SEL)/.test(e.target.tagName)||(e.preventDefault(),i.focus())})}());</script>
 
 								</div>
 								<footer id="footer">

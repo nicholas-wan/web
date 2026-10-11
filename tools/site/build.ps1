@@ -882,6 +882,31 @@ $photoIndexPhotos = foreach ($entry in $photoEntries) {
 $photoIndexJson = '{"version":1,"trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + "]}`n"
 $assetVersions['assets/data/photo-index.json'] = Get-ContentVersion $photoIndexJson
 
+# Small, inert postcard seeds make discovery available without fetching the
+# full index. The browser only attaches six thumbnails; the rest stay inert.
+$exploreThemes = Get-Content -LiteralPath (Join-Path $root 'journals\explore-themes.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$exploreUsedPhotos = @{}
+$exploreTripCounts = @{}
+$exploreFallback = [System.Collections.Generic.List[string]]::new()
+$exploreCards = @(foreach ($theme in $exploreThemes.PSObject.Properties) {
+    $tag = $theme.Name
+    if (-not $photoTagCounts[$tag]) { throw "Explore theme has no photos: $tag" }
+    $photo = $photoEntries | Where-Object { $_.Tags -contains $tag -and -not $_.Video -and -not $exploreUsedPhotos[$_.Id] } |
+        Sort-Object @{ Expression = { [int]$exploreTripCounts[$_.Trip] } }, @{ Expression = { if ($_.Width -ge $_.Height) { 0 } else { 1 } } } | Select-Object -First 1
+    if (-not $photo) { throw "Explore theme needs a distinct still photo: $tag" }
+    $exploreUsedPhotos[$photo.Id] = $true
+    $exploreTripCounts[$photo.Trip] = 1 + [int]$exploreTripCounts[$photo.Trip]
+    $name = [System.Net.WebUtility]::HtmlEncode($tag)
+    $title = [System.Net.WebUtility]::HtmlEncode($theme.Value)
+    $alt = [System.Net.WebUtility]::HtmlEncode($photo.Alt)
+    $focus = $photo.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + '% ' + $photo.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) + '%'
+    $card = '<a class="photo-explore__card" data-explore-action="tag" data-tag="' + $name + '" data-title="' + $title + '" href="travel?q=' + [uri]::EscapeDataString($tag) + '">' +
+        '<img src="' + $photo.Thumb + '" alt="' + $alt + '" width="' + $photo.Width + '" height="' + $photo.Height + '" loading="lazy" decoding="async" style="object-position:' + $focus + '">' +
+        '<span class="photo-explore__caption"><strong>' + $title + '</strong><span>' + $name + ' <span aria-hidden="true">&#8599;</span></span></span></a>'
+    $exploreFallback.Add(($card -replace 'href="[^"]+"', ('href="' + $photo.Trip + '#' + $photo.Section + '"')))
+    $card
+})
+
 $eventPages = @('house', 'prewed')
 $modularJournalSlugs = @($journalManifest | Where-Object { $_.contentOnly } | ForEach-Object { $_.slug })
 $pages = @(
@@ -939,6 +964,8 @@ foreach ($page in $pages) {
         # versioned URL from this attribute and injects the script on demand.
         $main = $main.Replace('data-search-script="assets/js/photo-search.js"', "data-search-script=`"$(Get-AssetRef 'assets/js/photo-search.js')`"")
         $main = $main.Replace('data-search-index="assets/data/photo-index.json"', "data-search-index=`"$(Get-AssetRef 'assets/data/photo-index.json')`"")
+        $main = $main.Replace('<!-- PHOTO_EXPLORE_SEEDS -->', ($exploreCards -join "`n"))
+        $main = $main.Replace('<!-- PHOTO_EXPLORE_FALLBACK -->', (($exploreFallback | Select-Object -First 6) -join "`n"))
     }
     if ($journalBySlug.ContainsKey($slug)) {
         $title = $journalBySlug[$slug].title
