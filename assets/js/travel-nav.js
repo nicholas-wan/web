@@ -217,8 +217,15 @@
   if (edgeStrip) {
     var markStripEdges = function () {
       var hidden = edgeStrip.scrollWidth - edgeStrip.clientWidth;
-      edgeStrip.classList.toggle('has-more-start', edgeStrip.scrollLeft > 2);
-      edgeStrip.classList.toggle('has-more-end', edgeStrip.scrollLeft < hidden - 2);
+      var moreStart = edgeStrip.scrollLeft > 2;
+      var moreEnd = edgeStrip.scrollLeft < hidden - 2;
+      edgeStrip.classList.toggle('has-more-start', moreStart);
+      edgeStrip.classList.toggle('has-more-end', moreEnd);
+      /* The desktop fades are painted by the nav over the strip's edges, so
+         the nav carries the same flags and learns where the strip starts. */
+      nav.classList.toggle('has-more-start', moreStart);
+      nav.classList.toggle('has-more-end', moreEnd);
+      nav.style.setProperty('--strip-left', Math.max(0, Math.round(edgeStrip.getBoundingClientRect().left - nav.getBoundingClientRect().left)) + 'px');
     };
     edgeStrip.addEventListener('scroll', markStripEdges, { passive: true });
     window.addEventListener('resize', markStripEdges);
