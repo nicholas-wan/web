@@ -133,6 +133,8 @@ test('initial and shuffled postcards render the reviewed thumbnail and crop for 
       expect(card.src).toBe(data.photos.find(p => p.id === card.id).thumb);
       expect(card.crop).toBe(`${cover.fx}% ${cover.fy}%`);
       expect(card.caption).not.toContain('Photo:');
+      expect(card.caption).toMatch(/ · \d{4}/);
+      expect(card.caption).not.toContain('Â');
     }
     if (!batch) {
       await page.getByRole('button', { name: 'Another mix' }).click();

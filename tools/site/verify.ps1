@@ -223,7 +223,8 @@ $prewed = Get-Content -LiteralPath (Join-Path $dist 'prewed.html') -Raw -Encodin
 foreach ($copiedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'assets/css/noscript.css',
         'assets/js/game.js', 'assets/js/listing-effects.js', 'assets/js/journal-progress.js',
         'assets/js/gallery.js', 'assets/js/travel-nav.js', 'assets/js/travel-map.js',
-        'assets/js/personal-timeline.js', 'assets/js/scramble-reveal.js')) {
+        'assets/js/personal-timeline.js', 'assets/js/scramble-reveal.js',
+        'assets/js/travel-discovery.js', 'assets/js/photo-search.js')) {
     Assert-DistMatchesSource $copiedAsset
 }
 
@@ -284,21 +285,22 @@ Assert-FileSizeBudget 'assets\js\canvas-background.js' 14
 Assert-FileSizeBudget 'assets\js\game.js' 24
 Assert-FileSizeBudget 'assets\js\listing-effects.js' 8
 Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
-# photo-search.js is injected on demand by the travel page's inline loader, so
+# photo-search.js is injected on demand by the travel page's discovery bootstrap, so
 # it is outside the per-page <script src> ceiling and carries its own budget.
 # 12 -> 14: quick-fill Try/Recent chips, Oct 2026.
 # 14 -> 15: fuzzy matching as a fallback only, entity-safe highlights, Oct 2026.
 # 15 -> 16: per-journal runs and the journal legend/filter row, Oct 2026.
 # 16 -> 19: randomized Explore plus relevance, input and storage safeguards (Oct 2026).
 # 19 -> 25: real photo postcards, trip-balanced Surprise me and lazy intent handoff (Oct 2026).
-Assert-FileSizeBudget 'assets\js\photo-search.js' 25
+# 25 -> 26: retry recovery, reversible moments and responsive previews (Oct 2026).
+Assert-FileSizeBudget 'assets\js\photo-search.js' 26
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8
-$searchLoader = [regex]::Match($travel, '(?s)<script>(.*?dataset\.searchScript.*?)</script>')
-# 512 -> 2048: randomize six inert thumbnail seeds without fetching the index;
-# queue the first discovery action while the lazy module/index arrive (Oct 2026).
-if (-not $searchLoader.Success -or $searchLoader.Groups[1].Value.Length -gt 2048 -or $searchLoader.Groups[1].Value -notmatch '\[\?&\]q=') { throw 'The travel page must carry its small inline photo-search loader (data-search-script, ?q= early load) inside #main.' }
+# The readable bootstrap replaces the inline loader and defers the 63 KB atlas.
+Assert-FileSizeBudget 'assets\js\travel-discovery.js' 6
+Assert-FileSizeBudget 'assets\js\travel-map.js' 64
+if ($travel -notmatch ('<script src="' + [regex]::Escape((Get-DistAssetRef 'assets/js/travel-discovery.js')) + '"') -or $travel -match '<script\b[^>]*\bsrc="assets/js/travel-map\.js' -or $travel -notmatch ('data-map-script="' + [regex]::Escape((Get-DistAssetRef 'assets/js/travel-map.js')) + '"')) { throw 'Travel must load the discovery bootstrap and defer the versioned atlas until approach or interaction.' }
 if ($travel -notmatch '<template id="photo-explore-seeds">' -or [regex]::Matches($travel, 'class="photo-explore__card"').Count -ne 30 -or $travel -match '<!-- PHOTO_EXPLORE_') { throw 'Travel must ship 24 inert postcards and six no-JS fallback cards, all expanded by the build.' }
 if ($travel -notmatch 'id="photo-results"[^>]*aria-labelledby="photo-results-title"' -or $travel -notmatch 'id="photo-search-status"[^>]*aria-live="polite"') { throw 'The travel page must ship the photo results landmark and its live status line before the search module loads.' }
 if ($photoSearchJs -notmatch 'history\.replaceState' -or $photoSearchJs -notmatch 'data-search-index' -or $photoSearchJs -notmatch 'DEBOUNCE = 120' -or $photoSearchJs -notmatch 'object-position:' -or $photoSearchJs -notmatch 'photo\.fx') { throw 'photo-search.js must keep URL state in ?q=, read the index from data-search-index, debounce input at 120ms, and preserve authored focal points in result thumbnails.' }
@@ -315,6 +317,14 @@ try {
     throw "assets/data/photo-index.json does not parse: $($_.Exception.Message)"
 }
 if ($photoIndex.version -ne 2) { throw 'assets/data/photo-index.json must declare version 2 (compact reviewed covers).' }
+if ($photoIndex.variants.Length -ne $photoIndex.photos.Count -or $photoIndex.variants -match '[^012]') { throw 'Every indexed photo must have a responsive variant flag.' }
+for ($i = 0; $i -lt $photoIndex.photos.Count; $i++) {
+    $photo = $photoIndex.photos[$i]
+    $flag = $photoIndex.variants.Substring($i, 1)
+    if ($flag -eq '0') { continue }
+    if ($photo.video -or $photo.w -le 480 -or $photo.thumb -cne ($photo.src -replace '(\.[^.]+)$', '-480$1')) { throw "Unsafe responsive photo: $($photo.id)" }
+    if ($flag -eq '2' -and -not (Test-Path -LiteralPath (Join-Path $dist ($photo.thumb -replace '-480\.', '-800.')))) { throw "Missing responsive sibling: $($photo.id)" }
+}
 $coverReviews = Get-Content -LiteralPath (Join-Path $root 'journals/explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 if (@($photoIndex.covers).Count -ne $coverReviews.Count) { throw 'The photo index must include every reviewed discovery cover.' }
 $publishedCovers = @{}

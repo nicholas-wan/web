@@ -56,7 +56,7 @@
 								</div>
 								<p class="travel-atlas__summary"><strong>10</strong> journals <span aria-hidden="true">&middot;</span> <strong>4</strong> continents</p>
 								<!-- Photo search. The build swaps data-search-script (and data-search-index) for
-								     versioned URLs; the inline loader at the end of #main injects
+								     versioned URLs; travel-discovery.js injects
 								     photo-search.js on demand, which adds the tag chips and the results section. -->
 								<form class="photo-search" id="photo-search" role="search" data-search-script="assets/js/photo-search.js" data-search-index="assets/data/photo-index.json" autocomplete="off">
 									<label class="sr-only" for="photo-search-input">Search travel photos</label>
@@ -69,17 +69,19 @@
 									<p class="sr-only" id="photo-search-hint">Search every journal photo by place, subject or caption.</p>
 									<div class="photo-search__suggest"></div>
 									<p class="photo-search__status" id="photo-search-status" role="status" aria-live="polite"></p>
+									<button type="button" class="photo-explore__button" id="photo-search-retry" hidden>Try again</button>
 								</form>
 							</header>
 
 							<section class="photo-explore" id="photo-explore" aria-labelledby="photo-explore-title">
 								<div class="photo-explore__heading"><h2 id="photo-explore-title">Browse photos</h2><button type="button" class="photo-explore__button" data-explore-action="shuffle" hidden>Another mix <span aria-hidden="true">&#8635;</span></button></div>
+								<p class="photo-explore__hint" hidden>Choose a topic to find matching photos.</p>
 								<div class="photo-explore__cards"><noscript><!-- PHOTO_EXPLORE_FALLBACK --></noscript></div>
 								<template id="photo-explore-seeds"><!-- PHOTO_EXPLORE_SEEDS --></template>
 							</section>
 							<section class="photo-moment" id="photo-moment" aria-labelledby="photo-moment-title" hidden>
 								<div class="photo-moment__content"></div>
-								<div class="photo-moment__actions"><button type="button" class="photo-explore__button" data-explore-action="surprise">Another moment <span aria-hidden="true">&#8635;</span></button><button type="button" class="photo-explore__button" data-explore-action="back">Back to exploring</button></div>
+								<div class="photo-moment__actions"><button type="button" class="photo-explore__button" data-explore-action="previous" disabled>Previous moment</button><button type="button" class="photo-explore__button" data-explore-action="surprise">Another moment <span aria-hidden="true">&#8635;</span></button><button type="button" class="photo-explore__button" data-explore-action="back">Back to exploring</button></div>
 							</section>
 
 							<!-- Photo search results; the map and archive are hidden while they show. -->
@@ -90,7 +92,7 @@
 							</section>
 
 							<div class="photo-explore__map-heading"><h2>Explore by destination</h2><p>Select a destination to browse trip stories and photos.</p></div>
-							<div class="travel-atlas__layout">
+							<div class="travel-atlas__layout" data-map-script="assets/js/travel-map.js">
 								<div class="travel-map">
 								<div class="travel-map__viewport" role="region" tabindex="0" aria-label="Interactive travel map. Scroll to zoom and drag to move around the map.">
 									<div class="travel-map__canvas">
@@ -348,12 +350,6 @@
 							</article>
 
 						</section>
-
-						<!-- Photo search loader. It lives inside #main because the build carries only
-						     main-to-footer markup; it injects photo-search.js on first interaction with
-						     the field (or at once for a ?q= link) so the script stays off the travel
-						     page's 80 KB <script src> budget. -->
-						<script>(function(){var D=document,f=D.getElementById('photo-search'),i=f.q,d,ready=false,s=D.getElementById('photo-search-status'),key='photo-search-explore',old=[],seeds=[].slice.call(D.getElementById('photo-explore-seeds').content.children);try{old=JSON.parse(sessionStorage.getItem(key))||[]}catch(e){}if(!Array.isArray(old))old=[];old=old.slice(0,6);var pool=seeds.filter(function(a){return old.indexOf(a.dataset.tag)<0}),cards=[];while(pool.length&&cards.length<6){cards.push(pool.splice(Math.floor(Math.random()*pool.length),1)[0].cloneNode(true))}D.querySelector('.photo-explore__cards').replaceChildren.apply(D.querySelector('.photo-explore__cards'),cards);try{sessionStorage.setItem(key,JSON.stringify(cards.map(function(a){return a.dataset.tag})))}catch(e){}D.querySelectorAll('[data-explore-action]').forEach(function(b){b.hidden=false});function send(){f.dispatchEvent(new Event('explore'))}function l(){if(d)return;d=D.createElement('script');d.src=f.dataset.searchScript;d.onload=function(){ready=true;send()};d.onerror=function(){s.textContent='Photo search is unavailable right now.';d=null};D.body.appendChild(d)}D.addEventListener('click',function(e){var b=e.target.closest('[data-explore-action]');if(!b||e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();f.dataset.exploreIntent=b.dataset.exploreAction==='tag'?'tag:'+b.dataset.tag:b.dataset.exploreAction;s.textContent='Loading photos…';if(ready)send();else l()});/[?&]q=/.test(location.search)&&l();i.onfocus=i.onpointerdown=i.onkeydown=l;i.oninput=function(){delete f.dataset.exploreIntent};D.addEventListener('keydown',function(e){e.key!='/'||/^(INP|TEX|SEL)/.test(e.target.tagName)||(e.preventDefault(),i.focus())})}());</script>
 
 								</div>
 								<footer id="footer">

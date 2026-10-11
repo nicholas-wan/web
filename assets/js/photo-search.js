@@ -1,4 +1,4 @@
-/* Travel photo search, injected on demand by travel.html's inline loader.
+/* Travel photo search, injected on demand by travel-discovery.js.
    Contracts: "Travel atlas contracts" in docs/project-context.md. */
 (function() {
 	'use strict';
@@ -20,7 +20,9 @@
 	var clearButton = form.querySelector('.photo-search__clear');
 	var collapsible = document.querySelectorAll('.travel-atlas__layout, .photo-explore__map-heading, #main > .travel-archive-heading, #main > .travel-grid');
 	var discovery = document.getElementById('photo-explore'), moment = document.getElementById('photo-moment');
-	var titles = {}, seenMoments = [];
+	var titles = {}, seenMoments = [], momentHistory = [], momentAt = -1;
+	var previousMoment = moment.querySelector('[data-explore-action="previous"]');
+	var retry = document.getElementById('photo-search-retry'), loading = false;
 	document.getElementById('photo-explore-seeds').content.querySelectorAll('[data-tag]').forEach(function(a) {
 		titles[a.dataset.tag] = a.dataset.title;
 	});
@@ -89,6 +91,7 @@
 			expanded[tag.tag] = tag.keys.slice(1).join(' ');
 		});
 		photos = data.photos.map(function(photo, order) {
+			photo.variants = +(data.variants || '').charAt(order);
 			var trip = trips[photo.trip] || {};
 			// Newest trip first, journal order within it (the archive is newest first).
 		photo.order = order - trip.order * 1e4;
@@ -223,8 +226,14 @@
 		try { sessionStorage.setItem('photo-search-explore', JSON.stringify(explore.map(function(tag) { return tag.tag; }))); } catch (e) {}
 	}
 
-	function thumbnail(photo) {
-		return '<img loading="lazy" decoding="async" src="' + escape(photo.thumb) + '" alt="' + escape(photo.alt) +
+	function thumbnail(photo, large) {
+		var grid = document.querySelector(large ? '.photo-moment__content' : '.photo-explore__cards');
+		var width = parseFloat(getComputedStyle(grid).gridTemplateColumns) - (large ? 0 : 2);
+		var sources = photo.variants ? photo.thumb + ' 480w, ' + photo.src + ' ' + photo.w + 'w' : '';
+		if (photo.variants === 2) sources += ', ' + photo.thumb.replace('-480.', '-800.') + ' 800w';
+		return '<img loading="' + (large ? 'eager' : 'lazy') + '" decoding="async"' +
+			(sources ? ' srcset="' + escape(sources) + '" sizes="' + Math.max(1, width || 480) + 'px"' : '') +
+			' src="' + escape(photo.thumb) + '" alt="' + escape(photo.alt) +
 			'" width="' + photo.w + '" height="' + photo.h + '" style="object-position:' +
 			(photo.fx == null ? 50 : photo.fx) + '% ' + (photo.fy == null ? 50 : photo.fy) + '%">';
 	}
@@ -263,8 +272,8 @@
 	function consumeIntent() {
 		var action = form.dataset.exploreIntent;
 		if (!action || !photos && !failed) return;
-		delete form.dataset.exploreIntent;
 		if (failed) { status.textContent = 'Photo search is unavailable right now.'; return; }
+		delete form.dataset.exploreIntent;
 		if (action.indexOf('tag:') === 0) {
 			input.value = action.slice(4);
 			run();
@@ -272,17 +281,24 @@
 		} else if (action === 'shuffle') {
 			exploreMore(); renderExplore();
 			status.textContent = 'Six new photo topics to explore.';
-		} else if (action === 'surprise') {
-			var photo = pickMoment(), first = moment.hidden;
+		} else if (action === 'surprise' || action === 'previous') {
+			if (action === 'previous') momentAt = Math.max(0, momentAt - 1);
+			else {
+				momentAt++;
+				if (momentAt === momentHistory.length) momentHistory.push(pickMoment());
+			}
+			var photo = momentHistory[momentAt], first = moment.hidden;
 			input.value = ''; run();
 			discovery.hidden = true;
 			moment.hidden = false;
 			moment.querySelector('.photo-moment__content').innerHTML =
-				'<a class="photo-moment__image" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '" aria-label="Open photo: ' + escape(photo.place) + '">' + thumbnail(photo) + '</a>' +
+				'<a class="photo-moment__image" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '" aria-label="Open photo: ' + escape(photo.place) + '">' + thumbnail(photo, true) + '</a>' +
 				'<div class="photo-moment__copy"><span class="travel-atlas__eyebrow">A moment from the journals</span>' +
 				'<h2 id="photo-moment-title" tabindex="-1">' + escape(photo.place) + '</h2><p>' + escape(trips[photo.trip].label + ' · ' + trips[photo.trip].year) +
 				'</p><p>' + escape(photo.sectionTitle) + '</p><a class="photo-moment__read" href="' + escape(photo.trip + '#' + photo.section) + '">Read this day <span aria-hidden="true">&#8599;</span></a></div>';
 			status.textContent = photo.place + ' · ' + tripLabel(photo.trip);
+			previousMoment.disabled = momentAt === 0;
+			if (previousMoment.disabled && document.activeElement === previousMoment) moment.querySelector('[data-explore-action="surprise"]').focus();
 			if (first) document.getElementById('photo-moment-title').focus();
 		} else if (action === 'back') {
 			moment.hidden = true; discovery.hidden = false; status.textContent = '';
@@ -523,12 +539,30 @@
 	if (initial && !input.value) input.value = initial;
 	if (input.value) run();
 
-	fetch(form.getAttribute('data-search-index'), { credentials: 'same-origin' })
+	function loadIndex() {
+		if (loading) return;
+		loading = true; failed = false;
+		retry.setAttribute('aria-disabled', 'true');
+		form.setAttribute('aria-busy', 'true');
+		status.textContent = 'Loading photos…';
+		fetch(form.getAttribute('data-search-index'), { credentials: 'same-origin' })
 		.then(function(response) {
 			if (!response.ok) throw response.status;
 			return response.json();
 		})
 		.then(prepare)
 		.catch(function() { failed = true; })
-		.then(function() { run(); consumeIntent(); });
+		.then(function() {
+			loading = false;
+			form.removeAttribute('aria-busy');
+			retry.removeAttribute('aria-disabled');
+			var restoreFocus = document.activeElement === retry;
+			retry.hidden = !failed;
+			run();
+			if (!failed && restoreFocus) input.focus();
+			consumeIntent();
+		});
+	}
+	form.addEventListener('retry-search', loadIndex);
+	loadIndex();
 })();

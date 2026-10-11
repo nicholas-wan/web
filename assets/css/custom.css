@@ -8615,6 +8615,8 @@ body.page-home #nav {
 
 .photo-explore__heading .photo-explore__button { flex: 0 0 auto; white-space: nowrap; }
 
+.photo-explore__hint { margin: -0.25rem 0 1rem; font-size: max(var(--text-floor), 0.85rem); }
+
 .photo-explore__button {
   height: auto;
   min-height: 3rem;
@@ -8726,7 +8728,7 @@ body.page-home #nav {
 .photo-moment__copy h2 { margin: 0.7rem 0; font: 300 1.8rem/1.4 var(--font-body); letter-spacing: -0.02em; text-transform: none; }
 .photo-moment__copy p { margin: 0 0 0.6rem; font-size: max(var(--text-floor), 0.85rem); }
 .photo-moment__read { display: inline-flex; align-items: center; min-height: 3rem; margin-top: 0.5rem; color: var(--color-brand-700); font-weight: 700; }
-.photo-moment__actions { display: flex; justify-content: space-between; gap: 0.6rem; margin-top: 1rem; }
+.photo-moment__actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem; margin-top: 1rem; }
 .photo-explore__card:focus-visible, .photo-explore__button:focus-visible, .photo-moment a:focus-visible { outline: 2px solid var(--color-brand-600); outline-offset: 3px; }
 
 @media screen and (max-width: 736px) {

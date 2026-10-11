@@ -83,6 +83,9 @@ The seeds only name places and caption words. The subject, animal, food, activit
 
 `tools/legacy/` contains destructive or one-time migration utilities retained only for provenance. Do not run them during normal builds. In particular, `cap-original-images.py` has already been run; re-encoding those originals was measured and rejected.
 
+
+Discovery uses a 6 KB external bootstrap and defers the atlas until it approaches the viewport or receives interaction. The photo index retains version 2 and adds a `variants` string, one digit per photo: 0 keeps the thumbnail, 1 offers its verified 480px sibling and original, 2 also offers its verified 800px sibling. Existing src/thumb paths supply the candidate URLs; custom crops and video posters never switch images. This keeps responsive metadata under 1 KB without expanding the 480 KB index budget.
+
 ## Source-of-truth rules
 
 - Edit source files, never `dist/`.

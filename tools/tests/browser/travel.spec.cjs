@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 const audit = require('./geometry.cjs');
 
 async function settled(page) {
+  await expect(page.locator('.travel-map__canvas')).toHaveAttribute('data-map-detail', /^(region|area|stop)$/);
   // Covers the map's fly-to, fade and debounced label measurement.
   await page.waitForTimeout(700);
   expect((await page.evaluate(audit)).errors).toEqual([]);
@@ -25,6 +26,7 @@ for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], 
       await page.goBack();
     }
     if (width <= 520) await page.getByRole('button', { name: 'Open the interactive travel atlas', exact: true }).click();
+    else await page.locator('.travel-map__viewport').scrollIntoViewIfNeeded();
     await settled(page);
     const picker = page.getByRole('combobox', { name: 'Explore a trip', exact: true });
     const trips = await picker.locator('option').evaluateAll(options => options.map(o => o.value));

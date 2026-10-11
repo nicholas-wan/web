@@ -694,7 +694,7 @@ $assetVersions = @{}
 foreach ($file in @('icons.css', 'main.css', 'noscript.css')) {
     $assetVersions["assets/css/$file"] = Get-FileContentVersion (Join-Path $root "assets\css\$file")
 }
-foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js')) {
+foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js')) {
     $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
 }
 $assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
@@ -862,6 +862,26 @@ foreach ($journal in $journalManifest) {
 $photoTagCounts = @{}
 foreach ($entry in $photoEntries) {
     foreach ($tag in $entry.Tags) { $photoTagCounts[$tag] = 1 + [int]$photoTagCounts[$tag] }
+    # One digit per photo advertises verified sibling choices without repeating
+    # paths in the index: 0 = keep thumb, 1 = 480 + original, 2 = add 800.
+    # Custom search crops and video posters never switch to a different image.
+    $variants = 0
+    $srcset = ''
+    if (-not $entry.Video -and $entry.Width -gt 480 -and $entry.Thumb -ceq ($entry.Src -replace '(\.[^.]+)$', '-480$1')) {
+        $thumbDimensions = Get-CachedImageDimensions (Resolve-SourceImagePath $entry.Thumb) $script:sourceImageIndex
+        if ($thumbDimensions.Width -eq 480) {
+            $variants = 1
+            $srcset = $entry.Thumb + ' 480w, ' + $entry.Src + ' ' + $entry.Width + 'w'
+            $medium = $entry.Thumb -replace '-480\.', '-800.'
+            $mediumPath = Resolve-SourceImagePath $medium
+            if ($entry.Width -gt 800 -and $mediumPath -and (Get-CachedImageDimensions $mediumPath $script:sourceImageIndex).Width -eq 800) {
+                $variants = 2
+                $srcset += ', ' + $medium + ' 800w'
+            }
+        }
+    }
+    $entry | Add-Member -NotePropertyName Variants -NotePropertyValue $variants
+    $entry | Add-Member -NotePropertyName Srcset -NotePropertyValue $srcset
 }
 # Search tags include contextual subjects that may be outside a thumbnail crop.
 # Discovery is stricter: only manually reviewed image/topic/crop pairs qualify.
@@ -919,7 +939,7 @@ $photoIndexPhotos = foreach ($entry in $photoEntries) {
         ',"sectionTitle":' + (ConvertTo-JsonString $entry.SectionTitle) + ',"place":' + (ConvertTo-JsonString $entry.Place) + ',"caption":' + (ConvertTo-JsonString $entry.Caption) +
         ',"alt":' + (ConvertTo-JsonString $entry.Alt) + ',"tags":[' + $tags + '],"video":' + $video + $focus + '}'
 }
-$photoIndexJson = '{"version":2,"trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + '],"covers":[' + ($photoIndexCovers -join ',') + "]}`n"
+$photoIndexJson = '{"version":2,"variants":"' + (($photoEntries | ForEach-Object { $_.Variants }) -join '') + '","trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + '],"covers":[' + ($photoIndexCovers -join ',') + "]}`n"
 $assetVersions['assets/data/photo-index.json'] = Get-ContentVersion $photoIndexJson
 
 # Small, inert postcard seeds make discovery available without fetching the
@@ -940,10 +960,11 @@ $exploreCards = @(foreach ($theme in $exploreThemes.PSObject.Properties) {
     $title = [System.Net.WebUtility]::HtmlEncode($theme.Value)
     $alt = [System.Net.WebUtility]::HtmlEncode($photo.Alt)
     $photoYear = if ($photo.Trip -match '_(\d{4})_') { $Matches[1] } else { '' }
-    $photoContext = [System.Net.WebUtility]::HtmlEncode($photo.Place + ' · ' + $photoYear)
+    $photoContext = [System.Net.WebUtility]::HtmlEncode($photo.Place + ' ' + [char]0xB7 + ' ' + $photoYear)
     $focus = $photo.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + '% ' + $photo.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) + '%'
+    $responsive = if ($photo.Srcset) { ' srcset="' + $photo.Srcset + '" sizes="(max-width: 736px) 45vw, 33vw"' } else { '' }
     $card = '<a class="photo-explore__card" data-cover-id="' + [System.Net.WebUtility]::HtmlEncode($photo.Id) + '" data-explore-action="tag" data-tag="' + $name + '" data-title="' + $title + '" href="travel?q=' + [uri]::EscapeDataString($tag) + '">' +
-        '<img src="' + $photo.Thumb + '" alt="' + $alt + '" width="' + $photo.Width + '" height="' + $photo.Height + '" loading="lazy" decoding="async" style="object-position:' + $focus + '">' +
+        '<img src="' + $photo.Thumb + '"' + $responsive + ' alt="' + $alt + '" width="' + $photo.Width + '" height="' + $photo.Height + '" loading="lazy" decoding="async" style="object-position:' + $focus + '">' +
         '<span class="photo-explore__caption"><strong>' + $title + '</strong><span><span>' + $photoContext + '</span><span aria-hidden="true">&#8599;</span></span></span></a>'
     $exploreFallback.Add(($card -replace 'href="[^"]+"', ('href="' + $photo.Trip + '#' + $photo.Section + '"')))
     $card
@@ -1006,6 +1027,7 @@ foreach ($page in $pages) {
         # versioned URL from this attribute and injects the script on demand.
         $main = $main.Replace('data-search-script="assets/js/photo-search.js"', "data-search-script=`"$(Get-AssetRef 'assets/js/photo-search.js')`"")
         $main = $main.Replace('data-search-index="assets/data/photo-index.json"', "data-search-index=`"$(Get-AssetRef 'assets/data/photo-index.json')`"")
+        $main = $main.Replace('data-map-script="assets/js/travel-map.js"', "data-map-script=`"$(Get-AssetRef 'assets/js/travel-map.js')`"")
         $main = $main.Replace('<!-- PHOTO_EXPLORE_SEEDS -->', ($exploreCards -join "`n"))
         $main = $main.Replace('<!-- PHOTO_EXPLORE_FALLBACK -->', (($exploreFallback | Select-Object -First 6) -join "`n"))
     }
@@ -1077,14 +1099,14 @@ foreach ($page in $pages) {
     $galleryPages = @("house", "prewed") + $tripOrder
     $galleryScript = if ($galleryPages -contains $slug) { "<script src=`"$(Get-AssetRef 'assets/js/gallery.js')`"></script>" } else { "" }
     $travelNavScript = if ($tripOrder -contains $slug) { "<script src=`"$(Get-AssetRef 'assets/js/travel-nav.js')`"></script>" } else { "" }
-    $travelMapScript = if ($slug -eq 'travel') { "<script src=`"$(Get-AssetRef 'assets/js/travel-map.js')`"></script>" } else { "" }
+    $travelDiscoveryScript = if ($slug -eq 'travel') { "<script src=`"$(Get-AssetRef 'assets/js/travel-discovery.js')`"></script>" } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { "<script src=`"$(Get-AssetRef 'assets/js/personal-timeline.js')`"></script>" } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { "<script src=`"$(Get-AssetRef 'assets/js/scramble-reveal.js')`"></script>" } else { "" }
     $gameScript = if ($slug -eq 'index') { "<script src=`"$(Get-AssetRef 'assets/js/game.js')`"></script>" } else { "" }
     $listingEffectsScript = if ($slug -in @('skills', 'travel')) { "<script src=`"$(Get-AssetRef 'assets/js/listing-effects.js')`"></script>" } else { "" }
     $journalProgressScript = if ($tripOrder -contains $slug) { "<script src=`"$(Get-AssetRef 'assets/js/journal-progress.js')`"></script>" } else { "" }
     $canvasScript = if ($slug -eq 'index') { "<script src=`"$(Get-AssetRef 'assets/js/canvas-background.js')`"></script>" } else { "" }
-    $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelMapScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
+    $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelDiscoveryScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
     $routeStylesheets = @()
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-map-page.css')`" />" }
@@ -1167,7 +1189,7 @@ if ($imageDimensionCacheDirty) {
 
 # Publish only runtime assets used by the generated Pages site.
 $runtimeCss = @("icons.css", "main.css", "noscript.css")
-$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js")
+$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCss) {
