@@ -557,7 +557,7 @@ if ($customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.guangzh
 # The desktop dead-space fix put a 4/3 aspect-ratio placeholder on compact
 # gallery bricks. On phones the caption is a static bar below the image, so the
 # phone brick must reset aspect-ratio to auto or the 4/3 box clips the caption.
-if ($customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.guangzhou-day--compact \.masonry \.brick\s*\{[^}]*aspect-ratio:\s*auto[^}]*contain-intrinsic-size:\s*auto 320px') { throw "Compact journal gallery bricks must reset aspect-ratio to auto at the phone breakpoint so the static caption bar is not clipped." }
+if ($customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.guangzhou-day--compact \.masonry \.brick\s*\{[^}]*aspect-ratio:\s*auto[^}]*content-visibility:\s*visible[^}]*contain-intrinsic-size:\s*none') { throw "Phone gallery rows must fit the image and caption without clipping or reserving a 320px offscreen placeholder." }
 # Every journal banner uses the same light placeholder. Contain-fit mobile
 # banners size to the image itself, so a dark wrapper only creates a black flash
 # or exposed band while the responsive source settles.
