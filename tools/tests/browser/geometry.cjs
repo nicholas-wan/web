@@ -12,13 +12,17 @@ module.exports = function auditTravelGeometry() {
   };
   const intersects = (a, b) => a.left < b.right - 0.5 && a.right > b.left + 0.5 && a.top < b.bottom - 0.5 && a.bottom > b.top + 0.5;
   const controls = [...map.querySelectorAll('.travel-map__trip-picker, .travel-map__controls, .travel-map__close, .travel-map__regions, .travel-map__status, .travel-map__hint, .travel-map__detail-card')].filter(visible);
-  const labels = [...map.querySelectorAll('.travel-map__detail-label')].filter(visible);
+  const labels = [...map.querySelectorAll('.travel-map__detail-label, .travel-map__place')].filter(visible);
+  const dots = [...map.querySelectorAll('.travel-map__detail-dot, .travel-map__marker-dot')].filter(visible);
   labels.forEach((label, i) => {
     const box = label.getBoundingClientRect();
     if (box.left < viewport.left - 1 || box.right > viewport.right + 1 || box.top < viewport.top - 1 || box.bottom > viewport.bottom + 1) errors.push('clipped: ' + label.textContent);
     if (label.scrollWidth > label.clientWidth + 1) errors.push('text overflow: ' + label.textContent);
     labels.slice(i + 1).forEach(other => {
       if (intersects(box, other.getBoundingClientRect())) errors.push('overlap: ' + label.textContent + ' / ' + other.textContent);
+    });
+    dots.forEach(dot => {
+      if (intersects(box, dot.getBoundingClientRect())) errors.push('pin overlap: ' + label.textContent);
     });
     controls.forEach(control => {
       if (intersects(box, control.getBoundingClientRect())) errors.push('control overlap: ' + label.textContent + ' / ' + control.className);
@@ -33,7 +37,7 @@ module.exports = function auditTravelGeometry() {
     const canvas = map.querySelector('.travel-map__canvas');
     const level = canvas.dataset.mapDetail;
     const trip = document.querySelector('#travel-map-trip').value;
-    const expected = [...map.querySelectorAll('.travel-map__detail')].filter(el => el.dataset.mapLevel === level && (!trip || el.dataset.mapTrip === trip) && !el.classList.contains('is-label-offscreen')).length;
+    const expected = [...map.querySelectorAll(level === 'region' ? '.travel-map__marker' : '.travel-map__detail')].filter(el => (level === 'region' || el.dataset.mapLevel === level) && (!trip || el.dataset.mapTrip === trip) && !el.classList.contains('is-label-offscreen')).length;
     if (list.children.length !== expected) errors.push('missing list destinations');
   }
   if (document.documentElement.scrollWidth > innerWidth + 1) errors.push('page overflow');

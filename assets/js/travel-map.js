@@ -259,6 +259,10 @@
       if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) return;
       marker.style.left = point.x + '%';
       marker.style.top = point.y + '%';
+      var leader = document.createElement('span');
+      leader.className = 'travel-map__detail-leader';
+      leader.setAttribute('aria-hidden', 'true');
+      marker.appendChild(leader);
     });
   };
 
@@ -279,13 +283,9 @@
   var createDetailPoints = function () {
     var layer = document.createElement('div');
     layer.className = 'travel-map__detail-layer';
-    // Number each trip's stops in route order (the section-sorted order the
-    // route path is drawn in, which for USA/Canada differs from DETAIL_POINTS
-    // array order) so the badges trace the drawn line. Keyed by point index.
+    // Number stops in section order, matching the route rather than array order.
     var stopSequence = {};
-    var stopTrips = {};
-    DETAIL_POINTS.forEach(function (point) { if (point[0] === 'stop') stopTrips[point[5]] = true; });
-    Object.keys(stopTrips).forEach(function (tripKey) {
+    Object.keys(TRIPS).forEach(function (tripKey) {
       stopsForTrip(tripKey).forEach(function (stop, order) {
         stopSequence[DETAIL_POINTS.indexOf(stop)] = order + 1;
       });
@@ -300,7 +300,6 @@
       link.setAttribute('data-map-level', point[0]);
       link.setAttribute('data-map-trip', point[5]);
       link.setAttribute('data-map-point', index.toString());
-      link.setAttribute('data-label-order', index.toString());
       link.setAttribute('aria-label', 'Show details for ' + point[1]);
       link.setAttribute('aria-controls', 'travel-map-detail-card');
       link.setAttribute('aria-expanded', 'false');
@@ -353,7 +352,7 @@
   var LABEL_DISTANCES = [0, 14, 28, 44, 62, 82, 104];
 
   var makeLabelCandidate = function (markerX, markerY, width, height, direction, distance) {
-    var gap = 11 + distance;
+    var gap = 16 + distance;
     var left = direction.x > 0 ? gap : (direction.x < 0 ? -width - gap : -width / 2);
     var top = direction.y > 0 ? gap : (direction.y < 0 ? -height - gap : -height / 2);
     return {
@@ -390,19 +389,27 @@
     labelList.hidden = true;
     labelList.replaceChildren();
     map.classList.remove('is-label-list');
-    detailLinks.forEach(function (link) { link.classList.remove('is-label-offscreen'); });
-    if (detailLevel === 'region' || (mobileMapQuery.matches && !isFullscreen)) return;
+    var regional = detailLevel === 'region';
+    var links = (regional ? regionMarkers : detailLinks).filter(function (link) {
+      return (regional || link.dataset.mapLevel === detailLevel) &&
+        (!activeTrip || link.dataset.mapTrip === activeTrip);
+    });
+    var labelSelector = regional ? '.travel-map__place' : '.travel-map__detail-label';
+    links.forEach(function (link) { link.classList.remove('is-label-offscreen'); });
+    if (mobileMapQuery.matches && !isFullscreen) return;
     var bounds = viewport.getBoundingClientRect();
     var occupied = Array.from(map.querySelectorAll('.travel-map__trip-picker, .travel-map__controls, .travel-map__close, .travel-map__regions, .travel-map__status, .travel-map__hint, .travel-map__detail-card')).filter(function (el) {
       return !el.hidden && el.getBoundingClientRect().width && getComputedStyle(el).visibility !== 'hidden';
     }).map(function (el) { return el.getBoundingClientRect(); });
     var obstacles = occupied.slice();
+    // Reserve every pin before placing any label, including later destinations.
+    links.forEach(function (link) {
+      occupied.push(link.querySelector(regional ? '.travel-map__marker-dot' : '.travel-map__detail-dot').getBoundingClientRect());
+    });
     var visible = [];
     var failed = false;
-    detailLinks.forEach(function (link) {
-      if (link.getAttribute('data-map-level') !== detailLevel ||
-          (activeTrip && link.getAttribute('data-map-trip') !== activeTrip)) return;
-      var label = link.querySelector('.travel-map__detail-label');
+    links.forEach(function (link) {
+      var label = link.querySelector(labelSelector);
       var leader = link.querySelector('.travel-map__detail-leader');
       // CSS positions labels from the link centre, not the larger selected dot.
       var rect = link.getBoundingClientRect();
@@ -454,9 +461,13 @@
     labelList.style.maxHeight = Math.max(24, best.height) + 'px';
     visible.forEach(function (link) {
       var item = document.createElement('a');
-      item.href = link.href;
-      item.textContent = link.querySelector('.travel-map__detail-label').textContent;
-      item.addEventListener('click', function (event) { event.preventDefault(); link.click(); });
+      item.href = regional ? link.querySelector('a').href : link.href;
+      item.textContent = link.querySelector(labelSelector).textContent;
+      item.addEventListener('click', function (event) {
+        event.preventDefault();
+        if (regional) selectTripAndEnter(link.dataset.mapTrip);
+        else link.click();
+      });
       labelList.appendChild(item);
     });
     labelList.hidden = false;
@@ -540,12 +551,7 @@
       var matchesTrip = !activeTrip || link.getAttribute('data-map-trip') === activeTrip;
       link.setAttribute('tabindex', matchesLevel && matchesTrip ? '0' : '-1');
     });
-    /* Focusability must track what is actually shown, not merely whether a trip
-       is selected. Blanking every marker whenever activeTrip was set left all
-       eleven of them opaque and mouse-clickable at region level — the zoom the
-       desktop map opens on — with no keyboard route to any of them, including
-       the selected trip's own. Same predicate as the mute below, so pointer and
-       keyboard can never disagree again. */
+    // Keyboard and pointer availability use the same level/trip predicate.
     regionMarkers.forEach(function (marker) {
       marker.firstElementChild.setAttribute('tabindex',
         detailLevel === 'region' && markerMatchesActiveTrip(marker) ? '0' : '-1');

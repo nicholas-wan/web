@@ -70,3 +70,20 @@ test('crowded labels retain every destination in a scrollable list', async ({ pa
   await expect(page.locator('[data-map-detail-card]')).toBeVisible();
   await settled(page);
 });
+
+// The opening view used to skip collision layout entirely: Chengdu hid Korea.
+for (const width of [600, 768, 1024, 1280, 1920]) {
+  test(`opening atlas keeps every region label clear at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/travel');
+    await page.evaluate(() => document.fonts.ready);
+    await page.getByRole('button', { name: 'Reset map view', exact: true }).click();
+    await settled(page);
+    expect((await page.evaluate(audit)).labels).toBe(12);
+    await expect(page.locator('.travel-map__marker--guangzhou .travel-map__place')).toHaveText('Guangzhou');
+    await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
+    await page.getByRole('button', { name: 'Reset map view', exact: true }).click();
+    await settled(page);
+    expect((await page.evaluate(audit)).labels).toBe(12);
+  });
+}

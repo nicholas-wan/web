@@ -439,10 +439,9 @@ foreach ($archiveImage in @('2026_chengdu_zhangjiajie/day2/red-panda-family.webp
 if ($travel -notmatch 'travel_2026_guangzhou' -or $travel -notmatch '<img class="citc" src="images/travel/2026_guangzhou/day5/pearl-river-view\.webp"[^>]*srcset="[^"]*pearl-river-view-480\.webp 480w' -or $travel -match '<source[^>]*pearl-river-view' -or $travel -notmatch 'alt="Guangzhou skyline beside the Pearl River"') { throw "Guangzhou journal card must use the scenery-based Pearl River thumbnail through its responsive srcset; a <source> override would pin phones to the full image." }
 $travelMapMarkup = [regex]::Match($travel, '(?s)<div class="travel-map__canvas">(.*?)<p class="travel-map__hint">').Groups[1].Value
 if ([regex]::Matches($travelMapMarkup, 'class="travel-map__journal-link"').Count -ne 12 -or $travelMapMarkup -match 'class="travel-map__journal-link"[^>]*href="[^"]+#') { throw "Every travel map popup must link to the top of its journal without a section fragment." }
-foreach ($mapLabel in @('US West', 'US East', 'Canada', 'Western Europe', 'Germany', 'Japan', 'South Korea', 'China', 'Western Australia', 'Melbourne', 'Sydney')) {
+foreach ($mapLabel in @('US West', 'US East', 'Canada', 'Western Europe', 'Germany', 'Japan', 'South Korea', 'Guangzhou', 'Chengdu', 'Western Australia', 'Melbourne', 'Sydney')) {
     if ($travelMapMarkup -notmatch ('class="travel-map__place"[^>]*>' + [regex]::Escape($mapLabel) + '</span>')) { throw "Travel map is missing normalized place label: $mapLabel" }
 }
-if ($customCss -notmatch '(?s)\.travel-map__marker--seoul \.travel-map__place\s*\{[^}]*top:\s*1\.8rem[^}]*right:\s*0\.7rem[^}]*left:\s*auto') { throw "South Korea must retain its collision-safe label offset from Japan." }
 if ($travelMapMarkup -match '<small>\s*20\d{2}' -or $travelMapMarkup -match 'class="travel-map__place"[^>]*>(?:USA|[^<]*WA|[^<]*''\d{2})</span>') { throw "Travel map labels or popup summaries still contain inconsistent regions or years." }
 if ((Get-Content -LiteralPath (Join-Path $dist 'travel_2019_siliconvalley.html') -Raw -Encoding UTF8) -notmatch '<h2 id="trip-section-1"[^>]*>#1 - The League</h2>') { throw "The Silicon Valley map link must land on the first journal chapter without repeating the journal title." }
 $guangzhou = Get-Content -LiteralPath (Join-Path $dist 'travel_2026_guangzhou.html') -Raw -Encoding UTF8
