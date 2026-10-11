@@ -142,7 +142,7 @@
     ['stop', 'Nami Island', 'travel_2017_seoul#trip-section-2', 37.7914, 127.5255, 'seoul'],
     ['stop', 'Chuncheon', 'travel_2017_seoul#trip-section-3', 37.8813, 127.7300, 'seoul'],
     ['stop', 'Guangzhou', 'travel_2026_guangzhou#trip-section-1', 23.1291, 113.2644, 'guangzhou'],
-    ['stop', 'Dujiangyan', 'travel_2026_chengdu_zhangjiajie#trip-section-1', 31.0010, 103.6194, 'chengdu-zhangjiajie'],
+    ['stop', 'Dujiangyan', 'travel_2026_chengdu_zhangjiajie#trip-section-2', 31.0010, 103.6194, 'chengdu-zhangjiajie'],
     ['stop', 'Chengdu', 'travel_2026_chengdu_zhangjiajie#trip-section-3', 30.5728, 104.0668, 'chengdu-zhangjiajie'],
     ['stop', 'Zhangjiajie', 'travel_2026_chengdu_zhangjiajie#trip-section-4', 29.1170, 110.4792, 'chengdu-zhangjiajie'],
     ['stop', 'Fremantle', 'travel_2023_perth#trip-section-2', -32.0569, 115.7439, 'perth'],

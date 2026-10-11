@@ -25,7 +25,7 @@ PAGES = ['404.html', 'experience.html', 'house.html', 'index.html', 'personal.ht
          'skills.html', 'travel.html', 'travel_2017_seoul.html', 'travel_2019_siliconvalley.html',
          'travel_2022_europe.html', 'travel_2023_perth.html', 'travel_2023_usacanada.html',
          'travel_2024_australia.html', 'travel_2024_germany.html', 'travel_2025_japan.html',
-         'travel_2026_guangzhou.html']
+         'travel_2026_chengdu_zhangjiajie.html', 'travel_2026_guangzhou.html']
 VIEWPORTS = [('desktop', dict(viewport={'width': 1440, 'height': 900})),
              ('tablet', dict(viewport={'width': 900, 'height': 900})),
              ('phone', dict(viewport={'width': 375, 'height': 812}, device_scale_factor=2, is_mobile=True, has_touch=True))]
