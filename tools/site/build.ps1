@@ -362,7 +362,7 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
     foreach ($heading in $headings) {
         $label = [regex]::Replace($heading.Groups[1].Value, '<[^>]+>', '')
         $label = [System.Net.WebUtility]::HtmlDecode(($label -replace '\s+', ' ').Trim())
-        $label = $label -replace '(?i)^Day\s+\d+\s*-\s*', ''
+        $label = $label -replace '(?i)^Day\s+\d+\s*[^\w\s]\s*', ''
         $label = $label -replace '^#\d+\s*-\s*', ''
         if ($label -eq 'Hutt Lagoon & Kalbarri National Park') { $label = 'Hutt Lagoon & Kalbarri' }
     if ($label -match '^Melbourne\s*-\s*(.+)$') { $label = 'Melbourne &middot; ' + $Matches[1] }
