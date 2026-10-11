@@ -45,6 +45,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 
 ## Travel journal contracts
 
+- Journal mastheads use a book icon and visible `Travel journals` label linking to `travel`, through `partials/travel-masthead.html`. The chosen masthead appears on phones and desktop; keep the day strip separate and preserve its sticky scrolling behavior. Other page mastheads retain Home. This adds no JavaScript or external icon request.
 - Guangzhou is the compact reference implementation. New and structurally updated journals remain content-only fragments; the build supplies the document shell, navigation, footer, styles, and scripts.
 - Preserve `data-journal-template="v2"` and the four tokens in `partials/travel-journal.html`: `{{MAIN_ATTRIBUTES}}`, `{{TRIP_NAVIGATION}}`, `{{JOURNAL_CONTENT}}`, and `{{TRIP_PAGINATION}}`.
 - Follow the class combinations and markup hierarchy in `journals/_template.html`, including the generic `travel-*` classes and `guangzhou-*` compatibility classes. Heading order is structural because the build derives section and map anchors from it.

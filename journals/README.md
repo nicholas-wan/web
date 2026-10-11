@@ -4,6 +4,8 @@ Use `data-nav-label` on a long section heading to supply a short pill label. The
 
 `partials/travel-journal.html` is the shared journal shell. `_template.html` is the canonical compact-journal content contract. Together they supply the responsive hero, day structure, routes, compact desktop masonry, two-row collage option, horizontal mobile galleries and swipe cue, lightbox, trip navigation, pagination, mobile menu, scripts, and footer.
 
+Every journal also shares `partials/travel-masthead.html`: a book icon and “Travel journals” link back to the travel archive on mobile and desktop.
+
 To add a journal:
 
 1. Copy `_template.html` to `travel_YYYY_destination.html` in this directory.

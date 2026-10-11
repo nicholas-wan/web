@@ -17,6 +17,7 @@ Add-Type -AssemblyName System.Drawing
 $navigationPartialPath = Join-Path $root "partials\site-navigation.html"
 if (-not (Test-Path -LiteralPath $navigationPartialPath)) { throw "Missing shared navigation partial: $navigationPartialPath" }
 $navigationTemplate = Get-Content -LiteralPath $navigationPartialPath -Raw -Encoding UTF8
+$travelMastheadTemplate = Get-Content -LiteralPath (Join-Path $root 'partials\travel-masthead.html') -Raw -Encoding UTF8
 $travelJournalPartialPath = Join-Path $root "partials\travel-journal.html"
 if (-not (Test-Path -LiteralPath $travelJournalPartialPath)) { throw "Missing shared travel journal partial: $travelJournalPartialPath" }
 $travelJournalTemplate = Get-Content -LiteralPath $travelJournalPartialPath -Raw -Encoding UTF8
@@ -1062,6 +1063,9 @@ foreach ($page in $pages) {
         $navigation = $navigation.Replace($activeMarker, $activeMarker + ' class="active"')
     }
     $navigation = [regex]::Replace($navigation, '\sdata-page="[^"]+"', '')
+    if ($tripOrder -contains $slug) {
+        $navigation = [regex]::Replace($navigation, '(?s)^\s*<header id="header">.*?</header>\s*', $travelMastheadTemplate + "`n")
+    }
     if ($eventPages -contains $slug) {
         $navigation = [regex]::Replace($navigation, '(?s)^\s*<header id="header">.*?</header>\s*', '')
         $navigation = '<div class="mobile-context-bar" aria-label="Event navigation"><a class="mobile-context-bar__back" href="personal">&#8592; Personal timeline</a></div>' + "`n" + $navigation

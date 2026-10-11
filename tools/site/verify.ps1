@@ -127,7 +127,8 @@ foreach ($page in $pages) {
     if ($scan -match 'assets/js/(?:jquery(?:\.scrollex|\.scrolly)?\.min|browser\.min|breakpoints\.min|util|arrow)\.js') { throw "$($page.Name) still loads a retired shared JavaScript dependency." }
     if ($scan -match 'fontawesome\.com|font-awesome/|font-awesome\.min\.css') { throw "$($page.Name) still loads a remote or retired Font Awesome bundle." }
     if ($scan -notmatch 'href=["'']personal["'']') { throw "$($page.Name) is missing the Personal navigation tab." }
-    if ($eventPageNames -notcontains $page.Name -and $page.Name -ne 'index.html' -and $scan -notmatch 'class="logo icon fa-home"') { throw "$($page.Name) is missing the centered home control." }
+    if ($eventPageNames -notcontains $page.Name -and $journalPageNames -notcontains $page.Name -and $page.Name -ne 'index.html' -and $scan -notmatch 'class="logo icon fa-home"') { throw "$($page.Name) is missing the centered home control." }
+    if ($journalPageNames -contains $page.Name -and ($scan -notmatch '(?s)<header id="header">\s*<a href="travel" class="logo journal-return" aria-label="Back to travel journals">.*?<span>Travel journals</span>' -or $scan -match 'class="logo icon fa-home"')) { throw "$($page.Name) must have the labelled Travel journals masthead linking to the archive." }
     if ($page.Name -eq 'index.html' -and $scan -match 'class="logo icon fa-home"|<header id="header">') { throw "Homepage must flow directly from its full-screen opening without a redundant home control." }
     if ($page.Name -ne 'index.html' -and ($scan -match '<canvas id="nokey"|assets/js/canvas-background\.js')) { throw "$($page.Name) must not run the homepage background canvas." }
     if ($page.Name -ne 'index.html' -and $scan -match 'assets/js/game\.js') { throw "$($page.Name) must not load the homepage interaction bundle." }

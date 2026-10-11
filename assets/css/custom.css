@@ -5058,10 +5058,6 @@ body.is-map-fullscreen #return-to-top {
     padding: 0 1rem;
   }
 
-  .page-travel-journal #header {
-    display: none;
-  }
-
   .portfolio-overview {
     padding: 1rem !important;
   }
@@ -5135,6 +5131,46 @@ body.is-map-fullscreen #return-to-top {
 /* Travel journal navigation. travel-nav.js publishes the toolbar's measured
    height as --travel-nav-offset so native anchor jumps clear the single-row
    rail precisely; the rem values are no-JS fallbacks. */
+.page-travel-journal #header {
+  display: flex;
+  height: 7rem;
+  min-height: 7rem;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.page-travel-journal #nav { margin-top: 0; }
+
+#header .journal-return {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 3rem;
+  padding: 0.6rem 1.2rem;
+  border-width: 1px !important;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.035em;
+  text-transform: none;
+  transition: color var(--motion-standard) ease, border-color var(--motion-standard) ease;
+}
+
+.journal-return svg {
+  flex: 0 0 1.35rem;
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+#header .journal-return:focus-visible {
+  outline: 2px solid #62d6c4;
+  outline-offset: 5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #header .journal-return { transition: none; }
+}
+
 [id^="trip-section-"] {
   scroll-margin-top: var(--travel-nav-offset, 7rem);
 }
