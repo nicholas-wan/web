@@ -219,10 +219,11 @@
 	function renderExplore() {
 		discovery.querySelector('.photo-explore__cards').innerHTML = explore.map(function(item) {
 			var title = titles[item.tag] || item.tag.replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); });
+			var context = 'Photo: ' + item.photo.place + ' · ' + trips[item.photo.trip].year;
 			return '<a class="photo-explore__card" data-explore-action="tag" data-tag="' + escape(item.tag) +
 				'" href="travel?q=' + encodeURIComponent(item.tag) + '">' + thumbnail(item.photo) +
-				'<span class="photo-explore__caption"><strong>' + escape(title) + '</strong><span>' + escape(item.tag) +
-				' <span aria-hidden="true">&#8599;</span></span></span></a>';
+				'<span class="photo-explore__caption"><strong>' + escape(title) + '</strong><span><span>' + escape(context) +
+				'</span><span aria-hidden="true">&#8599;</span></span></span></a>';
 		}).join('');
 	}
 

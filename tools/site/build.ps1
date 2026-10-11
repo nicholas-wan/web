@@ -899,10 +899,12 @@ $exploreCards = @(foreach ($theme in $exploreThemes.PSObject.Properties) {
     $name = [System.Net.WebUtility]::HtmlEncode($tag)
     $title = [System.Net.WebUtility]::HtmlEncode($theme.Value)
     $alt = [System.Net.WebUtility]::HtmlEncode($photo.Alt)
+    $photoYear = if ($photo.Trip -match '_(\d{4})_') { $Matches[1] } else { '' }
+    $photoContext = [System.Net.WebUtility]::HtmlEncode('Photo: ' + $photo.Place + ' · ' + $photoYear)
     $focus = $photo.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + '% ' + $photo.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) + '%'
     $card = '<a class="photo-explore__card" data-explore-action="tag" data-tag="' + $name + '" data-title="' + $title + '" href="travel?q=' + [uri]::EscapeDataString($tag) + '">' +
         '<img src="' + $photo.Thumb + '" alt="' + $alt + '" width="' + $photo.Width + '" height="' + $photo.Height + '" loading="lazy" decoding="async" style="object-position:' + $focus + '">' +
-        '<span class="photo-explore__caption"><strong>' + $title + '</strong><span>' + $name + ' <span aria-hidden="true">&#8599;</span></span></span></a>'
+        '<span class="photo-explore__caption"><strong>' + $title + '</strong><span><span>' + $photoContext + '</span><span aria-hidden="true">&#8599;</span></span></span></a>'
     $exploreFallback.Add(($card -replace 'href="[^"]+"', ('href="' + $photo.Trip + '#' + $photo.Section + '"')))
     $card
 })

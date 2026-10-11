@@ -8719,6 +8719,7 @@ body.page-home #nav {
 .photo-explore__caption > span {
   display: flex;
   justify-content: space-between;
+  gap: 0.5rem;
   margin-top: auto;
   color: var(--color-ink-600);
   font: 500 max(var(--text-floor), 0.75rem)/1.4 var(--font-display);
