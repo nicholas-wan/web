@@ -222,7 +222,18 @@
     };
     edgeStrip.addEventListener('scroll', markStripEdges, { passive: true });
     window.addEventListener('resize', markStripEdges);
-    if (document.fonts) document.fonts.ready.then(markStripEdges);
+    window.addEventListener('load', markStripEdges);
+    /* fonts.ready resolves before the tabs are re-laid out in Merriweather,
+       so a measurement taken in its callback still sees the narrower fallback
+       font and can leave the flag off while the swapped-in row overflows.
+       Observe the strip and its groups instead: ResizeObserver fires after
+       layout, so any later growth (font swap, late CSS) re-measures. */
+    if (document.fonts) document.fonts.ready.then(function () { window.requestAnimationFrame(markStripEdges); });
+    if (typeof ResizeObserver === 'function') {
+      var stripObserver = new ResizeObserver(markStripEdges);
+      stripObserver.observe(edgeStrip);
+      Array.prototype.forEach.call(edgeStrip.children, function (group) { stripObserver.observe(group); });
+    }
     markStripEdges();
   }
 
