@@ -721,69 +721,87 @@
     trigger.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); lastTrigger = trigger; show(index); } });
   });
 
-  /* Compact mobile journals are horizontal. A fading edge plus one short cue
-     makes that interaction discoverable, then gets out of the way after the
-     visitor actually scrolls each gallery. */
-  var cueRefreshers = [];
-  Array.prototype.forEach.call(document.querySelectorAll('.travel-gallery--compact, .guangzhou-day--compact .masonry'), function (gallery) {
+  /* Keep native swiping, with persistent progress and explicit phone controls. */
+  var galleryRefreshers = [];
+  Array.prototype.forEach.call(document.querySelectorAll('.travel-gallery--compact, .guangzhou-day--compact .masonry'), function (gallery, galleryIndex) {
     var shell = document.createElement('div');
-    var cue = document.createElement('div');
+    var controls = document.createElement('div');
     var counter = document.createElement('div');
     var tiles = Array.prototype.slice.call(gallery.querySelectorAll('.brick'));
+    if (!tiles.length) return;
 
     shell.className = 'journal-gallery-shell';
     gallery.parentNode.insertBefore(shell, gallery);
     shell.appendChild(gallery);
 
-    cue.className = 'journal-scroll-cue';
-    cue.setAttribute('aria-hidden', 'true');
-    cue.innerHTML = '<span>Swipe to browse</span><i aria-hidden="true">&#8596;</i>';
-    shell.appendChild(cue);
+    controls.className = 'journal-gallery-controls';
+    controls.setAttribute('role', 'group');
+    controls.setAttribute('aria-label', 'Photo gallery navigation');
+    gallery.id = gallery.id || 'journal-gallery-' + galleryIndex;
     counter.className = 'journal-gallery-count';
-    shell.appendChild(counter);
-    var updateCounter = function () {
+    counter.setAttribute('role', 'status');
+    counter.setAttribute('aria-atomic', 'true');
+    controls.appendChild(counter);
+    var buttons = [-1, 1].map(function (direction) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'journal-gallery-arrow';
+      button.setAttribute('aria-label', direction < 0 ? 'Previous photo' : 'Next photo');
+      button.setAttribute('aria-controls', gallery.id);
+      button.innerHTML = '<span aria-hidden="true">' + (direction < 0 ? '&#8249;' : '&#8250;') + '</span>';
+      button.addEventListener('click', function () {
+        var state = measure();
+        var target = Math.max(0, Math.min(tiles.length - 1, state.nearest + direction));
+        var left = gallery.scrollLeft + tiles[target].getBoundingClientRect().left - gallery.getBoundingClientRect().left;
+        gallery.scrollTo({ left: left, behavior: reducedMotion.matches ? 'instant' : 'smooth' });
+      });
+      controls.appendChild(button);
+      return button;
+    });
+    shell.insertBefore(controls, gallery);
+    var measure = function () {
       var left = gallery.getBoundingClientRect().left;
       var nearest = 0;
       var distance = Infinity;
+      var max = gallery.scrollWidth - gallery.clientWidth;
       tiles.forEach(function (tile, index) {
         var delta = Math.abs(tile.getBoundingClientRect().left - left);
         if (delta < distance) { distance = delta; nearest = index; }
       });
-      counter.textContent = (nearest + 1) + ' / ' + tiles.length;
+      if (max > 4 && gallery.scrollLeft >= max - 2) nearest = tiles.length - 1;
+      return { nearest: nearest, start: gallery.scrollLeft < 2, end: gallery.scrollLeft >= max - 2, scrollable: max > 4 };
+    };
+    var apply = function (state) {
+      var label = (state.nearest + 1) + ' / ' + tiles.length;
+      if (counter.textContent !== label) counter.textContent = label;
+      buttons[0].disabled = !state.scrollable || state.start;
+      buttons[1].disabled = !state.scrollable || state.end;
+      buttons.forEach(function (button, index) {
+        if (button.disabled && document.activeElement === button && !buttons[1 - index].disabled) {
+          buttons[1 - index].focus({ preventScroll: true });
+        }
+      });
     };
 
     /* Split so a resize can read every gallery before writing any: alternating
        reads and writes forced one layout per gallery (up to 36 per journal). */
-    var measureCue = function () {
-      var scrollable = gallery.scrollWidth > gallery.clientWidth + 4;
-      var atStart = gallery.scrollLeft < 6;
-      return function () {
-        cue.hidden = !scrollable;
-        gallery.classList.toggle('has-scroll-cue', scrollable && atStart);
-        updateCounter();
-      };
-    };
-    var dismissCue = function () {
-      updateCounter();
-      if (gallery.scrollLeft < 6) return;
-      cue.classList.add('is-dismissed');
-      gallery.classList.remove('has-scroll-cue');
-    };
-
-    gallery.addEventListener('scroll', dismissCue, { passive: true });
-    cueRefreshers.push(measureCue);
+    gallery.addEventListener('scroll', function () { apply(measure()); }, { passive: true });
+    galleryRefreshers.push(function () {
+      var state = measure();
+      return function () { apply(state); };
+    });
   });
-  var refreshCues = function () {
-    cueRefreshers.map(function (measure) { return measure(); }).forEach(function (apply) { apply(); });
+  var refreshGalleries = function () {
+    galleryRefreshers.map(function (measure) { return measure(); }).forEach(function (apply) { apply(); });
   };
-  if (cueRefreshers.length) requestAnimationFrame(refreshCues);
+  if (galleryRefreshers.length) requestAnimationFrame(refreshGalleries);
   /* Gallery overflow depends on width alone, so a phone URL-bar resize
-     (height only) leaves the cues as they are. */
-  var cueWidth = window.innerWidth;
+     (height only) leaves the controls as they are. */
+  var galleryWidth = window.innerWidth;
   window.addEventListener('resize', function () {
-    if (!cueRefreshers.length || window.innerWidth === cueWidth) return;
-    cueWidth = window.innerWidth;
-    requestAnimationFrame(refreshCues);
+    if (!galleryRefreshers.length || window.innerWidth === galleryWidth) return;
+    galleryWidth = window.innerWidth;
+    requestAnimationFrame(refreshGalleries);
   });
 
   overlay.querySelector('.lightbox__close').addEventListener('click', close);

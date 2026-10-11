@@ -3520,7 +3520,7 @@ body.is-map-fullscreen #return-to-top {
 }
 
 .travel-route-summary,
-.journal-gallery-count {
+.journal-gallery-controls {
   display: none;
 }
 
@@ -3915,7 +3915,7 @@ body.is-map-fullscreen #return-to-top {
     display: grid;
     grid-template-columns: none;
     grid-auto-rows: auto;
-    grid-auto-columns: min(76vw, 18rem);
+    grid-auto-columns: min(18rem, calc(100% - 3.5rem));
     grid-auto-flow: column;
     column-count: initial;
     gap: 0.75rem;
@@ -3938,76 +3938,52 @@ body.is-map-fullscreen #return-to-top {
     flex-direction: column;
   }
 
+  .journal-gallery-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.6rem;
+  }
+
   .journal-gallery-count {
-    display: block;
-    order: 3;
-    align-self: flex-end;
+    margin-right: auto;
     color: var(--color-ink-600);
     font: 600 max(var(--text-floor), 0.8rem)/1.5 var(--font-display);
-    margin-top: 0.25rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .journal-gallery-controls .journal-gallery-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 3rem;
+    width: 3rem;
+    height: 3rem;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    border: 1px solid var(--color-brand-700);
+    border-radius: 50%;
+    box-shadow: none;
+    background: transparent;
+    color: var(--color-brand-700) !important;
+    font: 400 1.75rem/1 var(--font-body);
+    letter-spacing: 0;
+    touch-action: manipulation;
+    transition: background-color var(--motion-fast), opacity var(--motion-fast);
+  }
+
+  .journal-gallery-controls .journal-gallery-arrow:hover:not(:disabled) {
+    background: rgba(18, 138, 134, 0.08);
+  }
+
+  .journal-gallery-controls .journal-gallery-arrow:disabled {
+    opacity: 0.3;
   }
 
   .journal-gallery-shell > .travel-gallery--compact,
   .guangzhou-day--compact .journal-gallery-shell > .masonry {
-    order: 2;
     min-width: 0;
-  }
-
-  .journal-scroll-cue {
-    position: static;
-    z-index: 2;
-    display: flex;
-    order: 1;
-    width: max-content;
-    min-height: 2rem;
-    align-self: flex-end;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    max-height: 2rem;
-    margin: 0 0 0.45rem;
-    padding: 0.28rem 0.6rem;
-    border: 1px solid rgba(18, 138, 134, 0.24);
-    border-radius: 999px;
-    background: rgba(18, 138, 134, 0.075);
-    box-shadow: 0 0.2rem 0.6rem rgba(3, 14, 30, 0.07);
-    color: var(--color-brand-700);
-    font-family: var(--font-display);
-    font-size: 0.68rem;
-    font-weight: 800;
-    letter-spacing: 0.07em;
-    line-height: 1;
-    opacity: 0.92;
-    text-transform: uppercase;
-    animation: journal-scroll-cue-shake 3s ease-in-out 2;
-    overflow: hidden;
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
-  }
-
-  .journal-scroll-cue[hidden] {
-    display: none;
-  }
-
-  .journal-scroll-cue i {
-    font-size: 1rem;
-    font-style: normal;
-  }
-
-  .journal-scroll-cue.is-dismissed {
-    animation: none;
-    border-color: transparent;
-    background: transparent;
-    box-shadow: none;
-    opacity: 0;
-    transform: translateX(0.4rem);
-    visibility: hidden;
-  }
-
-  .travel-gallery--compact.has-scroll-cue,
-  .guangzhou-day--compact .masonry.has-scroll-cue {
-    -webkit-mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 2.25rem), transparent 100%);
-    mask-image: linear-gradient(to right, #000 0, #000 calc(100% - 2.25rem), transparent 100%);
   }
 
   .travel-gallery--compact .brick,
@@ -5551,21 +5527,6 @@ a.travel-jump-group__label {
   .travel-section-nav a,
   .travel-section-nav .travel-jump-group + .travel-jump-group {
     transition: none;
-  }
-}
-
-@keyframes journal-scroll-cue-shake {
-  0%, 62%, 100% { transform: translateX(0); }
-  68% { transform: translateX(-0.22rem); }
-  73% { transform: translateX(0.28rem); }
-  78% { transform: translateX(-0.14rem); }
-  83% { transform: translateX(0.1rem); }
-  88% { transform: translateX(0); }
-}
-
-@media screen and (min-width: 601px) {
-  .journal-scroll-cue {
-    display: none;
   }
 }
 
@@ -7514,8 +7475,8 @@ body.page-home #nav {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .journal-scroll-cue {
-    animation: none;
+  .journal-gallery-controls .journal-gallery-arrow {
+    transition: none;
   }
 }
 
