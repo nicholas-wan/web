@@ -3873,7 +3873,7 @@ body.is-map-fullscreen #return-to-top {
     display: none;
   }
 
-  .guangzhou-route__more {
+  .guangzhou-day__route--collapsible.has-hidden-stops .guangzhou-route__more {
     display: inline-flex;
     min-height: 2.35rem;
     align-items: center;

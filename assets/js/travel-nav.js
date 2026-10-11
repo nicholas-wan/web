@@ -306,6 +306,8 @@
     if (!button || !route) return;
 
     group.classList.add('is-truncated');
+    // Phones list the first four stops; the button is only offered when it reveals more.
+    group.classList.toggle('has-hidden-stops', route.querySelectorAll('.guangzhou-route__stop').length > 4);
     button.setAttribute('aria-expanded', 'false');
 
     var updateDesktopWrap = function () {
