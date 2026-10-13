@@ -47,6 +47,8 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 
 ## Travel journal contracts
 
+- Lightbox loading refinements (Oct 2026): demote the previous viewing-size request when navigation changes, retaining the bounded cache for quick reversals. A cold journal fallback selects the smallest responsive preview. Zoom retains that photo's decoded preview until the original decodes; leaving the photo, closing, returning to fit or switching orientation mode cancels its pending zoom upgrade. Pointer pan release refreshes click suppression after a real drag, even after a stationary hold, while explicit controls remain immediately usable.
+
 - Journal mastheads use a book icon and visible `Travel journals` label linking to `travel`, through `partials/travel-masthead.html`. The chosen masthead appears on phones and desktop; keep the day strip separate and preserve its sticky scrolling behavior. Other page mastheads retain Home. This adds no JavaScript or external icon request.
 - Guangzhou is the compact reference implementation. New and structurally updated journals remain content-only fragments; the build supplies the document shell, navigation, footer, styles, and scripts.
 - Preserve `data-journal-template="v2"` and the four tokens in `partials/travel-journal.html`: `{{MAIN_ATTRIBUTES}}`, `{{TRIP_NAVIGATION}}`, `{{JOURNAL_CONTENT}}`, and `{{TRIP_PAGINATION}}`.

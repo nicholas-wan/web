@@ -245,6 +245,7 @@ $iconsCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\icons.css') -R
 $customCss = @($sharedCustomCss, $travelMapPageCss, $travelJournalCss, $experiencePageCss, $personalPageCss, $skillsPageCss) -join "`n"
 $personalTimelineJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\personal-timeline.js') -Raw -Encoding UTF8
 $galleryJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\gallery.js') -Raw -Encoding UTF8
+if ($galleryJs -notmatch 'zoomImage === image && currentSource === source && zoomLevel > 1' -or $galleryJs -notmatch 'image.decode\(\).then' -or $galleryJs -notmatch 'if \(pointerCaptured\) ignoreClickUntil') { throw "Lightbox zoom must retain its preview until decode, reject stale upgrades, and suppress held-pan release clicks." }
 $travelNavJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\travel-nav.js') -Raw -Encoding UTF8
 # Photo deep links (#photo=<id>, Oct 2026): travel-nav.js lands the tile through its settle-and-stop
 # loop and opens it through gallery.js's travelGallery hook so the lightbox contract stays in one place.

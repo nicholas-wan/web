@@ -53,6 +53,18 @@ test('reuse requests, promote current-image priority, and cap retained images at
   assert.equal(requests[0].cancelled, true);
 });
 
+test('cold journal fallback starts with a small preview instead of the viewing-size download', () => {
+  const t = setup(), s = t.state;
+  vm.runInContext(source.slice(source.indexOf('  var lightboxSource ='), source.indexOf('  var warmNeighbours =')), s);
+  s.isJournal = true;
+  assert.equal(s.lightboxSource(t.media[0]), '0-480.jpg');
+  t.media[0].currentSrc = 'already-loaded.jpg';
+  assert.equal(s.lightboxSource(t.media[0]), 'already-loaded.jpg');
+  delete t.media[0].currentSrc;
+  s.isJournal = false;
+  assert.equal(s.lightboxSource(t.media[0]), '0-800.jpg');
+});
+
 test('cold image starts immediately with its next neighbour, retaining the thumbnail until decoded', async () => {
   const t = setup(), s = t.state;
   s.fitUpgrade();
@@ -98,6 +110,46 @@ test('an in-flight neighbour becomes high priority without a second request or d
   assert.equal(s.viewerImage.src, 'thumbnail');
   await t.finish('1-800.jpg');
   assert.equal(s.viewerImage.src, '1-800.jpg');
+});
+
+test('rapid navigation demotes the previous current request, including direction reversal', () => {
+  const t = setup(), s = t.state;
+  s.fitUpgrade();
+  const first = t.requests[0];
+  s.current = 2; s.currentSource = t.media[2]; s.fitUpgrade();
+  assert.equal(first.fetchPriority, 'low');
+  assert.equal(s.findFitted('2-800.jpg').image.fetchPriority, 'high');
+  s.current = 1; s.currentSource = t.media[1]; s.navigationDirection = -1; s.fitUpgrade();
+  assert.equal(first.fetchPriority, 'high');
+  assert.equal(s.findFitted('2-800.jpg').image.fetchPriority, 'low');
+  assert.equal(t.requests.filter(i => i.src === '1-800.jpg').length, 1);
+});
+
+test('zoom returning to fit cancels its original and rejects a late decode; failures can retry', async () => {
+  const requests = [];
+  class Image {
+    removeAttribute() { this.cancelled = true; }
+    decode() { requests.push(this); return new Promise((resolve, reject) => { this.finish = resolve; this.fail = reject; }); }
+  }
+  const s = vm.createContext({ Image, currentSource: { src: 'original' }, viewerImage: { src: 'preview' },
+    zoomLevel: 1, imageRequest: 0, isJournal: true, clamp: (n, lo, hi) => Math.min(hi, Math.max(lo, n)),
+    fitUpgrade() {}, renderMediaTransform() {} });
+  vm.runInContext(source.slice(source.indexOf('  var zoomImage ='), source.indexOf('  var resetMediaTransform =')) +
+    source.slice(source.indexOf('  var setZoom ='), source.indexOf('  var toggleLandscapeView =')), s);
+  s.setZoom(2);
+  s.setZoom(2.5);
+  assert.equal(requests.length, 1, 'pinching must reuse the original request');
+  assert.equal(s.viewerImage.src, 'preview');
+  s.setZoom(1);
+  assert.equal(requests[0].cancelled, true);
+  requests[0].finish(); await Promise.resolve();
+  assert.equal(s.viewerImage.src, 'preview');
+  s.setZoom(2);
+  requests[1].fail(new Error('offline')); await Promise.resolve();
+  assert.equal(s.viewerImage.src, 'preview');
+  s.setZoom(2.5);
+  requests[2].finish(); await Promise.resolve();
+  assert.equal(s.viewerImage.src, 'original');
 });
 
 test('zoom and close invalidate pending display upgrades', async () => {

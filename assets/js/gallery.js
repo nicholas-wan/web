@@ -102,8 +102,8 @@
      not loaded yet: with no currentSrc to reuse, the viewer fell back to the
      full original (250-600 KB) and waited for it. Instead, warm the tiles on
      either side of the shown photo so their responsive file is already in
-     cache, and when a tile has not chosen a source yet pick the same candidate
-     the browser would (rendered width times device pixels) from its srcset. */
+     cache. Cold journals start with their smallest preview; other galleries
+     use rendered width times device pixels to choose from the srcset. */
   var responsiveCandidate = function (media, targetWidth) {
     var fallback = media.getAttribute('src');
     var srcset = media.getAttribute('srcset');
@@ -120,6 +120,7 @@
   };
   var lightboxSource = function (media) {
     if (media.currentSrc) return media.currentSrc;
+    if (isJournal) return responsiveCandidate(media, 1);
     var pixelRatio = Math.min(window.devicePixelRatio || 1, 3);
     return responsiveCandidate(media, (media.clientWidth || 320) * pixelRatio);
   };
@@ -246,6 +247,7 @@
      The remaining neighbours wait for decode; all share the five-entry cache. */
   var fitUpgrade = function () {
     var request = ++imageRequest;
+    fittedImages.forEach(function (entry) { entry.image.fetchPriority = 'low'; });
     if (!currentSource || zoomLevel > 1) return;
     var source = currentSource;
     var valid = function () {
@@ -342,7 +344,13 @@
     infoButton.setAttribute('aria-expanded', revealed ? 'true' : 'false');
     infoButton.setAttribute('aria-label', revealed ? 'Hide caption' : 'Show caption');
   };
+  var zoomImage = null;
+  var clearZoomImage = function () {
+    if (zoomImage) zoomImage.removeAttribute('src');
+    zoomImage = null;
+  };
   var resetMediaTransform = function () {
+    clearZoomImage();
     rotation = 0;
     fitScale = 1;
     zoomLevel = 1;
@@ -377,16 +385,25 @@
   var setZoom = function (nextZoom) {
     zoomLevel = clamp(nextZoom, 1, 3);
     if (zoomLevel > 1) ++imageRequest;
-    if (zoomLevel > 1 && currentSource && currentSource.src && viewerImage.src !== currentSource.src) {
-      viewerImage.src = currentSource.src;
+    if (zoomLevel > 1 && currentSource && currentSource.src && viewerImage.src !== currentSource.src && !zoomImage) {
+      var source = currentSource;
+      var image = zoomImage = new Image();
+      image.fetchPriority = 'high';
+      image.src = source.src;
+      image.decode().then(function () {
+        if (zoomImage === image && currentSource === source && zoomLevel > 1) viewerImage.src = image.src;
+      }, function () { if (zoomImage === image) clearZoomImage(); });
     }
     if (zoomLevel === 1) {
+      clearZoomImage();
       panX = 0;
       panY = 0;
+      if (isJournal) fitUpgrade();
     }
     renderMediaTransform();
   };
   var toggleLandscapeView = function () {
+    clearZoomImage();
     rotation = rotation ? 0 : 90;
     zoomLevel = 1;
     panX = 0;
@@ -395,6 +412,7 @@
     renderCaptionState();
     calculateFitScale();
     renderMediaTransform();
+    if (isJournal) fitUpgrade();
   };
   /* aria-modal tells assistive tech the page behind the dialog is gone, so
      focus must actually move into the dialog on open, stay inside it while it
@@ -754,6 +772,7 @@
   overlay.addEventListener('pointerup', function (event) {
     if (event.pointerId !== swipePointerId) return;
     if (pointerMode === 'pan') {
+      if (pointerCaptured) ignoreClickUntil = Date.now() + 500;
       cancelGesture();
       renderMediaTransform();
     } else {
