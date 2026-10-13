@@ -11,7 +11,7 @@
     if (reducedMotion.matches) {
       video.pause();
       video.currentTime = 0;
-    } else if (video.__nearViewport) {
+    } else if (video.__nearViewport && !document.hidden && !document.body.classList.contains('lightbox-open')) {
       var playback = video.play();
       if (playback && playback.catch) playback.catch(function () {});
     } else {
@@ -33,18 +33,23 @@
     if ('IntersectionObserver' in window) {
       var animationWarmup = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
-          entry.target.__nearViewport = entry.isIntersecting;
           if (entry.isIntersecting) revealPoster(entry.target);
-          syncAnimation(entry.target);
         });
       }, { rootMargin: '600px' });
-      journalAnimations.forEach(function (video) { animationWarmup.observe(video); });
+      var animationPlayback = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          entry.target.__nearViewport = entry.isIntersecting;
+          syncAnimation(entry.target);
+        });
+      });
+      journalAnimations.forEach(function (video) { animationWarmup.observe(video); animationPlayback.observe(video); });
     } else {
       journalAnimations.forEach(function (video) { video.__nearViewport = true; revealPoster(video); });
       syncAnimationPreference();
     }
     if (reducedMotion.addEventListener) reducedMotion.addEventListener('change', syncAnimationPreference);
     else if (reducedMotion.addListener) reducedMotion.addListener(syncAnimationPreference);
+    document.addEventListener('visibilitychange', syncAnimationPreference);
   }
 
   var images = Array.prototype.slice.call(document.querySelectorAll('#main img')).filter(function (image, index, candidates) {
@@ -150,7 +155,7 @@
       '<button class="lightbox__zoom-in" type="button" aria-label="Zoom in">&plus;</button>' +
     '</div>' +
     '<button class="lightbox__previous" type="button" aria-label="Previous media">&#8592;</button>' +
-    '<figure class="lightbox__figure"><div class="lightbox__viewport"><img class="lightbox__image" alt="" draggable="false"><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video></div><figcaption id="lightbox-caption" class="lightbox__caption"></figcaption></figure>' +
+    '<figure class="lightbox__figure"><div class="lightbox__viewport"><img class="lightbox__image" alt="" draggable="false"><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video></div><figcaption id="lightbox-caption" class="lightbox__caption" aria-live="polite" aria-atomic="true"></figcaption></figure>' +
     '<button class="lightbox__next" type="button" aria-label="Next media">&#8594;</button>';
   document.body.appendChild(overlay);
 
@@ -178,7 +183,6 @@
   var lastImageTap = 0;
   var swapCount = 0;
   var imageRequest = 0;
-  var upgradeTimer;
   var navigationDirection = 1;
   /* Keep a bounded decoded working set, not full originals or the whole trip. */
   var fittedImages = [];
@@ -237,10 +241,10 @@
     fittedImages.forEach(function (entry) { entry.dispose(); });
     fittedImages = [];
   };
-  /* A prepared photo bypasses the settling delay. Cold swipes retain the tile
-     fallback and avoid fetching a large image for every briefly passed photo. */
+  /* Start the current fitted image immediately, with one directional neighbour
+     in parallel. Waiting for the current decode starved fast mobile swipes.
+     The remaining neighbours wait for decode; all share the five-entry cache. */
   var fitUpgrade = function () {
-    window.clearTimeout(upgradeTimer);
     var request = ++imageRequest;
     if (!currentSource || zoomLevel > 1) return;
     var source = currentSource;
@@ -263,10 +267,13 @@
       if (currentIsVideo) { neighbours(); return; }
       var entry = prepareFitted(source, 'high');
       if (entry.ready) present(entry);
-      else entry.promise.then(present);
+      else {
+        var next = galleryMedia[(current + navigationDirection + galleryMedia.length) % galleryMedia.length];
+        if (next !== source && next.tagName !== 'VIDEO') prepareFitted(next, 'low');
+        entry.promise.then(present);
+      }
     };
-    if (!currentIsVideo && findFitted(fittedSource(source))) start();
-    else upgradeTimer = window.setTimeout(start, 180);
+    start();
   };
   var clamp = function (value, minimum, maximum) {
     return Math.min(maximum, Math.max(minimum, value));
@@ -329,7 +336,9 @@
     var revealed = collapsed && captionOpen;
     overlay.classList.toggle('is-caption-collapsed', collapsed);
     caption.classList.toggle('is-revealed', revealed);
-    infoButton.hidden = !collapsed || !caption.textContent.trim();
+    var hideInfo = !collapsed || !caption.textContent.trim();
+    if (hideInfo) handOffFocusBeforeHiding(infoButton);
+    infoButton.hidden = hideInfo;
     infoButton.setAttribute('aria-expanded', revealed ? 'true' : 'false');
     infoButton.setAttribute('aria-label', revealed ? 'Hide caption' : 'Show caption');
   };
@@ -367,7 +376,7 @@
   };
   var setZoom = function (nextZoom) {
     zoomLevel = clamp(nextZoom, 1, 3);
-    if (zoomLevel > 1) { ++imageRequest; window.clearTimeout(upgradeTimer); }
+    if (zoomLevel > 1) ++imageRequest;
     if (zoomLevel > 1 && currentSource && currentSource.src && viewerImage.src !== currentSource.src) {
       viewerImage.src = currentSource.src;
     }
@@ -425,16 +434,17 @@
     document.documentElement.classList.add('lightbox-open');
     document.body.style.setProperty('--lightbox-scroll-offset', '-' + lockedScrollY + 'px');
     document.body.classList.add('lightbox-open');
+    syncAnimationPreference();
   };
   var unlockBackgroundScroll = function () {
     document.documentElement.classList.remove('lightbox-open');
     document.body.classList.remove('lightbox-open');
+    syncAnimationPreference();
     document.body.style.removeProperty('--lightbox-scroll-offset');
     window.scrollTo(0, lockedScrollY);
   };
   var close = function () {
     ++imageRequest;
-    window.clearTimeout(upgradeTimer);
     clearFittedImages();
     viewerVideo.pause();
     resetMediaTransform();
@@ -453,7 +463,6 @@
   };
   var show = function (index) {
     ++imageRequest;
-    window.clearTimeout(upgradeTimer);
     var opening = !overlay.classList.contains('is-visible');
     navigationDirection = opening || index > current ? 1 : -1;
     current = (index + galleryMedia.length) % galleryMedia.length;
@@ -797,6 +806,10 @@
 
   /* Keep native swiping, with persistent progress and explicit phone controls. */
   var galleryRefreshers = [];
+  var galleryWarmers = new Map();
+  var galleryWarmup = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) { galleryWarmers.get(entry.target)(entry.isIntersecting); });
+  }, { rootMargin: '900px 0px' }) : null;
   Array.prototype.forEach.call(document.querySelectorAll('.travel-gallery--compact, .guangzhou-day--compact .masonry'), function (gallery, galleryIndex) {
     var shell = document.createElement('div');
     var controls = document.createElement('div');
@@ -855,11 +868,40 @@
           buttons[1 - index].focus({ preventScroll: true });
         }
       });
+      warmAhead(state);
     };
+
+    // A viewport observer cannot see through a horizontal scrollport's clip.
+    // Prepare a small window explicitly, only in galleries near the reader.
+    var nearViewport = !galleryWarmup;
+    var warmAhead = function (state) {
+      if (!nearViewport || !state.scrollable) return;
+      [0, 1, 2, -1].forEach(function (offset) {
+        var tile = tiles[state.nearest + offset];
+        var media = tile && tile.querySelector('img, video');
+        if (!media) return;
+        if (media.tagName === 'VIDEO') revealPoster(media);
+        else {
+          warmImage(media);
+          if (!offset) media.fetchPriority = 'auto';
+        }
+      });
+    };
+    if (galleryWarmup) {
+      galleryWarmers.set(gallery, function (near) {
+        nearViewport = near;
+        if (near) warmAhead(measure());
+      });
+      galleryWarmup.observe(gallery);
+    }
 
     /* Split so a resize can read every gallery before writing any: alternating
        reads and writes forced one layout per gallery (up to 36 per journal). */
-    gallery.addEventListener('scroll', function () { apply(measure()); }, { passive: true });
+    var scrollFrame = null;
+    gallery.addEventListener('scroll', function () {
+      if (scrollFrame !== null) return;
+      scrollFrame = requestAnimationFrame(function () { scrollFrame = null; apply(measure()); });
+    }, { passive: true });
     galleryRefreshers.push(function () {
       var state = measure();
       return function () { apply(state); };

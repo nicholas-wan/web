@@ -114,6 +114,13 @@ $navSignatures = [System.Collections.Generic.HashSet[string]]::new([System.Strin
 foreach ($page in $pages) {
     $html = Get-Content -LiteralPath $page.FullName -Raw -Encoding UTF8
     $scan = [regex]::Replace($html, '<!--.*?-->', '', 'Singleline')
+    if ($page.Name -eq '404.html') {
+        if ($scan -match '\b(?:src|href)="(?![a-zA-Z][a-zA-Z0-9+.-]*:|/|#)[^"]+') {
+            throw '404 assets and recovery links must resolve from the site root on nested missing URLs.'
+        }
+        # Compare shared navigation/assets using the same local-path form.
+        $scan = $scan -replace '(\b(?:src|href)=")/(?!/)', '$1'
+    }
     foreach ($tag in @('html', 'head', 'body')) {
         if ([regex]::Matches($scan, "<$tag\b", 'IgnoreCase').Count -ne 1) { throw "$($page.Name) must contain exactly one <$tag> tag." }
     }
@@ -298,7 +305,8 @@ if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'p
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8
 # The readable bootstrap replaces the inline loader and defers the 63 KB atlas.
-Assert-FileSizeBudget 'assets\js\travel-discovery.js' 6
+# 6 -> 7 KB (Oct 2026): preserve cold-submit and IME state before lazy search loads.
+Assert-FileSizeBudget 'assets\js\travel-discovery.js' 7
 Assert-FileSizeBudget 'assets\js\travel-map.js' 64
 if ($travel -notmatch ('<script src="' + [regex]::Escape((Get-DistAssetRef 'assets/js/travel-discovery.js')) + '"') -or $travel -match '<script\b[^>]*\bsrc="assets/js/travel-map\.js' -or $travel -notmatch ('data-map-script="' + [regex]::Escape((Get-DistAssetRef 'assets/js/travel-map.js')) + '"')) { throw 'Travel must load the discovery bootstrap and defer the versioned atlas until approach or interaction.' }
 if ($travel -notmatch '<template id="photo-explore-seeds">' -or [regex]::Matches($travel, 'class="photo-explore__card"').Count -ne 30 -or $travel -match '<!-- PHOTO_EXPLORE_') { throw 'Travel must ship 24 inert postcards and six no-JS fallback cards, all expanded by the build.' }
@@ -664,7 +672,7 @@ if ($galleryJs -notmatch 'class="lightbox__tools" role="group" aria-label="Image
 # Landscape view gives the reclaimed caption height to the image. The semantic
 # figcaption stays in the accessibility tree; an Info toggle can temporarily
 # reveal it as an upright, non-layout-shifting panel above the navigation band.
-if ($galleryJs -notmatch 'class="lightbox__info"[^>]*aria-label="Show caption"[^>]*aria-expanded="false"[^>]*aria-controls="lightbox-caption"[^>]*hidden' -or $galleryJs -notmatch '<figcaption id="lightbox-caption" class="lightbox__caption">' -or $galleryJs -notmatch "overlay\.classList\.toggle\('is-caption-collapsed', collapsed\)" -or $galleryJs -notmatch "caption\.classList\.toggle\('is-revealed', revealed\)" -or $galleryJs -notmatch 'infoButton\.hidden = !collapsed \|\| !caption\.textContent\.trim\(\)' -or $galleryJs -notmatch "infoButton\.setAttribute\('aria-expanded'" -or $galleryJs -notmatch "infoButton\.addEventListener\('click'" -or $galleryJs -notmatch '(?s)var toggleLandscapeView = function.*?captionOpen = false;.*?renderCaptionState\(\);.*?calculateFitScale\(\)' -or $customCss -notmatch '(?s)\.lightbox\.is-caption-collapsed \.lightbox__caption:not\(\.is-revealed\)\s*\{[^}]*position:\s*absolute[^}]*width:\s*1px[^}]*height:\s*1px[^}]*clip:\s*rect\(0 0 0 0\)' -or $customCss -notmatch '(?s)\.lightbox\.is-caption-collapsed \.lightbox__caption\.is-revealed\s*\{[^}]*position:\s*absolute[^}]*bottom:\s*calc\(5rem \+ env\(safe-area-inset-bottom\)\)[^}]*z-index:\s*3[^}]*max-height:\s*min\(30vh, 12rem\)[^}]*overflow:\s*auto') { throw "Rotated lightboxes must collapse captions accessibly and reveal them upright without resizing the image." }
+if ($galleryJs -notmatch 'class="lightbox__info"[^>]*aria-label="Show caption"[^>]*aria-expanded="false"[^>]*aria-controls="lightbox-caption"[^>]*hidden' -or $galleryJs -notmatch '<figcaption id="lightbox-caption" class="lightbox__caption" aria-live="polite" aria-atomic="true">' -or $galleryJs -notmatch "overlay\.classList\.toggle\('is-caption-collapsed', collapsed\)" -or $galleryJs -notmatch "caption\.classList\.toggle\('is-revealed', revealed\)" -or $galleryJs -notmatch 'if \(hideInfo\) handOffFocusBeforeHiding\(infoButton\);\s*infoButton\.hidden = hideInfo' -or $galleryJs -notmatch "infoButton\.setAttribute\('aria-expanded'" -or $galleryJs -notmatch "infoButton\.addEventListener\('click'" -or $galleryJs -notmatch '(?s)var toggleLandscapeView = function.*?captionOpen = false;.*?renderCaptionState\(\);.*?calculateFitScale\(\)' -or $customCss -notmatch '(?s)\.lightbox\.is-caption-collapsed \.lightbox__caption:not\(\.is-revealed\)\s*\{[^}]*position:\s*absolute[^}]*width:\s*1px[^}]*height:\s*1px[^}]*clip:\s*rect\(0 0 0 0\)' -or $customCss -notmatch '(?s)\.lightbox\.is-caption-collapsed \.lightbox__caption\.is-revealed\s*\{[^}]*position:\s*absolute[^}]*bottom:\s*calc\(5rem \+ env\(safe-area-inset-bottom\)\)[^}]*z-index:\s*3[^}]*max-height:\s*min\(30vh, 12rem\)[^}]*overflow:\s*auto') { throw "Rotated lightboxes must collapse captions accessibly and reveal them upright without resizing the image." }
 # The lightbox controls, video toggle, and gallery triggers must suppress the
 # ~300ms double-tap-zoom delay so taps fire immediately.
 if ($customCss -notmatch '(?s)\.lightbox button,\s*\.lightbox__video,\s*\.journal-lightbox-trigger,\s*\.content\[role="button"\]\s*\{[^}]*touch-action:\s*manipulation') { throw "Lightbox controls and gallery triggers must set touch-action: manipulation to kill the tap delay." }

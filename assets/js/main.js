@@ -237,6 +237,12 @@
 			event.preventDefault();
 			first.focus();
 		}
+		else {
+			// Safari may skip links in its native Tab order. Advance explicitly
+			// within the modal so that platform preferences cannot release focus.
+			event.preventDefault();
+			focusable[focusable.indexOf(document.activeElement) + (event.shiftKey ? -1 : 1)].focus();
+		}
 	});
 
 	function syncNavMode() {
@@ -658,11 +664,14 @@ canvas.addEventListener('mousemove', function(e){
 		var hint = card.querySelector('.toolkit-card__hint');
 		var label = card.querySelector('.toolkit-card__toggle-label');
 		var title = card.querySelector('.toolkit-card__title');
+		// The quiet Skills layout keeps summaries visible and hides disclosure controls.
+		if (button && window.getComputedStyle(button).display === 'none') expanded = true;
 		card.classList.toggle('is-expanded', expanded);
 		if (button) button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
 		if (detail) {
 			if (expanded) detail.style.setProperty('--toolkit-detail-height', detail.scrollHeight + 'px');
 			detail.setAttribute('aria-hidden', expanded ? 'false' : 'true');
+			detail.inert = !expanded;
 		}
 		if (hint) hint.textContent = expanded ? 'Hide details' : 'View details';
 		if (label && title) label.textContent = (expanded ? 'Hide ' : 'View ') + title.textContent + ' details';

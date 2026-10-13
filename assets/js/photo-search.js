@@ -8,7 +8,7 @@
 	if (!input) return;
 
 	var PAGE = 48, DEBOUNCE = 120, STORE = 'photo-search-recent';
-	var explore = [], fuzzyTerms = [], renderedQuery = '', composing = false;
+	var explore = [], fuzzyTerms = [], renderedQuery = '', composing = form.dataset.searchComposing === 'true';
 	// Field weights: tags, visible copy, description, trip, fallback aliases.
 	var EXACT = [3, 2, 1, 1, 3], PREFIX = [2, 2, 1, 1, 2];
 	var CJK = '\u3040-\u30ff\u3400-\u4dbf\u4e00-\u9fff\uf900-\ufaff\uff66-\uff9f';
@@ -422,6 +422,8 @@
 	}
 
 	function run() {
+		// Async index completion must wait for committed IME text too.
+		if (composing) return;
 		results.inert = false;
 		clearTimeout(timer);
 		clearTimeout(saveTimer);

@@ -6,6 +6,10 @@ module.exports = defineConfig({
   workers: 1,
   retries: 0,
   reporter: process.env.CI ? [['line'], ['github']] : 'list',
+  projects: [
+    { name: 'chromium', use: { browserName: 'chromium' } },
+    { name: 'webkit-smoke', testMatch: /(?:site-smoke|gallery-accessibility)\.spec\.cjs$/, use: { browserName: 'webkit' } }
+  ],
   use: {
     baseURL: 'http://127.0.0.1:4321',
     reducedMotion: 'reduce',

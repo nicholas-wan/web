@@ -60,6 +60,13 @@
   if (/[?&]q=/.test(location.search)) loadSearch();
   input.onfocus = input.onpointerdown = input.onkeydown = loadSearch;
   input.oninput = function () { delete form.dataset.exploreIntent; };
+  // Composition and submit can begin before the lazy module has arrived.
+  input.addEventListener('compositionstart', function () { form.dataset.searchComposing = 'true'; });
+  input.addEventListener('compositionend', function () { delete form.dataset.searchComposing; });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!ready) { status.textContent = 'Loading photos…'; loadSearch(); }
+  });
   document.addEventListener('keydown', function (e) {
     if (e.key === '/' && !/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) && !e.target.isContentEditable) {
       e.preventDefault(); input.focus();

@@ -1178,6 +1178,11 @@ $optionalScripts
     $template = $template.Replace('__CANONICAL__', $canonical)
     $ogImage = if ($ogImages.ContainsKey($slug)) { $ogImages[$slug] } else { $defaultOgImage }
     $template = $template.Replace('__OGIMAGE__', "https://nicholaswan.me/$ogImage")
+    # A custom 404 is served at the missing URL, including nested paths.
+    # Keep fragment links local, but resolve assets and recovery links at root.
+    if ($slug -eq '404') {
+        $template = [regex]::Replace($template, '(\b(?:src|href)=")(?![a-zA-Z][a-zA-Z0-9+.-]*:|/|#)([^"]+)', '$1/$2')
+    }
     Write-Utf8 (Join-Path $out $page.Name) $template
 }
 

@@ -33,7 +33,7 @@ jobs:
         working-directory: tools/tests/browser
         run: |
           npm ci
-          npx playwright install chromium
+          npx playwright install chromium webkit
 
       - name: Check search and lightbox logic
         working-directory: tools/tests/browser

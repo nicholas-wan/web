@@ -1,5 +1,55 @@
 const { test, expect } = require('@playwright/test');
 
+test('submitting before the search module arrives keeps the query without navigating', async ({ page }) => {
+  let release, requests = 0;
+  const gate = new Promise(resolve => { release = resolve; });
+  await page.route('**/photo-search.js*', async route => {
+    requests++;
+    await gate;
+    await route.continue();
+  });
+  let documents = 0;
+  page.on('request', request => { if (request.isNavigationRequest()) documents++; });
+  await page.goto('/travel');
+  const input = page.getByRole('searchbox');
+  await input.fill('panda');
+  await input.press('Enter');
+  await expect(page.locator('#photo-search-status')).toHaveText('Loading photos…');
+  await expect(input).toHaveValue('panda');
+  expect(documents).toBe(1);
+  release();
+  await expect(page.locator('.photo-hit').first()).toBeVisible();
+  await expect(page).toHaveURL(/q=panda/);
+  expect(documents).toBe(1);
+  expect(requests).toBe(1);
+});
+
+for (const delayed of ['photo-search.js', 'photo-index.json']) {
+  test(`composition waits for commitment when ${delayed} arrives mid-input`, async ({ page }) => {
+    let release;
+    const gate = new Promise(resolve => { release = resolve; });
+    await page.route(`**/${delayed}*`, async route => { await gate; await route.continue(); });
+    await page.goto('/travel');
+    const input = page.getByRole('searchbox');
+    await input.focus();
+    if (delayed === 'photo-index.json') await expect(page.locator('#photo-search')).toHaveAttribute('aria-busy', 'true');
+    await input.evaluate(input => {
+      input.dispatchEvent(new CompositionEvent('compositionstart'));
+      input.value = '京都';
+      input.dispatchEvent(new InputEvent('input', { bubbles: true, isComposing: true }));
+    });
+    const indexLoaded = page.waitForResponse(response => response.url().includes('photo-index.json'));
+    release();
+    await indexLoaded;
+    await expect(page.locator('#photo-search')).not.toHaveAttribute('aria-busy');
+    await expect(page).toHaveURL(/\/travel$/);
+    await expect(page.locator('#photo-results')).toBeHidden();
+    await input.evaluate(input => input.dispatchEvent(new CompositionEvent('compositionend')));
+    await expect(page).toHaveURL(/q=%E4%BA%AC%E9%83%BD/);
+    await expect(page.locator('.photo-hit').first()).toBeVisible();
+  });
+}
+
 test('retry recovers a pending discovery action without duplicate downloads', async ({ page }) => {
   let requests = 0;
   await page.route('**/photo-index.json*', async route => {

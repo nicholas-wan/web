@@ -53,11 +53,11 @@ test('reuse requests, promote current-image priority, and cap retained images at
   assert.equal(requests[0].cancelled, true);
 });
 
-test('cold image keeps its thumbnail until decoded, then prepares two ahead and one behind', async () => {
+test('cold image starts immediately with its next neighbour, retaining the thumbnail until decoded', async () => {
   const t = setup(), s = t.state;
   s.fitUpgrade();
-  assert.equal(t.requests.length, 0);
-  t.runTimers();
+  assert.equal(t.timers.size, 0, 'a cold current image must not wait behind a timer');
+  assert.deepEqual(t.requests.map(i => i.src), ['1-800.jpg', '2-800.jpg']);
   assert.equal(s.viewerImage.src, 'thumbnail');
   assert.equal(t.requests[0].fetchPriority, 'high');
   await t.finish('1-800.jpg');
@@ -83,7 +83,7 @@ test('out-of-order loads cannot replace a newer photo or start stale prefetches'
   s.current = 4; s.currentSource = t.media[4]; s.fitUpgrade(); t.runTimers();
   await t.finish('1-800.jpg');
   assert.equal(s.viewerImage.src, 'thumbnail');
-  assert.equal(t.requests.length, 2);
+  assert.equal(t.requests.length, 4, 'stale completion must not enqueue more neighbours');
   await t.finish('4-800.jpg');
   assert.equal(s.viewerImage.src, '4-800.jpg');
 });
@@ -93,7 +93,7 @@ test('an in-flight neighbour becomes high priority without a second request or d
   const pending = s.prepareFitted(t.media[1], 'low');
   s.fitUpgrade();
   assert.equal(t.timers.size, 0);
-  assert.equal(t.requests.length, 1);
+  assert.equal(t.requests.filter(i => i.src === '1-800.jpg').length, 1);
   assert.equal(pending.image.fetchPriority, 'high');
   assert.equal(s.viewerImage.src, 'thumbnail');
   await t.finish('1-800.jpg');
@@ -106,7 +106,7 @@ test('zoom and close invalidate pending display upgrades', async () => {
   s.zoomLevel = 2; s.imageRequest++; s.viewerImage.src = 'original';
   await t.finish('1-800.jpg');
   assert.equal(s.viewerImage.src, 'original');
-  assert.equal(t.requests.length, 1);
+  assert.equal(t.requests.length, 2);
   s.zoomLevel = 1; s.current = 2; s.currentSource = t.media[2];
   s.fitUpgrade(); t.runTimers();
   s.imageRequest++; s.clearFittedImages();
@@ -131,4 +131,18 @@ test('video neighbour prefetch never downloads video sources', () => {
   t.media[2].tagName = 'VIDEO'; s.currentIsVideo = true;
   s.fitUpgrade(); t.runTimers();
   assert.deepEqual(t.requests.map(i => i.src), ['3-800.jpg', '0-800.jpg']);
+});
+
+test('a fast swipe can show the next decoded image before the old current image finishes', async () => {
+  const t = setup(), s = t.state;
+  s.fitUpgrade();
+  await t.finish('2-800.jpg');
+  assert.equal(s.viewerImage.src, 'thumbnail');
+  s.current = 2; s.currentSource = t.media[2];
+  s.fitUpgrade();
+  assert.equal(s.viewerImage.src, '2-800.jpg');
+  assert.equal(t.requests.filter(i => i.src === '2-800.jpg').length, 1);
+  await t.finish('1-800.jpg');
+  assert.equal(s.viewerImage.src, '2-800.jpg');
+  assert.ok(s.fittedImages.length <= 5);
 });

@@ -28,6 +28,88 @@
   var MAX_FOLD_ANIMATION_VELOCITY = 0.85;
   var resnapping = false;
 
+  /* Controls sit beside the card, never inside its destination link. Manual
+     selection freezes a real frame; resuming restores the existing hover /
+     reading-band crossfades and their authored timings. */
+  galleryEvents.forEach(function (event) {
+    var card = event.querySelector('.personal-event-card');
+    var images = Array.prototype.slice.call(card.querySelectorAll('.personal-event-card__image--slideshow img'));
+    var title = card.querySelector('.personal-event-card__body > strong').textContent;
+    var controls = document.createElement('div');
+    controls.className = 'personal-gallery-controls';
+    controls.setAttribute('role', 'group');
+    controls.setAttribute('aria-label', title + ' photos');
+    controls.innerHTML = '<button type="button" data-photo-previous aria-label="Previous photo">&#8592;</button>' +
+      '<span class="personal-gallery-controls__count"></span>' +
+      '<button type="button" data-photo-next aria-label="Next photo">&#8594;</button>' +
+      '<button type="button" data-photo-playback>Pause</button>' +
+      '<span class="sr-only" role="status" aria-live="polite" aria-atomic="true"></span>';
+    event.appendChild(controls);
+    var playback = controls.querySelector('[data-photo-playback]');
+    var count = controls.querySelector('.personal-gallery-controls__count');
+    var status = controls.querySelector('[role="status"]');
+    var selected = 0;
+    var paused = reducedMotion.matches;
+
+    function visibleIndex() {
+      if (paused) return selected;
+      var best = 0;
+      images.forEach(function (image, index) {
+        if (parseFloat(window.getComputedStyle(image).opacity) > parseFloat(window.getComputedStyle(images[best]).opacity)) best = index;
+      });
+      return best;
+    }
+
+    function render(announce) {
+      event.classList.toggle('is-gallery-paused', paused);
+      images.forEach(function (image, index) {
+        image.classList.toggle('is-gallery-selected', index === selected);
+        if (paused) image.setAttribute('aria-hidden', index === selected ? 'false' : 'true');
+        else image.removeAttribute('aria-hidden');
+      });
+      playback.textContent = paused ? 'Resume' : 'Pause';
+      playback.setAttribute('aria-label', (paused ? 'Resume' : 'Pause') + ' automatic photos');
+      playback.hidden = reducedMotion.matches;
+      count.textContent = paused ? (selected + 1) + ' / ' + images.length : images.length + ' photos';
+      if (announce) status.textContent = 'Photo ' + (selected + 1) + ' of ' + images.length + ': ' + images[selected].alt;
+    }
+
+    function pause(announce) {
+      selected = visibleIndex();
+      paused = true;
+      event.classList.remove('is-gallery-resumed');
+      warmGallery(event);
+      render(announce);
+    }
+
+    function step(delta) {
+      pause(false);
+      selected = (selected + delta + images.length) % images.length;
+      render(true);
+    }
+
+    controls.querySelector('[data-photo-previous]').addEventListener('click', function () { step(-1); });
+    controls.querySelector('[data-photo-next]').addEventListener('click', function () { step(1); });
+    playback.addEventListener('click', function () {
+      if (!paused) pause(true);
+      else {
+        paused = false;
+        event.classList.add('is-gallery-resumed');
+        render(false);
+        status.textContent = 'Automatic photos resumed.';
+      }
+    });
+    event.addEventListener('focusin', function (focusEvent) {
+      if (focusEvent.target.matches(':focus-visible')) pause(false);
+    });
+    event.addEventListener('pointerleave', function () { event.classList.remove('is-gallery-resumed'); });
+    if (reducedMotion.addEventListener) reducedMotion.addEventListener('change', function () {
+      if (reducedMotion.matches) pause(false);
+      render(false);
+    });
+    render(false);
+  });
+
   function cancelFocusAnimations() {
     if (focusAnimationFrame !== null) window.cancelAnimationFrame(focusAnimationFrame);
     if (focusAnimationTimer !== null) window.clearTimeout(focusAnimationTimer);

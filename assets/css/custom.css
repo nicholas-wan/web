@@ -6906,6 +6906,7 @@ body.lightbox-open {
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .personal-timeline-event.is-gallery-resumed .personal-event-card__image--slideshow img,
   .personal-event-card:hover .personal-event-card__image--slideshow img,
   .personal-event-card:focus-visible .personal-event-card__image--slideshow img {
     animation-name: personal-card-slideshow;
@@ -6914,6 +6915,7 @@ body.lightbox-open {
     animation-iteration-count: infinite;
   }
 
+  .personal-timeline-event.is-gallery-resumed .personal-event-card__image--slideshow img:first-child,
   .personal-event-card:hover .personal-event-card__image--slideshow img:first-child,
   .personal-event-card:focus-visible .personal-event-card__image--slideshow img:first-child {
     animation-name: personal-card-slideshow-first;
@@ -6924,23 +6926,27 @@ body.lightbox-open {
   .personal-event-card__image--slideshow img:nth-child(4) { animation-delay: 3s; }
   .personal-event-card__image--slideshow img:nth-child(5) { animation-delay: 4s; }
 
+  .personal-timeline-event.is-gallery-resumed .personal-event-card__image--slides-2 img,
   .personal-event-card:hover .personal-event-card__image--slides-2 img,
   .personal-event-card:focus-visible .personal-event-card__image--slides-2 img {
     animation-name: personal-card-slideshow-2;
     animation-duration: 2s;
   }
 
+  .personal-timeline-event.is-gallery-resumed .personal-event-card__image--slides-2 img:first-child,
   .personal-event-card:hover .personal-event-card__image--slides-2 img:first-child,
   .personal-event-card:focus-visible .personal-event-card__image--slides-2 img:first-child {
     animation-name: personal-card-slideshow-first-2;
   }
 
+  .personal-timeline-event.is-gallery-resumed .personal-event-card__image--slides-3 img,
   .personal-event-card:hover .personal-event-card__image--slides-3 img,
   .personal-event-card:focus-visible .personal-event-card__image--slides-3 img {
     animation-name: personal-card-slideshow-3;
     animation-duration: 3s;
   }
 
+  .personal-timeline-event.is-gallery-resumed .personal-event-card__image--slides-3 img:first-child,
   .personal-event-card:hover .personal-event-card__image--slides-3 img:first-child,
   .personal-event-card:focus-visible .personal-event-card__image--slides-3 img:first-child {
     animation-name: personal-card-slideshow-first-3;
@@ -7350,6 +7356,54 @@ body.lightbox-open {
   transform: none;
 }
 
+/* Sibling controls keep destination links intact and expose the standalone
+   galleries to keyboards. Their row stays present through fold handoffs. */
+.personal-gallery-controls {
+  grid-column: 3;
+  grid-row: 2;
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  width: min(100%, 29.5rem);
+  padding-top: 0.3rem;
+  position: relative;
+  z-index: 4;
+  font: 600 max(var(--text-floor), 0.75rem)/1.3 var(--font-display);
+}
+.personal-timeline-event--left .personal-gallery-controls {
+  grid-column: 1;
+  justify-self: end;
+}
+.personal-gallery-controls button {
+  min-width: 3rem;
+  min-height: 3rem;
+  height: auto;
+  padding: 0 0.65rem;
+  border: 0;
+  border-radius: 0.4rem;
+  box-shadow: none;
+  background: #edf4f3;
+  color: #11807d !important;
+  font: inherit;
+  letter-spacing: 0;
+  line-height: 1.3;
+  text-transform: none;
+}
+.personal-gallery-controls button:focus-visible {
+  outline: 2px solid #11807d;
+  outline-offset: 2px;
+}
+.personal-gallery-controls button[hidden] { display: none; }
+.personal-gallery-controls__count { min-width: 3.25rem; text-align: center; }
+.personal-timeline-event.is-gallery-paused .personal-event-card__image--slideshow img {
+  animation: none !important;
+  opacity: 0 !important;
+}
+.personal-timeline-event.is-gallery-paused .personal-event-card__image--slideshow img.is-gallery-selected {
+  display: block !important;
+  opacity: 1 !important;
+}
 /* Route bundle: personal-base:end */
 body.page-event #nav {
   margin-top: 0 !important;
