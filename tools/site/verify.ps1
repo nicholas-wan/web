@@ -633,15 +633,15 @@ foreach ($journalName in $journalPageNames) {
 }
 if ($guangzhou -notmatch '<main id="main" class="[^"]*travel-journal[^"]*travel-journal--compact[^"]*guangzhou-journal' -or $guangzhou -notmatch 'class="travel-journal__content"' -or $guangzhou -match '<!DOCTYPE HTML>.*<!DOCTYPE HTML>') { throw "Guangzhou must prove the content-only compact journal build path without nesting a legacy document shell." }
 if ($japan -notmatch 'sizes="\(max-width: 736px\) 100vw, \(max-width: 1024px\) calc\(100vw - 176px\), \(max-width: 1680px\) 1024px, 1366px"' -or $customCss -notmatch '(?s)\.page-travel-journal header\.major > \.date::before,\s*\.page-travel-journal header\.major > \.date::after\s*\{[^}]*position:\s*static[^}]*flex:\s*1 1 0') { throw "Journal banners must request full-width sources and date dividers must not overlap their labels." }
-# Gallery photos cap phone density at the -800 tier (250px slot -> 800w at DPR 3);
-# only the LCP banner keeps the full-width 100vw phone slot. This keeps a 3x phone
-# journal near ~12 MB instead of ~33 MB. If the old truthful gallery slot returns,
-# every gallery image re-selects the full source on high-DPR phones.
+# Journal tiles use 480w phone previews (160px slot -> 480w at DPR 3);
+# only the LCP banner keeps the full-width 100vw phone slot. These previews
+# reduce contention beyond the earlier 800w phone cap. A full-width gallery
+# slot would select original files again on high-DPR phones.
 # Desktop journal tiles are five-up and measured 129-325px wide between 737px and
 # 1920px viewports, so the slot is 20vw (-480 on 1x, -800 on 2x). The old 800px
 # slot pulled -800 on 1x and the full original on 2x for a ~220px tile (Sep 2026).
 # Non-journal galleries (pre-wedding, personal) keep the 800px desktop slot.
-if ($japan -notmatch 'sizes="\(max-width: 736px\) 250px, 20vw"' -or $japan -match 'sizes="\(max-width: 736px\) (?:100vw|250px), 800px"' -or $usaCanada -match 'sizes="\(max-width: 736px\) 250px, 800px"' -or $prewed -notmatch 'sizes="\(max-width: 736px\) 250px, 800px"') { throw "Journal gallery images must use the measured 20vw desktop slot with the -800 phone cap; non-journal galleries keep the 800px slot." }
+if ($japan -notmatch 'sizes="\(max-width: 736px\) 160px, 20vw"' -or $japan -match 'sizes="\(max-width: 736px\) (?:100vw|250px), (?:800px|20vw)"' -or $usaCanada -match 'sizes="\(max-width: 736px\) 250px, (?:800px|20vw)"' -or $prewed -notmatch 'sizes="\(max-width: 736px\) 250px, 800px"') { throw "Journal gallery images must use the measured 20vw desktop slot with 480w phone previews; non-journal galleries keep the 800px slot." }
 if ([regex]::Matches($usaCanada, '-480\.jpg 480w').Count -lt 150 -or [regex]::Matches($perth, '-480\.jpg 480w').Count -lt 80 -or [regex]::Matches($europe, '-480\.jpg 480w').Count -lt 50) { throw "Journal galleries must publish -480 variants so the 20vw slot has a 1x source (run tools/images/make-responsive-variants.py)." }
 # Poster attributes are fetched at page load even under preload="none" (37 stills,
 # ~1.5 MB on USA/Canada). The build moves them to data-poster and gallery.js attaches

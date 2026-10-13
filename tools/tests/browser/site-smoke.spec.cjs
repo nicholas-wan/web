@@ -59,3 +59,26 @@ test('journal animations pause behind the lightbox and resume when it closes', a
   await page.keyboard.press('Escape');
   await expect.poll(() => video.evaluate(el => el.paused)).toBe(false);
 });
+
+test('DPR-3 phones use small journal tiles while the lightbox and zoom retain detail', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 3, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  try {
+    for (const trip of ['2026_guangzhou', '2025_japan']) {
+      await page.goto('http://127.0.0.1:4321/travel_' + trip);
+      const tile = page.locator('#main .content').filter({ has: page.locator('img[srcset*="-480"]') }).first();
+      const image = tile.locator('img');
+      await tile.scrollIntoViewIfNeeded();
+      await image.evaluate(img => img.decode());
+      expect(await image.evaluate(img => img.currentSrc)).toMatch(/-480\.(?:jpg|webp)$/);
+      const original = await image.evaluate(img => img.src);
+      await tile.click();
+      const viewer = page.locator('img.lightbox__image');
+      await expect(viewer).toHaveAttribute('src', /-800\.(?:jpg|webp)$/);
+      await viewer.evaluate(img => img.decode());
+      await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
+      await expect(viewer).toHaveAttribute('src', original);
+      await page.keyboard.press('Escape');
+    }
+  } finally { await context.close(); }
+});

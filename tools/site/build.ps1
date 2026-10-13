@@ -197,7 +197,7 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                 if ($sources.Count -gt 1) {
                     $tag = Add-AttributeToImgTag $tag ('srcset="{0}"' -f ($sources -join ', '))
                     if ($tag -notmatch '\bsizes=') {
-                        # Cap phone image density at the -800 tier for galleries. A
+                        # The earlier phone cap used the -800 tier for galleries. A
                         # truthful 100vw slot makes a DPR-3 phone (~390 CSS px ->
                         # 1170 device px) select the full 1600 px source for every
                         # gallery photo, so a journal ships ~33 MB on a 3x phone. A
@@ -219,7 +219,12 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                         # and 2x desktops the full ~1536px original for a
                         # ~220px tile. A 20vw slot selects -480 on 1x and -800
                         # on 2x screens up to 1920px wide (Sep 2026).
-                        $sizes = if ($isJournalBanner) { '(max-width: 736px) 100vw, (max-width: 1024px) calc(100vw - 176px), (max-width: 1680px) 1024px, 1366px' } elseif ($JournalGallery) { '(max-width: 736px) 250px, 20vw' } else { '(max-width: 736px) 250px, 800px' }
+                        # Oct 2026 phone-scroll profiling: 800w WebP tiles reached
+                        # 100-200 KB and competed on slow mobile links. Use existing
+                        # 480w previews for the ~264 CSS px horizontal tiles, via a
+                        # 160px density-capped slot at DPR <= 3. The lightbox selects
+                        # its own fitted source; zoom still uses the original.
+                        $sizes = if ($isJournalBanner) { '(max-width: 736px) 100vw, (max-width: 1024px) calc(100vw - 176px), (max-width: 1680px) 1024px, 1366px' } elseif ($JournalGallery) { '(max-width: 736px) 160px, 20vw' } else { '(max-width: 736px) 250px, 800px' }
                         $tag = Add-AttributeToImgTag $tag ('sizes="{0}"' -f $sizes)
                     }
                 }
