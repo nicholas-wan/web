@@ -23,3 +23,6 @@ tools/photos/work/
 # Rendered UI regression dependencies and failure artifacts.
 tools/tests/browser/node_modules/
 tools/tests/browser/test-results/
+
+# Impeccable critique snapshots (local design-review archive).
+.impeccable/

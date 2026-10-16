@@ -1722,7 +1722,7 @@ html:has(> body.is-map-fullscreen) {
   box-shadow: 0 0.2rem 0.55rem rgba(0, 0, 0, 0.24);
   color: rgba(255, 255, 255, 0.82);
   font-family: var(--font-display);
-  font-size: 0.48rem;
+  font-size: max(12px, 0.48rem);
   font-weight: 800;
   letter-spacing: 0.025em;
   line-height: 1.15;
@@ -2095,7 +2095,9 @@ html:has(> body.is-map-fullscreen) {
   background: rgba(7, 19, 21, 0.86);
   color: rgba(255, 255, 255, 0.74);
   font-family: var(--font-display);
-  font-size: 0.52rem;
+  /* 12px floors (Oct 2026): the 11pt root rendered this pill, the destination
+     labels and the detail card's small lines at 7-10px on phones and laptops. */
+  font-size: max(12px, 0.52rem);
   font-weight: 800;
   letter-spacing: 0.04em;
   line-height: 1;
@@ -2210,7 +2212,7 @@ html:has(> body.is-map-fullscreen) {
 .travel-map__detail-card-copy > p:first-child {
   margin: 0 0 0.24rem;
   color: #28d7c5;
-  font-size: 0.48rem;
+  font-size: max(12px, 0.48rem);
   font-weight: 900;
   letter-spacing: 0.06em;
   line-height: 1.25;
@@ -2229,7 +2231,7 @@ html:has(> body.is-map-fullscreen) {
 .travel-map__detail-card-copy > p:not(:first-child) {
   margin: 0.2rem 0 0;
   color: rgba(255, 255, 255, 0.58);
-  font-size: 0.56rem;
+  font-size: max(12px, 0.56rem);
   letter-spacing: 0.025em;
   line-height: 1.3;
 }
@@ -2244,7 +2246,7 @@ html:has(> body.is-map-fullscreen) {
   color: #ffb869 !important;
   /* Quiet, sentence-case call to action: the all-caps 900-weight treatment read
      as shouty next to the calm card. Keep the amber colour for emphasis. */
-  font-size: 0.72rem;
+  font-size: max(12px, 0.72rem);
   font-weight: 700;
   line-height: 1.2;
 }
@@ -2277,7 +2279,7 @@ html:has(> body.is-map-fullscreen) {
   /* !important: main.css paints every <button> #212931 !important, which
      left this label near-invisible dark-on-dark whatever colour we set. */
   color: #d7ecea !important;
-  font-size: 0.6rem;
+  font-size: max(12px, 0.6rem);
   font-weight: 700;
   letter-spacing: 0.05em;
   line-height: 1;
@@ -2310,7 +2312,6 @@ html:has(> body.is-map-fullscreen) {
   .travel-map__detail-step {
     height: 3rem;
     padding: 0 1rem;
-    font-size: 0.7rem;
   }
 
   .travel-map__detail-step span {
@@ -2369,6 +2370,12 @@ body.is-map-fullscreen #header,
 body.is-map-fullscreen #navPanelToggle,
 body.is-map-fullscreen #return-to-top {
   visibility: hidden;
+}
+
+/* The layout's z-index: 1 made a stacking context that trapped the fixed
+   overlay beneath the archive cards for hit-testing (Oct 2026). */
+body.is-map-fullscreen .travel-atlas__layout {
+  z-index: auto;
 }
 
 .travel-map.is-fullscreen {
@@ -2519,10 +2526,12 @@ body.is-map-fullscreen #return-to-top {
 }
 
 /* City-level dots need a comfortable thumb target in the overlay; the
-   visible dot stays small while the tappable halo grows. */
+   visible dot stays small while the tappable halo grows. -1.15rem around the
+   0.72rem dot is 44px at the phone root; travel-map.js reserves the rendered
+   dot, not this halo, when it lays out labels. */
 .travel-map.is-fullscreen .travel-map__detail::after {
   position: absolute;
-  inset: -0.75rem;
+  inset: -1.15rem;
   content: "";
 }
 
@@ -3016,8 +3025,9 @@ body.is-map-fullscreen #return-to-top {
 
   /* Phone-overlay typography: the desktop point sizes render around 7-9px
      at the phone root, illegible at arm's length. Overlay-scoped so the
-     inline map keeps its collision-tuned label sizes. */
-  .travel-map.is-fullscreen .travel-map__detail-card-copy > p:first-child,
+     inline map keeps its collision-tuned label sizes. The status pill,
+     destination labels and detail-card lines now carry a 12px floor at
+     every width, so only the remaining overlay sizes are listed here. */
   .travel-map.is-fullscreen .travel-map__city-links a {
     font-size: 0.62rem;
   }
@@ -3026,27 +3036,14 @@ body.is-map-fullscreen #return-to-top {
     font-size: 1.02rem;
   }
 
-  .travel-map.is-fullscreen .travel-map__detail-card-copy > p:not(:first-child),
   .travel-map.is-fullscreen .travel-map__hint {
     font-size: 0.72rem;
-  }
-
-  .travel-map.is-fullscreen .travel-map__detail-card-link {
-    font-size: 0.82rem;
-  }
-
-  .travel-map.is-fullscreen .travel-map__status {
-    font-size: max(var(--text-floor), 0.66rem);
   }
 
   /* Stop numbers sit inside a 1.2rem map dot, so they keep their canvas size
      like the place labels rather than take the 12px text floor. */
   .travel-map.is-fullscreen .travel-map__detail-number {
     font-size: 0.66rem;
-  }
-
-  .travel-map.is-fullscreen .travel-map__detail-label {
-    font-size: 0.6rem;
   }
 
   .travel-map.is-fullscreen .travel-map__marker-label strong {
@@ -3718,17 +3715,27 @@ body.is-map-fullscreen #return-to-top {
     object-position: center;
   }
 
+  /* Phone first screen (Oct 2026): less air above and inside the hero so the
+     banner starts within the first ~280px; desktop spacing is untouched. */
   #main.guangzhou-journal > article {
+    padding-top: 1rem;
     padding-right: 1.1rem;
     padding-left: 1.1rem;
+  }
+
+  .page-travel-journal header.major > .date {
+    margin-bottom: 1rem;
   }
 
   .guangzhou-journal__hero {
     margin-bottom: 2rem !important;
   }
 
+  .travel-journal__lede,
   .guangzhou-journal__lede {
     max-width: none;
+    margin-bottom: 1rem;
+    line-height: 1.7;
   }
 
   .guangzhou-journal__hero-image img {
@@ -5140,6 +5147,21 @@ body.is-map-fullscreen #return-to-top {
 }
 
 .page-travel-journal #nav { margin-top: 0; }
+
+/* Phone first screen (Oct 2026): the 7rem masthead held a 3rem pill in 4rem of
+   black; keep the 3rem tap height and shrink the band so the banner lands
+   higher. The floating return-to-top covered gallery tiles, as on Personal. */
+@media screen and (max-width: 736px) {
+  .page-travel-journal #header {
+    height: auto;
+    min-height: 0;
+    padding: 0.4rem 1rem;
+  }
+
+  body.page-travel-journal #return-to-top {
+    display: none !important;
+  }
+}
 
 #header .journal-return {
   display: inline-flex;
@@ -7498,6 +7520,25 @@ body.page-home #intro {
 }
 
 @media screen and (max-width: 600px) {
+  /* Phone first screen (Oct 2026): a tighter editorial intro brings the
+     banner above ~280px. verify.ps1 pins the 10rem summit-framed crop. */
+  .japan-journal .japan-journal__intro {
+    margin-bottom: 0.75rem;
+  }
+
+  .japan-journal .japan-journal__eyebrow {
+    margin-bottom: 0.4rem;
+  }
+
+  .japan-journal .japan-journal__title {
+    margin-bottom: 0.5rem;
+    font-size: 3rem;
+  }
+
+  .japan-journal .japan-journal__intro > .date {
+    margin-bottom: 0.5rem;
+  }
+
   .japan-journal .guangzhou-journal__hero-image img.journal-banner {
     height: 10rem;
   }
@@ -8626,6 +8667,24 @@ body.page-home #nav {
     height: 3rem;
     line-height: 3rem;
   }
+
+  /* Active query (Oct 2026): hide Surprise me and scroll the journal legend
+     as one edge-bleeding, right-faded row so the first photo stays in view. */
+  .photo-search.is-active .photo-explore__surprise { display: none; }
+
+  .photo-results__trips {
+    flex-wrap: nowrap;
+    margin: 0.85rem -2rem 0;
+    padding: 0.25rem 2rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
+  }
+
+  .photo-results__trips li { flex: none; }
+
+  /* Travel-only bundle (no page body class): return-to-top covered tiles. */
+  #return-to-top { display: none !important; }
 }
 
 @media (prefers-reduced-motion: reduce) {

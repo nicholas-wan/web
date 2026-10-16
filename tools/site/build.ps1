@@ -444,13 +444,10 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
         }
         elseif ($section.Label -match 'Melbourne') { $group = 'Melbourne' }
         elseif ($section.Label -match 'Sydney') { $group = 'Sydney' }
-        elseif ($Slug -eq 'travel_2022_europe') {
-            if ($section.Label -match 'France') { $group = 'France' }
-            elseif ($section.Label -match 'Belgium') { $group = 'Belgium' }
-            elseif ($section.Label -match 'Netherlands') { $group = 'Netherlands' }
-            elseif ($section.Label -match 'Germany') { $group = 'Germany' }
-            elseif ($section.Label -match 'Switzerland') { $group = 'Switzerland' }
-        }
+        # Europe's day pills are city labels ("To Paris", "Brussels", "Cologne"),
+        # so the former country grouping matched only "Netherlands" and split D4
+        # into a trailing second group, out of chronological order. All eight
+        # days sit in the single trip group like Guangzhou and Japan (Oct 2026).
         if (-not $groups.Contains($group)) { $groups[$group] = @() }
         $groups[$group] += $section
     }
