@@ -297,8 +297,8 @@
 				'<h2 id="photo-moment-title" tabindex="-1">' + escape(photo.place) + '</h2><p>' + escape(trips[photo.trip].label + ' · ' + trips[photo.trip].year) +
 				'</p><p>' + escape(photo.sectionTitle) + '</p><a class="photo-moment__read" href="' + escape(photo.trip + '#' + photo.section) + '">Read this day <span aria-hidden="true">&#8599;</span></a></div>';
 			status.textContent = photo.place + ' · ' + tripLabel(photo.trip);
-			previousMoment.disabled = momentAt === 0;
-			if (previousMoment.disabled && document.activeElement === previousMoment) moment.querySelector('[data-explore-action="surprise"]').focus();
+			if (!momentAt && document.activeElement === previousMoment) moment.querySelector('[data-explore-action="surprise"]').focus();
+			previousMoment.hidden = !momentAt;
 			if (first) document.getElementById('photo-moment-title').focus();
 		} else if (action === 'back') {
 			moment.hidden = true; discovery.hidden = false; status.textContent = '';
@@ -402,7 +402,7 @@
 			hits = hits.slice(0, limit - shown);
 			if (!hits.length) return;
 			shown += hits.length;
-			html += (tier ? '<h3 class="photo-results__tier">Partial matches</h3>' : '') +
+			html += (tier ? '<h3 class="photo-results__tier">Partial matches</h3>' : visible[1].length ? '<h3 class="sr-only">Full matches</h3>' : '') +
 				'<ul class="photo-results__grid">' + hits.map(function(hit) { return card(hit.photo, terms, tier && hit.why); }).join('') + '</ul>';
 		});
 		if (full) sentence.push(plural(full, 'photo matches', 'photos match') + (terms.length > 1 ? ' all terms' : ''));

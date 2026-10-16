@@ -554,6 +554,7 @@
     if (heading) {
       var sectionMedia = galleryMedia.filter(function (item, index) { return mediaSections[index] === heading; });
       var day = /^Day\s+\d+/i.exec(heading.textContent.trim());
+      caption.insertAdjacentHTML('beforeend', '<span class="sr-only"> ·</span>');
       var context = document.createElement('span');
       context.className = 'lightbox__context';
       context.textContent = ' ' + (day ? day[0] : heading.textContent.trim().replace(/^#\d+\s*-\s*/, '')) +
@@ -835,6 +836,9 @@
     var counter = document.createElement('div');
     var tiles = Array.prototype.slice.call(gallery.querySelectorAll('.brick'));
     if (!tiles.length) return;
+    gallery.setAttribute('role', 'list');
+    gallery.setAttribute('aria-label', tiles.length + ' photos');
+    tiles.forEach(function (tile) { tile.setAttribute('role', 'listitem'); });
 
     shell.className = 'journal-gallery-shell';
     gallery.parentNode.insertBefore(shell, gallery);

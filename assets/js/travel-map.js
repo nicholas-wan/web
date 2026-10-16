@@ -768,8 +768,9 @@
         link.getAttribute('data-map-trip') === activeTrip);
     });
     regionMarkers.forEach(function (marker) {
-      marker.classList.toggle('is-trip-active',
-        Boolean(activeTrip) && marker.getAttribute('data-map-trip') === activeTrip);
+      var active = Boolean(activeTrip) && marker.getAttribute('data-map-trip') === activeTrip;
+      marker.classList.toggle('is-trip-active', active);
+      marker.firstElementChild.setAttribute('aria-expanded', String(active));
     });
     if (tripPicker && tripPicker.value !== activeTrip) tripPicker.value = activeTrip;
     setActiveRegion('');

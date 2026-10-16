@@ -108,7 +108,7 @@ test('previous moments are reversible without consuming unseen photos', async ({
   const first = await image.getAttribute('href');
   const previous = page.getByRole('button', { name: 'Previous moment', exact: true });
   const next = page.getByRole('button', { name: 'Another moment', exact: true });
-  await expect(previous).toBeDisabled();
+  await expect(previous).toBeHidden();
   await next.click();
   const second = await image.getAttribute('href');
   const seen = await page.evaluate(() => sessionStorage.getItem('photo-explore-moments'));

@@ -2,13 +2,22 @@
   'use strict';
 
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var phone = window.matchMedia && window.matchMedia('(max-width: 736px)').matches;
   var watchers = [];
   var scheduled = false;
   var REVEAL_DURATION = 480;
   var REVEAL_STAGGER = 60;
+  /* The stagger counts from the first card revealed in the same frame, not
+     from the card's position in the grid, and phones cap it at two steps:
+     a fast flick used to land on cards that all waited the full 480ms
+     before their 480ms fade, so the screen stayed white for about a second
+     (Oct 2026). Cards also reveal a quarter viewport ahead of the fold. */
+  var STAGGER_CAP = phone ? 2 : 8;
+  var LOOKAHEAD = 0.25;
 
-  function reveal(element) {
-    var delay = parseInt(element.style.getPropertyValue('--reveal-delay'), 10) || 0;
+  function reveal(element, order) {
+    var delay = Math.min(order, STAGGER_CAP) * REVEAL_STAGGER;
+    element.style.setProperty('--reveal-delay', delay + 'ms');
     element.classList.add('is-revealed');
     window.setTimeout(function () {
       element.style.removeProperty('--reveal-delay');
@@ -20,19 +29,21 @@
     var rect = element.getBoundingClientRect();
     if (!rect.width || !rect.height) return false;
     var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-    var visible = Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0);
+    var visible = Math.min(rect.bottom, viewportHeight * (1 + LOOKAHEAD)) - Math.max(rect.top, 0);
     return visible > rect.height * ratio;
   }
 
   function checkWatchers() {
     scheduled = false;
+    var batch = [];
     for (var index = watchers.length - 1; index >= 0; index--) {
       var watcher = watchers[index];
       if (inViewport(watcher.element, watcher.ratio)) {
         watchers.splice(index, 1);
-        reveal(watcher.element);
+        batch.unshift(watcher.element);
       }
     }
+    batch.forEach(reveal);
     if (!watchers.length) {
       window.removeEventListener('scroll', scheduleCheck);
       window.removeEventListener('resize', scheduleCheck);
@@ -49,9 +60,8 @@
     var selectors = ['.education-grid .education-card', '.travel-grid .travel-card'];
     var items = [];
     selectors.forEach(function (selector) {
-      Array.prototype.forEach.call(document.querySelectorAll(selector), function (element, index) {
+      Array.prototype.forEach.call(document.querySelectorAll(selector), function (element) {
         element.setAttribute('data-reveal', '');
-        element.style.setProperty('--reveal-delay', (Math.min(index, 8) * REVEAL_STAGGER) + 'ms');
         items.push(element);
       });
     });

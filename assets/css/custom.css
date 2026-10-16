@@ -3843,6 +3843,14 @@ body.is-map-fullscreen .travel-atlas__layout {
     line-height: 1.5;
   }
 
+  /* Narrow columns: the theme's justified <p> leaves rivers (Oct 2026). */
+  .travel-route-summary,
+  .guangzhou-day__note,
+  .travel-journal__note,
+  .australia-journal .col-12 > p {
+    text-align: left;
+  }
+
   .guangzhou-day__route--collapsible .guangzhou-route__more {
     display: inline-flex;
     min-height: 3rem;
@@ -5254,6 +5262,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   font-size: 1rem;
 }
 .travel-strip-arrow:disabled { opacity: 0.3; }
+.travel-strip-arrow[hidden] { display: none; }
 @media screen and (max-width: 980px) {
   .travel-strip-arrow { display: none; }
 }
@@ -5834,7 +5843,7 @@ body.lightbox-open {
   align-items: center;
   justify-content: center;
   padding: 4.5rem 5rem 2rem;
-  background: rgba(8, 10, 14, 0.96);
+  background: rgba(8, 10, 14, 0.98);
   opacity: 0;
   pointer-events: none;
   touch-action: pan-y pinch-zoom;
@@ -8650,7 +8659,7 @@ body.page-home #nav {
   }
 
   .photo-search__chip {
-    min-height: 2.5rem;
+    min-height: 3rem;
   }
 
   .photo-search__label {

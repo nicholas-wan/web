@@ -248,6 +248,8 @@
       if (!moreEnd && document.activeElement === forward && moreStart) back.focus({ preventScroll: true });
       back.disabled = !moreStart;
       forward.disabled = !moreEnd;
+      /* Nothing to scroll: hide both, never two dimmed arrows. */
+      back.hidden = forward.hidden = hidden <= 2;
     };
     edgeStrip.addEventListener('scroll', markStripEdges, { passive: true });
     window.addEventListener('resize', markStripEdges);
