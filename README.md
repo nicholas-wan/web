@@ -31,4 +31,17 @@ Edit the file under `images/` (or `images-webp/`), delete its `-480`/`-800`/`-12
 
 Colour grades, crops and removals are logged per photo in [docs/photo-edits.csv](docs/photo-edits.csv) with the commit they shipped in. Removals never touch the people in a photo.
 
+## Owner preferences (Oct 2026)
+
+Decided during the design reviews of 16–17 Oct 2026. Do not propose these again; the full contracts are in [docs/project-context.md](docs/project-context.md).
+
+- The home hero's desktop button stays an icon circle that reveals its label on hover; phones keep the labelled pill.
+- The Personal timeline keeps dimming unfocused cards and leaves the gallery controls where they are.
+- No skip-to-content link and no change to the homepage cards' focus ring.
+- The floating return-to-top circle stays on phones; it is the quick way back up.
+- No contact line on the Work page; email and LinkedIn live in the nav and footer.
+- Photos must be served at phone sizes: every gallery or card image needs `-480`/`-800` siblings and a `sizes` that matches its real slot.
+- Phone text never drops below the 12px floor; section headings on a page share one style.
+- No SEO, analytics or resume-PDF work; the hero copy is approved text.
+
 See [docs/build.md](docs/build.md) for the build and image pipeline and [docs/project-context.md](docs/project-context.md) for the behaviour contracts.

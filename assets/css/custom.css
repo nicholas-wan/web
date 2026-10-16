@@ -172,8 +172,7 @@
 }
 
 .toolkit-card:hover,
-.toolkit-card:focus-within,
-.toolkit-card.is-expanded {
+.toolkit-card:focus-within {
   border-color: var(--color-brand-200);
   box-shadow: var(--shadow-card-hover);
   transform: translateY(-2px);
@@ -220,55 +219,6 @@
   color: inherit;
 }
 
-.toolkit-card__toggle:focus-visible {
-  outline: 2px solid var(--color-brand-600);
-  outline-offset: 3px;
-}
-
-.toolkit-card__toggle {
-  appearance: none;
-  -webkit-appearance: none;
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 0.35rem;
-  background: transparent;
-  box-shadow: none;
-  cursor: pointer;
-}
-
-.toolkit-card__toggle:hover,
-.toolkit-card__toggle:active,
-.toolkit-card__toggle:focus {
-  background: transparent;
-  box-shadow: none;
-}
-
-.toolkit-card__summary::after {
-  position: absolute;
-  top: 50%;
-  right: 0.2rem;
-  width: 0.55rem;
-  height: 0.55rem;
-  margin-top: -0.4rem;
-  border: solid var(--color-brand-700);
-  border-width: 0 2px 2px 0;
-  content: "";
-  transform: rotate(45deg);
-  transition: transform 0.25s ease;
-}
-
-.toolkit-card.is-expanded .toolkit-card__summary::after {
-  transform: rotate(225deg);
-}
-
 .toolkit-card__logo {
   display: grid;
   flex: 0 0 3.1rem;
@@ -311,79 +261,18 @@
   text-align: left;
 }
 
-/* This 11px type needs #53656c (6.1:1) and #0c6663 (6.8:1) on the white
-   card; the previous #8a999e (2.9:1) and brand-600 (4.2:1) fail AA. */
-.toolkit-card__hint {
-  display: block;
-  margin-top: 0.35rem;
-  color: var(--color-ink-600);
-  font-size: 0.7rem;
-  line-height: 1.25;
-  text-align: left;
-}
-
-.toolkit-card__eyebrow {
-  display: block;
-  margin: 0 0 0.28rem;
-  color: var(--color-brand-700);
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.11em;
-  line-height: 1.3;
-  text-align: left;
-  text-transform: uppercase;
-}
-
-/* Details ship expanded; main.js adds toolkit-card--js and collapses them,
-   so the content stays reachable without JS. Expansion is click/keyboard
-   only (main.js) — a CSS :hover rule here would fight the click-to-collapse
-   state (visually open, aria-expanded=false). */
-.toolkit-card__detail {
-  overflow: hidden;
-}
-
-.toolkit-card--js .toolkit-card__detail {
-  max-height: 0;
-  opacity: 0;
-  transform: translateY(-0.35rem);
-  transition: max-height 0.25s ease, opacity 0.2s ease, transform 0.25s ease;
-}
-
-.toolkit-card--js.is-expanded .toolkit-card__detail {
-  max-height: var(--toolkit-detail-height, 22rem);
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Without JS the details are already open — "Select to explore" is a lie. */
-.toolkit-card:not(.toolkit-card--js) .toolkit-card__hint {
-  display: none;
-}
-
-@media print {
-  .toolkit-card__detail {
-    max-height: none !important;
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
-  .toolkit-card__hint {
-    display: none;
-  }
-}
-
+/* The card details are plain, always-visible content. The phone disclosure
+   (toggle button, eyebrow, hint, tag list and logo grid) was hidden at every
+   width by the quiet Skills treatment, so its markup, CSS and main.js code
+   path were removed (Oct 2026). */
 @media (prefers-reduced-motion: reduce) {
   .toolkit-card,
-  .toolkit-card__summary::after,
-  .toolkit-card__detail,
   .tech-stack__grid li {
     transition: none !important;
   }
 
   .toolkit-card:hover,
   .toolkit-card:focus-within,
-  .toolkit-card.is-expanded,
   .tech-stack__grid li:hover {
     transform: none;
   }
@@ -395,102 +284,6 @@
   font-size: 0.88rem;
   line-height: 1.6;
   text-align: left;
-}
-
-.toolkit-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem 0.9rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.toolkit-tags li {
-  position: relative;
-  margin: 0;
-  padding: 0 0 0 0.65rem;
-  color: #496066;
-  font-family: "Source Sans Pro", Helvetica, sans-serif;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.025em;
-  line-height: 1.45;
-}
-
-.toolkit-tags li::before {
-  position: absolute;
-  top: 0.54em;
-  left: 0;
-  width: 0.28rem;
-  height: 0.28rem;
-  border-radius: 50%;
-  background: #55a7a3;
-  content: "";
-}
-
-.tool-logo-list {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.5rem;
-  margin: 0.85rem 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.tool-logo-list li {
-  display: flex;
-  min-height: 2.75rem;
-  min-width: 0;
-  align-items: center;
-  gap: 0.45rem;
-  margin: 0;
-  padding: 0.35rem 0.2rem;
-  border: 0;
-  background: transparent;
-  color: #40545b;
-  font-family: "Source Sans Pro", Helvetica, sans-serif;
-  font-size: 0.7rem;
-  font-weight: 750;
-  line-height: 1.2;
-  text-align: left;
-}
-
-.tool-logo-list li > span:last-child {
-  min-width: 0;
-  overflow: visible;
-  overflow-wrap: normal;
-  white-space: normal;
-}
-
-.tool-logo-frame {
-  display: grid;
-  flex: 0 0 2rem;
-  width: 2rem;
-  height: 1.85rem;
-  place-items: center;
-  background: transparent;
-}
-
-.tool-logo-frame img {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: 1.7rem;
-  max-height: 1.55rem;
-  object-fit: contain;
-}
-
-.tool-logo-frame img.tool-logo--wide {
-  width: auto;
-  height: auto;
-  max-width: 1.9rem;
-  max-height: 1.15rem;
-}
-
-.tool-logo-frame--fallback {
-  color: #4c6f7b;
-  font-size: 1rem;
 }
 
 .tech-stack {
@@ -578,10 +371,6 @@
 
   .skills-grid {
     grid-template-columns: 1fr;
-  }
-
-  .tool-logo-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .toolkit-card {
@@ -4375,7 +4164,7 @@ body.is-map-fullscreen .travel-atlas__layout {
 .case-study__company-label {
   color: var(--color-ink-900);
   font-family: var(--font-display);
-  font-size: 0.8rem;
+  font-size: max(var(--text-floor), 0.8rem);
   font-weight: 900;
   letter-spacing: 0.05em;
   line-height: 1.25;
@@ -4385,7 +4174,7 @@ body.is-map-fullscreen .travel-atlas__layout {
 .case-study__company-role {
   margin-top: 0.2rem;
   color: var(--color-ink-500);
-  font-size: 0.84rem;
+  font-size: max(var(--text-floor), 0.84rem);
   line-height: 1.35;
 }
 
@@ -4395,7 +4184,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   /* Keep at least ink-500: lighter greys fall below WCAG AA 4.5:1 at this
      size on the card backgrounds. */
   color: var(--color-ink-500);
-  font-size: 0.78rem;
+  font-size: max(var(--text-floor), 0.78rem);
   line-height: 1.35;
 }
 
@@ -4524,7 +4313,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   background: #edf6f5;
   color: #285a59;
   font-family: "Source Sans Pro", Helvetica, sans-serif;
-  font-size: 0.76rem;
+  font-size: max(var(--text-floor), 0.76rem);
   font-weight: 700;
   line-height: 1.3;
 }
@@ -4657,7 +4446,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   align-items: center;
   color: #0f7470;
   font-family: "Source Sans Pro", Helvetica, sans-serif;
-  font-size: 0.78rem;
+  font-size: max(var(--text-floor), 0.78rem);
   font-weight: 800;
 }
 
@@ -6632,7 +6421,6 @@ body.lightbox-open {
     min-height: 5.75rem;
   }
 
-  .page-skills .toolkit-card__hint,
   .page-skills .tech-stack__grid strong {
     font-size: 0.9rem;
   }
@@ -7870,6 +7658,22 @@ body.page-home #nav {
   text-transform: uppercase;
 }
 
+/* One heading voice on the page (Oct 2026): the Tech stack title shares the
+   quiet Skills/Education heading style at every width instead of the theme's
+   centred Source Sans display size. */
+.page-skills .tech-stack__heading {
+  text-align: left;
+}
+
+.page-skills .tech-stack__heading h2 {
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-align: left;
+  text-transform: none;
+}
+
 @media screen and (min-width: 981px) {
   .page-skills #main > .post {
     display: grid;
@@ -7997,8 +7801,7 @@ body.page-home #nav {
   }
 
   .page-skills .toolkit-card:hover,
-  .page-skills .toolkit-card:focus-within,
-  .page-skills .toolkit-card.is-expanded {
+  .page-skills .toolkit-card:focus-within {
     border-color: #c8d2d0;
     background: #f5f7f5;
     box-shadow: none;
@@ -8030,25 +7833,6 @@ body.page-home #nav {
     letter-spacing: 0;
     line-height: 1.25;
     text-transform: none;
-  }
-
-  .page-skills .toolkit-card__eyebrow,
-  .page-skills .toolkit-card__hint,
-  .page-skills .toolkit-card__toggle,
-  .page-skills .toolkit-card__summary::after,
-  .page-skills .toolkit-tags,
-  .page-skills .tool-logo-list {
-    display: none;
-  }
-
-  .page-skills .toolkit-card__detail,
-  .page-skills .toolkit-card--js .toolkit-card__detail,
-  .page-skills .toolkit-card--js.is-expanded .toolkit-card__detail {
-    max-height: none;
-    overflow: visible;
-    opacity: 1;
-    transform: none;
-    transition: none;
   }
 
   .page-skills .toolkit-card__detail > p {
@@ -8096,9 +7880,13 @@ body.page-home #nav {
     margin-bottom: 0 !important;
   }
 
-  .page-skills .skills-heading h2 {
+  /* Education shares the quiet heading on phones and tablets too (Oct 2026);
+     it previously fell through to the theme's uppercase display heading. */
+  .page-skills .skills-heading h2,
+  .page-skills .education-heading h2 {
     font-family: var(--font-body);
     font-size: 1.5rem !important;
+    font-weight: 700;
     letter-spacing: 0;
     text-align: left;
     text-transform: none;
@@ -8124,8 +7912,7 @@ body.page-home #nav {
   }
 
   .page-skills .toolkit-card:hover,
-  .page-skills .toolkit-card:focus-within,
-  .page-skills .toolkit-card.is-expanded {
+  .page-skills .toolkit-card:focus-within {
     border-color: #c8d2d0;
     background: #f5f7f5;
     box-shadow: none;
@@ -8157,25 +7944,6 @@ body.page-home #nav {
     letter-spacing: 0;
     line-height: 1.25;
     text-transform: none;
-  }
-
-  .page-skills .toolkit-card__eyebrow,
-  .page-skills .toolkit-card__hint,
-  .page-skills .toolkit-card__toggle,
-  .page-skills .toolkit-card__summary::after,
-  .page-skills .toolkit-tags,
-  .page-skills .tool-logo-list {
-    display: none;
-  }
-
-  .page-skills .toolkit-card__detail,
-  .page-skills .toolkit-card--js .toolkit-card__detail,
-  .page-skills .toolkit-card--js.is-expanded .toolkit-card__detail {
-    max-height: none;
-    overflow: visible;
-    opacity: 1;
-    transform: none;
-    transition: none;
   }
 
   .page-skills .toolkit-card__detail > p {

@@ -48,7 +48,7 @@ test('visible skills evidence stays keyboard-accessible at every breakpoint', as
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/skills');
     const detail = page.locator('#toolkit-ai-detail');
-    await expect(detail).toHaveAttribute('aria-hidden', 'false');
+    await expect(detail).toBeVisible();
     await expect(detail).not.toHaveAttribute('inert', '');
     const evidence = detail.getByRole('link', { name: 'See the agentic AI case study' });
     await evidence.focus();
