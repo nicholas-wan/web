@@ -696,7 +696,7 @@ $assetVersions = @{}
 foreach ($file in @('icons.css', 'main.css', 'noscript.css')) {
     $assetVersions["assets/css/$file"] = Get-FileContentVersion (Join-Path $root "assets\css\$file")
 }
-foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js')) {
+foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js')) {
     $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
 }
 $assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
@@ -1108,11 +1108,12 @@ foreach ($page in $pages) {
     $travelDiscoveryScript = if ($slug -eq 'travel') { "<script src=`"$(Get-AssetRef 'assets/js/travel-discovery.js')`"></script>" } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { "<script src=`"$(Get-AssetRef 'assets/js/personal-timeline.js')`"></script>" } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { "<script src=`"$(Get-AssetRef 'assets/js/scramble-reveal.js')`"></script>" } else { "" }
+    $anomalyPeekScript = if ($slug -eq 'experience') { "<script src=`"$(Get-AssetRef 'assets/js/anomaly-peek.js')`"></script>" } else { "" }
     $gameScript = if ($slug -eq 'index') { "<script src=`"$(Get-AssetRef 'assets/js/game.js')`"></script>" } else { "" }
     $listingEffectsScript = if ($slug -in @('skills', 'travel')) { "<script src=`"$(Get-AssetRef 'assets/js/listing-effects.js')`"></script>" } else { "" }
     $journalProgressScript = if ($tripOrder -contains $slug) { "<script src=`"$(Get-AssetRef 'assets/js/journal-progress.js')`"></script>" } else { "" }
     $canvasScript = if ($slug -eq 'index') { "<script src=`"$(Get-AssetRef 'assets/js/canvas-background.js')`"></script>" } else { "" }
-    $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelDiscoveryScript, $personalTimelineScript, $scrambleRevealScript) | Where-Object { $_ }) -join "`n    "
+    $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelDiscoveryScript, $personalTimelineScript, $scrambleRevealScript, $anomalyPeekScript) | Where-Object { $_ }) -join "`n    "
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
     $routeStylesheets = @()
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-map-page.css')`" />" }
@@ -1203,7 +1204,7 @@ if ($imageDimensionCacheDirty) {
 
 # Publish only runtime assets used by the generated Pages site.
 $runtimeCss = @("icons.css", "main.css", "noscript.css")
-$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js")
+$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCss) {

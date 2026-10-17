@@ -27,3 +27,9 @@
 			transform: none;
 			opacity: 1;
 		}
+
+/* The Work page's anomaly peek needs its script: without JavaScript its
+   chips would be buttons that do nothing. */
+.anomaly-peek {
+	display: none !important;
+}

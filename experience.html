@@ -45,6 +45,21 @@
 							<li><span>Outcome</span><strong data-scramble-row data-scramble-lead="1"><span data-scramble-source>New detection capabilities in daily operational use</span></strong></li>
 						</ul>
 						<ul class="case-study__tags" aria-label="Cloud analytics capabilities"><li>AWS</li><li>Microsoft 365</li><li>Behavioural baselining</li><li>Detection engineering</li><li>Python</li></ul>
+						<div class="anomaly-peek">
+							<p class="anomaly-peek__hint"><strong>See an anomaly get caught</strong><span aria-hidden="true"> &middot; <span class="anomaly-peek__hint-hover">hover a chart</span><span class="anomaly-peek__hint-touch">tap a chart</span></span></p>
+							<button class="anomaly-peek__chip" type="button" aria-expanded="false" aria-controls="anomaly-card-series" data-peek="series"><svg class="anomaly-peek__mini" data-mini="series" aria-hidden="true" focusable="false"></svg>Over time</button>
+							<button class="anomaly-peek__chip" type="button" aria-expanded="false" aria-controls="anomaly-card-graph" data-peek="graph"><svg class="anomaly-peek__mini" data-mini="graph" aria-hidden="true" focusable="false"></svg>Across connections</button>
+							<div class="anomaly-card" id="anomaly-card-series" role="group" aria-label="Anomaly detection over time" data-peek-card="series">
+								<p class="anomaly-card__title">Activity over time</p>
+								<div class="anomaly-card__plot" data-series></div>
+								<p class="anomaly-card__note">Points outside the normal range are flagged.</p>
+							</div>
+							<div class="anomaly-card" id="anomaly-card-graph" role="group" aria-label="Anomaly detection across connections" data-peek-card="graph">
+								<p class="anomaly-card__title">Connections</p>
+								<div class="anomaly-card__plot" data-graph></div>
+								<p class="anomaly-card__note">Links never seen before are flagged.</p>
+							</div>
+						</div>
 					</article>
 
 					<section class="internship-group" aria-labelledby="internships-label">

@@ -299,335 +299,202 @@
 })();
 
 /*Canvas*/
-(function() {
-var canvas = document.getElementById('nokey');
-var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-var compactCanvas = window.matchMedia && window.matchMedia('(max-width: 736px)').matches;
-if (canvas && reducedMotion) {
-   canvas.hidden = true;
-}
-if (canvas && !reducedMotion) {
-   var can_w = parseInt(canvas.getAttribute('width')),
-   can_h = parseInt(canvas.getAttribute('height')),
-   ctx = canvas.getContext('2d'),
-   animationFrameId = null,
-   canvasRunning = false;
+/* Homepage background: the drifting particle network behind the hero, plus
+   "calm signals" (Oct 2026, owner-approved after a lab trial): every few
+   seconds one small bright signal hops along the existing links from node to
+   node, like a message passing between agents, and each node it reaches
+   glows briefly. The signal is clipped out of the hero text block so it never
+   crosses the name or headline. No labels and no extra lines. Hidden under
+   reduced motion, paused off screen and in hidden tabs, and phone
+   height-only resizes are ignored. */
+(function () {
+  'use strict';
 
-// console.log(typeof can_w);
+  var canvas = document.getElementById('nokey');
+  if (!canvas) { return; }
+  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { canvas.hidden = true; return; }
 
-var ball = {
-      x: 0,
-      y: 0,
-      vx: 0,
-      vy: 0,
-      r: 0,
-      alpha: 1,
-      phase: 0
-   },
-   ball_color = {
-       r: 0,
-       g: 224,
-       b: 224
-   },
-   R = 2,
-   balls = [],
-   alpha_f = 0.03,
-   alpha_phase = 0,
+  var ctx = canvas.getContext('2d');
+  var compactCanvas = window.matchMedia && window.matchMedia('(max-width: 736px)').matches;
+  var finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+  var W = 0, H = 0;
+  var R = 2, LINK = compactCanvas ? 145 : 210, ball_limit = compactCanvas ? 9 : 14;
+  var balls = [];
+  var mouse = { x: 0, y: 0, mouse: true, active: false };
 
-// Line
-   link_line_width = 0.8,
-   dis_limit = compactCanvas ? 145 : 210,
-   ball_limit = compactCanvas ? 9 : 14,
-   add_mouse_point = true,
-   mouse_in = false,
-   mouse_ball = {
-      x: 0,
-      y: 0,
-      vx: 0,
-      vy: 0,
-      r: 0,
-      type: 'mouse'
-   };
+  // Signals: a hop takes HOP ms; a chain makes up to HOPS hops, then the next
+  // chain starts after a quiet gap so the effect stays occasional.
+  var HOP = 900, HOPS = 4, GAP = 1800;
+  var signal = null, nextSignalAt = 0;
 
-// Random speed
-function getRandomSpeed(pos){
-    var  min = -1,
-       max = 1;
-    switch(pos){
-        case 'top':
-            return [randomNumFrom(min, max), randomNumFrom(0.1, max)];
-            break;
-        case 'right':
-            return [randomNumFrom(min, -0.1), randomNumFrom(min, max)];
-            break;
-        case 'bottom':
-            return [randomNumFrom(min, max), randomNumFrom(min, -0.1)];
-            break;
-        case 'left':
-            return [randomNumFrom(0.1, max), randomNumFrom(min, max)];
-            break;
-        default:
-            return;
-            break;
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+
+  function spawn() {
+    var side = Math.floor(Math.random() * 4), b = { r: R, alpha: 1, phase: rand(0, 10), glow: 0 };
+    if (side === 0) { b.x = rand(0, W); b.y = -R; b.vx = rand(-1, 1); b.vy = rand(0.1, 1); }
+    else if (side === 1) { b.x = W + R; b.y = rand(0, H); b.vx = rand(-1, -0.1); b.vy = rand(-1, 1); }
+    else if (side === 2) { b.x = rand(0, W); b.y = H + R; b.vx = rand(-1, 1); b.vy = rand(-1, -0.1); }
+    else { b.x = -R; b.y = rand(0, H); b.vx = rand(0.1, 1); b.vy = rand(-1, 1); }
+    return b;
+  }
+
+  function dist(a, b) { var dx = a.x - b.x, dy = a.y - b.y; return Math.sqrt(dx * dx + dy * dy); }
+
+  // The hero text (name to CTA): signals pass behind it, never across it.
+  var textBox = null;
+  function measureText() {
+    var top = document.querySelector('#intro h1');
+    var bottom = document.querySelector('#intro .portfolio-hero__actions') || top;
+    var summary = document.querySelector('#intro .portfolio-hero__summary') || top;
+    if (!top) { textBox = null; return; }
+    var c = canvas.getBoundingClientRect(), a = top.getBoundingClientRect(), s = summary.getBoundingClientRect(), b = bottom.getBoundingClientRect();
+    textBox = {
+      x: Math.min(a.left, s.left, b.left) - c.left - 16, y: a.top - c.top - 16,
+      w: Math.max(a.right, s.right, b.right) - Math.min(a.left, s.left, b.left) + 32, h: b.bottom - a.top + 32
+    };
+  }
+
+  function initCanvas() {
+    var docEl = document.documentElement;
+    W = docEl.clientWidth; H = docEl.clientHeight;
+    canvas.width = W; canvas.height = H;
+    measureText();
+  }
+
+  function neighbours(from) {
+    return balls.filter(function (b) { return b !== from && !b.mouse && dist(b, from) < LINK * 0.85; });
+  }
+
+  function startSignal(t) {
+    var candidates = balls.filter(function (b) { return !b.mouse && b.x > 0 && b.x < W && b.y > 0 && b.y < H && neighbours(b).length; });
+    if (!candidates.length) { nextSignalAt = t + 600; return; }
+    var from = candidates[Math.floor(Math.random() * candidates.length)];
+    var opts = neighbours(from);
+    signal = { from: from, to: opts[Math.floor(Math.random() * opts.length)], start: t, hops: 1, trail: [] };
+    from.glow = 1;
+  }
+
+  function stepSignal(t) {
+    if (!signal) { if (t >= nextSignalAt) { startSignal(t); } return; }
+    var p = (t - signal.start) / HOP;
+    if (p >= 1) {
+      signal.to.glow = 1;
+      // Hop on to a node not just visited, if the link still holds.
+      var opts = neighbours(signal.to).filter(function (b) { return b !== signal.from; });
+      if (signal.hops >= HOPS || !opts.length || balls.indexOf(signal.to) < 0) { signal = null; nextSignalAt = t + GAP; return; }
+      signal = { from: signal.to, to: opts[Math.floor(Math.random() * opts.length)], start: t, hops: signal.hops + 1, trail: signal.trail };
+      p = 0;
     }
-}
-function randomArrayItem(arr){
-    return arr[Math.floor(Math.random() * arr.length)];
-}
-function randomNumFrom(min, max){
-    return Math.random()*(max - min) + min;
-}
-// Random Ball
-function getRandomBall(){
-    var pos = randomArrayItem(['top', 'right', 'bottom', 'left']);
-    switch(pos){
-        case 'top':
-            return {
-                x: randomSidePos(can_w),
-                y: -R,
-                vx: getRandomSpeed('top')[0],
-                vy: getRandomSpeed('top')[1],
-                r: R,
-                alpha: 1,
-                phase: randomNumFrom(0, 10)
-            }
-            break;
-        case 'right':
-            return {
-                x: can_w + R,
-                y: randomSidePos(can_h),
-                vx: getRandomSpeed('right')[0],
-                vy: getRandomSpeed('right')[1],
-                r: R,
-                alpha: 1,
-                phase: randomNumFrom(0, 10)
-            }
-            break;
-        case 'bottom':
-            return {
-                x: randomSidePos(can_w),
-                y: can_h + R,
-                vx: getRandomSpeed('bottom')[0],
-                vy: getRandomSpeed('bottom')[1],
-                r: R,
-                alpha: 1,
-                phase: randomNumFrom(0, 10)
-            }
-            break;
-        case 'left':
-            return {
-                x: -R,
-                y: randomSidePos(can_h),
-                vx: getRandomSpeed('left')[0],
-                vy: getRandomSpeed('left')[1],
-                r: R,
-                alpha: 1,
-                phase: randomNumFrom(0, 10)
-            }
-            break;
-    }
-}
-function randomSidePos(length){
-    return Math.ceil(Math.random() * length);
-}
+    // Both ends drift while the signal travels, so place it along the live link.
+    var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+    var x = signal.from.x + (signal.to.x - signal.from.x) * e;
+    var y = signal.from.y + (signal.to.y - signal.from.y) * e;
+    signal.trail.unshift({ x: x, y: y });
+    signal.trail.length = Math.min(signal.trail.length, 10);
+    signal.x = x; signal.y = y;
+  }
 
-// Draw Ball
-function renderBalls(){
-    Array.prototype.forEach.call(balls, function(b){
-       if(!b.hasOwnProperty('type')){
-           ctx.fillStyle = 'rgba('+ball_color.r+','+ball_color.g+','+ball_color.b+','+b.alpha+')';
-           ctx.beginPath();
-           ctx.arc(b.x, b.y, R, 0, Math.PI*2, true);
-           ctx.closePath();
-           ctx.fill();
-       }
-    });
-}
+  function render(t) {
+    ctx.clearRect(0, 0, W, H);
+    var pts = mouse.active ? balls.concat([mouse]) : balls;
 
-// Update balls
-function updateBalls(){
-    var new_balls = [];
-    Array.prototype.forEach.call(balls, function(b){
-        b.x += b.vx;
-        b.y += b.vy;
-
-        if(b.x > -(50) && b.x < (can_w+50) && b.y > -(50) && b.y < (can_h+50)){
-           new_balls.push(b);
+    for (var i = 0; i < pts.length; i++) {
+      for (var j = i + 1; j < pts.length; j++) {
+        var f = dist(pts[i], pts[j]) / LINK;
+        if (f < 1) {
+          var lit = signal && ((pts[i] === signal.from && pts[j] === signal.to) || (pts[j] === signal.from && pts[i] === signal.to));
+          ctx.strokeStyle = lit ? 'rgba(0,224,224,' + ((1 - f) * 0.7).toFixed(3) + ')' : 'rgba(150,150,150,' + ((1 - f) * 0.45).toFixed(3) + ')';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath(); ctx.moveTo(pts[i].x, pts[i].y); ctx.lineTo(pts[j].x, pts[j].y); ctx.stroke();
         }
+      }
+    }
 
-        // alpha change
-        b.phase += alpha_f;
-        b.alpha = Math.abs(Math.cos(b.phase));
-        // console.log(b.alpha);
+    balls.forEach(function (b) {
+      if (b.glow > 0.02) {
+        var g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, 14);
+        g.addColorStop(0, 'rgba(0,224,224,' + (0.5 * b.glow).toFixed(3) + ')'); g.addColorStop(1, 'rgba(0,224,224,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, b.y, 14, 0, Math.PI * 2); ctx.fill();
+        b.glow *= 0.94;
+      }
+      ctx.fillStyle = 'rgba(0,224,224,' + Math.max(b.alpha, b.glow).toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(b.x, b.y, R, 0, Math.PI * 2); ctx.fill();
     });
 
-    balls = new_balls.slice(0);
-}
-
-// loop alpha
-function loopAlphaInf(){
-
-}
-
-// Draw lines
-function renderLines(){
-    var fraction, alpha;
-    for (var i = 0; i < balls.length; i++) {
-        for (var j = i + 1; j < balls.length; j++) {
-
-           fraction = getDisOf(balls[i], balls[j]) / dis_limit;
-
-           if(fraction < 1){
-               alpha = ((1 - fraction) * 0.45).toString();
-
-               ctx.strokeStyle = 'rgba(150,150,150,'+alpha+')';
-               ctx.lineWidth = link_line_width;
-
-               ctx.beginPath();
-               ctx.moveTo(balls[i].x, balls[i].y);
-               ctx.lineTo(balls[j].x, balls[j].y);
-               ctx.stroke();
-               ctx.closePath();
-           }
-        }
+    if (signal && signal.trail.length) {
+      ctx.save();
+      if (textBox) {
+        ctx.beginPath(); ctx.rect(0, 0, W, H); ctx.rect(textBox.x, textBox.y, textBox.w, textBox.h); ctx.clip('evenodd');
+      }
+      signal.trail.forEach(function (pt, k) {
+        ctx.fillStyle = 'rgba(200,255,252,' + (k === 0 ? 1 : 0.45 * (1 - k / signal.trail.length)).toFixed(3) + ')';
+        ctx.beginPath(); ctx.arc(pt.x, pt.y, k === 0 ? 2.6 : 1.8, 0, Math.PI * 2); ctx.fill();
+      });
+      ctx.restore();
     }
-}
+  }
 
-// calculate distance between two points
-function getDisOf(b1, b2){
-    var  delta_x = Math.abs(b1.x - b2.x),
-       delta_y = Math.abs(b1.y - b2.y);
+  function update() {
+    balls = balls.filter(function (b) {
+      b.x += b.vx; b.y += b.vy;
+      b.phase += 0.03; b.alpha = Math.abs(Math.cos(b.phase));
+      return b.x > -50 && b.x < W + 50 && b.y > -50 && b.y < H + 50;
+    });
+    if (balls.length < ball_limit) { balls.push(spawn()); }
+  }
 
-    return Math.sqrt(delta_x*delta_x + delta_y*delta_y);
-}
-
-// add balls if there a little balls
-function addBallIfy(){
-    if(balls.length < ball_limit){
-        balls.push(getRandomBall());
+  // The canvas sits behind the hero only; once the reader scrolls past it,
+  // stop repainting an unseen layer every frame.
+  var canvasRunning = false, rafId = null, canvasOnScreen = true;
+  function frame(t) {
+    if (!canvasRunning) { return; }
+    stepSignal(t);
+    render(t);
+    update();
+    rafId = window.requestAnimationFrame(frame);
+  }
+  function start() {
+    if (!document.hidden && canvasOnScreen && !canvasRunning) {
+      canvasRunning = true; rafId = window.requestAnimationFrame(frame);
     }
-}
-
-// Render
-function render(){
-    if(!canvasRunning){
-        return;
-    }
-    ctx.clearRect(0, 0, can_w, can_h);
-
-    renderBalls();
-
-    renderLines();
-
-    updateBalls();
-
-    addBallIfy();
-
-    animationFrameId = window.requestAnimationFrame(render);
-}
-
-// Init Balls
-function initBalls(num){
-    for(var i = 1; i <= num; i++){
-        balls.push({
-            x: randomSidePos(can_w),
-            y: randomSidePos(can_h),
-            vx: getRandomSpeed('top')[0],
-            vy: getRandomSpeed('top')[1],
-            r: R,
-            alpha: 1,
-            phase: randomNumFrom(0, 10)
-        });
-    }
-}
-// Init Canvas
-function initCanvas(){
-    // clientWidth/Height exclude the scrollbar; innerWidth/Height include it,
-    // which made the canvas wider than the layout viewport and let the page
-    // scroll horizontally by the scrollbar width.
-    var docEl = document.documentElement;
-    canvas.setAttribute('width', docEl.clientWidth);
-    canvas.setAttribute('height', docEl.clientHeight);
-
-    can_w = parseInt(canvas.getAttribute('width'));
-    can_h = parseInt(canvas.getAttribute('height'));
-}
-// A phone URL-bar show/hide resizes only the height by about a toolbar, and
-// resetting the bitmap then clears the canvas mid-scroll for nothing visible.
-// Desktop windows have no URL-bar resizes, so they always re-init.
-window.addEventListener('resize', function(e){
-    var docEl = document.documentElement;
-    if(compactCanvas && docEl.clientWidth === can_w && Math.abs(docEl.clientHeight - can_h) < 160){
-        return;
-    }
-    initCanvas();
-});
-
-// The canvas sits behind the hero only; once the reader scrolls past it,
-// stop repainting an unseen layer every frame.
-var canvasOnScreen = true;
-
-function goMovie(){
-    initCanvas();
-    if(!balls.length){
-        initBalls(compactCanvas ? 11 : 20);
-    }
-    if(!document.hidden && canvasOnScreen && !canvasRunning){
-        canvasRunning = true;
-        animationFrameId = window.requestAnimationFrame(render);
-    }
-}
-function stopMovie(){
+  }
+  function stop() {
     canvasRunning = false;
-    if(animationFrameId !== null){
-        window.cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-    }
-}
-goMovie();
+    if (rafId !== null) { window.cancelAnimationFrame(rafId); rafId = null; }
+  }
 
-if('IntersectionObserver' in window){
-    new IntersectionObserver(function(entries){
-        canvasOnScreen = entries[entries.length - 1].isIntersecting;
-        if(canvasOnScreen){
-            goMovie();
-        } else {
-            stopMovie();
-        }
+  initCanvas();
+  for (var n = 0; n < (compactCanvas ? 11 : 20); n++) {
+    var b = spawn(); b.x = rand(0, W); b.y = rand(0, H); balls.push(b);
+  }
+  nextSignalAt = 1400; // let the headline scramble finish first
+  start();
+
+  // A phone URL-bar show/hide changes only the height; re-initialising then
+  // would clear the bitmap mid-scroll for nothing visible.
+  window.addEventListener('resize', function () {
+    var docEl = document.documentElement;
+    if (compactCanvas && docEl.clientWidth === W && Math.abs(docEl.clientHeight - H) < 160) { return; }
+    initCanvas();
+  });
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(measureText); }
+  window.setTimeout(measureText, 1300);
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      canvasOnScreen = entries[entries.length - 1].isIntersecting;
+      if (canvasOnScreen) { start(); } else { stop(); }
     }).observe(canvas);
-}
+  }
+  document.addEventListener('visibilitychange', function () { if (document.hidden) { stop(); } else { start(); } });
 
-document.addEventListener('visibilitychange', function(){
-    if(document.hidden){
-        stopMovie();
-    } else {
-        goMovie();
-    }
-});
-
-// Mouse effect
-canvas.addEventListener('mouseenter', function(){
-    mouse_in = true;
-    balls.push(mouse_ball);
-});
-canvas.addEventListener('mouseleave', function(){
-    mouse_in = false;
-    var new_balls = [];
-    Array.prototype.forEach.call(balls, function(b){
-        if(!b.hasOwnProperty('type')){
-            new_balls.push(b);
-        }
-    });
-    balls = new_balls.slice(0);
-});
-canvas.addEventListener('mousemove', function(e){
-    var e = e || window.event;
-    mouse_ball.x = e.pageX;
-    mouse_ball.y = e.pageY;
-    // console.log(mouse_ball);
-});
-
-}
+  // The hero text sits above the canvas, so track the pointer on the document.
+  if (finePointer) {
+    document.addEventListener('pointermove', function (e) {
+      var r = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top;
+      mouse.active = mouse.x >= 0 && mouse.y >= 0 && mouse.x <= r.width && mouse.y <= r.height;
+    }, { passive: true });
+  }
 })();
 
 // Shared progressive enhancement: keep gallery pages fast and external links safe.

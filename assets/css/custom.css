@@ -4486,6 +4486,255 @@ body.is-map-fullscreen .travel-atlas__layout {
   border-bottom: 0;
 }
 
+/* Anomaly peek (Oct 2026, owner-approved after a lab trial): two chips at the foot of the Cloud Anomaly card,
+   each with a tiny live preview, opening one small chart card at a time
+   below the chips. Brand teal for normal, the card's outcome amber for
+   anything flagged, ink for every label. */
+
+/* The chip row: its own row after the tags, unpositioned so the cards
+   position against the card itself. */
+.page-experience #cloud-analytics .anomaly-peek {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+/* The call to action: one line above the chips, a bold teal invitation and
+   a muted "hover/tap a chart" so it reads as something to do. */
+.page-experience #cloud-analytics .anomaly-peek__hint {
+  flex-basis: 100%;
+  margin: 0.25rem 0 0;
+  color: #68727e;
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: max(var(--text-floor, 0px), 0.8rem);
+  line-height: 1.35;
+  text-align: left;
+}
+.page-experience #cloud-analytics .anomaly-peek__hint strong { color: #0c6663; font-weight: 700; }
+.anomaly-peek__hint-touch { display: none; }
+@media (hover: none) {
+  .anomaly-peek__hint-hover { display: none; }
+  .anomaly-peek__hint-touch { display: inline; }
+}
+
+.page-experience #cloud-analytics .anomaly-peek__chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: auto;
+  padding: 0.3rem 0.75rem 0.3rem 0.4rem;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px #cfdcda, 0 1px 2px rgba(7, 19, 21, 0.06);
+  color: #20343d !important;
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: max(var(--text-floor, 0px), 0.78rem);
+  font-weight: 700;
+  letter-spacing: normal;
+  line-height: 1.3;
+  text-transform: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: box-shadow var(--motion-fast, 150ms) ease, transform var(--motion-fast, 150ms) ease;
+}
+.page-experience #cloud-analytics .anomaly-peek__chip[aria-expanded="true"] {
+  box-shadow: inset 0 0 0 1px #11807d, 0 4px 12px rgba(12, 102, 99, 0.14);
+  color: #0c6663 !important;
+}
+@media (hover: hover) {
+  .page-experience #cloud-analytics .anomaly-peek__chip:hover {
+    box-shadow: inset 0 0 0 1px #11807d, 0 4px 12px rgba(12, 102, 99, 0.14);
+    color: #0c6663 !important;
+    transform: translateY(-1px);
+  }
+}
+.page-experience #cloud-analytics .anomaly-peek__chip:focus-visible {
+  outline: 2px solid #128a86;
+  outline-offset: 3px;
+}
+/* The nudge: once the previews come to rest, each chip glows once, a beat
+   apart, to invite a hover or tap. Never repeats while you watch. */
+.page-experience #cloud-analytics .anomaly-peek__chip.is-nudging {
+  animation: peek-nudge 900ms var(--ease-standard, ease-out) 1;
+}
+.page-experience #cloud-analytics .anomaly-peek__chip.is-nudging + .anomaly-peek__chip.is-nudging { animation-delay: 160ms; }
+/* Only the peak is keyed, so the glow starts and ends on whatever shadow
+   the chip has (resting, hover or open). */
+@keyframes peek-nudge {
+  40% { box-shadow: inset 0 0 0 1px #11807d, 0 0 0 5px rgba(17, 128, 125, 0.16); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-experience #cloud-analytics .anomaly-peek__chip.is-nudging { animation: none; }
+}
+/* Touch: a 44px tap area without a taller chip. */
+@media (pointer: coarse) {
+  .page-experience #cloud-analytics .anomaly-peek__chip::before {
+    content: "";
+    position: absolute;
+    inset: -0.55rem -0.2rem;
+  }
+}
+.anomaly-peek__mini {
+  display: block;
+  flex: none;
+  padding: 2px 4px;
+  border-radius: 999px;
+  background: #f2f8f7;
+  overflow: visible;
+}
+.mini-band { fill: rgba(17, 128, 125, 0.14); }
+.mini-line { fill: none; stroke: #11807d; stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; }
+.mini-flag { fill: #c46d1c; stroke: #ffffff; stroke-width: 1; }
+.mini-edge { stroke: rgba(17, 128, 125, 0.4); stroke-width: 1; }
+.mini-odd { stroke: #c46d1c; stroke-width: 1.2; stroke-dasharray: 2 1.5; }
+.mini-node { fill: #11807d; stroke: #ffffff; stroke-width: 1; }
+.mini-node.is-odd { fill: #c46d1c; }
+.mini-packet { fill: #11807d; opacity: 0.7; }
+
+/* The chart cards: absolutely placed below the chip row by the script, so
+   opening one never moves the page or covers the writeup above. */
+.page-experience #cloud-analytics .anomaly-card {
+  position: absolute;
+  z-index: 30;
+  width: min(24rem, calc(100% - 1.5rem));
+  padding: 0.85rem 1rem 0.7rem;
+  border: 1px solid #dce6e5;
+  border-radius: 0.6rem;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(7, 19, 21, 0.16);
+  text-align: left;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity var(--motion-standard, 220ms) ease, transform var(--motion-standard, 220ms) var(--ease-standard, ease), visibility 0s linear var(--motion-standard, 220ms);
+}
+.page-experience #cloud-analytics .anomaly-card.is-open {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition: opacity var(--motion-standard, 220ms) ease, transform var(--motion-standard, 220ms) var(--ease-standard, ease), visibility 0s;
+}
+.page-experience #cloud-analytics .anomaly-card__title {
+  margin: 0 0 0.3rem;
+  color: #68727e;
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: max(var(--text-floor, 0px), 0.7rem);
+  font-weight: 700;
+  letter-spacing: var(--eyebrow-tracking, 0.12em);
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+.page-experience #cloud-analytics .anomaly-card__plot { position: relative; }
+.page-experience #cloud-analytics .anomaly-card__plot svg { display: block; overflow: visible; }
+.page-experience #cloud-analytics .anomaly-card__note {
+  margin: 0.35rem 0 0;
+  text-align: left;
+  color: #596273;
+  font-size: max(var(--text-floor, 0px), 0.78rem);
+  line-height: 1.45;
+}
+
+/* Chart marks (shared by both cards). */
+.peek-band { fill: rgba(17, 128, 125, 0.12); }
+.peek-mid { fill: none; stroke: rgba(17, 128, 125, 0.3); stroke-width: 1; }
+.peek-axis { stroke: #d7e4e2; stroke-width: 1; }
+.peek-line { fill: none; stroke: #11807d; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.peek-flag { fill: #c46d1c; stroke: #ffffff; stroke-width: 2; }
+.peek-label {
+  fill: #20343d;
+  stroke: #ffffff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.peek-pulse {
+  fill: none;
+  stroke: #c46d1c;
+  stroke-width: 1.5;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: peek-pulse 1600ms var(--ease-standard, ease-out) infinite;
+}
+svg.is-paused .peek-pulse { animation-play-state: paused; }
+svg.is-drawing .peek-flag,
+svg.is-drawing .peek-label,
+svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
+@keyframes peek-pulse {
+  from { opacity: 0.9; transform: scale(1); }
+  to { opacity: 0; transform: scale(3.2); }
+}
+.peek-edge { stroke: rgba(17, 128, 125, 0.28); stroke-width: 1; }
+.peek-node { fill: #11807d; stroke: #ffffff; stroke-width: 2; transition: fill var(--motion-standard, 220ms) ease; }
+.peek-node.is-odd { fill: #c46d1c; }
+.peek-packet { fill: #11807d; opacity: 0.75; }
+.peek-odd { stroke: #c46d1c; stroke-width: 1.5; stroke-dasharray: 4 3; stroke-linecap: round; }
+.peek-odd-packet { fill: #c46d1c; }
+.peek-ring { fill: none; stroke: #c46d1c; stroke-width: 1.5; }
+
+@media (prefers-reduced-motion: reduce) {
+  .peek-pulse { animation: none; }
+  .page-experience #cloud-analytics .anomaly-card,
+  .page-experience #cloud-analytics .anomaly-card.is-open { transition: none; transform: none; }
+}
+/* Phones: no hover, little width, and a floating card would cover the next
+   section. The chips become two equal halves under the call-to-action line,
+   and a tap opens that chart inline, straight below the chips, pushing the
+   page down rather than covering anything. The row stays last in the card. */
+@media screen and (max-width: 736px) {
+  .page-experience #cloud-analytics > .anomaly-peek {
+    grid-row: 6;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+    gap: 0.45rem;
+  }
+  .page-experience #cloud-analytics .anomaly-peek__hint { grid-column: 1 / -1; margin: 0.15rem 0 0; }
+  .anomaly-peek__hint-hover { display: none; }
+  .anomaly-peek__hint-touch { display: inline; }
+  .page-experience #cloud-analytics .anomaly-peek__chip {
+    justify-content: flex-start;
+    min-width: 0;
+    min-height: 44px;
+    transform: none;
+    padding: 0.35rem 0.6rem 0.35rem 0.4rem;
+    border-radius: 0.6rem;
+    white-space: normal;
+    text-align: left;
+  }
+  .page-experience #cloud-analytics .anomaly-peek__chip::before { display: none; }
+  .page-experience #cloud-analytics .anomaly-card {
+    position: static;
+    grid-column: 1 / -1;
+    width: auto;
+    display: none;
+    margin-top: 0.15rem;
+    box-shadow: none;
+    transform: none;
+  }
+  .page-experience #cloud-analytics .anomaly-card.is-open {
+    display: block;
+    animation: anomaly-card-in var(--motion-standard, 220ms) ease both;
+  }
+}
+@keyframes anomaly-card-in { from { opacity: 0; } }
+/* The narrowest phones: a shorter mini leaves room for "Across connections". */
+@media screen and (max-width: 374px) {
+  .page-experience #cloud-analytics .anomaly-peek__mini { width: 40px; height: 13px; }
+}
+@media screen and (max-width: 736px) and (prefers-reduced-motion: reduce) {
+  .page-experience #cloud-analytics .anomaly-card.is-open { animation: none; }
+}
+
 /* Route bundle: experience-base:end */
 /* Quieter, more compact desktop section navigation. */
 @media screen and (min-width: 981px) {

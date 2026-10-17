@@ -1,0 +1,462 @@
+/* Anomaly peek: the flavour of anomaly detection on the Cloud Anomaly
+   Analytics card, kept small until asked for (Oct 2026, owner-approved after
+   a lab trial). Loaded on the Work page only.
+   - A one-line call to action ("See an anomaly get caught · hover a chart")
+     sits above two chips, "Over time" and "Across connections", each with a
+     tiny live preview. When the card comes into view the previews play for
+     about four seconds, rest on their amber flags, and each chip glows once.
+     This replays at most every 20 seconds.
+   - Hovering, focusing or tapping a chip opens only that chart, in a card
+     that drops below the chips (never over the writeup). A click or tap pins
+     it; leaving, Escape or a tap elsewhere closes it (on phones the inline
+     card closes from its chip). One open at a time.
+   - A chart animates only while its card is open and on screen, and holds in
+     a hidden tab. Reduced motion (including a change mid-visit): still frames.
+   All data is simulated (and obviously illustrative), so the cards carry
+   no disclaimer. */
+(function () {
+  'use strict';
+  var root = document.querySelector('.anomaly-peek');
+  if (!root) { return; }
+  var NS = 'http://www.w3.org/2000/svg';
+  var motionQuery = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  var reduce = !!(motionQuery && motionQuery.matches);
+
+  function el(name, attrs, parent) {
+    var node = document.createElementNS(NS, name);
+    for (var k in attrs) { node.setAttribute(k, attrs[k]); }
+    if (parent) { parent.appendChild(node); }
+    return node;
+  }
+  function ease(f) { return f < 0.5 ? 2 * f * f : 1 - Math.pow(-2 * f + 2, 2) / 2; }
+  function lerp(a, b, f) { return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f }; }
+
+  // ---- Simulated signal shared by the mini preview and the full chart ----
+  // Uniform noise on ±6 has sigma 6/sqrt(3); the normal range is the expected
+  // level ± 3 sigma, which plain noise never leaves. Two periodic anomalies.
+  var SIGMA = 6 / Math.sqrt(3), BAND = 3 * SIGMA, MAX = 120;
+  function expected(t) { return 58 + 20 * Math.sin(t / 9) + 7 * Math.sin(t / 3.1); }
+  function noise(t) { var s = Math.sin(t * 12.9898 + 78.233) * 43758.5453; return ((s - Math.floor(s)) * 2 - 1) * 6; }
+  function sample(t) {
+    var v = expected(t) + noise(t);
+    if (t % 37 === 19) { v += 7 * SIGMA; } else if (t % 53 === 30) { v -= 6 * SIGMA; }
+    return v;
+  }
+
+  // ---- One animation loop for whatever is currently live ----
+  var tickers = [], rafId = null, last = 0;
+  function loop(ts) {
+    var dt = Math.min(100, ts - last);
+    last = ts;
+    tickers = tickers.filter(function (t) { return t.live(); });
+    tickers.forEach(function (t) { t.tick(dt); });
+    rafId = tickers.length ? window.requestAnimationFrame(loop) : null;
+  }
+  function wake(ticker) {
+    if (tickers.indexOf(ticker) < 0) { tickers.push(ticker); }
+    if (rafId === null) { rafId = window.requestAnimationFrame(function (ts) { last = ts; loop(ts); }); }
+  }
+
+  // ---- Full time-series chart ----
+  function createSeries(host) {
+    var svg = el('svg', { 'aria-hidden': 'true', focusable: 'false' }, host);
+    var clipId = 'peek-clip-' + Math.random().toString(36).slice(2, 8);
+    var clipRect = el('rect', {}, el('clipPath', { id: clipId }, el('defs', {}, svg)));
+    var axis = el('line', { class: 'peek-axis' }, svg);
+    var slide = el('g', {}, el('g', { 'clip-path': 'url(#' + clipId + ')' }, svg));
+    var band = el('path', { class: 'peek-band' }, slide);
+    var mid = el('path', { class: 'peek-mid' }, slide);
+    var line = el('path', { class: 'peek-line' }, slide);
+    var flags = el('g', {}, slide);
+    var W = 0, H = 130, N = 60, dx = 0, pad = { top: 20, right: 6, bottom: 16, left: 6 };
+    var t0 = 0, phase = 0, drawnIn = false, STEP = 900;
+    function y(v) { return pad.top + (H - pad.top - pad.bottom) * (1 - v / MAX); }
+    function x(i) { return pad.left + i * dx; }
+    function layout() {
+      W = Math.round(host.clientWidth) || 300;
+      N = Math.max(30, Math.round(W / 6.5));
+      dx = (W - pad.left - pad.right) / (N - 1);
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
+      clipRect.setAttribute('x', pad.left); clipRect.setAttribute('y', 0);
+      clipRect.setAttribute('width', W - pad.left - pad.right); clipRect.setAttribute('height', H);
+      axis.setAttribute('x1', pad.left); axis.setAttribute('x2', W - pad.right);
+      axis.setAttribute('y1', H - pad.bottom + 0.5); axis.setAttribute('y2', H - pad.bottom + 0.5);
+      draw();
+    }
+    function draw() {
+      var top = '', bottom = '', m = '', l = '';
+      flags.textContent = '';
+      for (var i = 0; i <= N; i++) {
+        var t = t0 + i, e = expected(t), v = sample(t), px = x(i).toFixed(1);
+        top += (i ? 'L' : 'M') + px + ' ' + y(e + BAND).toFixed(1);
+        m += (i ? 'L' : 'M') + px + ' ' + y(e).toFixed(1);
+        l += (i ? 'L' : 'M') + px + ' ' + y(v).toFixed(1);
+        var z = (v - e) / SIGMA;
+        if (Math.abs(z) > 3) {
+          var fx = x(i), fy = y(v);
+          var ring = el('circle', { class: 'peek-pulse', cx: fx, cy: fy, r: 4.5 }, flags);
+          ring.style.animationDelay = (-(performance.now() % 1600)).toFixed(0) + 'ms';
+          el('circle', { class: 'peek-flag', cx: fx, cy: fy, r: 4.5 }, flags);
+          var label = el('text', { class: 'peek-label', x: fx, y: fy + (z > 0 ? -10 : 19), 'text-anchor': 'middle' }, flags);
+          label.textContent = (z > 0 ? '+' : '−') + Math.abs(z).toFixed(1) + 'σ';
+        }
+      }
+      for (var j = N; j >= 0; j--) { bottom += 'L' + x(j).toFixed(1) + ' ' + y(expected(t0 + j) - BAND).toFixed(1); }
+      band.setAttribute('d', top + bottom + 'Z');
+      mid.setAttribute('d', m);
+      line.setAttribute('d', l);
+      slide.setAttribute('transform', 'translate(' + (-phase * dx).toFixed(2) + ' 0)');
+    }
+    function drawIn() {
+      if (drawnIn || reduce) { drawnIn = true; return; }
+      drawnIn = true;
+      var len = line.getTotalLength();
+      line.style.strokeDasharray = len; line.style.strokeDashoffset = len;
+      svg.classList.add('is-drawing');
+      line.getBoundingClientRect();
+      line.style.transition = 'stroke-dashoffset 820ms cubic-bezier(0.2, 0.8, 0.2, 1)';
+      line.style.strokeDashoffset = '0';
+      window.setTimeout(function () {
+        line.style.transition = ''; line.style.strokeDasharray = ''; line.style.strokeDashoffset = '';
+        svg.classList.remove('is-drawing');
+      }, 860);
+    }
+    return {
+      layout: layout,
+      open: function () { if (Math.abs(host.clientWidth - W) >= 1) { layout(); } drawIn(); },
+      tick: function (dt) {
+        phase += dt / STEP;
+        if (phase >= 1) { t0 += Math.floor(phase); phase %= 1; draw(); }
+        else { slide.setAttribute('transform', 'translate(' + (-phase * dx).toFixed(2) + ' 0)'); }
+      },
+      setPaused: function (p) { svg.classList.toggle('is-paused', p); }
+    };
+  }
+
+  // ---- Full graph chart: usual links, packets, an unusual link that comes and goes ----
+  var NODES = [[0.10, 0.28], [0.08, 0.72], [0.27, 0.50], [0.30, 0.14], [0.26, 0.88],
+    [0.70, 0.18], [0.90, 0.38], [0.68, 0.62], [0.90, 0.80], [0.52, 0.36]];
+  var EDGES = [[0, 2], [1, 2], [3, 2], [4, 2], [2, 9], [9, 5], [9, 7], [5, 6], [7, 8], [6, 8], [0, 3], [1, 4], [9, 6], [2, 7]];
+  var ODD = [[4, 5], [3, 8], [1, 6], [0, 7]];
+  function createGraph(host) {
+    var svg = el('svg', { 'aria-hidden': 'true', focusable: 'false' }, host);
+    var CYCLE = 6500, GROW = 600, TRAVEL = 900, HOLD = 3600, FADE = 600;
+    var W = 0, H = 130, pts = [];
+    var edgeEls = EDGES.map(function () { return el('line', { class: 'peek-edge' }, svg); });
+    var odd = el('line', { class: 'peek-odd' }, svg);
+    var nodeEls = NODES.map(function () { return el('circle', { class: 'peek-node', r: 4 }, svg); });
+    var packets = [0, 1, 2].map(function () { return el('circle', { class: 'peek-packet', r: 2.2 }, svg); });
+    var oddPacket = el('circle', { class: 'peek-odd-packet', r: 3 }, svg);
+    var ring = el('circle', { class: 'peek-ring', r: 4 }, svg);
+    var label = el('text', { class: 'peek-label', 'text-anchor': 'middle' }, svg);
+    label.textContent = 'Unusual link';
+    var gt = GROW + TRAVEL + 1300, nextPacket = 0, live = [];
+    function layout() {
+      W = Math.round(host.clientWidth) || 300;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
+      pts = NODES.map(function (p) { return { x: 12 + p[0] * (W - 24), y: 18 + p[1] * (H - 36) }; });
+      EDGES.forEach(function (e, k) {
+        edgeEls[k].setAttribute('x1', pts[e[0]].x); edgeEls[k].setAttribute('y1', pts[e[0]].y);
+        edgeEls[k].setAttribute('x2', pts[e[1]].x); edgeEls[k].setAttribute('y2', pts[e[1]].y);
+      });
+      nodeEls.forEach(function (n, k) { n.setAttribute('cx', pts[k].x); n.setAttribute('cy', pts[k].y); });
+      render(false);
+    }
+    function render(withPackets) {
+      if (withPackets && gt >= nextPacket) {
+        var e = EDGES[Math.floor(Math.random() * EDGES.length)];
+        live.push({ e: Math.random() < 0.5 ? e : [e[1], e[0]], start: gt });
+        nextPacket = gt + 420;
+      }
+      live = live.filter(function (p) { return gt - p.start < 1100; });
+      packets.forEach(function (c, k) {
+        var p = withPackets && live[k];
+        if (!p) { c.setAttribute('visibility', 'hidden'); return; }
+        var q = lerp(pts[p.e[0]], pts[p.e[1]], ease((gt - p.start) / 1100));
+        c.setAttribute('cx', q.x.toFixed(1)); c.setAttribute('cy', q.y.toFixed(1)); c.setAttribute('visibility', 'visible');
+      });
+      var c = gt % CYCLE, pair = ODD[Math.floor(gt / CYCLE) % ODD.length];
+      var a = pts[pair[0]], b = pts[pair[1]];
+      var fade = c > HOLD ? Math.max(0, 1 - (c - HOLD) / FADE) : 1;
+      var end = lerp(a, b, ease(Math.min(1, c / GROW)));
+      odd.setAttribute('x1', a.x); odd.setAttribute('y1', a.y);
+      odd.setAttribute('x2', end.x.toFixed(1)); odd.setAttribute('y2', end.y.toFixed(1));
+      odd.style.opacity = fade.toFixed(3);
+      var tp = (c - GROW) / TRAVEL;
+      if (tp > 0 && tp < 1) {
+        var q = lerp(a, b, ease(tp));
+        oddPacket.setAttribute('cx', q.x.toFixed(1)); oddPacket.setAttribute('cy', q.y.toFixed(1)); oddPacket.setAttribute('visibility', 'visible');
+      } else { oddPacket.setAttribute('visibility', 'hidden'); }
+      var rp = (c - GROW - TRAVEL) / 1200;
+      if (rp > 0 && rp < 1) {
+        ring.setAttribute('cx', b.x); ring.setAttribute('cy', b.y);
+        ring.setAttribute('r', (4 + rp * 10).toFixed(1)); ring.style.opacity = (0.9 * (1 - rp)).toFixed(3);
+        ring.setAttribute('visibility', 'visible');
+      } else { ring.setAttribute('visibility', 'hidden'); }
+      nodeEls.forEach(function (n, k) { n.classList.toggle('is-odd', k === pair[1] && c > GROW + TRAVEL && fade > 0); });
+      // Label on the target node, clear of its ring, never on the busy middle.
+      label.setAttribute('x', Math.max(36, Math.min(W - 36, b.x)).toFixed(1));
+      label.setAttribute('y', (b.y < 30 ? b.y + 22 : b.y - 18).toFixed(1));
+      label.style.opacity = (c > GROW ? fade : 0).toFixed(3);
+    }
+    return {
+      layout: layout,
+      open: function () { if (Math.abs(host.clientWidth - W) >= 1) { layout(); } },
+      tick: function (dt) { gt += dt; render(true); },
+      setPaused: function () {}
+    };
+  }
+
+  // ---- Mini previews inside the chips ----
+  function createMiniSeries(svg) {
+    var W = 56, H = 18, N = 22, STEP = 260, RUN = 4200;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
+    var band = el('path', { class: 'mini-band' }, svg);
+    var line = el('path', { class: 'mini-line' }, svg);
+    var dot = el('circle', { class: 'mini-flag', r: 2.6 }, svg);
+    // Rest on a window (t 4..26) holding only the upward spike at t=19, clear
+    // of the dip at t=30; the run starts so the spike enters from the right.
+    var END = 4, START = END - Math.round(RUN / STEP);
+    var t = START, elapsed = 0;
+    function yy(v) { return 2 + (H - 4) * (1 - (v - 20) / 95); }
+    function draw(pos) {
+      var base = Math.floor(pos), frac = pos - base, dx = W / (N - 1), top = '', bot = '', l = '', flag = null;
+      for (var i = 0; i <= N; i++) {
+        var tt = base + i, px = (i - frac) * dx;
+        top += (i ? 'L' : 'M') + px.toFixed(1) + ' ' + yy(expected(tt) + BAND).toFixed(1);
+        l += (i ? 'L' : 'M') + px.toFixed(1) + ' ' + yy(sample(tt)).toFixed(1);
+        if (Math.abs(sample(tt) - expected(tt)) > 3 * SIGMA && px > 2 && px < W - 2) { flag = { x: px, y: yy(sample(tt)) }; }
+      }
+      for (var j = N; j >= 0; j--) { bot += 'L' + ((j - frac) * dx).toFixed(1) + ' ' + yy(expected(base + j) - BAND).toFixed(1); }
+      band.setAttribute('d', top + bot + 'Z');
+      line.setAttribute('d', l);
+      if (flag) { dot.setAttribute('cx', flag.x.toFixed(1)); dot.setAttribute('cy', Math.max(3, flag.y).toFixed(1)); dot.setAttribute('visibility', 'visible'); }
+      else { dot.setAttribute('visibility', 'hidden'); }
+    }
+    draw(END);
+    return {
+      replay: function () { elapsed = 0; t = START; draw(t); },
+      tick: function (dt) { elapsed += dt; t = START + Math.min(1, elapsed / RUN) * (END - START); draw(t); },
+      done: function () { return elapsed >= RUN; },
+      rest: function () { draw(END); }
+    };
+  }
+  function createMiniGraph(svg) {
+    var W = 56, H = 18, RUN = 4200;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
+    var P = [{ x: 6, y: 5 }, { x: 6, y: 13 }, { x: 20, y: 9 }, { x: 36, y: 5 }, { x: 50, y: 10 }];
+    [[0, 2], [1, 2], [2, 3], [3, 4]].forEach(function (e) {
+      el('line', { class: 'mini-edge', x1: P[e[0]].x, y1: P[e[0]].y, x2: P[e[1]].x, y2: P[e[1]].y }, svg);
+    });
+    var odd = el('line', { class: 'mini-odd', x1: P[1].x, y1: P[1].y }, svg);
+    var packet = el('circle', { class: 'mini-packet', r: 1.4 }, svg);
+    var nodes = P.map(function (p) { return el('circle', { class: 'mini-node', cx: p.x, cy: p.y, r: 2.2 }, svg); });
+    var elapsed = 0;
+    function draw(ms) {
+      // A packet runs the usual path, then the unusual link grows to node 4.
+      var route = [P[0], P[2], P[3], P[4]], f = (ms % 1400) / 1400, seg = Math.min(2, Math.floor(f * 3));
+      var q = lerp(route[seg], route[seg + 1], ease(f * 3 - seg));
+      packet.setAttribute('cx', q.x.toFixed(1)); packet.setAttribute('cy', q.y.toFixed(1));
+      packet.setAttribute('visibility', ms < RUN - 600 ? 'visible' : 'hidden');
+      var g = Math.max(0, Math.min(1, (ms - 2000) / 700)), end = lerp(P[1], P[4], ease(g));
+      odd.setAttribute('x2', end.x.toFixed(1)); odd.setAttribute('y2', end.y.toFixed(1));
+      odd.style.opacity = g > 0 ? 1 : 0;
+      nodes[4].classList.toggle('is-odd', g >= 1);
+    }
+    draw(RUN);
+    return {
+      replay: function () { elapsed = 0; draw(0); },
+      tick: function (dt) { elapsed += dt; draw(Math.min(elapsed, RUN)); },
+      done: function () { return elapsed >= RUN; },
+      rest: function () { draw(RUN); }
+    };
+  }
+
+  // ---- Wire chips, minis and cards ----
+  var card = root.closest('.case-study') || root.parentElement;
+  var charts = {
+    series: { chip: root.querySelector('[data-peek="series"]'), pop: root.querySelector('[data-peek-card="series"]') },
+    graph: { chip: root.querySelector('[data-peek="graph"]'), pop: root.querySelector('[data-peek-card="graph"]') }
+  };
+  charts.series.chart = createSeries(charts.series.pop.querySelector('[data-series]'));
+  charts.graph.chart = createGraph(charts.graph.pop.querySelector('[data-graph]'));
+  charts.series.mini = createMiniSeries(charts.series.chip.querySelector('[data-mini]'));
+  charts.graph.mini = createMiniGraph(charts.graph.chip.querySelector('[data-mini]'));
+  var keys = ['series', 'graph'];
+  keys.forEach(function (k) { charts[k].chart.layout(); });
+
+  var onScreen = false;
+  // Minis: play once each time the card comes into view, then rest.
+  var miniTicker = {
+    live: function () {
+      var active = onScreen && !document.hidden && !reduce && keys.some(function (k) { return !charts[k].mini.done(); });
+      if (!active) { keys.forEach(function (k) { if (reduce || charts[k].mini.done()) { charts[k].mini.rest(); } }); }
+      return active;
+    },
+    tick: function (dt) {
+      keys.forEach(function (k) { if (!charts[k].mini.done()) { charts[k].mini.tick(dt); } });
+      if (nudgePending && keys.every(function (k) { return charts[k].mini.done(); })) { nudgePending = false; nudge(); }
+    }
+  };
+  // When the previews come to rest, each chip glows once (CSS), unless one
+  // is already open: the reader has found them.
+  var nudgePending = false;
+  function nudge() {
+    if (keys.some(function (k) { return charts[k].state.open; })) { return; }
+    keys.forEach(function (k) {
+      var chip = charts[k].chip;
+      chip.classList.remove('is-nudging');
+      void chip.offsetWidth;
+      chip.classList.add('is-nudging');
+      chip.addEventListener('animationend', function done(e) {
+        if (e.animationName !== 'peek-nudge') { return; }
+        chip.classList.remove('is-nudging');
+        chip.removeEventListener('animationend', done);
+      });
+    });
+  }
+  // Each open chart animates while open and on screen.
+  keys.forEach(function (k) {
+    var c = charts[k];
+    c.state = { hovering: false, focus: false, pinned: false, dismissed: false, open: false, touched: 0, leave: null };
+    c.ticker = {
+      live: function () { var on = c.state.open && onScreen && !document.hidden && !reduce; c.chart.setPaused(!on); return on; },
+      tick: function (dt) { c.chart.tick(dt); }
+    };
+  });
+
+  var inline = window.matchMedia('(max-width: 736px)');
+  function place(c) {
+    // Phones show the card inline below the chips (CSS), so nothing to place.
+    if (inline.matches) { c.pop.style.left = ''; c.pop.style.top = ''; return; }
+    // Below the chip row, left-aligned with the chip and kept inside the card.
+    // The row is unpositioned, so chip and row offsets are both card-relative.
+    var pop = c.pop, chip = c.chip;
+    var w = pop.offsetWidth, cw = card.clientWidth, padX = 12;
+    var left = Math.max(padX, Math.min(cw - w - padX, chip.offsetLeft));
+    pop.style.left = left + 'px';
+    pop.style.top = (root.offsetTop + root.offsetHeight + 8) + 'px';
+  }
+  // One card at a time. Whatever the reader is hovering or focusing right
+  // now wins; failing that, the last pinned card shows. So hovering the other
+  // chip previews it over a pin, and the pin returns when the pointer leaves.
+  var stamp = 0;
+  function update() {
+    var want = keys.filter(function (k) { var s = charts[k].state; return !s.dismissed && (s.hovering || s.focus); });
+    if (!want.length) { want = keys.filter(function (k) { var s = charts[k].state; return !s.dismissed && s.pinned; }); }
+    want.sort(function (x, y) { return charts[y].state.touched - charts[x].state.touched; });
+    var show = want[0] || null;
+    keys.forEach(function (k) {
+      var c = charts[k], s = c.state, v = k === show;
+      if (v === s.open) { return; }
+      s.open = v;
+      c.pop.classList.toggle('is-open', v);
+      c.chip.setAttribute('aria-expanded', String(v));
+      // Place first: on phones the card only gets its width once displayed.
+      if (v) { place(c); c.chart.open(); wake(c.ticker); }
+    });
+  }
+  function inside(c, node) { return !!node && (c.pop.contains(node) || c.chip.contains(node)); }
+
+  keys.forEach(function (k) {
+    var c = charts[k], s = c.state;
+    [c.chip, c.pop].forEach(function (node) {
+      node.addEventListener('pointerenter', function (e) {
+        if (e.pointerType !== 'mouse') { return; }
+        window.clearTimeout(s.leave);
+        if (!s.hovering) { s.dismissed = false; }
+        s.hovering = true;
+        s.touched = ++stamp;
+        update();
+      });
+      node.addEventListener('pointerleave', function (e) {
+        if (e.pointerType !== 'mouse') { return; }
+        window.clearTimeout(s.leave);
+        s.leave = window.setTimeout(function () { s.hovering = false; update(); }, 200);
+      });
+      node.addEventListener('focusin', function (e) {
+        if (!inside(c, e.relatedTarget)) { s.dismissed = false; }
+        s.focus = true;
+        s.touched = ++stamp;
+        update();
+      });
+      node.addEventListener('focusout', function (e) { if (!inside(c, e.relatedTarget)) { s.focus = false; update(); } });
+    });
+    c.chip.addEventListener('click', function () {
+      if (s.open && s.pinned) { s.pinned = false; s.dismissed = true; }
+      else {
+        // Pinning one card unpins the other.
+        keys.forEach(function (o) { charts[o].state.pinned = false; });
+        s.pinned = true; s.dismissed = false; s.touched = ++stamp;
+      }
+      update();
+      if (s.open) {
+        window.requestAnimationFrame(function () {
+          var r = c.pop.getBoundingClientRect(), chipTop = c.chip.getBoundingClientRect().top;
+          if (r.bottom > window.innerHeight) {
+            // Never scroll so far that the chips leave the top of the screen.
+            var by = Math.min(r.bottom - window.innerHeight + 16, chipTop - 8);
+            if (by > 0) { window.scrollBy({ top: by, behavior: reduce ? 'auto' : 'smooth' }); }
+          }
+        });
+      }
+    });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') { return; }
+    keys.forEach(function (k) {
+      var c = charts[k], s = c.state;
+      if (!s.open) { return; }
+      s.pinned = false; s.dismissed = true; update();
+    });
+  });
+  // Outside presses close a floating card: a mouse on press, touch on the tap
+  // itself (click), since a finger's pointerdown may be the start of a scroll.
+  // Inline phone cards close from their chip instead.
+  function closeOutside(target) {
+    if (inline.matches) { return; }
+    keys.forEach(function (k) {
+      var c = charts[k], s = c.state;
+      if (s.open && !inside(c, target)) { s.pinned = false; s.dismissed = true; update(); }
+    });
+  }
+  document.addEventListener('pointerdown', function (e) { if (e.pointerType === 'mouse') { closeOutside(e.target); } });
+  document.addEventListener('click', function (e) { if (e.pointerType && e.pointerType !== 'mouse') { closeOutside(e.target); } });
+
+  var lastW = card.clientWidth;
+  if ('ResizeObserver' in window) new ResizeObserver(function () {
+    if (Math.abs(card.clientWidth - lastW) < 1) { return; }
+    lastW = card.clientWidth;
+    keys.forEach(function (k) { charts[k].chart.layout(); if (charts[k].state.open) { place(charts[k]); } });
+  }).observe(card);
+
+  function resume() {
+    if (!onScreen || document.hidden || reduce) { return; }
+    wake(miniTicker);
+    keys.forEach(function (k) { if (charts[k].state.open) { wake(charts[k].ticker); } });
+  }
+  var lastReplay = -Infinity;
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      var was = onScreen;
+      onScreen = entries[entries.length - 1].isIntersecting;
+      var now = performance.now();
+      if (onScreen && !was && !reduce && now - lastReplay > 20000) {
+        lastReplay = now;
+        keys.forEach(function (k) { charts[k].mini.replay(); });
+        nudgePending = true;
+      }
+      resume();
+    }, { threshold: 0.15 }).observe(card);
+  } else { onScreen = true; }
+  document.addEventListener('visibilitychange', resume);
+  function onMotionChange() {
+    reduce = motionQuery.matches;
+    if (reduce) { keys.forEach(function (k) { charts[k].mini.rest(); }); }
+    resume();
+  }
+  if (motionQuery) {
+    if (motionQuery.addEventListener) { motionQuery.addEventListener('change', onMotionChange); }
+    else if (motionQuery.addListener) { motionQuery.addListener(onMotionChange); }
+  }
+})();

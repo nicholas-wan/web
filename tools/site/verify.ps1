@@ -144,6 +144,7 @@ foreach ($page in $pages) {
     if ($page.Name -eq 'index.html' -and $scan -match 'class="logo icon fa-home"|<header id="header">') { throw "Homepage must flow directly from its full-screen opening without a redundant home control." }
     if ($page.Name -ne 'index.html' -and ($scan -match '<canvas id="nokey"|assets/js/canvas-background\.js')) { throw "$($page.Name) must not run the homepage background canvas." }
     if ($page.Name -ne 'index.html' -and $scan -match 'assets/js/game\.js') { throw "$($page.Name) must not load the homepage interaction bundle." }
+    if ($page.Name -ne 'experience.html' -and $scan -match 'assets/js/anomaly-peek\.js') { throw "$($page.Name) must not load the Work page's anomaly peek." }
     if ($page.Name -in @('skills.html', 'travel.html')) {
         if ($scan -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/listing-effects.js'))) { throw "$($page.Name) is missing its listing effects bundle." }
     } elseif ($scan -match 'assets/js/listing-effects\.js') { throw "$($page.Name) must not load the listing effects bundle." }
@@ -243,7 +244,8 @@ foreach ($copiedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'asset
         'assets/js/game.js', 'assets/js/listing-effects.js', 'assets/js/journal-progress.js',
         'assets/js/gallery.js', 'assets/js/travel-nav.js', 'assets/js/travel-map.js',
         'assets/js/personal-timeline.js', 'assets/js/scramble-reveal.js',
-        'assets/js/travel-discovery.js', 'assets/js/photo-search.js', 'assets/js/page-transitions.js')) {
+        'assets/js/travel-discovery.js', 'assets/js/photo-search.js', 'assets/js/page-transitions.js',
+        'assets/js/anomaly-peek.js')) {
     Assert-DistMatchesSource $copiedAsset
 }
 
@@ -286,7 +288,9 @@ Assert-FileSizeBudget 'assets\css\travel-journal.css' 31
 # 10 -> 11: partial-match reason line, Oct 2026.
 # 11 -> 16: approved photo postcards and random-moment preview (Oct 2026).
 Assert-FileSizeBudget 'assets\css\travel-search.css' 16
-Assert-FileSizeBudget 'assets\css\experience-page.css' 12
+# 12 -> 22: the Cloud Anomaly card's anomaly peek (two chips with mini previews and
+# two small chart cards, Oct 2026) adds about 9 KB of route-only CSS.
+Assert-FileSizeBudget 'assets\css\experience-page.css' 22
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 Assert-FileSizeBudget 'assets\css\skills-page.css' 10
 Assert-FileSizeBudget 'assets\css\icons.css' 4
@@ -315,6 +319,8 @@ Assert-FileSizeBudget 'assets\js\canvas-background.js' 14
 Assert-FileSizeBudget 'assets\js\game.js' 24
 Assert-FileSizeBudget 'assets\js\listing-effects.js' 8
 Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
+# The Work page's anomaly peek (Oct 2026): two charts and two mini previews.
+Assert-FileSizeBudget 'assets\js\anomaly-peek.js' 26
 # photo-search.js is injected on demand by the travel page's discovery bootstrap, so
 # it is outside the per-page <script src> ceiling and carries its own budget.
 # 12 -> 14: quick-fill Try/Recent chips, Oct 2026.
@@ -787,6 +793,10 @@ if ([regex]::Matches($experience, 'January 2021 &ndash; Present').Count -ne 2 -o
 if ([regex]::Matches($experience, 'class="case-study__company"').Count -ne 4) { throw "Only the agentic AI card and the three internships carry a full company header; Cloud Analytics defers to the hero card." }
 if ($homeHtml -notmatch 'id="about-me"') { throw "Homepage About section anchor is missing." }
 if ($homeHtml -notmatch '<canvas id="nokey"') { throw "Homepage background animation canvas is missing." }
+# The Cloud Anomaly card ends with two chips that each open one small chart
+# below them (never over the writeup); only the Work page loads the script.
+if ([regex]::Matches($experience, 'data-peek="(series|graph)"').Count -ne 2 -or [regex]::Matches($experience, 'data-peek-card="(series|graph)"').Count -ne 2 -or $experience -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/anomaly-peek.js'))) { throw "The Work page must carry the two anomaly-peek chips, their two chart cards and anomaly-peek.js." }
+if ($canvasJs -notmatch 'function stepSignal' -or $canvasJs -notmatch "clip\('evenodd'\)") { throw "The homepage canvas must keep its calm signals, clipped out of the hero text." }
 if ($homeHtml -notmatch '<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon\.png" />' -or $homeHtml -notmatch '<link rel="manifest" href="site\.webmanifest" />') { throw "Home-screen icon or manifest link is missing." }
 foreach ($iconAsset in @('site.webmanifest', 'favicon.ico', 'images\apple-touch-icon.png', 'images\icon-192.png', 'images\icon-512.png')) {
     if (-not (Test-Path -LiteralPath (Join-Path $dist $iconAsset))) { throw "Missing published home-screen icon asset: $iconAsset" }
