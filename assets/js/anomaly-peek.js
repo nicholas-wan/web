@@ -8,8 +8,8 @@
      This replays at most every 20 seconds.
    - Hovering, focusing or tapping a chip opens only that chart, in a card
      that drops below the chips (never over the writeup). A click or tap pins
-     it; leaving, Escape or a tap elsewhere closes it (on phones the inline
-     card closes from its chip). One open at a time.
+     it; leaving, Escape or a tap elsewhere closes it (on phones and touch
+     tablets the inline card closes from its chip). One open at a time.
    - A chart animates only while its card is open and on screen, and holds in
      a hidden tab. Reduced motion (including a change mid-visit): still frames.
    All data is simulated (and obviously illustrative), so the cards carry
@@ -325,9 +325,10 @@
     };
   });
 
-  var inline = window.matchMedia('(max-width: 736px)');
+  var inline = window.matchMedia('(max-width: 736px), (hover: none)');
   function place(c) {
-    // Phones show the card inline below the chips (CSS), so nothing to place.
+    // Phones and touch tablets show the card inline below the chips (CSS),
+    // so nothing to place.
     if (inline.matches) { c.pop.style.left = ''; c.pop.style.top = ''; return; }
     // Below the chip row, left-aligned with the chip and kept inside the card.
     // The row is unpositioned, so chip and row offsets are both card-relative.
@@ -361,8 +362,9 @@
   keys.forEach(function (k) {
     var c = charts[k], s = c.state;
     [c.chip, c.pop].forEach(function (node) {
+      // Inline cards open on click only: hover would push the page about.
       node.addEventListener('pointerenter', function (e) {
-        if (e.pointerType !== 'mouse') { return; }
+        if (e.pointerType !== 'mouse' || inline.matches) { return; }
         window.clearTimeout(s.leave);
         if (!s.hovering) { s.dismissed = false; }
         s.hovering = true;
@@ -412,7 +414,7 @@
   });
   // Outside presses close a floating card: a mouse on press, touch on the tap
   // itself (click), since a finger's pointerdown may be the start of a scroll.
-  // Inline phone cards close from their chip instead.
+  // Inline cards (phones, touch tablets) close from their chip instead.
   function closeOutside(target) {
     if (inline.matches) { return; }
     keys.forEach(function (k) {

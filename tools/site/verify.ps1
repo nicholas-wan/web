@@ -264,6 +264,10 @@ $customCss = @($sharedCustomCss, $travelMapPageCss, $travelJournalCss, $experien
 # opt in to cross-document view transitions on the 220ms token, and reduced motion
 # opts out. See "Page changes" in README.md.
 if ($sharedCustomCss -notmatch '(?s)body:not\(\.page-home\) #wrapper\.fade-in::before\s*\{\s*display:\s*none' -or $sharedCustomCss -notmatch '(?s)@view-transition\s*\{\s*navigation:\s*auto' -or $sharedCustomCss -notmatch '(?s)prefers-reduced-motion: reduce\)\s*\{\s*@view-transition\s*\{\s*navigation:\s*none' -or $sharedCustomCss -notmatch '(?s)::view-transition-group\(\*\).*?animation-duration:\s*var\(--motion-standard\)' -or $sharedCustomCss -notmatch '(?s)#nav \.nav-active-mark\s*\{[^}]*view-transition-name:\s*nav-active-mark') { throw "Content pages must skip the black load overlay and keep the 220ms page transition with its reduced-motion opt-out and gliding tab mark." }
+# Desktop tab-page titles glide too (Oct 2026), the old title gone by halfway so two
+# different words never overlap, and page-transitions.js sits them out off-screen.
+$pageTransitionsJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\page-transitions.js') -Raw -Encoding UTF8
+if ($sharedCustomCss -notmatch '(?s)@media screen and \(min-width: 981px\)\s*\{\s*#portfolio-title,\s*\.skills-heading h2,\s*#personal-timeline-title,\s*#travel-atlas-title\s*\{[^}]*view-transition-name:\s*page-title' -or $sharedCustomCss -notmatch '(?s)@keyframes page-title-out\s*\{\s*50%, 100%\s*\{\s*opacity:\s*0' -or $pageTransitionsJs -notmatch "viewTransitionName === 'page-title'") { throw "Desktop tab-page titles must glide between pages without overlapping, and sit out off-screen." }
 $personalTimelineJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\personal-timeline.js') -Raw -Encoding UTF8
 $galleryJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\gallery.js') -Raw -Encoding UTF8
 if ($galleryJs -notmatch 'zoomImage === image && currentSource === source && zoomLevel > 1' -or $galleryJs -notmatch 'image.decode\(\).then' -or $galleryJs -notmatch 'if \(pointerCaptured\) ignoreClickUntil') { throw "Lightbox zoom must retain its preview until decode, reject stale upgrades, and suppress held-pan release clicks." }
@@ -802,6 +806,10 @@ if ($homeHtml -notmatch '<canvas id="nokey"') { throw "Homepage background anima
 # The Cloud Anomaly card ends with two chips that each open one small chart
 # below them (never over the writeup); only the Work page loads the script.
 if ([regex]::Matches($experience, 'data-peek="(series|graph)"').Count -ne 2 -or [regex]::Matches($experience, 'data-peek-card="(series|graph)"').Count -ne 2 -or $experience -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/anomaly-peek.js'))) { throw "The Work page must carry the two anomaly-peek chips, their two chart cards and anomaly-peek.js." }
+# Phones and touch tablets (Oct 2026): no hover, so a pinned floating card would sit
+# over Early career; the card opens inline instead and the chips are 44px tall.
+$anomalyPeekJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\anomaly-peek.js') -Raw -Encoding UTF8
+if ($anomalyPeekJs -notmatch [regex]::Escape("matchMedia('(max-width: 736px), (hover: none)')") -or $experiencePageCss -notmatch '(?s)@media screen and \(max-width: 736px\), screen and \(hover: none\)\s*\{\s*\.page-experience #cloud-analytics \.anomaly-peek__chip\s*\{[^}]*min-height:\s*44px.*?\.anomaly-card\s*\{[^}]*position:\s*static') { throw "Phones and touch tablets must open the anomaly charts inline below 44px chips." }
 if ($canvasJs -notmatch 'function stepSignal' -or $canvasJs -notmatch "clip\('evenodd'\)") { throw "The homepage canvas must keep its calm signals, clipped out of the hero text." }
 if ($homeHtml -notmatch '<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon\.png" />' -or $homeHtml -notmatch '<link rel="manifest" href="site\.webmanifest" />') { throw "Home-screen icon or manifest link is missing." }
 foreach ($iconAsset in @('site.webmanifest', 'favicon.ico', 'images\apple-touch-icon.png', 'images\icon-192.png', 'images\icon-512.png')) {

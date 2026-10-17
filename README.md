@@ -35,7 +35,7 @@ Decided 16–17 Oct 2026; do not propose otherwise. Details are under [Behaviour
 
 - Hero: desktop button stays a 3rem icon circle that reveals its label on hover (phones keep the pill); copy is approved text; the canvas keeps its calm signals.
 - Motion is calm and earns its place; decorative effects (entrance reveals, magnetic buttons, spotlight grids) are declined.
-- Pages crossfade in 220ms with no black load wait.
+- Pages crossfade in 220ms with no black load wait; desktop tab-page titles glide into place.
 - Work: no contact line; anomaly charts open one at a time from their chips, never over the writeup, with no "simulated" note.
 - Skills cards carry no case-study links.
 - Personal: unfocused cards stay dimmed to 0.55; galleries have no photo controls.
@@ -163,8 +163,9 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
   - Content pages skip the load overlay (`#wrapper.fade-in::before`); the homepage keeps it.
   - Cross-document view transitions (Chrome/Edge 126+, Safari 18.2+): one 220ms crossfade; shared header and nav stay still. Elsewhere, and under reduced motion: none.
   - Desktop active tab: build-added empty `.nav-active-mark` after the active link, so it glides.
+  - Desktop (≥981px) tab-page titles (Work, Skills, Personal, Travel; owner-approved Oct 2026) share `view-transition-name: page-title`, sized to their text, and glide; the old title is gone by halfway and the new one fades in over the second half, so different words never overlap.
   - `assets/js/page-transitions.js` loads in `<head>` so `pagereveal` binds before first paint.
-  - Mark sits out when it would fly: off-screen on either page (scroll, Back, `#anchor`), House and Pre-Wedding (no header), homepage during the intro fade.
+  - Mark and title sit out when they would fly (event pages and the homepage intro: the arriving side only): off-screen on either page (scroll, Back, `#anchor`), House and Pre-Wedding (no header), homepage during the intro fade.
   - Never name `#main` or other large regions (morph shows a blank).
   - Rejected: content drift; Ctrl/⌘K palette.
 - Motion tokens (`custom.css`): 150ms feedback, 220ms card/nav, 320ms images, 480ms reveals (60ms stagger), 520ms large moves. Scramble, timeline FLIP, nav sheet, atlas fly-to keep their own timings.
@@ -234,7 +235,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Cloud Anomaly ends with an anomaly peek (owner-approved; `assets/js/anomaly-peek.js`, experience bundle).
 - CTA "See an anomaly get caught · hover a chart" ("tap a chart" on phones) above chips Over time and Across connections.
 - Chip previews play ~4s on entering view, rest on the amber flag, glow once (max every 20s).
-- Hover, focus or tap opens only that chart: desktop, a floating card below the chips, never over the writeup; phones (≤736px), an inline card pushing content down.
+- Hover, focus or tap opens only that chart: mouse desktops, a floating card below the chips, never over the writeup; phones (≤736px) and touch tablets (`hover: none`), an inline card pushing content down, below 44px chips (a pinned floating card covered Early career, Oct 2026).
 - Click/tap pins; hovering the other chip previews it, then the pin returns.
 - Equal-size cards, one plain note each, no "simulated" disclaimer (owner).
 - Charts animate only while open and on screen; reduced motion shows stills.

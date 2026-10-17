@@ -4704,17 +4704,25 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
   .page-experience #cloud-analytics .anomaly-peek__chip {
     justify-content: flex-start;
     min-width: 0;
-    min-height: 44px;
-    transform: none;
     padding: 0.35rem 0.6rem 0.35rem 0.4rem;
     border-radius: 0.6rem;
     white-space: normal;
     text-align: left;
   }
+  .page-experience #cloud-analytics .anomaly-card { grid-column: 1 / -1; }
+}
+/* Phones and touch tablets: with no hover to preview, a tap pins the card,
+   and a pinned floating card would sit over Early career. So the card opens
+   inline below the chips (anomaly-peek.js matches this query), and the chips
+   themselves are 44px tall. */
+@media screen and (max-width: 736px), screen and (hover: none) {
+  .page-experience #cloud-analytics .anomaly-peek__chip {
+    min-height: 44px;
+    transform: none;
+  }
   .page-experience #cloud-analytics .anomaly-peek__chip::before { display: none; }
   .page-experience #cloud-analytics .anomaly-card {
     position: static;
-    grid-column: 1 / -1;
     width: auto;
     display: none;
     margin-top: 0.15rem;
@@ -4726,12 +4734,21 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     animation: anomaly-card-in var(--motion-standard, 220ms) ease both;
   }
 }
+/* Touch tablets keep the chip row; the card takes its own line (the margin
+   fills the rest of it) at the desktop card's width. */
+@media screen and (min-width: 737px) and (hover: none) {
+  .page-experience #cloud-analytics .anomaly-card {
+    flex: none;
+    width: min(24rem, 100%);
+    margin-right: calc(100% - min(24rem, 100%));
+  }
+}
 @keyframes anomaly-card-in { from { opacity: 0; } }
 /* The narrowest phones: a shorter mini leaves room for "Across connections". */
 @media screen and (max-width: 374px) {
   .page-experience #cloud-analytics .anomaly-peek__mini { width: 40px; height: 13px; }
 }
-@media screen and (max-width: 736px) and (prefers-reduced-motion: reduce) {
+@media (prefers-reduced-motion: reduce) {
   .page-experience #cloud-analytics .anomaly-card.is-open { animation: none; }
 }
 
@@ -4828,6 +4845,49 @@ body:not(.page-home) #wrapper.fade-in::before {
 ::view-transition-new(*) {
   animation-duration: var(--motion-standard);
   animation-timing-function: var(--ease-standard);
+}
+
+/* Desktop tab pages also glide their title (Oct 2026, owner-approved): the
+   old title moves and resizes into the new one while the two crossfade.
+   Each title shrinks to its text so the glide runs text box to text box;
+   the snapshots keep their proportions (height-led) rather than stretching.
+   page-transitions.js sits a title out when it is off-screen. */
+@media screen and (min-width: 981px) {
+  #portfolio-title,
+  .skills-heading h2,
+  #personal-timeline-title,
+  #travel-atlas-title {
+    width: fit-content;
+    view-transition-name: page-title;
+  }
+
+  #personal-timeline-title {
+    margin-inline: auto;
+  }
+}
+
+/* Different words overlaid read as a jumble, so the old title is gone by
+   halfway and the new one fades in over the second half. */
+::view-transition-old(page-title),
+::view-transition-new(page-title) {
+  width: auto;
+  height: 100%;
+}
+
+::view-transition-old(page-title) {
+  animation-name: page-title-out;
+}
+
+::view-transition-new(page-title) {
+  animation-name: page-title-in;
+}
+
+@keyframes page-title-out {
+  50%, 100% { opacity: 0; }
+}
+
+@keyframes page-title-in {
+  0%, 50% { opacity: 0; }
 }
 
 #navPanelToggle,
