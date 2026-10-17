@@ -226,8 +226,11 @@ foreach ($page in $pages) {
     # it). The warning below flags that headroom in green builds.
     if ($scriptBytes -gt 80KB) { throw "$($page.Name) exceeds the 80 KB raw JavaScript budget." }
     Warn-BudgetHeadroom "$($page.Name) JS" $scriptBytes 80KB
-    if ($page.Length -gt 225KB) { throw "$($page.Name) exceeds the 225 KB generated-HTML budget." }
-    Warn-BudgetHeadroom "$($page.Name) HTML" $page.Length 225KB
+    # 225 -> 256: every journal tile now carries a descriptive alt sentence instead of
+    # a copy of its caption (Oct 2026); travel_2023_usacanada.html, the largest journal
+    # at 213 tiles, grew from 221 KB to 235 KB.
+    if ($page.Length -gt 256KB) { throw "$($page.Name) exceeds the 256 KB generated-HTML budget." }
+    Warn-BudgetHeadroom "$($page.Name) HTML" $page.Length 256KB
 }
 
 if ($navSignatures.Count -ne 1) { throw "Generated pages do not share one consistent navigation block." }
@@ -346,7 +349,10 @@ if ($travelSearchCss -notmatch '(?s)\.travel-atlas__layout\[hidden\]\s*\{[^}]*he
 # The photo search index is fetched by photo-search.js on first use, never at
 # page load. The full schema is 468 KB raw for 898 photos after the October
 # 2026 Chengdu and Zhangjiajie journal; it remains compact when transferred.
-Assert-FileSizeBudget 'assets\data\photo-index.json' 480
+# 480 -> 560: the index carries every tile alt because search ranks on it, and all
+# 699 caption-copy alts across seven journals became descriptive sentences (Oct 2026),
+# taking it from 480 KB to 520 KB; the headroom covers future journals in that style.
+Assert-FileSizeBudget 'assets\data\photo-index.json' 560
 if ($travel -notmatch ('data-search-index="' + [regex]::Escape((Get-DistAssetRef 'assets/data/photo-index.json')) + '"')) { throw 'The travel page must carry the versioned photo-index.json URL in data-search-index.' }
 try {
     $photoIndex = Get-Content -LiteralPath (Join-Path $dist 'assets\data\photo-index.json') -Raw -Encoding UTF8 | ConvertFrom-Json
