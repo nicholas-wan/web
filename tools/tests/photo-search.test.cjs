@@ -96,7 +96,9 @@ test('compact cover references round-trip every reviewed topic and focal point',
   });
   assert.deepEqual(decoded, reviews.map(({ id, tags, fx, fy }) => ({ id, tags, fx, fy })));
   assert.equal(new Set(decoded.map(c => c.id)).size, decoded.length);
-  assert.ok(fs.statSync(path.join(root, 'dist/assets/data/photo-index.json')).size <= 480 * 1024);
+  // Matches verify.ps1: 480 -> 560 KB when every journal alt became a descriptive
+  // sentence (Oct 2026); the index carries each alt because search ranks on it.
+  assert.ok(fs.statSync(path.join(root, 'dist/assets/data/photo-index.json')).size <= 560 * 1024);
 });
 
 test('bubble tea is its own topic and misidentified animals are corrected', () => {
