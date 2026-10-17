@@ -6836,10 +6836,6 @@ body.lightbox-open {
 }
 
 @media screen and (max-width: 736px) {
-  .page-experience #main > .portfolio-headline {
-    display: none;
-  }
-
   .page-experience .portfolio-overview {
     padding: 1.15rem !important;
   }
@@ -9169,3 +9165,55 @@ body.page-home #nav {
   .photo-explore__card:hover, .photo-explore__card:focus-visible { transform: none; }
 }
 /* Route bundle: travel-search:end */
+
+/* Shared page openings and aligned internships, owner-approved 18 Oct 2026.
+   html adds specificity over the separately loaded route bundles. */
+body { --opening-gutter: 2rem; }
+html .page-experience #main > .portfolio-headline { display:block; padding:2rem var(--opening-gutter) 0; }
+html .page-experience .portfolio-overview { padding:1.5rem var(--opening-gutter) 2rem !important; border-top:0 !important; }
+html .page-skills #main > .post,
+html .personal-timeline-page > .personal-timeline { padding:2rem var(--opening-gutter) 3rem !important; }
+html #main > .travel-atlas { margin:0; padding:2rem var(--opening-gutter); border:0; border-radius:0; box-shadow:none; background:#fff; }
+html .page-skills #main > .post header.major.skills-heading,
+html .personal-timeline__intro { max-width:none; margin:0 0 1.5rem !important; padding:0; text-align:left; }
+html .page-experience .portfolio-headline h1,
+html .page-skills #main > .post header.major.skills-heading h2,
+html .personal-timeline__intro h1,
+html .travel-atlas__header h1 { max-width:none; margin:0 !important; color:var(--color-ink-900); font:700 1.8rem/1.3 var(--font-body) !important; letter-spacing:-.025em; text-transform:none; text-align:left; }
+html .page-skills .skills-heading::before,
+html .travel-atlas__eyebrow,
+html .page-opening-eyebrow { display:block; margin:0 0 .5rem; color:var(--color-brand-700); font:700 var(--eyebrow-size)/1.3 var(--font-display); letter-spacing:var(--eyebrow-tracking); text-transform:uppercase; text-align:left; }
+html .page-skills .skills-heading p,
+html .personal-timeline__intro p,
+html .travel-atlas__header > div > p { margin:.65rem 0 0; max-width:55rem; color:var(--color-ink-500); font:300 max(var(--text-floor), .9rem)/1.65 var(--font-body); text-align:left; }
+html .page-experience .internship-group__grid { align-items:start; }
+@media(min-width:981px) {
+ html .page-experience .internship-group__grid { align-items:stretch; }
+ html .page-experience .case-study--internship { display:grid; grid-row:span 4; grid-template-rows:subgrid; row-gap:0; }
+ html .page-experience .case-study--internship > header { display:contents; }
+ html .page-experience .case-study--internship .case-study__tags { align-self:start; }
+}
+html .page-experience .case-study--internship { padding:1.2rem; }
+html .page-experience .case-study--internship .case-study__company { flex-direction:column; align-items:flex-start; gap:.75rem; min-height:0; margin-bottom:1rem; }
+html .page-experience .case-study--internship .case-study__company > span { min-width:0; max-width:100%; }
+html .page-experience .case-study--internship .company-logo { height:2.75rem; }
+html .page-experience .case-study--internship h2 { min-height:0; overflow-wrap:break-word; }
+html .page-experience .case-study--internship .case-study__lede { font-size:max(var(--text-floor), .86rem); }
+html .page-experience .case-study--internship .case-study__tags { margin:0; }
+@media(max-width:736px) {
+ body { --opening-gutter:1.15rem; }
+ html .page-experience #main > .portfolio-headline,
+ html .page-skills #main > .post,
+ html .personal-timeline-page > .personal-timeline,
+ html #main > .travel-atlas { padding-top:1.5rem !important; }
+ html .page-experience .portfolio-headline h1,
+ html .page-skills #main > .post header.major.skills-heading h2,
+ html .personal-timeline__intro h1,
+ html .travel-atlas__header h1 { font-size:1.5rem !important; }
+}
+
+html .page-skills #main > .post { border-top:0; }
+@media(max-width:980px) {
+ html .page-experience .case-study--internship .case-study__company { flex-direction:row; }
+ html .page-experience .case-study--internship .case-study__company > span { flex:1; }
+}

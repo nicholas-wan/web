@@ -154,10 +154,12 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 
 ### Site-wide behavior
 
+- Tab-page openings (approved 18 Oct 2026): matching left-aligned serif title scale, teal eyebrows, top spacing and gutters on Work, Skills, Personal and Travel. Work stays visible on phones; Personal is left-aligned; Travel opens on plain white. Desktop titles retain their glide.
+
 - 404 uses root-relative assets and nav links so nested paths work; fragment links stay local.
 - New-tab links need `rel="noopener noreferrer"`.
 - Skills (owner decisions): summaries have no links (no "View … case study"); details always visible; no phone toggles, eyebrows, tag lists or tool-logo lists (`verify.ps1` enforces).
-- Skills, Tech stack, Education headings: one quiet left-aligned Merriweather style.
+- Skills, Tech stack, Education headings: quiet left-aligned Merriweather; Skills is the page title and uses the shared opening scale.
 - Skills has no generated banner; its `Capabilities` eyebrow gives hierarchy.
 - Page changes (owner-approved):
   - Content pages skip the load overlay (`#wrapper.fade-in::before`); the homepage keeps it.
@@ -229,10 +231,10 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 
 ### Experience page contracts
 
-- Generated `Agentic AI Product Lead, Cyber Defence` headline (renamed from "…for Threat Hunting", Oct 2026, plainer and one line from 1366px): shown on desktop, hidden on phones (first DSTA card holds the title).
+- Page opening (approved 18 Oct 2026): `Experience` eyebrow and `Selected work` title at every width. The job title appears only in its DSTA card.
 - DSTA cards on phones: company context, title, Problem/My role/Outcome rail, copy, tags.
 - Cloud Analytics header is `display: contents` at the phone breakpoint only; desktop stays two-column.
-- Internship cards: three in a row above 980px, stacked below (at 768px three columns wrapped each date line to 4-5 lines). Shopee's same-year range gives the year once (`April – November 2020`) so its meta fits two lines like the others. No fixed card height, and tags follow the description rather than pinning to the card foot (Oct 2026), so a shorter card has no gap above its tags.
+- Internship cards: three in a row above 980px, stacked below (at 768px three columns wrapped each date line to 4-5 lines). Shopee's same-year range gives the year once (`April – November 2020`) so its meta fits two lines like the others. Equal-height desktop cards share company/title/description/tag rows through subgrid (approved 18 Oct 2026); no fixed height. Logos sit above company details on desktop, beside them on stacked phone/tablet cards; descriptions respect the 12px phone floor.
 - The second DSTA card is titled Cyber Detection Analytics (renamed from Cloud Anomaly Analytics, Oct 2026; anchor stays `#cloud-analytics`). Its lede names both halves: AWS and Microsoft 365 anomalies, and phishing domains impersonating MINDEF websites (owner-approved wording).
 - Cyber Detection Analytics ends with an anomaly peek (owner-approved; `assets/js/anomaly-peek.js`, experience bundle).
 - CTA "Hover a chart to see it catch something" ("Tap a chart…" on phones; was "See an anomaly get caught · hover a chart", Oct 2026) above chips Phishing domains, Statistical baseline and Graph analysis (named by method, Oct 2026; were Over time and Across connections) (phones and tablets ≤980px: three equal tiles in one row, thumbnail above a centred label; desktop: three chips as wide as the widest, content centred, a small arrow at the right; thumbnails drawn at 78×24).
