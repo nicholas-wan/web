@@ -1,422 +1,510 @@
 # Nicholas Wan's website
 
-Static personal site. `tools/site/build.ps1` generates `dist/` from the root pages and the travel-journal fragments; GitHub Actions builds, verifies and deploys it to GitHub Pages.
+Static personal site. `tools/site/build.ps1` builds `dist/` from the root pages and `journals/`; GitHub Actions verifies and deploys it to GitHub Pages.
 
 ## Commands
 
 ```powershell
-powershell.exe -NoProfile -File tools/site.ps1 check  # clean build + verification, CI's PowerShell 5.1
+powershell.exe -NoProfile -File tools/site.ps1 check  # CI-equivalent clean build + verify (Windows PowerShell 5.1)
 .\tools\site.ps1 build          # build only (-Clean to start fresh)
 .\tools\site.ps1 verify         # verify an existing dist/
-node tools/preview-server.mjs   # preview dist/ at http://localhost:4321
+node tools/preview-server.mjs   # preview dist/ at http://localhost:4321 (plain static servers 404 the extensionless URLs)
 ```
 
-Use the preview server, not a plain static server: the site's extensionless page URLs 404 elsewhere.
-
-CI also runs the Node and browser tests after the check; run them before pushing (from `tools/tests/browser`, after a build):
+CI then runs these; run them before pushing, after a build, from `tools/tests/browser` (first `npm ci` and `npx playwright install chromium webkit`):
 
 ```powershell
 node --test ../photo-search.test.cjs ../lightbox-cache.test.cjs
-npm test   # Playwright layout checks (npm ci and npx playwright install chromium webkit first)
+npm test   # Playwright layout checks
 ```
 
 ## Layout
 
-- `assets/` styles, scripts, fonts and public downloads
-- `images/` source media; `images-webp/` the WebP overlay the build prefers
-- `journals/` travel-journal fragments, their manifest, photo tags and template
-- `partials/` shared page fragments
-- `tools/` build, verification, image, map and font tooling
-- `docs/` the photo-edit register (`photo-edits.csv`)
-- `dist/` generated output; never edit or commit it
-
-Travel discovery shows six postcards at a time from visually reviewed photos; the full search index loads only on interaction. See [Travel journals](#travel-journals) for journal and postcard editing.
+- `assets/` styles, scripts, fonts, downloads · `images/` source media · `images-webp/` WebP overlay the build prefers
+- `journals/` journal fragments, manifest, photo tags, template · `partials/` shared fragments
+- `tools/` build, verify, image, map and font tooling · `docs/photo-edits.csv` photo-edit log
+- `dist/` generated; never edit or commit it
 
 ## Editing photos
 
-Edit the file under `images/` (or `images-webp/`), delete its `-480`/`-800`/`-1200` siblings, run `python .\tools\images\make-responsive-variants.py`, then `git checkout --` any sibling the tool re-encoded for a photo you did not touch. Tiles crop to a fixed shape, so prefer the tile's `--focus-x`/`--focus-y` over cropping pixels.
+Edit under `images/` (or `images-webp/`), delete its `-480`/`-800`/`-1200` siblings, run `python .\tools\images\make-responsive-variants.py`, then `git checkout --` any sibling it re-encoded for a photo you didn't touch. Prefer a tile's `--focus-x`/`--focus-y` to cropping pixels. Log grades, crops and removals in `docs/photo-edits.csv` with their commit; removals never touch people.
 
-Colour grades, crops and removals are logged per photo in [docs/photo-edits.csv](docs/photo-edits.csv) with the commit they shipped in. Removals never touch the people in a photo.
+## Owner preferences
 
-## Owner preferences (Oct 2026)
+Decided 16–17 Oct 2026; do not propose otherwise. Details are under [Behaviour contracts](#behaviour-contracts).
 
-Decided during the design reviews of 16–17 Oct 2026. Do not propose these again; the full contracts are in [Behaviour contracts](#behaviour-contracts).
-
-- The home hero's desktop button stays an icon circle that reveals its label on hover; phones keep the labelled pill.
-- The Personal timeline keeps dimming unfocused cards; its photo galleries have no controls (removed 17 Oct 2026).
-- No skip-to-content link and no change to the homepage cards' focus ring.
-- The floating return-to-top circle stays on phones; it is the quick way back up.
-- No contact line on the Work page; email and LinkedIn live in the nav and footer.
-- Photos must be served at phone sizes: every gallery or card image needs `-480`/`-800` siblings and a `sizes` that matches its real slot.
-- Phone text never drops below the 12px floor; section headings on a page share one style.
-- No SEO, analytics or resume-PDF work; the hero copy is approved text.
-- Motion must be calm and earn its place; purely decorative effects (entrance reveals, magnetic buttons, spotlight grids) are declined.
-- The hero canvas keeps its calm signals; pages crossfade in 220ms with no black load wait.
-- The Work page's anomaly charts open one at a time from their chips, never over the writeup, with no "simulated" disclaimer.
+- Hero: desktop button stays a 3rem icon circle that reveals its label on hover (phones keep the pill); copy is approved text; the canvas keeps its calm signals.
+- Motion is calm and earns its place; decorative effects (entrance reveals, magnetic buttons, spotlight grids) are declined.
+- Pages crossfade in 220ms with no black load wait.
+- Work: no contact line; anomaly charts open one at a time from their chips, never over the writeup, with no "simulated" note.
 - Skills cards carry no case-study links.
-
-The rest of this file is the full reference: [Build and deployment](#build-and-deployment), [Behaviour contracts](#behaviour-contracts), [Travel journals](#travel-journals), [Fonts](#fonts) and [Vendor theme](#vendor-theme).
+- Personal: unfocused cards stay dimmed to 0.55; galleries have no photo controls.
+- No skip link, no change to the homepage cards' focus ring; return-to-top stays on phones (except Travel, journals and Personal, where it is hidden).
+- Every gallery or card image ships `-480`/`-800` siblings with a `sizes` matching its slot.
+- Phone text never drops below 12px; section headings on a page share one style.
+- No SEO, analytics or resume-PDF work.
 
 ## Build and deployment
 
-The root HTML files remain legacy content sources. `tools/site/build.ps1` generates a clean static copy in `dist/` with shared navigation, footer, metadata, scripts, and image-loading attributes.
+Root HTML files are legacy content sources; `tools/site/build.ps1` generates `dist/`.
 
-Travel journals use `partials/travel-journal.html` for their shared shell. Their order, labels, metadata, and source files live in `journals/manifest.json`; new journals should be content-only fragments based on `journals/_template.html`.
+### Build notes
 
-### Build commands
+- Match CI on Windows with `powershell.exe -NoProfile -File tools/site.ps1 check`; a PowerShell 7 pass is not enough. In 5.1, `@(...)` around a root-array `ConvertFrom-Json` nests it: assign the result directly.
+- Builds are incremental (`assets/fonts` and `assets/icons` are mirrored, so a removed source file also leaves `dist/`); use `build -Clean` after removing other files or to reset.
+- `-Output` must be a `dist*` folder directly inside the repo, as `-Clean` empties it.
 
-Run the complete CI-equivalent workflow:
+### Checks and output
 
-```powershell
-.\tools\site.ps1 check
-```
+- The build fails on any generated reference to an `images/` path missing from both `images/` and `images-webp/`; it alone covers CSS `url()`, script strings and `data-poster`.
+- `verify.ps1` checks HTML attributes and fails on any `<img>` without `alt`.
+- Only referenced images ship, plus `CNAME`, `robots.txt`, `sitemap.xml`, `site.webmanifest` and `favicon.ico` (Chromium always requests it).
 
-On Windows, invoke `powershell.exe -NoProfile -File tools/site.ps1 check` explicitly to use the same Windows PowerShell 5.1 engine as CI. PowerShell 7 alone can miss compatibility failures: in 5.1, wrapping a root-array `ConvertFrom-Json` pipeline in `@(...)` nests the whole array. Assign its result directly before iterating or counting reviews.
+### Responsive images
 
-Builds are incremental by default. Use a clean build after removing files or when the output must be reset:
+- Banner `sizes`: `100vw` on phones, `calc(100vw - 176px)` to 1024px, `1024px` to 1680px, `1366px` above.
+- Banners get a `-1200` tier (`make-responsive-variants.py --banners-only`, q82 JPEG / q80 WebP, kept only if it saves a fifth) for DPR-3 phones. Seoul and Guangzhou are excluded (2:1 art).
+- Journal tiles use a density-capped `160px` phone slot and a `20vw` desktop slot; non-journal galleries keep `800px`. No images are recompressed.
+- Journal animations use `data-poster`, not `poster`, which loads eagerly. `gallery.js` attaches it near the viewport; `travel-map.js` reads either.
 
-```powershell
-.\tools\site.ps1 build
-.\tools\site.ps1 build -Clean
-.\tools\site.ps1 verify
-```
+### CSS and JavaScript
 
-Incremental builds retain unchanged published images and cache source-image dimensions in the ignored `.cache/` directory. Clean builds reset `dist/` but may reuse valid dimension metadata. `-Output` must name a `dist*` folder directly inside the repository (for example `dist` or `dist-test`); anything else is refused because `-Clean` empties it. Incremental builds mirror `assets/fonts` and `assets/icons`, so a file removed from source also leaves `dist`.
-
-The build fails when generated HTML, CSS, script or manifest output references an `images/` path that exists in neither `images/` nor `images-webp/`. That scan is the only check covering CSS `url()`, script strings and `data-poster`; `verify.ps1` checks HTML attributes and also fails on any `<img>` without an `alt` attribute.
-
-The build adds intrinsic image dimensions, native lazy loading, first-image priority, responsive `srcset` markup, and the controlled `images-webp/` overlay. Source originals remain in `images/`; only referenced runtime assets are copied to `dist/`, together with the root files `CNAME`, `robots.txt`, `sitemap.xml`, `site.webmanifest` and `favicon.ico` (Chromium requests `/favicon.ico` on every page regardless of the declared PNG icon).
-
-Journal banners advertise their measured layout width as `sizes`: `100vw` on phones, `calc(100vw - 176px)` up to 1024px, `1024px` up to 1680px and `1366px` above, where the 16pt root widens the column. They add a `-1200` tier (`make-responsive-variants.py --banners-only`, q82 JPEG / q80 WebP, kept only when it saves a fifth of the bytes): a DPR-3 phone needs ~1170 device pixels, so without it phones skipped `-800` and fetched the 1470–1920px original, up to 463 KB for the LCP image. Seoul and Guangzhou are excluded: their 2:1 artwork is cover-cropped into the ~1.58:1 phone box, which needs ~1364 device pixels.
-
-Phone journal tiles use existing `-480` previews through a density-capped `160px` slot (up to DPR 3), appropriate for their roughly 264 CSS px frame. This trades some thumbnail sharpness for smaller transfers while preserving the lightbox viewing-size image and original on zoom. A 390px/DPR-3, 4x-CPU, 1.6 Mbps/150ms-RTT Guangzhou scroll experiment reduced unloaded visible-image samples from 48/66 to 30/66; this is a synthetic stress test, not a physical iPhone timing guarantee. Banners and non-journal galleries keep their existing source policy. No images are recompressed.
-
-Journal gallery tiles advertise a `20vw` desktop `sizes` slot (measured five-up tile widths, 129–325px between 737px and 1920px viewports) so 1x screens select `-480` and 2x screens `-800`; non-journal galleries keep the `800px` slot. Journal animations have their `poster` renamed to `data-poster`, because a poster attribute downloads at page load even with `preload="none"`; `gallery.js` attaches it as the animation nears the viewport and `travel-map.js` reads either attribute for the atlas detail card.
-
-`assets/css/custom.css` remains the authored source of truth. The build extracts marker-bounded route blocks into `travel-map-page.css`, `travel-journal.css`, `experience-page.css`, `personal-page.css`, and `skills-page.css`. Generated pages load only their matching route bundle; shared rules remain in the generated `custom.css`.
-
-`assets/js/main.js` also remains the authored theme source. Its shared shell is dependency-free and owns navigation, focus management, the page reveal, and return-to-top behavior. The build extracts its marked canvas block into `canvas-background.js` for the homepage only. Homepage interactions stay in `game.js`; the Work page's anomaly peek is `anomaly-peek.js`; Skills and Travel use `listing-effects.js`, and journals use `journal-progress.js`. Verification enforces route ownership, rejects the retired jQuery/theme-helper runtime, and caps per-page JavaScript payloads.
-
-Preview `dist/` with `node tools/preview-server.mjs [port]`, which the `.claude/launch.json` configuration runs on port 4321. It resolves extensionless URLs such as `/experience` to their `.html` files the way GitHub Pages does; a plain static server such as `python -m http.server` does not, so every navigation link 404s there.
+- `assets/css/custom.css` is the authored source. The build splits marker-bounded route blocks into `travel-map-page.css`, `travel-journal.css`, `experience-page.css`, `personal-page.css` and `skills-page.css`; shared rules stay in generated `custom.css`.
+- `assets/js/main.js` is the authored, dependency-free theme shell. Its marked canvas block becomes homepage-only `canvas-background.js`.
+- Route scripts: `game.js` (homepage), `anomaly-peek.js` (Work), `listing-effects.js` (Skills, Travel), `journal-progress.js` (journals). Verification enforces route ownership, rejects the retired jQuery/theme-helper runtime and caps per-page JavaScript.
 
 ### Theme stylesheet
 
-`assets/css/main.css` is the Massively theme stylesheet with its unused rules removed (Sep 2026: 848 rules down to 366, 79 KB to 46 KB, about 10 KB to 7 KB gzipped). A rule was removed only when a class, id or element in its selector exists nowhere on the built site: not in the generated HTML, not in any script string literal, and not in the DOM captured after scripts ran at desktop, tablet and phone widths in several interaction states. Base styles for plain content elements that journals may use later (`h4`–`h6`, `em`, `b`, `ol`, `blockquote`, `code`, `pre`, `hr`, `sub`, `sup`, `mark`, tables, `dl`, `iframe`) were kept on purpose; form controls and the theme's grid, box, feature and pagination components were not, so reintroducing those needs their rules restored from `vendor/massively/`.
-
-The tooling lives in `tools/css/`: `computed-style-check.py` hashes the computed style and box of every element on every page and state (needs `pip install playwright` and Microsoft Edge), and `prune-main-css.py` performs the removal from that baseline. The prune was accepted after a side-by-side run of that check (17 pages, 3 viewports, 172 states, ~123,000 elements) found no differences other than the timing noise its old-versus-old control run also shows: mid-crossfade photo opacities on the personal timeline and the phone atlas teaser's replaying animation.
+- `assets/css/main.css` is Massively with rules pruned whose selectors match nothing in the HTML, scripts or rendered DOM.
+- Base styles for `h4`–`h6`, `em`, `b`, `ol`, `blockquote`, `code`, `pre`, `hr`, `sub`, `sup`, `mark`, tables, `dl` and `iframe` are kept on purpose. Form controls and the grid, box, feature and pagination components are gone; restore their rules from `vendor/massively/` before using them.
+- `tools/css/computed-style-check.py` (needs `pip install playwright` and Edge) baselines styles for `prune-main-css.py`.
 
 ### Deployment
 
-GitHub Pages does not execute PowerShell when publishing directly from a branch. `.github/workflows/pages.yml` checks out `master`, runs `tools/site.ps1 check`, and deploys the resulting `dist/` artifact. The build step runs under Windows PowerShell 5.1 (`shell: powershell`), the same engine as every local check, so a local `site.ps1 check` pass is representative of CI.
-
-Before uploading the Pages artifact, CI installs the pinned Playwright dependency in `tools/tests/browser` and runs its Chromium geometry suite and a small WebKit navigation/gallery smoke suite against `dist/`. It checks all ten trips at phone, tablet, desktop and landscape sizes, including zoom, selected-place cards, reopening and orientation changes. It also checks archive column counts, whole-card phone navigation, and search exploration, relevance, keyboard/IME interactions, error states and photo deep links. The search and lightbox Node regression suites run before the browser suite. A failure blocks deployment and uploads screenshots and traces. For a local terminal run after `site.ps1 check`: `cd tools/tests/browser`, `npm ci`, `npx playwright install chromium webkit`, then `npm test`. Interactive browser audits may reuse the read-only `geometry.cjs` function.
-
-The Pages source must remain **GitHub Actions**. The custom domain is configured in Pages settings; the committed `CNAME` is copied into the artifact but does not replace that setting.
+- `.github/workflows/pages.yml` checks out `master`, runs `tools/site.ps1 check` under Windows PowerShell 5.1 and deploys `dist/`. The Pages source must remain **GitHub Actions**; the custom domain lives in Pages settings, which `CNAME` does not replace.
+- Before upload, CI runs the search and lightbox Node suites, then the Playwright suites in `tools/tests/browser` (Chromium geometry, WebKit smoke) against `dist/`. A failure blocks deployment and uploads screenshots and traces.
+- Local run after `site.ps1 check`: `cd tools/tests/browser`, `npm ci`, `npx playwright install chromium webkit`, `npm test`. Interactive audits may reuse the read-only `geometry.cjs`.
 
 ### Asset tooling
-
-Active image tools live under `tools/images/`:
 
 ```powershell
 python .\tools\images\make-responsive-variants.py
 python .\tools\images\convert-curated-webp.py
 ```
 
-`make-responsive-variants.py` emits the controlled `-480` and `-800` JPEG set, gives every journal gallery source with an `-800` sibling a `-480` one (the 1x desktop source for the `20vw` slot), and closes responsive-coverage gaps for journal JPEGs and WebPs when the result is smaller; animated WebPs are excluded. Animations ship as an H.264 MP4 tile plus a static `-poster.webp`; do not add animated WebP or GIF tiles. `convert-curated-webp.py` regenerates the selected deterministic WebP overlay. `make-touch-icons.py` regenerates the home-screen icons (`images/apple-touch-icon.png`, `icon-192.png` and `icon-512.png`) from the owner-approved dark-field "NW" monogram polygons, rendered at 8x supersample and downscaled for clean edges.
+- `make-touch-icons.py` regenerates the home-screen icons from the owner-approved "NW" monogram.
+- Animations ship as an H.264 MP4 plus a static `-poster.webp`. Do not add animated WebP or GIF tiles.
+- `tools/maps/generate-world-map.ps1` rebuilds `images/travel/world-map.svg` at `-Tolerance 0.25`, keeping every feature, sub-pixel islets included.
+- Never run the destructive `tools/legacy/` scripts in builds. Do not re-run `cap-original-images.py` or re-encode originals.
 
-Editing an existing photo (Oct 2026): the tool skips a variant that already exists, so delete the edited photo's `-480`/`-800`/`-1200` siblings first; `--banners-only` restores the `-1200` banner tier. It also re-encodes the full `-800` set on every run, so afterwards restore (`git checkout --`) every changed sibling whose source you did not edit, or the commit churns several hundred unchanged images. Journal and gallery tiles are fixed-shape `object-fit: cover` boxes (4:3, or the two-row tall brick), so a pixel crop never changes the grid layout but does move what shows inside the tile; check the tile at desktop and phone widths, and prefer the per-image `--focus-x`/`--focus-y` when only the framing is wrong. Video posters are re-grabbed from the tile's own MP4 at the poster's existing dimensions.
+**Editing a photo:**
 
-The map generator lives at `tools/maps/generate-world-map.ps1` and downloads Natural Earth data before replacing `images/travel/world-map.svg`. It simplifies every ring with Douglas–Peucker at `-Tolerance 0.25` canvas pixels (45,965 points and 218 KB gzipped down to ~17,500 points and ~90 KB) while keeping every feature, including sub-pixel islets.
+1. Delete its `-480`/`-800`/`-1200` siblings; the tool skips existing variants. `--banners-only` restores `-1200`.
+2. The tool re-encodes every `-800`: `git checkout --` each changed sibling you did not edit.
+3. Tiles are fixed `object-fit: cover` boxes, so a crop moves the framing, not the grid. Check desktop and phone; prefer `--focus-x`/`--focus-y` for framing.
+4. Re-grab video posters from the tile's own MP4 at their existing size.
 
-The pre-wedding wordmark font ships as a 12 KB WOFF2 subset of `tools/fonts/josephsophia.otf`; the [Fonts](#fonts) section has the regeneration command, which must list every character the wordmark uses.
+### Photo search
 
-Source Sans Pro 700 (`assets/fonts/source-sans-pro-700-latin.woff2`, 15.7 KB) is a static latin instance of the Source Sans 3 variable font produced by `tools/fonts/subset-source-sans.py` with the same unicode range and feature list as the shipped 900 cut; `verify.ps1` caps it at 20 KB so the variable font can never ship. The build preloads the Source Sans 900 face on every page and Raleway on journal pages, and `main.css` declares a size-adjusted Arial fallback so cold loads do not reflow headings.
-
-The travel photo search reads `assets/data/photo-index.json`, which the build generates from the journals and two tracked sidecars (Oct 2026). `journals/tag-vocabulary.json` is the controlled vocabulary: each tag has a facet (place, subject, activity, food, people, animal, season, weather, time, event), search synonyms and, for places, an optional `parent` (city, region, country, continent). `journals/photo-tags.json` maps each gallery tile id to its tags. The id is the tile's path under `images/travel/` without the extension (`2025_japan/day14_hakone/fuji1`), so a JPEG-to-WebP swap keeps it; animations keep `.mp4` (`2019_sv/SF_sutro.mp4`), because some share a base name with a still. The index lists every tile in journal order with its section anchor (`trip-section-N`), caption, dimensions, `-480` thumb (or poster) and tags, plus every vocabulary tag with its photo count. The travel page's `data-search-index` attribute carries its content-hashed URL; `verify.ps1` checks it tile by tile against the generated journals and holds it to a 560 KB budget (520 KB raw at 898 photos; the budget was 480 KB until Oct 2026, when every journal alt became a descriptive sentence and the index, which carries each alt for search ranking, grew by 40 KB).
+- The build generates `assets/data/photo-index.json` from the journals plus:
+  - `journals/tag-vocabulary.json`: controlled tags, each with a facet (place, subject, activity, food, people, animal, season, weather, time, event), synonyms and, for places, an optional `parent` (city, region, country, continent).
+  - `journals/photo-tags.json`: tile id to tags. The id is the path under `images/travel/` without extension, so WebP swaps keep it; animations keep `.mp4`, as some share a still's name.
+- The travel page's `data-search-index` carries the index's content-hashed URL. `verify.ps1` checks the index tile by tile and enforces a **560 KB** budget. The Discovery bootstrap has a **7 KB** budget and loads the index and atlas lazily.
 
 ```powershell
 python -I .\tools\photos\seed_photo_tags.py
 ```
 
-`seed_photo_tags.py` (stdlib only) seeds tags from the vocabulary: names and synonyms found as whole words in each tile's caption title and text, alt text, and image folder and file name, with the section heading and a per-trip fallback supplying the place when the tile names none, and parents added for every place. Its `TRIPS` table holds per-trip facts the captions do not repeat (season from the journal dates, honeymoon), and `STOP_PHRASES` keeps false matches out (New York is not York, WA). It merges rather than overwrites: hand-added tags survive reruns, ids whose tile has gone are kept and reported for re-keying, and a second run changes nothing. When adding a journal, add its `TRIPS` row and any new places (with `parent`) or terms to the vocabulary, run the script, then hand-correct the new entries in `photo-tags.json`; the check fails while any tile has no tags or a tag outside the vocabulary.
+- `TRIPS` holds facts captions omit; `STOP_PHRASES` blocks false matches. The script merges: hand edits survive, ids of removed tiles are kept and reported for re-keying, and a second run changes nothing.
+- The check fails if any tile has no tags or an unknown tag.
 
-The travel landing’s plain topic labels live in `journals/explore-themes.json`; its approved cover pool lives in `journals/explore-covers.json`. Review every topic against the actual thumbnail at the card’s 8:5 aspect ratio, not just the full photo or its search tags. A review records the photo id, thumbnail path, SHA-256 digest, focal point (0–100 percent), and visible topics. The build rejects missing photos, animations, duplicate ids, unknown topic assignments and changed thumbnail files; verification independently checks the published images and initial seed assignments. After changing a reviewed image, inspect its crop again before updating the digest. The generated version 2 photo index includes compact cover tuples [photoIndex, [tagPositions], fx?, fy?], where tag positions refer to that photo’s own tag array and omitted coordinates mean 50/50. References are generated together with the photos; stable ids, explicit crops and hashes remain in the source reviews. Verification decodes every tuple and checks it against the source review. This keeps all 802 usable still-photo covers under the lazy-index budget (480 KB at the time, 560 KB since the Oct 2026 alt rewrite). Both the inert 24-card template and Another mix use this pool, so a new search tag cannot silently become a postcard cover. Six no-JavaScript fallback cards link to journal sections. The bootstrap selects six initial cards per visit, and the full index stays lazy. All postcards show place · year without a Photo: prefix.
+**Tagging a new journal:**
 
-The seeds only name places and caption words. The subject, animal, food, activity, people, weather and time tags were written in Oct 2026 by Claude agents that looked at every photo (and one extracted frame per animation) and chose from the vocabulary; Nicholas declined to use the Anthropic API for this, so the process is agent sessions, not a script. To repeat it for a new journal: build once so `dist/assets/data/photo-index.json` exists, generate a manifest per chunk of about 60 tiles (id, image to view, caption context, seed tags), have each agent write `tools/photos/work/tags/<manifest>.json` and check it with `python -I tools/photos/validate_tags.py <file>` (vocabulary membership, 3 to 14 tags, every manifest id present), then merge the files into `photo-tags.json`. `tools/photos/work/` is ignored by git; only the merged sidecar ships. Words the agents wanted but could not use are worth adding to the vocabulary before the next pass.
+1. Add its `TRIPS` row and new places (with `parent`) or terms to the vocabulary; run the seed script; hand-correct the new entries.
+2. Other facets come from Claude agent sessions viewing each photo, not a script (Nicholas declined the Anthropic API).
+3. Build once, make a manifest per ~60 tiles, have each agent write `tools/photos/work/tags/<manifest>.json`, and validate it with `python -I tools/photos/validate_tags.py <file>` (vocabulary tags only, 3–14 per tile, every manifest id present).
+4. Merge into `photo-tags.json`; `tools/photos/work/` is git-ignored. Add words agents wanted to the vocabulary before the next pass.
 
-`tools/legacy/` contains destructive or one-time migration utilities retained only for provenance. Do not run them during normal builds. In particular, `cap-original-images.py` has already been run; re-encoding those originals was measured and rejected.
+### Discovery covers
 
-Discovery uses a 7 KB-budget external bootstrap (Oct 2026: cold-submit and IME handoff guards) and defers the atlas until it approaches the viewport or receives interaction. The photo index retains version 2 and adds a `variants` string, one digit per photo: 0 keeps the thumbnail, 1 offers its verified 480px sibling and original, 2 also offers its verified 800px sibling. Existing src/thumb paths supply the candidate URLs; custom crops and video posters never switch images. This keeps responsive metadata under 1 KB without expanding the index budget.
+- Topics: `journals/explore-themes.json`. Covers come only from the reviewed pool in `journals/explore-covers.json`, so a new search tag cannot become a cover.
+- Review each topic against the actual 8:5 card crop. Record photo id, thumbnail path, SHA-256, focal point (0–100%) and visible topics. Re-inspect a changed image's crop before updating its digest.
+- The build rejects missing photos, animations, duplicate ids, unknown topics and changed thumbnails. All covers must fit the index budget.
+- Use specific topic labels such as **bubble tea**. Keep six cards per batch and the lazy-loading budgets. Postcards show place · year, no "Photo:" prefix.
 
 ### Source-of-truth rules
 
 - Edit source files, never `dist/`.
-- `tools/site/build.ps1` owns the generated document head and cache-busting versions.
-- `tools/site/verify.ps1` independently checks generated content and private-artifact exclusions.
-- `images-webp/` stays tracked so CI does not depend on Pillow or nondeterministic recompression.
+- `build.ps1` owns the document head and cache-busting versions.
+- `verify.ps1` independently checks generated content and private-artifact exclusions.
+- Keep `images-webp/` tracked so CI needs no Pillow or nondeterministic recompression.
 
 ## Behaviour contracts
 
-This document records site behavior that is easy to break accidentally and difficult to infer from the markup alone. It is not a second build guide or task history.
-
-Read [`AGENTS.md`](AGENTS.md) first. Use [Build and deployment](#build-and-deployment) for build, deployment, images, and repository-size work; and [Travel journals](#travel-journals) plus the complete [`journals/_template.html`](journals/_template.html) for journal authoring.
+Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) first; see [Build and deployment](#build-and-deployment), and for journals [Travel journals](#travel-journals) plus all of [`journals/_template.html`](journals/_template.html).
 
 ### Architecture
 
-- This is a static HTML site based on the Massively theme. Root HTML files are legacy sources; `tools/site/build.ps1` generates `dist/`.
-- Shared behavior belongs in `assets/css/custom.css`, `assets/js/`, and generated-page partials. Marker-bounded route CSS remains authored in `custom.css`; the build extracts it into page-specific generated bundles. Upstream Sass in `vendor/massively/sass/` is reference material, not the active CSS source.
-- Travel journals are content fragments registered in `journals/manifest.json` and rendered through `partials/travel-journal.html`.
-- Preserve public URLs, responsive behavior, accessibility, and the existing visual language unless Nicholas explicitly requests a change.
+- Static Massively-theme site; root HTML is legacy source; `tools/site/build.ps1` generates `dist/`.
+- Shared code: `assets/css/custom.css`, `assets/js/`, generated-page partials.
+- Marker-bounded route CSS lives in `custom.css`; the build splits it into page bundles.
+- `vendor/massively/sass/` is reference only.
+- Journals: fragments in `journals/manifest.json`, rendered by `partials/travel-journal.html`.
+- Keep public URLs, responsiveness, accessibility and visual language unless Nicholas asks.
 
 ### Site-wide behavior
 
-- Custom 404 output uses root-relative assets and recovery/navigation links so nested nonexistent paths remain usable. Fragment links remain local.
-- Skills summaries carry no links (owner decision, Oct 2026: the inline "View … case study" links were removed; do not add them back) and their details are always visible at every width. The phone disclosure toggles, eyebrows, tag lists and tool-logo lists were dead markup hidden at every width and were removed with their CSS and script (Oct 2026); `verify.ps1` now fails if any of it returns. The three Skills section headings (Skills, Tech stack, Education) share one quiet left-aligned Merriweather style at every width.
-- Page changes (Oct 2026, owner-approved after a lab trial).
-  - Content pages no longer wait under the theme's black load overlay (`#wrapper.fade-in::before`: a 0.75s hold, then a 1s fade on every page). The homepage keeps the overlay, because its intro already sits above it.
-  - Where cross-document view transitions are supported (Chrome/Edge 126+, Safari 18.2+), the next page arrives in one 220ms crossfade. Areas identical on both pages, such as the header and nav, look still.
-  - The desktop active-tab highlight is a separate empty `.nav-active-mark` that the build adds after the active link, so it glides to the new tab. `assets/js/page-transitions.js` loads in `<head>` so its `pagereveal` listener exists before first paint. It keeps the mark out of a change when the mark would fly instead of glide: when it is off-screen on either page (scrolled, Back to a scrolled spot, or an `#anchor` landing), on event pages (House and Pre-Wedding drop the header, so their nav sits higher), and on the homepage while its intro fade is still up.
-  - Other browsers load pages normally, and reduced motion gets no transition.
-  - Do not name `#main` or other large regions. A geometry morph between pages of different heights, or from a scrolled position, read as a blank followed by a fade in the trial. A directional content drift was dropped as decorative, and a Ctrl/⌘K jump palette was shelved: five tabs, and Travel has its own search.
-- Ordinary interface motion uses the duration and easing tokens in `assets/css/custom.css`: quick feedback is 150ms, card and navigation feedback is 220ms, image treatments are 320ms, listing reveals are 480ms with a 60ms stagger, and large spatial moves may use 520ms. Keep bespoke functional sequences such as the scramble, timeline FLIP, mobile navigation sheet, and atlas fly-to on their documented timings rather than forcing them onto the shared card rhythm.
-- Primary-page pagers stay visually unboxed, but use a short teal direction rule and small arrow travel so the previous/next destinations remain discoverable above the footer. Reduced motion keeps those states static. Pager text aligns with the page column (x=208 on desktop, the footer label's 29px on phones) through `--pager-pad`; the journal pager's "Next" rule sits under the right-aligned text (the `a.travel-pagination__next::after` selector must outrank `.travel-pagination a::after`), and `#main > .travel-pagination` restates the 1px soft border because the theme's `#main > *` 2px rule otherwise wins (Oct 2026).
-- Hover is teal, never the theme's `#18bfef` (Oct 2026): `custom.css` overrides `a:hover`/`button:hover` to brand-700 with equal specificity and `!important`, nav and footer links and icon rings take brand-200 on their dark chrome, and the atlas zoom, region and close buttons pin white text. `#header a:hover` keeps the theme colour by choice. Real `<button>`s and `[role="button"]`s share the `a:focus-visible` teal ring; the archive card ring is teal, not grey.
-- Small uppercase labels share `--eyebrow-size` (`max(var(--text-floor), 0.7rem)`) and `--eyebrow-tracking` (0.12em) in brand-700: atlas and Japan eyebrows, the search label, the archive eyebrow, internship labels, journal day dates, pager spans and the footer "Contact". Controls share `--radius-control` (0.3rem). Day-strip pills are Source Sans 700 with a brand-600 active pill at every width; the former `#333` greys are `--color-ink-800`. "Browse photos" uses the map-heading scale (1.1rem/900). Lightbox captions use 1.5 leading and the context line floors at 12px.
-- Fonts (Oct 2026): Source Sans Pro ships at 700 (latin, `tools/fonts/subset-source-sans.py` from the Source Sans 3 variable font) and 900, so authored weights resolve honestly: small labels request 700, titles 900, and `.travel-map__place` stays an explicit 900 because the atlas collision layout is tuned to that width. Every page preloads the Source Sans 900 face, journals also preload Raleway, and `--font-display` names the size-adjusted `"Source Sans Fallback"` (Arial at 86%/97%) so a cold load does not reflow headings or the nav.
-- Skills intentionally begins directly with its content instead of a generated section banner. Its small `Capabilities` eyebrow supplies hierarchy without adding another surface, and phone descriptions retain a 12px floor.
-- At phone and tablet breakpoints, primary calls to action, map controls, and archive actions keep a 3rem touch target. Dense atlas pins may use transparent hit halos and region controls instead of enlarging overlapping visible dots.
-- The lightbox and mobile navigation sheet are modal dialogs. Preserve focus-on-open, trapped Tab navigation, Escape/close behavior, focus restoration, and frozen background scroll when editing `gallery.js` or `main.js`. The lightbox uses a quiet backdrop fade and content fade/scale; reduced motion resolves both immediately. Its backdrop is 0.98 alpha (Oct 2026, up from 0.96): on phones the day heading and route button showed through behind the zoom controls. On phones, its top image tools and bottom previous/next controls occupy reserved safe-area-aware bands instead of obscuring the media. Wide still images in portrait orientation expose an optional landscape-view toggle; while active, the caption leaves image layout but remains available to assistive technology, and an Info toggle reveals it upright in a temporary panel without resizing the image. Zoom buttons, double-tap zoom, two-finger pinch, and panning share one bounded 1–3× transform. At fitted scale, touch and pen users swipe horizontally through the same circular media sequence as the arrow controls; once zoomed, a one-finger drag pans instead. Keyboard arrows follow the same split: they page through media at fitted scale and pan a zoomed still by a fifth of the viewport per press. A tap or click on the empty area beside the media closes the viewer — including the letterbox inside the full-screen viewport, but never a drag release or a drag inside the revealed caption panel — while taps on the media itself do not. When a zoom limit disables the focused zoom button, focus hands off to the opposite one so keyboard operation never drops to the page. Video tap-to-pause remains distinct and videos do not expose still-image tools.
-- The pre-wedding hero wordmark intentionally uses private-use Wedding-font glyphs. Do not “correct” its unusual DOM text; its accessible name is `Nicholas and Yingxian` through `role="img"` and `aria-label`.
-- Do not add fixed image dimensions to `.content-image` masonry tiles when they would distort the gallery. Preserve useful alt text, lazy loading below the fold, and visible subjects at both desktop and mobile crops.
-- Near-duplicate photos in galleries are deliberate (owner decision, Oct 2026). Do not remove them as redundant; edit individual photos instead.
-- New links that open another tab need `rel="noopener noreferrer"`.
-- Phone text keeps a 12px floor through `font-size: max(var(--text-floor), <rem>)`. `--text-floor` is 12px at ≤736px and 0 above it, so wider screens keep their authored sizes; a bare `max(12px, …)` would also enlarge laptop text, because the root is 11pt (14.67px) at ≤1280px. Atlas place labels on the map canvas are the exception: their collision layout is tuned to the current size.
-- `html` carries `overflow-x: clip`, so `body { overflow: hidden }` no longer stops page scroll. The nav sheet and atlas overlay lock the root through `html:has(> body.is-navPanel-visible)` / `html:has(> body.is-map-fullscreen)`; the lightbox keeps its own fixed-body lock.
-- Work that depends only on width (card measurement, gallery scroll cues, the intro swipe's `measure()`, the homepage canvas bitmap) skips height-only resizes, which phones fire whenever the URL bar shows or hides.
+- 404 uses root-relative assets and nav links so nested paths work; fragment links stay local.
+- New-tab links need `rel="noopener noreferrer"`.
+- Skills (owner decisions): summaries have no links (no "View … case study"); details always visible; no phone toggles, eyebrows, tag lists or tool-logo lists (`verify.ps1` enforces).
+- Skills, Tech stack, Education headings: one quiet left-aligned Merriweather style.
+- Skills has no generated banner; its `Capabilities` eyebrow gives hierarchy.
+- Page changes (owner-approved):
+  - Content pages skip the load overlay (`#wrapper.fade-in::before`); the homepage keeps it.
+  - Cross-document view transitions (Chrome/Edge 126+, Safari 18.2+): one 220ms crossfade; shared header and nav stay still. Elsewhere, and under reduced motion: none.
+  - Desktop active tab: build-added empty `.nav-active-mark` after the active link, so it glides.
+  - `assets/js/page-transitions.js` loads in `<head>` so `pagereveal` binds before first paint.
+  - Mark sits out when it would fly: off-screen on either page (scroll, Back, `#anchor`), House and Pre-Wedding (no header), homepage during the intro fade.
+  - Never name `#main` or other large regions (morph shows a blank).
+  - Rejected: content drift; Ctrl/⌘K palette.
+- Motion tokens (`custom.css`): 150ms feedback, 220ms card/nav, 320ms images, 480ms reveals (60ms stagger), 520ms large moves. Scramble, timeline FLIP, nav sheet, atlas fly-to keep their own timings.
+- Primary pagers: unboxed, short teal rule, small arrow travel; static under reduced motion.
+- Pager text aligns via `--pager-pad` (x=208 desktop, 29px phones).
+- `a.travel-pagination__next::after` must outrank `.travel-pagination a::after` (rule under right-aligned "Next").
+- `#main > .travel-pagination` restates the 1px soft border over the theme's `#main > *` 2px.
+- Hover is teal, never `#18bfef`: `a:hover`/`button:hover` → brand-700, equal specificity, `!important`.
+- Brand-200 for nav, footer links, icon rings on dark chrome; white text on atlas zoom, region, close buttons.
+- `#header a:hover` keeps the theme colour by choice.
+- `<button>` and `[role="button"]` share the `a:focus-visible` teal ring; archive card ring is teal.
+- Small uppercase labels: `--eyebrow-size` (`max(var(--text-floor), 0.7rem)`), `--eyebrow-tracking` (0.12em), brand-700 (atlas/Japan/archive eyebrows, search label, internship labels, day dates, pager spans, footer "Contact").
+- `--radius-control` (0.3rem) for controls; `--color-ink-800`, not `#333`.
+- Day-strip pills: Source Sans 700, brand-600 active.
+- "Browse photos": 1.1rem/900. Lightbox captions: 1.5 leading, context line ≥12px.
+- Source Sans Pro ships 700 (latin, via `tools/fonts/subset-source-sans.py` from Source Sans 3) and 900; labels use 700, titles 900.
+- `.travel-map__place` stays explicit 900 (atlas collision layout).
+- Preload Source Sans 900 everywhere, Raleway on journals. `--font-display` uses size-adjusted `"Source Sans Fallback"` (Arial 86%/97%) against cold-load reflow.
+- Phone floor: `font-size: max(var(--text-floor), <rem>)`; `--text-floor` is 12px at ≤736px, else 0.
+- Never bare `max(12px, …)` (the 11pt root at ≤1280px would grow laptop text), except the atlas text listed under Travel atlas contracts. Atlas canvas labels are exempt from the floor.
+- Phone/tablet: CTAs, map controls, archive actions keep 3rem targets; dense atlas pins may use transparent halos and region controls instead.
+- Lightbox and nav sheet are modal: in `gallery.js`/`main.js` keep focus-on-open, Tab trap, Escape/close, focus restore, frozen scroll.
+- Lightbox: quiet backdrop and content fade/scale, instant under reduced motion. Backdrop 0.98 alpha so phone zoom controls stay clear.
+- Phones: tools and prev/next in reserved safe-area bands, never over media.
+- Wide stills in portrait: optional landscape toggle; caption leaves layout but stays accessible; Info shows it upright in a temporary panel without resizing.
+- Zoom buttons, double-tap, pinch, pan: one bounded 1–3× transform.
+- Fitted: swipe and arrow keys page one circular sequence. Zoomed: one-finger drag pans; arrows pan a fifth of the viewport.
+- Tap/click on empty space beside media (letterbox included) closes; drag releases, caption-panel drags and media taps do not.
+- A zoom limit disabling the focused button moves focus to the other.
+- Video tap-to-pause stays distinct; no still tools on video.
+- Pre-wedding wordmark uses private-use Wedding-font glyphs deliberately; never "correct" it. Name `Nicholas and Yingxian` via `role="img"` + `aria-label`.
+- No fixed dimensions on `.content-image` masonry tiles if they distort.
+- Keep useful alt text, below-fold lazy loading, visible subjects on desktop and mobile crops.
+- Near-duplicate gallery photos are deliberate (owner decision): edit, never remove.
+- `html` has `overflow-x: clip`, so `body { overflow: hidden }` cannot stop scroll. Lock the root via `html:has(> body.is-navPanel-visible)` / `html:has(> body.is-map-fullscreen)`; the lightbox keeps its fixed-body lock.
+- Width-only work (card measurement, gallery scroll cues, intro swipe `measure()`, canvas bitmap) ignores height-only (URL-bar) resizes.
 
 ### Homepage contracts
 
 - Keep the scroll animation and background canvas.
-- The canvas carries calm signals (Oct 2026, owner-approved after a lab trial): the particle network is unchanged, and every few seconds one small bright signal hops up to four links between nodes, each node it reaches glowing briefly, then rests about two seconds. The signal is clipped out of the hero text block (name to CTA) so it never crosses the name or headline. Rejected in the same trial and not to be proposed again: a labelled agent-graph canvas with captions ("too messy") and a letter-by-letter name rise (hid the name in the first-impression window and from LCP).
-- The hero is `100lvh` so the opening phone screen stays fully black in both URL-bar states. On phones its bottom padding also absorbs the `lvh`-minus-`svh` difference, so the hero content stays centred in the visible window while the URL bar is shown; desktop resolves that to the plain 4rem padding. `initHeroSnap` in `game.js` is phone-only: a scroll that settles partway across the gated band glides to the About section's measured document top (900ms, ease-in-out; a new touch or wheel input cancels it), where the portrait completes its rightward sweep into the settled layout. Measure that real section offset rather than assuming it equals the hero height, because intervening layout spacing otherwise leaves the glide short. Forward snapping keeps the 90ms momentum debounce; reverse uses the first 32ms timer after upward intent instead of repeatedly debouncing momentum, so it starts promptly after touch release while remaining interruptible. Desktop and reduced motion scroll plainly — do not reintroduce CSS mandatory snap, which cannot be slowed and fights the scroll-driven About swipe.
-- The hero contains the name, one scrambling headline, one short support line, and the selected-work CTA. The current copy is:
+- Canvas (owner-approved): particle network plus, every few seconds, one signal hopping up to four links, lighting nodes, resting ~2s; clipped out of the hero text (name to CTA).
+- Never propose again: labelled agent-graph canvas; letter-by-letter name rise (hurt LCP).
+- Hero is `100lvh` so the phone opening stays black in both URL-bar states.
+- Phones only: bottom padding absorbs `lvh` − `svh` to keep content centred; desktop is plain 4rem.
+- `initHeroSnap` (`game.js`), phones only: a scroll settling mid-band glides to About's measured document top (900ms, ease-in-out), finishing the portrait sweep; touch or wheel cancels.
+- Measure About's real offset, not hero height, or the glide falls short.
+- Forward snap: 90ms momentum debounce. Reverse: first 32ms timer after upward intent.
+- Desktop and reduced motion scroll plainly. Never reintroduce CSS mandatory snap (unslowable, fights the About swipe).
+- Hero: name, scrambling headline, support line, selected-work CTA.
   - Headline: `I build agentic AI products for real-world security operations.`
   - Support: `Product direction · DSTA`
-- The headline is owner-approved product copy. Propose copy changes instead of silently rewriting it. Do not restore the rejected multi-line paragraph hero or a skills list in the hero.
-- The site has exactly three scramble effects: the homepage headline and both Outcome rows on the experience page. All use `assets/js/scramble-reveal.js`; do not add another or remove one as incidental cleanup.
-- Preserve the scramble’s current constraints: it plays once, finishes in about 1.2 seconds, keeps opening words readable from the first frame, renders full-length width-matched noise to avoid reflow, and leaves real text in the DOM. Its enhanced visual is seeded with that noise frame so it never flashes the complete sentence before scrambling. Reduced motion skips the effect. The homepage starts after its text has remained visible for a brief 180ms hold. Experience-card observers arm 150ms after `DOMContentLoaded` (`PAGE_REVEAL_DELAY_MS`; content pages no longer have a load fade), then require 70% of the Outcome row to remain visible for the same hold; leaving the viewport during that hold cancels it. Do not tie either trigger to image-dependent `load` timing.
-- The theme’s load fade can cover the hero. Preserve the homepage intro stacking fix when changing hero layers or entrance effects.
-- On mobile, the About photo remains low and bottom-anchored because `game.js` derives swipe progress from its settled position. The phone scene occupies exactly one `svh` viewport and is not sticky: its photo-driven entry reaches the settled layout at the About section top, so the following cards move with the very next scroll instead of sitting behind a completed 22vh pin. Desktop retains the taller sticky scrub and centers the About cluster. Do not normalize those layouts into one shared vertical alignment.
+- Headline is owner-approved: propose, never silently rewrite. No multi-line paragraph hero or hero skills list.
+- Exactly three scrambles via `assets/js/scramble-reveal.js`: homepage headline, both experience Outcome rows. Never add or remove one incidentally.
+- Scramble: once, ~1.2s, opening words readable from frame one, full-length width-matched noise, real text in the DOM, visual seeded with noise (no sentence flash). Reduced motion skips it.
+- Homepage trigger: 180ms visible hold. Experience: observers arm 150ms after `DOMContentLoaded` (`PAGE_REVEAL_DELAY_MS`), then 70% of the Outcome row visible for the same hold; leaving cancels.
+- Never tie either trigger to image `load`.
+- Keep the intro stacking fix (load fade can cover the hero) when changing hero layers or entrances.
+- Phones: About photo stays low and bottom-anchored; `game.js` reads swipe progress from it.
+- Phones: scene is one `svh`, not sticky, settling at the About top so cards follow the next scroll.
+- Desktop: taller sticky scrub, centred About cluster. Never unify the two.
 
 ### Experience page contracts
 
-- The generated `Agentic AI Product Lead for Threat Hunting` page headline remains visible on desktop but is hidden on phones, where the first DSTA card owns that full title. Both DSTA cards use the same phone reading order: company context, title, Problem/My role/Outcome rail, supporting copy, then capability tags. Cloud Analytics uses `display: contents` for its header only at the phone breakpoint so its lede can follow the rail without changing the established two-column desktop composition.
-- The Cloud Anomaly card ends with an anomaly peek (Oct 2026, owner-approved after a lab trial; `assets/js/anomaly-peek.js`, styles in the experience bundle). A one-line call to action ("See an anomaly get caught · hover a chart", "tap a chart" on phones) sits above two chips, Over time and Across connections, each holding a tiny live preview that plays about four seconds when the card enters view, rests on its amber flag and glows the chip once (at most every 20 seconds). Hover, focus or tap opens only that chip's chart: on desktop a floating card below the chips that never covers the writeup, on phones (at most 736px) an inline card that pushes the page down. A click or tap pins it; hovering the other chip previews that one and the pin returns. Both cards are the same size, carry one plain note each and no "simulated" disclaimer (owner: "it's obvious"). A chart animates only while open and on screen; reduced motion shows still frames. Do not put both charts on the card at once or overlay the writeup: both were rejected as overwhelming.
+- Generated `Agentic AI Product Lead for Threat Hunting` headline: shown on desktop, hidden on phones (first DSTA card holds the title).
+- DSTA cards on phones: company context, title, Problem/My role/Outcome rail, copy, tags.
+- Cloud Analytics header is `display: contents` at the phone breakpoint only; desktop stays two-column.
+- Cloud Anomaly ends with an anomaly peek (owner-approved; `assets/js/anomaly-peek.js`, experience bundle).
+- CTA "See an anomaly get caught · hover a chart" ("tap a chart" on phones) above chips Over time and Across connections.
+- Chip previews play ~4s on entering view, rest on the amber flag, glow once (max every 20s).
+- Hover, focus or tap opens only that chart: desktop, a floating card below the chips, never over the writeup; phones (≤736px), an inline card pushing content down.
+- Click/tap pins; hovering the other chip previews it, then the pin returns.
+- Equal-size cards, one plain note each, no "simulated" disclaimer (owner).
+- Charts animate only while open and on screen; reduced motion shows stills.
+- Never show both charts at once or overlay the writeup.
 
 ### Travel journal contracts
 
-- Lightbox loading refinements (Oct 2026): demote the previous viewing-size request when navigation changes, retaining the bounded cache for quick reversals. A cold journal fallback selects the smallest responsive preview. Zoom retains that photo's decoded preview until the original decodes; leaving the photo, closing, returning to fit or switching orientation mode cancels its pending zoom upgrade. Pointer pan release refreshes click suppression after a real drag, even after a stationary hold, while explicit controls remain immediately usable.
-
-- Journal mastheads use a book icon and visible `Travel journals` label linking to `travel`, through `partials/travel-masthead.html`. The chosen masthead appears on phones and desktop; keep the day strip separate and preserve its sticky scrolling behavior. Other page mastheads retain Home. This adds no JavaScript or external icon request. On phones the masthead band is compact (about 56px, the pill keeps its 44px tap height) and the hero's top padding, date and lede margins are tightened so a journal banner starts within roughly 280px of the top (Oct 2026: it used to start at 368–394px, 60% chrome before the first photograph). Desktop spacing is unchanged.
-- The floating return-to-top control is hidden at the phone breakpoint on the travel page and every journal, as it already was on Personal (Oct 2026): it covered archive cards, gallery captions and the route disclosure button.
-- Guangzhou is the compact reference implementation. New and structurally updated journals remain content-only fragments; the build supplies the document shell, navigation, footer, styles, and scripts.
-- Preserve `data-journal-template="v2"` and the four tokens in `partials/travel-journal.html`: `{{MAIN_ATTRIBUTES}}`, `{{TRIP_NAVIGATION}}`, `{{JOURNAL_CONTENT}}`, and `{{TRIP_PAGINATION}}`.
-- Follow the class combinations and markup hierarchy in `journals/_template.html`, including the generic `travel-*` classes and `guangzhou-*` compatibility classes. Heading order is structural because the build derives section and map anchors from it.
-- Journal date ranges use four-digit years: `D Month YYYY – D Month YYYY`, or `Month YYYY – Month YYYY` when exact days are unknown. Compact ranges elsewhere (archive cards, atlas, Personal metas) use a spaced en dash with the year once: `October – November 2025`, `23 – 31 July 2018`. Work and education metas use full month names and "months", never "mos".
-- Copy conventions (Oct 2026): British spelling; serial comma; "Washington, D.C."; "Yingxian" on first mention; arrival days are Day 1 (Perth was renumbered from Day 0); Silicon Valley chapter headings carry no "#N -" prefix (the Chapter slot numbers them); Guangzhou tiles with a Chinese name use the 汉字 title and a "Pīnyīn · description" caption; journal `<title>`s are "Nicholas Wan - {label} Trip" and meta descriptions follow "Nicholas Wan's [Place] travel journal from [Month YYYY]: [stops]."; the atlas names trips by journal label (Perth, Europe, Silicon Valley, Seoul), with the region in brackets where one journal has two pins; actions say "View …" (not "See"/"Visit"); the 404 title follows the "Nicholas Wan - …" pattern and its cards use the nav names.
-- Use focal-point custom properties for banner and gallery crops. Tall collage cards reserve two 4:3 desktop rows plus the 1rem gutter with width-based padding; their absolutely positioned content cannot feed its natural image height back into grid row sizing. This also preserves the second row in sparse galleries. On phones, padding and absolute positioning reset so image and caption size normally. Tall-grid browser checks cover every journal using this treatment. `gallery.js` gives every journal gallery `role="list"` with an `N photos` label and each tile `role="listitem"` (Oct 2026), so a screen reader hears the count instead of 27 consecutive unlabelled buttons. Phone galleries keep a persistent counter and previous/next arrow buttons in normal flow above the photos. Native swiping remains available, with an unfaded preview of the next tile; the old animated swipe hint and edge mask are retired. Arrows stop at each end, single-photo galleries disable both, and reduced motion advances immediately. The counter reports the nearest tile and total, including the final tile at the scroll limit. Phone bricks use actual content sizing (`content-visibility: visible`, no intrinsic placeholder): the generic 320px offscreen estimate otherwise stretches the whole horizontal row below the image and caption. Lazy media loading remains enabled. Journal narrative paragraphs are limited to 70ch on desktop.
-- Journal hero titles use title case, upright Raleway, and the shared 3.5rem cap (`clamp(2.25rem, 6vw, 3.5rem)`). The lede is set at 1.65 leading with `text-wrap: balance` (Oct 2026): the theme's 2.4× hero leading made a wrapped lede read as two paragraphs with a two-word orphan line on Seoul, Germany and Silicon Valley. Japan retains its separate editorial hero. Existing artwork banners are preserved. The date sits 1.5rem above the title and the journal article opens with 2.5rem top padding on desktop.
-- Journal day headings retain their full titles. Optional `data-nav-label` supplies a concise pill label; the build prefixes actual day headings with D0, D1, etc. Every journal's pills sit in one trip group in section order; only Australia splits into Melbourne and Sydney. Europe's former country grouping in `build.ps1` matched only the "Netherlands" city label and pushed D4 into a trailing second group after D8; it is gone (Oct 2026). Chapter/place journals keep their own meaning. Day entries, including departures and repeated destinations, remain individually reachable. A day with a single photo remains an ordinary quarter-width tile (owner decision). Route-stop subtitles use `--color-ink-600`.
-- Phones initially show the first and last route stop plus a “View all N stops” disclosure. The collapsed summary shows each stop's name and its `<small>` subtitle joined by a middle dot (`樟宜机场 · Zhāngyí Jīchǎng → …`), because the authored name is native script in Guangzhou and Japan and the pinyin or English lives only in the subtitle (Oct 2026); stops without a subtitle show the name alone. The summary and Australia's intro paragraph are left-aligned at the phone breakpoint, because the theme's justified `p` leaves rivers in a narrow column (Oct 2026); day notes were already left-aligned. Every route box is labelled `Route` (Seoul said `Places` until Oct 2026). Australia keeps its older header markup without a lede; its header has a 2.5rem bottom margin (an inline `margin:0 !important` used to press the banner against the Melbourne heading) and its intro paragraph takes the day-note treatment (Oct 2026). Every route uses the shared enhancement, including older journals without authored buttons. Expansion reveals the complete bilingual numbered timeline; collapsed stops are hidden from assistive technology. Desktop retains wrapped-route expansion.
-- Chengdu & Zhangjiajie tile captions are place names only, with no descriptive second line (owner decision, Oct 2026): the title names where the photo was taken, so the gallery reads as a map of the day rather than a commentary.
-- Journal banners share one height, `clamp(16rem, 28vw, 22rem)` with a 22rem wrapper cap, the frame Japan already used (Oct 2026, owner-approved): the earlier 27rem cap made a 1920px window open on a 576px banner starting ~764px down, so the first screen showed only its top sliver and Day 1 sat about 1.5 screens away. Phones keep their own heights and contain-fit wrappers.
-- Journal banners use one shared pale placeholder. Wide contain-fit artwork sizes its mobile wrapper to the image's natural ratio; do not add a dark wrapper background, which appears as a black flash or exposed band while the responsive source settles.
-- Japan uses a left-aligned editorial title block above its full-bleed banner: a small `Travel journal` eyebrow, a title-case Raleway destination title, the trip dates, and the lede. The banner is the text-free Arakurayama frame (rebuilt Oct 2026 from `day14_hakone/fuji2.jpg`, which also stays in the gallery by owner choice) and is framed at `50% 52%` to keep Fuji's summit in view; do not put another title over the photograph.
-- The journal lightbox keeps at most five decoded viewing-size images while open. It displays a prepared image immediately; otherwise it shows the responsive tile while requesting the current fitted image immediately at high priority. One neighbour in the navigation direction starts in parallel at low priority so a slow current decode cannot stall the next swipe. After the current image is decoded, preparation extends to two neighbours ahead and one behind; videos retain their separate poster/playback path. Stale loads cannot replace another image or override zoom. Closing releases the decoded cache. Zoom still fetches the original. Adjacent tiles are also warmed, and fit remains stable across source upgrades. Near-viewport phone gallery rows explicitly warm the current tile, two ahead and one behind their horizontal clip; scroll measurement runs once per animation frame. Animation posters warm near the viewport, but video playback requires actual visibility and pauses while the lightbox or a hidden tab prevents reading it. The polite, atomic caption keeps the place name and adds section/day context plus its position within that section; a visually hidden middle dot separates the two, because the context sits on its own line visually but ran into the caption when announced (`…京都勝牛 Hiroshima · 1 of 16`, Oct 2026). Hiding the focused Info control transfers focus to the dialog close button before hiding it, including on orientation changes. Run `node --test tools/tests/lightbox-cache.test.cjs` for download/decode ordering, cache bounds, direction, failure, zoom and close regressions.
-- Journal animations are MP4 tiles whose `poster` the build renames to `data-poster`; `gallery.js` attaches it near the viewport and before the lightbox opens. A literal `poster` attribute downloads at page load even under `preload="none"` (USA/Canada: 37 stills, ~1.5 MB before any scroll). Gallery tiles use 480w previews on phones (a density-capped 160px slot up to DPR 3) to reduce scroll-time transfer contention, and the measured `20vw` desktop slot. The lightbox independently upgrades viewing resolution and zoom still loads the original; see [Build and deployment](#build-and-deployment).
-- Journal section links use the measured sticky-toolbar correction in `assets/js/travel-nav.js`, aligning the date above the heading when present. Keep one horizontally scrollable row. Desktop earlier/later arrow buttons expose overflow and are hidden (`hidden` attribute) while the strip does not overflow, rather than rendering as two dimmed disabled buttons on short journals such as Guangzhou and Japan (Oct 2026); phones retain their right-edge fade. Scrollspy centres only the horizontal strip. ResizeObserver refreshes edge controls after font and layout changes.
+- Guangzhou is the reference; journals are content-only fragments the build wraps.
+- Preserve `data-journal-template="v2"` and `partials/travel-journal.html` tokens `{{MAIN_ATTRIBUTES}}`, `{{TRIP_NAVIGATION}}`, `{{JOURNAL_CONTENT}}`, `{{TRIP_PAGINATION}}`.
+- Follow `journals/_template.html` classes and hierarchy (`travel-*`, `guangzhou-*` compatibility). Heading order is structural (it derives section and map anchors).
+- Masthead (all sizes): book icon, `Travel journals` link to `travel` via `partials/travel-masthead.html`; no JS or external icon. Other pages keep Home. Day strip stays separate and sticky.
+- Phones: ~56px masthead (44px pill), tight hero spacing, banner within ~280px of the top.
+- Return-to-top hidden on phones (travel and journals).
+- Dates: `D Month YYYY – D Month YYYY` or `Month YYYY – Month YYYY` if days unknown. Compact ranges (archive, atlas, Personal metas): spaced en dash, year once (`October – November 2025`, `23 – 31 July 2018`). Work/education metas: full months, "months", never "mos".
+- Copy: British spelling; serial comma; "Washington, D.C."; "Yingxian" on first mention; arrival is Day 1; no "#N -" on Silicon Valley chapter headings; Guangzhou Chinese-name tiles use 汉字 title, "Pīnyīn · description" caption; actions say "View …", not "See"/"Visit".
+- `<title>` "Nicholas Wan - {label} Trip"; meta "Nicholas Wan's [Place] travel journal from [Month YYYY]: [stops]."; 404 title "Nicholas Wan - …", cards use nav names.
+- Atlas uses journal labels (Perth, Europe, Silicon Valley, Seoul), region in brackets where a journal has two pins.
+- Chengdu & Zhangjiajie captions: place names only (owner decision).
+- Hero: title-case upright Raleway, `clamp(2.25rem, 6vw, 3.5rem)`; lede 1.65 leading, `text-wrap: balance`; date 1.5rem above; desktop article top padding 2.5rem. Keep artwork banners.
+- Japan's editorial hero: left-aligned `Travel journal` eyebrow, title, dates, lede, above a full-bleed text-free Arakurayama banner (`day14_hakone/fuji2.jpg`, also in the gallery, owner choice) at `50% 52%`. No title over the photo.
+- Banners: `clamp(16rem, 28vw, 22rem)`, 22rem wrapper cap (owner-approved); phones keep own heights and contain-fit wrappers. Shared pale placeholder; wide contain-fit art sizes its mobile wrapper to natural ratio. Never a dark wrapper background (black flash).
+- Crops use focal-point custom properties. Tall collage cards reserve two 4:3 desktop rows plus 1rem gutter via width-based padding; phones reset it. Tall-grid checks cover every such journal.
+- `gallery.js`: gallery `role="list"` labelled `N photos`; tiles `role="listitem"`.
+- Phone galleries: counter and previous/next arrows in flow above photos; native swipe, unfaded next-tile preview, no swipe hint or edge mask; arrows stop at ends, disabled for single photos; reduced motion jumps; counter shows nearest tile/total, last included at the scroll limit.
+- Phone bricks: `content-visibility: visible`, no intrinsic placeholder (the 320px estimate stretches rows). Keep lazy loading.
+- Desktop narrative max 70ch. Single-photo days stay quarter-width tiles (owner decision).
+- Day headings keep full titles; optional `data-nav-label` sets the pill; build prefixes D0, D1…. One pill group in section order; only Australia splits (Melbourne, Sydney); no country grouping in `build.ps1`. Chapter/place journals keep their meaning. Every day (departures, repeats) stays reachable.
+- Route subtitles use `--color-ink-600`. Every route box is labelled `Route` and gets the shared enhancement.
+- Phone routes: first and last stop plus "View all N stops"; summary joins name and `<small>` subtitle with a middle dot (`樟宜机场 · Zhāngyí Jīchǎng → …`), name alone if none. Expanded: full bilingual numbered timeline; collapsed stops hidden from assistive tech. Desktop keeps wrapped expansion.
+- Phone route summary and Australia's intro are left-aligned. Australia keeps its lede-less header, 2.5rem bottom margin, day-note intro.
+- Lightbox: at most five decoded viewing-size images; closing releases them.
+- Show a prepared image at once; else the tile, while the fitted image loads at high priority and one directional neighbour at low priority in parallel. After decode, prepare two ahead, one behind.
+- Navigation demotes the previous request but keeps the cache. Cold fallback: smallest responsive preview.
+- Videos keep their own path. Stale loads never replace another image or override zoom. Fit stays stable; adjacent tiles warm.
+- Zoom loads the original, holding the decoded preview until it decodes; leaving, closing, fit or orientation-mode switch cancels it.
+- Pan release after a real drag (even with a stationary hold) refreshes click suppression; controls stay usable.
+- Near-viewport phone rows warm current, two ahead, one behind; scroll measured once per frame.
+- Posters warm near the viewport; playback needs visibility (pauses under the lightbox or a hidden tab).
+- Caption (polite, atomic): place name, then section/day and position within that section, split by a visually hidden middle dot (`…京都勝牛 Hiroshima · 1 of 16`).
+- Hiding a focused Info control first moves focus to close (orientation changes too).
+- Test: `node --test tools/tests/lightbox-cache.test.cjs`.
+- MP4 animations: the build renames `poster` to `data-poster`; `gallery.js` attaches it near the viewport and before the lightbox (literal `poster` loads despite `preload="none"`).
+- Tiles: 480w on phones (160px slot, density-capped to DPR 3); `20vw` desktop. See [Build and deployment](#build-and-deployment).
+- Section links use the sticky-toolbar correction in `assets/js/travel-nav.js` (date above heading, if any). One horizontally scrollable row.
+- Desktop strip arrows get `hidden` without overflow (not dimmed); phones keep the right-edge fade; ResizeObserver refreshes them. Scrollspy centres only the strip.
 
 #### Journal scrolling contract
 
-- The horizontal pill scrollport keeps 0.25rem vertical padding inside its clipping boundary; the desktop rail's outer padding is reduced by the same amount. Keep this clearance when changing navigation spacing: pills flush with the scrollport edge can lose their lower rounded borders when scrolling back through the sticky transition (Oct 2026).
-- The self-scrolling report first appeared on iPhone, but its causes live in the shared journal shell, so the safeguards apply to every travel journal on mobile and desktop.
-- A hash landing must wait until both the document scroll position and the target heading position have settled. Late image, gallery-shell, and font layout changes may move the target; repeatedly correcting during that churn makes the page appear to scroll by itself. Once the aligned position is stable for two checks after load and fonts are ready, stop the correction loop instead of retaining control for the full deadline.
-- Any wheel, touch, pointer or keyboard input cancels the bounded landing correction. For section anchors, an otherwise unexpected document scroll also cancels it. This includes movement immediately after `load`, before an image-heavy journal has produced its first correction sample. The correction records its own expected `scrollTo` destination so its one intentional movement is not mistaken for user input. `load` and `pageshow` must not re-land an old hash after the visitor has started reading; a deliberate new section-tab selection re-arms the correction through `hashchange`.
-- Scrollspy centres the active section tab (phones, and desktop since Oct 2026) by calling `scrollTo` on `.travel-jump-groups` itself. Do not use `scrollIntoView` for a child of the sticky strip: iPhone Safari can transfer that movement to the root page and create a vertical jump.
-- The mobile rail and its embedded hamburger remain dark before and after the rail becomes sticky. Hide the wrapper-level hamburger until `travel-nav.js` moves it into the rail; otherwise the generic white floating style can flash against the black journal header.
-- `#photo=<path under images/travel, no extension; animations keep .mp4>` (for example `#photo=2023_usa_canada/day12/zoo_gif1.mp4`) is a photo deep link, the target of every search hit. `travel-nav.js` lands the tile's `.brick` through the same bounded, settle-and-stop correction as section anchors, then opens it through `window.travelGallery` from `gallery.js` (loaded first), so focus, caption, zoom and sequence behaviour stay the lightbox's own. Visitor input during the landing cancels the auto-open too. Matching uses authored `src`/`srcset`/`<source>`/`data-poster` paths, never `currentSrc`, and the id's extension decides whether a still or an animation is wanted because the two can share a basename (`SF_sutro`). When the viewer closes, the tile carries `is-deep-linked` for 1.5s; its ring is static under reduced motion. Closing never touches history. Photo landing observes layout-driven root scrolling and child gallery/section-strip scrolling without cancelling the handoff; cold mobile font/layout anchoring can move the document before the viewer opens. Physical visitor input still cancels immediately. Section-anchor landing retains its stricter unexpected-root-scroll guard.
-- All journal pages add `is-travel-journal-scroll-guard`; at the phone breakpoint it sets `overscroll-behavior-y: none` on the root and body so an upward fling at the top cannot become pull-to-refresh.
-- Regression checks cover every generated journal at desktop and phone widths: no root horizontal overflow, the shared navigation script and guard are present, section anchors exist, the sticky strip owns its horizontal overflow, and user input is never followed by an automatic re-landing.
+- Applies to every journal, all sizes.
+- Pill scrollport keeps 0.25rem vertical padding inside its clip; desktop rail outer padding drops to match. Keep it (pill borders clip otherwise).
+- Hash landing waits until document scroll and target both settle, then settle-and-stop: two stable checks after load and fonts end the loop.
+- Wheel, touch, pointer or keyboard input cancels it; for section anchors, so does unexpected document scroll, even right after `load`.
+- The correction records its own `scrollTo` target, so it is not read as input.
+- `load` and `pageshow` never re-land an old hash once reading starts; a new tab selection re-arms via `hashchange`.
+- Scrollspy centres the active tab (all sizes) with `scrollTo` on `.travel-jump-groups`. Never `scrollIntoView` a strip child: iPhone Safari jumps the root.
+- Mobile rail and hamburger stay dark throughout; hide the wrapper-level hamburger until `travel-nav.js` moves it in.
+- `#photo=<path under images/travel, no extension; animations keep .mp4>` (e.g. `#photo=2023_usa_canada/day12/zoo_gif1.mp4`) is the photo deep link (search-hit target).
+- `travel-nav.js` lands its `.brick` with the same settle-and-stop correction, then opens it through `window.travelGallery` (`gallery.js` loads first); the lightbox owns focus, caption, zoom, sequence. Input cancels the auto-open.
+- Match authored `src`/`srcset`/`<source>`/`data-poster`, never `currentSrc`; extension picks still or animation (shared basenames, e.g. `SF_sutro`).
+- On close the tile gets `is-deep-linked` for 1.5s (static ring under reduced motion). Closing never touches history.
+- Photo landing tolerates layout-driven root and child scrolling; physical input cancels. Section anchors keep the stricter guard.
+- Journals add `is-travel-journal-scroll-guard`: `overscroll-behavior-y: none` on root and body at the phone breakpoint.
+- Checks, every journal at desktop and phone widths: no root horizontal overflow; nav script and guard present; anchors exist; strip owns its overflow; input never followed by re-landing.
 
 ### Personal page contracts
 
-- The Latte and Mocha card links directly to `@twoshotsofcuteness` with an Instagram icon. Do not restore the hover popover, mobile phone mockup, or third-party Instagram embed.
-- Orientation and Naval Diving Unit are self-contained timeline galleries, not popup or detail-page destinations. They use the same hover lift, border, shadow, and crossfade treatment as the linked galleries while keeping a default cursor because they are not links. Orientation rotates its two real photos and NDU rotates its three; do not duplicate frames to imitate the five-photo galleries. The retired `experience_ndu` page must stay unpublished.
-- Personal card images, and every pre-wedding and house tile, carry an authored `sizes` that matches the measured slot and ship `-480`/`-800` siblings (Oct 2026): Personal `(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 85vw, (max-width: 1680px) 275px, 366px`; galleries `(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 90vw, (max-width: 767px) 76vw, (max-width: 1023px) 40vw, (max-width: 1279px) 27vw, 20vw`. The build's generic `250px` phone slot had phones fetching 1600px originals for 313px frames (house 416 KB → 195 KB at 390px; desktop Personal 1.56 MB → 0.77 MB). The DPR-3 clause caps those phones at the `-800` tier. House siblings live beside the WebP overlay under `images-webp/personal/house/`, because the build looks for siblings next to the resolved file. `verify.ps1` checks the slots and siblings. Pre-wedding phones stay on `-800` on purpose (a 331px tile at 2x needs 662 device px). `images/brawlstars/` and `images/experience/NDU/` still lack a `-480` tier.
-- Mobile timeline endpoints stay fully inside the viewport. Personal-page cards use larger mobile type, and the legacy floating return-to-top control remains hidden on that breakpoint so it cannot cover card content.
-- The five timeline galleries have no photo controls (owner decision, 17 Oct 2026: the previous / count / next / Pause row under each card was removed; do not restore it). They crossfade on hover or keyboard focus on desktop, and the card nearest the reading focus plays on touch; reduced motion holds every gallery on its first photo. The cats, house, and pre-wedding cards each rotate five photos; Orientation rotates two and NDU rotates three, all with overlapping crossfades. Desktop hover previews stay quick at one second per photo; touch autoplay uses four seconds per photo so mobile visitors can read each image. On touch, only the gallery card nearest the viewport's reading focus animates; the others hold their first image. Set the animation with longhands — the `animation:` shorthand resets `animation-delay` and collapses the stagger. On touch, a gallery's later frames stay `display: none` until `warmGallery` marks it warm (once its card is on screen, ahead of activation and the first crossfade), because the stacked lazy frames otherwise all download as each card nears.
-- Tile shapes differ per breakpoint and per photo, so each image carries its own `--focus-x`/`--focus-y`; do not reintroduce a per-class `object-position`. The Brawl Stars artwork is intentionally full-bleed and keeps a 16/9 frame when focused on mobile, which retains almost the complete artwork.
-- `object-fit: cover` crops rather than scales, so a frame only shows the whole photo when their proportions match. Six of the nine photos are 3:2 and the frames aim at that: `--image-col` widens on desktop as a card opens and focuses, and mobile moves 2/1 folded to 3/2 open. Latte & Mocha (upright) and Code in the Community (square) carry `personal-event-card--upright` to keep a squarer frame — widening those two crops them harder, not softer. Measure before retuning any ratio; the card cannot exceed ~451px, so the timeline column, not `max-width`, is the real ceiling.
-- On desktop the photo sets a floor on card height and never a ceiling, and its frames are absolutely positioned. A capped frame cannot stretch to its grid row, which leaves bare card below the photo whenever the text runs taller; letting the photo size itself instead makes an upright source stand a third taller than its neighbours.
-- Scroll promotes one card: on phones exactly one is open and every other is folded, so an unread card is already compact rather than arriving at full size, and each fold is paid for by an unfold, which keeps the page height near constant. Desktop folds only cards already read. Focus is sticky by 48px because folding moves cards, which changes which card is nearest and will otherwise flip focus back and forth.
-- Phone focus handoffs change intrinsic card height atomically. Do not animate the description height, body spacing, title margin, or image aspect ratio at that breakpoint: iPhone Safari continues momentum scrolling while those layout transitions run, so the document lurches underneath an upward flick. At reading speed, smooth only adjacent handoffs and only the outgoing/incoming pair with the short FLIP translation and clipped reveal in `personal-timeline.js`; fast or skipped-card flicks change immediately. Compositor-only opacity, transforms, and clipping are safe because they do not reflow the document.
-- Desktop fold and focus resizes share one 320ms FLIP-curve (`cubic-bezier(0.2, 0.8, 0.2, 1)`) choreography across the card width, description height, body and title spacing, and the photo's `min-height`, so a single resize reads as one motion rather than several staggered ones. The image `min-height` transition is scoped to `min-width: 737px` and kept out of the shared `.personal-event-card__image` base rule: below the 736px single-rail breakpoint (`singleRail`) the focus handoff must still change height atomically, so a base-level transition would reintroduce the Safari lurch in the tablet-narrow band. Fast desktop scrolling snaps the folds through the `is-resnapping` suppression class (the `is-measuring` pattern) while `personal-timeline.js` pins the focused card with a one-frame scroll correction, so a fold above the reading line does not drag the card being read; slow reads leave that stability to the browser's native scroll anchoring. Do not drop the correction's `!singleRail`/`!reducedMotion` guards or let it write scroll while a fold is still animating — it measures after forcing layout precisely so it never fights native anchoring or double-compensates.
-- Timeline events carry `data-category` for structure only. The four category accent colours were unused — shadowed by `.personal-timeline-event` since they shared its specificity — and are deliberately gone; a category legend is separately forbidden, so re-adding colour would encode something the page never decodes.
+- Latte and Mocha links to `@twoshotsofcuteness` (Instagram icon); never restore popover, mockup or embed.
+- Orientation and Naval Diving Unit are self-contained galleries, not popups or pages; linked-gallery hover, default cursor. Orientation rotates two real photos, NDU three; never duplicate frames. `experience_ndu` stays unpublished.
+- Personal card, pre-wedding and house images need authored `sizes` and `-480`/`-800` siblings:
+  - Personal: `(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 85vw, (max-width: 1680px) 275px, 366px`
+  - Galleries: `(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 90vw, (max-width: 767px) 76vw, (max-width: 1023px) 40vw, (max-width: 1279px) 27vw, 20vw`
+- DPR-3 clause caps phones at `-800`. House siblings sit beside the WebP overlay in `images-webp/personal/house/`, because the build looks for siblings next to the resolved file. `verify.ps1` checks slots and siblings. Pre-wedding phones stay on `-800` deliberately. `images/brawlstars/`, `images/experience/NDU/` lack `-480`.
+- Mobile: endpoints inside the viewport, larger card type, return-to-top hidden.
+- The five timeline galleries have no photo controls (owner decision, 17 Oct 2026).
+- Desktop crossfades on hover/keyboard focus, 1s per photo. Touch plays only the card nearest reading focus, 4s per photo. Reduced motion holds first photos.
+- Cats, house, pre-wedding rotate five photos; crossfades overlap.
+- Use animation longhands (shorthand resets `animation-delay`).
+- On touch, later frames stay `display: none` until `warmGallery` marks the card warm, once it is on screen, ahead of activation and the first crossfade.
+- Per-image `--focus-x`/`--focus-y`; no per-class `object-position`. Brawl Stars is full-bleed, 16/9 focused on mobile.
+- Frames target 3:2: desktop `--image-col` widens as a card opens; mobile 2/1 folded, 3/2 open. Latte & Mocha and Code in the Community use `personal-event-card--upright` to keep a squarer frame (widening crops them harder).
+- Measure before retuning ratios; the timeline column caps cards at ~451px, not `max-width`.
+- Desktop photo sets a card-height floor, never a ceiling; frames absolutely positioned.
+- Phones: exactly one card open. Desktop folds only read cards. Focus sticky by 48px.
+- Phone handoffs change height atomically; never animate description height, body spacing, title margin or aspect ratio there (iPhone Safari momentum lurch).
+- At reading speed, smooth only the adjacent outgoing/incoming pair (FLIP, clipped reveal in `personal-timeline.js`); fast flicks are instant. Opacity, transforms, clipping are safe.
+- Desktop fold/focus resizes share one 320ms `cubic-bezier(0.2, 0.8, 0.2, 1)` across width, description height, spacing and photo `min-height`.
+- Scope the `min-height` transition to `min-width: 737px`, never the `.personal-event-card__image` base rule (lurch below 736px `singleRail`).
+- Fast desktop scroll snaps folds via `is-resnapping` (the `is-measuring` pattern); `personal-timeline.js` pins the focused card by one-frame correction; slow reads use native anchoring. Keep its `!singleRail`/`!reducedMotion` guards; never write scroll mid-fold.
+- `data-category` is structural; no category colours or legend.
 
 ### Travel archive contracts
 
-- Archive cards use three columns above 1100px, two on tablets and phones, and one at 20em or narrower (also accommodating enlarged default text). Photos retain a 4:3 frame. Cards use title-case serif headings, a compact date and a whole-card link. Desktop retains a short excerpt; phones keep only the full title and date. The repeated category and boxed CTA are hidden at every size to avoid an oversized empty footer. Do not clamp away destination names.
-- Archive card images advertise `sizes="(max-width: 736px) 45vw, 800px"` in `travel.html` (Oct 2026): the build's generic `250px` phone slot made a DPR-2 phone fetch the `-800` candidate for a 174px two-up tile, about 1 MB across eight cards before any scroll. Every card image needs a `-480` sibling so that slot has a candidate; the Paris and Cologne card crops got theirs then.
-- Archive cards reveal with the shared 480ms fade and 60ms stagger, but `listing-effects.js` counts the stagger from the first card revealed in the same frame (not the card's grid index), caps it at two steps on phones and eight on desktop, and treats the viewport as a quarter taller than it is (Oct 2026). A fast phone flick used to land on cards that all waited 480ms before a 480ms fade, about a second of white screen; measured on a 390px phone, every landed-on card is opaque within about 570ms instead of 930ms.
+- Three columns above 1100px, two on tablets and phones, one at 20em or narrower.
+- 4:3 photos, title-case serif headings, compact date, whole-card link; excerpt on desktop only. Category and CTA hidden. Never clamp destination names.
+- `sizes="(max-width: 736px) 45vw, 800px"` in `travel.html`; every card image needs a `-480` sibling.
+- Reveal: 480ms fade, 60ms stagger; `listing-effects.js` counts from the first card revealed that frame (not grid index), caps at two steps on phones, eight on desktop, and treats the viewport as a quarter taller.
 
 ### Travel atlas contracts
 
-- The atlas is progressive: the opening view shows broad trip regions, intermediate zoom shows countries or states, and close zoom shows journal stops.
-- The trip selector turns the atlas into a journey explorer: choosing a trip fits its mapped stops, draws one restrained route, and mutes unrelated destinations. Activating a trip's region pin enters the trip the same way, then reveals its first stop's detail card after the fly-to lands; area-level dots enter their trip identically, because the phone overlay opens above area zoom and those dots — not the region pins — are what a visitor can actually tap there. The fullscreen fit biases the route above the bottom sheet so low-lying stops such as Australia are not buried beneath the card. Keep its status pill below the selector rather than overlapping it. Selecting an area or stop reveals the shared journal detail card instead of navigating immediately; the card resolves its photograph from that linked journal section, and its explicit link performs navigation. On phones the card becomes a bottom sheet above the region controls, and the chosen marker is kept out from underneath it.
-- The desktop zoom-out floor is the intentional cropped opening view; tablets may use the full map, while phones (≤520px) never render the inline world strip — a teaser card fades in a full-screen overlay whose floor is the fit-to-height view, with region jump chips. The phone teaser previews that interaction once it is substantially visible: a luminous Natural Earth projected Paris-to-Tokyo flight arc draws between two teal pins, an ellipse-matched bright tracer moves linearly as the route's leading edge while the line reveals directly behind it, the destination emits a tap ripple behind its unobstructed pin, and the card lifts subtly for two cycles. It then rests for five seconds and replays while the card remains substantially visible; leaving the viewport stops the loop. The teaser artwork and coordinates share one 1200:624 projection surface, enlarged to 188% and panned to centre the complete Paris-to-Tokyo route within its crop. The projection begins flush with the media's top edge so it never exposes an empty band; preserve the clear margins around both endpoints. Its compact action row says `Explore the map`, reports `10 trips · 12 regions`, and uses one restrained dot-line-chevron route cue because the full poster is already the button; do not restore the redundant gesture instructions, generic northeast arrow, or full-width CTA. Reduced motion keeps the poster static. Closing fades the overlay before teardown; reduced motion and exits from the phone breakpoint tear it down immediately. Preserve the breakpoint-aware rebase.
-- Store marker locations as latitude and longitude and project them with the shared Natural Earth 1 implementation in `assets/js/travel-map.js`. Do not hand-place percentage coordinates or replace the vector map with a raster.
-- Every map link must resolve to a matching `trip-section-*` anchor. Keep separate labelled callouts when the same city appears in more than one journal.
-- Opening-region labels and zoomed destination labels share collision layout (Oct 2026); reserve all visible pins before placing labels, and never restore per-destination CSS offsets. The Guangzhou region label names the city rather than China, distinguishing it from Chengdu.
-- Labels use rendered dimensions and the link centre, reserve space for controls and the open detail card, and retry after font/map size changes. A wider free-space search replaces the old least-overlap fallback. If the view is full, all its destinations remain selectable in a scrollable list in the largest control-free vertical band; geographic dots stay on the map. The rendered browser checks in `tools/tests/browser` block deployment on collisions, clipping or missing fallback entries.
-- Atlas text carries a 12px floor (`max(12px, …rem)`) on the status pill, destination labels, the detail card's step line, date, link and Prev/Next buttons (Oct 2026): at the 11pt root they rendered at 7–10px on phones and laptops. Stop numbers inside dots and the inline map's collision-tuned place labels keep their canvas sizes. In the phone overlay each stop dot's transparent halo extends 1.15rem so the tap target is 44px while the visible dot stays small; `travel-map.js` reserves the rendered dot, not the halo, when laying out labels. Each region dot (`role="button"`) carries `aria-controls="travel-map-detail-card"` and an `aria-expanded` that `setActiveTrip` sets true while that dot's trip is the active one (Oct 2026); the generated stop links already did. While fullscreen, `.travel-atlas__layout` drops its `z-index: 1`, which otherwise made a stacking context that left the fixed overlay beneath the archive cards for hit-testing.
-- Dense labels may move and use leader lines, but an in-view destination must not disappear merely because labels collide. Hyper-local attractions belong in regional popup links rather than as overlapping world-map dots.
-- `images/travel/world-map.svg` is generated by `tools/maps/generate-world-map.ps1` from Natural Earth data with 0.25px Douglas–Peucker simplification; regenerate it when geography changes and keep the tolerance, which held the atlas's 10x zoom acceptable while cutting the travel page's largest transfer by ~60%.
+- Zoom levels: trip regions → countries/states → journal stops.
+- Choosing a trip fits its stops, draws one restrained route, mutes other destinations.
+- Region pins and area dots enter their trip the same way, then open the first stop's card after the fly-to (phones tap dots).
+- Fullscreen fit keeps the route above the bottom sheet (Australia).
+- Status pill sits below the selector, not over it.
+- Selecting an area/stop opens the shared detail card (photo from the linked section); only its link navigates.
+- Phones: card is a bottom sheet above region controls; chosen marker stays clear of it.
+- Zoom-out floor: desktop = cropped opening view; tablets may show the full map.
+- Phones (≤520px): no inline world strip; a teaser opens a full-screen overlay (fit-to-height floor, region jump chips).
+- Teaser when visible: projected Paris-to-Tokyo arc between teal pins; ellipse-matched tracer leads linearly, line revealed behind; tap ripple behind the unobstructed destination pin; card lifts two cycles; 5s rest, replay; stops off-screen.
+- Teaser art and coordinates share one 1200:624 surface at 188%, route centred, flush with the media top; keep endpoint margins.
+- Action row: `Explore the map`, `10 trips · 12 regions`, one dot-line-chevron cue. Do not restore gesture instructions, the northeast arrow or a full-width CTA.
+- Overlay fades before teardown; reduced motion (static poster) and leaving the phone breakpoint tear down immediately. Keep the breakpoint-aware rebase.
+- Markers are lat/long, projected by the shared Natural Earth 1 code in `assets/js/travel-map.js`; never percentage coordinates or a raster map.
+- Every map link resolves to a `trip-section-*` anchor.
+- A city in several journals keeps separate labelled callouts.
+- Region and destination labels share collision layout (Oct 2026): reserve visible pins first; never restore per-destination CSS offsets.
+- Guangzhou label names the city, not China (vs Chengdu).
+- Labels use rendered size and link centre, avoid controls and the open card, retry after font/map resize.
+- Wider free-space search replaces the least-overlap fallback.
+- Full view: destinations stay selectable in a scrollable list in the largest control-free vertical band; dots stay.
+- `tools/tests/browser` blocks deployment on collisions, clipping or missing fallback entries.
+- 12px floor (`max(12px, …rem)`, Oct 2026): status pill, destination labels, card step line, date, link, Prev/Next. Dot numbers and inline-map place labels keep canvas sizes.
+- Phone stop dots: 1.15rem transparent halo = 44px target; `travel-map.js` reserves the dot, not the halo, for labels.
+- Region dots (`role="button"`): `aria-controls="travel-map-detail-card"`, `aria-expanded` set by `setActiveTrip` (Oct 2026).
+- Fullscreen drops `.travel-atlas__layout`'s `z-index: 1` (else the overlay hit-tests beneath archive cards).
+- Dense labels may move and use leader lines; collisions never hide an in-view destination.
+- Hyper-local attractions: regional popup links, not world-map dots.
+- `images/travel/world-map.svg`: built by `tools/maps/generate-world-map.ps1` from Natural Earth, 0.25px Douglas–Peucker; regenerate on geography changes; keep the tolerance (10x zoom).
 
 #### Photo search contracts
 
-- The travel landing opens with “Wander through the journals.”, a search field and Surprise me, then six photo postcards (three columns on desktop, two on phones). The field keeps a drawn magnifier, `/` shortcut and Escape-to-clear. Phone fields, clear controls and every chip (suggestions, Try/Recent and the journal legend) are 3rem, with 16px input text to prevent iOS zoom; chips were 2.5rem (36.7px) until Oct 2026. The destination map and journal archive follow discovery.
-- While a query is active, `.travel-atlas__layout` (map and phone teaser), the archive heading, and `.travel-grid` take the `hidden` attribute and results render in `#photo-results` directly under the field; clearing restores them. They are hidden, never removed. The atlas layout collapses to zero height but keeps its width, because `travel-map.js` measures its viewport on resize and on crossing the desktop crop breakpoint; `display: none` there left the map uncropped after a hidden breakpoint change. A query that begins while the phone overlay is open closes it first (through `[data-map-close]`, so the map's own teardown and focus restoration run).
-- `photo-search.js` is never a static `<script src>`: the travel page keeps its 80 KB external-script ceiling. A capped 6 KB external bootstrap (`travel-discovery.js`) chooses six inert, build-generated postcard seeds on each visit, excluding the preceding batch in sessionStorage. Only the attached thumbnails load. The versioned module and full index load on search interaction, a discovery action, or `?q=`. The bootstrap queues the first action until both are ready and owns the `/` shortcut. It eagerly loads only initially visible attached postcards; the rest stay lazy. Script/index failures expose Try again, retain the pending action or edited query, and announce “Photo search is unavailable right now.” without hiding the map or archive. With JavaScript disabled, six fallback postcards link directly to their journal sections.
-- The query lives in the URL as `?q=` through `history.replaceState` (no history entries; removed when empty) and is read on load, so a search survives a reload and can be shared. Each hit links to `<trip slug>#photo=<id>`, which the journals resolve to the photo and open in the lightbox.
-- Ranking: each term (lowercased, accents and punctuation stripped, one token per CJK character) takes its best field score — exact tag 3, tag prefix 2, place or caption exact/prefix 2, alt or section title 1, trip label or year 1; Damerau–Levenshtein distance 1 for terms of five or more letters scores as that field's prefix match minus 0.5, and only stands in for a term that has no exact or prefix hit anywhere in the index (Oct 2026: `beach` used to pull in every "bench" caption, with the wrong word highlighted). A best match in the hidden fields (alt, section title, trip) counts half, applied once in `termScore` rather than in the weight tables, so it never outranks a tag, place or caption hit for the same term but still surfaces when nothing better exists. Each term's score is then weighted by rarity, `log(1 + N / df)` with `df` the photos that term matches, so a common colour word cannot rank level with a rare subject (Oct 2026: for `red panda` the alt-text "Red" on two Guangzhou towers ranked level with the giant panda). Photos matching every term rank before partial matches (Unsplash-style); when both tiers render, the first carries a visually hidden `Full matches` heading so heading navigation does not land on `Partial matches` first (Oct 2026). Within a tier the hits form one run per trip (Oct 2026, asked for as "group by journal without the whitespace"): trips are ordered by their best hit, newest first on a tie (like the archive), and within a trip by terms matched, then score, then journal order, so the most relevant journal leads and its hits sit together. Partial tiles carry one muted `matches: panda` line under the caption, listing the matched terms in query order with `(in description)` after a term whose best match was hidden; full-match tiles never show it, because their highlights already explain them. Highlights are marked before the text is HTML-escaped, so a numeric query can never land a `<mark>` inside an `&#38;` entity. Input is debounced 120ms; 48 hits render at first with a Show more button, to keep the DOM light.
-- Each tier is one continuous grid (`repeat(auto-fill, minmax(170px, 1fr))`, 0.75rem gap; two columns on phones), about six equal tiles a row at 1280px like the journals' own galleries, with the last row left-aligned. Do not bring back per-trip headings or sub-grids (Oct 2026): a trip with one or two hits claimed a whole row of ~300px cards and turned the results into a tall column of white space; Flickr, Google Photos and Unsplash never give a group its own row and keep the context on the tile instead. Grouping by journal is the per-trip runs plus a legend row above the first grid (`.photo-results__trips`, shown when more than one trip has hits; on phones it is one horizontally scrolling, edge-bleeding row with a right fade rather than a wrapped block, and the full-width Surprise me button is hidden while the form carries `is-active`, because a broad query otherwise put a 44px button and five rows of chips between the field and the first photo, Oct 2026): one chip per trip in run order with its count (trip labels carry the full year, `Japan · 2025`, since a two-digit year beside the count read as `25 113`, Oct 2026), a pressed chip (`aria-pressed`) narrows both tiers to that journal and adds `Japan · 2025 only` to the status sentence, pressing it again or typing clears the filter, and focus returns to the same chip after the rebuild. A tile is the 4:3 thumbnail with a trip chip over its bottom-left corner (`Japan · 2025`) and an `Animation` badge top-right for videos, then one caption line — place in bold, caption after a middle dot, matches marked — clamped to two lines. The day/section pill is gone on purpose; it was the largest text on the card. Arrow keys move by the grid's live column count.
-- Suggestions are up to six tag chips (buttons, not a combobox) whose tag or synonym starts with the last term and which have at least one photo, so a chip never runs an empty search; a chip replaces the longest matching phrase suffix, preserving earlier context ("Japan mount f" becomes "Japan mount fuji"). `verify.ps1` warns, without failing, about vocabulary tags that have no photos, because tagging is a manual pass and the build is where a gap gets noticed (Oct 2026: 17 such tags; three were real gaps and were tagged, the other fourteen, including six Tokyo districts the Japan trip never reached, were pruned; re-add a tag when a journal needs it). A query with no hits shows the six most-used tags and a Clear search button. The count sentence lives in the form's `role="status"` paragraph, which exists before the module loads so announcements are not lost.
-- Photo postcards use 24 plain initial themes from `journals/explore-themes.json`. Both initial cards and Another mix may use only visually reviewed image/topic pairs in `journals/explore-covers.json` (Oct 2026). Search tags alone never qualify a cover: a restaurant photo can contain tea in the original while its 8:5 postcard crop hides every cup. Each review locks the thumbnail path, SHA-256 image digest, focal point and explicitly visible topics. Builds fail when a reviewed thumbnail changes or a reviewed topic stops matching its indexed photo. Review the exact 8:5 crop before adding or updating a record. Another mix samples only topics with reviewed covers, balancing facets and excluding the preceding batch; search still uses the complete tag vocabulary. The current pool contains 802 reviewed covers across 293 topics, from an audit of all 811 still photos; nine crops were excluded because their framing hides the useful subject. Bubble tea is a separate topic from tea. Animal statues and model food qualify as sculpture/miniature covers, not live animals or meals. The section is labelled Browse photos; use plain topic names and place · year beneath them, without a Photo: prefix, slogans or invented emotions. Keep the 24 inert starter cards and six attached images so the expanded pool adds no opening-page download. The lazy index uses version 2 compact cover tuples (photo position, positions in that photo’s tags, optional focal x/y; omitted coordinates mean 50/50). Decode and group covers by topic once, so Another mix avoids scanning all covers for every vocabulary term. The index sits near 520 KB under a 560 KB budget (raised from 480 KB in Oct 2026 because every journal alt is now a descriptive sentence and search ranks on alt text); the module has a 26 KB budget. Initial cards need distinct approved covers; shuffled cards also avoid duplicate photos and prefer trip variety. A postcard starts the existing search and focuses the first result without opening the phone keyboard. Suggestions omit counts because canonical membership and broader search totals differ.
-- Surprise me opens an inline photo moment with its real place, trip/year, section and Read this day link (the section line is omitted when it only repeats the place, as in Germany's city chapters, Oct 2026); Surprise me carries the same ↻ as Another mix and the postcards carry no glyph, because both act in place, while ↗ stays on Read this day, which navigates (Oct 2026); the image opens the existing photo deep link. It chooses a trip first, avoids the preceding trip while alternatives remain, and tracks seen photo ids in sessionStorage until every photo has appeared. Blocked/corrupt storage remains safe. Previous moment walks a separate session-page history; Another moment moves forward through that history before choosing a new unseen photo. At the beginning, Previous is hidden (not a disabled button, Oct 2026) and focus moves to Another moment. Another moment retains button focus; Back to exploring restores focus to Surprise me. Search hides the preview and postcards; clearing restores discovery.
-- Recent keeps four distinct successful queries in localStorage, validates the stored array before use, and exposes Clear. IME composition waits for committed text. Pending input makes old results inert, and stale pagination/filter actions cannot mix a new query with old hits. During search the collapsed map/archive are also inert, so invisible map controls do not remain keyboard/screen-reader targets. Index failures are announced even when the field is empty. Run `node --test tools/tests/photo-search.test.cjs` after building; CI also exercises mobile/desktop discovery, phrase suggestions, paging, filtering, keyboard navigation, photo deep links, failures, URL restore and IME input.
+- Landing: "Wander through the journals.", field, Surprise me, six postcards (3 columns desktop, 2 phones), then map and archive.
+- Field: drawn magnifier, `/` shortcut, Escape clears.
+- Phones: fields, clear controls, all chips 3rem; input 16px (iOS zoom).
+- Active query: `.travel-atlas__layout`, archive heading, `.travel-grid` get `hidden`; results in `#photo-results` under the field. Hide, never remove.
+- Hidden atlas: zero height, full width, never `display: none` (`travel-map.js` measures it on resize/breakpoint).
+- A query closes an open phone overlay via `[data-map-close]` (runs teardown, focus restore).
+- `photo-search.js` is never a static `<script src>`.
+- The 7 KB bootstrap `travel-discovery.js` picks six inert build-generated postcard seeds per visit, excluding the last batch (sessionStorage); only attached thumbnails load, visible ones eagerly.
+- Module and index load on search, a discovery action or `?q=`; bootstrap queues the first action and owns `/`.
+- Load failure: Try again, keep the pending action/query, announce "Photo search is unavailable right now.", keep map and archive.
+- No JavaScript: six fallback postcards link to journal sections.
+- `?q=` via `history.replaceState` (no entries; removed when empty), read on load.
+- Hits link to `<trip slug>#photo=<id>` (opens the lightbox).
+- Ranking:
+  - Normalise: lowercase, strip accents/punctuation, one token per CJK character.
+  - Best field score per term: exact tag 3; tag prefix 2; place/caption exact/prefix 2; alt/section title 1; trip label/year 1.
+  - Damerau–Levenshtein 1 (terms ≥5 letters) = field prefix − 0.5, only if the term has no exact/prefix hit in the index.
+  - Hidden-field best match (alt, section title, trip) counts half, once, in `termScore`, not the weight tables.
+  - Rarity weight `log(1 + N / df)`, `df` = photos matching the term.
+  - Full matches before partial; with both, a visually hidden `Full matches` heading leads.
+  - Per tier, one run per trip: trips by best hit (newest on tie); inside by terms matched, score, journal order.
+- Partial tiles only: muted `matches: panda` line, query order, `(in description)` for hidden-field matches.
+- Mark highlights before HTML-escaping (no `<mark>` in `&#38;`).
+- 120ms debounce; 48 hits, then Show more.
+- One grid per tier: `repeat(auto-fill, minmax(170px, 1fr))`, 0.75rem gap, 2 columns phones, last row left-aligned.
+- Do not bring back per-trip headings or sub-grids (Oct 2026).
+- Legend `.photo-results__trips` when >1 trip has hits: chip per trip, run order, count, full year (`Japan · 2025`).
+- Phones: legend is one scrolling edge-bleeding row with right fade; full-width Surprise me hidden while form has `is-active`.
+- Pressed chip (`aria-pressed`) filters both tiers, adds `Japan · 2025 only` to status; press again or type to clear; focus returns to the chip.
+- Tile: 4:3 thumbnail, trip chip bottom-left, `Animation` badge top-right (videos), caption (bold place · caption) clamped to two lines.
+- Day/section pill removed on purpose; do not restore.
+- Arrow keys follow the live column count.
+- Suggestions: ≤6 tag chips (buttons, not a combobox) whose tag/synonym starts with the last term and has ≥1 photo; no counts.
+- A chip replaces the longest matching phrase suffix ("Japan mount f" → "Japan mount fuji").
+- `verify.ps1` warns, not fails, on photo-less tags; re-add pruned tags when a journal needs them.
+- No hits: six most-used tags plus Clear search.
+- Count sentence: form's `role="status"` paragraph, present before the module loads.
+- Postcards: 24 plain themes in `journals/explore-themes.json`.
+- Initial cards and Another mix use only visually reviewed pairs in `journals/explore-covers.json` (Oct 2026); tags alone never qualify a cover.
+- Reviews lock thumbnail path, SHA-256, focal point, visible topics; builds fail if a reviewed thumbnail changes or topic stops matching.
+- Review the exact 8:5 crop before adding/updating a record.
+- Another mix: reviewed topics only, balanced facets, excludes last batch; search keeps the full vocabulary.
+- Pool: 802 covers across 293 topics.
+- Bubble tea ≠ tea; animal statues and model food are sculpture/miniature, not animals or meals.
+- Label Browse photos; plain topic names, place · year beneath; no Photo: prefix, slogans or invented emotions.
+- Keep 24 inert starter cards and six attached images (no extra opening download).
+- Index v2 cover tuples: photo position, tag positions, optional focal x/y (default 50/50); group by topic once on decode.
+- Initial cards: distinct approved covers; shuffles also avoid duplicate photos, prefer trip variety.
+- A postcard runs the search and focuses the first result without the phone keyboard.
+- Surprise me: inline moment with real place, trip/year, section (omitted if it repeats the place), Read this day; image opens the deep link.
+- Glyphs (Oct 2026): ↻ on Surprise me and Another mix; none on postcards; ↗ only on Read this day.
+- Moments: trip first, avoid the last trip while others remain, seen ids in sessionStorage until all shown; safe if storage is blocked/corrupt.
+- Previous moment walks a separate session history; Another moment replays forward before picking new.
+- At the start Previous is hidden, not disabled, and focus goes to Another moment, which keeps focus; Back to exploring focuses Surprise me.
+- Search hides preview and postcards; clearing restores them.
+- Recent: four distinct successful queries, localStorage, validated, with Clear.
+- IME: wait for committed text.
+- Pending input inerts old results; stale paging/filter actions never mix queries.
+- Collapsed map/archive are inert during search.
+- Announce index failures even with an empty field.
+- Run `node --test tools/tests/photo-search.test.cjs` after building; CI also covers mobile/desktop discovery, phrase suggestions, paging, filtering, keyboard, deep links, failures, URL restore, IME.
 
-- Budgets: `photo-search.js` 26 KB and `travel-search.css` 16 KB, raised from 19/11 KB for the approved photo postcards and random-moment preview (Oct 2026). The initial external-script cap remains unchanged; the full index stays lazy. Motion uses shared tokens and resolves immediately under reduced motion.
+- Budgets: `photo-search.js` 26 KB, `travel-search.css` 16 KB (from 19/11 KB, Oct 2026); index ~520 KB of 560 KB (from 480 KB, Oct 2026, for descriptive alts); index lazy.
+- Motion: shared tokens, immediate under reduced motion.
 
 #### Discovery loading and recovery (Oct 2026)
 
-- The initial travel bundle uses `travel-discovery.js` instead of loading the atlas eagerly. The bootstrap prevents native reloads on cold search submission and records IME composition; initial module startup and index completion wait for compositionend before rendering results. The atlas loads within 120px of the viewport or on focus/pointer interaction; an activation before download completes is replayed once. Keep the 80 KB initial-page budget and a separate 64 KB atlas budget. The earlier full-budget note records the pre-deferral layout.
-- Postcards explain “Choose a topic to find matching photos.” only when enhanced search is available; no-JavaScript cards still link directly to journals.
-- Responsive postcard and moment images use existing 480/original and optional 800 siblings. The index adds one `variants` digit per photo (0 = thumbnail only, 1 = 480/original, 2 = also 800). Video posters and custom crops remain unchanged. The build checks candidate dimensions and the browser measures image slots, updating sizes after resize.
+- Bootstrap blocks native reload on cold submit and records IME composition; startup and index wait for compositionend before rendering.
+- Atlas loads within 120px of the viewport or on focus/pointer; an early activation replays once.
+- "Choose a topic to find matching photos." shows only with enhanced search.
+- Postcard/moment images use existing 480/original and optional 800 siblings; index `variants` digit per photo: 0 thumbnail, 1 480/original, 2 also 800.
+- Video posters and custom crops unchanged.
+- Build checks candidate dimensions; browser measures slots, resizes `sizes`.
 
 ### Dead ends and hidden dependencies
 
-- **No SEO, analytics, or resume-PDF work (owner decision, Jul 2026)** — do not add og tags, structured data, or tracking scripts; the League "1 year internship" journal note is intentional.
-- **Declined from the Oct 2026 site critique (owner decisions, 17 Oct 2026)** — do not propose again: the desktop home hero button stays a 3rem icon circle whose label appears on hover (phones keep the labelled pill); the Personal timeline keeps dimming unfocused cards to 0.55 (its gallery control rows were later removed at the owner's request, 17 Oct 2026); no skip-to-content link and no focus-ring change on the homepage link cards; the floating return-to-top stays on phones because it is the quick way back up; no contact line on the Work page (email and LinkedIn stay in the nav and footer).
-
-- **Build size — measured, no easy win (do not retry).** Travel JPEGs are already q40–42;
-  recompressing is break-even or worse (the 1600px cap makes them *bigger*). JPEG→WebP was
-  refuted — 104 of 495 files grew, net +81MB to save 24MB; only the 9 banners (q82) have
-  headroom. The wins that did land (Sep 2026) were selection, not recompression: the
-  `20vw` journal slot plus 676 new `-480` tiles (+32 MB tracked, but ~60% fewer image
-  bytes per tile on 1x desktops and no more full originals on 2x), deferred animation
-  posters, the simplified world map, and the circus globe's animated WebP (1.77 MB, the
-  largest file on the site) re-encoded as a 457 KB MP4.
-- **History was squashed to one commit on 22 Sep 2026.** The clone was 2.4 GB against a
-  344 MB tree (~1 GB of tracked `dist/` history, ~280 MB superseded GIFs, moved image
-  folders and pre-cap photo versions). Partial `git filter-repo` rewrites were measured
-  first: dropping `dist/` and GIFs gave 1.96 GB, also dropping every path absent from HEAD
-  about 900 MB, so only a squash reached the ~350 MB floor. The complete pre-squash history
-  (all refs, including a July `backup/pre-force-update` branch and Codex checkpoint refs)
-  is in `C:/Users/nicho/Projects/web-before-squash.bundle`; restore with `git clone` on the
-  bundle if it is ever needed, otherwise it can be deleted. Do not track `dist/` or GIFs
-  again; the pipeline details are in [Build and deployment](#build-and-deployment).
-- **Text sources are pinned to LF by `.gitattributes`; do not remove it (Jul 2026).**
-  GitHub's Windows CI runner checks out with `core.autocrlf=true`, so before this file
-  existed, LF sources were smudged to CRLF on CI only. That added ~1 byte per line to the
-  byte-copied JS assets and the extracted CSS bundles, inflating them past their
-  `verify.ps1` size budgets on CI even though local builds passed — so a green local check
-  shipped nothing and the deploy silently stayed on stale assets. `.gitattributes` forces
-  `eol=lf` for every text extension; the size budgets are calibrated against LF bytes.
-- **`travel-map-page.css` sits within a few hundred bytes of its 49 KB budget (Oct 2026).**
-  `verify.ps1` allows the generated atlas bundle 50,176 LF bytes and it runs close to that
-  line (within about 1 KB of it as of Oct 2026), so even a modest travel/atlas CSS
-  addition can trip the check. Do not add large CSS to the travel/atlas route. When a
-  needed addition does trip it, bump the budget deliberately with a dated rationale
-  comment (the existing 40 → 42 note beside the assertion is the pattern) rather than
-  stripping the explanatory comments in `custom.css` to bank bytes.
-- **Keep travel JavaScript deferred (Oct 2026).** The 80 KB initial-script ceiling remains unchanged. `travel-discovery.js` has a 7 KB budget (Oct 2026: early submit interception and IME state must exist before the lazy module arrives); the atlas loads near the viewport under its own 64 KB budget. Photo search loads on interaction under a 26 KB budget. Do not restore eager atlas or search scripts to fill the recovered startup headroom.
-- **`.travel-gallery__item--tall` looks unused, isn't.** It pairs with the
-  `guangzhou-gallery__brick--tall` compat class; the markup carries only the compat class
-  today, so the generic half scans as dead — but SKILL.md mandates the pairing, and
-  removing the CSS silently unstyles future journals.
+- **No SEO, analytics or resume-PDF work (owner decision, Jul 2026):** no og tags, structured data or tracking. The League "1 year internship" note is intentional.
+- **Declined from the Oct 2026 site critique:** every item is in [Owner preferences](#owner-preferences); do not propose them again.
+- **Build size: measured, no easy win (do not retry).**
+  - JPEGs are q40–42; recompressing is break-even or worse (1600px cap enlarges them).
+  - JPEG→WebP refuted (net growth); only the 9 banners (q82) have headroom.
+  - Sep 2026 wins were selection: `20vw` slot with `-480` tiles, deferred animation posters, simplified world map, circus globe WebP → MP4.
+- **History was squashed to one commit on 22 Sep 2026.** Partial `git filter-repo` rewrites missed the ~350 MB floor; only a squash reached it.
+  - Pre-squash history (all refs): `C:/Users/nicho/Projects/web-before-squash.bundle`; restore with `git clone` on it, else deletable.
+  - Do not track `dist/` or GIFs again; see [Build and deployment](#build-and-deployment).
+- **`.gitattributes` pins text to LF; do not remove it (Jul 2026).** CI's `core.autocrlf=true` CRLF pushed JS/CSS past `verify.ps1` budgets on CI only, silently stalling deploys. Budgets assume LF.
+- **`travel-map-page.css` sits under 1 KB below its 49 KB (50,176 LF bytes) `verify.ps1` budget (Oct 2026).**
+  - No large CSS on the travel/atlas route.
+  - If needed, bump the budget with a dated rationale comment (like the 40 → 42 note); never strip `custom.css` comments to save bytes.
+- **Keep travel JavaScript deferred (Oct 2026).** Initial travel bundle loads `travel-discovery.js`, not the atlas; 80 KB initial ceiling; `travel-discovery.js` 7 KB (submit interception and IME state must precede the module); atlas 64 KB, near viewport; search 26 KB, on interaction. Do not restore eager atlas or search scripts.
+- **`.travel-gallery__item--tall` looks unused, isn't.** It pairs with the `guangzhou-gallery__brick--tall` compat class (the only one in markup); SKILL.md mandates the pair; removing it unstyles future journals.
 
 ### Working with these contracts
 
-- Make intentional behavior changes in source, then update matching assertions in `tools/site/verify.ps1` in the same change.
-- When shared CSS or JavaScript changes, update its cache version through `tools/site/build.ps1`, which is the sole source of truth for asset versions.
-- Validate behavior in generated `dist/`, not only in source HTML. For visual changes, inspect desktop and mobile layouts, crops, overflow, navigation, focus behavior, and reduced motion as applicable.
+- Change behaviour in source and update `tools/site/verify.ps1` assertions in the same change.
+- Bump shared CSS/JS cache versions through `tools/site/build.ps1`, the sole source of asset versions.
+- Validate in generated `dist/`; for visual changes check desktop and mobile layout, crops, overflow, navigation, focus and reduced motion.
 
 ## Travel journals
 
-Use `data-nav-label` on a long section heading to supply a short pill label. The build retains the full heading as its accessible name and prefixes numbered days automatically. Shared scripts provide phone route summaries with an inline full-route disclosure, gallery counts, and section-aware lightbox counters.
+- `partials/travel-journal.html` is the shared shell; `journals/_template.html` is the content contract.
+- `data-nav-label` gives a long heading a short pill label; the full heading stays its accessible name.
+- Postcard covers and tags: see Photo search and Discovery covers under [Build and deployment](#build-and-deployment).
+- Journals are `contentOnly` fragments, never the retired full-page format. Guangzhou is the reference.
 
-`partials/travel-journal.html` is the shared journal shell. `journals/_template.html` is the canonical compact-journal content contract. Together they supply the responsive hero, day structure, routes, compact desktop masonry, two-row collage option, horizontal mobile galleries and swipe cue, lightbox, trip navigation, pagination, mobile menu, scripts, and footer.
-
-Every journal also shares `partials/travel-masthead.html`: a book icon and “Travel journals” link back to the travel archive on mobile and desktop.
-
-To add a journal:
+**To add a journal:**
 
 1. Copy `journals/_template.html` to `journals/travel_YYYY_destination.html`.
-2. Keep only journal content in that file; do not copy `<html>`, `<head>`, navigation, footer, script, or stylesheet markup.
-3. Keep the compatibility classes shown in `journals/_template.html`; the generic `travel-*` classes document intent while the `guangzhou-*` aliases preserve the existing journal styling.
-4. Set `--hero-focus-x` / `--hero-focus-y` on the banner and `--focus-x` / `--focus-y` on photographs when the default centre crop misses the subject.
-5. Use `travel-gallery__item--tall guangzhou-gallery__brick--tall` only for vertical collages that should occupy exactly two desktop rows. It returns to one normal card on mobile.
-6. Add one ordered entry to `journals/manifest.json` with `contentOnly` set to `true`, `source` set to the content fragment, and the journal metadata. The build adds the required compact-journal page classes automatically.
-7. Add the destination's map points in `assets/js/travel-map.js`.
-8. Run the normal clean build and verification workflow.
-
-All current travel journals now live in `journals/` and use the `contentOnly` contract. The build still supports the retired full-page source format for compatibility, but new and updated journals should remain content fragments. Guangzhou is the reference compact implementation. Every generated journal is rendered through the shared journal partial.
-
-### Discovery postcards
-
-`journals/photo-tags.json` and `journals/tag-vocabulary.json` power search; only reviewed photo/topic pairs in `journals/explore-covers.json` qualify as postcard covers. Check that each named subject is visible in the actual 8:5 crop, use specific labels such as **bubble tea**, and record the thumbnail hash and focal point. Re-review any changed image before updating its hash.
-
-`journals/explore-themes.json` supplies the small starter set; Another mix uses the full reviewed pool. Keep six cards per batch and the existing lazy-loading and size budgets. See [Build and deployment](#build-and-deployment) for validation and index details.
+2. Keep only content: no `<html>`, `<head>`, navigation, footer, script or stylesheet markup.
+3. Keep the template's compatibility classes; the `guangzhou-*` aliases carry the styling.
+4. Set `--hero-focus-x`/`--hero-focus-y` on the banner and `--focus-x`/`--focus-y` on photos when the centre crop misses.
+5. Use `travel-gallery__item--tall guangzhou-gallery__brick--tall` only for vertical collages spanning exactly two desktop rows.
+6. Add one ordered `journals/manifest.json` entry with `contentOnly: true`, `source` set to the fragment, and the metadata.
+7. Add map points in `assets/js/travel-map.js`.
+8. Run the clean build and verification.
 
 ## Fonts
 
-`tools/fonts/josephsophia.otf` is the source of the pre-wedding wordmark font. The site
-publishes only `assets/fonts/josephsophia-wordmark.woff2`, a subset holding the
-wordmark's letters and the three private-use swash glyphs it uses. If the
-wordmark text in `prewed.html` changes, regenerate the subset with every
-character it now uses:
+### Wordmark
+
+Only `assets/fonts/josephsophia-wordmark.woff2` ships, subset from `tools/fonts/josephsophia.otf`. If the wordmark in `prewed.html` changes, regenerate it listing every character used (`pip install fonttools brotli`):
 
 ```powershell
 pyftsubset tools/fonts/josephsophia.otf --unicodes="U+0020,U+0061,U+0063,U+0067,U+0068,U+0069,U+006C,U+006E,U+006F,U+0078,U+0079,U+E01C,U+E03E,U+E03F" --layout-features='*' --flavor=woff2 --output-file=assets/fonts/josephsophia-wordmark.woff2
 ```
 
-`pyftsubset` comes with `pip install fonttools brotli`.
-
 ### Source Sans Pro 700
 
-`assets/fonts/source-sans-pro-700-latin.woff2` (15.7 KB, Oct 2026) is a static
-wght=700 instance of Adobe's Source Sans 3 variable font (v3.052, SIL OFL),
-cut to the same Google Fonts "latin" unicode range and the same OpenType
-feature list as the shipped `source-sans-pro-900-latin.woff2` (a Google Fonts
-cut of Source Sans Pro 2.045: unhinted, `ccmp dnom frac liga locl numr pnum` +
-`kern mark mkmk`). `tools/fonts/subset-source-sans.py` pins the axis with fontTools'
-instancer and subsets in one step:
+`assets/fonts/source-sans-pro-700-latin.woff2` is a static 700 instance of Source Sans 3 VF, matching the 900 cut's "latin" range and features:
 
 ```powershell
 python -I tools/fonts/subset-source-sans.py <path-to-SourceSans3VF-Upright> --weight 700 --output assets/fonts/source-sans-pro-700-latin.woff2
 ```
 
-The variable font is not tracked here. The Oct 2026 build used the copy that
-Streamlit bundles under its `static/static/media/SourceSansVF-Upright.ttf.*.woff2`
-in the local Anaconda install; the official source is the Source Sans 3 release
-at <https://github.com/adobe-fonts/source-sans/releases> (`VAR/SourceSans3VF-Upright.ttf`
-or the `WOFF2/VAR` build). Source Sans 3 has taller vertical metrics than the
-2.045 Black cut, so the `@font-face` in `assets/css/main.css` pins the 700 face
-with `ascent-override: 98.4%; descent-override: 27.3%; line-gap-override: 0%`
-(the Black's hhea 984/-273 at 1000 upm); keep those if the file is regenerated.
+- Source: <https://github.com/adobe-fonts/source-sans/releases> (`VAR/SourceSans3VF-Upright.ttf`); not tracked.
+- `verify.ps1` caps it at 20 KB so the variable font never ships.
+- Keep its `main.css` overrides when regenerating: `ascent-override: 98.4%; descent-override: 27.3%; line-gap-override: 0%`.
+- `main.css` declares a size-adjusted Arial fallback so cold loads do not reflow headings.
 
 ## Vendor theme
 
-`vendor/massively/` preserves the upstream Sass source for the HTML5 UP Massively theme. It is not compiled by this repository's build; the published theme CSS is `assets/css/main.css`.
-
-Treat these files as vendor reference material. A future Sass workflow should be introduced explicitly rather than assuming edits here affect the deployed site.
+`vendor/massively/` is uncompiled upstream Massively Sass, for reference only; edits there do not affect the site, whose theme CSS is `assets/css/main.css`. Add any Sass workflow explicitly.
