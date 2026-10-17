@@ -4589,8 +4589,9 @@ body.is-map-fullscreen .travel-atlas__layout {
 .mini-line { fill: none; stroke: #11807d; stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; }
 .mini-flag { fill: #c46d1c; stroke: #ffffff; stroke-width: 1; }
 .mini-edge { stroke: rgba(17, 128, 125, 0.4); stroke-width: 1; }
-.mini-odd { stroke: #c46d1c; stroke-width: 1.2; stroke-dasharray: 2 1.5; }
+.mini-odd { fill: none; stroke: #c46d1c; stroke-width: 1.2; stroke-dasharray: 2 1.5; }
 .mini-node { fill: #11807d; stroke: #ffffff; stroke-width: 1; }
+.mini-ring { fill: none; stroke: #c46d1c; stroke-width: 1; }
 .mini-node.is-odd { fill: #c46d1c; }
 .mini-packet { fill: #11807d; opacity: 0.7; }
 
@@ -4746,7 +4747,8 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
 @keyframes anomaly-card-in { from { opacity: 0; } }
 /* The narrowest phones: a shorter mini leaves room for "Across connections". */
 @media screen and (max-width: 374px) {
-  .page-experience #cloud-analytics .anomaly-peek__mini { width: 40px; height: 13px; }
+  /* Border-box: slim padding so the chart itself draws at 36x11. */
+  .page-experience #cloud-analytics .anomaly-peek__mini { width: 40px; height: 13px; padding: 1px 2px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .page-experience #cloud-analytics .anomaly-card.is-open { animation: none; }

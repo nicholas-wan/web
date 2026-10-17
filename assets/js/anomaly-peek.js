@@ -208,48 +208,75 @@
   }
 
   // ---- Mini previews inside the chips ----
+  // Each plays for RUN ms; when its anomaly is caught, one ring marks it.
+  var RUN = 4200, RING = 900;
+  function ringAt(ring, p, f) {
+    var on = f > 0 && f < 1;
+    ring.setAttribute('visibility', on ? 'visible' : 'hidden');
+    if (!on) { return; }
+    ring.setAttribute('cx', p.x.toFixed(1)); ring.setAttribute('cy', p.y.toFixed(1));
+    ring.setAttribute('r', (2.6 + f * 3).toFixed(2)); ring.style.opacity = (0.8 * (1 - f)).toFixed(3);
+  }
   function createMiniSeries(svg) {
-    var W = 56, H = 18, N = 22, STEP = 260, RUN = 4200;
+    var W = 56, H = 18, N = 22, STEP = 260;
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
-    var band = el('path', { class: 'mini-band' }, svg);
-    var line = el('path', { class: 'mini-line' }, svg);
-    var dot = el('circle', { class: 'mini-flag', r: 2.6 }, svg);
+    // Line and band fade out at both ends instead of stopping at a hard edge.
+    var id = 'mini-fade-' + Math.random().toString(36).slice(2, 8), defs = el('defs', {}, svg);
+    var grad = el('linearGradient', { id: id + 'g' }, defs);
+    [[0, 0], [0.12, 1], [0.88, 1], [1, 0]].forEach(function (s) { el('stop', { offset: s[0], 'stop-color': '#fff', 'stop-opacity': s[1] }, grad); });
+    el('rect', { width: W, height: H, fill: 'url(#' + id + 'g)' }, el('mask', { id: id, maskUnits: 'userSpaceOnUse', x: 0, y: 0, width: W, height: H }, defs));
+    var faded = el('g', { mask: 'url(#' + id + ')' }, svg);
+    var band = el('path', { class: 'mini-band' }, faded);
+    var line = el('path', { class: 'mini-line' }, faded);
+    var ring = el('circle', { class: 'mini-ring' }, svg);
+    var dot = el('circle', { class: 'mini-flag' }, svg);
     // Rest on a window (t 4..26) holding only the upward spike at t=19, clear
     // of the dip at t=30; the run starts so the spike enters from the right.
     var END = 4, START = END - Math.round(RUN / STEP);
-    var t = START, elapsed = 0;
+    var elapsed = 0, flag = null;
     function yy(v) { return 2 + (H - 4) * (1 - (v - 20) / 95); }
     function draw(pos) {
-      var base = Math.floor(pos), frac = pos - base, dx = W / (N - 1), top = '', bot = '', l = '', flag = null;
+      var base = Math.floor(pos), frac = pos - base, dx = W / (N - 1), top = '', bot = '', l = '';
+      flag = null;
       for (var i = 0; i <= N; i++) {
         var tt = base + i, px = (i - frac) * dx;
         top += (i ? 'L' : 'M') + px.toFixed(1) + ' ' + yy(expected(tt) + BAND).toFixed(1);
         l += (i ? 'L' : 'M') + px.toFixed(1) + ' ' + yy(sample(tt)).toFixed(1);
-        if (Math.abs(sample(tt) - expected(tt)) > 3 * SIGMA && px > 2 && px < W - 2) { flag = { x: px, y: yy(sample(tt)) }; }
+        if (Math.abs(sample(tt) - expected(tt)) > 3 * SIGMA && px > 2 && px < W - 2) { flag = { x: px, y: Math.max(3, yy(sample(tt))) }; }
       }
       for (var j = N; j >= 0; j--) { bot += 'L' + ((j - frac) * dx).toFixed(1) + ' ' + yy(expected(base + j) - BAND).toFixed(1); }
       band.setAttribute('d', top + bot + 'Z');
       line.setAttribute('d', l);
-      if (flag) { dot.setAttribute('cx', flag.x.toFixed(1)); dot.setAttribute('cy', Math.max(3, flag.y).toFixed(1)); dot.setAttribute('visibility', 'visible'); }
-      else { dot.setAttribute('visibility', 'hidden'); }
+      // The flag grows in as its point clears the right-hand fade.
+      var r = flag ? 2.6 * Math.min(1, (W - 2 - flag.x) / 7) : 0;
+      dot.setAttribute('visibility', r > 0.3 ? 'visible' : 'hidden');
+      if (flag) { dot.setAttribute('cx', flag.x.toFixed(1)); dot.setAttribute('cy', flag.y.toFixed(1)); dot.setAttribute('r', r.toFixed(2)); dot.style.strokeWidth = Math.min(1, r / 2.6).toFixed(2); }
     }
-    draw(END);
+    function at(ms) {
+      // Eased both ways: the scroll gathers pace, then settles on the flag.
+      draw(START + ease(Math.min(1, ms / RUN)) * (END - START));
+      ringAt(ring, flag, flag ? (ms - RUN) / RING : 0);
+    }
+    at(RUN + RING);
     return {
-      replay: function () { elapsed = 0; t = START; draw(t); },
-      tick: function (dt) { elapsed += dt; t = START + Math.min(1, elapsed / RUN) * (END - START); draw(t); },
-      done: function () { return elapsed >= RUN; },
-      rest: function () { draw(END); }
+      replay: function () { elapsed = 0; at(0); },
+      tick: function (dt) { elapsed += dt; at(elapsed); },
+      done: function () { return elapsed >= RUN + RING; },
+      rest: function () { at(RUN + RING); }
     };
   }
   function createMiniGraph(svg) {
-    var W = 56, H = 18, RUN = 4200;
+    var W = 56, H = 18, GROW = 2000;
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
     var P = [{ x: 6, y: 5 }, { x: 6, y: 13 }, { x: 20, y: 9 }, { x: 36, y: 5 }, { x: 50, y: 10 }];
     [[0, 2], [1, 2], [2, 3], [3, 4]].forEach(function (e) {
       el('line', { class: 'mini-edge', x1: P[e[0]].x, y1: P[e[0]].y, x2: P[e[1]].x, y2: P[e[1]].y }, svg);
     });
-    var odd = el('line', { class: 'mini-odd', x1: P[1].x, y1: P[1].y }, svg);
+    // The unusual link bows below the usual path, so it reads as a new route.
+    var C = { x: 28, y: 19 };
+    var odd = el('path', { class: 'mini-odd' }, svg);
     var packet = el('circle', { class: 'mini-packet', r: 1.4 }, svg);
+    var ring = el('circle', { class: 'mini-ring' }, svg);
     var nodes = P.map(function (p) { return el('circle', { class: 'mini-node', cx: p.x, cy: p.y, r: 2.2 }, svg); });
     var elapsed = 0;
     function draw(ms) {
@@ -258,10 +285,12 @@
       var q = lerp(route[seg], route[seg + 1], ease(f * 3 - seg));
       packet.setAttribute('cx', q.x.toFixed(1)); packet.setAttribute('cy', q.y.toFixed(1));
       packet.setAttribute('visibility', ms < RUN - 600 ? 'visible' : 'hidden');
-      var g = Math.max(0, Math.min(1, (ms - 2000) / 700)), end = lerp(P[1], P[4], ease(g));
-      odd.setAttribute('x2', end.x.toFixed(1)); odd.setAttribute('y2', end.y.toFixed(1));
-      odd.style.opacity = g > 0 ? 1 : 0;
+      // Grow the curve to g by splitting it there (de Casteljau).
+      var g = Math.max(0, Math.min(1, (ms - GROW) / 700)), e = ease(g), c = lerp(P[1], C, e), end = lerp(c, lerp(C, P[4], e), e);
+      odd.setAttribute('d', 'M' + P[1].x + ' ' + P[1].y + 'Q' + c.x.toFixed(1) + ' ' + c.y.toFixed(1) + ' ' + end.x.toFixed(1) + ' ' + end.y.toFixed(1));
+      odd.style.opacity = Math.min(1, g * 4).toFixed(3);
       nodes[4].classList.toggle('is-odd', g >= 1);
+      ringAt(ring, P[4], (ms - GROW - 700) / RING);
     }
     draw(RUN);
     return {

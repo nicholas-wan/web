@@ -234,7 +234,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Cloud Analytics header is `display: contents` at the phone breakpoint only; desktop stays two-column.
 - Cloud Anomaly ends with an anomaly peek (owner-approved; `assets/js/anomaly-peek.js`, experience bundle).
 - CTA "See an anomaly get caught · hover a chart" ("tap a chart" on phones) above chips Over time and Across connections.
-- Chip previews play ~4s on entering view, rest on the amber flag, glow once (max every 20s).
+- Chip previews play ~4s on entering view (eased, line ends faded), land on the amber flag with one ring, then glow once (max every 20s).
 - Hover, focus or tap opens only that chart: mouse desktops, a floating card below the chips, never over the writeup; phones (≤736px) and touch tablets (`hover: none`), an inline card pushing content down, below 44px chips (a pinned floating card covered Early career, Oct 2026).
 - Click/tap pins; hovering the other chip previews it, then the pin returns.
 - Equal-size cards, one plain note each, no "simulated" disclaimer (owner).
