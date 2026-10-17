@@ -4486,7 +4486,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   border-bottom: 0;
 }
 
-/* Anomaly peek (Oct 2026, owner-approved after a lab trial): two chips at the foot of the Cloud Anomaly card,
+/* Anomaly peek (Oct 2026, owner-approved after a lab trial): three chips at the foot of the Cyber Detection Analytics card,
    each with a tiny live preview, opening one small chart card at a time
    below the chips. Brand teal for normal, the card's outcome amber for
    anything flagged, ink for every label. */
@@ -4681,6 +4681,15 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
 .peek-odd { stroke: #c46d1c; stroke-width: 1.5; stroke-dasharray: 4 3; stroke-linecap: round; }
 .peek-odd-packet { fill: #c46d1c; }
 .peek-ring { fill: none; stroke: #c46d1c; stroke-width: 1.5; }
+/* Phishing domains: the address-bar text and the "Phishing" tag. */
+.peek-url,
+.peek-tag {
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+.peek-url { fill: #20343d; }
+.peek-tag { fill: #ffffff; letter-spacing: 0.03em; }
 
 @media (prefers-reduced-motion: reduce) {
   .peek-pulse { animation: none; }
@@ -4711,6 +4720,8 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     text-align: left;
   }
   .page-experience #cloud-analytics .anomaly-card { grid-column: 1 / -1; }
+  /* Three chips: Phishing domains leads on its own row, the other two pair. */
+  .page-experience #cloud-analytics .anomaly-peek__chip[data-peek="site"] { grid-column: 1 / -1; }
 }
 /* Phones and touch tablets: with no hover to preview, a tap pins the card,
    and a pinned floating card would sit over Early career. So the card opens
@@ -4749,6 +4760,8 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
 @media screen and (max-width: 374px) {
   /* Border-box: slim padding so the chart itself draws at 36x11. */
   .page-experience #cloud-analytics .anomaly-peek__mini { width: 40px; height: 13px; padding: 1px 2px; }
+  /* A two-line note is the tallest any card gets here, so all three match. */
+  .page-experience #cloud-analytics .anomaly-card__note { min-height: 2.9em; }
 }
 @media (prefers-reduced-motion: reduce) {
   .page-experience #cloud-analytics .anomaly-card.is-open { animation: none; }
@@ -6700,6 +6713,18 @@ body.lightbox-open {
 
   .page-experience #cloud-analytics .case-study__tags {
     grid-column: 1;
+  }
+}
+
+/* Tablets: three internship cards side by side left each date line a column
+   about 90px wide (4-5 lines), so they stack like the DSTA cards above. */
+@media screen and (max-width: 980px) {
+  .page-experience .internship-group__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-experience .case-study--internship {
+    min-height: 0;
   }
 }
 

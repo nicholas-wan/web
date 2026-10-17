@@ -36,7 +36,7 @@ Decided 16–17 Oct 2026; do not propose otherwise. Details are under [Behaviour
 - Hero: desktop button stays a 3rem icon circle that reveals its label on hover (phones keep the pill); copy is approved text; the canvas keeps its calm signals.
 - Motion is calm and earns its place; decorative effects (entrance reveals, magnetic buttons, spotlight grids) are declined.
 - Pages crossfade in 220ms with no black load wait; desktop tab-page titles glide into place.
-- Work: no contact line; anomaly charts open one at a time from their chips, never over the writeup, with no "simulated" note.
+- Work: no contact line; anomaly charts open one at a time from their chips, never over the writeup, with no "simulated" note. Phishing domains leads the three charts; its fake keeps the padlock (most phishing sites use HTTPS).
 - Skills cards carry no case-study links.
 - Personal: unfocused cards stay dimmed to 0.55; galleries have no photo controls.
 - No skip link, no change to the homepage cards' focus ring; return-to-top stays on phones (except Travel, journals and Personal, where it is hidden).
@@ -232,14 +232,17 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Generated `Agentic AI Product Lead for Threat Hunting` headline: shown on desktop, hidden on phones (first DSTA card holds the title).
 - DSTA cards on phones: company context, title, Problem/My role/Outcome rail, copy, tags.
 - Cloud Analytics header is `display: contents` at the phone breakpoint only; desktop stays two-column.
-- Cloud Anomaly ends with an anomaly peek (owner-approved; `assets/js/anomaly-peek.js`, experience bundle).
-- CTA "See an anomaly get caught · hover a chart" ("tap a chart" on phones) above chips Over time and Across connections.
-- Chip previews play ~4s on entering view (eased, line ends faded), land on the amber flag with one ring, then glow once (max every 20s).
+- Internship cards: three in a row above 980px, stacked below (at 768px three columns wrapped each date line to 4-5 lines). Shopee's same-year range gives the year once (`April – November 2020`) so its meta fits two lines like the others.
+- The second DSTA card is titled Cyber Detection Analytics (renamed from Cloud Anomaly Analytics, Oct 2026; anchor stays `#cloud-analytics`). Its lede names both halves: AWS and Microsoft 365 anomalies, and phishing domains impersonating MINDEF websites (owner-approved wording).
+- Cyber Detection Analytics ends with an anomaly peek (owner-approved; `assets/js/anomaly-peek.js`, experience bundle).
+- CTA "See an anomaly get caught · hover a chart" ("tap a chart" on phones) above chips Phishing domains, Over time and Across connections (phones: Phishing domains on its own row, the other two paired).
+- Phishing domains (owner-approved Oct 2026, renamed from Lookalike sites): a copy lifts off a real sign-in page, one scan crosses both, amber marks draw where it differs ("rn" for "m" in the address, an off logo, a form posting elsewhere), then the copy is outlined and tagged "Phishing"; it replays every 14s while open. It shows what differs, never the detector's steps or order.
+- Chip previews play ~4s on entering view (eased, line ends faded), land on the amber flag with one ring, then glow once (max every 20s). While on screen they replay every 15s without the glow, holding while a chart is open or the tab is hidden.
 - Hover, focus or tap opens only that chart: mouse desktops, a floating card below the chips, never over the writeup; phones (≤736px) and touch tablets (`hover: none`), an inline card pushing content down, below 44px chips (a pinned floating card covered Early career, Oct 2026).
 - Click/tap pins; hovering the other chip previews it, then the pin returns.
-- Equal-size cards, one plain note each, no "simulated" disclaimer (owner).
+- Equal-size cards (all 130px plots; notes reserve two lines at ≤374px), one plain note each, no "simulated" disclaimer (owner).
 - Charts animate only while open and on screen; reduced motion shows stills.
-- Never show both charts at once or overlay the writeup.
+- Never show two charts at once or overlay the writeup.
 
 ### Travel journal contracts
 

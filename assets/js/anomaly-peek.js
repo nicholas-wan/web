@@ -1,11 +1,12 @@
-/* Anomaly peek: the flavour of anomaly detection on the Cloud Anomaly
+/* Anomaly peek: the flavour of anomaly detection on the Cyber Detection
    Analytics card, kept small until asked for (Oct 2026, owner-approved after
    a lab trial). Loaded on the Work page only.
    - A one-line call to action ("See an anomaly get caught · hover a chart")
-     sits above two chips, "Over time" and "Across connections", each with a
+     sits above three chips, "Phishing domains" (added Oct 2026, owner-approved),
+     "Over time" and "Across connections", each with a
      tiny live preview. When the card comes into view the previews play for
      about four seconds, rest on their amber flags, and each chip glows once.
-     This replays at most every 20 seconds.
+     This replays at most every 20 seconds; on screen, they loop every 15.
    - Hovering, focusing or tapping a chip opens only that chart, in a card
      that drops below the chips (never over the writeup). A click or tap pins
      it; leaving, Escape or a tap elsewhere closes it (on phones and touch
@@ -30,6 +31,7 @@
   }
   function ease(f) { return f < 0.5 ? 2 * f * f : 1 - Math.pow(-2 * f + 2, 2) / 2; }
   function lerp(a, b, f) { return { x: a.x + (b.x - a.x) * f, y: a.y + (b.y - a.y) * f }; }
+  function clamp(f) { return Math.max(0, Math.min(1, f)); }
 
   // ---- Simulated signal shared by the mini preview and the full chart ----
   // Uniform noise on ±6 has sigma 6/sqrt(3); the normal range is the expected
@@ -207,6 +209,119 @@
     };
   }
 
+  // ---- Phishing domains: a copy lifts off a real sign-in page, a matching
+  // scan crosses both, and what differs is marked: "rn" posing as "m", an
+  // off logo and a form that posts elsewhere. Then the copy is outlined.
+  var TEAL = '#11807d', AMBER = '#c46d1c', INK = '#20343d', SOFT = '#d7e4e2';
+  function dash(node, f) { node.setAttribute('stroke-dashoffset', (1 - f).toFixed(3)); node.setAttribute('visibility', f > 0 ? 'visible' : 'hidden'); }
+  function drawable(node) { node.setAttribute('pathLength', 1); node.setAttribute('stroke-dasharray', '1 1'); return node; }
+  function createSite(host) {
+    var svg = el('svg', { 'aria-hidden': 'true', focusable: 'false' }, host);
+    var W = 0, H = 130, PY = 14, PH = 104, pw = 0, x0 = 4, x1 = 0, t = 0, DUR = 7600, LOOP = 14000;
+    var pages = [], marks = {}, swapX = 0, swapW = 0, tx = 22, idle = false;
+    function page(fake) {
+      var g = el('g', {}, svg), p = { g: g };
+      p.box = el('rect', { y: PY, height: PH, rx: 9, fill: '#fff', stroke: SOFT, 'stroke-width': 1.2 }, g);
+      p.bar = el('rect', { x: 6, y: PY + 6, height: 18, rx: 9, fill: '#f2f8f7' }, g);
+      p.lock = el('g', {}, g);
+      el('path', { d: 'M12 ' + (PY + 15) + 'v-2a2.5 2.5 0 0 1 5 0v2', fill: 'none', stroke: TEAL, 'stroke-width': 1.2, opacity: 0.7 }, p.lock);
+      el('rect', { x: 11, y: PY + 14.5, width: 7, height: 5, rx: 1.2, fill: TEAL, opacity: 0.7 }, p.lock);
+      p.url = el('text', { class: 'peek-url', x: 22, y: PY + 19.5 }, g);
+      if (fake) {
+        p.url.appendChild(document.createTextNode('exa'));
+        p.swap = el('tspan', {}, p.url); p.swap.textContent = 'rn';
+        p.url.appendChild(document.createTextNode('ple.com'));
+      } else { p.url.textContent = 'example.com'; }
+      p.logo = el('circle', { r: fake ? 9 : 10, fill: fake ? '#2a9d8a' : TEAL }, g);
+      p.tick = el('path', { fill: 'none', stroke: '#fff', 'stroke-width': fake ? 2.4 : 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
+      p.title = el('rect', { y: PY + 62, height: 5, rx: 2.5, fill: INK, opacity: 0.78 }, g);
+      p.field = el('rect', { x: 12, y: PY + 73, height: 10, rx: 3, fill: 'none', stroke: SOFT }, g);
+      p.button = el('rect', { x: 12, y: PY + 88, height: 11, rx: 4, fill: TEAL }, g);
+      p.scan = el('g', { opacity: 0 }, g);
+      el('rect', { x: -5, y: PY + 2, width: 10, height: PH - 4, rx: 5, fill: TEAL, opacity: 0.08 }, p.scan);
+      el('rect', { x: -1, y: PY + 2, width: 2, height: PH - 4, rx: 1, fill: TEAL, opacity: 0.55 }, p.scan);
+      p.fake = fake;
+      return p;
+    }
+    pages = [page(false), page(true)];
+    var real = pages[0], fake = pages[1], stroke = { fill: 'none', stroke: AMBER, 'stroke-width': 1.5, 'stroke-linecap': 'round' };
+    ['url', 'logo', 'form', 'outline'].forEach(function (k) { marks[k] = drawable(el('path', stroke, svg)); });
+    marks.outline.setAttribute('stroke-width', 1.8);
+    var dot = el('circle', { r: 0, fill: AMBER }, svg);
+    var halo = el('rect', { fill: 'none', stroke: AMBER, 'stroke-width': 1 }, svg);
+    var tag = el('g', {}, svg);
+    var tagBox = el('rect', { width: 64, height: 16, rx: 8, fill: AMBER }, tag);
+    var tagText = el('text', { class: 'peek-tag', 'text-anchor': 'middle' }, tag);
+    tagText.textContent = 'Phishing';
+    function layout() {
+      W = Math.round(host.clientWidth) || 300;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
+      // The narrowest phones tighten the gap and address so ".com" clears the bar.
+      var narrow = W < 240, gap = Math.max(narrow ? 8 : 14, Math.min(24, W * 0.06)), inset = narrow ? 4 : 6;
+      pw = (W - 2 * x0 - gap) / 2; x1 = x0 + pw + gap; tx = narrow ? 19 : 22;
+      pages.forEach(function (p) {
+        p.url.setAttribute('x', tx); p.lock.setAttribute('transform', 'translate(' + (tx - 22) + ' 0)');
+        p.bar.setAttribute('x', inset); p.bar.setAttribute('width', pw - 2 * inset);
+        var cx = pw / 2 + (p.fake ? 2 : 0), cy = PY + (p.fake ? 45 : 44);
+        p.box.setAttribute('width', pw);
+        p.logo.setAttribute('cx', cx); p.logo.setAttribute('cy', cy);
+        p.tick.setAttribute('d', p.fake ? 'M' + (cx - 5.5) + ' ' + (cy - 1.5) + 'l3 5.5 7.5-7' : 'M' + (cx - 6) + ' ' + cy + 'l4 4 8-9');
+        p.title.setAttribute('x', pw * 0.25); p.title.setAttribute('width', pw * 0.5);
+        p.field.setAttribute('width', pw - 24); p.button.setAttribute('width', pw - 24);
+      });
+      // Underline exactly "rn"; fall back to an estimate while hidden.
+      try { swapX = fake.url.getSubStringLength(0, 3); swapW = fake.url.getSubStringLength(3, 2); } catch (e) { swapX = 0; }
+      if (!swapX) { swapX = 19; swapW = 14; }
+      marks.url.setAttribute('d', 'M' + (x1 + tx + swapX).toFixed(1) + ' ' + (PY + 23) + 'h' + swapW.toFixed(1));
+      var lx = x1 + pw / 2 + 2, ly = PY + 45;
+      marks.logo.setAttribute('d', 'M' + lx + ' ' + (ly - 15) + 'a15 15 0 1 1-.01 0');
+      var bx = x1 + pw - 12, by = PY + 93.5;
+      marks.form.setAttribute('d', 'M' + bx + ' ' + by + 'C' + (bx + 12) + ' ' + by + ' ' + (bx + 12) + ' ' + (by + 12) + ' ' + (bx + 2) + ' ' + (PY + PH + 9));
+      dot.setAttribute('cx', bx + 2); dot.setAttribute('cy', PY + PH + 9);
+      var r = 9, w = pw - 2 * r, h = PH - 2 * r;
+      marks.outline.setAttribute('d', 'M' + (x1 + r) + ' ' + PY + 'h' + w + 'a9 9 0 0 1 9 9v' + h + 'a9 9 0 0 1-9 9h-' + w + 'a9 9 0 0 1-9-9v-' + h + 'a9 9 0 0 1 9-9z');
+      tagBox.setAttribute('x', x1 + pw - 64); tagBox.setAttribute('y', PY - 8);
+      tagText.setAttribute('x', x1 + pw - 32); tagText.setAttribute('y', PY + 4);
+      idle = false;
+      render();
+    }
+    function render() {
+      var c = reduce ? DUR : t % LOOP, a = ease(Math.min(1, c / 600)), s = ease(clamp((c - 1900) / 1200));
+      // Nothing moves between the last pulse and the fade before a replay.
+      var still = !reduce && c > 11700 && c < 13500;
+      if (still && idle) { return; }
+      idle = still;
+      svg.style.opacity = reduce ? 1 : (1 - clamp((c - 13500) / 500)).toFixed(2);
+      real.g.setAttribute('transform', 'translate(' + x0 + ' ' + (6 * (1 - a)).toFixed(1) + ')');
+      real.g.style.opacity = a.toFixed(2);
+      fake.g.style.opacity = clamp((c - 600) / 500).toFixed(2);
+      fake.g.setAttribute('transform', 'translate(' + (x0 + (x1 - x0) * s).toFixed(1) + ' 0)');
+      var sp = clamp((c - 3300) / 2000), sx = 8 + (pw - 16) * ease(sp);
+      pages.forEach(function (p) { p.scan.setAttribute('transform', 'translate(' + sx.toFixed(1) + ' 0)'); p.scan.style.opacity = sp > 0 && sp < 1 ? 1 : 0; });
+      function at(v, len) { return sp > 0 ? clamp((sx - v) / len) : 0; }
+      var u = at(tx + swapX, 14), f = at(pw - 24, 14);
+      dash(marks.url, u); fake.swap.setAttribute('fill', u > 0.4 ? AMBER : INK);
+      dash(marks.logo, at(pw / 2 - 12, 36));
+      dash(marks.form, f); dot.setAttribute('r', (2.4 * clamp((f - 0.9) * 10)).toFixed(2));
+      dash(marks.outline, ease(clamp((c - 5500) / 700)));
+      var tg = clamp((c - 6100) / 400);
+      tag.style.opacity = tg.toFixed(2); tag.setAttribute('transform', 'translate(0 ' + (4 * (1 - tg)).toFixed(1) + ')');
+      var hp = c > 6200 && c < 11600 && !reduce ? ((c - 6200) % 1800) / 1800 : -1, g = 1.5 + hp * 7;
+      halo.setAttribute('visibility', hp < 0 ? 'hidden' : 'visible');
+      if (hp >= 0) {
+        halo.setAttribute('x', x1 - g); halo.setAttribute('y', PY - g); halo.setAttribute('width', pw + 2 * g);
+        halo.setAttribute('height', PH + 2 * g); halo.setAttribute('rx', 9 + g); halo.style.opacity = (0.6 * (1 - hp)).toFixed(2);
+      }
+    }
+    return {
+      layout: layout,
+      // Re-measure on every open: the address font may have loaded since.
+      open: function () { t = 0; layout(); },
+      tick: function (dt) { t += dt; render(); },
+      setPaused: function () {}
+    };
+  }
+
   // ---- Mini previews inside the chips ----
   // Each plays for RUN ms; when its anomaly is caught, one ring marks it.
   var RUN = 4200, RING = 900;
@@ -301,21 +416,52 @@
     };
   }
 
+  function createMiniSite(svg) {
+    var W = 56, H = 18, X0 = 8, X1 = 30;
+    svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
+    // The chart in miniature: a copy slides out from behind a tiny sign-in
+    // page, then its outline and one address mark turn amber.
+    function page(fake) {
+      var g = el('g', {}, svg), p = { g: g };
+      p.box = el('rect', { x: 0, y: 2, width: 18, height: 14, rx: 2.5, fill: '#fff', stroke: '#cfdcda', 'stroke-width': 0.6 }, g);
+      el('rect', { x: 2.5, y: 4, width: 13, height: 2.4, rx: 1.2, fill: '#e3eceb' }, g);
+      el('circle', { cx: fake ? 9.6 : 9, cy: fake ? 9.4 : 9.2, r: fake ? 1.9 : 2.2, fill: fake ? '#2a9d8a' : TEAL }, g);
+      el('rect', { x: 4, y: 12.6, width: 10, height: 1.8, rx: 0.9, fill: TEAL }, g);
+      if (fake) { p.mark = el('rect', { x: 6, y: 4, width: 3.2, height: 2.4, rx: 1, fill: AMBER }, g); }
+      return p;
+    }
+    var real = page(false), copy = page(true), ring = el('circle', { class: 'mini-ring' }, svg), elapsed = 0;
+    real.g.setAttribute('transform', 'translate(' + X0 + ' 0)');
+    function draw(ms) {
+      var m = ease(clamp((ms - 800) / 1000)), on = ms >= 2300;
+      copy.g.setAttribute('transform', 'translate(' + (X0 + (X1 - X0) * m).toFixed(2) + ' 0)');
+      copy.g.style.opacity = clamp((ms - 300) / 300).toFixed(2);
+      copy.box.setAttribute('stroke', on ? AMBER : '#cfdcda'); copy.box.setAttribute('stroke-width', on ? 0.9 : 0.6);
+      copy.mark.style.opacity = on ? 1 : 0;
+      ringAt(ring, { x: X1 + 9.6, y: 9.4 }, (ms - 2500) / RING);
+    }
+    draw(RUN);
+    return {
+      replay: function () { elapsed = 0; draw(0); },
+      tick: function (dt) { elapsed += dt; draw(Math.min(elapsed, RUN)); },
+      done: function () { return elapsed >= RUN; },
+      rest: function () { draw(RUN); }
+    };
+  }
+
   // ---- Wire chips, minis and cards ----
   var card = root.closest('.case-study') || root.parentElement;
-  var charts = {
-    series: { chip: root.querySelector('[data-peek="series"]'), pop: root.querySelector('[data-peek-card="series"]') },
-    graph: { chip: root.querySelector('[data-peek="graph"]'), pop: root.querySelector('[data-peek-card="graph"]') }
-  };
-  charts.series.chart = createSeries(charts.series.pop.querySelector('[data-series]'));
-  charts.graph.chart = createGraph(charts.graph.pop.querySelector('[data-graph]'));
-  charts.series.mini = createMiniSeries(charts.series.chip.querySelector('[data-mini]'));
-  charts.graph.mini = createMiniGraph(charts.graph.chip.querySelector('[data-mini]'));
-  var keys = ['series', 'graph'];
+  var keys = ['site', 'series', 'graph'], charts = {};
+  var makers = { site: [createSite, createMiniSite], series: [createSeries, createMiniSeries], graph: [createGraph, createMiniGraph] };
+  keys.forEach(function (k) {
+    var c = charts[k] = { chip: root.querySelector('[data-peek="' + k + '"]'), pop: root.querySelector('[data-peek-card="' + k + '"]') };
+    c.chart = makers[k][0](c.pop.querySelector('.anomaly-card__plot'));
+    c.mini = makers[k][1](c.chip.querySelector('[data-mini]'));
+  });
   keys.forEach(function (k) { charts[k].chart.layout(); });
 
   var onScreen = false;
-  // Minis: play once each time the card comes into view, then rest.
+  // Minis: play each time the card comes into view, then rest (and loop).
   var miniTicker = {
     live: function () {
       var active = onScreen && !document.hidden && !reduce && keys.some(function (k) { return !charts[k].mini.done(); });
@@ -324,9 +470,25 @@
     },
     tick: function (dt) {
       keys.forEach(function (k) { if (!charts[k].mini.done()) { charts[k].mini.tick(dt); } });
-      if (nudgePending && keys.every(function (k) { return charts[k].mini.done(); })) { nudgePending = false; nudge(); }
+      if (keys.every(function (k) { return charts[k].mini.done(); })) {
+        if (nudgePending) { nudgePending = false; nudge(); }
+        loopLater();
+      }
     }
   };
+  // While the card stays on screen they replay every 15s, without the glow,
+  // holding while a chart is open or the tab is hidden.
+  var loopTimer = 0;
+  function loopLater() {
+    window.clearTimeout(loopTimer);
+    loopTimer = window.setTimeout(function () {
+      if (!onScreen || reduce) { return; }
+      if (document.hidden || keys.some(function (k) { return charts[k].state.open; })) { loopLater(); return; }
+      lastReplay = performance.now();
+      keys.forEach(function (k) { charts[k].mini.replay(); });
+      resume();
+    }, 15000);
+  }
   // When the previews come to rest, each chip glows once (CSS), unless one
   // is already open: the reader has found them.
   var nudgePending = false;
