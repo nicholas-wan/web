@@ -36,7 +36,7 @@ Colour grades, crops and removals are logged per photo in [docs/photo-edits.csv]
 Decided during the design reviews of 16–17 Oct 2026. Do not propose these again; the full contracts are in [docs/project-context.md](docs/project-context.md).
 
 - The home hero's desktop button stays an icon circle that reveals its label on hover; phones keep the labelled pill.
-- The Personal timeline keeps dimming unfocused cards and leaves the gallery controls where they are.
+- The Personal timeline keeps dimming unfocused cards; its photo galleries have no controls (removed 17 Oct 2026).
 - No skip-to-content link and no change to the homepage cards' focus ring.
 - The floating return-to-top circle stays on phones; it is the quick way back up.
 - No contact line on the Work page; email and LinkedIn live in the nav and footer.

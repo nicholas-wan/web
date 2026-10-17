@@ -1,45 +1,33 @@
 const { test, expect } = require('@playwright/test');
 
-test('standalone personal galleries support keyboard photo selection without navigation', async ({ page }) => {
-  await page.goto('/personal');
-  for (const [name, total] of [['Orientation Group Leader', 2], ['Naval Diving Unit', 3]]) {
-    const controls = page.getByRole('group', { name: name + ' photos', exact: true });
-    const event = controls.locator('..');
-    const next = controls.getByRole('button', { name: 'Next photo', exact: true });
-    await next.focus();
-    await page.keyboard.press('Enter');
-    await expect(controls.getByRole('status')).toContainText('Photo 2 of ' + total);
-    await expect(event.locator('img.is-gallery-selected')).toHaveCSS('opacity', '1');
-    await expect(next).toBeFocused();
-    await controls.getByRole('button', { name: 'Previous photo', exact: true }).focus();
-    await page.keyboard.press('Space');
-    await expect(controls.getByRole('status')).toContainText('Photo 1 of ' + total);
-    await page.keyboard.press('Space');
-    await expect(controls.getByRole('status')).toContainText('Photo ' + total + ' of ' + total);
-    await expect(page).toHaveURL(/\/personal$/);
-  }
-  await expect(page.locator('a .personal-gallery-controls')).toHaveCount(0);
-});
-
-test('touch autoplay pauses on a selected frame and resumes explicitly', async ({ browser }) => {
+test('personal galleries carry no photo controls and still play on touch', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:4321/personal');
-  const controls = page.getByRole('group', { name: 'Latte & Mocha photos', exact: true });
-  const event = controls.locator('..');
-  await controls.scrollIntoViewIfNeeded();
+  // Owner decision (17 Oct 2026): no previous/next/pause row under the cards.
+  await expect(page.locator('.personal-gallery-controls')).toHaveCount(0);
+  const event = page.locator('[data-timeline-event]', { hasText: 'Latte & Mocha' });
+  await event.scrollIntoViewIfNeeded();
   await expect(event).toHaveClass(/is-gallery-active/);
-  await controls.getByRole('button', { name: 'Pause automatic photos', exact: true }).tap();
-  await expect(event).toHaveClass(/is-gallery-paused/);
-  const photo = event.locator('img.is-gallery-selected');
-  await expect(photo).toHaveCSS('animation-name', 'none');
-  await expect(photo).toHaveCSS('opacity', '1');
-  await controls.getByRole('button', { name: 'Resume automatic photos', exact: true }).tap();
-  await expect(event).not.toHaveClass(/is-gallery-paused/);
   await expect(event.locator('.personal-event-card__image img').first()).toHaveCSS('animation-name', 'personal-card-slideshow-first');
-  await controls.getByRole('button', { name: 'Next photo', exact: true }).tap();
-  await expect(event).toHaveClass(/is-gallery-paused/);
-  await expect(controls.getByRole('status')).toContainText('Photo 2 of 5');
+  await context.close();
+});
+
+test('keyboard focus plays the standalone galleries on desktop', async ({ browser }) => {
+  // The suite defaults to reduced motion, which correctly holds the first photo.
+  const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'no-preference' });
+  const page = await context.newPage();
+  await page.goto('http://127.0.0.1:4321/personal');
+  for (const name of ['Orientation Group Leader photos', 'Naval Diving Unit photos']) {
+    const card = page.getByRole('group', { name, exact: true });
+    // Tab to the card like a keyboard user: script focus does not set
+    // :focus-visible, which is what plays the crossfade.
+    for (let i = 0; i < 60 && !(await card.evaluate(el => el === document.activeElement)); i++) {
+      await page.keyboard.press('Tab');
+    }
+    await expect(card).toBeFocused();
+    await expect(card.locator('.personal-event-card__image img').first()).not.toHaveCSS('animation-name', 'none');
+  }
   await context.close();
 });
 
