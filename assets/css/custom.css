@@ -4718,24 +4718,27 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
   .page-experience #cloud-analytics > .anomaly-peek {
     grid-row: 6;
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: stretch;
     gap: 0.45rem;
   }
   .page-experience #cloud-analytics .anomaly-peek__hint { grid-column: 1 / -1; margin: 0.15rem 0 0; }
   .anomaly-peek__hint-hover { display: none; }
   .anomaly-peek__hint-touch { display: inline; }
+  /* Three equal tiles in one row: thumbnail above a centred label, top
+     aligned so the thumbnails line up when one label is a line shorter. */
   .page-experience #cloud-analytics .anomaly-peek__chip {
+    flex-direction: column;
     justify-content: flex-start;
+    gap: 0.3rem;
     min-width: 0;
-    padding: 0.35rem 0.6rem 0.35rem 0.4rem;
+    padding: 0.5rem 0.3rem 0.45rem;
     border-radius: 0.6rem;
+    line-height: 1.2;
     white-space: normal;
-    text-align: left;
+    text-align: center;
   }
   .page-experience #cloud-analytics .anomaly-card { grid-column: 1 / -1; }
-  /* Three chips: Phishing domains leads on its own row, the other two pair. */
-  .page-experience #cloud-analytics .anomaly-peek__chip[data-peek="site"] { grid-column: 1 / -1; }
 }
 /* Phones and touch tablets: with no hover to preview, a tap pins the card,
    and a pinned floating card would sit over Early career. So the card opens
@@ -4770,7 +4773,7 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
   }
 }
 @keyframes anomaly-card-in { from { opacity: 0; } }
-/* The narrowest phones: a shorter mini leaves room for "Across connections". */
+/* The narrowest phones: a shorter mini leaves room for the longer chip names. */
 @media screen and (max-width: 374px) {
   /* Border-box: slim padding so the chart itself draws at 36x11. */
   .page-experience #cloud-analytics .anomaly-peek__mini { width: 40px; height: 13px; padding: 1px 2px; }

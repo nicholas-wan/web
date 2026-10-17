@@ -48,20 +48,20 @@
 						<div class="anomaly-peek">
 							<p class="anomaly-peek__hint"><strong>See an anomaly get caught</strong><span aria-hidden="true"> &middot; <span class="anomaly-peek__hint-hover">hover a chart</span><span class="anomaly-peek__hint-touch">tap a chart</span></span></p>
 							<button class="anomaly-peek__chip" type="button" aria-expanded="false" aria-controls="anomaly-card-site" data-peek="site"><svg class="anomaly-peek__mini" data-mini="site" aria-hidden="true" focusable="false"></svg>Phishing domains</button>
-							<button class="anomaly-peek__chip" type="button" aria-expanded="false" aria-controls="anomaly-card-series" data-peek="series"><svg class="anomaly-peek__mini" data-mini="series" aria-hidden="true" focusable="false"></svg>Over time</button>
-							<button class="anomaly-peek__chip" type="button" aria-expanded="false" aria-controls="anomaly-card-graph" data-peek="graph"><svg class="anomaly-peek__mini" data-mini="graph" aria-hidden="true" focusable="false"></svg>Across connections</button>
+							<button class="anomaly-peek__chip" type="button" aria-expanded="false" aria-controls="anomaly-card-series" data-peek="series"><svg class="anomaly-peek__mini" data-mini="series" aria-hidden="true" focusable="false"></svg>Statistical baseline</button>
+							<button class="anomaly-peek__chip" type="button" aria-expanded="false" aria-controls="anomaly-card-graph" data-peek="graph"><svg class="anomaly-peek__mini" data-mini="graph" aria-hidden="true" focusable="false"></svg>Graph analysis</button>
 							<div class="anomaly-card" id="anomaly-card-site" role="group" aria-label="Phishing domain detection" data-peek-card="site">
 								<p class="anomaly-card__title">Phishing domains</p>
 								<div class="anomaly-card__plot" data-site></div>
 								<p class="anomaly-card__note">Copies of real sites are flagged.</p>
 							</div>
-							<div class="anomaly-card" id="anomaly-card-series" role="group" aria-label="Anomaly detection over time" data-peek-card="series">
-								<p class="anomaly-card__title">Activity over time</p>
+							<div class="anomaly-card" id="anomaly-card-series" role="group" aria-label="Statistical baseline anomaly detection" data-peek-card="series">
+								<p class="anomaly-card__title">Statistical baseline</p>
 								<div class="anomaly-card__plot" data-series></div>
 								<p class="anomaly-card__note">Points outside the normal range are flagged.</p>
 							</div>
-							<div class="anomaly-card" id="anomaly-card-graph" role="group" aria-label="Anomaly detection across connections" data-peek-card="graph">
-								<p class="anomaly-card__title">Connections</p>
+							<div class="anomaly-card" id="anomaly-card-graph" role="group" aria-label="Graph analysis anomaly detection" data-peek-card="graph">
+								<p class="anomaly-card__title">Graph analysis</p>
 								<div class="anomaly-card__plot" data-graph></div>
 								<p class="anomaly-card__note">Links never seen before are flagged.</p>
 							</div>

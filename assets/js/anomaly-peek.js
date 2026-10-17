@@ -3,7 +3,7 @@
    a lab trial). Loaded on the Work page only.
    - A one-line call to action ("See an anomaly get caught · hover a chart")
      sits above three chips, "Phishing domains" (added Oct 2026, owner-approved),
-     "Over time" and "Across connections", each with a
+     "Statistical baseline" and "Graph analysis", each with a
      tiny live preview. When the card comes into view the previews play for
      about four seconds, rest on their amber flags, and each chip glows once.
      This replays at most every 20 seconds; on screen, they loop every 15.
@@ -211,8 +211,7 @@
 
   // ---- Phishing domains: a copy lifts off a real sign-in page, a matching
   // scan crosses both, and what differs is marked: a dot swapped for a
-  // hyphen, an off logo and a form that posts elsewhere. Then the copy is
-  // outlined.
+  // hyphen and an off logo. Then the copy is outlined.
   var TEAL = '#11807d', AMBER = '#c46d1c', INK = '#20343d', SOFT = '#d7e4e2';
   function dash(node, f) { node.setAttribute('stroke-dashoffset', (1 - f).toFixed(3)); node.setAttribute('visibility', f > 0 ? 'visible' : 'hidden'); }
   function drawable(node) { node.setAttribute('pathLength', 1); node.setAttribute('stroke-dasharray', '1 1'); return node; }
@@ -250,9 +249,8 @@
     }
     pages = [page(false), page(true)];
     var real = pages[0], fake = pages[1], stroke = { fill: 'none', stroke: AMBER, 'stroke-width': 1.5, 'stroke-linecap': 'round' };
-    ['url', 'logo', 'form', 'outline'].forEach(function (k) { marks[k] = drawable(el('path', stroke, svg)); });
+    ['url', 'logo', 'outline'].forEach(function (k) { marks[k] = drawable(el('path', stroke, svg)); });
     marks.outline.setAttribute('stroke-width', 1.8);
-    var dot = el('circle', { r: 0, fill: AMBER }, svg);
     var halo = el('rect', { fill: 'none', stroke: AMBER, 'stroke-width': 1 }, svg);
     var tag = el('g', {}, svg);
     var tagBox = el('rect', { width: 64, height: 16, rx: 8, fill: AMBER }, tag);
@@ -288,9 +286,6 @@
       marks.url.setAttribute('d', 'M' + (x1 + tx + swapX).toFixed(1) + ' ' + (PY + 23) + 'h' + swapW.toFixed(1));
       var lx = x1 + pw / 2 + 2, ly = PY + 45;
       marks.logo.setAttribute('d', 'M' + lx + ' ' + (ly - 15) + 'a15 15 0 1 1-.01 0');
-      var bx = x1 + pw - 12, by = PY + 93.5;
-      marks.form.setAttribute('d', 'M' + bx + ' ' + by + 'C' + (bx + 12) + ' ' + by + ' ' + (bx + 12) + ' ' + (by + 12) + ' ' + (bx + 2) + ' ' + (PY + PH + 9));
-      dot.setAttribute('cx', bx + 2); dot.setAttribute('cy', PY + PH + 9);
       var r = 9, w = pw - 2 * r, h = PH - 2 * r;
       marks.outline.setAttribute('d', 'M' + (x1 + r) + ' ' + PY + 'h' + w + 'a9 9 0 0 1 9 9v' + h + 'a9 9 0 0 1-9 9h-' + w + 'a9 9 0 0 1-9-9v-' + h + 'a9 9 0 0 1 9-9z');
       tagBox.setAttribute('x', x1 + pw - 64); tagBox.setAttribute('y', PY - 8);
@@ -312,10 +307,9 @@
       var sp = clamp((c - 3300) / 2000), sx = 8 + (pw - 16) * ease(sp);
       pages.forEach(function (p) { p.scan.setAttribute('transform', 'translate(' + sx.toFixed(1) + ' 0)'); p.scan.style.opacity = sp > 0 && sp < 1 ? 1 : 0; });
       function at(v, len) { return sp > 0 ? clamp((sx - v) / len) : 0; }
-      var u = at(tx + swapX, 14), f = at(pw - 24, 14);
+      var u = at(tx + swapX, 14);
       dash(marks.url, u); fake.swap.setAttribute('fill', u > 0.4 ? AMBER : INK);
       dash(marks.logo, at(pw / 2 - 12, 36));
-      dash(marks.form, f); dot.setAttribute('r', (2.4 * clamp((f - 0.9) * 10)).toFixed(2));
       dash(marks.outline, ease(clamp((c - 5500) / 700)));
       var tg = clamp((c - 6100) / 400);
       tag.style.opacity = tg.toFixed(2); tag.setAttribute('transform', 'translate(0 ' + (4 * (1 - tg)).toFixed(1) + ')');
