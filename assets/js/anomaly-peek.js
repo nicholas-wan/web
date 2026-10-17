@@ -210,8 +210,9 @@
   }
 
   // ---- Phishing domains: a copy lifts off a real sign-in page, a matching
-  // scan crosses both, and what differs is marked: "rn" posing as "m", an
-  // off logo and a form that posts elsewhere. Then the copy is outlined.
+  // scan crosses both, and what differs is marked: a dot swapped for a
+  // hyphen, an off logo and a form that posts elsewhere. Then the copy is
+  // outlined.
   var TEAL = '#11807d', AMBER = '#c46d1c', INK = '#20343d', SOFT = '#d7e4e2';
   function dash(node, f) { node.setAttribute('stroke-dashoffset', (1 - f).toFixed(3)); node.setAttribute('visibility', f > 0 ? 'visible' : 'hidden'); }
   function drawable(node) { node.setAttribute('pathLength', 1); node.setAttribute('stroke-dasharray', '1 1'); return node; }
@@ -219,6 +220,15 @@
     var svg = el('svg', { 'aria-hidden': 'true', focusable: 'false' }, host);
     var W = 0, H = 130, PY = 14, PH = 104, pw = 0, x0 = 4, x1 = 0, t = 0, DUR = 7600, LOOP = 14000;
     var pages = [], marks = {}, swapX = 0, swapW = 0, tx = 22, idle = false;
+    // A dot swapped for a hyphen (eservices.example.sg -> eservices-example.sg).
+    // Narrow bars use the shorter "my" pair rather than cutting the address.
+    var NAMES = ['eservices', 'my'], name = NAMES[0];
+    function fill(p) {
+      p.url.textContent = name + (p.fake ? '' : '.example.sg');
+      if (!p.fake) { return; }
+      p.swap = el('tspan', {}, p.url); p.swap.textContent = '-';
+      p.url.appendChild(document.createTextNode('example.sg'));
+    }
     function page(fake) {
       var g = el('g', {}, svg), p = { g: g };
       p.box = el('rect', { y: PY, height: PH, rx: 9, fill: '#fff', stroke: SOFT, 'stroke-width': 1.2 }, g);
@@ -227,11 +237,6 @@
       el('path', { d: 'M12 ' + (PY + 15) + 'v-2a2.5 2.5 0 0 1 5 0v2', fill: 'none', stroke: TEAL, 'stroke-width': 1.2, opacity: 0.7 }, p.lock);
       el('rect', { x: 11, y: PY + 14.5, width: 7, height: 5, rx: 1.2, fill: TEAL, opacity: 0.7 }, p.lock);
       p.url = el('text', { class: 'peek-url', x: 22, y: PY + 19.5 }, g);
-      if (fake) {
-        p.url.appendChild(document.createTextNode('exa'));
-        p.swap = el('tspan', {}, p.url); p.swap.textContent = 'rn';
-        p.url.appendChild(document.createTextNode('ple.com'));
-      } else { p.url.textContent = 'example.com'; }
       p.logo = el('circle', { r: fake ? 9 : 10, fill: fake ? '#2a9d8a' : TEAL }, g);
       p.tick = el('path', { fill: 'none', stroke: '#fff', 'stroke-width': fake ? 2.4 : 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
       p.title = el('rect', { y: PY + 62, height: 5, rx: 2.5, fill: INK, opacity: 0.78 }, g);
@@ -256,11 +261,12 @@
     function layout() {
       W = Math.round(host.clientWidth) || 300;
       svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
-      // The narrowest phones tighten the gap and address so ".com" clears the bar.
-      var narrow = W < 240, gap = Math.max(narrow ? 8 : 14, Math.min(24, W * 0.06)), inset = narrow ? 4 : 6;
-      pw = (W - 2 * x0 - gap) / 2; x1 = x0 + pw + gap; tx = narrow ? 19 : 22;
+      // The narrowest phones tighten the gap and padding so the address fits.
+      var narrow = W < 240, gap = Math.max(narrow ? 6 : 14, Math.min(24, W * 0.06)), inset = narrow ? 3 : 6;
+      x0 = narrow ? 2 : 4; pw = (W - 2 * x0 - gap) / 2; x1 = x0 + pw + gap; tx = narrow ? 17 : 22;
       pages.forEach(function (p) {
-        p.url.setAttribute('x', tx); p.lock.setAttribute('transform', 'translate(' + (tx - 22) + ' 0)');
+        p.url.setAttribute('x', tx); p.url.setAttribute('letter-spacing', narrow ? -0.2 : 0);
+        p.lock.setAttribute('transform', 'translate(' + (tx - 22) + ' 0)');
         p.bar.setAttribute('x', inset); p.bar.setAttribute('width', pw - 2 * inset);
         var cx = pw / 2 + (p.fake ? 2 : 0), cy = PY + (p.fake ? 45 : 44);
         p.box.setAttribute('width', pw);
@@ -269,9 +275,16 @@
         p.title.setAttribute('x', pw * 0.25); p.title.setAttribute('width', pw * 0.5);
         p.field.setAttribute('width', pw - 24); p.button.setAttribute('width', pw - 24);
       });
-      // Underline exactly "rn"; fall back to an estimate while hidden.
-      try { swapX = fake.url.getSubStringLength(0, 3); swapW = fake.url.getSubStringLength(3, 2); } catch (e) { swapX = 0; }
-      if (!swapX) { swapX = 19; swapW = 14; }
+      var room = pw - inset - tx - (narrow ? 3 : 6);
+      name = NAMES[0]; pages.forEach(fill);
+      try {
+        if (fake.url.getComputedTextLength() > room) { name = NAMES[1]; pages.forEach(fill); }
+        if (fake.url.getComputedTextLength() > room) { pages.forEach(function (p) { p.url.setAttribute('letter-spacing', -0.45); }); }
+      } catch (e) {}
+      // Underline the hyphen (at least 6px wide); estimate while hidden.
+      try { swapX = fake.url.getSubStringLength(0, name.length); swapW = fake.url.getSubStringLength(name.length, 1); } catch (e) { swapX = 0; }
+      if (!swapX) { swapX = 54; swapW = 4; }
+      if (swapW < 6) { swapX -= (6 - swapW) / 2; swapW = 6; }
       marks.url.setAttribute('d', 'M' + (x1 + tx + swapX).toFixed(1) + ' ' + (PY + 23) + 'h' + swapW.toFixed(1));
       var lx = x1 + pw / 2 + 2, ly = PY + 45;
       marks.logo.setAttribute('d', 'M' + lx + ' ' + (ly - 15) + 'a15 15 0 1 1-.01 0');
@@ -496,6 +509,7 @@
     if (keys.some(function (k) { return charts[k].state.open; })) { return; }
     keys.forEach(function (k) {
       var chip = charts[k].chip;
+      if (chip.classList.contains('is-breathing')) { return; }
       chip.classList.remove('is-nudging');
       void chip.offsetWidth;
       chip.classList.add('is-nudging');
@@ -533,6 +547,11 @@
   // now wins; failing that, the last pinned card shows. So hovering the other
   // chip previews it over a pin, and the pin returns when the pointer leaves.
   var stamp = 0;
+  // The first chip breathes while the card is on screen, until any chart is
+  // opened; then it rests for the visit.
+  var seen = false;
+  try { seen = window.sessionStorage.getItem('peek-seen') === '1'; } catch (e) {}
+  function breathe() { charts[keys[0]].chip.classList.toggle('is-breathing', onScreen && !seen); }
   function update() {
     var want = keys.filter(function (k) { var s = charts[k].state; return !s.dismissed && (s.hovering || s.focus); });
     if (!want.length) { want = keys.filter(function (k) { var s = charts[k].state; return !s.dismissed && s.pinned; }); }
@@ -545,7 +564,10 @@
       c.pop.classList.toggle('is-open', v);
       c.chip.setAttribute('aria-expanded', String(v));
       // Place first: on phones the card only gets its width once displayed.
-      if (v) { place(c); c.chart.open(); wake(c.ticker); }
+      if (v) {
+        place(c); c.chart.open(); wake(c.ticker);
+        if (!seen) { seen = true; breathe(); try { window.sessionStorage.setItem('peek-seen', '1'); } catch (e) {} }
+      }
     });
   }
   function inside(c, node) { return !!node && (c.pop.contains(node) || c.chip.contains(node)); }
@@ -639,9 +661,10 @@
         keys.forEach(function (k) { charts[k].mini.replay(); });
         nudgePending = true;
       }
+      breathe();
       resume();
     }, { threshold: 0.15 }).observe(card);
-  } else { onScreen = true; }
+  } else { onScreen = true; breathe(); }
   document.addEventListener('visibilitychange', resume);
   function onMotionChange() {
     reduce = motionQuery.matches;

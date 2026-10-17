@@ -328,7 +328,8 @@ Assert-FileSizeBudget 'assets\js\listing-effects.js' 8
 Assert-FileSizeBudget 'assets\js\journal-progress.js' 4
 # The Work page's anomaly peek (Oct 2026): charts and mini previews behind its chips.
 # 26 -> 36: the Phishing domains chart and its mini preview, a third chip (Oct 2026).
-Assert-FileSizeBudget 'assets\js\anomaly-peek.js' 36
+# 36 -> 40: the breathing first chip and the width-aware .sg address pair (Oct 2026).
+Assert-FileSizeBudget 'assets\js\anomaly-peek.js' 40
 # photo-search.js is injected on demand by the travel page's discovery bootstrap, so
 # it is outside the per-page <script src> ceiling and carries its own budget.
 # 12 -> 14: quick-fill Try/Recent chips, Oct 2026.

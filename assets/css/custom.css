@@ -4569,6 +4569,20 @@ body.is-map-fullscreen .travel-atlas__layout {
 @media (prefers-reduced-motion: reduce) {
   .page-experience #cloud-analytics .anomaly-peek__chip.is-nudging { animation: none; }
 }
+/* The first chip breathes while the card is on screen until any chart is
+   opened (owner-approved Oct 2026); reduced motion holds a teal outline. */
+.page-experience #cloud-analytics .anomaly-peek__chip.is-breathing {
+  animation: peek-breathe 2.6s ease-in-out infinite;
+}
+@keyframes peek-breathe {
+  50% { box-shadow: inset 0 0 0 1.5px #11807d, 0 0 0 5px rgba(17, 128, 125, 0.14); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-experience #cloud-analytics .anomaly-peek__chip.is-breathing {
+    animation: none;
+    box-shadow: inset 0 0 0 1.5px #11807d;
+  }
+}
 /* Touch: a 44px tap area without a taller chip. */
 @media (pointer: coarse) {
   .page-experience #cloud-analytics .anomaly-peek__chip::before {
