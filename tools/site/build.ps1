@@ -696,7 +696,7 @@ $assetVersions = @{}
 foreach ($file in @('icons.css', 'main.css', 'noscript.css')) {
     $assetVersions["assets/css/$file"] = Get-FileContentVersion (Join-Path $root "assets\css\$file")
 }
-foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js')) {
+foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js')) {
     $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
 }
 $assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
@@ -1084,7 +1084,11 @@ foreach ($page in $pages) {
     $activePage = if ($eventPages -contains $slug) { 'personal' } elseif ($tripOrder -contains $slug) { 'travel' } else { $slug }
     $activeMarker = 'data-page="' + $activePage + '"'
     if ($navigation.Contains($activeMarker)) {
-        $navigation = $navigation.Replace($activeMarker, $activeMarker + ' class="active"')
+        # The empty mark after the active link carries the tab highlight, so a
+        # page change can glide it to the new tab (custom.css "Page changes").
+        $markedNavigation = [regex]::Replace($navigation, '(<li ' + [regex]::Escape($activeMarker) + ')>(<a\b.*?</a>)</li>', '$1 class="active">$2<span class="nav-active-mark" aria-hidden="true"></span></li>')
+        if ($markedNavigation -eq $navigation) { throw "Could not add the nav-active-mark to the $activePage tab; check partials/site-navigation.html." }
+        $navigation = $markedNavigation
     }
     $navigation = [regex]::Replace($navigation, '\sdata-page="[^"]+"', '')
     if ($tripOrder -contains $slug) {
@@ -1151,6 +1155,7 @@ $routeStylesheetMarkup
     <link rel="shortcut icon" type="image/png" href="images/favicon.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
     <link rel="manifest" href="site.webmanifest" />
+    <script src="$(Get-AssetRef 'assets/js/page-transitions.js')"></script>
 </head>
 <body class="$bodyClass">
 $canvasMarkup
@@ -1198,7 +1203,7 @@ if ($imageDimensionCacheDirty) {
 
 # Publish only runtime assets used by the generated Pages site.
 $runtimeCss = @("icons.css", "main.css", "noscript.css")
-$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js")
+$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCss) {

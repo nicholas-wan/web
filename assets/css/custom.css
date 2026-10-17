@@ -4510,9 +4510,27 @@ body.is-map-fullscreen .travel-atlas__layout {
     outline-offset: -4px;
   }
 
+  /* The active-tab highlight is its own element: the build adds an empty
+     .nav-active-mark after the active link, so a page change can glide it
+     from the old tab to the new one (see "Page changes" below). */
   #nav ul.links li.active {
+    position: relative;
+    background: none;
+  }
+
+  #nav ul.links li.active > a {
+    position: relative;
+    z-index: 1;
+  }
+
+  #nav .nav-active-mark {
+    display: block;
+    position: absolute;
+    inset: 0;
     background: rgba(255, 255, 255, 0.08);
     box-shadow: inset 0 -2px 0 rgba(40, 215, 197, 0.72);
+    pointer-events: none;
+    view-transition-name: nav-active-mark;
   }
 
   #nav ul.links li.active a,
@@ -4524,6 +4542,43 @@ body.is-map-fullscreen .travel-atlas__layout {
     min-width: 3rem;
     min-height: 3rem;
   }
+}
+
+/* Below 981px the nav moves into the menu sheet, which styles its own
+   active row. */
+.nav-active-mark {
+  display: none;
+}
+
+/* Page changes (Oct 2026). Content pages no longer wait under the theme's
+   black load overlay (#wrapper.fade-in::before in main.css: a 0.75s hold
+   and then a 1s fade on every page). The homepage keeps it, because its
+   intro already sits above it. Where the browser supports cross-document
+   view transitions (Chrome/Edge 126+, Safari 18.2+), the next page arrives
+   in one 220ms crossfade: areas identical on both pages, such as the header
+   and nav, look still, and the active-tab highlight glides to its new tab.
+   assets/js/page-transitions.js stops that highlight flying in from
+   off-screen. Other browsers load pages normally; reduced motion gets no
+   transition. */
+body:not(.page-home) #wrapper.fade-in::before {
+  display: none;
+}
+
+@view-transition {
+  navigation: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+}
+
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: var(--motion-standard);
+  animation-timing-function: var(--ease-standard);
 }
 
 #navPanelToggle,
