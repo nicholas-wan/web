@@ -13,6 +13,13 @@ node tools/preview-server.mjs   # preview dist/ at http://localhost:4321
 
 Use the preview server, not a plain static server: the site's extensionless page URLs 404 elsewhere.
 
+CI also runs the Node and browser tests after the check; run them before pushing (from `tools/tests/browser`, after a build):
+
+```powershell
+node --test ../photo-search.test.cjs ../lightbox-cache.test.cjs
+npm test   # Playwright layout checks (npm ci and npx playwright install chromium webkit first)
+```
+
 ## Layout
 
 - `assets/` styles, scripts, fonts and public downloads
@@ -43,5 +50,9 @@ Decided during the design reviews of 16–17 Oct 2026. Do not propose these agai
 - Photos must be served at phone sizes: every gallery or card image needs `-480`/`-800` siblings and a `sizes` that matches its real slot.
 - Phone text never drops below the 12px floor; section headings on a page share one style.
 - No SEO, analytics or resume-PDF work; the hero copy is approved text.
+- Motion must be calm and earn its place; purely decorative effects (entrance reveals, magnetic buttons, spotlight grids) are declined.
+- The hero canvas keeps its calm signals; pages crossfade in 220ms with no black load wait.
+- The Work page's anomaly charts open one at a time from their chips, never over the writeup, with no "simulated" disclaimer.
+- Skills cards carry no case-study links.
 
 See [docs/build.md](docs/build.md) for the build and image pipeline and [docs/project-context.md](docs/project-context.md) for the behaviour contracts.
