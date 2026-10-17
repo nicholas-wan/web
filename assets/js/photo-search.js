@@ -128,7 +128,7 @@
 	}
 
 	function tripLabel(slug) {
-		return trips[slug].label + ' · ' + String(trips[slug].year).slice(-2);
+		return trips[slug].label + ' · ' + trips[slug].year;
 	}
 
 	function search(terms) {
@@ -245,7 +245,7 @@
 			return '<a class="photo-explore__card" data-cover-id="' + escape(item.photo.id) + '" data-explore-action="tag" data-tag="' + escape(item.tag) +
 				'" href="travel?q=' + encodeURIComponent(item.tag) + '">' + thumbnail(item.photo) +
 				'<span class="photo-explore__caption"><strong>' + escape(title) + '</strong><span><span>' + escape(context) +
-				'</span><span aria-hidden="true">&#8599;</span></span></span></a>';
+				'</span></span></span></a>';
 		}).join('');
 	}
 
@@ -295,7 +295,7 @@
 				'<a class="photo-moment__image" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '" aria-label="Open photo: ' + escape(photo.place) + '">' + thumbnail(photo, true) + '</a>' +
 				'<div class="photo-moment__copy"><span class="travel-atlas__eyebrow">A moment from the journals</span>' +
 				'<h2 id="photo-moment-title" tabindex="-1">' + escape(photo.place) + '</h2><p>' + escape(trips[photo.trip].label + ' · ' + trips[photo.trip].year) +
-				'</p><p>' + escape(photo.sectionTitle) + '</p><a class="photo-moment__read" href="' + escape(photo.trip + '#' + photo.section) + '">Read this day <span aria-hidden="true">&#8599;</span></a></div>';
+				'</p>' + (photo.sectionTitle === photo.place ? '' : '<p>' + escape(photo.sectionTitle) + '</p>') + '<a class="photo-moment__read" href="' + escape(photo.trip + '#' + photo.section) + '">Read this day <span aria-hidden="true">&#8599;</span></a></div>';
 			status.textContent = photo.place + ' · ' + tripLabel(photo.trip);
 			if (!momentAt && document.activeElement === previousMoment) moment.querySelector('[data-explore-action="surprise"]').focus();
 			previousMoment.hidden = !momentAt;

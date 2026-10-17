@@ -50,7 +50,7 @@ test('visible skills evidence stays keyboard-accessible at every breakpoint', as
     const detail = page.locator('#toolkit-ai-detail');
     await expect(detail).toBeVisible();
     await expect(detail).not.toHaveAttribute('inert', '');
-    const evidence = detail.getByRole('link', { name: 'See the agentic AI case study' });
+    const evidence = detail.getByRole('link', { name: 'View the agentic AI case study' });
     await evidence.focus();
     await expect(evidence).toBeFocused();
     await page.keyboard.press('Enter');

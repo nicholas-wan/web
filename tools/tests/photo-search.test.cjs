@@ -159,7 +159,7 @@ test('diacritics, CJK, photo links and numeric highlights retain their meaning',
   assert.ok(api.search(api.tokens('düsseldorf'))[0].length);
   assert.ok(api.search(api.tokens('京都'))[0].length);
   assert.equal(api.highlight('A & B <3>', ['3']), 'A &#38; B &#60;<mark>3</mark>&#62;');
-  assert.equal(api.tripLabel('travel_2023_usacanada'), 'USA & Canada · 23');
+  assert.equal(api.tripLabel('travel_2023_usacanada'), 'USA & Canada · 2023');
 });
 
 test('corrupt saved searches cannot stop initialization', () => {

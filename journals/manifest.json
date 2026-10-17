@@ -7,7 +7,7 @@
     "contentOnly": true,
     "mainClass": "seoul-2017-journal",
     "title": "Nicholas Wan - Seoul Trip",
-    "description": "Nicholas Wan's winter travel journal from Seoul, Nami Island, Gwacheon, and Chuncheon in December 2017.",
+    "description": "Nicholas Wan's Seoul travel journal from December 2017: Seoul, Nami Island, and Chuncheon.",
     "ogImage": "images/travel/2017_seoul/seoul-winter-banner.webp"
   },
   {
@@ -16,8 +16,8 @@
     "label": "Silicon Valley",
     "source": "journals/travel_2019_siliconvalley.html",
     "contentOnly": true,
-    "title": "Nicholas Wan - Silicon Valley",
-    "description": "Nicholas Wan's 2019 Silicon Valley work and travel journal.",
+    "title": "Nicholas Wan - Silicon Valley Trip",
+    "description": "Nicholas Wan's Silicon Valley travel journal from August 2019 to April 2020: San Francisco, Monterey, and Las Vegas.",
     "ogImage": "images/travel/2019_sv/MONTEREY_bigsby-800.jpg"
   },
   {
@@ -27,7 +27,7 @@
     "source": "journals/travel_2022_europe.html",
     "contentOnly": true,
     "title": "Nicholas Wan - Europe Trip",
-    "description": "Nicholas Wan's Europe travel journal and photography from 2022.",
+    "description": "Nicholas Wan's Europe travel journal from October 2022: Paris, Amsterdam, and Lucerne.",
     "ogImage": "images/travel/2022_europe/europe_cover.jpg"
   },
   {
@@ -37,7 +37,7 @@
     "source": "journals/travel_2023_perth.html",
     "contentOnly": true,
     "title": "Nicholas Wan - Perth Trip",
-    "description": "Nicholas Wan's Perth travel journal and photography from 2023.",
+    "description": "Nicholas Wan's Perth travel journal from June 2023: Fremantle, Rottnest Island, and Kalbarri.",
     "ogImage": "images/travel/2023_perth/perth_card.jpg"
   },
   {
@@ -47,7 +47,7 @@
     "source": "journals/travel_2023_usacanada.html",
     "contentOnly": true,
     "title": "Nicholas Wan - USA & Canada Trip",
-    "description": "Nicholas Wan's USA and Canada travel journal and photography from 2023.",
+    "description": "Nicholas Wan's USA and Canada travel journal from October 2023: New York, Boston, and Toronto.",
     "ogImage": "images/travel/2023_usa_canada/cover_photo-800.jpg"
   },
   {
@@ -57,7 +57,7 @@
     "source": "journals/travel_2024_germany.html",
     "contentOnly": true,
     "title": "Nicholas Wan - Germany Trip",
-    "description": "Nicholas Wan's Germany work and travel journal from 2024.",
+    "description": "Nicholas Wan's Germany travel journal from April 2024: Kalkar, Cologne, and Essen.",
     "ogImage": "images/travel/2024_germany/germany_banner_card.jpg"
   },
   {
@@ -68,7 +68,7 @@
     "contentOnly": true,
     "mainClass": "australia-journal guangzhou-day--compact",
     "title": "Nicholas Wan - Australia Trip",
-    "description": "Nicholas Wan's Melbourne and Sydney honeymoon travel journal and photography from 2024.",
+    "description": "Nicholas Wan's Australia travel journal from August 2024: Melbourne, the Great Ocean Road, and Sydney.",
     "ogImage": "images/travel/2024_australia/banner-800.jpg"
   },
   {
@@ -79,7 +79,7 @@
     "contentOnly": true,
     "mainClass": "japan-journal",
     "title": "Nicholas Wan - Japan Trip",
-    "description": "Nicholas Wan's Japan travel journal and photography from 2025.",
+    "description": "Nicholas Wan's Japan travel journal from October 2025: Hiroshima, Kyoto, and Tokyo.",
     "ogImage": "images/travel/2025_japan/japan_banner_japan-800.jpg"
   },
   {
@@ -90,7 +90,7 @@
     "contentOnly": true,
     "mainClass": "guangzhou-2026-journal",
     "title": "Nicholas Wan - Guangzhou Trip",
-    "description": "Nicholas Wan's six-day Guangzhou travel journal from May 2026, covering Old Guangzhou, Chimelong, Baiyun Mountain, and Canton Tower.",
+    "description": "Nicholas Wan's Guangzhou travel journal from May 2026: Shamian Island, Chimelong, and Canton Tower.",
     "ogImage": "images/travel/2026_guangzhou/day5/canton-tower-couple.webp"
   },
   {
@@ -101,7 +101,7 @@
     "contentOnly": true,
     "mainClass": "chengdu-zhangjiajie-2026-journal",
     "title": "Nicholas Wan - Chengdu & Zhangjiajie Trip",
-    "description": "Nicholas Wan's seven-day Chengdu, Dujiangyan, and Zhangjiajie travel journal from October 2026.",
+    "description": "Nicholas Wan's Chengdu and Zhangjiajie travel journal from October 2026: Dujiangyan, Chengdu, and Tianmen Mountain.",
     "ogImage": "images/travel/2026_chengdu_zhangjiajie/day2/red-panda-family.webp"
   }
 ]

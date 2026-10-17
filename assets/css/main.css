@@ -97,6 +97,52 @@
   src: url("../fonts/source-sans-pro-900-latin.woff2") format("woff2");
   unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
+/* Source Sans Pro 700 normal latin. A static wght=700 instance of the Source
+   Sans 3 variable font (tools/fonts/subset-source-sans.py), so tags, buttons
+   and labels get a real bold instead of the 900 Black. Source Sans 3 carries
+   taller vertical metrics (1000/-326) than the 2.045 Black cut (984/-273); the
+   overrides pin it to the Black's so mixed-weight lines share one line box.
+   Latin-ext characters fall through to the 900 latin-ext face. */
+@font-face {
+  font-family: "Source Sans Pro";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  ascent-override: 98.4%;
+  descent-override: 27.3%;
+  line-gap-override: 0%;
+  src: url("../fonts/source-sans-pro-700-latin.woff2") format("woff2");
+  unicode-range: U+0-FF, U+131, U+152-153, U+2BB-2BC, U+2C6, U+2DA, U+2DC, U+304, U+308, U+329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* Size-adjusted local fallbacks for the display stack. Listed after
+   "Source Sans Pro" in the stack, they render the pre-swap frame in Arial
+   scaled to Source Sans's advance widths (uppercase 900 text with 0.075em
+   tracking measures 86-88% of Arial Bold; 86% was calibrated in Chromium
+   against 639 headings, nav links and buttons at 390 and 1440 so the phone
+   Work headings keep their line count) with the Black cut's ascent/descent,
+   so headings and nav links keep their height when the WOFF2 arrives. The
+   regular face only matters if Source Sans fails to load; 600-900 requests
+   use Arial Bold. */
+@font-face {
+  font-family: "Source Sans Fallback";
+  font-style: normal;
+  font-weight: 100 500;
+  src: local("Arial"), local("ArialMT");
+  size-adjust: 97%;
+  ascent-override: 98.4%;
+  descent-override: 27.3%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Source Sans Fallback";
+  font-style: normal;
+  font-weight: 600 900;
+  src: local("Arial Bold"), local("Arial-BoldMT");
+  size-adjust: 86%;
+  ascent-override: 98.4%;
+  descent-override: 27.3%;
+  line-gap-override: 0%;
+}
 /* Raleway 400 normal latin-ext */
 @font-face {
   font-family: "Raleway";
@@ -276,7 +322,7 @@ p {
 }
 
 h1, h2, h3, h4, h5, h6 {
-	font-family: "Source Sans Pro", Helvetica, sans-serif;
+	font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
 	font-weight: 900;
 	line-height: 1.5;
 	letter-spacing: 0.075em;
@@ -1240,7 +1286,7 @@ button, .button {
 	border-radius: 0;
 	cursor: pointer;
 	display: inline-block;
-	font-family: "Source Sans Pro", Helvetica, sans-serif;
+	font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
 	font-size: 0.8rem;
 	font-weight: 900;
 	letter-spacing: 0.075em;
@@ -1293,7 +1339,7 @@ button:hover, .button:hover {
 
 label {
 	display: block;
-	font-family: "Source Sans Pro", Helvetica, sans-serif;
+	font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
 	font-weight: 900;
 	line-height: 1.5;
 	letter-spacing: 0.075em;
@@ -1799,7 +1845,7 @@ table td {
 }
 
 table th {
-	font-family: "Source Sans Pro", Helvetica, sans-serif;
+	font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
 	font-size: 0.8rem;
 	font-weight: 900;
 	letter-spacing: 0.075em;
@@ -2173,7 +2219,7 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 	border-style: solid;
 	border-color: #ffffff;
 	border-width: 5px !important;
-	font-family: "Source Sans Pro", Helvetica, sans-serif;
+	font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
 	font-size: 2.25rem;
 	font-weight: 900;
 	letter-spacing: 0.075em;
@@ -2294,7 +2340,7 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 	-webkit-flex-shrink: 1;
 	-ms-flex-shrink: 1;
 	flex-shrink: 1;
-	font-family: "Source Sans Pro", Helvetica, sans-serif;
+	font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
 	font-weight: 900;
 	letter-spacing: 0.075em;
 	list-style: none;
@@ -2899,7 +2945,7 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 	right: 0.75rem;
 	border: 0;
 	color: #ffffff;
-	font-family: "Source Sans Pro", Helvetica, sans-serif;
+	font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
 	font-size: 0.9rem;
 	font-weight: 900;
 	letter-spacing: 0.075em;
@@ -2985,7 +3031,7 @@ body.is-preload #intro:not(.hidden) + #header + #nav {
 #navPanel .links li a {
 	border-bottom: 0;
 	display: block;
-	font-family: "Source Sans Pro", Helvetica, sans-serif;
+	font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
 	font-size: 0.9rem;
 	font-size: 0.9rem;
 	font-weight: 900;

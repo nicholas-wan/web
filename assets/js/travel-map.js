@@ -22,7 +22,7 @@
 
   var TRIPS = {
     'silicon-valley': {
-      title: 'California & Nevada',
+      title: 'Silicon Valley',
       dates: 'August 2019 – April 2020',
       image: 'images/travel/2019_sv/SF_sutro_sunset.jpg',
       imageAlt: 'Sunset in San Francisco'
@@ -34,13 +34,13 @@
       imageAlt: 'New York skyline'
     },
     europe: {
-      title: 'Western Europe',
+      title: 'Europe',
       dates: '22 October – 1 November 2022',
       image: 'images/travel/2022_europe/day2/paris3-card.jpg',
       imageAlt: 'Eiffel Tower in Paris'
     },
     germany: {
-      title: 'North Rhine-Westphalia',
+      title: 'Germany',
       dates: '6 – 28 April 2024',
       image: 'images/travel/2024_germany/germany_banner_card.jpg',
       imageAlt: 'Germany travel photograph'
@@ -52,31 +52,31 @@
       imageAlt: 'Mount Fuji framed by autumn trees'
     },
     seoul: {
-      title: 'Seoul & Gangwon',
+      title: 'Seoul',
       dates: '18 – 26 December 2017',
       image: 'images/travel/2017_seoul/namsan-tower.webp',
       imageAlt: 'Winter view over Seoul from Namsan Tower'
     },
     guangzhou: {
-      title: 'Guangdong · Guangzhou',
+      title: 'Guangzhou',
       dates: '10 – 15 May 2026',
       image: 'images/travel/2026_guangzhou/day5/canton-tower-couple.webp',
       imageAlt: 'Nicholas and his wife at Canton Tower'
     },
     'chengdu-zhangjiajie': {
-      title: 'Sichuan & Hunan',
+      title: 'Chengdu & Zhangjiajie',
       dates: '3 – 9 October 2026',
       image: 'images/travel/2026_chengdu_zhangjiajie/day2/red-panda-family.webp',
       imageAlt: 'Four red pandas leaning over a wooden rail in Dujiangyan'
     },
     perth: {
-      title: 'Western Australia',
+      title: 'Perth',
       dates: '28 June – 8 July 2023',
       image: 'images/travel/2023_perth/perth_card.jpg',
       imageAlt: 'Perth travel photograph'
     },
     australia: {
-      title: 'Victoria & New South Wales',
+      title: 'Australia',
       dates: '2 – 14 August 2024',
       image: 'images/travel/2024_australia/melbourne_12apostles/apostles3.jpg',
       imageAlt: 'Twelve Apostles at sunset'
@@ -90,7 +90,7 @@
     ['area', 'Nevada', 'travel_2019_siliconvalley#trip-section-4', 38.8026, -116.4194, 'silicon-valley'],
     ['area', 'New York', 'travel_2023_usacanada#trip-section-2', 42.9538, -75.5268, 'usa-canada'],
     ['area', 'Massachusetts', 'travel_2023_usacanada#trip-section-6', 42.4072, -71.3824, 'usa-canada'],
-    ['area', 'Washington D.C.', 'travel_2023_usacanada#trip-section-14', 38.9072, -77.0369, 'usa-canada'],
+    ['area', 'Washington, D.C.', 'travel_2023_usacanada#trip-section-14', 38.9072, -77.0369, 'usa-canada'],
     ['area', 'Ontario', 'travel_2023_usacanada#trip-section-9', 50.0, -85.0, 'usa-canada'],
     ['area', 'France', 'travel_2022_europe#trip-section-2', 46.2276, 2.2137, 'europe'],
     ['area', 'Belgium', 'travel_2022_europe#trip-section-3', 50.5039, 4.4699, 'europe'],
@@ -115,7 +115,7 @@
     ['stop', 'Los Angeles', 'travel_2019_siliconvalley#trip-section-5', 34.0522, -118.2437, 'silicon-valley'],
     ['stop', 'New York City', 'travel_2023_usacanada#trip-section-2', 40.7128, -74.006, 'usa-canada'],
     ['stop', 'Boston', 'travel_2023_usacanada#trip-section-6', 42.3601, -71.0589, 'usa-canada'],
-    ['stop', 'Washington D.C.', 'travel_2023_usacanada#trip-section-14', 38.9072, -77.0369, 'usa-canada'],
+    ['stop', 'Washington, D.C.', 'travel_2023_usacanada#trip-section-14', 38.9072, -77.0369, 'usa-canada'],
     ['stop', 'Niagara Falls', 'travel_2023_usacanada#trip-section-9', 43.0962, -79.0377, 'usa-canada'],
     ['stop', 'Toronto', 'travel_2023_usacanada#trip-section-11', 43.6532, -79.3832, 'usa-canada'],
     ['stop', 'Paris', 'travel_2022_europe#trip-section-2', 48.8566, 2.3522, 'europe'],

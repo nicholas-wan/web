@@ -546,9 +546,9 @@ function Add-SectionIntro([string]$Markup, [string]$Slug) {
 
 function Add-GalleryPageHeading([string]$Markup, [string]$Slug) {
     $label = if ($Slug -eq 'house') {
-        'House photoshoot'
+        'House Photoshoot'
     } elseif ($Slug -eq 'prewed') {
-        'Pre-wedding photoshoot'
+        'Pre-Wedding Photoshoot'
     } elseif ($tripOrder -contains $Slug) {
         [System.Net.WebUtility]::HtmlEncode($tripLabels[$Slug]) + ' travel journal'
     } else {
@@ -967,7 +967,7 @@ $exploreCards = @(foreach ($theme in $exploreThemes.PSObject.Properties) {
     $responsive = if ($photo.Srcset) { ' srcset="' + $photo.Srcset + '" sizes="(max-width: 736px) 45vw, 33vw"' } else { '' }
     $card = '<a class="photo-explore__card" data-cover-id="' + [System.Net.WebUtility]::HtmlEncode($photo.Id) + '" data-explore-action="tag" data-tag="' + $name + '" data-title="' + $title + '" href="travel?q=' + [uri]::EscapeDataString($tag) + '">' +
         '<img src="' + $photo.Thumb + '"' + $responsive + ' alt="' + $alt + '" width="' + $photo.Width + '" height="' + $photo.Height + '" loading="lazy" decoding="async" style="object-position:' + $focus + '">' +
-        '<span class="photo-explore__caption"><strong>' + $title + '</strong><span><span>' + $photoContext + '</span><span aria-hidden="true">&#8599;</span></span></span></a>'
+        '<span class="photo-explore__caption"><strong>' + $title + '</strong><span><span>' + $photoContext + '</span></span></span></a>'
     $exploreFallback.Add(($card -replace 'href="[^"]+"', ('href="' + $photo.Trip + '#' + $photo.Section + '"')))
     $card
 })
@@ -1123,7 +1123,9 @@ foreach ($page in $pages) {
     $shareImageMeta = if ($slug -in @('experience', 'skills')) { '' } else { "    <meta property=`"og:image`" content=`"__OGIMAGE__`" />`n    <meta name=`"twitter:card`" content=`"summary_large_image`" />" }
     $introLine = if ($intro) { "    $intro" } else { "" }
     $canvasMarkup = if ($slug -eq 'index') { '    <canvas id="nokey" width="800" height="800" aria-hidden="true"></canvas>' } else { '' }
-    $preloadMarkup = '    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />'
+    $preloadMarkup = '    <link rel="preload" href="assets/fonts/source-sans-pro-900-latin.woff2" as="font" type="font/woff2" crossorigin />'
+    $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />'
+    if ($tripOrder -contains $slug) { $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/raleway-400-latin.woff2" as="font" type="font/woff2" crossorigin />' }
     if ($bannerPreload) { $preloadMarkup += "`n" + $bannerPreload }
     $template = @"
 <!DOCTYPE HTML>
