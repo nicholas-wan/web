@@ -2,7 +2,7 @@
 # runners (which set core.autocrlf=true). Without this, LF sources are smudged
 # to CRLF on CI checkout, inflating the byte-copied JS assets and the extracted
 # CSS bundles past their verify.ps1 size budgets even though local builds pass.
-# See docs/project-context.md "Dead ends and hidden dependencies".
+# See README.md, "Behaviour contracts" > "Dead ends and hidden dependencies".
 *.js    text eol=lf
 *.mjs   text eol=lf
 *.cjs   text eol=lf

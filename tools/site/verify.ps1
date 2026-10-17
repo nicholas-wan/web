@@ -222,7 +222,7 @@ foreach ($page in $pages) {
     }
     # The 80 KB JS ceiling is a real page-weight limit, held at point-of-need and
     # never bumped on spec — see the "80 KB per-page JavaScript ceiling" bullet under
-    # "Dead ends" in docs/project-context.md (the travel page sits essentially at
+    # "Dead ends" in README.md (the travel page sits essentially at
     # it). The warning below flags that headroom in green builds.
     if ($scriptBytes -gt 80KB) { throw "$($page.Name) exceeds the 80 KB raw JavaScript budget." }
     Warn-BudgetHeadroom "$($page.Name) JS" $scriptBytes 80KB
@@ -262,7 +262,7 @@ $iconsCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\icons.css') -R
 $customCss = @($sharedCustomCss, $travelMapPageCss, $travelJournalCss, $experiencePageCss, $personalPageCss, $skillsPageCss) -join "`n"
 # Page changes (Oct 2026): content pages skip the theme's black load overlay, pages
 # opt in to cross-document view transitions on the 220ms token, and reduced motion
-# opts out. See "Page changes" in docs/project-context.md.
+# opts out. See "Page changes" in README.md.
 if ($sharedCustomCss -notmatch '(?s)body:not\(\.page-home\) #wrapper\.fade-in::before\s*\{\s*display:\s*none' -or $sharedCustomCss -notmatch '(?s)@view-transition\s*\{\s*navigation:\s*auto' -or $sharedCustomCss -notmatch '(?s)prefers-reduced-motion: reduce\)\s*\{\s*@view-transition\s*\{\s*navigation:\s*none' -or $sharedCustomCss -notmatch '(?s)::view-transition-group\(\*\).*?animation-duration:\s*var\(--motion-standard\)' -or $sharedCustomCss -notmatch '(?s)#nav \.nav-active-mark\s*\{[^}]*view-transition-name:\s*nav-active-mark') { throw "Content pages must skip the black load overlay and keep the 220ms page transition with its reduced-motion opt-out and gliding tab mark." }
 $personalTimelineJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\personal-timeline.js') -Raw -Encoding UTF8
 $galleryJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\gallery.js') -Raw -Encoding UTF8
@@ -308,7 +308,7 @@ foreach ($merriweatherCut in @('merriweather-300-latin', 'merriweather-700-latin
     Assert-FileSizeBudget "assets\fonts\$merriweatherCut.woff2" 48
 }
 # Source Sans Pro 700 is a static latin instance of the ~170 KB Source Sans 3
-# variable font (tools/fonts/README.md); the variable file must never ship.
+# variable font (README.md, "Fonts"); the variable file must never ship.
 Assert-FileSizeBudget 'assets\fonts\source-sans-pro-700-latin.woff2' 20
 $mainCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\main.css') -Raw -Encoding UTF8
 if ($sharedCustomCss -notmatch '--font-display:\s*"Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;' -or $mainCss -notmatch '(?s)@font-face\s*\{[^}]*font-family:\s*"Source Sans Fallback";[^}]*font-weight:\s*600 900;[^}]*src:\s*local\("Arial Bold"\)[^}]*size-adjust:\s*8[0-9]%') { throw 'The display stack must name the size-adjusted "Source Sans Fallback" face (Oct 2026 cold-load reflow fix).' }

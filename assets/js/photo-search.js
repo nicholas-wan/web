@@ -1,5 +1,5 @@
 /* Travel photo search, injected on demand by travel-discovery.js.
-   Contracts: "Travel atlas contracts" in docs/project-context.md. */
+   Contracts: "Travel atlas contracts" in README.md. */
 (function() {
 	'use strict';
 

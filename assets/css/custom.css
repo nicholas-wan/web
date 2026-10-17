@@ -936,7 +936,7 @@ canvas#nokey {
 }
 /* Pre-wedding wordmark: Joseph Sophia subset to the wordmark's letters and its
    private-use swash glyphs (82 KB OTF to 12 KB WOFF2; source and command in
-   tools/fonts/README.md). block keeps fallback glyphs from flashing in place of
+   README.md, "Fonts"). block keeps fallback glyphs from flashing in place of
    the private-use characters. Declared here instead of an inline <style> in
    the page body; it downloads only on the page that renders it. */
 @font-face {
