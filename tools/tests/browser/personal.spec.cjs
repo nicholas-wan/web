@@ -43,17 +43,14 @@ test('touch autoplay pauses on a selected frame and resumes explicitly', async (
   await context.close();
 });
 
-test('visible skills evidence stays keyboard-accessible at every breakpoint', async ({ page }) => {
+test('skills summaries stay visible and link-free at every breakpoint', async ({ page }) => {
   for (const width of [320, 390, 768, 1280]) {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/skills');
     const detail = page.locator('#toolkit-ai-detail');
     await expect(detail).toBeVisible();
     await expect(detail).not.toHaveAttribute('inert', '');
-    const evidence = detail.getByRole('link', { name: 'View the agentic AI case study' });
-    await evidence.focus();
-    await expect(evidence).toBeFocused();
-    await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/\/experience#agentic-ai$/);
+    // Owner decision (Oct 2026): the summaries no longer link to case studies.
+    await expect(page.locator('.toolkit-card__detail a')).toHaveCount(0);
   }
 });

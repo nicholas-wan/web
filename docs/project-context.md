@@ -14,7 +14,7 @@ Read [`AGENTS.md`](../AGENTS.md) first. Use [`build.md`](build.md) for build, de
 ## Site-wide behavior
 
 - Custom 404 output uses root-relative assets and recovery/navigation links so nested nonexistent paths remain usable. Fragment links remain local.
-- Skills summaries link to the matching Work case studies and their details are always visible at every width. The phone disclosure toggles, eyebrows, tag lists and tool-logo lists were dead markup hidden at every width and were removed with their CSS and script (Oct 2026); `verify.ps1` now fails if any of it returns. The three Skills section headings (Skills, Tech stack, Education) share one quiet left-aligned Merriweather style at every width.
+- Skills summaries carry no links (owner decision, Oct 2026: the inline "View … case study" links were removed; do not add them back) and their details are always visible at every width. The phone disclosure toggles, eyebrows, tag lists and tool-logo lists were dead markup hidden at every width and were removed with their CSS and script (Oct 2026); `verify.ps1` now fails if any of it returns. The three Skills section headings (Skills, Tech stack, Education) share one quiet left-aligned Merriweather style at every width.
 - Page changes (Oct 2026, owner-approved after a lab trial).
   - Content pages no longer wait under the theme's black load overlay (`#wrapper.fade-in::before`: a 0.75s hold, then a 1s fade on every page). The homepage keeps the overlay, because its intro already sits above it.
   - Where cross-document view transitions are supported (Chrome/Edge 126+, Safari 18.2+), the next page arrives in one 220ms crossfade. Areas identical on both pages, such as the header and nav, look still.
