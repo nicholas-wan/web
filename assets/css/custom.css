@@ -4551,6 +4551,37 @@ body.is-map-fullscreen .travel-atlas__layout {
     transform: translateY(-1px);
   }
 }
+/* Wide desktops: three chips as wide as the widest one (equal 1fr columns
+   in a fit-content grid), thumbnail and label centred, and a small arrow at
+   the right that nudges on hover, a cue that the chip opens something. */
+@media screen and (min-width: 981px) {
+  .page-experience #cloud-analytics > .anomaly-peek {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: fit-content;
+    max-width: 100%;
+  }
+  .page-experience #cloud-analytics .anomaly-peek__hint { grid-column: 1 / -1; }
+  .page-experience #cloud-analytics .anomaly-peek__chip { min-width: 0; }
+  .page-experience #cloud-analytics .anomaly-peek__chip > .anomaly-peek__mini { margin-left: auto; }
+  .page-experience #cloud-analytics .anomaly-peek__chip::after {
+    content: "";
+    flex: none;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin: 0 0.15rem 0 auto;
+    border-top: 1.6px solid currentColor;
+    border-right: 1.6px solid currentColor;
+    opacity: 0.5;
+    transform: rotate(45deg);
+    transition: transform var(--motion-fast, 150ms) ease, opacity var(--motion-fast, 150ms) ease;
+  }
+  .page-experience #cloud-analytics .anomaly-peek__chip:hover::after,
+  .page-experience #cloud-analytics .anomaly-peek__chip[aria-expanded="true"]::after {
+    opacity: 1;
+    transform: translateX(2px) rotate(45deg);
+  }
+}
 .page-experience #cloud-analytics .anomaly-peek__chip:focus-visible {
   outline: 2px solid #128a86;
   outline-offset: 3px;
@@ -4594,9 +4625,14 @@ body.is-map-fullscreen .travel-atlas__layout {
 .anomaly-peek__mini {
   display: block;
   flex: none;
+  /* Drawn at 78x24 (from 48x14, Oct 2026) in a slightly deeper well, so the
+     thumbnails read at a glance and invite a click. */
+  width: 86px;
+  height: 28px;
   padding: 2px 4px;
   border-radius: 999px;
-  background: #f2f8f7;
+  background: #e9f4f2;
+  box-shadow: inset 0 0 0 1px rgba(17, 128, 125, 0.12);
   overflow: visible;
 }
 .mini-band { fill: rgba(17, 128, 125, 0.14); }
@@ -4715,18 +4751,22 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
    and a tap opens that chart inline, straight below the chips, pushing the
    page down rather than covering anything. The row stays last in the card. */
 @media screen and (max-width: 736px) {
+  .page-experience #cloud-analytics > .anomaly-peek { grid-row: 6; }
+  .anomaly-peek__hint-hover { display: none; }
+  .anomaly-peek__hint-touch { display: inline; }
+}
+/* Phones and tablets: three equal tiles in one row, thumbnail above a
+   centred label, top aligned so the thumbnails line up when one label is a
+   line shorter. Wide desktops use equal-width chips instead. */
+@media screen and (max-width: 980px) {
   .page-experience #cloud-analytics > .anomaly-peek {
-    grid-row: 6;
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: stretch;
     gap: 0.45rem;
   }
   .page-experience #cloud-analytics .anomaly-peek__hint { grid-column: 1 / -1; margin: 0.15rem 0 0; }
-  .anomaly-peek__hint-hover { display: none; }
-  .anomaly-peek__hint-touch { display: inline; }
-  /* Three equal tiles in one row: thumbnail above a centred label, top
-     aligned so the thumbnails line up when one label is a line shorter. */
+  .page-experience #cloud-analytics .anomaly-peek__chip::after { display: none; }
   .page-experience #cloud-analytics .anomaly-peek__chip {
     flex-direction: column;
     justify-content: flex-start;
@@ -4739,6 +4779,10 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     text-align: center;
   }
   .page-experience #cloud-analytics .anomaly-card { grid-column: 1 / -1; }
+}
+/* Phone tiles are about 93px wide: a slightly smaller thumbnail keeps a margin. */
+@media screen and (max-width: 736px) {
+  .anomaly-peek__mini { width: 78px; height: 25px; }
 }
 /* Phones and touch tablets: with no hover to preview, a tap pins the card,
    and a pinned floating card would sit over Early career. So the card opens
@@ -4776,7 +4820,7 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
 /* The narrowest phones: a shorter mini leaves room for the longer chip names. */
 @media screen and (max-width: 374px) {
   /* Border-box: slim padding so the chart itself draws at 36x11. */
-  .page-experience #cloud-analytics .anomaly-peek__mini { width: 40px; height: 13px; padding: 1px 2px; }
+  .page-experience #cloud-analytics .anomaly-peek__mini { width: 60px; height: 20px; padding: 1px 2px; }
   /* A two-line note is the tallest any card gets here, so all three match. */
   .page-experience #cloud-analytics .anomaly-card__note { min-height: 2.9em; }
 }
@@ -6591,6 +6635,21 @@ body.lightbox-open {
 
 .page-experience #agentic-ai .case-study__writeup-body { color: #a9bfbe; }
 
+/* Above phones the two DSTA cards' titles and body text step down
+   (Oct 2026): at 1680px+ the site's larger root made them 33px and 21px,
+   loud beside the rail. Phones keep their own sizes. */
+@media screen and (min-width: 737px) {
+  .page-experience #agentic-ai h2,
+  .page-experience #cloud-analytics h2 {
+    font-size: 1.35rem;
+  }
+
+  .page-experience #agentic-ai .case-study__writeup-body,
+  .page-experience #cloud-analytics .case-study__lede {
+    font-size: 0.94rem;
+  }
+}
+
 /* The support card mirrors the hero's shape at a smaller scale: context
    strip on top, title and lede in the wide left column, a light-theme dot
    timeline as the right rail, tags across the base. Auto-placement handles
@@ -6672,13 +6731,44 @@ body.lightbox-open {
   grid-column: 1 / -1;
 }
 
+/* Desktop: the Problem/Role/Outcome rail can be taller than the lede, so
+   the tags sit under the lede and the rail spans beside both, rather than
+   the tags waiting below the rail. (A spacer row for the rail's extra
+   height doubled the row gap above the chips; the columns now match.) */
+@media screen and (min-width: 981px) {
+  .page-experience #cloud-analytics > header {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .page-experience #cloud-analytics > .case-study__highlights {
+    grid-column: 2;
+    grid-row: 2 / 4;
+  }
+
+  .page-experience #cloud-analytics > .case-study__tags {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .page-experience #cloud-analytics > .anomaly-peek {
+    grid-row: 4;
+  }
+}
+
 .page-experience .internship-group__grid {
   gap: 0.8rem;
 }
 
+/* No fixed height (was 18rem, Oct 2026) and tags follow the description:
+   the tallest card sets the row, and any spare height falls at the foot of
+   a shorter card rather than as a gap above its tags. */
 .page-experience .case-study--internship {
-  min-height: 18rem;
   padding: 1rem;
+}
+
+.page-experience .case-study--internship .case-study__tags {
+  margin-top: 0;
 }
 
 .page-experience .case-study--internship .case-study__company {

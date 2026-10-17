@@ -1,7 +1,7 @@
 /* Anomaly peek: the flavour of anomaly detection on the Cyber Detection
    Analytics card, kept small until asked for (Oct 2026, owner-approved after
    a lab trial). Loaded on the Work page only.
-   - A one-line call to action ("See an anomaly get caught · hover a chart")
+   - A one-line call to action ("Hover a chart to see it catch something")
      sits above three chips, "Phishing domains" (added Oct 2026, owner-approved),
      "Statistical baseline" and "Graph analysis", each with a
      tiny live preview. When the card comes into view the previews play for

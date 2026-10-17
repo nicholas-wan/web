@@ -297,7 +297,8 @@ Assert-FileSizeBudget 'assets\css\travel-journal.css' 31
 Assert-FileSizeBudget 'assets\css\travel-search.css' 16
 # 12 -> 22: the Cloud Anomaly card's anomaly peek (two chips with mini previews and
 # two small chart cards, Oct 2026) adds about 9 KB of route-only CSS.
-Assert-FileSizeBudget 'assets\css\experience-page.css' 22
+# 22 -> 24: the third chart chip, equal-width chips with an open arrow and phone/tablet tiles (Oct 2026).
+Assert-FileSizeBudget 'assets\css\experience-page.css' 24
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 Assert-FileSizeBudget 'assets\css\skills-page.css' 10
 Assert-FileSizeBudget 'assets\css\icons.css' 4
@@ -831,7 +832,7 @@ foreach ($distPage in Get-ChildItem -LiteralPath $dist -Filter '*.html') {
     if ((Get-Content -LiteralPath $distPage.FullName -Raw -Encoding UTF8) -match 'target="_blank"(?![^>]*rel=)') { throw "$($distPage.Name) opens a tab without rel=noopener noreferrer." }
 }
 if ($experience -notmatch '<body class="is-preload page-experience">') { throw "Work layout scope is missing." }
-if ($experience -notmatch 'id="selected-work" class="portfolio-headline"' -or [regex]::Matches($experience, 'Agentic AI Product Lead for Threat Hunting').Count -ne 2 -or $experience -match 'Agentic AI for Threat Hunting' -or $experience -match 'section-intro' -or $experience -notmatch 'class="internship-group' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?\.page-experience #main > \.portfolio-headline\s*\{[^}]*display:\s*none') { throw "Desktop must retain its Work headline while the phone card owns the consolidated Agentic AI Product Lead title." }
+if ($experience -notmatch 'id="selected-work" class="portfolio-headline"' -or [regex]::Matches($experience, 'Agentic AI Product Lead, Cyber Defence').Count -ne 2 -or $experience -match 'Agentic AI for Threat Hunting' -or $experience -match 'section-intro' -or $experience -notmatch 'class="internship-group' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?\.page-experience #main > \.portfolio-headline\s*\{[^}]*display:\s*none') { throw "Desktop must retain its Work headline while the phone card owns the consolidated Agentic AI Product Lead title." }
 if ([regex]::Matches($experience, 'class="case-study case-study--work"').Count -ne 2) { throw "The two DSTA cards must use the same work-card format." }
 if ($experience -match 'case-study--compact' -or $experience -match 'case-study--lead' -or $experience -match 'case-study--wide') { throw "Retired work-card variants are still present." }
 if ([regex]::Matches($experience, 'class="case-study case-study--internship"').Count -ne 3) { throw "Internships must be presented as three compact cards in one row." }
