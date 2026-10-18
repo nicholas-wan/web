@@ -425,6 +425,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Initial cards: distinct approved covers; shuffles also avoid duplicate photos, prefer trip variety.
 - A postcard runs the search and focuses the first result without the phone keyboard.
 - Surprise me: inline moment with real place, trip/year, section (omitted if it repeats the place), Read this day; image opens the deep link.
+- Surprise me presentation (approved 18 Oct 2026): white, borderless photo and serif caption with quiet controls. Uncropped landscapes sit beside the caption on desktop and above it on phones (240px image cap); portraits and near-square photos use a compact side-by-side layout. The duplicate visible status is visually hidden while the moment is open, retaining its live announcement.
 - Glyphs (Oct 2026): ↻ on Surprise me and Another mix; none on postcards; ↗ only on Read this day.
 - Moments: trip first, avoid the last trip while others remain, seen ids in sessionStorage until all shown; safe if storage is blocked/corrupt.
 - Previous moment walks a separate session history; Another moment replays forward before picking new.
@@ -437,7 +438,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Announce index failures even with an empty field.
 - Run `node --test tools/tests/photo-search.test.cjs` after building; CI also covers mobile/desktop discovery, phrase suggestions, paging, filtering, keyboard, deep links, failures, URL restore, IME.
 
-- Budgets: `photo-search.js` 30 KB (26 → 30, 18 Oct 2026, for decoded swaps and recovery), `travel-search.css` 16 KB (from 19/11 KB, Oct 2026); index ~520 KB of 560 KB (from 480 KB, Oct 2026, for descriptive alts); index lazy.
+- Budgets: `photo-search.js` 30 KB (26 → 30, 18 Oct 2026, for decoded swaps and recovery), `travel-search.css` 19 KB (16 → 19, 18 Oct 2026, for the approved responsive Surprise me layout); index ~520 KB of 560 KB (from 480 KB, Oct 2026, for descriptive alts); index lazy.
 - Motion: shared tokens, immediate under reduced motion.
 
 #### Discovery loading and recovery (Oct 2026)

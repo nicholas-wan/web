@@ -29,7 +29,7 @@
     });
   });
   imageObserver.observe(cardGrid);
-  imageObserver.observe(document.querySelector('.photo-moment__content'));
+  imageObserver.observe(document.querySelector('.photo-moment'));
   // Only attached, initially visible images are eager; template images stay inert.
   cards.forEach(function (a) {
     var img = a.querySelector('img'), box = img.getBoundingClientRect();

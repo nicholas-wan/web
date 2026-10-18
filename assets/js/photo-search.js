@@ -233,8 +233,8 @@
 	}
 
 	function thumbnail(photo, large) {
-		var grid = document.querySelector(large ? '.photo-moment__content' : '.photo-explore__cards');
-		var width = parseFloat(getComputedStyle(grid).gridTemplateColumns) - (large ? 0 : 2);
+		var grid = document.querySelector(large ? '.photo-moment' : '.photo-explore__cards');
+		var width = (parseFloat(getComputedStyle(grid).gridTemplateColumns) || (large ? grid.clientWidth : 480)) - (large ? 0 : 2);
 		var sources = photo.variants ? photo.thumb + ' 480w, ' + photo.src + ' ' + photo.w + 'w' : '';
 		if (photo.variants === 2) sources += ', ' + photo.thumb.replace('-480.', '-800.') + ' 800w';
 		return '<img loading="' + (large ? 'eager' : 'lazy') + '" decoding="async"' +
@@ -365,6 +365,7 @@
 			input.value = ''; run();
 			discovery.hidden = true;
 			moment.hidden = false;
+			moment.classList.toggle('is-portrait', photo.h > photo.w * .9);
 			moment.querySelector('.photo-moment__content').innerHTML =
 				'<a class="photo-moment__image" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '" aria-label="Open photo: ' + escape(photo.place) + '">' + thumbnail(photo, true) + '</a>' +
 				'<div class="photo-moment__copy"><span class="travel-atlas__eyebrow">A moment from the journals</span>' +

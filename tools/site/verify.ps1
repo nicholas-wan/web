@@ -294,7 +294,8 @@ Assert-FileSizeBudget 'assets\css\travel-journal.css' 31
 # sits within a few hundred bytes of its cap (Oct 2026).
 # 10 -> 11: partial-match reason line, Oct 2026.
 # 11 -> 16: approved photo postcards and random-moment preview (Oct 2026).
-Assert-FileSizeBudget 'assets\css\travel-search.css' 16
+# 16 -> 19 KB (18 Oct 2026): approved borderless Surprise me layout, with uncropped responsive photos.
+Assert-FileSizeBudget 'assets\css\travel-search.css' 19
 # 12 -> 22: the Cloud Anomaly card's anomaly peek (two chips with mini previews and
 # two small chart cards, Oct 2026) adds about 9 KB of route-only CSS.
 # 22 -> 24: the third chart chip, equal-width chips with an open arrow and phone/tablet tiles (Oct 2026).
@@ -355,6 +356,7 @@ if ($travel -notmatch '<template id="photo-explore-seeds">' -or [regex]::Matches
 if ($travel -notmatch 'id="photo-results"[^>]*aria-labelledby="photo-results-title"' -or $travel -notmatch 'id="photo-search-status"[^>]*aria-live="polite"') { throw 'The travel page must ship the photo results landmark and its live status line before the search module loads.' }
 if ($photoSearchJs -notmatch 'history\.replaceState' -or $photoSearchJs -notmatch 'data-search-index' -or $photoSearchJs -notmatch 'DEBOUNCE = 120' -or $photoSearchJs -notmatch 'object-position:' -or $photoSearchJs -notmatch 'photo\.fx') { throw 'photo-search.js must keep URL state in ?q=, read the index from data-search-index, debounce input at 120ms, and preserve authored focal points in result thumbnails.' }
 $travelSearchCss = Get-Content -LiteralPath (Join-Path $dist 'assets/css/travel-search.css') -Raw -Encoding UTF8
+if ($travelSearchCss -notmatch 'html:has\(#photo-moment:not\(\[hidden\]\)\)\s+#photo-search-status' -or $travelSearchCss -notmatch 'object-fit: contain' -or $photoSearchJs -notmatch 'photo\.h > photo\.w \* \.9') { throw 'Surprise me must preserve uncropped photos, classify portrait layouts, and keep its duplicate live status visually hidden while open.' }
 if ($travelSearchCss -notmatch '(?s)\.travel-atlas__layout\[hidden\]\s*\{[^}]*height:\s*0[^}]*visibility:\s*hidden' -or $travelSearchCss -match '(?s)\.travel-atlas__layout\[hidden\]\s*\{[^}]*display:\s*none') { throw 'A collapsed atlas must keep its width (zero height, hidden), never display: none; travel-map.js measures it on resize.' }
 # The photo search index is fetched by photo-search.js on first use, never at
 # page load. The full schema is 468 KB raw for 898 photos after the October
