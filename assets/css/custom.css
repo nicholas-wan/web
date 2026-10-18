@@ -9999,6 +9999,11 @@ html.timeline-review{--timeline-icon-width:136px;--timeline-icon-height:91px;--t
  .timeline-review.mobile-variant-a .mobile-photo-cta{display:flex;align-items:flex-end;position:absolute;inset:auto 0 0;height:54px;padding:0 10px 8px;box-sizing:border-box;background:linear-gradient(transparent,rgba(0,0,0,.68) 45%,rgba(0,0,0,.72));color:#fff;font:500 12px/18px Arial,sans-serif;letter-spacing:0;text-transform:none;pointer-events:none}
 }
 
+/* Approved static search invitation: compact desktop, full mobile column. */
+.timeline-review .photo-search__field{background:#fff;border-color:#88a996}
+.timeline-review .photo-search__example{flex-basis:100%;font:12px/1.5 Arial,sans-serif!important;color:#526a5c!important;margin:8px 0 0!important;letter-spacing:0;text-transform:none}
+@media(min-width:737px){.timeline-review #photo-search{width:100%;max-width:420px;justify-self:start}}
+
 /* Search results temporarily replace both journal presentations. */
 .timeline-review #main>.compact-journals[hidden],
 .timeline-review #main>.compact-journals.journals-expanded[hidden],

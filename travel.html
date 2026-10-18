@@ -61,10 +61,11 @@
 								<form class="photo-search" id="photo-search" role="search" data-search-script="assets/js/photo-search.js" data-search-index="assets/data/photo-index.json" autocomplete="off">
 									<label class="sr-only" for="photo-search-input">Search travel photos</label>
 									<div class="photo-search__field">
-										<input class="photo-search__input" id="photo-search-input" type="search" name="q" placeholder="Search places, food, moments…" aria-describedby="photo-search-hint" aria-controls="photo-results" enterkeyhint="search" spellcheck="false" />
+										<input class="photo-search__input" id="photo-search-input" type="search" name="q" placeholder="Search places, food, moments…" aria-describedby="photo-search-hint photo-search-example" aria-controls="photo-results" enterkeyhint="search" spellcheck="false" />
 										<kbd class="photo-search__key" aria-hidden="true">/</kbd>
 										<button type="button" class="photo-search__clear" aria-label="Clear search" data-clear hidden>&times;</button>
 									</div>
+									<p class="photo-search__example" id="photo-search-example">Try red pandas, Kyoto, or coffee.</p>
 									<p class="sr-only" id="photo-search-hint">Search every journal photo by place, subject, or caption.</p>
 									<div class="photo-search__suggest"></div>
 									<p class="photo-search__status" id="photo-search-status" role="status" aria-live="polite"></p>
