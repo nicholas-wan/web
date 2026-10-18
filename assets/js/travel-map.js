@@ -987,7 +987,7 @@
     minScale = useDesktopCrop ? DESKTOP_INITIAL_SCALE : MIN_SCALE;
     scale = minScale;
     tx = useDesktopCrop ? (viewport.clientWidth - baseCanvasWidth() * scale) / 2 : 0;
-    ty = 0;
+    ty = useDesktopCrop ? -baseCanvasHeight() * .07 : 0;
     scheduleApply();
   };
 

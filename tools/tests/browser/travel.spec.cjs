@@ -13,15 +13,16 @@ for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], 
     await page.setViewportSize({ width, height });
     await page.goto('/travel');
     await page.evaluate(() => document.fonts.ready);
-    const grid = page.locator('.travel-grid');
+    const grid = page.locator(width<=736?'.mobile-journal-list':'.travel-grid');
     await grid.scrollIntoViewIfNeeded();
-    expect(await grid.evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(width <= 320 ? 1 : width < 981 ? 2 : width < 1280 ? 3 : 4);
+    if(width>736) expect(await grid.evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(width>=1100?3:1);
+    else await expect(grid.locator('.mobile-journal-row')).toHaveCount(10);
     expect(await page.locator('.travel-card').count()).toBe(10);
     if (width <= 600) {
-      const card = page.locator('.travel-card').first();
+      const card = page.locator('.mobile-journal-card').first();
       await expect(card.locator('.actions')).toBeHidden();
       const target = await card.locator('.travel-card__image').getAttribute('href');
-      await card.locator('h2').click({ force: true });
+      await card.locator('.travel-card__image').click();
       await expect(page).toHaveURL(new RegExp(target + '$'));
       await page.goBack();
     }

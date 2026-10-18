@@ -9461,4 +9461,547 @@ html .page-skills #main > .post { border-top:0; }
 
 @media (prefers-reduced-motion: reduce) { .authored-scene, .authored-scene * { animation: none !important; transition: none !important; } }
 
+
+/* Approved travel journals: artwork, motion, responsive rail and previews. */
+/* One shared scene duration: the scheduler reads matching data-duration. */
+.polish-travel .authored-scene.is-active *{animation-duration:var(--polish-duration)!important}
+.polish-travel .authored-scene[data-scene="2"] svg{filter:contrast(1.12)}
+.polish-travel .authored-scene[data-scene="8"] svg{filter:contrast(1.1)}
+.polish-travel .polish-paris-tier,.polish-travel .polish-paris-beacon,.polish-travel .polish-fuji-veil,.polish-travel .polish-panda-snack{opacity:0}
+.polish-travel .is-active .polish-tier-one{animation:polish-tier-one var(--polish-duration) ease both}
+.polish-travel .is-active .polish-tier-two{animation:polish-tier-two var(--polish-duration) ease both}
+.polish-travel .is-active .polish-tier-three{animation:polish-tier-three var(--polish-duration) ease both}
+.polish-travel .is-active .polish-paris-beacon{animation:polish-beacon var(--polish-duration) ease-in-out both;transform-origin:60px 11px}
+@keyframes polish-tier-one{0%,8%,100%{opacity:0}20%,76%{opacity:1}92%{opacity:.2}}
+@keyframes polish-tier-two{0%,19%,100%{opacity:0}31%,76%{opacity:1}92%{opacity:.2}}
+@keyframes polish-tier-three{0%,30%,100%{opacity:0}42%,76%{opacity:1}92%{opacity:.2}}
+@keyframes polish-beacon{0%,39%{opacity:0;transform:rotate(-7deg)}48%{opacity:1}76%{opacity:.8;transform:rotate(29deg)}90%,100%{opacity:0;transform:rotate(35deg)}}
+.polish-travel .authored-scene[data-scene="7"].is-active .landscape-fuji-sun{animation-name:polish-fuji-sun}
+.polish-travel .authored-scene[data-scene="7"].is-active .landscape-fuji-cloud-left{animation-name:polish-fuji-left}
+.polish-travel .authored-scene[data-scene="7"].is-active .landscape-fuji-cloud-right{animation-name:polish-fuji-right}
+.polish-travel .authored-scene[data-scene="7"].is-active .landscape-fuji-dawn{animation-name:polish-fuji-dawn}
+.polish-travel .is-active .polish-fuji-veil{animation:polish-fuji-veil var(--polish-duration) ease-in-out both}
+@keyframes polish-fuji-sun{0%,12%{transform:translateY(0);opacity:1}24%{transform:translateY(0);opacity:0}25%{transform:translateY(27px);opacity:0}36%{opacity:1}78%,100%{transform:translateY(0);opacity:1}}
+@keyframes polish-fuji-left{0%,100%{transform:translateX(0);opacity:1}30%{transform:translateX(15px);opacity:.9}65%{transform:translateX(-4px);opacity:1}}
+@keyframes polish-fuji-right{0%,100%{transform:translateX(0);opacity:1}30%{transform:translateX(-14px);opacity:.9}65%{transform:translateX(4px);opacity:1}}
+@keyframes polish-fuji-veil{0%,8%{opacity:0;transform:translateX(-8px)}22%,32%{opacity:1;transform:translateX(0)}65%,100%{opacity:0;transform:translateX(19px)}}
+@keyframes polish-fuji-dawn{0%,100%{opacity:.23}26%{opacity:.05}73%{opacity:.6}}
+.polish-travel .authored-scene[data-scene="9"].is-active .panda-performer{animation-name:polish-panda-peek}
+.polish-travel .authored-scene[data-scene="9"].is-active .panda-face{animation-name:polish-panda-look}
+.polish-travel .authored-scene[data-scene="9"].is-active .nature-bamboo{animation-name:polish-panda-bamboo}
+.polish-travel .authored-scene[data-scene="9"].is-active .panda-eye-left,.polish-travel .authored-scene[data-scene="9"].is-active .panda-eye-right{animation-name:polish-panda-blink}
+.polish-travel .is-active .polish-panda-arm{transform-origin:29px 51px;animation:polish-panda-arm var(--polish-duration) ease-in-out both}
+.polish-travel .is-active .polish-panda-mouth{transform-origin:40px 51px;animation:polish-panda-chew var(--polish-duration) ease both}
+.polish-travel .is-active .polish-panda-snack{transform-origin:39px 50px;animation:polish-panda-snack var(--polish-duration) ease both}
+@keyframes polish-panda-peek{0%,100%{transform:translateX(-4px)}23%,77%{transform:translateX(2px)}}
+@keyframes polish-panda-look{0%,100%{transform:rotate(0)}15%,30%{transform:rotate(-9deg)}45%,72%{transform:rotate(-3deg)}82%{transform:rotate(2deg)}}
+@keyframes polish-panda-arm{0%,16%,100%{transform:rotate(0)}31%{transform:rotate(28deg)}44%,73%{transform:rotate(-38deg)}87%{transform:rotate(-8deg)}}
+@keyframes polish-panda-bamboo{0%,100%{transform:rotate(0)}31%{transform:rotate(4deg)}45%{transform:rotate(-4deg)}56%{transform:rotate(2deg)}73%{transform:rotate(0)}}
+@keyframes polish-panda-snack{0%,30%{opacity:0;transform:translate(-9px,3px) rotate(-15deg)}42%{opacity:1;transform:translate(0,0) rotate(0)}52%{transform:translate(0,-1px) rotate(4deg)}59%{transform:translate(0,0) rotate(0)}66%{transform:translate(0,-1px) rotate(4deg)}74%{opacity:1;transform:translate(0,0) scale(.8)}88%,100%{opacity:0;transform:translate(0,2px) scale(.7)}}
+@keyframes polish-panda-chew{0%,45%,59%,73%,100%{transform:scaleY(1)}52%,66%{transform:scaleY(.35)}}
+@keyframes polish-panda-blink{0%,19%,25%,77%,83%,100%{transform:scaleY(1)}22%,80%{transform:scaleY(.06)}}
+/* Other scenes retain their silhouettes; secondary motion follows the main action. */
+.polish-travel .authored-scene[data-scene="1"].is-active .landscape-bridge-car{animation-name:polish-bridge-car}
+@keyframes polish-bridge-car{0%,35%{opacity:0;transform:translateX(-8px)}40%{opacity:1}82%{opacity:1;transform:translateX(106px)}90%,100%{opacity:0;transform:translateX(121px)}}
+.polish-travel .is-active .perth-wake,.polish-travel .is-active .sydney-wake,.polish-travel .is-active .polish-liberty-wake{animation:polish-wake var(--polish-duration) ease both;transform-box:fill-box;transform-origin:right}
+@keyframes polish-wake{0%,10%,100%{opacity:0;transform:scaleX(.2)}30%{opacity:.7;transform:scaleX(.7)}65%,83%{opacity:1;transform:scaleX(1)}}
+.polish-travel .authored-scene[data-scene="6"].is-active .sydney-bird{animation:none!important}
+.polish-travel .authored-scene[data-scene="0"].is-active .seoul-spill{animation-name:polish-gate-light}
+@keyframes polish-gate-light{0%,22%,100%{opacity:0}46%,73%{opacity:.95}88%{opacity:.2}}
+.polish-travel .authored-scene[data-scene="5"] .cologne-bell{transform-box:fill-box}
+.polish-travel .authored-scene[data-scene="5"].is-active .cologne-bell{transform-origin:50% 0%;animation-name:polish-bell}
+@keyframes polish-bell{0%,13%,100%{transform:rotate(0)}26%{transform:rotate(-28deg)}38%{transform:rotate(24deg)}50%{transform:rotate(-16deg)}62%{transform:rotate(10deg)}74%{transform:rotate(-4deg)}87%{transform:rotate(0)}}
+.polish-travel .authored-scene[data-scene="8"].is-active .canton-capsule{animation-name:polish-capsule}
+@keyframes polish-capsule{0%,10%,100%{transform:translate(0,0) scale(1);opacity:1}30%{transform:translate(13.5px,-4px) scale(.65);opacity:.18}50%{transform:translate(27px,0) scale(.95);opacity:1}72%{transform:translate(13.5px,5px) scale(1.12);opacity:1}92%{transform:translate(0,0) scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.polish-travel .authored-scene *{animation:none!important}}
+
+/* A small gull glides across a shallow arc. Reset occurs entirely outside the
+   clipped SVG; it re-enters from the left instead of making a forced U-turn. */
+.polish-travel .v2-bird-flight{transform:translate(17px,22px)}
+.polish-travel .v2-bird-wing-left,.polish-travel .v2-bird-wing-right{transform-origin:0 0}
+.polish-travel .authored-scene[data-scene="6"].is-active .v2-bird-flight{animation:v2-bird-flight var(--polish-duration) linear both}
+.polish-travel .authored-scene[data-scene="6"].is-active .v2-bird-body{animation:v2-bird-bank var(--polish-duration) ease-in-out both;transform-origin:0 0}
+.polish-travel .authored-scene[data-scene="6"].is-active .v2-bird-wing-left{animation:v2-wing-left var(--polish-duration) ease-in-out both}
+.polish-travel .authored-scene[data-scene="6"].is-active .v2-bird-wing-right{animation:v2-wing-right var(--polish-duration) ease-in-out both}
+@keyframes v2-bird-flight{0%{transform:translate(17px,22px);opacity:1}22%{transform:translate(50px,17px);opacity:1}48%{transform:translate(89px,16px);opacity:1}76%{transform:translate(132px,20px);opacity:1}76.1%{transform:translate(132px,20px);opacity:0}76.2%{transform:translate(-12px,23px);opacity:0}76.3%{transform:translate(-12px,23px);opacity:1}100%{transform:translate(17px,22px);opacity:1}}
+@keyframes v2-bird-bank{0%,100%{transform:rotate(-3deg)}26%{transform:rotate(-7deg)}62%{transform:rotate(2deg)}}
+@keyframes v2-wing-left{0%,5%,21%,37%,100%{transform:scaleY(1)}12%,29%{transform:scaleY(-.35)}47%,65%{transform:scaleY(.86)}}
+@keyframes v2-wing-right{0%,6%,23%,39%,100%{transform:scaleY(1)}14%,31%{transform:scaleY(-.28)}49%,67%{transform:scaleY(.9)}}
+/* An actual ellipse, composed of two SVG elliptical arcs. Offset rotation is
+   disabled so the capsule hangs upright instead of turning like a wheel. */
+.polish-travel .v2-capsule-orbit{offset-path:path('M 43 19 A 17 6 0 0 1 77 19 A 17 6 0 0 1 43 19');offset-distance:0%;offset-rotate:0deg;offset-anchor:0px 0px}
+.polish-travel .v2-capsule-rear{visibility:hidden}
+.polish-travel .authored-scene[data-scene="8"].is-active .v2-capsule-orbit{animation:v2-capsule-orbit var(--polish-duration) linear both}
+.polish-travel .authored-scene[data-scene="8"].is-active .v2-capsule-rear{animation:v2-capsule-rear var(--polish-duration) steps(1,end) both}
+.polish-travel .authored-scene[data-scene="8"].is-active .v2-capsule-front{animation:v2-capsule-front var(--polish-duration) steps(1,end) both}
+@keyframes v2-capsule-orbit{0%,8%{offset-distance:0%}92%,100%{offset-distance:100%}}
+@keyframes v2-capsule-rear{0%,50%,100%{visibility:hidden}8%{visibility:visible}}
+@keyframes v2-capsule-front{0%,50%,100%{visibility:visible}8%{visibility:hidden}}
+@media(prefers-reduced-motion:reduce){.polish-travel .authored-scene .v2-bird-flight,.polish-travel .authored-scene .v2-bird-flight *,.polish-travel .authored-scene .v2-capsule-orbit,.polish-travel .authored-scene .v2-capsule-rear,.polish-travel .authored-scene .v2-capsule-front{animation:none!important}}
+
+/* V2 keeps Fuji's sun in place: weather and light move continuously. */
+.polish-nature-v2.polish-travel .authored-scene[data-scene="7"].is-active .landscape-fuji-sun{animation:none!important}
+.polish-nature-v2.polish-travel .authored-scene[data-scene="7"].is-active .landscape-fuji-cloud-left{animation-name:nature-v2-cloud-left}
+.polish-nature-v2.polish-travel .authored-scene[data-scene="7"].is-active .landscape-fuji-cloud-right{animation-name:nature-v2-cloud-right}
+.polish-nature-v2.polish-travel .authored-scene[data-scene="7"].is-active .landscape-fuji-dawn{animation-name:nature-v2-light}
+.polish-nature-v2.polish-travel .authored-scene[data-scene="7"].is-active .landscape-fuji-reflection{animation-name:nature-v2-reflection;transform-origin:76px 70px}
+@keyframes nature-v2-cloud-left{0%,100%{transform:translate(0,0);opacity:1}25%{transform:translate(10px,-1px);opacity:.95}56%{transform:translate(24px,1px);opacity:.85}80%{transform:translate(8px,0);opacity:.95}}
+@keyframes nature-v2-cloud-right{0%,100%{transform:translate(0,0);opacity:1}28%{transform:translate(-7px,1px);opacity:.85}55%{transform:translate(-17px,2px);opacity:.72}82%{transform:translate(-5px,0);opacity:.9}}
+@keyframes nature-v2-light{0%,100%{opacity:.23}33%{opacity:.07}73%{opacity:.65}}
+@keyframes nature-v2-reflection{0%,100%{opacity:.65;transform:scaleX(1)}32%{opacity:.15;transform:scaleX(.6)}73%{opacity:1;transform:scaleX(1.35)}}
+/* A short arm rests against the outer torso; the paw lifts its held bamboo to eat. */
+.polish-nature-v2.polish-travel .authored-scene[data-scene="9"].is-active .panda-performer{animation-name:nature-v2-body}
+.polish-nature-v2.polish-travel .authored-scene[data-scene="9"].is-active .panda-face{animation-name:nature-v2-face}
+.polish-nature-v2.polish-travel .authored-scene[data-scene="9"].is-active .nature-bamboo{animation-name:nature-v2-background-bamboo}
+.polish-nature-v2 .is-active .nature-v2-pickup{transform-origin:49px 61px;animation:nature-v2-pickup var(--polish-duration) cubic-bezier(.4,0,.2,1) both}
+.polish-nature-v2 .is-active .nature-v2-mouth{transform-origin:40px 51px;animation:nature-v2-chew var(--polish-duration) ease both}
+@keyframes nature-v2-body{0%,100%{transform:translateX(-4px)}24%,77%{transform:translate(-2px,0)}87%{transform:translate(-3px,0)}}
+@keyframes nature-v2-face{0%,100%{transform:rotate(0)}19%{transform:rotate(3deg) translateY(1px)}39%{transform:rotate(-2deg)}49%{transform:rotate(-1deg) translateY(1px)}57%{transform:rotate(-2deg)}65%{transform:rotate(-1deg) translateY(1px)}75%{transform:rotate(-2deg)}88%{transform:rotate(1deg)}}
+@keyframes nature-v2-pickup{0%,12%,100%{transform:translate(0,0) rotate(0)}29%,75%{transform:translate(-1px,-2px) rotate(5deg)}48%,63%{transform:translate(-1px,-1.5px) rotate(4deg)}87%{transform:translate(0,-.5px) rotate(1deg)}}
+@keyframes nature-v2-chew{0%,42%,57%,72%,100%{transform:scale(1)}49%,64%{transform:scale(1.25,.25)}}
+@keyframes nature-v2-background-bamboo{0%,100%{transform:rotate(0)}22%{transform:rotate(-3deg)}42%{transform:rotate(2deg)}68%{transform:rotate(-1deg)}}
+@media(prefers-reduced-motion:reduce){.polish-nature-v2 .authored-scene *{animation:none!important}}
+
+.cr-liberty-glint,.cr-liberty-ripple{opacity:0}.authored-scene.is-active .cr-liberty-glint{animation:cr-glint var(--polish-duration) ease both}.authored-scene.is-active .cr-liberty-ferry{animation:cr-ferry var(--polish-duration) linear both}.authored-scene.is-active .cr-ripple-a{animation:cr-ripple-a var(--polish-duration) ease both}.authored-scene.is-active .cr-ripple-b{animation:cr-ripple-b var(--polish-duration) ease both}@keyframes cr-glint{0%,15%,100%{opacity:0}40%,65%{opacity:.65}}@keyframes cr-ferry{0%,5%{transform:translateX(0)}95%,100%{transform:translateX(145px)}}@keyframes cr-ripple-a{0%,30%,100%{opacity:0}45%{opacity:.8}70%{opacity:0}}@keyframes cr-ripple-b{0%,58%,100%{opacity:0}73%{opacity:.8}94%{opacity:0}}@media(prefers-reduced-motion:reduce){.authored-scene .cr-liberty-ferry{transform:translateX(47px)}.authored-scene .cr-liberty-glint,.authored-scene .cr-liberty-ferry,.authored-scene .cr-liberty-ripple{animation:none!important}}
+
+.ca-seoul-glint,.ca-tower-light,.ca-beacon,.ca-spark,.ca-glass{opacity:0}
+.ca-car{opacity:0}.ca-dusk{opacity:.2}.ca-snow{opacity:.65}
+.ca-fog-back{opacity:.5}.ca-fog-front{opacity:.65}
+.authored-scene.is-active .ca-snow{animation:ca-snow 3800ms ease-in-out both}
+.authored-scene.is-active .ca-seoul-glint{animation:ca-glint 3800ms ease both}
+.authored-scene.is-active .ca-car{animation:ca-drive 4000ms linear both}
+.authored-scene.is-active .ca-fog-back{animation:ca-fog-back 4000ms ease-in-out both}
+.authored-scene.is-active .ca-fog-front{animation:ca-fog-front 4000ms ease-in-out both}
+.authored-scene.is-active .ca-dusk{animation:ca-dusk 4200ms ease both}
+.authored-scene.is-active .ca-tower-light{animation:ca-light 4200ms ease both}
+.authored-scene.is-active .ca-beacon{transform-origin:60px 7px;animation:ca-beacon 4200ms ease-in-out both}
+.authored-scene.is-active .ca-spark{animation:ca-spark 4200ms ease both}
+.authored-scene.is-active .ca-glass{animation:ca-glass 4000ms ease both}
+@keyframes ca-snow{0%,100%{opacity:.65;transform:translate(0,0)}20%{opacity:.8}70%{transform:translate(3px,8px);opacity:.75}85%{transform:translate(4px,10px);opacity:0}86%{transform:translate(0,0);opacity:0}}
+@keyframes ca-glint{0%,20%,100%{opacity:0}40%,65%{opacity:.85}}
+@keyframes ca-drive{0%,10%{opacity:0;transform:translateX(-12px)}18%{opacity:1}82%{opacity:1}95%,100%{opacity:0;transform:translateX(125px)}}
+@keyframes ca-fog-back{0%,100%{opacity:.5;transform:translate(0,0)}42%,62%{opacity:.75;transform:translate(10px,-2px)}}
+@keyframes ca-fog-front{0%,100%{opacity:.65;transform:translate(0,0)}45%,68%{opacity:.85;transform:translate(-9px,1px)}}
+@keyframes ca-dusk{0%,100%{opacity:.2}30%,78%{opacity:1}}
+@keyframes ca-light{0%,15%,100%{opacity:0}40%,78%{opacity:.9}}
+@keyframes ca-beacon{0%,23%,100%{opacity:0;transform:rotate(0)}35%{opacity:.55;transform:rotate(0)}73%{opacity:.35;transform:rotate(25deg)}85%{opacity:0;transform:rotate(30deg)}}
+@keyframes ca-spark{0%,42%,56%,72%,100%{opacity:0}49%,65%{opacity:1}}
+@keyframes ca-glass{0%,15%,100%{opacity:0}38%,72%{opacity:.65}}
+@media(prefers-reduced-motion:reduce){.authored-scene[data-corrected="architecture"] *{animation:none!important}}
+
+.cl-ferry{transform:translateX(22px);opacity:0}.cl-wake{opacity:0}
+.cl-gull{transform:translate(17px,19px)}.cl-wing{transform-origin:0 0}
+.authored-scene.is-active .cl-ferry{animation:cl-ferry var(--polish-duration) linear both}
+.authored-scene.is-active .cl-wake{animation:cl-wake var(--polish-duration) ease both}
+.authored-scene.is-active .cl-gull{animation:cl-gull var(--polish-duration) linear both}
+.authored-scene.is-active .cl-wing{animation:cl-wing var(--polish-duration) ease-in-out both}
+@keyframes cl-ferry{0%{transform:translateX(14px);opacity:0}14%,83%{opacity:1}100%{transform:translateX(123px);opacity:0}}
+@keyframes cl-wake{0%,15%,100%{opacity:0;transform:scaleX(.3);transform-origin:18px 74px}40%{opacity:.9;transform:scaleX(1)}80%{opacity:0;transform:scaleX(1.6)}}
+@keyframes cl-gull{0%{transform:translate(17px,19px);opacity:1}24%{transform:translate(52px,14px)}50%{transform:translate(91px,15px)}76%{transform:translate(132px,19px);opacity:1}76.1%{transform:translate(132px,19px);opacity:0}76.2%{transform:translate(-12px,20px);opacity:0}76.3%{transform:translate(-12px,20px);opacity:1}100%{transform:translate(17px,19px);opacity:1}}
+@keyframes cl-wing{0%,5%,22%,40%,100%{transform:scaleY(1)}13%,31%{transform:scaleY(-.3)}50%,68%{transform:scaleY(.9)}}
+.cl-capsule{offset-path:path('M53 27 A7 1.6 -8 0 1 67 25 A7 1.6 -8 0 1 53 27');offset-distance:0%;offset-rotate:0deg;offset-anchor:0px 0px}
+.cl-capsule-rear{visibility:hidden}.cl-tower-light{opacity:0}
+.authored-scene.is-active .cl-capsule{animation:cl-orbit var(--polish-duration) linear both}
+.authored-scene.is-active .cl-capsule-rear{animation:cl-rear var(--polish-duration) steps(1,end) both}
+.authored-scene.is-active .cl-capsule-front{animation:cl-front var(--polish-duration) steps(1,end) both}
+.authored-scene.is-active .cl-tower-light{animation:cl-tower-light var(--polish-duration) ease both}
+@keyframes cl-orbit{0%,8%{offset-distance:0%}92%,100%{offset-distance:100%}}
+@keyframes cl-rear{0%,50%,100%{visibility:hidden}8%{visibility:visible}}
+@keyframes cl-front{0%,50%,100%{visibility:visible}8%{visibility:hidden}}
+@keyframes cl-tower-light{0%,12%{opacity:0;transform:translateY(0)}25%{opacity:.8}75%{opacity:.8;transform:translateY(-65px)}90%,100%{opacity:0;transform:translateY(-65px)}}
+@media(prefers-reduced-motion:reduce){.authored-scene [class^="cl-"]{animation:none!important}}
+
+.corrected-nature.is-active .cn-perth-reflection{animation:cn-reflection var(--polish-duration) ease-in-out both;transform-origin:60px 58px}
+.corrected-nature.is-active .cn-perth-ripple-a{animation:cn-ripple-a var(--polish-duration) ease-in-out both}
+.corrected-nature.is-active .cn-perth-ripple-b{animation:cn-ripple-b var(--polish-duration) ease-in-out both}
+.corrected-nature.is-active .cn-perth-flag{animation:cn-flag var(--polish-duration) ease-in-out both;transform-origin:28px 25px}
+@keyframes cn-reflection{0%,100%{transform:scaleY(1);opacity:.25}35%{transform:scaleY(.7) translateX(2px);opacity:.14}70%{transform:scaleY(1.1) translateX(-1px);opacity:.3}}
+@keyframes cn-ripple-a{0%,100%{transform:translateX(0);opacity:1}44%{transform:translateX(5px);opacity:.45}72%{transform:translateX(-2px);opacity:.8}}
+@keyframes cn-ripple-b{0%,100%{transform:translateX(0);opacity:1}54%{transform:translateX(-4px);opacity:.4}80%{transform:translateX(1px);opacity:.8}}
+@keyframes cn-flag{0%,100%{transform:skewY(0)}20%{transform:skewY(14deg) scaleX(.8)}43%{transform:skewY(-9deg)}65%{transform:skewY(8deg) scaleX(.9)}82%{transform:skewY(-3deg)}}
+.corrected-nature.is-active .cn-fuji-cloud-a{animation:cn-cloud-a var(--polish-duration) ease-in-out both}
+.corrected-nature.is-active .cn-fuji-cloud-b{animation:cn-cloud-b var(--polish-duration) ease-in-out both}
+.corrected-nature.is-active .cn-fuji-light{animation:cn-light var(--polish-duration) ease-in-out both}
+.corrected-nature.is-active .cn-fuji-maple{animation:cn-maple var(--polish-duration) ease-in-out both;transform-origin:14px 72px}
+@keyframes cn-cloud-a{0%,100%{transform:translateX(0);opacity:1}43%{transform:translateX(-15px);opacity:.8}75%{transform:translateX(-6px);opacity:.9}}
+@keyframes cn-cloud-b{0%,100%{transform:translateX(0);opacity:1}51%{transform:translateX(11px);opacity:.6}80%{transform:translateX(3px);opacity:.9}}
+@keyframes cn-light{0%,100%{opacity:0}26%{opacity:.03}62%{opacity:.22}83%{opacity:.1}}
+@keyframes cn-maple{0%,100%{transform:rotate(0)}27%{transform:rotate(4deg)}53%{transform:rotate(-3deg)}76%{transform:rotate(1deg)}}
+.corrected-nature.is-active .cn-panda-head{animation:cn-head var(--polish-duration) ease-in-out both;transform-origin:35px 45px}
+.corrected-nature.is-active .cn-panda-feeding{animation:cn-feed var(--polish-duration) ease-in-out both;transform-origin:24px 51px}
+.corrected-nature.is-active .cn-panda-jaw{animation:cn-jaw var(--polish-duration) ease both;transform-origin:36px 45px}
+.corrected-nature.is-active .cn-panda-eyes{animation:cn-eyes var(--polish-duration) linear both;transform-box:fill-box;transform-origin:center}
+.corrected-nature.is-active .cn-pillar-mist{animation:cn-mist var(--polish-duration) ease-in-out both}
+@keyframes cn-head{0%,100%{transform:rotate(0)}22%{transform:rotate(4deg) translateY(1px)}42%{transform:rotate(-2deg)}53%{transform:rotate(-1deg) translateY(.7px)}63%{transform:rotate(-2deg)}74%{transform:rotate(0) translateY(.7px)}88%{transform:rotate(1deg)}}
+@keyframes cn-feed{0%,100%{transform:translate(0,0) rotate(0)}30%,77%{transform:translate(0,-1.2px) rotate(-3deg)}48%,65%{transform:translate(0,-.6px) rotate(-2deg)}}
+@keyframes cn-jaw{0%,37%,58%,77%,100%{transform:scaleY(1)}48%,68%{transform:scaleY(.3)}}
+@keyframes cn-eyes{0%,18%,24%,81%,87%,100%{transform:scaleY(1)}21%,84%{transform:scaleY(.1)}}
+@keyframes cn-mist{0%,100%{transform:translateX(0);opacity:.72}57%{transform:translateX(5px);opacity:.35}}
+@media(prefers-reduced-motion:reduce){.corrected-nature *{animation:none!important}}
+
+.depth-nature .cn-perth-reflection{opacity:.17}
+.depth-nature .dn-deck{animation:none!important}
+/* No translucent foundation: the photographs do not resolve submerged structure. */
+
+.depth-nature-panda.is-active .dn-panda-feed{transform-origin:20px 51px;animation:dn-feeding 6s ease-in-out both}
+.depth-nature-panda.is-active .dn-panda-head{transform-origin:32px 49px;animation:dn-nod 6s ease-in-out both}
+.depth-nature-panda.is-active .dn-panda-mouth{transform-origin:42px 48px;animation:dn-chew 6s ease-in-out both}
+@keyframes dn-feeding{0%,100%{transform:rotate(0)}20%,68%{transform:rotate(-6deg)}32%,51%{transform:rotate(-4deg)}82%{transform:rotate(-1deg)}}
+@keyframes dn-nod{0%,100%{transform:rotate(0)}24%{transform:rotate(3deg)}39%,60%{transform:rotate(1deg)}49%,70%{transform:rotate(2deg)}84%{transform:rotate(-1deg)}}
+@keyframes dn-chew{0%,28%,40%,54%,68%,100%{transform:translateY(0)}34%,47%,61%{transform:translateY(.65px)}}
+.depth-nature-fuji.is-active .cn-fuji-maple{animation:dn-foliage 6s ease-in-out both}
+@keyframes dn-foliage{0%,100%{transform:rotate(0)}23%{transform:rotate(6deg)}47%{transform:rotate(-4deg)}72%{transform:rotate(3deg)}88%{transform:rotate(-1deg)}}
+@media(prefers-reduced-motion:reduce){.depth-nature-panda *,.depth-nature-fuji *{animation:none!important}}
+
+.depth-nature .dn-reflections{opacity:.22}
+.depth-nature.is-active .dn-reflect-a{animation:dn-reflect-a var(--polish-duration) ease-in-out both}
+.depth-nature.is-active .dn-reflect-b{animation:dn-reflect-b var(--polish-duration) ease-in-out both}
+.depth-nature.is-active .dn-reflect-c{animation:dn-reflect-a var(--polish-duration) ease-in-out reverse both}
+@keyframes dn-reflect-a{0%,100%{opacity:.9;transform:translateX(0)}40%{opacity:.35;transform:translateX(1.8px)}72%{opacity:.65;transform:translateX(-.8px)}}
+@keyframes dn-reflect-b{0%,100%{opacity:.65;transform:translateX(0)}30%{opacity:.9;transform:translateX(-1px)}65%{opacity:.25;transform:translateX(2px)}}
+.depth-nature-fuji.is-active .cn-fuji-cloud-a{animation:dn-cloud-clear var(--polish-duration) linear both}
+@keyframes dn-cloud-clear{0%{transform:translateX(0);opacity:1}45%{transform:translateX(16px);opacity:.8}75%{transform:translateX(29px);opacity:0}76%{transform:translateX(0);opacity:0}100%{transform:translateX(0);opacity:1}}
+@keyframes dn-feeding{0%,100%{transform:rotate(0)}22%{transform:rotate(-10deg)}30%,70%{transform:rotate(-8deg)}82%{transform:rotate(-3deg)}}
+
+.da-seoul-light,.da-cologne-light,.da-cologne-lower,.da-cologne-mid,.da-cologne-upper{opacity:0}.da-snow{opacity:.65}
+.da-paris-sky{opacity:.15}.da-paris-light,.da-paris-beam{opacity:0}
+.authored-scene.is-active .da-paris-sky{animation:da-paris-sky 6200ms ease both}
+.authored-scene.is-active .da-paris-light{animation:da-paris-light 6200ms ease both}
+.authored-scene.is-active .da-paris-beam{transform-origin:60px 7px;animation:da-paris-beam 6200ms ease-in-out both}
+.authored-scene.is-active .da-seoul-light{animation:da-seoul-light 6200ms ease both;stroke-width:1.15}
+.authored-scene.is-active .da-snow{animation:da-snow 6200ms ease-in-out both}
+.authored-scene.is-active .da-cologne-lower{animation:da-cologne-lower 6200ms ease both}
+.authored-scene.is-active .da-cologne-mid{animation:da-cologne-mid 6200ms ease both}
+.authored-scene.is-active .da-cologne-upper{animation:da-cologne-upper 6200ms ease both}
+.authored-scene[data-scene="1"].is-active .ca-car,.authored-scene[data-scene="1"].is-active .ca-fog-back,.authored-scene[data-scene="1"].is-active .ca-fog-front{animation-duration:6200ms}
+@keyframes da-seoul-light{0%,12%,100%{opacity:0}30%,80%{opacity:1}90%{opacity:.6}}
+@keyframes da-snow{0%,100%{opacity:.65;transform:translate(0,0)}65%{opacity:.7;transform:translate(3px,7px)}85%{opacity:0;transform:translate(4px,9px)}86%{opacity:0;transform:translate(0,0)}}
+@keyframes da-cologne-lower{0%,8%,100%{opacity:0}22%,84%{opacity:1}}
+@keyframes da-cologne-mid{0%,25%,100%{opacity:0}42%,84%{opacity:.95}}
+@keyframes da-cologne-upper{0%,43%,100%{opacity:0}60%,84%{opacity:.95}}
+@keyframes da-paris-sky{0%,100%{opacity:.15}28%,82%{opacity:.65}}
+@keyframes da-paris-light{0%,12%,100%{opacity:0}30%,84%{opacity:1}}
+@keyframes da-paris-beam{0%,30%,100%{opacity:0;transform:rotate(0)}40%{opacity:.65;transform:rotate(0)}78%{opacity:.5;transform:rotate(25deg)}90%{opacity:0;transform:rotate(30deg)}}
+@media(prefers-reduced-motion:reduce){.authored-scene[data-depth="architecture"] *{animation:none!important}}
+
+.da-seoul-sweep{opacity:0}
+.authored-scene.is-active .da-seoul-sweep{animation:da-seoul-sweep 6200ms ease both}
+@keyframes da-seoul-sweep{0%,10%{opacity:0;transform:translateX(0)}15%{opacity:.9}40%{opacity:.9;transform:translateX(20px)}45%,100%{opacity:0;transform:translateX(20px)}}
+.da-bridge-car{opacity:0}.da-bridge-fog-back{opacity:.5}.da-bridge-fog-front{opacity:.6}
+.authored-scene.is-active .da-bridge-car{animation:da-bridge-car 6200ms linear both}
+.authored-scene.is-active .da-bridge-fog-back{animation:da-bridge-fog-back 6200ms linear both}
+.authored-scene.is-active .da-bridge-fog-front{animation:da-bridge-fog-front 6200ms linear both}
+@keyframes da-bridge-car{0%{opacity:0;transform:translateX(0)}12%,88%{opacity:1}100%{opacity:0;transform:translateX(135px)}}
+@keyframes da-bridge-fog-back{0%{opacity:.5;transform:translateX(0)}65%{opacity:.5;transform:translateX(23px)}85%{opacity:0;transform:translateX(30px)}86%{opacity:0;transform:translateX(0)}100%{opacity:.5;transform:translateX(0)}}
+@keyframes da-bridge-fog-front{0%{opacity:.6;transform:translateX(0)}60%{opacity:.6;transform:translateX(16px)}82%{opacity:0;transform:translateX(22px)}83%{opacity:0;transform:translateX(0)}100%{opacity:.6;transform:translateX(0)}}
+
+/* Two complete lighting events within a single 6.2-second scene. */
+@keyframes da-seoul-light{0%,8%,44%,51%,91%,100%{opacity:0}18%,34%,62%,80%{opacity:1}}
+@keyframes da-seoul-sweep{0%,8%{opacity:0;transform:translateX(0)}12%{opacity:1;transform:translateX(0)}32%{opacity:1;transform:translateX(20px)}36%,48%{opacity:0;transform:translateX(20px)}49%,53%{opacity:0;transform:translateX(0)}57%{opacity:1;transform:translateX(0)}78%{opacity:1;transform:translateX(20px)}82%,100%{opacity:0;transform:translateX(20px)}}
+@keyframes da-cologne-lower{0%,5%,43%,51%,93%,100%{opacity:0}13%,35%,59%,85%{opacity:1}}
+@keyframes da-cologne-mid{0%,12%,44%,58%,94%,100%{opacity:0}21%,35%,67%,85%{opacity:.95}}
+@keyframes da-cologne-upper{0%,20%,45%,66%,95%,100%{opacity:0}29%,35%,75%,85%{opacity:.95}}
+
+.depth-sydney .dl-ferry{transform:translateX(-34px)}
+.depth-sydney.is-active .dl-ferry{animation:dl-ferry-pass var(--polish-duration,6800ms) linear both}
+.depth-sydney.is-active .dl-ferry-foam{animation:dl-ferry-foam var(--polish-duration,6800ms) linear both}
+@keyframes dl-ferry-pass{from{transform:translateX(-34px)}to{transform:translateX(134px)}}
+@keyframes dl-ferry-foam{from{stroke-dashoffset:0}to{stroke-dashoffset:24}}
+@media(prefers-reduced-motion:reduce){.depth-sydney .dl-ferry{animation:none!important;transform:translateX(42px)}.depth-sydney .dl-ferry-foam{animation:none!important}}
+.depth-canton .dl-tram{offset-path:path('M53 27 A7 1.6 -8 0 1 67 25 A7 1.6 -8 0 1 53 27');offset-distance:0%;offset-rotate:0deg;offset-anchor:0px 0px}
+.depth-canton.is-active .dl-tram{animation:dl-tram var(--polish-duration,4000ms) linear both}
+.depth-canton .dl-tram-rear{visibility:hidden}
+.depth-canton.is-active .dl-tram-rear{animation:dl-tram-rear var(--polish-duration,4000ms) steps(1,end) both}
+.depth-canton.is-active .dl-tram-front{animation:dl-tram-front var(--polish-duration,4000ms) steps(1,end) both}
+@keyframes dl-tram{from{offset-distance:0%}to{offset-distance:100%}}
+@keyframes dl-tram-rear{0%{visibility:visible}50%,100%{visibility:hidden}}
+@keyframes dl-tram-front{0%{visibility:hidden}50%,100%{visibility:visible}}
+@media(prefers-reduced-motion:reduce){.depth-canton .dl-tram,.depth-canton .dl-tram-front,.depth-canton .dl-tram-rear{animation:none!important}.depth-canton .dl-tram{offset-distance:0%}.depth-canton .dl-tram-rear{visibility:hidden}.depth-canton .dl-tram-front{visibility:visible}}
+
+.authored-scene.is-active *{animation-duration:var(--scene-duration,6200ms)!important}
+/* Hold a readable torch highlight, then give it a second soft glint. */
+@keyframes cr-glint{0%,8%,100%{opacity:0}20%,48%{opacity:.85}57%{opacity:.25}66%,85%{opacity:.7}95%{opacity:0}}
+/* Water and flag carry Perth's motion while the building remains fixed. */
+@keyframes cn-flag{0%,100%{transform:skewY(0)}12%,50%{transform:skewY(16deg) scaleX(.78)}29%,70%{transform:skewY(-12deg) scaleX(1.05)}85%{transform:skewY(8deg)}}
+@keyframes cn-ripple-a{0%,100%{transform:translateX(0);opacity:.8}30%{transform:translateX(8px);opacity:.5}65%{transform:translateX(-3px);opacity:.95}}
+@keyframes cn-ripple-b{0%,100%{transform:translateX(0);opacity:.8}40%{transform:translateX(-7px);opacity:.4}78%{transform:translateX(4px);opacity:.9}}
+@media(prefers-reduced-motion:reduce){.authored-scene.is-active *{animation:none!important}}
+
+/* B: both leaves share identical timing and scale, hinged at opposite outer posts. */
+.authored-scene[data-depth="seoul-gate-b"] .sb-left{transform-box:view-box;transform-origin:50px 56.5px}
+.authored-scene[data-depth="seoul-gate-b"] .sb-right{transform-box:view-box;transform-origin:70px 56.5px}
+.authored-scene[data-depth="seoul-gate-b"] .sb-left,.authored-scene[data-depth="seoul-gate-b"] .sb-right{transform:scaleX(1)}
+.authored-scene[data-depth="seoul-gate-b"] .sb-interior{opacity:.2}
+.authored-scene[data-depth="seoul-gate-b"] .sb-spill{opacity:0}
+.authored-scene[data-depth="seoul-gate-b"].is-active .sb-left,.authored-scene[data-depth="seoul-gate-b"].is-active .sb-right{animation:sb-door 6200ms cubic-bezier(.42,0,.25,1) both}
+.authored-scene[data-depth="seoul-gate-b"].is-active .sb-interior{animation:sb-warm 6200ms ease-in-out both}
+.authored-scene[data-depth="seoul-gate-b"].is-active .sb-spill{animation:sb-spill 6200ms ease-in-out both}
+@keyframes sb-door{0%,12%,100%{transform:scaleX(1)}38%,72%{transform:scaleX(.14)}}
+@keyframes sb-warm{0%,12%,100%{opacity:.2}38%,72%{opacity:.92}}
+@keyframes sb-spill{0%,18%,100%{opacity:0}40%,70%{opacity:.68}88%{opacity:.12}}
+@media(prefers-reduced-motion:reduce){.authored-scene[data-depth="seoul-gate-b"] *{animation:none!important}.authored-scene[data-depth="seoul-gate-b"] .sb-left,.authored-scene[data-depth="seoul-gate-b"] .sb-right{transform:scaleX(1)}.authored-scene[data-depth="seoul-gate-b"] .sb-spill{opacity:0}}
+
+/* Local full-page sizing and small-scale motion. */
+.journal-neighbour{display:none}
+html.timeline-review{--timeline-icon-width:136px;--timeline-icon-height:91px;--timeline-line:167px;--timeline-inset:78px}
+.timeline-review .authored-scene,.timeline-review .authored-scene>svg{width:var(--timeline-icon-width);height:var(--timeline-icon-height);flex-shrink:0}
+.timeline-review .chronology-track{height:calc(var(--timeline-icon-height)*2 + 168px)}
+.timeline-review .chronology-line{top:var(--timeline-line);left:var(--timeline-inset);right:var(--timeline-inset)}
+.timeline-review .chronology-trip{top:calc(var(--timeline-line) - 8px)}
+.timeline-review .chronology-name{top:calc(-1 * var(--timeline-icon-height) - 53px);gap:4px;left:-18px;right:-18px}
+.timeline-review .chronology-trip.lane-1 .chronology-name{top:29px}
+.timeline-review .chronology-pulse{top:calc(var(--timeline-line) - 3px)}
+.timeline-review .chronology-label{max-width:130px}
+.timeline-review .travel-atlas--map{padding-top:2rem!important}
+.timeline-review .travel-atlas--map .photo-explore__map-heading{margin-top:0}
+.timeline-review .da-seoul-light{stroke:#e6bb58;stroke-width:1.65!important}
+.timeline-review .da-seoul-sweep{fill:#ffe5a0}
+.timeline-review .da-bridge-fog-back{fill:#bdceca}
+.timeline-review .da-bridge-fog-front{fill:#d7e4de}
+.timeline-review .da-paris-light{stroke:#ba842c;stroke-width:1.35}
+.timeline-review .da-paris-beam{fill:#d6ad58}
+.timeline-review .da-cologne-lower,.timeline-review .da-cologne-mid,.timeline-review .da-cologne-upper{fill:#e7b959}
+.timeline-review .cn-perth-ripple-a,.timeline-review .cn-perth-ripple-b{stroke:#749aa5;stroke-width:1.15}
+.timeline-review .cr-liberty-glint{fill:#f2c459}
+.timeline-review .cn-fuji-cloud-a{fill:#b6c9cb}
+.timeline-review .depth-nature-panda.is-active .dn-panda-feed{animation-name:timeline-feeding}
+@keyframes timeline-feeding{0%,100%{transform:translateY(0) rotate(0)}22%{transform:translateY(0) rotate(-10deg)}30%,70%{transform:translateY(0) rotate(-8deg)}82%{transform:translateY(1px) rotate(-3deg)}}
+@media(prefers-reduced-motion:reduce){.timeline-review .authored-scene *{animation:none!important}.timeline-review .dn-panda-feed{transform:none}}
+.timeline-review #main>.journal-preview-controls{display:flex;align-items:end;justify-content:space-between;gap:20px;padding:14px 40px!important;border-top:0}
+.journal-preview-controls label{margin:0;font-size:12px;color:#42695f;flex:1;max-width:470px}
+.journal-preview-controls select{margin-top:5px;height:42px;font-size:14px}
+.journal-preview-controls button{height:42px;line-height:40px;white-space:nowrap}
+.timeline-review #main>.compact-journals:not(.journals-expanded){display:block!important;padding:0 40px 24px!important;border-top:0}
+.compact-journals:not(.journals-expanded)>.travel-card:not(.preview-selected){display:none!important}
+.timeline-review .compact-journals:not(.journals-expanded)>.travel-card.preview-selected{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;min-height:160px;width:100%!important;max-width:900px;margin:0;transform:none;opacity:1}
+.timeline-review .compact-journals:not(.journals-expanded) .travel-card__image{grid-column:1;grid-row:1/3;aspect-ratio:auto;height:160px}
+.timeline-review .compact-journals:not(.journals-expanded) .travel-card header{grid-column:2;grid-row:1;padding:18px 24px 0}
+.timeline-review .compact-journals:not(.journals-expanded) .travel-card header:after{content:'Read journal →';display:block;font:600 13px sans-serif;color:#286957;margin-top:12px}
+.timeline-review .compact-journals:not(.journals-expanded) .travel-card>p{display:block;grid-column:2;grid-row:2;padding:4px 24px 16px;font-size:13px}
+.journal-preview-controls[hidden]{display:none!important}
+@media(min-width:737px){
+ .timeline-review #main>.journal-chronology{background:#f3f7f3;border:1px solid #dce7de!important;border-bottom:0!important;margin:0 40px!important;border-radius:10px 10px 0 0;padding:16px 12px 0!important}
+ .journal-preview-help{font:14px/1.5 sans-serif!important;margin:0 12px 4px!important;color:#42685b!important}
+ .timeline-review .chronology-detail{display:none}
+ /* Leave room for the lower labels and their keyboard-focus outline inside the scrollport. */
+ .timeline-review .chronology-track{height:calc(var(--timeline-icon-height)*2 + 140px)}
+ .timeline-review .chronology-line{top:var(--timeline-line)}
+ .timeline-review .chronology-trip{top:calc(var(--timeline-line) - 8px)}
+ .timeline-review .chronology-name{top:calc(-1 * var(--timeline-icon-height) - 53px)}
+ .timeline-review .chronology-trip.lane-1 .chronology-name{top:20px}
+ .timeline-review .chronology-pulse{top:calc(var(--timeline-line) - 3px)}
+ .timeline-review #main>.journal-preview-controls{margin:0 40px 24px;padding:8px 24px 12px!important;justify-content:flex-end;background:#f3f7f3;border:1px solid #dce7de;border-top:0;border-radius:0 0 10px 10px}
+ .timeline-review .journal-preview-controls label{display:none}
+ .timeline-review .journal-preview-controls button{border:0;box-shadow:none;text-transform:none;letter-spacing:0;height:32px;line-height:30px;min-height:32px;padding:0;font-size:12px}
+ /* All previews contribute to one shared row height; only the selected card is visible.
+    This also reserves room for longer text at narrower desktop widths. */
+ .timeline-review #main>.compact-journals:not(.journals-expanded){display:grid!important;grid-template-columns:minmax(0,1fr);gap:0;width:auto!important;margin:0 40px;padding:16px 24px 0!important;background:#f3f7f3;border:1px solid #dce7de;border-top:0;border-bottom:0;border-radius:0;overflow-anchor:none}
+ .timeline-review .compact-journals:not(.journals-expanded)>.travel-card{display:grid!important;grid-area:1/1;grid-template-columns:240px minmax(0,1fr);grid-template-rows:auto auto;min-height:160px;width:100%!important;max-width:900px;margin:0 auto!important;transform:none;overflow-anchor:none}
+ .timeline-review .compact-journals:not(.journals-expanded)>.travel-card:not(.preview-selected){visibility:hidden;pointer-events:none}
+ .timeline-review .compact-journals:not(.journals-expanded)>.travel-card.preview-selected{visibility:visible;margin:0 auto!important}
+ .timeline-review .chronology-preview-cue{display:none}
+ .timeline-review .journal-is-selected .chronology-name{background:#e3eee4;border-radius:7px;box-shadow:0 0 0 5px #e3eee4}
+ .timeline-review .journal-is-selected .chronology-preview-cue{color:#174d3b}
+ .timeline-review .journal-is-selected .chronology-dot{box-shadow:0 0 0 3px #a8c8b6}
+ .timeline-review .chronology-name:hover .chronology-preview-cue{text-decoration:underline}
+}
+@media(max-width:736px){.timeline-review #main>.journal-preview-controls{padding:12px 18px!important;flex-wrap:wrap;gap:12px}.journal-preview-controls label{flex-basis:100%;max-width:none}.timeline-review #main>.compact-journals:not(.journals-expanded){padding:0 18px 20px!important}.timeline-review .compact-journals:not(.journals-expanded)>.travel-card.preview-selected{grid-template-columns:110px 1fr;min-height:150px}.timeline-review .compact-journals:not(.journals-expanded) .travel-card__image{height:100%;min-height:150px}.timeline-review .compact-journals:not(.journals-expanded) .travel-card header{padding:12px 14px 0}.timeline-review .compact-journals:not(.journals-expanded) .travel-card>p{padding:4px 14px 12px;font-size:12px}.timeline-review .travel-archive-heading>p{display:none}}
+@media(min-width:1100px){
+ .timeline-review #main>.compact-journals:not(.journals-expanded){grid-template-columns:150px minmax(0,1fr) 150px;column-gap:22px;align-items:center}
+ .timeline-review .compact-journals:not(.journals-expanded)>.travel-card{grid-area:1/2;grid-template-columns:minmax(170px,38%) minmax(0,1fr)}
+ .timeline-review .compact-journals:not(.journals-expanded)>.journal-neighbour{display:flex;flex-direction:column;align-items:stretch;align-self:center;grid-area:1/1;width:150px;height:auto;padding:0;background:transparent;border:0;border-radius:5px;box-shadow:none;text-align:left;text-transform:none;letter-spacing:0;white-space:normal;line-height:1.3;color:#35594b;cursor:pointer}
+ .timeline-review .compact-journals:not(.journals-expanded)>.journal-later{grid-area:1/3}
+ .timeline-review .journal-neighbour img{display:block;width:150px;height:82px;object-fit:cover;border-radius:4px;opacity:.65;filter:saturate(.65);transition:opacity .18s}
+ .timeline-review .journal-neighbour:hover img,.timeline-review .journal-neighbour:focus-visible img{opacity:1;filter:none}
+ .timeline-review .journal-neighbour:focus-visible{outline:2px solid #347d6c;outline-offset:5px}
+ .timeline-review .neighbour-direction{font:500 11px/1.4 Arial,sans-serif;margin-top:7px}
+ .timeline-review .neighbour-title{font:600 14px/1.35 Georgia,serif;margin-top:3px}
+ .timeline-review .compact-journals:not(.journals-expanded)>.journal-neighbour.is-empty{visibility:hidden}
+}
+@media(prefers-reduced-motion:reduce){.timeline-review .journal-neighbour img{transition:none}}
+@media(min-width:1100px){
+ .timeline-review .compact-journals:not(.journals-expanded)>.journal-neighbour{padding:0!important;width:150px!important;min-width:0;margin:0!important}
+ .timeline-review .compact-journals:not(.journals-expanded)>.travel-card.preview-selected{grid-template-columns:minmax(170px,38%) minmax(0,1fr)}
+}
+/* Crossfade in the shared grid cell so selection never animates page height. */
+@media(min-width:737px){
+ .timeline-review .compact-journals:not(.journals-expanded)>.travel-card{animation:none!important;transition:opacity 300ms ease,transform 300ms cubic-bezier(.2,.8,.2,1),visibility 0s linear 300ms!important}
+ .timeline-review .compact-journals:not(.journals-expanded)>.travel-card:not(.preview-selected){opacity:0!important;transform:translateY(6px)!important;visibility:hidden;z-index:0}
+ .timeline-review .compact-journals:not(.journals-expanded)>.travel-card.preview-selected{opacity:1!important;transform:translateY(0)!important;visibility:visible;z-index:1;transition-delay:0s!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .timeline-review .compact-journals:not(.journals-expanded)>.travel-card,
+ .timeline-review .compact-journals:not(.journals-expanded)>.travel-card:not(.preview-selected){transition:none!important;transform:none!important}
+}
+/* Keep discovery useful, but let the journal timeline lead the page. */
+.timeline-review .travel-atlas__header{row-gap:16px!important;margin-bottom:18px!important}
+.timeline-review .travel-portals{max-width:390px;gap:10px}
+.timeline-review .travel-portals .travel-portal{padding:6px 12px 10px}
+.timeline-review .portal-label{font-size:13px}
+.timeline-review .portal-label small{font-size:11px;margin-top:3px}
+.timeline-review .portal-art{height:66px;flex-basis:66px;width:120px}
+.timeline-review .portal-stack img{left:29px;top:8px}
+.timeline-review .photo-explore{margin-top:14px!important;margin-bottom:16px!important}
+.timeline-review .photo-explore__heading{margin-bottom:6px!important}
+.timeline-review .photo-explore__hint{margin:0 0 10px;font-size:12px}
+.timeline-review .photo-explore__card img{height:105px;aspect-ratio:auto}
+.timeline-review .photo-explore__caption{padding:8px 12px;gap:3px}
+.timeline-review .photo-explore__caption strong{font-size:15px;line-height:1.3}
+.timeline-review .photo-explore__caption>span{font-size:11px;line-height:1.4}
+.timeline-review #main>.travel-atlas:first-child{padding-bottom:18px!important}
+.timeline-review #main>.travel-archive-heading{padding-top:20px!important;padding-bottom:18px!important}
+@media(min-width:737px){
+ .timeline-review #main>.journal-chronology{position:relative;padding-top:12px!important}
+ .timeline-review .journal-preview-help{padding-right:100px;font-size:12px!important}
+ .timeline-review .chronology-intro{position:absolute;right:24px;top:12px;margin:0}
+ .timeline-review .chronology-intro>span{font-size:12px}
+}
+@media(max-width:736px){
+ .timeline-review .travel-portals{max-width:none}
+ .timeline-review .portal-art{height:58px;flex-basis:58px}
+ .timeline-review .photo-explore__cards{gap:8px}
+ .timeline-review .photo-explore__card{flex-direction:row;align-items:stretch}
+ .timeline-review .photo-explore__card img{width:60px;height:76px;flex:0 0 60px}
+ .timeline-review .photo-explore__caption{padding:7px;justify-content:center;gap:4px}
+ .timeline-review .photo-explore__caption strong{font-size:13px}
+ .timeline-review .photo-explore__caption>span{font-size:10px;margin-top:0}
+}
+.timeline-review #main>.travel-archive-heading{margin-top:8px!important;min-height:0}
+.timeline-review #main>.travel-archive-heading h2{margin:0!important}
+.timeline-review #main>.travel-archive-heading span{margin-bottom:5px}
+/* Preserve recognisable photos and the original shortcut artwork proportions. */
+.timeline-review .travel-portals{max-width:480px}
+.timeline-review .portal-art{width:148px;height:88px;flex-basis:88px}
+.timeline-review .portal-stack img{left:42px;top:15px}
+.timeline-review .photo-explore__card{display:flex;flex-direction:column;align-items:stretch}
+.timeline-review .photo-explore__card img{width:100%;height:145px;flex:0 0 145px;object-fit:cover}
+.timeline-review .photo-explore__caption{position:static!important;inset:auto!important;transform:none!important;background:#faf8f2;flex:1;padding:8px 12px}
+@media(max-width:736px){
+ .timeline-review .portal-art{width:120px;height:72px;flex-basis:72px}
+ .timeline-review .portal-stack img{left:29px;top:9px}
+ .timeline-review .photo-explore__card img{width:100%;height:100px;flex:0 0 100px}
+ .timeline-review .photo-explore__caption{padding:7px 9px;gap:4px}
+ .timeline-review .photo-explore__caption strong{font-size:14px}
+ .timeline-review .photo-explore__caption>span{font-size:11px}
+}
+/* Restore the reviewed photo crop; compact the surrounding UI instead. */
+.timeline-review .photo-explore__card img{height:auto;aspect-ratio:1.6;flex:none;width:100%;object-fit:cover}
+.timeline-review .photo-explore__heading{margin-bottom:4px!important}
+.timeline-review .photo-explore__hint{margin:0 0 8px}
+.timeline-review .photo-explore__caption{padding:7px 12px;gap:2px}
+.timeline-review .photo-explore{margin-top:8px!important;margin-bottom:8px!important}
+@media(min-width:981px){
+ .timeline-review .travel-atlas__header{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.15fr);column-gap:24px;row-gap:18px!important;align-items:center}
+ .timeline-review .travel-atlas__header>div{grid-column:1/-1}
+ .timeline-review .travel-atlas__header>.photo-search{grid-column:1;grid-row:2;min-width:0;width:100%;align-self:center}
+ .timeline-review .travel-atlas__header>.travel-portals{grid-column:2;grid-row:2;max-width:none;width:100%;margin:0}
+ .timeline-review .travel-portals .travel-portal{flex-direction:row;align-items:center;gap:10px;padding:8px 14px;min-height:94px}
+ .timeline-review .portal-art{width:120px;height:76px;flex:0 0 120px}
+ .timeline-review .portal-stack img{left:29px;top:10px}
+ .timeline-review .portal-label{font-size:14px}
+ .timeline-review .portal-label small{font-size:11px}
+ .timeline-review .portal-arrow{right:10px;bottom:12px}
+}
+@media(min-width:981px) and (max-width:1200px){
+ .timeline-review .portal-art{width:80px;flex-basis:80px}
+ .timeline-review .portal-stack img{left:9px}
+ .timeline-review .travel-portals .travel-portal{gap:6px;padding:8px}
+}
+/* A modestly smaller map, preserving its geographic aspect ratio. */
+@media(min-width:737px){
+ .timeline-review .travel-atlas--map .travel-atlas__layout{max-width:54rem}
+}
+/* Retire the displaced atlas ornament after splitting the page into sections. */
+.timeline-review .travel-atlas::after{display:none}
+@media(min-width:981px){
+ .timeline-review .travel-atlas--map .travel-map:not(.is-fullscreen) .travel-map__viewport{aspect-ratio:1200 / 520;overflow:hidden}
+}
+
+.mobile-journal-list{display:none}
+@media(max-width:736px){
+ .timeline-review #main>.journal-chronology,.timeline-review #main>.journal-preview-controls,.timeline-review #main>.compact-journals,.timeline-review #main>.compact-journals:not(.journals-expanded){display:none!important}
+ .timeline-review #main>.mobile-journal-list{display:flex;flex-direction:column;padding:16px 14px!important;border:0}
+ .mobile-journal-list[hidden]{display:none!important}
+ .mobile-journal-card{position:relative;min-width:0;margin:0;padding:0;border:0;box-shadow:none;background:transparent;opacity:1;transform:none}
+ .mobile-journal-card header{margin:0;padding:0}.mobile-journal-card h2{font:700 18px/1.25 Georgia,serif;text-transform:none;letter-spacing:0;margin:6px 0}
+ .mobile-journal-card .date{font-size:11px;line-height:1.4;color:#65776e}.mobile-journal-card>p{font:12px/1.4 Georgia,serif;margin:6px 0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+ .mobile-journal-card .image{display:block;margin:0}.mobile-journal-card img{width:100%;height:100%;object-fit:cover;display:block}
+ .mobile-read{display:inline-block;font:600 12px/1.4 sans-serif;color:#286957;padding:10px 0;min-height:44px;border:0}
+ .mobile-journal-row .chronology-trip{pointer-events:auto}.mobile-journal-row .chronology-name{pointer-events:auto}.mobile-journal-row .chronology-trip:before{display:none}
+ .mobile-selected .mobile-journal-card{outline:2px solid #8bafa0;outline-offset:5px;border-radius:4px}
+ .mobile-variant-c .mobile-journal-row{display:grid;grid-template-columns:104px minmax(0,1fr);gap:14px;position:relative;padding:18px 0;border-bottom:1px solid #dce6df;min-height:130px}
+ .mobile-variant-c .mobile-journal-row:before{content:'';position:absolute;left:50px;top:0;bottom:0;border-left:1px solid #cbded3;z-index:0}
+ .mobile-variant-c .chronology-trip{position:relative;left:auto!important;top:auto!important;width:104px;height:96px;margin:0;display:block;align-self:center}
+ .mobile-variant-c .chronology-name{position:relative;left:auto;right:auto;top:auto!important;width:104px;display:block;background:#fff}
+ .mobile-variant-c .authored-scene,.mobile-variant-c .authored-scene>svg{width:104px;height:70px;margin:0}
+ .mobile-variant-c .chronology-label,.mobile-variant-c .chronology-date{display:none}
+ .mobile-variant-c .chronology-dot{left:47px;top:82px}
+ .mobile-variant-c .mobile-journal-card .image{display:none}
+ .mobile-variant-c .mobile-journal-card>p{display:none}
+}
+
+@media(max-width:736px){html.timeline-review.mobile-variant-b .mobile-journal-list::before{left:63.5px}.mobile-variant-b .mobile-read{padding:10px 12px}.mobile-variant-c .mobile-journal-row:last-child:before{bottom:50%}}
+
+/* A — compact chronological rail. Original animated scene links live at left;
+   the matching real journal card stays readable and clickable at right. */
+@media (max-width:736px){
+  .timeline-review.mobile-variant-a .journal-chronology{display:none!important}
+  .timeline-review.mobile-variant-a .mobile-journal-list{display:grid;gap:0;margin:22px 0 34px;padding:0;min-width:0}
+  .timeline-review.mobile-variant-a .mobile-journal-row{position:relative;display:grid;grid-template-columns:112px minmax(0,1fr);column-gap:18px;align-items:start;min-width:0;padding:0 0 28px;margin:0;border:0}
+  .timeline-review.mobile-variant-a .mobile-journal-row::before{content:"";position:absolute;top:10px;bottom:0;left:55px;width:1px;background:#d6e1db;pointer-events:none}
+  .timeline-review.mobile-variant-a .mobile-journal-row:last-child::before{bottom:auto;height:125px}
+  .timeline-review.mobile-variant-a .mobile-journal-row .chronology-trip{position:relative!important;inset:auto!important;top:auto!important;left:auto!important;display:block!important;width:112px!important;height:auto!important;min-height:145px;margin:0!important;padding:0 0 12px!important;pointer-events:auto!important;text-align:center;border:0!important;border-radius:0;background:#fff!important;color:#285f54;z-index:1;transform:none!important;text-decoration:none;box-shadow:none}
+  .timeline-review.mobile-variant-a .mobile-journal-row .chronology-trip::before{display:none!important}
+  .timeline-review.mobile-variant-a .mobile-journal-row .chronology-dot{display:none!important}
+  .timeline-review.mobile-variant-a .mobile-journal-row .chronology-name{position:static!important;inset:auto!important;display:flex!important;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;min-height:0!important;padding:0!important;margin:0;background:#fff;pointer-events:auto!important;transform:none!important}
+  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene{display:block;width:112px!important;height:75px!important;min-width:112px;flex:none;margin:0 0 5px!important;transform:none!important;overflow:visible}
+  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene>svg{display:block;width:112px!important;height:75px!important;max-width:none}
+  .timeline-review.mobile-variant-a .mobile-journal-row .chronology-label{display:block;max-width:112px;min-height:0;margin:0;padding:0 4px;font-family:inherit;font-size:12px!important;font-weight:700;line-height:1.35;letter-spacing:0;text-transform:none;color:#285247;overflow-wrap:anywhere}
+  .timeline-review.mobile-variant-a .mobile-journal-row .chronology-date{display:block;max-width:108px;margin:0;font-size:12px!important;font-weight:400;line-height:1.4;letter-spacing:0;text-transform:none;color:#718078}
+  .timeline-review.mobile-variant-a .mobile-journal-row .mobile-journal-card{display:block!important;position:relative;min-width:0;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform:none!important;opacity:1!important;text-align:left}
+  .timeline-review.mobile-variant-a .mobile-journal-card>a.image,
+  .timeline-review.mobile-variant-a .mobile-journal-card>.travel-card__image,
+  .timeline-review.mobile-variant-a .mobile-journal-card>a:has(>img){display:block;position:relative;width:100%;margin:0 0 11px!important;padding:0;border:0!important;border-radius:4px;overflow:hidden;aspect-ratio:1.48}
+  .timeline-review.mobile-variant-a .mobile-journal-card img{display:block;width:100%!important;height:100%!important;aspect-ratio:1.48;object-fit:cover;object-position:center;margin:0!important;border-radius:4px}
+  .timeline-review.mobile-variant-a .mobile-journal-card header{display:block!important;margin:0 0 8px!important;padding:0!important;border:0;background:transparent;text-align:left}
+  .timeline-review.mobile-variant-a .mobile-journal-card header .date{display:block;margin:0 0 5px!important;font-size:12px!important;line-height:1.35;letter-spacing:0;text-transform:none;color:#748078}
+  .timeline-review.mobile-variant-a .mobile-journal-card h2{margin:0!important;padding:0;font-family:Georgia,serif;font-size:19px!important;font-weight:400!important;line-height:1.2!important;letter-spacing:-.2px!important;text-transform:none!important;color:#243e36;overflow-wrap:anywhere}
+  .timeline-review.mobile-variant-a .mobile-journal-card h2 a{display:block;padding:0 0 5px;border:0!important;color:inherit;text-decoration:none}
+  .timeline-review.mobile-variant-a .mobile-journal-card>p{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin:0!important;font-size:12px!important;line-height:1.55!important;text-align:left;color:#69776e}
+  .timeline-review.mobile-variant-a .mobile-journal-card .actions{display:none!important}
+  .timeline-review.mobile-variant-a .mobile-journal-row a:focus-visible{outline:2px solid #347d6c!important;outline-offset:4px;border-radius:3px}
+  .timeline-review.mobile-variant-a .mobile-journal-row .chronology-trip:focus-visible .chronology-name{outline:none!important}
+}
+@media (max-width:360px){
+  .timeline-review.mobile-variant-a .mobile-journal-row{column-gap:10px;padding-bottom:24px}
+  .timeline-review.mobile-variant-a .mobile-journal-card h2{font-size:17px!important}
+  .timeline-review.mobile-variant-a .mobile-journal-card>p{-webkit-line-clamp:2}
+}
+@media (prefers-reduced-motion:reduce){
+  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene,
+  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene *{animation:none!important;transition:none!important}
+}
+/* Refined A: paired images, one set of labels, and a two-line excerpt. */
+@media(max-width:736px){
+ .timeline-review.mobile-variant-a .mobile-journal-list{margin:8px 0 20px}
+ .timeline-review.mobile-variant-a .mobile-journal-row{padding-bottom:28px;column-gap:14px}
+ .timeline-review.mobile-variant-a .mobile-journal-row .chronology-trip{min-height:0;padding:22px 0 8px!important}
+ .timeline-review.mobile-variant-a .mobile-journal-card header,.timeline-review.mobile-variant-a .mobile-read{display:none!important}
+ .timeline-review.mobile-variant-a .mobile-journal-card>a.image,.timeline-review.mobile-variant-a .mobile-journal-card>.travel-card__image{height:120px;aspect-ratio:auto;margin:0 0 10px!important}
+ .timeline-review.mobile-variant-a .mobile-journal-card img{height:120px!important;aspect-ratio:auto}
+ .timeline-review.mobile-variant-a .mobile-journal-card>p{-webkit-line-clamp:2;line-height:1.45!important}
+ .timeline-review.mobile-variant-a .mobile-journal-row:last-child::before{height:100px}
+}
+
+.mobile-photo-cta{display:none}
+@media(max-width:736px){
+ .timeline-review.mobile-variant-a .mobile-photo-cta{display:none}
+ .timeline-review.mobile-variant-a .mobile-read{display:inline-flex!important;align-items:center;min-height:32px;padding:4px 0;margin-top:2px;color:#285f50;font:600 11px/18px Arial,sans-serif;text-decoration:underline;text-underline-offset:3px;border:0}
+}
+
+/* Search results temporarily replace both journal presentations. */
+.timeline-review #main>.compact-journals[hidden],
+.timeline-review #main>.compact-journals.journals-expanded[hidden],
+.timeline-review #main>.mobile-journal-list[hidden]{display:none!important}
+@media(min-width:737px){.timeline-review .chronology-trip.lane-1 .chronology-name{top:26px}}
 /* Route bundle: travel-navigation:end */

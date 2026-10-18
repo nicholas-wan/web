@@ -295,10 +295,12 @@ Assert-FileSizeBudget 'assets\css\custom.css' 90
 Assert-FileSizeBudget 'assets\css\travel-map-page.css' 49
 # Approved Travel shortcut cards and compressed chronology (18 Oct 2026).
 # 10 -> 21: ten approved, original layered destination scenes (18 Oct 2026).
-Assert-FileSizeBudget 'assets\css\travel-navigation.css' 21
+# Approved layered illustrations, desktop journal previews and mobile rail (18 Oct 2026).
+Assert-FileSizeBudget 'assets\css\travel-navigation.css' 80
 Assert-FileSizeBudget 'assets\js\travel-shortcuts.js' 4
 # Repeating scene sequence, travelling pulse and interaction/pause lifecycle.
-Assert-FileSizeBudget 'assets\js\travel-chronology.js' 11
+# Includes synchronized journal previews and the mobile animated rail.
+Assert-FileSizeBudget 'assets\js\travel-chronology.js' 30
 # 30 -> 31: journal lede leading and the Australia hero gap and intro treatment (Oct 2026).
 Assert-FileSizeBudget 'assets\css\travel-journal.css' 31
 # Photo search styles live in their own route bundle because travel-map-page.css

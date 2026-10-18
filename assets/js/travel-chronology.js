@@ -84,7 +84,7 @@
   pulse.setAttribute('aria-hidden', 'true');
   pulse.hidden = true;
   track.append(pulse);
-  let active = null, hovered = null, inView = false;
+  let active = null, hovered = null, inView = false, nextIndex = 0, keyboardPaused = false;
   let guideTimer, guideAnimation, guideRun = 0;
   const stop = entry => {
     if (!entry) return;
@@ -95,26 +95,33 @@
     entry.art.getAnimations({ subtree: true }).forEach(animation => animation.cancel());
     if (active === entry) active = null;
   };
-  const stopGuide = () => {
+  const stopGuide = (preserve = null) => {
     clearTimeout(guideTimer);
     guideTimer = null;
     guideRun++;
     if (guideAnimation) guideAnimation.cancel();
     guideAnimation = null;
     pulse.hidden = true;
-    if (active && active.automatic) stop(active);
+    if (active && active.automatic && active !== preserve) stop(active);
   };
   const stopAll = () => { stopGuide(); entries.forEach(stop); };
-  const canGuide = () => inView && !section.hidden && !document.hidden && !reduced.matches && !hovered && !section.contains(document.activeElement);
+  // Pointer focus can remain on an icon after the mouse leaves. Only keyboard
+  // focus should keep the tour paused once hover has ended.
+  const canGuide = () => inView && !section.hidden && !document.hidden && !reduced.matches && !hovered && !keyboardPaused;
   const play = (entry, automatic = false) => {
     entries.forEach(item => clearTimeout(item.intent));
     if (!entry.visible || document.hidden || reduced.matches || section.hidden) return false;
+    // Taking over the currently playing scene must not reset its pose.
+    if (active === entry && !automatic) { entry.automatic = false; return true; }
     if (active && active !== entry) stop(active);
     stop(entry);
     active = entry;
     entry.automatic = automatic;
+    entry.endsAt = performance.now() + entry.duration + 80;
+    nextIndex = (entries.indexOf(entry) + 1) % entries.length;
     const run = entry.run;
     entry.art.classList.add('is-active');
+    if (automatic) section.dispatchEvent(new CustomEvent('timeline-destination', { detail: { href: entry.trip.getAttribute('href') } }));
     entry.timer = setTimeout(() => {
       if (entry.run === run) stop(entry);
     }, entry.duration + 80);
@@ -126,11 +133,12 @@
   };
   const schedule = delay => {
     clearTimeout(guideTimer);
+    if (active && !active.automatic) delay = Math.max(delay, active.endsAt - performance.now() + (nextIndex === 0 ? 2000 : 650));
     if (canGuide()) guideTimer = setTimeout(() => { guideTimer = null; startSequence(); }, delay);
   };
   function startSequence() {
     if (!canGuide()) return;
-    const visible = entries.filter(entry => entry.visible);
+    const visible = entries.slice(nextIndex).concat(entries.slice(0, nextIndex)).filter(entry => entry.visible);
     if (!visible.length) return;
     const run = ++guideRun;
     let previous = position(visible[0]);
@@ -150,7 +158,10 @@
         if (!play(entry, true)) { stopGuide(); schedule(2000); return; }
         guideTimer = setTimeout(() => { guideTimer = null; step(index + 1); }, entry.duration + 160);
       };
+      // A chronological wrap fades to the first stop; never sweep backwards
+      // across the dated line as if returning through time.
       if (!index) perform();
+      else if (next <= previous) guideTimer = setTimeout(perform, 2000);
       else {
         guideAnimation = pulse.animate([
           { transform: 'translateX(' + previous + 'px)' },
@@ -179,19 +190,23 @@
     entries.push(entry);
     observer.observe(art);
     trip.addEventListener('pointerenter', () => {
+      keyboardPaused = false;
       hovered = entry;
-      stopGuide();
+      stopGuide(entry);
       entries.forEach(item => clearTimeout(item.intent));
       entry.intent = setTimeout(() => play(entry), 100);
     });
     trip.addEventListener('pointerleave', () => {
       if (hovered === entry) hovered = null;
+      // A previous keyboard check can leave :focus-visible on the old icon.
+      // Leaving a pointer interaction explicitly hands control back to the tour.
+      keyboardPaused = false;
       clearTimeout(entry.intent);
-      schedule(2000);
+      schedule(nextIndex === 0 ? 2000 : 650);
     });
-    trip.addEventListener('focus', () => { stopGuide(); play(entry); });
+    trip.addEventListener('focus', () => { keyboardPaused = trip.matches(':focus-visible'); stopGuide(entry); play(entry); });
   });
-  section.addEventListener('focusout', () => setTimeout(() => schedule(2000), 0));
+  section.addEventListener('focusout', () => { keyboardPaused = false; setTimeout(() => schedule(nextIndex === 0 ? 2000 : 650), 0); });
   section.querySelector('.chronology-scroll').addEventListener('scroll', () => {
     stopGuide(); schedule(2000);
   }, { passive: true });
@@ -207,4 +222,82 @@
   reduced.addEventListener('change', () => { stopAll(); schedule(2000); });
   document.addEventListener('visibilitychange', () => { stopAll(); if (!document.hidden) schedule(2000); });
   window.addEventListener('pagehide', stopAll);
+  window.polishTimelineReplay = index => {
+    const entry = entries[Math.max(0, Math.min(entries.length - 1, Number(index) || 0))];
+    stopGuide();
+    if (entry) stop(entry);
+    if (entry && play(entry)) schedule(2000);
+  };
+  window.polishTimelineTour = () => {
+    stopAll();
+    nextIndex = 0;
+    schedule(0);
+  };
+})();
+
+(()=>{
+ const root=document.documentElement;root.classList.add('timeline-review','polish-travel');
+ const timeline=document.querySelector('.journal-chronology');
+ const track=timeline.querySelector('.chronology-track');
+ const links=[...track.querySelectorAll('.chronology-trip')];
+ const month=value=>Number(value.slice(0,4))*12+Number(value.slice(5,7))-1;
+ const weights=links.slice(1).map((link,i)=>1+Math.sqrt(Math.max(0,month(link.dataset.start)-month(links[i].dataset.start))));
+ const sum=weights.reduce((a,b)=>a+b,0);
+ function size(width){width=[112,128,136,148].includes(width)?width:136;const height=Math.round(width*2/3),inset=width/2+10;root.style.setProperty('--timeline-icon-width',width+'px');root.style.setProperty('--timeline-icon-height',height+'px');root.style.setProperty('--timeline-line',(height+76)+'px');root.style.setProperty('--timeline-inset',inset+'px');track.style.minWidth=Math.max(1080,links.length*width*.88)+'px';let cumulative=0;links.forEach((link,i)=>{if(i)cumulative+=weights[i-1];const f=sum?cumulative/sum:.5;link.style.left='calc('+f*100+'% + '+(inset-2*inset*f)+'px)';});root.dataset.iconSize=String(width);}
+ size(136);
+ const grid=document.querySelector('.travel-grid'),map=document.querySelector('.travel-atlas__layout'),heading=document.querySelector('.photo-explore__map-heading');
+ if(grid&&map&&heading){const section=document.createElement('section');section.className='travel-atlas travel-atlas--map';section.setAttribute('aria-label','Explore by destination');grid.after(section);section.append(heading,map);}
+ if(grid){
+  const cards=[...grid.querySelectorAll('.travel-card')];
+  grid.classList.add('compact-journals');grid.id='journal-preview';
+  const toolbar=document.createElement('div');toolbar.className='journal-preview-controls';
+  const label=document.createElement('label');label.textContent='Journal preview';
+  const select=document.createElement('select');select.setAttribute('aria-label','Preview a journal');
+  cards.forEach((card,i)=>{const option=document.createElement('option');option.value=String(i);option.textContent=card.querySelector('h2').textContent+' · '+card.querySelector('.date').textContent.trim();select.append(option);});label.append(select);
+  const expand=document.createElement('button');expand.type='button';expand.textContent='Show all 10 journals';expand.setAttribute('aria-expanded','false');expand.setAttribute('aria-controls',grid.id);
+  toolbar.append(label,expand);grid.after(toolbar);
+  const ordered=links.map(link=>cards.find(c=>c.querySelector('.travel-card__image').getAttribute('href')===link.getAttribute('href'))).filter(Boolean);
+  const neighbours=[-1,1].map(step=>{const button=document.createElement('button');button.type='button';button.className='journal-neighbour '+(step<0?'journal-earlier':'journal-later');grid.append(button);return {button,step,card:null};});
+  neighbours.forEach(n=>n.button.addEventListener('click',()=>{if(n.card)show(n.card);}));
+  function show(card){if(card.classList.contains('preview-selected'))return;const hadSelection=cards.some(c=>c.classList.contains('preview-selected'));cards.forEach(c=>c.classList.toggle('preview-selected',c===card));select.value=String(cards.indexOf(card));const href=card.querySelector('.travel-card__image').getAttribute('href');links.forEach(link=>{const chosen=link.getAttribute('href')===href;link.classList.toggle('journal-is-selected',chosen);const cue=link.querySelector('.chronology-preview-cue');if(cue)cue.textContent=chosen?'Showing below ↓':'Preview ↓';});
+   neighbours.forEach(n=>{n.card=ordered[ordered.indexOf(card)+n.step];n.button.replaceChildren();n.button.disabled=!n.card;n.button.classList.toggle('is-empty',!n.card);if(!n.card){n.button.setAttribute('aria-label',n.step<0?'No earlier journal':'No later journal');return;}const img=n.card.querySelector('img').cloneNode(true);img.alt='';const direction=document.createElement('span');direction.className='neighbour-direction';direction.textContent=n.step<0?'← Earlier trip':'Later trip →';const title=document.createElement('span');title.className='neighbour-title';title.textContent=n.card.querySelector('h2').textContent.trim();n.button.append(img,direction,title);n.button.setAttribute('aria-label','Preview '+title.textContent);});
+   if(hadSelection&&!grid.classList.contains('journals-expanded')&&matchMedia('(min-width:1100px) and (prefers-reduced-motion:no-preference)').matches)neighbours.forEach(n=>{if(n.card)n.button.animate([{opacity:.3,transform:'translateY(4px)'},{opacity:1,transform:'translateY(0)'}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'});});
+  }
+  select.addEventListener('change',()=>show(cards[Number(select.value)]));
+  expand.addEventListener('click',()=>{const open=grid.classList.toggle('journals-expanded');expand.setAttribute('aria-expanded',String(open));expand.textContent=open?'Collapse journals':'Show all 10 journals';});
+  let hoverIntent;
+  links.forEach(link=>{const card=cards.find(c=>c.querySelector('.travel-card__image').getAttribute('href')===link.getAttribute('href'));if(!card)return;link.setAttribute('aria-controls',grid.id);link.setAttribute('aria-describedby','journal-preview-help');const cue=document.createElement('span');cue.className='chronology-preview-cue';cue.textContent='Preview ↓';link.querySelector('.chronology-name').append(cue);link.addEventListener('pointerenter',()=>{clearTimeout(hoverIntent);hoverIntent=setTimeout(()=>show(card),250);});link.addEventListener('pointerleave',()=>clearTimeout(hoverIntent));link.addEventListener('focus',()=>{clearTimeout(hoverIntent);show(card);});link.addEventListener('click',e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey||e.button!==0)return;e.preventDefault();e.stopImmediatePropagation();clearTimeout(hoverIntent);show(card);card.querySelector('.travel-card__image').focus({preventScroll:true});card.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});},true);});
+  timeline.addEventListener('timeline-destination',event=>{const card=cards.find(c=>c.querySelector('.travel-card__image').getAttribute('href')===event.detail.href);if(card){clearTimeout(hoverIntent);show(card);}});
+  show(cards[0]);
+  const archive=document.querySelector('.travel-archive-heading');archive.querySelector('h2').textContent='Travel journals';archive.querySelector('p').textContent='Explore the timeline';
+  const help=document.createElement('p');help.id='journal-preview-help';help.className='journal-preview-help';help.textContent='Hover a trip to preview its journal. Click to bring the card into view.';timeline.prepend(help);
+  const sync=()=>toolbar.hidden=grid.hidden;new MutationObserver(sync).observe(grid,{attributes:true,attributeFilter:['hidden']});sync();
+ }
+})();
+
+(()=>{
+ const root=document.documentElement,source=document.querySelector('.journal-chronology'),grid=document.querySelector('.travel-grid');if(!source||!grid)return;
+ root.classList.add('mobile-variant-a');
+ const list=document.createElement('section');list.className='mobile-journal-list';list.setAttribute('aria-label','Travel journals timeline');
+ const entries=[...source.querySelectorAll('.chronology-trip')].map((trip,i)=>{
+  const original=[...grid.querySelectorAll('.travel-card')].find(c=>c.querySelector('a').getAttribute('href')===trip.getAttribute('href'));if(!original)return null;
+  const row=document.createElement('article');row.className='mobile-journal-row';const icon=trip.cloneNode(true);icon.removeAttribute('aria-controls');icon.hidden=false;
+  icon.querySelector('.chronology-preview-cue')?.remove();icon.classList.remove('journal-is-selected');icon.removeAttribute('aria-describedby');
+  const art=icon.querySelector('.authored-scene');art.classList.remove('is-active');
+  // The desktop SVG remains in the DOM, so local paint-server IDs must differ.
+  art.querySelectorAll('[id]').forEach(el=>{const old=el.id;el.id='mobile-'+old;art.querySelectorAll('*').forEach(n=>{[...n.attributes].forEach(a=>{if(a.value.includes('url(#'+old+')'))n.setAttribute(a.name,a.value.replaceAll('url(#'+old+')','url(#mobile-'+old+')'));});});});
+  const card=original.cloneNode(true);card.className='mobile-journal-card';card.removeAttribute('style');card.removeAttribute('data-reveal');card.querySelector('.actions')?.remove();card.querySelector('header p')?.remove();
+  const photo=card.querySelector('a.travel-card__image,a.image');if(photo){const cue=document.createElement('span');cue.className='mobile-photo-cta';cue.textContent='View journal →';cue.setAttribute('aria-hidden','true');photo.append(cue);}
+  const read=document.createElement('a');read.className='mobile-read';read.href=trip.getAttribute('href');read.textContent='Read journal →';card.append(read);
+  row.append(icon,card);list.append(row);return {row,icon,art,index:i,visible:false};
+ }).filter(Boolean);grid.before(list);
+ const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let timer,active,next=0,held=false;
+ function clear(){clearTimeout(timer);if(active)active.art.classList.remove('is-active');active=null;}
+ function play(entry){if(active===entry)return;if(active)active.art.classList.remove('is-active');active=entry;void entry.art.getBoundingClientRect();if(!reduced.matches)entry.art.classList.add('is-active');}
+ function tour(){if(!media.matches||reduced.matches||document.hidden||held)return;const visible=entries.filter(e=>e.visible);if(!visible.length)return;const entry=visible.find(e=>e.index>=next)||visible[0];play(entry);next=entry.index+1;const last=entry===visible[visible.length-1];timer=setTimeout(()=>{clear();timer=setTimeout(tour,last?2000:650);},Number(entry.art.dataset.duration)||6200);}
+ function resume(){clear();timer=setTimeout(tour,500);}
+ entries.forEach(e=>{e.icon.addEventListener('pointerenter',()=>{held=true;clearTimeout(timer);play(e);});e.icon.addEventListener('pointerleave',()=>{held=false;clearTimeout(timer);timer=setTimeout(resume,2000);});e.icon.addEventListener('focus',()=>{held=true;clearTimeout(timer);play(e);});e.icon.addEventListener('blur',()=>{held=false;resume();});e.icon.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();play(e);e.row.classList.add('mobile-selected');entries.filter(x=>x!==e).forEach(x=>x.row.classList.remove('mobile-selected'));});});
+ const observer=new IntersectionObserver(items=>{items.forEach(item=>{const e=entries.find(x=>x.art===item.target);e.visible=item.isIntersecting&&item.intersectionRatio>.5;});if(!active||!active.visible)resume();},{threshold:[0,.5,1]});entries.forEach(e=>observer.observe(e.art));
+ media.addEventListener('change',resume);reduced.addEventListener('change',resume);document.addEventListener('visibilitychange',resume);
+ new MutationObserver(()=>{list.hidden=grid.hidden;}).observe(grid,{attributes:true,attributeFilter:['hidden']});
 })();
