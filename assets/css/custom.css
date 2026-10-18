@@ -10012,7 +10012,7 @@ html.timeline-review{--timeline-icon-width:136px;--timeline-icon-height:91px;--t
 .travel-tour-controls button{min-height:44px;padding:0 10px;font-size:12px;letter-spacing:0;text-transform:none;box-shadow:none;color:#285f50;text-decoration:underline;text-underline-offset:3px}
 img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity:0}
 .travel-card__image:has(img[data-journal-src]),.travel-card__image:has(.journal-photo-pending),.travel-card__image:has(.journal-photo-failed){background:#f1f5f2}
-@media(max-width:736px){#main>.travel-tour-controls{padding-inline:14px}}
+@media(max-width:736px){#main>.travel-tour-controls{display:none}}
 /* Narrow tablets keep every stop visible with room for wrapped dates. */
 @media(min-width:737px) and (max-width:980px){
  .timeline-review .chronology-date{max-width:calc(100% - 16px);text-wrap:balance}

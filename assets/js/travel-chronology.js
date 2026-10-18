@@ -291,18 +291,23 @@
   const read=document.createElement('a');read.className='mobile-read';read.href=trip.getAttribute('href');read.textContent='Read journal →';card.append(read);
   row.append(icon,card);list.append(row);return {row,icon,art,index:i,visible:false};
  }).filter(Boolean);grid.before(list);
- const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let timer,active,next=0,held=false;
+ const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let timer,active,frame;
  function clear(){clearTimeout(timer);if(active)active.art.classList.remove('is-active');active=null;}
- function play(entry){if(document.hidden||list.hidden||!media.matches)return;if(active===entry)return;if(active)active.art.classList.remove('is-active');active=entry;next=entry.index+1;entry.endsAt=performance.now()+(Number(entry.art.dataset.duration)||6200);void entry.art.getBoundingClientRect();if(!reduced.matches)entry.art.classList.add('is-active');}
- function tour(){if(!media.matches||reduced.matches||document.hidden||held||list.hidden||source.classList.contains('tour-paused'))return;const visible=entries.filter(e=>e.visible);if(!visible.length)return;const entry=visible.find(e=>e.index>=next)||visible[0];play(entry);next=entry.index+1;const last=entry===visible[visible.length-1];timer=setTimeout(()=>{clear();timer=setTimeout(tour,last?2000:650);},Number(entry.art.dataset.duration)||6200);}
- function resume(){clear();timer=setTimeout(tour,500);}
- function finish(){clearTimeout(timer);timer=setTimeout(()=>{clear();if(!held)timer=setTimeout(tour,next>=entries.length?2000:650);},Math.max(0,active?active.endsAt-performance.now():0));}
- entries.forEach(e=>{e.icon.addEventListener('pointerenter',event=>{if(event.pointerType==='touch')return;held=true;clearTimeout(timer);play(e);finish();});e.icon.addEventListener('pointerleave',()=>{held=false;finish();});e.icon.addEventListener('focus',()=>{held=e.icon.matches(':focus-visible');clearTimeout(timer);play(e);finish();});e.icon.addEventListener('blur',()=>{held=false;resume();});e.icon.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();held=e.icon.matches(':focus-visible');play(e);finish();e.row.classList.add('mobile-selected');entries.filter(x=>x!==e).forEach(x=>x.row.classList.remove('mobile-selected'));});});
- const observer=new IntersectionObserver(items=>{items.forEach(item=>{const e=entries.find(x=>x.art===item.target);e.visible=item.isIntersecting&&item.intersectionRatio>.5;});if(!active||!active.visible)resume();},{threshold:[0,.5,1]});entries.forEach(e=>observer.observe(e.art));
- media.addEventListener('change',resume);reduced.addEventListener('change',resume);document.addEventListener('visibilitychange',resume);
- source.addEventListener('tour-pause',resume);
- source.addEventListener('tour-step',event=>{const entry=entries[event.detail.index];if(!entry||!media.matches)return;clear();held=false;entry.row.scrollIntoView({block:'center',behavior:'instant'});play(entry);next=entry.index+1;timer=setTimeout(resume,Number(entry.art.dataset.duration)||6200);});
- new MutationObserver(()=>{list.hidden=grid.hidden;if(list.hidden){held=false;clear();}else resume();}).observe(grid,{attributes:true,attributeFilter:['hidden']});
+ function play(entry){clear();active=entry;void entry.art.getBoundingClientRect();entry.art.classList.add('is-active');timer=setTimeout(()=>{clear();update();},Number(entry.art.dataset.duration)||6200);}
+ // Repeat the scene nearest the reader; do not tour unrelated visible rows.
+ function update(){
+  if(!media.matches||reduced.matches||document.hidden||list.hidden){clear();return;}
+  let nearest=null,distance=Infinity;
+  entries.forEach(entry=>{const box=entry.art.getBoundingClientRect(),visible=Math.min(innerHeight,box.bottom)-Math.max(0,box.top);if(!box.height||visible<box.height/2)return;const delta=Math.abs((box.top+box.bottom)/2-innerHeight/2);if(delta<distance){nearest=entry;distance=delta;}});
+  if(nearest!==active){if(nearest)play(nearest);else clear();}
+ }
+ function requestUpdate(){if(frame)return;frame=requestAnimationFrame(()=>{frame=0;update();});}
+ entries.forEach(e=>e.icon.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();e.row.classList.add('mobile-selected');entries.filter(x=>x!==e).forEach(x=>x.row.classList.remove('mobile-selected'));update();}));
+ const observer=new IntersectionObserver(requestUpdate,{threshold:[0,.5,1]});entries.forEach(e=>observer.observe(e.art));
+ window.addEventListener('scroll',requestUpdate,{passive:true});window.addEventListener('resize',requestUpdate);
+ media.addEventListener('change',update);reduced.addEventListener('change',update);document.addEventListener('visibilitychange',update);
+ new MutationObserver(()=>{list.hidden=grid.hidden;update();}).observe(grid,{attributes:true,attributeFilter:['hidden']});
+
 })();
 
 /* Keep photos outside the reading area inert, including the hidden presentation. */
