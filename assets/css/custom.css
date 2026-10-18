@@ -9801,7 +9801,7 @@ html.timeline-review{--timeline-icon-width:136px;--timeline-icon-height:91px;--t
  .timeline-review .compact-journals:not(.journals-expanded)>.travel-card:not(.preview-selected){visibility:hidden;pointer-events:none}
  .timeline-review .compact-journals:not(.journals-expanded)>.travel-card.preview-selected{visibility:visible;margin:0 auto!important}
  .timeline-review .chronology-preview-cue{display:none}
- .timeline-review .journal-is-selected .chronology-name{background:#e3eee4;border-radius:7px;box-shadow:0 0 0 5px #e3eee4}
+ .timeline-review .journal-is-selected .chronology-name{background:rgba(255,255,255,.72);border-radius:7px;box-shadow:0 0 0 1px #d5e2d9}
  .timeline-review .journal-is-selected .chronology-preview-cue{color:#174d3b}
  .timeline-review .journal-is-selected .chronology-dot{box-shadow:0 0 0 3px #a8c8b6}
  .timeline-review .chronology-name:hover .chronology-preview-cue{text-decoration:underline}

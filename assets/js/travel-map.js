@@ -1003,7 +1003,7 @@
     resetView();
   };
 
-  var openFullscreen = function () {
+  var openFullscreen = function (event) {
     if (isFullscreen) return;
     if (fullscreenCloseTimer) {
       window.clearTimeout(fullscreenCloseTimer);
@@ -1016,7 +1016,7 @@
       mapImage.loading = 'eager';
     }
     isFullscreen = true;
-    lastFocused = document.activeElement;
+    lastFocused = event && event.currentTarget === teaser ? teaser : document.activeElement;
     map.classList.add('is-fullscreen');
     map.setAttribute('role', 'dialog');
     map.setAttribute('aria-modal', 'true');

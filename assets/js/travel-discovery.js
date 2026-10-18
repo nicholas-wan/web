@@ -36,6 +36,8 @@
     document.body.appendChild(script);
   }
   retry.addEventListener('click', function () {
+    // Safari pointer activation does not focus buttons automatically.
+    retry.focus({ preventScroll: true });
     if (ready) form.dispatchEvent(new Event('retry-search'));
     else { status.textContent = 'Loading photos…'; loadSearch(); }
   });
