@@ -287,8 +287,7 @@
   // The desktop SVG remains in the DOM, so local paint-server IDs must differ.
   art.querySelectorAll('[id]').forEach(el=>{const old=el.id;el.id='mobile-'+old;art.querySelectorAll('*').forEach(n=>{[...n.attributes].forEach(a=>{if(a.value.includes('url(#'+old+')'))n.setAttribute(a.name,a.value.replaceAll('url(#'+old+')','url(#mobile-'+old+')'));});});});
   const card=original.cloneNode(true);card.className='mobile-journal-card';card.removeAttribute('style');card.removeAttribute('data-reveal');card.querySelectorAll('noscript').forEach(n=>n.remove());card.querySelector('img').sizes='(max-width:736px) calc(100vw - 154px), 800px';card.querySelector('.actions')?.remove();card.querySelector('header p')?.remove();
-  const photo=card.querySelector('a.travel-card__image,a.image');if(photo){const cue=document.createElement('span');cue.className='mobile-photo-cta';cue.textContent='View journal →';cue.setAttribute('aria-hidden','true');photo.append(cue);}
-  const read=document.createElement('a');read.className='mobile-read';read.href=trip.getAttribute('href');read.textContent='Read journal →';card.append(read);
+  const photo=card.querySelector('a.travel-card__image,a.image');if(photo){const cue=document.createElement('span');cue.className='mobile-photo-cta';cue.textContent='Read journal →';photo.setAttribute('aria-label','Read journal — '+trip.querySelector('.chronology-label').textContent);cue.setAttribute('aria-hidden','true');photo.append(cue);}
   row.append(icon,card);list.append(row);return {row,icon,art,index:i,visible:false};
  }).filter(Boolean);grid.before(list);
  const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let timer,active,frame;
