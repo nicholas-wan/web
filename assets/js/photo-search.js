@@ -20,6 +20,7 @@
 	var clearButton = form.querySelector('.photo-search__clear');
 	var collapsible = document.querySelectorAll('.travel-atlas__layout, .photo-explore__map-heading, #main > .travel-archive-heading, #main > .travel-grid');
 	var discovery = document.getElementById('photo-explore'), moment = document.getElementById('photo-moment');
+	var mixButton = discovery.querySelector('[data-explore-action="shuffle"]'), mix = null;
 	var titles = {}, seenMoments = [], momentHistory = [], momentAt = -1;
 	var previousMoment = moment.querySelector('[data-explore-action="previous"]');
 	var retry = document.getElementById('photo-search-retry'), loading = false;
@@ -212,18 +213,23 @@
 		if (pool.length < 6) pool = reviewed;
 		shuffle(pool).forEach(function(tag) { (groups[tag.facet] || (groups[tag.facet] = [])).push(tag); });
 		var facets = shuffle(Object.keys(groups));
-		explore = [];
-		while (facets.length && explore.length < 6) {
+		var next = [];
+		while (facets.length && next.length < 6) {
 			var facet = facets.shift();
 			var tag = groups[facet].pop().tag;
 			var candidates = shuffle(coverTopics[tag].slice());
-			var unused = candidates.filter(function(photo) { return !explore.some(function(item) { return item.photo.id === photo.id; }); });
+			var unused = candidates.filter(function(photo) { return !next.some(function(item) { return item.photo.id === photo.id; }); });
 			if (!unused.length) { if (groups[facet].length) facets.push(facet); continue; }
-			var varied = unused.filter(function(photo) { return !explore.some(function(item) { return item.photo.trip === photo.trip; }); });
-			explore.push({ tag: tag, photo: (varied.length ? varied : unused)[0] });
+			var varied = unused.filter(function(photo) { return !next.some(function(item) { return item.photo.trip === photo.trip; }); });
+			next.push({ tag: tag, photo: (varied.length ? varied : unused)[0] });
 			if (groups[facet].length) facets.push(facet);
 		}
-		try { sessionStorage.setItem('photo-search-explore', JSON.stringify(explore.map(function(tag) { return tag.tag; }))); } catch (e) {}
+		return next;
+	}
+
+	function saveExplore(next) {
+		explore = next;
+		try { sessionStorage.setItem('photo-search-explore', JSON.stringify(next.map(function(tag) { return tag.tag; }))); } catch (e) {}
 	}
 
 	function thumbnail(photo, large) {
@@ -238,8 +244,8 @@
 			(photo.fx == null ? 50 : photo.fx) + '% ' + (photo.fy == null ? 50 : photo.fy) + '%">';
 	}
 
-	function renderExplore() {
-		discovery.querySelector('.photo-explore__cards').innerHTML = explore.map(function(item) {
+	function exploreMarkup(batch) {
+		return batch.map(function(item) {
 			var title = titles[item.tag] || item.tag.replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); });
 			var context = item.photo.place + ' · ' + trips[item.photo.trip].year;
 			return '<a class="photo-explore__card" data-cover-id="' + escape(item.photo.id) + '" data-explore-action="tag" data-tag="' + escape(item.tag) +
@@ -247,6 +253,74 @@
 				'<span class="photo-explore__caption"><strong>' + escape(title) + '</strong><span><span>' + escape(context) +
 				'</span></span></span></a>';
 		}).join('');
+	}
+
+	function cancelMix() {
+		if (mix) {
+			clearTimeout(mix.timeout);
+			mix.animations.forEach(function(animation) { animation.cancel(); });
+			if (mix.overlay) mix.overlay.remove();
+			mix.grid.style.height = mix.grid.style.position = '';
+			mix = null;
+		}
+		mixButton.removeAttribute('aria-disabled');
+		mixButton.firstChild.textContent = 'Another mix ';
+	}
+
+	function focusExplore() {
+		if (!mix) return;
+		cancelMix();
+		if (status.textContent === 'Loading photos…') status.textContent = '';
+	}
+	discovery.querySelector('.photo-explore__cards').addEventListener('focusin', focusExplore);
+
+	function mixExplore() {
+		if (mix) return;
+		var grid = discovery.querySelector('.photo-explore__cards'), next = exploreMore();
+		var stage = document.createElement('div');
+		stage.innerHTML = exploreMarkup(next);
+		var task = mix = { grid: grid, animations: [] };
+		mixButton.setAttribute('aria-disabled', 'true');
+		mixButton.firstChild.textContent = 'Loading photos… ';
+		status.textContent = 'Loading photos…';
+		// Decode only replacements for currently visible image slots. Detached
+		// lazy images below the viewport stay lazy when the new batch is attached.
+		var slots = grid.querySelectorAll('img');
+		var ready = [].map.call(stage.querySelectorAll('img'), function(img, index) {
+			var box = slots[index] && slots[index].getBoundingClientRect();
+			if (!box || box.bottom <= 0 || box.top >= innerHeight) return;
+			img.loading = 'eager';
+			return img.decode();
+		});
+		var timeout = new Promise(function(resolve, reject) { task.timeout = setTimeout(reject, 15000); });
+		Promise.race([Promise.all(ready), timeout]).then(function() {
+			if (mix !== task) return;
+			if (grid.contains(document.activeElement)) { focusExplore(); return; }
+			clearTimeout(task.timeout);
+			var animate = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+			if (animate) {
+				var style = getComputedStyle(grid);
+				var overlay = task.overlay = document.createElement('div');
+				overlay.setAttribute('aria-hidden', 'true'); overlay.inert = true;
+				overlay.style.cssText = 'position:absolute;inset:0;display:grid;pointer-events:none;grid-template-columns:' + style.gridTemplateColumns + ';gap:' + style.gap;
+				grid.style.height = grid.getBoundingClientRect().height + 'px';
+				grid.style.position = 'relative';
+				[].forEach.call(grid.children, function(card) { overlay.appendChild(card.cloneNode(true)); });
+			}
+			grid.replaceChildren.apply(grid, [].slice.call(stage.children));
+			saveExplore(next);
+			status.textContent = 'Six new photo topics to explore.';
+			if (!animate) { cancelMix(); return; }
+			[].forEach.call(grid.children, function(card) { task.animations.push(card.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' })); });
+			grid.appendChild(task.overlay);
+			var fade = task.overlay.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: 'ease-out', fill: 'forwards' });
+			task.animations.push(fade);
+			fade.finished.then(function() { if (mix === task) cancelMix(); }, function() {});
+		}, function() {
+			if (mix !== task) return;
+			cancelMix();
+			status.textContent = 'Could not load new photos. Choose Another mix to try again.';
+		});
 	}
 
 	// Choose a trip first so the longest journal cannot dominate. Do not repeat
@@ -274,13 +348,13 @@
 		if (!action || !photos && !failed) return;
 		if (failed) { status.textContent = 'Photo search is unavailable right now.'; return; }
 		delete form.dataset.exploreIntent;
+		if (action !== 'shuffle') cancelMix();
 		if (action.indexOf('tag:') === 0) {
 			input.value = action.slice(4);
 			run();
 			results.querySelector('.photo-hit').focus();
 		} else if (action === 'shuffle') {
-			exploreMore(); renderExplore();
-			status.textContent = 'Six new photo topics to explore.';
+			mixExplore();
 		} else if (action === 'surprise' || action === 'previous') {
 			if (action === 'previous') momentAt = Math.max(0, momentAt - 1);
 			else {
@@ -422,13 +496,18 @@
 	}
 
 	function run() {
+		cancelMix();
 		// Async index completion must wait for committed IME text too.
 		if (composing) return;
 		results.inert = false;
 		clearTimeout(timer);
 		clearTimeout(saveTimer);
 		var value = input.value, query = value.trim();
-		if (!query && renderedQuery) { exploreMore(); renderExplore(); renderedQuery = ''; }
+		if (!query && renderedQuery) {
+			saveExplore(exploreMore());
+			discovery.querySelector('.photo-explore__cards').innerHTML = exploreMarkup(explore);
+			renderedQuery = '';
+		}
 		discovery.hidden = !!query && !failed;
 		moment.hidden = true;
 		var terms = unique(tokens(value));
@@ -496,6 +575,7 @@
 	}
 
 	input.addEventListener('input', function() {
+		cancelMix();
 		delete form.dataset.exploreIntent;
 		results.inert = true;
 		clearButton.hidden = !input.value;
@@ -503,7 +583,7 @@
 		if (!composing) timer = setTimeout(run, DEBOUNCE);
 	});
 
-	input.addEventListener('compositionstart', function() { composing = true; clearTimeout(timer); });
+	input.addEventListener('compositionstart', function() { cancelMix(); composing = true; clearTimeout(timer); });
 	input.addEventListener('compositionend', function() { composing = false; run(); });
 
 	form.addEventListener('submit', function(event) {

@@ -4,6 +4,12 @@
   var form = document.getElementById('photo-search'), input = form.q;
   var status = document.getElementById('photo-search-status');
   var retry = document.getElementById('photo-search-retry');
+  var mixButton = document.querySelector('[data-explore-action="shuffle"]');
+  function pendingMix(pending) {
+    if (pending) mixButton.setAttribute('aria-disabled', 'true');
+    else mixButton.removeAttribute('aria-disabled');
+    mixButton.firstChild.textContent = pending ? 'Loading photos… ' : 'Another mix ';
+  }
   var script, ready = false, old = [], key = 'photo-search-explore';
   var seeds = Array.from(document.getElementById('photo-explore-seeds').content.children);
   try { old = JSON.parse(sessionStorage.getItem(key)) || []; } catch (e) {}
@@ -38,6 +44,7 @@
     script.src = form.dataset.searchScript;
     script.onload = function () { ready = true; send(); };
     script.onerror = function () {
+      pendingMix(false);
       script.remove(); script = null;
       status.textContent = 'Photo search is unavailable right now.';
       retry.removeAttribute('aria-disabled');
@@ -51,17 +58,21 @@
   });
   document.addEventListener('click', function (e) {
     var b = e.target.closest('[data-explore-action]');
-    if (!b || b.disabled || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    if (!b || b.disabled || b.getAttribute('aria-disabled') === 'true' || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
+    pendingMix(b === mixButton);
     form.dataset.exploreIntent = b.dataset.exploreAction === 'tag' ? 'tag:' + b.dataset.tag : b.dataset.exploreAction;
     status.textContent = 'Loading photos…';
     if (ready) send(); else loadSearch();
   });
   if (/[?&]q=/.test(location.search)) loadSearch();
   input.onfocus = input.onpointerdown = input.onkeydown = loadSearch;
-  input.oninput = function () { delete form.dataset.exploreIntent; };
+  input.oninput = function () { pendingMix(false); delete form.dataset.exploreIntent; };
   // Composition and submit can begin before the lazy module has arrived.
-  input.addEventListener('compositionstart', function () { form.dataset.searchComposing = 'true'; });
+  input.addEventListener('compositionstart', function () {
+    pendingMix(false); delete form.dataset.exploreIntent;
+    form.dataset.searchComposing = 'true';
+  });
   input.addEventListener('compositionend', function () { delete form.dataset.searchComposing; });
   form.addEventListener('submit', function (e) {
     e.preventDefault();

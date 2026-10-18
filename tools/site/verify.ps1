@@ -339,10 +339,13 @@ Assert-FileSizeBudget 'assets\js\anomaly-peek.js' 40
 # 16 -> 19: randomized Explore plus relevance, input and storage safeguards (Oct 2026).
 # 19 -> 25: real photo postcards, trip-balanced Surprise me and lazy intent handoff (Oct 2026).
 # 25 -> 26: retry recovery, reversible moments and responsive previews (Oct 2026).
-Assert-FileSizeBudget 'assets\js\photo-search.js' 26
+# 26 -> 30 KB (18 Oct 2026): owner-approved decode-before-swap postcards, bounded
+# loading/retry and stale-intent cancellation; search stays outside the initial-page bundle.
+Assert-FileSizeBudget 'assets\js\photo-search.js' 30
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8
+if ($photoSearchJs -notmatch 'function mixExplore' -or $photoSearchJs -notmatch 'img\.decode\(' -or $photoSearchJs -notmatch 'mix !== task' -or $photoSearchJs -notmatch 'prefers-reduced-motion: reduce') { throw 'Another mix must retain the old batch during decode and reject stale refreshes, with reduced-motion support.' }
 # The readable bootstrap replaces the inline loader and defers the 63 KB atlas.
 # 6 -> 7 KB (Oct 2026): preserve cold-submit and IME state before lazy search loads.
 Assert-FileSizeBudget 'assets\js\travel-discovery.js' 7

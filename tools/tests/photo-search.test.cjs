@@ -10,7 +10,7 @@ const reviews = JSON.parse(fs.readFileSync(path.join(root, 'journals/explore-cov
 function setup(saved = {}) {
   const node = () => ({ value: '', hidden: false, innerHTML: '', textContent: '', dataset: {},
     addEventListener() {}, querySelector() { return node(); }, querySelectorAll() { return []; },
-    classList: { toggle() {} }, focus() {} });
+    classList: { toggle() {} }, focus() {}, removeAttribute() {}, firstChild: { textContent: '' } });
   const form = node(), input = form.q = node(), results = node();
   results.parentNode = node();
   const nodes = { 'photo-search': form, 'photo-results': results, 'photo-search-status': node(),
@@ -20,7 +20,7 @@ function setup(saved = {}) {
     localStorage: storage, sessionStorage: storage, setTimeout: () => 1, clearTimeout() {},
     URLSearchParams, location: { search: '', pathname: '/travel', hash: '' }, history: { replaceState() {} } };
   let source = fs.readFileSync(path.join(root, 'assets/js/photo-search.js'), 'utf8');
-  source = source.replace('\tvar initial =', '\tglobalThis.api = { prepare, search, tokens, highlight, completeTag, exploreMore, pickMoment, recent, run, tripLabel, getExplore: () => explore, getTags: () => tags }; return;\n\tvar initial =');
+  source = source.replace('\tvar initial =', '\tglobalThis.api = { prepare, search, tokens, highlight, completeTag, sampleExplore: exploreMore, exploreMore: () => saveExplore(exploreMore()), pickMoment, recent, run, tripLabel, getExplore: () => explore, getTags: () => tags }; return;\n\tvar initial =');
   vm.runInNewContext(source, context);
   context.api.prepare(structuredClone(index));
   return { ...context.api, input, status: nodes['photo-search-status'], saved };
@@ -39,6 +39,17 @@ test('exploration samples six populated facets with matching, distinct photos an
   const reloaded = setup(api.saved);
   reloaded.exploreMore();
   assert.ok(reloaded.getExplore().every(t => !api.getExplore().some(p => p.tag === t.tag)));
+});
+
+test('sampling replacement topics does not commit a pending or failed batch', () => {
+  const api = setup();
+  api.exploreMore();
+  const prior = api.getExplore(), storage = api.saved['photo-search-explore'];
+  const next = api.sampleExplore();
+  assert.equal(next.length, 6);
+  assert.ok(next.every(item => !prior.some(old => old.tag === item.tag)));
+  assert.equal(api.getExplore(), prior);
+  assert.equal(api.saved['photo-search-explore'], storage);
 });
 
 test('Surprise me visits every photo before repeating, varies trips and survives reload', () => {

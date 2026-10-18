@@ -38,6 +38,7 @@ Decided 16–17 Oct 2026; do not propose otherwise. Details are under [Behaviour
 - Pages crossfade in 220ms with no black load wait; desktop tab-page titles glide into place.
 - Work: no contact line; anomaly charts open one at a time from their chips, never over the writeup, with no "simulated" note. Phishing domains leads the three charts; its fake keeps the padlock (most phishing sites use HTTPS).
 - Skills cards carry no case-study links.
+- No Work section-shortcut row (declined 18 Oct 2026).
 - Personal: unfocused cards stay dimmed to 0.55; galleries have no photo controls.
 - No skip link, no change to the homepage cards' focus ring; return-to-top stays on phones (except Travel, journals and Personal, where it is hidden).
 - Every gallery or card image ships `-480`/`-800` siblings with a `sizes` matching its slot.
@@ -415,6 +416,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Reviews lock thumbnail path, SHA-256, focal point, visible topics; builds fail if a reviewed thumbnail changes or topic stops matching.
 - Review the exact 8:5 crop before adding/updating a record.
 - Another mix: reviewed topics only, balanced facets, excludes last batch; search keeps the full vocabulary.
+- Another mix refresh (approved 18 Oct 2026): keep the current six postcards while visible replacements decode, show Loading photos on the focused button, then crossfade once for 220ms (instant under reduced motion). Below-fold replacements stay lazy. Failure/timeout keeps the old batch and permits retry; search, focusing a postcard, or another discovery action cancels stale replacement work. Commit session history only with the displayed batch.
 - Pool: 802 covers across 293 topics.
 - Bubble tea ≠ tea; animal statues and model food are sculpture/miniature, not animals or meals.
 - Label Browse photos; plain topic names, place · year beneath; no Photo: prefix, slogans or invented emotions.
@@ -435,7 +437,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Announce index failures even with an empty field.
 - Run `node --test tools/tests/photo-search.test.cjs` after building; CI also covers mobile/desktop discovery, phrase suggestions, paging, filtering, keyboard, deep links, failures, URL restore, IME.
 
-- Budgets: `photo-search.js` 26 KB, `travel-search.css` 16 KB (from 19/11 KB, Oct 2026); index ~520 KB of 560 KB (from 480 KB, Oct 2026, for descriptive alts); index lazy.
+- Budgets: `photo-search.js` 30 KB (26 → 30, 18 Oct 2026, for decoded swaps and recovery), `travel-search.css` 16 KB (from 19/11 KB, Oct 2026); index ~520 KB of 560 KB (from 480 KB, Oct 2026, for descriptive alts); index lazy.
 - Motion: shared tokens, immediate under reduced motion.
 
 #### Discovery loading and recovery (Oct 2026)
@@ -462,7 +464,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - **`travel-map-page.css` sits under 1 KB below its 49 KB (50,176 LF bytes) `verify.ps1` budget (Oct 2026).**
   - No large CSS on the travel/atlas route.
   - If needed, bump the budget with a dated rationale comment (like the 40 → 42 note); never strip `custom.css` comments to save bytes.
-- **Keep travel JavaScript deferred (Oct 2026).** Initial travel bundle loads `travel-discovery.js`, not the atlas; 80 KB initial ceiling; `travel-discovery.js` 7 KB (submit interception and IME state must precede the module); atlas 64 KB, near viewport; search 26 KB, on interaction. Do not restore eager atlas or search scripts.
+- **Keep travel JavaScript deferred (Oct 2026).** Initial travel bundle loads `travel-discovery.js`, not the atlas; 80 KB initial ceiling; `travel-discovery.js` 7 KB (submit interception and IME state must precede the module); atlas 64 KB, near viewport; search 30 KB, on interaction. Do not restore eager atlas or search scripts.
 - **`.travel-gallery__item--tall` looks unused, isn't.** It pairs with the `guangzhou-gallery__brick--tall` compat class (the only one in markup); SKILL.md mandates the pair; removing it unstyles future journals.
 
 ### Working with these contracts
