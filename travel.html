@@ -54,7 +54,7 @@
 									<h1 id="travel-atlas-title">Wander through the journals.</h1>
 									<p>Places, meals, and little moments from the road.</p>
 								</div>
-								<p class="travel-atlas__summary"><strong>10</strong> journals <span aria-hidden="true">&middot;</span> <strong>4</strong> continents</p>
+								<!-- TRAVEL_SHORTCUTS -->
 								<!-- Photo search. The build swaps data-search-script (and data-search-index) for
 								     versioned URLs; travel-discovery.js injects
 								     photo-search.js on demand, which adds the tag chips and the results section. -->
@@ -87,7 +87,7 @@
 							</section>
 
 							<div class="photo-explore__map-heading"><h2>Explore by destination</h2><p>Select a destination to browse trip stories and photos.</p></div>
-							<div class="travel-atlas__layout" data-map-script="assets/js/travel-map.js">
+							<div class="travel-atlas__layout" id="travel-map" data-map-script="assets/js/travel-map.js">
 								<div class="travel-map">
 								<div class="travel-map__viewport" role="region" tabindex="0" aria-label="Interactive travel map. Scroll to zoom and drag to move around the map.">
 									<div class="travel-map__canvas">
@@ -222,6 +222,7 @@
 							<p>Newest first</p>
 						</div>
 
+						<!-- TRAVEL_CHRONOLOGY -->
 						<section class="posts travel-grid" aria-labelledby="travel-archive-title">
 							<article class="travel-card">
 								<header>

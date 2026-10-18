@@ -15,7 +15,7 @@ for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], 
     await page.evaluate(() => document.fonts.ready);
     const grid = page.locator('.travel-grid');
     await grid.scrollIntoViewIfNeeded();
-    expect(await grid.evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(width <= 320 ? 1 : width <= 1100 ? 2 : 3);
+    expect(await grid.evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(width <= 320 ? 1 : width < 981 ? 2 : width < 1280 ? 3 : 4);
     expect(await page.locator('.travel-card').count()).toBe(10);
     if (width <= 600) {
       const card = page.locator('.travel-card').first();

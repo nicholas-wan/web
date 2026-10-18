@@ -9273,3 +9273,92 @@ html .page-experience .case-study--internship .case-study__tags li {
 }
 
 html .page-skills #main > .post { border-top:0; }
+
+/* Route bundle: travel-navigation:start */
+/* Approved shortcut tiles. Artwork previews the two existing destinations. */
+.travel-portals{display:grid;grid-template-columns:1fr 1fr;gap:14px;grid-column:1/-1;justify-self:start;width:100%;max-width:480px;margin:1rem 0 .35rem;text-align:left}
+.travel-portals .travel-portal{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:3px;min-width:0;padding:8px 16px 14px;background:#f1f6f3;border:1px solid #dce7e0;border-radius:7px;color:#215e59;font-family:var(--font-display);line-height:1.25;font-style:normal;text-decoration:none;transition:background 220ms}
+.travel-portals .travel-portal:hover{background:#e8f1eb}
+.travel-portals .travel-portal:focus-visible{outline:2px solid var(--color-brand-700);outline-offset:3px}
+.portal-label{font-size:max(var(--text-floor),1rem);font-weight:700;white-space:nowrap}
+.portal-label small{display:block;margin-top:5px;font-size:max(var(--text-floor),.7rem);font-weight:400;color:#6c7775;letter-spacing:.02em}
+.portal-art{display:block;position:relative;align-self:center;width:148px;height:88px;flex:0 0 88px}
+.portal-route svg{display:block;width:100%;height:100%;overflow:visible;fill:#327b70}
+.portal-route path{fill:none;stroke-width:1.2;stroke:#aac9c0}
+.portal-route .route-guide{stroke-dasharray:2 4}
+.portal-route .route-ink{stroke:#327b70;stroke-dasharray:1;stroke-dashoffset:0}
+.portal-route .route-traveller{fill:#c38a3c}
+.portal-arrow{position:absolute;right:14px;bottom:25px;font-size:16px;color:#52867d}
+.portal-stack img{position:absolute;left:42px;top:15px;width:65px;height:49px;object-fit:cover;border:2px solid #fff;border-radius:2px;box-shadow:0 1px 5px #173b3326;transform-origin:50% 90%}
+.portal-stack img:nth-child(1){transform:translate(-9px,-1px) rotate(-12deg)}
+.portal-stack img:nth-child(2){transform:translate(7px,-2px) rotate(10deg)}
+.portal-stack img:nth-child(3){transform:translate(0,4px)}
+.travel-portal.is-playing .route-ink{animation:portal-draw 1.8s ease-in-out both}
+.travel-portal.is-playing .route-traveller{offset-path:path('M38.44 13.82Q52 -1 65.68 17.01');cx:0;cy:0;animation:portal-travel 1.8s ease-in-out both}
+.travel-portal.is-playing .portal-stack img:nth-child(1){animation:portal-left 1.6s ease-in-out both}
+.travel-portal.is-playing .portal-stack img:nth-child(2){animation:portal-right 1.6s ease-in-out both}
+.travel-portal.is-playing .portal-stack img:nth-child(3){animation:portal-front 1.6s ease-in-out both}
+.travel-portals.is-paused *{animation-play-state:paused!important}
+@keyframes portal-draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes portal-travel{from{offset-distance:0%}to{offset-distance:100%}}
+@keyframes portal-left{0%,100%{transform:translate(-9px,-1px) rotate(-12deg)}45%,65%{transform:translate(-17px,-4px) rotate(-19deg)}}
+@keyframes portal-right{0%,100%{transform:translate(7px,-2px) rotate(10deg)}45%,65%{transform:translate(17px,-4px) rotate(18deg)}}
+@keyframes portal-front{0%,100%{transform:translate(0,4px)}45%,65%{transform:translate(0,6px)}}
+.travel-atlas__layout,#travel-archive-title{scroll-margin-top:2rem}
+/* The opening shortcut owns the animated invitation; the lower phone teaser rests. */
+.travel-map-teaser.is-previewing,.travel-map-teaser.is-previewing *{animation:none!important}
+@media(min-width:737px){.travel-atlas__header{align-items:flex-start}.travel-portals{margin-top:0;margin-bottom:0}}
+@media(max-width:736px){
+ .travel-portals{gap:10px;margin:.75rem 0 .25rem}
+ .travel-portals .travel-portal{padding:5px 11px 12px}
+ .portal-art{width:118px;height:80px;flex-basis:80px}
+ .portal-stack img{width:52px;height:40px;left:33px;top:15px}
+ .portal-arrow{right:10px;font-size:13px}
+ .travel-portal.is-playing .portal-stack img:nth-child(1){animation-name:portal-left-phone}
+ .travel-portal.is-playing .portal-stack img:nth-child(2){animation-name:portal-right-phone}
+}
+@keyframes portal-left-phone{0%,100%{transform:translate(-4px,-1px) rotate(-12deg)}45%,65%{transform:translate(-7px,-4px) rotate(-17deg)}}
+@keyframes portal-right-phone{0%,100%{transform:translate(4px,-2px) rotate(10deg)}45%,65%{transform:translate(7px,-4px) rotate(16deg)}}
+@media(prefers-reduced-motion:reduce){.travel-portals *{animation:none!important;transition:none!important}.portal-route .route-traveller{offset-path:none!important;cx:65.68;cy:17.01}}
+
+/* Travel archive and chronology, approved 18 October 2026. */
+.travel-grid .travel-card > p { display: none; }
+.travel-grid .travel-card { grid-template-rows: auto 1fr; }
+@media (min-width: 1280px) { .travel-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 981px) and (max-width: 1279px) { .travel-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+#main > .journal-chronology { padding: 0 !important; margin: 0 2rem 1rem; border: 0; min-width: 0; }
+#main > .journal-chronology[hidden] { display: none; }
+.chronology-intro { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.chronology-intro h3 { font-family: inherit; text-transform: none; letter-spacing: 0; font-size: 1rem; margin: 0; color: #284e48; }
+.chronology-intro > span, .chronology-detail { font: max(var(--text-floor), .78rem)/1.5 var(--font-display); color: #5b706b; }
+.chronology-intro > span { margin-left: auto; }
+.chronology-scroll { overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: #9ab7ac #edf2ee; padding: 3px 0 8px; }
+.chronology-track { width: 100%; min-width: 1000px; height: 180px; position: relative; }
+.chronology-controls { display: flex; gap: 4px; }
+.chronology-controls[hidden] { display: none; }
+.chronology-controls button { width: 44px; height: 44px; padding: 0; line-height: 1; border: 1px solid #d1dfd6; border-radius: 4px; box-shadow: none; font-size: 18px; letter-spacing: 0; color: #285f54; background: white; }
+.chronology-line { position: absolute; left: 56px; right: 56px; top: 91px; height: 2px; background: #a8c4b8; transform-origin: left; }
+.journal-chronology.is-revealed .chronology-line { animation: chronology-draw 1.2s ease-out both; }
+.journal-chronology.is-paused .chronology-line { animation-play-state: paused; }
+@keyframes chronology-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.chronology-trip { position: absolute; top: 83px; width: 100px; height: 48px; margin-left: -50px; border: 0 !important; color: #285f54; display: block; text-align: center; font: 600 12px/1.25 var(--font-display); pointer-events: none; }
+.chronology-dot, .chronology-name { pointer-events: auto; }
+.chronology-dot { display: block; position: absolute; left: 45px; top: 4px; width: 10px; height: 10px; border: 2px solid white; border-radius: 50%; background: #347d6c; box-shadow: 0 0 0 1px #347d6c; }
+.chronology-dot::after { content: ""; position: absolute; width: 44px; height: 44px; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.chronology-name { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; position: absolute; top: -71px; left: 0; right: 0; min-height: 44px; padding: 3px 0; background: transparent; }
+.chronology-trip.lane-1 .chronology-name { top: 24px; }
+.chronology-trip::before { content: ""; position: absolute; left: 49px; top: -20px; height: 24px; width: 1px; background: #c4d5cc; }
+.chronology-trip.lane-1::before { top: 14px; height: 15px; }
+.chronology-trip:hover .chronology-name { color: #184c40; text-decoration: underline; text-underline-offset: 3px; }
+.chronology-trip:focus-visible { outline: none; }
+.chronology-trip:focus-visible .chronology-name, .chronology-controls button:focus-visible, .chronology-scroll:focus-visible { outline: 2px solid #347d6c; outline-offset: 2px; }
+.chronology-flags { display: flex; gap: 3px; align-items: center; justify-content: center; min-height: 12px; }
+.chronology-flags img { display: block; width: 16px; height: 12px; object-fit: contain; box-shadow: 0 0 0 1px #173d3012; }
+.chronology-label { display: block; max-width: 100px; line-height: 1.3; }
+.chronology-date { font-size: 11px; font-weight: 400; line-height: 1.25; color: #6c7d76; white-space: normal; }
+.chronology-detail { margin: 9px 0 0 !important; min-height: 2.5em; text-align: left !important; }
+.travel-card.is-timeline-selected { outline: 2px solid #347d6c; outline-offset: 3px; }
+@media (max-width: 736px) { #main > .journal-chronology { display: none; } }
+@media (prefers-reduced-motion: reduce) { .journal-chronology.is-revealed .chronology-line { animation: none; } }
+
+/* Route bundle: travel-navigation:end */

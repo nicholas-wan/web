@@ -102,6 +102,7 @@ foreach ($retiredPath in $retiredPaths) {
 $eventPageNames = @('house.html', 'prewed.html')
 $journalPageNames = @($journalManifest | ForEach-Object { "$($_.slug).html" })
 $routeCssOwners = @{
+    'travel-navigation.css' = @('travel.html')
     'travel-map-page.css' = @('travel.html')
     'travel-search.css' = @('travel.html')
     'travel-journal.css' = $journalPageNames
@@ -145,6 +146,10 @@ foreach ($page in $pages) {
     if ($page.Name -ne 'index.html' -and ($scan -match '<canvas id="nokey"|assets/js/canvas-background\.js')) { throw "$($page.Name) must not run the homepage background canvas." }
     if ($page.Name -ne 'index.html' -and $scan -match 'assets/js/game\.js') { throw "$($page.Name) must not load the homepage interaction bundle." }
     if ($page.Name -ne 'experience.html' -and $scan -match 'assets/js/anomaly-peek\.js') { throw "$($page.Name) must not load the Work page's anomaly peek." }
+    foreach ($travelScript in @('travel-shortcuts.js', 'travel-chronology.js')) {
+        $hasTravelScript = $scan -match [regex]::Escape((Get-DistAssetRef "assets/js/$travelScript"))
+        if (($page.Name -eq 'travel.html') -ne $hasTravelScript) { throw "$travelScript must load only on Travel." }
+    }
     if ($page.Name -in @('skills.html', 'travel.html')) {
         if ($scan -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/listing-effects.js'))) { throw "$($page.Name) is missing its listing effects bundle." }
     } elseif ($scan -match 'assets/js/listing-effects\.js') { throw "$($page.Name) must not load the listing effects bundle." }
@@ -248,7 +253,7 @@ foreach ($copiedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'asset
         'assets/js/gallery.js', 'assets/js/travel-nav.js', 'assets/js/travel-map.js',
         'assets/js/personal-timeline.js', 'assets/js/scramble-reveal.js',
         'assets/js/travel-discovery.js', 'assets/js/photo-search.js', 'assets/js/page-transitions.js',
-        'assets/js/anomaly-peek.js')) {
+        'assets/js/anomaly-peek.js', 'assets/js/travel-shortcuts.js', 'assets/js/travel-chronology.js')) {
     Assert-DistMatchesSource $copiedAsset
 }
 
@@ -288,6 +293,10 @@ Assert-FileSizeBudget 'assets\css\custom.css' 90
 # 46 -> 48: ellipse-matched mobile route tracer (Jul 2026).
 # 48 -> 49: collision-safe destination list and compact 3/2-column archive (Oct 2026).
 Assert-FileSizeBudget 'assets\css\travel-map-page.css' 49
+# Approved Travel shortcut cards and compressed chronology (18 Oct 2026).
+Assert-FileSizeBudget 'assets\css\travel-navigation.css' 10
+Assert-FileSizeBudget 'assets\js\travel-shortcuts.js' 4
+Assert-FileSizeBudget 'assets\js\travel-chronology.js' 6
 # 30 -> 31: journal lede leading and the Australia hero gap and intro treatment (Oct 2026).
 Assert-FileSizeBudget 'assets\css\travel-journal.css' 31
 # Photo search styles live in their own route bundle because travel-map-page.css

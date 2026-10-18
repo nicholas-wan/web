@@ -336,10 +336,14 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 
 ### Travel archive contracts
 
-- Three columns above 1100px, two on tablets and phones, one at 20em or narrower.
-- 4:3 photos, title-case serif headings, compact date, whole-card link; excerpt on desktop only. Category and CTA hidden. Never clamp destination names.
+- Archive approved 18 Oct 2026: four columns at 1280px and wider, three at 981–1279px, two below, one at 20em or narrower.
+- 4:3 photos, title-case serif headings, compact date, whole-card link; excerpts, category and CTA hidden. Never clamp destination names.
 - `sizes="(max-width: 736px) 45vw, 800px"` in `travel.html`; every card image needs a `-480` sibling.
 - Reveal: 480ms fade, 60ms stagger; `listing-effects.js` counts from the first card revealed that frame (not grid index), caps at two steps on phones, eight on desktop, and treats the viewport as a quarter taller.
+
+- Timeline approved 18 Oct 2026: gentle compression of chronological gaps (weight `1 + sqrt(month gap)`), actual month/date ranges under smaller destination labels, local country flags, alternating labels above/below. No visible timeline subheading or explanatory sentence (owner requested removal); no annual ticks or duration bars. Hidden at 736px and below. Minimum track width grows with trip count; horizontal controls handle narrower views. Click selects and focuses the matching archive card; line draws once, pauses offscreen/hidden, reduced motion is static.
+- Travel shortcut cards approved 18 Oct 2026: two pale preview cards, top-aligned with the title block on desktop. Explore map uses real world-map artwork and a Paris–Tokyo route; Read journals uses three real covers. Both use down arrows. Desktop map and journal jumps scroll only the window (never `scrollIntoView`, which can scroll the clipped atlas section). Phone map shortcut opens the existing overlay. Clear active photo search before either action.
+- Shortcut animations run once on entry and on hover/focus, pause offscreen or in hidden tabs, and respect reduced motion. Keep all previews usable without JavaScript.
 
 ### Travel atlas contracts
 
@@ -352,7 +356,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Phones: card is a bottom sheet above region controls; chosen marker stays clear of it.
 - Zoom-out floor: desktop = cropped opening view; tablets may show the full map.
 - Phones (≤520px): no inline world strip; a teaser opens a full-screen overlay (fit-to-height floor, region jump chips).
-- Teaser when visible: projected Paris-to-Tokyo arc between teal pins; ellipse-matched tracer leads linearly, line revealed behind; tap ripple behind the unobstructed destination pin; card lifts two cycles; 5s rest, replay; stops off-screen.
+- Lower phone map teaser stays static (18 Oct 2026) to avoid competing with the top animated map shortcut; its overlay action is unchanged.
 - Teaser art and coordinates share one 1200:624 surface at 188%, route centred, flush with the media top; keep endpoint margins.
 - Action row: `Explore the map`, `10 trips · 12 regions`, one dot-line-chevron cue. Do not restore gesture instructions, the northeast arrow or a full-width CTA.
 - Overlay fades before teardown; reduced motion (static poster) and leaving the phone breakpoint tear down immediately. Keep the breakpoint-aware rebase.
@@ -375,7 +379,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 
 #### Photo search contracts
 
-- Landing (approved 18 Oct 2026): "Wander through the journals.", field, four postcards (4 columns above 980px, 2 columns on tablets and phones), then map and archive.
+- Landing (approved 18 Oct 2026): "Wander through the journals.", field, four postcards (4 columns above 980px, 2 columns on tablets and phones), then map and archive. The opening includes two navigation previews; the desktop archive includes the compressed chronology.
 - Field: drawn magnifier, `/` shortcut, Escape clears.
 - Phones: fields, clear controls, all chips 3rem; input 16px (iOS zoom).
 - Active query: `.travel-atlas__layout`, archive heading, `.travel-grid` get `hidden`; results in `#photo-results` under the field. Hide, never remove.
