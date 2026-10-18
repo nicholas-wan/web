@@ -61,6 +61,12 @@ for (const width of [737, 768, 844, 981, 1366, 1920]) {
     const trips = timeline.locator('.chronology-trip');
     await expect(trips).toHaveCount(10);
     await expect(timeline.locator('.authored-scene > svg')).toHaveCount(10);
+    const torchFits = await timeline.locator('.cr-liberty-glint').evaluate(glint => {
+      const glow = glint.getBoundingClientRect();
+      const scene = glint.closest('svg').getBoundingClientRect();
+      return glow.top >= scene.top + 1 && glow.left >= scene.left && glow.right <= scene.right;
+    });
+    expect(torchFits).toBe(true);
     const fitting = await timeline.evaluate(el => {
       const scroller = el.querySelector('.chronology-scroll');
       const bounds = el.querySelector('.chronology-track').getBoundingClientRect();
