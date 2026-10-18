@@ -1034,6 +1034,7 @@ foreach ($page in $pages) {
         $main = $main.Replace('data-search-index="assets/data/photo-index.json"', "data-search-index=`"$(Get-AssetRef 'assets/data/photo-index.json')`"")
         $main = $main.Replace('data-map-script="assets/js/travel-map.js"', "data-map-script=`"$(Get-AssetRef 'assets/js/travel-map.js')`"")
         $main = $main.Replace('<!-- PHOTO_EXPLORE_SEEDS -->', ($exploreCards -join "`n"))
+        $main = $main.Replace('<!-- TRAVEL_SEED_BOOTSTRAP -->', '<script>' + (Get-Content -LiteralPath (Join-Path $root 'assets/js/travel-seeds.js') -Raw -Encoding UTF8).Trim() + '</script>')
         $main = $main.Replace('<!-- PHOTO_EXPLORE_FALLBACK -->', (($exploreFallback | Select-Object -First 4) -join "`n"))
     }
     if ($journalBySlug.ContainsKey($slug)) {
@@ -1146,6 +1147,8 @@ foreach ($page in $pages) {
     $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />'
     if ($tripOrder -contains $slug) { $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/raleway-400-latin.woff2" as="font" type="font/woff2" crossorigin />' }
     if ($bannerPreload) { $preloadMarkup += "`n" + $bannerPreload }
+    # Apply approved Travel geometry before first paint, not after its runtime downloads.
+    $travelLayoutBootstrap = if ($slug -eq 'travel') { "    <script>document.documentElement.classList.add('timeline-review','polish-travel','mobile-variant-a');</script>" } else { '' }
     $template = @"
 <!DOCTYPE HTML>
 <html lang="en">
@@ -1153,6 +1156,7 @@ foreach ($page in $pages) {
     <title>$title</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+$travelLayoutBootstrap
     <meta name="description" content="$description" />
     <meta name="theme-color" content="#11807d" />
     <link rel="canonical" href="__CANONICAL__" />

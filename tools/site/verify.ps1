@@ -301,7 +301,11 @@ Assert-FileSizeBudget 'assets\js\travel-shortcuts.js' 4
 # Repeating scene sequence, travelling pulse and interaction/pause lifecycle.
 # Includes synchronized journal previews and the mobile animated rail.
 Assert-FileSizeBudget 'assets\js\travel-chronology.js' 30
+$chronologySource = Get-Content -LiteralPath (Join-Path $dist 'assets/js/travel-chronology.js') -Raw -Encoding UTF8
+if ($chronologySource -notmatch "track.style.minWidth='0'") { throw 'Travel timeline must fit the page instead of requiring horizontal scrolling.' }
 $travelDeferredMarkup = Get-Content -LiteralPath (Join-Path $dist 'travel.html') -Raw -Encoding UTF8
+if ($travelDeferredMarkup -notmatch "(?s)<head>.*?classList.add\('timeline-review','polish-travel','mobile-variant-a'\).*?</head>") { throw 'Travel must apply its layout before first paint.' }
+
 if ([regex]::Matches($travelDeferredMarkup, 'data-journal-src="').Count -ne 10 -or [regex]::Matches($travelDeferredMarkup, 'data-journal-srcset="').Count -ne 10) {
     throw 'Travel must defer all ten responsive journal covers until their visible presentation approaches.'
 }
@@ -370,6 +374,7 @@ if ($photoSearchJs -notmatch 'function mixExplore' -or $photoSearchJs -notmatch 
 Assert-FileSizeBudget 'assets\js\travel-discovery.js' 7
 Assert-FileSizeBudget 'assets\js\travel-map.js' 64
 if ($travel -notmatch ('<script src="' + [regex]::Escape((Get-DistAssetRef 'assets/js/travel-discovery.js')) + '"') -or $travel -match '<script\b[^>]*\bsrc="assets/js/travel-map\.js' -or $travel -notmatch ('data-map-script="' + [regex]::Escape((Get-DistAssetRef 'assets/js/travel-map.js')) + '"')) { throw 'Travel must load the discovery bootstrap and defer the versioned atlas until approach or interaction.' }
+if ($travel -notmatch '(?s)</template>\s*<script>/\* Inlined immediately' -or $travel -match '<!-- TRAVEL_SEED_BOOTSTRAP -->') { throw 'Travel must select its four seed postcards inline before the deferred runtime.' }
 $exploreSeeds = [regex]::Match($travel, '(?s)<template id="photo-explore-seeds">(.*?)</template>').Groups[1].Value
 if ([regex]::Matches($exploreSeeds, 'class="photo-explore__card"').Count -ne 24 -or [regex]::Matches($travel, 'class="photo-explore__card"').Count -ne 28 -or $travel -match '<!-- PHOTO_EXPLORE_') { throw 'Travel must ship 24 inert postcards and four no-JS fallback cards, all expanded by the build.' }
 if ($travel -notmatch 'id="photo-results"[^>]*aria-labelledby="photo-results-title"' -or $travel -notmatch 'id="photo-search-status"[^>]*aria-live="polite"') { throw 'The travel page must ship the photo results landmark and its live status line before the search module loads.' }

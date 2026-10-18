@@ -1,4 +1,12 @@
 const {test,expect}=require('@playwright/test');
+test('opening layout and four postcards exist before external scripts arrive',async({page})=>{
+ await page.route('**/*.js*',route=>route.abort());
+ await page.goto('/travel');
+ await expect(page.locator('html')).toHaveClass(/timeline-review/);
+ await expect(page.locator('html')).toHaveClass(/mobile-variant-a/);
+ await expect(page.locator('.photo-explore__cards > a')).toHaveCount(4);
+ await expect(page.locator('.photo-explore__cards > a').first()).toBeVisible();
+});
 for(const width of [320,390,1366])test(`travel deferred photos and tour controls at ${width}`,async({page})=>{
  await page.setViewportSize({width,height:844});await page.goto('/travel');
  const hidden=page.locator(width<=736?'.travel-grid > .travel-card img':'.mobile-journal-card img');

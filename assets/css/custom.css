@@ -9748,10 +9748,11 @@ html.timeline-review{--timeline-icon-width:136px;--timeline-icon-height:91px;--t
 .timeline-review .chronology-track{height:calc(var(--timeline-icon-height)*2 + 168px)}
 .timeline-review .chronology-line{top:var(--timeline-line);left:var(--timeline-inset);right:var(--timeline-inset)}
 .timeline-review .chronology-trip{top:calc(var(--timeline-line) - 8px)}
-.timeline-review .chronology-name{top:calc(-1 * var(--timeline-icon-height) - 53px);gap:4px;left:-18px;right:-18px}
+.timeline-review .chronology-name{top:calc(-1 * var(--timeline-icon-height) - 53px);gap:4px;left:calc((100px - var(--timeline-icon-width))/2);right:calc((100px - var(--timeline-icon-width))/2)}
 .timeline-review .chronology-trip.lane-1 .chronology-name{top:29px}
 .timeline-review .chronology-pulse{top:calc(var(--timeline-line) - 3px)}
-.timeline-review .chronology-label{max-width:130px}
+.timeline-review .chronology-label{max-width:100%}
+.timeline-review .chronology-date{max-width:100%}
 .timeline-review .travel-atlas--map{padding-top:2rem!important}
 .timeline-review .travel-atlas--map .photo-explore__map-heading{margin-top:0}
 .timeline-review .da-seoul-light{stroke:#e6bb58;stroke-width:1.65!important}
@@ -10012,4 +10013,10 @@ html.timeline-review{--timeline-icon-width:136px;--timeline-icon-height:91px;--t
 img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity:0}
 .travel-card__image:has(img[data-journal-src]),.travel-card__image:has(.journal-photo-pending),.travel-card__image:has(.journal-photo-failed){background:#f1f5f2}
 @media(max-width:736px){#main>.travel-tour-controls{padding-inline:14px}}
+/* Narrow tablets keep every stop visible with room for wrapped dates. */
+@media(min-width:737px) and (max-width:980px){
+ .timeline-review .chronology-date{max-width:calc(100% - 16px);text-wrap:balance}
+ .timeline-review .chronology-name{top:calc(-1 * var(--timeline-icon-height) - 76px)}
+ .timeline-review .chronology-track{height:calc(var(--timeline-icon-height)*2 + 204px)}
+}
 /* Route bundle: travel-navigation:end */

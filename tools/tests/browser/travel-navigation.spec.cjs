@@ -51,7 +51,7 @@ test('phone map shortcut opens the atlas and its close control restores browsing
   expect(await page.locator('.travel-atlas').first().evaluate(el => el.scrollTop)).toBe(0);
 });
 
-for (const width of [1366, 1920]) {
+for (const width of [737, 768, 844, 981, 1366, 1920]) {
   test(`timeline endpoints fit and trip selection finds the matching journal at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1080 });
     await page.goto('/travel');
@@ -72,7 +72,8 @@ for (const width of [1366, 1920]) {
         })
       };
     });
-    if(fitting.overflow>1) await expect(timeline.locator('.chronology-controls')).toBeVisible();
+    expect(fitting.overflow).toBeLessThanOrEqual(1);
+    await expect(timeline.locator('.chronology-controls')).toBeHidden();
     expect(fitting.labels.every(Boolean)).toBe(true);
     const scenes = await trips.evaluateAll(es => es.map(trip => {
       const art = trip.querySelector('.authored-scene').getBoundingClientRect();
@@ -87,8 +88,8 @@ for (const width of [1366, 1920]) {
       return { width: art.width, height: art.height, fits: art.left >= scroll.left - 1 && art.right <= scroll.right + 1 && art.top >= scroll.top - 1 && art.bottom <= scroll.bottom + 1, gap };
     }));
     for (const scene of scenes) {
-      expect(scene.width).toBeCloseTo(136, 0);
-      expect(scene.height).toBeCloseTo(91, 0);
+      if(width>=981){expect(scene.width).toBeCloseTo(136,0);expect(scene.height).toBeCloseTo(91,0);}
+      else {expect(scene.width).toBeGreaterThanOrEqual(100);expect(scene.width).toBeLessThanOrEqual(136);expect(scene.height).toBeCloseTo(Math.round(scene.width*2/3),0);}
       expect(scene.fits).toBe(true);
       expect(scene.gap).toBeGreaterThanOrEqual(5);
     }

@@ -12,15 +12,7 @@
   const controls = section.querySelector('.chronology-controls');
   const buttons = controls.querySelectorAll('button');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  const month = value => Number(value.slice(0, 4)) * 12 + Number(value.slice(5, 7)) - 1;
-  const weights = links.slice(1).map((link, i) => 1 + Math.sqrt(Math.max(0, month(link.dataset.start) - month(links[i].dataset.start))));
-  const sum = weights.reduce((a, b) => a + b, 0);
-  let cumulative = 0;
-  track.style.minWidth = Math.max(1000, links.length * 100) + 'px';
   links.forEach((link, i) => {
-    if (i) cumulative += weights[i - 1];
-    const fraction = sum ? cumulative / sum : .5;
-    link.style.left = 'calc(' + fraction * 100 + '% + ' + (56 - 112 * fraction) + 'px)';
     const destination = link.getAttribute('href');
     const cardLink = [...grid.querySelectorAll('a.travel-card__image[href]')].find(a => a.getAttribute('href') === destination);
     const card = cardLink && cardLink.closest('.travel-card');
@@ -241,11 +233,18 @@
  const timeline=document.querySelector('.journal-chronology');
  const track=timeline.querySelector('.chronology-track');
  const links=[...track.querySelectorAll('.chronology-trip')];
- const month=value=>Number(value.slice(0,4))*12+Number(value.slice(5,7))-1;
- const weights=links.slice(1).map((link,i)=>1+Math.sqrt(Math.max(0,month(link.dataset.start)-month(links[i].dataset.start))));
- const sum=weights.reduce((a,b)=>a+b,0);
- function size(width){width=[112,128,136,148].includes(width)?width:136;const height=Math.round(width*2/3),inset=width/2+10;root.style.setProperty('--timeline-icon-width',width+'px');root.style.setProperty('--timeline-icon-height',height+'px');root.style.setProperty('--timeline-line',(height+76)+'px');root.style.setProperty('--timeline-inset',inset+'px');track.style.minWidth=Math.max(1080,links.length*width*.88)+'px';let cumulative=0;links.forEach((link,i)=>{if(i)cumulative+=weights[i-1];const f=sum?cumulative/sum:.5;link.style.left='calc('+f*100+'% + '+(inset-2*inset*f)+'px)';});root.dataset.iconSize=String(width);}
- size(136);
+ // Fit all ten stops within one view; dates carry time, spacing carries order.
+ const scroller=timeline.querySelector('.chronology-scroll');
+ let previousWidth=0;
+ function fit(){
+  const available=scroller.clientWidth;if(!available||available===previousWidth)return;previousWidth=available;
+  const width=Math.min(136,Math.floor((available-16)/5.5)),height=Math.round(width*2/3),inset=width/2+8;
+  root.style.setProperty('--timeline-icon-width',width+'px');root.style.setProperty('--timeline-icon-height',height+'px');
+  root.style.setProperty('--timeline-line',(height+(matchMedia('(max-width:980px)').matches?100:76))+'px');root.style.setProperty('--timeline-inset',inset+'px');
+  track.style.minWidth='0';
+  links.forEach((link,i)=>{const fraction=i/(links.length-1);link.style.left='calc('+fraction*100+'% + '+(inset-2*inset*fraction)+'px)';});
+ }
+ new ResizeObserver(fit).observe(scroller);fit();
  const grid=document.querySelector('.travel-grid'),map=document.querySelector('.travel-atlas__layout'),heading=document.querySelector('.photo-explore__map-heading');
  if(grid&&map&&heading){const section=document.createElement('section');section.className='travel-atlas travel-atlas--map';section.setAttribute('aria-label','Explore by destination');grid.after(section);section.append(heading,map);}
  if(grid){
