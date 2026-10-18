@@ -70,3 +70,141 @@
   }, { threshold: .2 }).observe(section);
   pause();
 })();
+
+/* Destination scenes: sequential visible tour, with manual interaction priority. */
+(() => {
+  'use strict';
+  const section = document.querySelector('.journal-chronology');
+  if (!section) return;
+  const track = section.querySelector('.chronology-track');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const entries = [];
+  const pulse = document.createElement('span');
+  pulse.className = 'chronology-pulse';
+  pulse.setAttribute('aria-hidden', 'true');
+  pulse.hidden = true;
+  track.append(pulse);
+  let active = null, hovered = null, inView = false;
+  let guideTimer, guideAnimation, guideRun = 0;
+  const stop = entry => {
+    if (!entry) return;
+    clearTimeout(entry.timer);
+    clearTimeout(entry.intent);
+    entry.run++;
+    entry.art.classList.remove('is-active');
+    entry.art.getAnimations({ subtree: true }).forEach(animation => animation.cancel());
+    if (active === entry) active = null;
+  };
+  const stopGuide = () => {
+    clearTimeout(guideTimer);
+    guideTimer = null;
+    guideRun++;
+    if (guideAnimation) guideAnimation.cancel();
+    guideAnimation = null;
+    pulse.hidden = true;
+    if (active && active.automatic) stop(active);
+  };
+  const stopAll = () => { stopGuide(); entries.forEach(stop); };
+  const canGuide = () => inView && !section.hidden && !document.hidden && !reduced.matches && !hovered && !section.contains(document.activeElement);
+  const play = (entry, automatic = false) => {
+    entries.forEach(item => clearTimeout(item.intent));
+    if (!entry.visible || document.hidden || reduced.matches || section.hidden) return false;
+    if (active && active !== entry) stop(active);
+    stop(entry);
+    active = entry;
+    entry.automatic = automatic;
+    const run = entry.run;
+    entry.art.classList.add('is-active');
+    entry.timer = setTimeout(() => {
+      if (entry.run === run) stop(entry);
+    }, entry.duration + 80);
+    return true;
+  };
+  const position = entry => {
+    const dot = entry.trip.querySelector('.chronology-dot').getBoundingClientRect();
+    return dot.left + dot.width / 2 - track.getBoundingClientRect().left;
+  };
+  const schedule = delay => {
+    clearTimeout(guideTimer);
+    if (canGuide()) guideTimer = setTimeout(() => { guideTimer = null; startSequence(); }, delay);
+  };
+  function startSequence() {
+    if (!canGuide()) return;
+    const visible = entries.filter(entry => entry.visible);
+    if (!visible.length) return;
+    const run = ++guideRun;
+    let previous = position(visible[0]);
+    const step = index => {
+      if (run !== guideRun || !canGuide()) return;
+      if (index === visible.length) { pulse.hidden = true; schedule(2000); return; }
+      const entry = visible[index];
+      if (!entry.visible) { stopGuide(); schedule(2000); return; }
+      const next = position(entry);
+      pulse.hidden = false;
+      const perform = () => {
+        if (run !== guideRun || !canGuide()) return;
+        pulse.style.transform = 'translateX(' + next + 'px)';
+        if (guideAnimation) guideAnimation.cancel();
+        guideAnimation = null;
+        previous = next;
+        if (!play(entry, true)) { stopGuide(); schedule(2000); return; }
+        guideTimer = setTimeout(() => { guideTimer = null; step(index + 1); }, entry.duration + 160);
+      };
+      if (!index) perform();
+      else {
+        guideAnimation = pulse.animate([
+          { transform: 'translateX(' + previous + 'px)' },
+          { transform: 'translateX(' + next + 'px)' }
+        ], { duration: 650, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' });
+        guideAnimation.finished.then(perform).catch(() => {});
+      }
+    };
+    step(0);
+  }
+  const observer = new IntersectionObserver(items => items.forEach(item => {
+    const entry = entries.find(candidate => candidate.art === item.target);
+    if (!entry) return;
+    entry.visible = item.isIntersecting && item.intersectionRatio > .5;
+    if (!entry.visible) {
+      if (active === entry && entry.automatic) stopGuide();
+      stop(entry);
+    }
+    if (entry.visible && document.activeElement === entry.trip && active !== entry) {
+      stopGuide(); play(entry);
+    } else if (entry.visible && !active && !guideTimer && pulse.hidden) schedule(500);
+  }), { threshold: [0, .5, 1] });
+  section.querySelectorAll('.authored-scene').forEach(art => {
+    const trip = art.closest('.chronology-trip');
+    const entry = { trip, art, duration: Number(art.dataset.duration), visible: false, run: 0 };
+    entries.push(entry);
+    observer.observe(art);
+    trip.addEventListener('pointerenter', () => {
+      hovered = entry;
+      stopGuide();
+      entries.forEach(item => clearTimeout(item.intent));
+      entry.intent = setTimeout(() => play(entry), 100);
+    });
+    trip.addEventListener('pointerleave', () => {
+      if (hovered === entry) hovered = null;
+      clearTimeout(entry.intent);
+      schedule(2000);
+    });
+    trip.addEventListener('focus', () => { stopGuide(); play(entry); });
+  });
+  section.addEventListener('focusout', () => setTimeout(() => schedule(2000), 0));
+  section.querySelector('.chronology-scroll').addEventListener('scroll', () => {
+    stopGuide(); schedule(2000);
+  }, { passive: true });
+  new IntersectionObserver(items => {
+    const wasInView = inView;
+    inView = items[0].isIntersecting && items[0].intersectionRatio >= .5;
+    if (inView && !wasInView) schedule(500);
+    else if (!inView) stopAll();
+  }, { threshold: [0, .5, 1] }).observe(section);
+  new MutationObserver(() => {
+    if (section.hidden) stopAll(); else schedule(500);
+  }).observe(section, { attributes: true, attributeFilter: ['hidden'] });
+  reduced.addEventListener('change', () => { stopAll(); schedule(2000); });
+  document.addEventListener('visibilitychange', () => { stopAll(); if (!document.hidden) schedule(2000); });
+  window.addEventListener('pagehide', stopAll);
+})();
