@@ -105,9 +105,10 @@
     if (active && active.automatic && active !== preserve) stop(active);
   };
   const stopAll = () => { stopGuide(); entries.forEach(stop); };
+  section.addEventListener('tour-pause', () => { stopAll(); schedule(500); });
   // Pointer focus can remain on an icon after the mouse leaves. Only keyboard
   // focus should keep the tour paused once hover has ended.
-  const canGuide = () => inView && !section.hidden && !document.hidden && !reduced.matches && !hovered && !keyboardPaused;
+  const canGuide = () => inView && !section.hidden && !document.hidden && !reduced.matches && !hovered && !keyboardPaused && !section.classList.contains('tour-paused');
   const play = (entry, automatic = false) => {
     entries.forEach(item => clearTimeout(item.intent));
     if (!entry.visible || document.hidden || reduced.matches || section.hidden) return false;
@@ -260,7 +261,7 @@
   const neighbours=[-1,1].map(step=>{const button=document.createElement('button');button.type='button';button.className='journal-neighbour '+(step<0?'journal-earlier':'journal-later');grid.append(button);return {button,step,card:null};});
   neighbours.forEach(n=>n.button.addEventListener('click',()=>{if(n.card)show(n.card);}));
   function show(card){if(card.classList.contains('preview-selected'))return;const hadSelection=cards.some(c=>c.classList.contains('preview-selected'));cards.forEach(c=>c.classList.toggle('preview-selected',c===card));select.value=String(cards.indexOf(card));const href=card.querySelector('.travel-card__image').getAttribute('href');links.forEach(link=>{const chosen=link.getAttribute('href')===href;link.classList.toggle('journal-is-selected',chosen);const cue=link.querySelector('.chronology-preview-cue');if(cue)cue.textContent=chosen?'Showing below ↓':'Preview ↓';});
-   neighbours.forEach(n=>{n.card=ordered[ordered.indexOf(card)+n.step];n.button.replaceChildren();n.button.disabled=!n.card;n.button.classList.toggle('is-empty',!n.card);if(!n.card){n.button.setAttribute('aria-label',n.step<0?'No earlier journal':'No later journal');return;}const img=n.card.querySelector('img').cloneNode(true);img.alt='';const direction=document.createElement('span');direction.className='neighbour-direction';direction.textContent=n.step<0?'← Earlier trip':'Later trip →';const title=document.createElement('span');title.className='neighbour-title';title.textContent=n.card.querySelector('h2').textContent.trim();n.button.append(img,direction,title);n.button.setAttribute('aria-label','Preview '+title.textContent);});
+   neighbours.forEach(n=>{n.card=ordered[ordered.indexOf(card)+n.step];n.button.replaceChildren();n.button.disabled=!n.card;n.button.classList.toggle('is-empty',!n.card);if(!n.card){n.button.setAttribute('aria-label',n.step<0?'No earlier journal':'No later journal');return;}const img=n.card.querySelector('img').cloneNode(true);img.alt='';img.classList.remove('journal-photo-pending','journal-photo-failed');img.sizes='(min-width:1100px) 220px, 45vw';const direction=document.createElement('span');direction.className='neighbour-direction';direction.textContent=n.step<0?'← Earlier trip':'Later trip →';const title=document.createElement('span');title.className='neighbour-title';title.textContent=n.card.querySelector('h2').textContent.trim();n.button.append(img,direction,title);n.button.setAttribute('aria-label','Preview '+title.textContent);});
    if(hadSelection&&!grid.classList.contains('journals-expanded')&&matchMedia('(min-width:1100px) and (prefers-reduced-motion:no-preference)').matches)neighbours.forEach(n=>{if(n.card)n.button.animate([{opacity:.3,transform:'translateY(4px)'},{opacity:1,transform:'translateY(0)'}],{duration:300,easing:'cubic-bezier(.2,.8,.2,1)'});});
   }
   select.addEventListener('change',()=>show(cards[Number(select.value)]));
@@ -286,18 +287,62 @@
   const art=icon.querySelector('.authored-scene');art.classList.remove('is-active');
   // The desktop SVG remains in the DOM, so local paint-server IDs must differ.
   art.querySelectorAll('[id]').forEach(el=>{const old=el.id;el.id='mobile-'+old;art.querySelectorAll('*').forEach(n=>{[...n.attributes].forEach(a=>{if(a.value.includes('url(#'+old+')'))n.setAttribute(a.name,a.value.replaceAll('url(#'+old+')','url(#mobile-'+old+')'));});});});
-  const card=original.cloneNode(true);card.className='mobile-journal-card';card.removeAttribute('style');card.removeAttribute('data-reveal');card.querySelector('.actions')?.remove();card.querySelector('header p')?.remove();
+  const card=original.cloneNode(true);card.className='mobile-journal-card';card.removeAttribute('style');card.removeAttribute('data-reveal');card.querySelectorAll('noscript').forEach(n=>n.remove());card.querySelector('img').sizes='(max-width:736px) calc(100vw - 154px), 800px';card.querySelector('.actions')?.remove();card.querySelector('header p')?.remove();
   const photo=card.querySelector('a.travel-card__image,a.image');if(photo){const cue=document.createElement('span');cue.className='mobile-photo-cta';cue.textContent='View journal →';cue.setAttribute('aria-hidden','true');photo.append(cue);}
   const read=document.createElement('a');read.className='mobile-read';read.href=trip.getAttribute('href');read.textContent='Read journal →';card.append(read);
   row.append(icon,card);list.append(row);return {row,icon,art,index:i,visible:false};
  }).filter(Boolean);grid.before(list);
  const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let timer,active,next=0,held=false;
  function clear(){clearTimeout(timer);if(active)active.art.classList.remove('is-active');active=null;}
- function play(entry){if(active===entry)return;if(active)active.art.classList.remove('is-active');active=entry;void entry.art.getBoundingClientRect();if(!reduced.matches)entry.art.classList.add('is-active');}
- function tour(){if(!media.matches||reduced.matches||document.hidden||held)return;const visible=entries.filter(e=>e.visible);if(!visible.length)return;const entry=visible.find(e=>e.index>=next)||visible[0];play(entry);next=entry.index+1;const last=entry===visible[visible.length-1];timer=setTimeout(()=>{clear();timer=setTimeout(tour,last?2000:650);},Number(entry.art.dataset.duration)||6200);}
+ function play(entry){if(document.hidden||list.hidden||!media.matches)return;if(active===entry)return;if(active)active.art.classList.remove('is-active');active=entry;next=entry.index+1;entry.endsAt=performance.now()+(Number(entry.art.dataset.duration)||6200);void entry.art.getBoundingClientRect();if(!reduced.matches)entry.art.classList.add('is-active');}
+ function tour(){if(!media.matches||reduced.matches||document.hidden||held||list.hidden||source.classList.contains('tour-paused'))return;const visible=entries.filter(e=>e.visible);if(!visible.length)return;const entry=visible.find(e=>e.index>=next)||visible[0];play(entry);next=entry.index+1;const last=entry===visible[visible.length-1];timer=setTimeout(()=>{clear();timer=setTimeout(tour,last?2000:650);},Number(entry.art.dataset.duration)||6200);}
  function resume(){clear();timer=setTimeout(tour,500);}
- entries.forEach(e=>{e.icon.addEventListener('pointerenter',()=>{held=true;clearTimeout(timer);play(e);});e.icon.addEventListener('pointerleave',()=>{held=false;clearTimeout(timer);timer=setTimeout(resume,2000);});e.icon.addEventListener('focus',()=>{held=true;clearTimeout(timer);play(e);});e.icon.addEventListener('blur',()=>{held=false;resume();});e.icon.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();play(e);e.row.classList.add('mobile-selected');entries.filter(x=>x!==e).forEach(x=>x.row.classList.remove('mobile-selected'));});});
+ function finish(){clearTimeout(timer);timer=setTimeout(()=>{clear();if(!held)timer=setTimeout(tour,next>=entries.length?2000:650);},Math.max(0,active?active.endsAt-performance.now():0));}
+ entries.forEach(e=>{e.icon.addEventListener('pointerenter',event=>{if(event.pointerType==='touch')return;held=true;clearTimeout(timer);play(e);finish();});e.icon.addEventListener('pointerleave',()=>{held=false;finish();});e.icon.addEventListener('focus',()=>{held=e.icon.matches(':focus-visible');clearTimeout(timer);play(e);finish();});e.icon.addEventListener('blur',()=>{held=false;resume();});e.icon.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();held=e.icon.matches(':focus-visible');play(e);finish();e.row.classList.add('mobile-selected');entries.filter(x=>x!==e).forEach(x=>x.row.classList.remove('mobile-selected'));});});
  const observer=new IntersectionObserver(items=>{items.forEach(item=>{const e=entries.find(x=>x.art===item.target);e.visible=item.isIntersecting&&item.intersectionRatio>.5;});if(!active||!active.visible)resume();},{threshold:[0,.5,1]});entries.forEach(e=>observer.observe(e.art));
  media.addEventListener('change',resume);reduced.addEventListener('change',resume);document.addEventListener('visibilitychange',resume);
- new MutationObserver(()=>{list.hidden=grid.hidden;}).observe(grid,{attributes:true,attributeFilter:['hidden']});
+ source.addEventListener('tour-pause',resume);
+ source.addEventListener('tour-step',event=>{const entry=entries[event.detail.index];if(!entry||!media.matches)return;clear();held=false;entry.row.scrollIntoView({block:'center',behavior:'instant'});play(entry);next=entry.index+1;timer=setTimeout(resume,Number(entry.art.dataset.duration)||6200);});
+ new MutationObserver(()=>{list.hidden=grid.hidden;if(list.hidden){held=false;clear();}else resume();}).observe(grid,{attributes:true,attributeFilter:['hidden']});
+})();
+
+/* Keep photos outside the reading area inert, including the hidden presentation. */
+(() => {
+ const images=new Set(document.querySelectorAll('img[data-journal-src]'));
+ function warm(){images.forEach(img=>{if(!img.isConnected||!img.dataset.journalSrc){observer.unobserve(img);images.delete(img);return;}const r=img.getBoundingClientRect();if(!r.width||r.top>innerHeight+200||r.bottom< -200||getComputedStyle(img).visibility==='hidden')return;
+  img.classList.add('journal-photo-pending');const done=()=>{img.classList.remove('journal-photo-pending');if(!img.naturalWidth)img.classList.add('journal-photo-failed');};img.addEventListener('load',done,{once:true});img.addEventListener('error',done,{once:true});
+  if(img.dataset.journalSrcset)img.srcset=img.dataset.journalSrcset;
+  img.src=img.dataset.journalSrc;delete img.dataset.journalSrc;delete img.dataset.journalSrcset;observer.unobserve(img);images.delete(img);
+ });}
+ const observer=new IntersectionObserver(warm,{rootMargin:'200px'});images.forEach(img=>observer.observe(img));
+ const grid=document.querySelector('.travel-grid');
+ new MutationObserver(()=>{grid.querySelectorAll('img[data-journal-src]').forEach(img=>{if(!images.has(img)){images.add(img);observer.observe(img);}});warm();}).observe(grid,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
+ window.addEventListener('resize',warm);warm();
+})();
+
+/* A persistent stop control also works for touch and keyboard users. */
+(() => {
+ const timeline=document.querySelector('.journal-chronology'),mobile=document.querySelector('.mobile-journal-list');
+ const bar=document.createElement('div');bar.className='travel-tour-controls';bar.setAttribute('role','group');bar.setAttribute('aria-label','Journal animation controls');
+ const pause=document.createElement('button');pause.type='button';pause.textContent='Pause tour';pause.setAttribute('aria-pressed','false');
+ pause.addEventListener('click',()=>{const paused=timeline.classList.toggle('tour-paused');pause.setAttribute('aria-pressed',String(paused));pause.textContent=paused?'Resume tour':'Pause tour';timeline.dispatchEvent(new Event('tour-pause'));});
+ bar.append(pause);
+ let index=0;
+ timeline.addEventListener('timeline-destination',event=>{index=[...timeline.querySelectorAll('.chronology-trip')].findIndex(a=>a.getAttribute('href')===event.detail.href);});
+ ['Previous','Next','Replay'].forEach((text,i)=>{const button=document.createElement('button');button.type='button';button.textContent=text;button.addEventListener('click',()=>{
+  const links=[...timeline.querySelectorAll('.chronology-trip')];const selected=matchMedia('(max-width:736px)').matches?[...mobile.querySelectorAll('.mobile-journal-row')].findIndex(row=>row.querySelector('.is-active')||row.classList.contains('mobile-selected')):links.findIndex(link=>link.classList.contains('journal-is-selected'));if(selected>=0)index=selected;index=(index+(i===0?-1:i===1?1:0)+links.length)%links.length;
+  if(matchMedia('(max-width:736px)').matches){timeline.dispatchEvent(new CustomEvent('tour-step',{detail:{index}}));return;}
+  const link=links[index];timeline.dispatchEvent(new CustomEvent('timeline-destination',{detail:{href:link.getAttribute('href')}}));
+  const scroller=timeline.querySelector('.chronology-scroll');scroller.scrollLeft+=link.getBoundingClientRect().left-scroller.getBoundingClientRect().left-scroller.clientWidth/2;
+  requestAnimationFrame(()=>window.polishTimelineReplay(index));
+ });bar.append(button);});timeline.before(bar);
+ const heading=document.querySelector('.travel-archive-heading');const sync=()=>bar.hidden=heading.hidden;new MutationObserver(sync).observe(heading,{attributes:true,attributeFilter:['hidden']});sync();
+})();
+
+/* CSS backgrounds ignore loading=lazy: attach the full vector map on approach. */
+(() => {
+ const atlas=document.querySelector('.travel-atlas__layout');
+ const warm=()=>{atlas.style.setProperty('--travel-map-art','url("../../images/travel/world-map.svg")');observer.disconnect();};
+ const observer=new IntersectionObserver(items=>{if(!atlas.hidden&&items.some(e=>e.isIntersecting))warm();},{rootMargin:'200px'});
+ observer.observe(atlas);atlas.addEventListener('pointerdown',warm,{once:true});atlas.addEventListener('focusin',warm,{once:true});
 })();

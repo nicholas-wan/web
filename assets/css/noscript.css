@@ -33,3 +33,5 @@
 .anomaly-peek {
 	display: none !important;
 }
+
+.travel-map-teaser__projection{background-image:url("../../images/travel/world-map.svg")}

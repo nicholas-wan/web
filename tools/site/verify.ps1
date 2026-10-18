@@ -301,6 +301,11 @@ Assert-FileSizeBudget 'assets\js\travel-shortcuts.js' 4
 # Repeating scene sequence, travelling pulse and interaction/pause lifecycle.
 # Includes synchronized journal previews and the mobile animated rail.
 Assert-FileSizeBudget 'assets\js\travel-chronology.js' 30
+$travelDeferredMarkup = Get-Content -LiteralPath (Join-Path $dist 'travel.html') -Raw -Encoding UTF8
+if ([regex]::Matches($travelDeferredMarkup, 'data-journal-src="').Count -ne 10 -or [regex]::Matches($travelDeferredMarkup, 'data-journal-srcset="').Count -ne 10) {
+    throw 'Travel must defer all ten responsive journal covers until their visible presentation approaches.'
+}
+
 # 30 -> 31: journal lede leading and the Australia hero gap and intro treatment (Oct 2026).
 Assert-FileSizeBudget 'assets\css\travel-journal.css' 31
 # Photo search styles live in their own route bundle because travel-map-page.css

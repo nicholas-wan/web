@@ -1064,6 +1064,16 @@ foreach ($page in $pages) {
     }
     $main = Add-ImagePerformanceAttributes $main (Join-Path $root "images") $sourceImageIndex ($tripOrder -contains $slug)
     $main = Add-GalleryAltText $main $slug
+    if ($slug -eq 'travel') {
+        # Native lazy loading may fetch every rail photo on slow connections.
+        # Keep responsive sources inert until the visible presentation approaches.
+        $main = [regex]::Replace($main, '<img\b[^>]*class="citc"[^>]*>', {
+            param($m)
+            $deferred = $m.Value -replace '\ssrc=', ' data-journal-src=' -replace '\ssrcset=', ' data-journal-srcset='
+            return $deferred + '<noscript><style>img[data-journal-src]{display:none}</style>' + $m.Value + '</noscript>'
+        })
+    }
+
     $intro = Add-ImagePerformanceAttributes $intro (Join-Path $root "images") $sourceImageIndex
     # The autoplay attribute makes the browser download every animation at page
     # load even under preload="metadata". Rename it to data-autoplay so
