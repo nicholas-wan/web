@@ -19,10 +19,9 @@
 	var status = document.getElementById('photo-search-status');
 	var clearButton = form.querySelector('.photo-search__clear');
 	var collapsible = document.querySelectorAll('.travel-atlas__layout, .photo-explore__map-heading, #main > .travel-archive-heading, #main > .travel-grid');
-	var discovery = document.getElementById('photo-explore'), moment = document.getElementById('photo-moment');
+	var discovery = document.getElementById('photo-explore');
 	var mixButton = discovery.querySelector('[data-explore-action="shuffle"]'), mix = null;
-	var titles = {}, seenMoments = [], momentHistory = [], momentAt = -1;
-	var previousMoment = moment.querySelector('[data-explore-action="previous"]');
+	var titles = {};
 	var retry = document.getElementById('photo-search-retry'), loading = false;
 	document.getElementById('photo-explore-seeds').content.querySelectorAll('[data-tag]').forEach(function(a) {
 		titles[a.dataset.tag] = a.dataset.title;
@@ -210,11 +209,11 @@
 		if (!Array.isArray(previous)) previous = [];
 		var reviewed = tags.filter(function(tag) { return coverTopics[tag.tag]; });
 		var pool = reviewed.filter(function(tag) { return previous.indexOf(tag.tag) < 0; });
-		if (pool.length < 6) pool = reviewed;
+		if (pool.length < 4) pool = reviewed;
 		shuffle(pool).forEach(function(tag) { (groups[tag.facet] || (groups[tag.facet] = [])).push(tag); });
 		var facets = shuffle(Object.keys(groups));
 		var next = [];
-		while (facets.length && next.length < 6) {
+		while (facets.length && next.length < 4) {
 			var facet = facets.shift();
 			var tag = groups[facet].pop().tag;
 			var candidates = shuffle(coverTopics[tag].slice());
@@ -232,12 +231,12 @@
 		try { sessionStorage.setItem('photo-search-explore', JSON.stringify(next.map(function(tag) { return tag.tag; }))); } catch (e) {}
 	}
 
-	function thumbnail(photo, large) {
-		var grid = document.querySelector(large ? '.photo-moment' : '.photo-explore__cards');
-		var width = (parseFloat(getComputedStyle(grid).gridTemplateColumns) || (large ? grid.clientWidth : 480)) - (large ? 0 : 2);
+	function thumbnail(photo) {
+		var grid = document.querySelector('.photo-explore__cards');
+		var width = (parseFloat(getComputedStyle(grid).gridTemplateColumns) || 480) - 2;
 		var sources = photo.variants ? photo.thumb + ' 480w, ' + photo.src + ' ' + photo.w + 'w' : '';
 		if (photo.variants === 2) sources += ', ' + photo.thumb.replace('-480.', '-800.') + ' 800w';
-		return '<img loading="' + (large ? 'eager' : 'lazy') + '" decoding="async"' +
+		return '<img loading="lazy" decoding="async"' +
 			(sources ? ' srcset="' + escape(sources) + '" sizes="' + Math.max(1, width || 480) + 'px"' : '') +
 			' src="' + escape(photo.thumb) + '" alt="' + escape(photo.alt) +
 			'" width="' + photo.w + '" height="' + photo.h + '" style="object-position:' +
@@ -309,7 +308,7 @@
 			}
 			grid.replaceChildren.apply(grid, [].slice.call(stage.children));
 			saveExplore(next);
-			status.textContent = 'Six new photo topics to explore.';
+			status.textContent = 'Four new photo topics to explore.';
 			if (!animate) { cancelMix(); return; }
 			[].forEach.call(grid.children, function(card) { task.animations.push(card.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 220, easing: 'ease-out' })); });
 			grid.appendChild(task.overlay);
@@ -321,26 +320,6 @@
 			cancelMix();
 			status.textContent = 'Could not load new photos. Choose Another mix to try again.';
 		});
-	}
-
-	// Choose a trip first so the longest journal cannot dominate. Do not repeat
-	// a photo until the collection is exhausted; blocked storage still works.
-	function pickMoment() {
-		if (!seenMoments.length) {
-			try { seenMoments = JSON.parse(sessionStorage.getItem('photo-explore-moments')) || []; } catch (e) {}
-			if (!Array.isArray(seenMoments)) seenMoments = [];
-			seenMoments = seenMoments.filter(function(id) { return typeof id === 'string' && photos.some(function(p) { return p.id === id; }); });
-		}
-		var last = photos.find(function(p) { return p.id === seenMoments[seenMoments.length - 1]; });
-		var available = photos.filter(function(p) { return seenMoments.indexOf(p.id) < 0; });
-		if (!available.length) { seenMoments = []; available = photos; }
-		var tripPool = unique(available.map(function(p) { return p.trip; }));
-		if (last && tripPool.length > 1) tripPool = tripPool.filter(function(trip) { return trip !== last.trip; });
-		var trip = shuffle(tripPool)[0];
-		var photo = shuffle(available.filter(function(p) { return p.trip === trip; }))[0];
-		seenMoments.push(photo.id);
-		try { sessionStorage.setItem('photo-explore-moments', JSON.stringify(seenMoments)); } catch (e) {}
-		return photo;
 	}
 
 	function consumeIntent() {
@@ -355,29 +334,6 @@
 			results.querySelector('.photo-hit').focus();
 		} else if (action === 'shuffle') {
 			mixExplore();
-		} else if (action === 'surprise' || action === 'previous') {
-			if (action === 'previous') momentAt = Math.max(0, momentAt - 1);
-			else {
-				momentAt++;
-				if (momentAt === momentHistory.length) momentHistory.push(pickMoment());
-			}
-			var photo = momentHistory[momentAt], first = moment.hidden;
-			input.value = ''; run();
-			discovery.hidden = true;
-			moment.hidden = false;
-			moment.classList.toggle('is-portrait', photo.h > photo.w * .9);
-			moment.querySelector('.photo-moment__content').innerHTML =
-				'<a class="photo-moment__image" href="' + escape(photo.trip + '#photo=' + encodeURI(photo.id)) + '" aria-label="Open photo: ' + escape(photo.place) + '">' + thumbnail(photo, true) + '</a>' +
-				'<div class="photo-moment__copy"><span class="travel-atlas__eyebrow">A moment from the journals</span>' +
-				'<h2 id="photo-moment-title" tabindex="-1">' + escape(photo.place) + '</h2><p>' + escape(trips[photo.trip].label + ' · ' + trips[photo.trip].year) +
-				'</p>' + (photo.sectionTitle === photo.place ? '' : '<p>' + escape(photo.sectionTitle) + '</p>') + '<a class="photo-moment__read" href="' + escape(photo.trip + '#' + photo.section) + '">Read this day <span aria-hidden="true">&#8599;</span></a></div>';
-			status.textContent = photo.place + ' · ' + tripLabel(photo.trip);
-			if (!momentAt && document.activeElement === previousMoment) moment.querySelector('[data-explore-action="surprise"]').focus();
-			previousMoment.hidden = !momentAt;
-			if (first) document.getElementById('photo-moment-title').focus();
-		} else if (action === 'back') {
-			moment.hidden = true; discovery.hidden = false; status.textContent = '';
-			form.querySelector('[data-explore-action="surprise"]').focus();
 		}
 	}
 	form.addEventListener('explore', consumeIntent);
@@ -510,7 +466,6 @@
 			renderedQuery = '';
 		}
 		discovery.hidden = !!query && !failed;
-		moment.hidden = true;
 		var terms = unique(tokens(value));
 		clearButton.hidden = !value;
 		syncUrl(query);

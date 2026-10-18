@@ -945,7 +945,7 @@ $photoIndexJson = '{"version":2,"variants":"' + (($photoEntries | ForEach-Object
 $assetVersions['assets/data/photo-index.json'] = Get-ContentVersion $photoIndexJson
 
 # Small, inert postcard seeds make discovery available without fetching the
-# full index. The browser only attaches six thumbnails; the rest stay inert.
+# full index. The browser only attaches four thumbnails; the rest stay inert.
 $exploreThemes = Get-Content -LiteralPath (Join-Path $root 'journals\explore-themes.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $exploreUsedPhotos = @{}
 $exploreTripCounts = @{}
@@ -964,7 +964,7 @@ $exploreCards = @(foreach ($theme in $exploreThemes.PSObject.Properties) {
     $photoYear = if ($photo.Trip -match '_(\d{4})_') { $Matches[1] } else { '' }
     $photoContext = [System.Net.WebUtility]::HtmlEncode($photo.Place + ' ' + [char]0xB7 + ' ' + $photoYear)
     $focus = $photo.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + '% ' + $photo.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) + '%'
-    $responsive = if ($photo.Srcset) { ' srcset="' + $photo.Srcset + '" sizes="(max-width: 736px) 45vw, 33vw"' } else { '' }
+    $responsive = if ($photo.Srcset) { ' srcset="' + $photo.Srcset + '" sizes="(max-width: 980px) 45vw, 25vw"' } else { '' }
     $card = '<a class="photo-explore__card" data-cover-id="' + [System.Net.WebUtility]::HtmlEncode($photo.Id) + '" data-explore-action="tag" data-tag="' + $name + '" data-title="' + $title + '" href="travel?q=' + [uri]::EscapeDataString($tag) + '">' +
         '<img src="' + $photo.Thumb + '"' + $responsive + ' alt="' + $alt + '" width="' + $photo.Width + '" height="' + $photo.Height + '" loading="lazy" decoding="async" style="object-position:' + $focus + '">' +
         '<span class="photo-explore__caption"><strong>' + $title + '</strong><span><span>' + $photoContext + '</span></span></span></a>'
@@ -1031,7 +1031,7 @@ foreach ($page in $pages) {
         $main = $main.Replace('data-search-index="assets/data/photo-index.json"', "data-search-index=`"$(Get-AssetRef 'assets/data/photo-index.json')`"")
         $main = $main.Replace('data-map-script="assets/js/travel-map.js"', "data-map-script=`"$(Get-AssetRef 'assets/js/travel-map.js')`"")
         $main = $main.Replace('<!-- PHOTO_EXPLORE_SEEDS -->', ($exploreCards -join "`n"))
-        $main = $main.Replace('<!-- PHOTO_EXPLORE_FALLBACK -->', (($exploreFallback | Select-Object -First 6) -join "`n"))
+        $main = $main.Replace('<!-- PHOTO_EXPLORE_FALLBACK -->', (($exploreFallback | Select-Object -First 4) -join "`n"))
     }
     if ($journalBySlug.ContainsKey($slug)) {
         $title = $journalBySlug[$slug].title

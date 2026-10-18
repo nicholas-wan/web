@@ -1,6 +1,35 @@
 const { test, expect } = require('@playwright/test');
 test.use({ actionTimeout: 10000 });
 
+for (const width of [320, 375, 768, 1024, 1366]) {
+  test(`four real discovery cards form the intended rows at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/travel');
+    const cards = page.locator('.photo-explore__cards > .photo-explore__card');
+    const images = page.locator('.photo-explore__cards img');
+    await expect(cards).toHaveCount(4);
+    await expect(images).toHaveCount(4);
+    await expect(page.locator('[data-explore-action="surprise"], #photo-moment')).toHaveCount(0);
+    const assertRows = async () => {
+      const boxes = await cards.evaluateAll(es => es.map(e => {
+        const box = e.getBoundingClientRect();
+        return { top: Math.round(box.top), width: box.width, height: box.height };
+      }));
+      expect(boxes.every(box => box.width > 0 && box.height > 0)).toBe(true);
+      const rows = [...new Set(boxes.map(box => box.top))];
+      expect(rows.length).toBe(width >= 981 ? 1 : 2);
+      expect(rows.map(top => boxes.filter(box => box.top === top).length)).toEqual(width >= 981 ? [4] : [2, 2]);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+    };
+    await assertRows();
+    await page.getByRole('button', { name: 'Another mix' }).click();
+    await expect(page.locator('#photo-search-status')).toHaveText('Four new photo topics to explore.');
+    await expect(cards).toHaveCount(4);
+    await expect(images).toHaveCount(4);
+    await assertRows();
+  });
+}
+
 for (const width of [390, 1280]) {
   test(`search and discovery at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
@@ -8,12 +37,12 @@ for (const width of [390, 1280]) {
     const input = page.getByRole('searchbox', { name: 'Search travel photos' });
     const explore = page.locator('.photo-explore__cards');
     await expect(explore).toBeVisible();
-    await expect(explore.locator('[data-tag]')).toHaveCount(6);
+    await expect(explore.locator('[data-tag]')).toHaveCount(4);
     expect(await page.locator('script[src*="photo-search"]').count()).toBe(0);
     expect(await page.evaluate(() => performance.getEntriesByType('resource').some(r => r.name.includes('photo-index.json')))).toBe(false);
     const first = await explore.locator('[data-tag]').evaluateAll(es => es.map(e => e.dataset.tag));
     await page.getByRole('button', { name: 'Another mix' }).click();
-    await expect(page.locator('#photo-search-status')).toHaveText('Six new photo topics to explore.');
+    await expect(page.locator('#photo-search-status')).toHaveText('Four new photo topics to explore.');
     const second = await explore.locator('[data-tag]').evaluateAll(es => es.map(e => e.dataset.tag));
     expect(second.every(tag => !first.includes(tag))).toBe(true);
     await expect(page.getByRole('button', { name: 'Another mix' })).toBeFocused();
@@ -69,7 +98,7 @@ test('cold postcard click survives a delayed index, reload avoids its previous t
   const first = await cards.evaluateAll(es => es.map(e => e.dataset.tag));
   await page.reload();
   const next = await cards.evaluateAll(es => es.map(e => e.dataset.tag));
-  expect(next.length).toBe(6);
+  expect(next.length).toBe(4);
   expect(next.every(tag => !first.includes(tag))).toBe(true);
   await cards.first().click();
   await expect(page.locator('.photo-hit').first()).toBeVisible();
@@ -77,56 +106,11 @@ test('cold postcard click survives a delayed index, reload avoids its previous t
   await expect(page.getByRole('searchbox')).toHaveValue(next[0]);
 });
 
-test('Surprise me previews real moments, changes trips, and returns focus at 320px', async ({ page }) => {
-  await page.setViewportSize({ width: 320, height: 800 });
-  await page.goto('/travel');
-  await page.getByRole('button', { name: 'Surprise me' }).click();
-  await expect(page.locator('#photo-moment')).toBeVisible();
-  await expect(page.locator('#photo-moment-title')).toBeFocused();
-  const first = await page.locator('.photo-moment__image').getAttribute('href');
-  expect(first).toMatch(/^travel_.+#photo=.+/);
-  const day = await page.getByRole('link', { name: 'Read this day' }).getAttribute('href');
-  expect(day).toMatch(/^travel_.+#trip-section-\d+/);
-  await page.getByRole('button', { name: 'Another moment' }).click();
-  const next = await page.locator('.photo-moment__image').getAttribute('href');
-  expect(next.split('#')[0]).not.toBe(first.split('#')[0]);
-  await expect(page.getByRole('button', { name: 'Another moment' })).toBeFocused();
-  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
-  await page.getByRole('button', { name: 'Back to exploring' }).click();
-  await expect(page.locator('#photo-moment')).toBeHidden();
-  await expect(page.locator('.photo-explore__cards [data-tag]')).toHaveCount(6);
-  await expect(page.getByRole('button', { name: 'Surprise me' })).toBeFocused();
-});
-
-for (const width of [320, 1280]) {
-  test(`portrait moment hides and restores focus after Back at ${width}px`, async ({ page }) => {
-    await page.setViewportSize({ width, height: 900 });
-    await page.goto('/travel');
-    const indexUrl = await page.locator('#photo-search').getAttribute('data-search-index');
-    const data = await (await page.request.get('/' + indexUrl)).json();
-    const portrait = data.photos.find(photo => photo.h > photo.w * .9);
-    expect(portrait).toBeTruthy();
-    // Leave one real portrait unseen so random trip/photo selection is deterministic.
-    await page.evaluate(ids => sessionStorage.setItem('photo-explore-moments', JSON.stringify(ids)),
-      data.photos.filter(photo => photo.id !== portrait.id).map(photo => photo.id));
-    await page.getByRole('button', { name: 'Surprise me' }).click();
-    const moment = page.locator('#photo-moment');
-    await expect(moment).toBeVisible();
-    await expect(moment).toHaveClass(/is-portrait/);
-    await expect(page.locator('#photo-moment-title')).toBeFocused();
-    await page.getByRole('button', { name: 'Back to exploring' }).click();
-    await expect(moment).toHaveAttribute('hidden', '');
-    await expect(moment).toBeHidden();
-    await expect(page.getByRole('button', { name: 'Surprise me' })).toBeFocused();
-    await expect(page.locator('.photo-explore__cards')).toBeVisible();
-  });
-}
-
 test('postcards and journal links remain available without JavaScript', async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
   const page = await context.newPage();
   await page.goto('/travel');
-  await expect(page.locator('.photo-explore__card')).toHaveCount(6);
+  await expect(page.locator('.photo-explore__card')).toHaveCount(4);
   await expect(page.locator('.photo-explore__card').first()).toBeVisible();
   await expect(page.getByRole('button', { name: 'Surprise me' })).toHaveCount(0);
   await expect(page.locator('.travel-grid')).toBeVisible();
@@ -139,7 +123,7 @@ test('initial and shuffled postcards render the reviewed thumbnail and crop for 
   const indexUrl = await page.locator('#photo-search').getAttribute('data-search-index');
   const data = await (await page.request.get('/' + indexUrl)).json();
   const cards = page.locator('.photo-explore__cards .photo-explore__card');
-  await expect(cards).toHaveCount(6);
+  await expect(cards).toHaveCount(4);
   const tea = page.locator('.photo-explore__cards [data-tag="tea"]');
   await expect(tea).toHaveCount(1);
   await expect(tea).not.toHaveAttribute('data-cover-id', '2023_perth/day3/bariuma_ramen');
@@ -149,7 +133,7 @@ test('initial and shuffled postcards render the reviewed thumbnail and crop for 
       crop: getComputedStyle(e.querySelector('img')).objectPosition,
       caption: e.querySelector('.photo-explore__caption').textContent
     })));
-    expect(rendered).toHaveLength(6);
+    expect(rendered).toHaveLength(4);
     for (const card of rendered) {
       const row = data.covers.find(c => data.photos[c[0]].id === card.id);
       const cover = { tags: row[1].map(i => data.photos[row[0]].tags[i]), fx: row[2] ?? 50, fy: row[3] ?? 50 };
@@ -162,7 +146,7 @@ test('initial and shuffled postcards render the reviewed thumbnail and crop for 
     }
     if (!batch) {
       await page.getByRole('button', { name: 'Another mix' }).click();
-      await expect(page.locator('#photo-search-status')).toHaveText('Six new photo topics to explore.');
+      await expect(page.locator('#photo-search-status')).toHaveText('Four new photo topics to explore.');
     }
   }
 });

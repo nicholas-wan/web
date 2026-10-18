@@ -14,25 +14,25 @@ function setup(saved = {}) {
   const form = node(), input = form.q = node(), results = node();
   results.parentNode = node();
   const nodes = { 'photo-search': form, 'photo-results': results, 'photo-search-status': node(),
-    'photo-explore': node(), 'photo-moment': node(), 'photo-explore-seeds': { content: node() } };
+    'photo-explore': node(), 'photo-explore-seeds': { content: node() } };
   const storage = { getItem: key => saved[key] || null, setItem: (key, value) => { saved[key] = value; } };
   const context = { document: { getElementById: id => nodes[id], querySelectorAll: () => [] },
     localStorage: storage, sessionStorage: storage, setTimeout: () => 1, clearTimeout() {},
     URLSearchParams, location: { search: '', pathname: '/travel', hash: '' }, history: { replaceState() {} } };
   let source = fs.readFileSync(path.join(root, 'assets/js/photo-search.js'), 'utf8');
-  source = source.replace('\tvar initial =', '\tglobalThis.api = { prepare, search, tokens, highlight, completeTag, sampleExplore: exploreMore, exploreMore: () => saveExplore(exploreMore()), pickMoment, recent, run, tripLabel, getExplore: () => explore, getTags: () => tags }; return;\n\tvar initial =');
+  source = source.replace('\tvar initial =', '\tglobalThis.api = { prepare, search, tokens, highlight, completeTag, sampleExplore: exploreMore, exploreMore: () => saveExplore(exploreMore()), recent, run, tripLabel, getExplore: () => explore, getTags: () => tags }; return;\n\tvar initial =');
   vm.runInNewContext(source, context);
   context.api.prepare(structuredClone(index));
   return { ...context.api, input, status: nodes['photo-search-status'], saved };
 }
 
-test('exploration samples six populated facets with matching, distinct photos and fresh topics', () => {
+test('exploration samples four populated facets with matching, distinct photos and fresh topics', () => {
   const api = setup();
   api.exploreMore();
   const first = api.getExplore().map(t => t.tag);
-  assert.equal(new Set(first).size, 6);
-  assert.equal(new Set(first.map(name => index.tags.find(t => t.tag === name).facet)).size, 6);
-  assert.equal(new Set(api.getExplore().map(t => t.photo.id)).size, 6);
+  assert.equal(new Set(first).size, 4);
+  assert.equal(new Set(first.map(name => index.tags.find(t => t.tag === name).facet)).size, 4);
+  assert.equal(new Set(api.getExplore().map(t => t.photo.id)).size, 4);
   assert.ok(api.getExplore().every(t => t.photo.tags.includes(t.tag)));
   api.exploreMore();
   assert.ok(api.getExplore().every(t => !first.includes(t.tag)));
@@ -46,27 +46,10 @@ test('sampling replacement topics does not commit a pending or failed batch', ()
   api.exploreMore();
   const prior = api.getExplore(), storage = api.saved['photo-search-explore'];
   const next = api.sampleExplore();
-  assert.equal(next.length, 6);
+  assert.equal(next.length, 4);
   assert.ok(next.every(item => !prior.some(old => old.tag === item.tag)));
   assert.equal(api.getExplore(), prior);
   assert.equal(api.saved['photo-search-explore'], storage);
-});
-
-test('Surprise me visits every photo before repeating, varies trips and survives reload', () => {
-  const api = setup(), seen = new Set();
-  let last;
-  for (let i = 0; i < index.photos.length; i++) {
-    const photo = api.pickMoment();
-    assert.ok(!seen.has(photo.id));
-    const remainingTrips = new Set(index.photos.filter(p => !seen.has(p.id)).map(p => p.trip));
-    if (last && remainingTrips.size > 1) assert.notEqual(photo.trip, last.trip);
-    seen.add(photo.id); last = photo;
-  }
-  assert.equal(seen.size, index.photos.length);
-  const next = api.pickMoment();
-  assert.notEqual(next.trip, last.trip);
-  const reloaded = setup(api.saved);
-  assert.notEqual(reloaded.pickMoment().id, next.id);
 });
 
 test('every exploration candidate has at least one full-match photo', () => {
@@ -81,7 +64,7 @@ test('discovery only uses visually reviewed topic/crop pairs, including after re
   const reviewed = new Map(reviews.map(c => [c.id, c]));
   for (let i = 0; i < 150; i++) {
     api.exploreMore();
-    assert.equal(api.getExplore().length, 6);
+    assert.equal(api.getExplore().length, 4);
     for (const { tag, photo } of api.getExplore()) {
       const cover = reviewed.get(photo.id);
       assert.ok(cover && cover.tags.includes(tag), `${tag}: ${photo.id}`);

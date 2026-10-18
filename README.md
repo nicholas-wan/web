@@ -38,6 +38,7 @@ Decided 16–17 Oct 2026; do not propose otherwise. Details are under [Behaviour
 - Pages crossfade in 220ms with no black load wait; desktop tab-page titles glide into place.
 - Work: no contact line; anomaly charts open one at a time from their chips, never over the writeup, with no "simulated" note. Phishing domains leads the three charts; its fake keeps the padlock (most phishing sites use HTTPS).
 - Skills cards carry no case-study links.
+- Keep the current Home, Skills and Personal designs. The compact Tech stack proposal was rejected (18 Oct 2026).
 - No Work section-shortcut row (declined 18 Oct 2026).
 - Personal: unfocused cards stay dimmed to 0.55; galleries have no photo controls.
 - No skip link, no change to the homepage cards' focus ring; return-to-top stays on phones (except Travel, journals and Personal, where it is hidden).
@@ -131,7 +132,7 @@ python -I .\tools\photos\seed_photo_tags.py
 - Topics: `journals/explore-themes.json`. Covers come only from the reviewed pool in `journals/explore-covers.json`, so a new search tag cannot become a cover.
 - Review each topic against the actual 8:5 card crop. Record photo id, thumbnail path, SHA-256, focal point (0–100%) and visible topics. Re-inspect a changed image's crop before updating its digest.
 - The build rejects missing photos, animations, duplicate ids, unknown topics and changed thumbnails. All covers must fit the index budget.
-- Use specific topic labels such as **bubble tea**. Keep six cards per batch and the lazy-loading budgets. Postcards show place · year, no "Photo:" prefix.
+- Use specific topic labels such as **bubble tea**. Keep four cards per batch and the lazy-loading budgets. Postcards show place · year, no "Photo:" prefix.
 
 ### Source-of-truth rules
 
@@ -374,17 +375,17 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 
 #### Photo search contracts
 
-- Landing: "Wander through the journals.", field, Surprise me, six postcards (3 columns desktop, 2 phones), then map and archive.
+- Landing (approved 18 Oct 2026): "Wander through the journals.", field, four postcards (4 columns above 980px, 2 columns on tablets and phones), then map and archive.
 - Field: drawn magnifier, `/` shortcut, Escape clears.
 - Phones: fields, clear controls, all chips 3rem; input 16px (iOS zoom).
 - Active query: `.travel-atlas__layout`, archive heading, `.travel-grid` get `hidden`; results in `#photo-results` under the field. Hide, never remove.
 - Hidden atlas: zero height, full width, never `display: none` (`travel-map.js` measures it on resize/breakpoint).
 - A query closes an open phone overlay via `[data-map-close]` (runs teardown, focus restore).
 - `photo-search.js` is never a static `<script src>`.
-- The 7 KB bootstrap `travel-discovery.js` picks six inert build-generated postcard seeds per visit, excluding the last batch (sessionStorage); only attached thumbnails load, visible ones eagerly.
+- The 7 KB bootstrap `travel-discovery.js` picks four inert build-generated postcard seeds per visit, excluding the last batch (sessionStorage); only attached thumbnails load, visible ones eagerly.
 - Module and index load on search, a discovery action or `?q=`; bootstrap queues the first action and owns `/`.
 - Load failure: Try again, keep the pending action/query, announce "Photo search is unavailable right now.", keep map and archive.
-- No JavaScript: six fallback postcards link to journal sections.
+- No JavaScript: four fallback postcards link to journal sections.
 - `?q=` via `history.replaceState` (no entries; removed when empty), read on load.
 - Hits link to `<trip slug>#photo=<id>` (opens the lightbox).
 - Ranking:
@@ -401,7 +402,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - One grid per tier: `repeat(auto-fill, minmax(170px, 1fr))`, 0.75rem gap, 2 columns phones, last row left-aligned.
 - Do not bring back per-trip headings or sub-grids (Oct 2026).
 - Legend `.photo-results__trips` when >1 trip has hits: chip per trip, run order, count, full year (`Japan · 2025`).
-- Phones: legend is one scrolling edge-bleeding row with right fade; full-width Surprise me hidden while form has `is-active`.
+- Phones: legend is one scrolling edge-bleeding row with right fade.
 - Pressed chip (`aria-pressed`) filters both tiers, adds `Japan · 2025 only` to status; press again or type to clear; focus returns to the chip.
 - Tile: 4:3 thumbnail, trip chip bottom-left, `Animation` badge top-right (videos), caption (bold place · caption) clamped to two lines.
 - Day/section pill removed on purpose; do not restore.
@@ -416,21 +417,17 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Reviews lock thumbnail path, SHA-256, focal point, visible topics; builds fail if a reviewed thumbnail changes or topic stops matching.
 - Review the exact 8:5 crop before adding/updating a record.
 - Another mix: reviewed topics only, balanced facets, excludes last batch; search keeps the full vocabulary.
-- Another mix refresh (approved 18 Oct 2026): keep the current six postcards while visible replacements decode, show Loading photos on the focused button, then crossfade once for 220ms (instant under reduced motion). Below-fold replacements stay lazy. Failure/timeout keeps the old batch and permits retry; search, focusing a postcard, or another discovery action cancels stale replacement work. Commit session history only with the displayed batch.
+- Another mix refresh (approved 18 Oct 2026): keep the current four postcards while visible replacements decode, show Loading photos on the focused button, then crossfade once for 220ms (instant under reduced motion). Below-fold replacements stay lazy. Failure/timeout keeps the old batch and permits retry; search, focusing a postcard, or another discovery action cancels stale replacement work. Commit session history only with the displayed batch.
 - Pool: 802 covers across 293 topics.
 - Bubble tea ≠ tea; animal statues and model food are sculpture/miniature, not animals or meals.
 - Label Browse photos; plain topic names, place · year beneath; no Photo: prefix, slogans or invented emotions.
-- Keep 24 inert starter cards and six attached images (no extra opening download).
+- Keep 24 inert starter cards and four attached images (no extra opening download).
 - Index v2 cover tuples: photo position, tag positions, optional focal x/y (default 50/50); group by topic once on decode.
 - Initial cards: distinct approved covers; shuffles also avoid duplicate photos, prefer trip variety.
 - A postcard runs the search and focuses the first result without the phone keyboard.
-- Surprise me: inline moment with real place, trip/year, section (omitted if it repeats the place), Read this day; image opens the deep link.
-- Surprise me presentation (approved 18 Oct 2026): white, borderless photo and serif caption with quiet controls. Uncropped landscapes sit beside the caption on desktop and above it on phones (240px image cap); portraits and near-square photos use a compact side-by-side layout. The duplicate visible status is visually hidden while the moment is open, retaining its live announcement.
-- Glyphs (Oct 2026): ↻ on Surprise me and Another mix; none on postcards; ↗ only on Read this day.
-- Moments: trip first, avoid the last trip while others remain, seen ids in sessionStorage until all shown; safe if storage is blocked/corrupt.
-- Previous moment walks a separate session history; Another moment replays forward before picking new.
-- At the start Previous is hidden, not disabled, and focus goes to Another moment, which keeps focus; Back to exploring focuses Surprise me. The moment's `hidden` state must override portrait layout rules at every viewport width.
-- Search hides preview and postcards; clearing restores them.
+- Surprise me was removed by explicit owner decision on 18 Oct 2026. Do not restore its button, inline viewer, random-moment history, or runtime. Discovery is now the four topic postcards and Another mix.
+- Glyphs: ↻ on Another mix; none on postcards.
+- Search hides postcards; clearing restores them.
 - Recent: four distinct successful queries, localStorage, validated, with Clear.
 - IME: wait for committed text.
 - Pending input inerts old results; stale paging/filter actions never mix queries.
@@ -438,7 +435,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Announce index failures even with an empty field.
 - Run `node --test tools/tests/photo-search.test.cjs` after building; CI also covers mobile/desktop discovery, phrase suggestions, paging, filtering, keyboard, deep links, failures, URL restore, IME.
 
-- Budgets: `photo-search.js` 30 KB (26 → 30, 18 Oct 2026, for decoded swaps and recovery), `travel-search.css` 19 KB (16 → 19, 18 Oct 2026, for the approved responsive Surprise me layout); index ~520 KB of 560 KB (from 480 KB, Oct 2026, for descriptive alts); index lazy.
+- Budgets: `photo-search.js` 30 KB (26 → 30, 18 Oct 2026, for decoded swaps and recovery), `travel-search.css` 19 KB ceiling (retained after removing Surprise me on 18 Oct 2026); index ~520 KB of 560 KB (from 480 KB, Oct 2026, for descriptive alts); index lazy.
 - Motion: shared tokens, immediate under reduced motion.
 
 #### Discovery loading and recovery (Oct 2026)
@@ -446,7 +443,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Bootstrap blocks native reload on cold submit and records IME composition; startup and index wait for compositionend before rendering.
 - Atlas loads within 120px of the viewport or on focus/pointer; an early activation replays once.
 - "Choose a topic to find matching photos." shows only with enhanced search.
-- Postcard/moment images use existing 480/original and optional 800 siblings; index `variants` digit per photo: 0 thumbnail, 1 480/original, 2 also 800.
+- Postcard images use existing 480/original and optional 800 siblings; index `variants` digit per photo: 0 thumbnail, 1 480/original, 2 also 800.
 - Video posters and custom crops unchanged.
 - Build checks candidate dimensions; browser measures slots, resizes `sizes`.
 

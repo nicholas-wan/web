@@ -43,7 +43,7 @@ test('a cold index failure restores the mix button and retry completes its pendi
   expect(await batch(page)).toEqual(before);
   expect(await saved(page)).toBe(storage);
   await page.getByRole('button', { name: 'Try again', exact: true }).click();
-  await expect(page.locator('#photo-search-status')).toHaveText('Six new photo topics to explore.');
+  await expect(page.locator('#photo-search-status')).toHaveText('Four new photo topics to explore.');
   expect(await batch(page)).not.toEqual(before);
 });
 
@@ -103,7 +103,7 @@ test('a failed replacement preserves the batch and selection history and can be 
   await button.click();
   await expect.poll(() => page.evaluate(() => window.pendingMixImages.length)).toBeGreaterThan(0);
   await release(page);
-  await expect(page.locator('#photo-search-status')).toHaveText('Six new photo topics to explore.');
+  await expect(page.locator('#photo-search-status')).toHaveText('Four new photo topics to explore.');
   expect(await batch(page)).not.toEqual(before);
 });
 
@@ -126,7 +126,7 @@ test('using an old postcard while decoding cancels the mix and preserves keyboar
   await expect(page.locator('#photo-search-status')).toBeEmpty();
 });
 
-test('a stale mix cannot replace a search or a newer mix after Surprise and Back', async ({ page }) => {
+test('a stale mix cannot replace a search or a newer mix after clearing a search', async ({ page }) => {
   const button = await prepare(page);
   const storage = await saved(page);
   await button.click();
@@ -142,9 +142,10 @@ test('a stale mix cannot replace a search or a newer mix after Surprise and Back
   await button.click();
   await expect.poll(() => page.evaluate(() => window.pendingMixImages.length)).toBeGreaterThan(0);
   await page.evaluate(() => { window.oldMixImages = window.pendingMixImages.splice(0); });
-  await page.getByRole('button', { name: 'Surprise me', exact: true }).click();
-  await expect(page.locator('#photo-moment')).toBeVisible();
-  await page.getByRole('button', { name: 'Back to exploring', exact: true }).click();
+  await page.getByRole('searchbox').fill('panda');
+  await expect(page.locator('.photo-hit').first()).toBeVisible();
+  await page.locator('.photo-search__clear').click();
+  await expect(page.locator('#photo-explore')).toBeVisible();
   await button.click();
   await expect.poll(() => page.evaluate(() => window.pendingMixImages.length)).toBeGreaterThan(0);
   await release(page);
@@ -153,7 +154,7 @@ test('a stale mix cannot replace a search or a newer mix after Surprise and Back
   await page.evaluate(() => window.oldMixImages.forEach(image => image.resolve()));
   expect(await batch(page)).toEqual(latest);
   expect(await saved(page)).toBe(latestStorage);
-  await expect(page.locator('#photo-search-status')).toHaveText('Six new photo topics to explore.');
+  await expect(page.locator('#photo-search-status')).toHaveText('Four new photo topics to explore.');
 });
 
 test('successful mix crossfades for 220ms without moving the grid', async ({ page }) => {
@@ -167,7 +168,7 @@ test('successful mix crossfades for 220ms without moving the grid', async ({ pag
   const after = await page.locator('.photo-explore__cards').boundingBox();
   expect(Math.abs(before.height - after.height)).toBeLessThanOrEqual(1);
   expect(Math.abs(before.y - after.y)).toBeLessThanOrEqual(1);
-  expect(await page.evaluate(() => window.mixAnimations)).toEqual([220, 220, 220, 220, 220, 220, 220]);
+  expect(await page.evaluate(() => window.mixAnimations)).toEqual([220, 220, 220, 220, 220]);
   await expect(button).toBeFocused();
 });
 
@@ -179,9 +180,9 @@ test('phone mix waits only for visible slots, leaving lower images lazy', async 
     const box = img.getBoundingClientRect(); return box.bottom > 0 && box.top < innerHeight;
   }).length);
   expect(visible).toBeGreaterThan(0);
-  expect(visible).toBeLessThan(6);
+  expect(visible).toBeLessThan(4);
   expect(await page.evaluate(() => window.pendingMixImages.length)).toBe(visible);
   await release(page);
   await expect(button).not.toHaveAttribute('aria-disabled');
-  expect(await page.locator('.photo-explore__cards > a img[loading="lazy"]').count()).toBe(6 - visible);
+  expect(await page.locator('.photo-explore__cards > a img[loading="lazy"]').count()).toBe(4 - visible);
 });
