@@ -235,7 +235,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Page opening (approved 18 Oct 2026): `Experience` eyebrow and `Selected work` title at every width. The job title appears only in its DSTA card.
 - DSTA cards on phones: company context, title, Problem/My role/Outcome rail, copy, tags.
 - Cloud Analytics header is `display: contents` at the phone breakpoint only; desktop stays two-column.
-- Internship cards: three in a row above 980px, stacked below (at 768px three columns wrapped each date line to 4-5 lines). Shopee's same-year range gives the year once (`April – November 2020`) so its meta fits two lines like the others. Equal-height desktop cards share company/title/description/tag rows through subgrid (approved 18 Oct 2026); no fixed height. Logos sit above company details on desktop, beside them on stacked phone/tablet cards; descriptions respect the 12px phone floor.
+- Internship entries (approved 18 Oct 2026): three full-width rows with quiet separators. Above 736px company/date metadata sits beside title, description and plain teal capability tags; on phones metadata sits above the description. Logos sit beside metadata except at 737–1100px, where they sit above it to keep dates readable. The description and tags share a static `.internship-entry__body` wrapper so metadata height cannot create a gap between them. Keep all original copy, no fixed heights, no new motion, and the 12px phone text floor. Shopee's same-year range gives the year once (`April – November 2020`).
 - The second DSTA card is titled Cyber Detection Analytics (renamed from Cloud Anomaly Analytics, Oct 2026; anchor stays `#cloud-analytics`). Its lede names both halves: AWS and Microsoft 365 anomalies, and phishing domains impersonating MINDEF websites (owner-approved wording).
 - Cyber Detection Analytics ends with an anomaly peek (owner-approved; `assets/js/anomaly-peek.js`, experience bundle).
 - CTA "Hover a chart to see it catch something" ("Tap a chart…" on phones; was "See an anomaly get caught · hover a chart", Oct 2026) above chips Phishing domains, Statistical baseline and Graph analysis (named by method, Oct 2026; were Over time and Across connections) (phones and tablets ≤980px: three equal tiles in one row, thumbnail above a centred label; desktop: three chips as wide as the widest, content centred, a small arrow at the right; thumbnails drawn at 78×24).
@@ -429,7 +429,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Glyphs (Oct 2026): ↻ on Surprise me and Another mix; none on postcards; ↗ only on Read this day.
 - Moments: trip first, avoid the last trip while others remain, seen ids in sessionStorage until all shown; safe if storage is blocked/corrupt.
 - Previous moment walks a separate session history; Another moment replays forward before picking new.
-- At the start Previous is hidden, not disabled, and focus goes to Another moment, which keeps focus; Back to exploring focuses Surprise me.
+- At the start Previous is hidden, not disabled, and focus goes to Another moment, which keeps focus; Back to exploring focuses Surprise me. The moment's `hidden` state must override portrait layout rules at every viewport width.
 - Search hides preview and postcards; clearing restores them.
 - Recent: four distinct successful queries, localStorage, validated, with Clear.
 - IME: wait for committed text.

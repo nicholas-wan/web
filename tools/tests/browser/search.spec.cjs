@@ -98,6 +98,30 @@ test('Surprise me previews real moments, changes trips, and returns focus at 320
   await expect(page.getByRole('button', { name: 'Surprise me' })).toBeFocused();
 });
 
+for (const width of [320, 1280]) {
+  test(`portrait moment hides and restores focus after Back at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/travel');
+    const indexUrl = await page.locator('#photo-search').getAttribute('data-search-index');
+    const data = await (await page.request.get('/' + indexUrl)).json();
+    const portrait = data.photos.find(photo => photo.h > photo.w * .9);
+    expect(portrait).toBeTruthy();
+    // Leave one real portrait unseen so random trip/photo selection is deterministic.
+    await page.evaluate(ids => sessionStorage.setItem('photo-explore-moments', JSON.stringify(ids)),
+      data.photos.filter(photo => photo.id !== portrait.id).map(photo => photo.id));
+    await page.getByRole('button', { name: 'Surprise me' }).click();
+    const moment = page.locator('#photo-moment');
+    await expect(moment).toBeVisible();
+    await expect(moment).toHaveClass(/is-portrait/);
+    await expect(page.locator('#photo-moment-title')).toBeFocused();
+    await page.getByRole('button', { name: 'Back to exploring' }).click();
+    await expect(moment).toHaveAttribute('hidden', '');
+    await expect(moment).toBeHidden();
+    await expect(page.getByRole('button', { name: 'Surprise me' })).toBeFocused();
+    await expect(page.locator('.photo-explore__cards')).toBeVisible();
+  });
+}
+
 test('postcards and journal links remain available without JavaScript', async ({ browser, baseURL }) => {
   const context = await browser.newContext({ javaScriptEnabled: false, baseURL });
   const page = await context.newPage();

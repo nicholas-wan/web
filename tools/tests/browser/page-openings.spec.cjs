@@ -34,7 +34,7 @@ for (const width of [320, 375, 1366]) {
 }
 
 for (const width of [320, 375, 768, 1024, 1366, 1920]) {
-  test(`internship cards contain their text and align desktop rows at ${width}px`, async ({ page }) => {
+  test(`internship entries contain text and keep descriptions with tags at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/experience');
     await page.evaluate(() => document.fonts.ready);
@@ -54,9 +54,16 @@ for (const width of [320, 375, 768, 1024, 1366, 1920]) {
           if (rect.left < box.left - 1 || rect.right > box.right + 1 || rect.top < box.top - 1 || rect.bottom > box.bottom + 1) overflow.push(node.textContent.trim());
         }
       }
+      const company = card.querySelector('.case-study__company').getBoundingClientRect();
+      const body = card.querySelector('.internship-entry__body').getBoundingClientRect();
+      const lede = card.querySelector('.case-study__lede').getBoundingClientRect();
+      const tags = card.querySelector('.case-study__tags').getBoundingClientRect();
       return {
-        id: card.id, height: box.height, overflow,
-        rows: ['.case-study__company', 'h2', '.case-study__lede', '.case-study__tags'].map(selector => card.querySelector(selector).getBoundingClientRect().top),
+        id: card.id, top: box.top, bottom: box.bottom, left: box.left, width: box.width, overflow,
+        company: { left: company.left, right: company.right, top: company.top, bottom: company.bottom },
+        body: { left: body.left, top: body.top },
+        tagGap: tags.top - lede.bottom,
+        expectedTagGap: parseFloat(getComputedStyle(card.querySelector('.case-study__tags')).marginTop),
         ledeSize: parseFloat(getComputedStyle(card.querySelector('.case-study__lede')).fontSize)
       };
     }));
@@ -64,10 +71,19 @@ for (const width of [320, 375, 768, 1024, 1366, 1920]) {
     for (const card of cards) {
       expect(card.overflow, card.id + ' text overflow').toEqual([]);
       if (width <= 736) expect(card.ledeSize, card.id + ' phone text floor').toBeGreaterThanOrEqual(12);
-      if (width > 980) {
-        expect(Math.abs(card.height - cards[0].height), card.id + ' height').toBeLessThanOrEqual(1);
-        card.rows.forEach((top, index) => expect(Math.abs(top - cards[0].rows[index]), card.id + ' row ' + index).toBeLessThanOrEqual(1));
+      expect(Math.abs(card.left - cards[0].left), card.id + ' entry left edge').toBeLessThanOrEqual(1);
+      expect(Math.abs(card.width - cards[0].width), card.id + ' entry width').toBeLessThanOrEqual(1);
+      expect(Math.abs(card.tagGap - card.expectedTagGap), card.id + ' no stretched tag gap').toBeLessThanOrEqual(1);
+      if (width > 736) {
+        expect(card.body.left, card.id + ' description beside company').toBeGreaterThan(card.company.right);
+        expect(Math.abs(card.body.top - card.company.top), card.id + ' columns top align').toBeLessThanOrEqual(1);
+      } else {
+        expect(card.body.top, card.id + ' description below company').toBeGreaterThan(card.company.bottom);
+        expect(Math.abs(card.body.left - card.company.left), card.id + ' phone left edges').toBeLessThanOrEqual(1);
       }
+    }
+    for (let i = 1; i < cards.length; i++) {
+      expect(cards[i].top, cards[i].id + ' follows previous entry').toBeGreaterThanOrEqual(cards[i - 1].bottom - 1);
     }
   });
 }
