@@ -210,14 +210,20 @@
   }
 
   // ---- Phishing domains: a copy lifts off a real sign-in page, a matching
-  // scan crosses both, and what differs is marked: a dot swapped for a
+  // comparison links matching features, and marks a dot swapped for a
   // hyphen and an off logo. Then the copy is outlined.
   var TEAL = '#11807d', AMBER = '#c46d1c', INK = '#20343d', SOFT = '#d7e4e2';
   function dash(node, f) { node.setAttribute('stroke-dashoffset', (1 - f).toFixed(3)); node.setAttribute('visibility', f > 0 ? 'visible' : 'hidden'); }
   function drawable(node) { node.setAttribute('pathLength', 1); node.setAttribute('stroke-dasharray', '1 1'); return node; }
   function createSite(host) {
     var svg = el('svg', { 'aria-hidden': 'true', focusable: 'false' }, host);
-    var W = 0, H = 130, PY = 14, PH = 104, pw = 0, x0 = 4, x1 = 0, t = 0, DUR = 7600, LOOP = 14000;
+
+    var depthId='depth-'+Math.random().toString(36).slice(2,8), defs=el('defs',{},svg);
+    var surface=el('linearGradient',{id:depthId+'surface',x1:0,y1:0,x2:0,y2:1},defs);
+    el('stop',{offset:0,'stop-color':'#ffffff'},surface);el('stop',{offset:1,'stop-color':'#f4f7f5'},surface);
+    var buttonGradient=el('linearGradient',{id:depthId+'button',x1:0,y1:0,x2:0,y2:1},defs);
+    el('stop',{offset:0,'stop-color':'#249b91'},buttonGradient);el('stop',{offset:1,'stop-color':'#076b69'},buttonGradient);
+    var W = 0, H = 130, PY = 14, PH = 104, pw = 0, x0 = 4, x1 = 0, t = 0, DUR = 4800, LOOP = 10000;
     var pages = [], marks = {}, swapX = 0, swapW = 0, tx = 22, idle = false;
     // A dot swapped for a hyphen (eservices.example.sg -> eservices-example.sg).
     // Narrow bars use the shorter "my" pair rather than cutting the address.
@@ -230,12 +236,20 @@
     }
     function page(fake) {
       var g = el('g', {}, svg), p = { g: g };
-      p.box = el('rect', { y: PY, height: PH, rx: 9, fill: '#fff', stroke: SOFT, 'stroke-width': 1.2 }, g);
-      p.bar = el('rect', { x: 6, y: PY + 6, height: 18, rx: 9, fill: '#f2f8f7' }, g);
+      p.shadow = el('rect',{y:PY+3,height:PH,rx:9,fill:'#173e35',opacity:0.10},g);
+      p.box = el('rect', { y: PY, height: PH, rx: 9, fill: 'url(#'+depthId+'surface)', stroke: '#bbd0c8', 'stroke-width': 1.2 }, g);
+      // Compact browser chrome, inside the existing card footprint.
+      p.chrome = el('path',{fill:'#e8efec'},g);
+      [9,14,19].forEach(function(x){el('circle',{cx:x,cy:PY+5.5,r:1.35,fill:'#91aaa0'},g);});
+      p.tab = el('path',{fill:'#fff',stroke:'#d5e1db','stroke-width':0.65},g);
+      p.divider = el('path',{fill:'none',stroke:'#d8e4de','stroke-width':0.7},g);
+      p.bar = el('rect', { x: 6, y: PY + 12, height: 18, rx: 4, fill: '#f2f8f7' }, g);
+      p.bar.setAttribute('stroke','#ffffff');p.bar.setAttribute('stroke-width','0.8');
       p.lock = el('g', {}, g);
       el('path', { d: 'M12 ' + (PY + 15) + 'v-2a2.5 2.5 0 0 1 5 0v2', fill: 'none', stroke: TEAL, 'stroke-width': 1.2, opacity: 0.7 }, p.lock);
       el('rect', { x: 11, y: PY + 14.5, width: 7, height: 5, rx: 1.2, fill: TEAL, opacity: 0.7 }, p.lock);
-      p.url = el('text', { class: 'peek-url', x: 22, y: PY + 19.5 }, g);
+      if(fake){p.highlight=el('rect',{y:PY+14,height:16,rx:2,fill:AMBER,opacity:0},g);}
+      p.url = el('text', { class: 'peek-url', x: 22, y: PY + 25.5 }, g);
       p.logo = el('circle', { r: fake ? 9 : 10, fill: fake ? '#2a9d8a' : TEAL }, g);
       p.tick = el('path', { fill: 'none', stroke: '#fff', 'stroke-width': fake ? 2.4 : 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, g);
       p.title = el('rect', { y: PY + 62, height: 5, rx: 2.5, fill: INK, opacity: 0.78 }, g);
@@ -244,6 +258,9 @@
       p.scan = el('g', { opacity: 0 }, g);
       el('rect', { x: -5, y: PY + 2, width: 10, height: PH - 4, rx: 5, fill: TEAL, opacity: 0.08 }, p.scan);
       el('rect', { x: -1, y: PY + 2, width: 2, height: PH - 4, rx: 1, fill: TEAL, opacity: 0.55 }, p.scan);
+      p.button.setAttribute('fill','url(#'+depthId+'button)');
+      p.field.setAttribute('fill','#ffffff');p.field.setAttribute('stroke','#c5d8d0');
+      p.edge=el('path',{fill:'none',stroke:'#ffffff','stroke-width':1,opacity:0.8},g);
       p.fake = fake;
       return p;
     }
@@ -252,6 +269,10 @@
     ['url', 'logo', 'outline'].forEach(function (k) { marks[k] = drawable(el('path', stroke, svg)); });
     marks.outline.setAttribute('stroke-width', 1.8);
     var halo = el('rect', { fill: 'none', stroke: AMBER, 'stroke-width': 1 }, svg);
+    // Compare the same features on both pages, then retain only the differences.
+    var referenceMark = drawable(el('path', {fill:'none',stroke:TEAL,'stroke-width':1.5,'stroke-linecap':'round'}, svg));
+    var comparisonLink = drawable(el('path', {fill:'none',stroke:TEAL,'stroke-width':1,'stroke-dasharray':'2 3',opacity:0.45}, svg));
+    var referenceLogo = drawable(el('path', {fill:'none',stroke:TEAL,'stroke-width':1,opacity:0.6}, svg));
     var tag = el('g', {}, svg);
     var tagBox = el('rect', { width: 64, height: 16, rx: 8, fill: AMBER }, tag);
     var tagText = el('text', { class: 'peek-tag', 'text-anchor': 'middle' }, tag);
@@ -264,10 +285,14 @@
       x0 = narrow ? 2 : 4; pw = (W - 2 * x0 - gap) / 2; x1 = x0 + pw + gap; tx = narrow ? 17 : 22;
       pages.forEach(function (p) {
         p.url.setAttribute('x', tx); p.url.setAttribute('letter-spacing', narrow ? -0.2 : 0);
-        p.lock.setAttribute('transform', 'translate(' + (tx - 22) + ' 0)');
+        p.lock.setAttribute('transform', 'translate(' + (tx - 22) + ' 6)');
         p.bar.setAttribute('x', inset); p.bar.setAttribute('width', pw - 2 * inset);
         var cx = pw / 2 + (p.fake ? 2 : 0), cy = PY + (p.fake ? 45 : 44);
-        p.box.setAttribute('width', pw);
+        p.chrome.setAttribute('d','M0 '+(PY+9)+'Q0 '+PY+' 9 '+PY+'H'+(pw-9)+'Q'+pw+' '+PY+' '+pw+' '+(PY+9)+'V'+(PY+33)+'H0Z');
+        p.tab.setAttribute('d','M27 '+(PY+10)+'L29 '+(PY+3)+'H'+Math.min(65,pw-10)+'L'+Math.min(68,pw-7)+' '+(PY+10)+'Z');
+        p.divider.setAttribute('d','M1 '+(PY+33)+'H'+(pw-1));
+        p.box.setAttribute('width', pw);p.shadow.setAttribute('width',pw);
+        p.edge.setAttribute('d','M5 '+(PY+8)+'Q5 '+(PY+2)+' 11 '+(PY+2)+'H'+(pw-11));
         p.logo.setAttribute('cx', cx); p.logo.setAttribute('cy', cy);
         p.tick.setAttribute('d', p.fake ? 'M' + (cx - 5.5) + ' ' + (cy - 1.5) + 'l3 5.5 7.5-7' : 'M' + (cx - 6) + ' ' + cy + 'l4 4 8-9');
         p.title.setAttribute('x', pw * 0.25); p.title.setAttribute('width', pw * 0.5);
@@ -283,8 +308,13 @@
       try { swapX = fake.url.getSubStringLength(0, name.length); swapW = fake.url.getSubStringLength(name.length, 1); } catch (e) { swapX = 0; }
       if (!swapX) { swapX = 54; swapW = 4; }
       if (swapW < 6) { swapX -= (6 - swapW) / 2; swapW = 6; }
-      marks.url.setAttribute('d', 'M' + (x1 + tx + swapX).toFixed(1) + ' ' + (PY + 23) + 'h' + swapW.toFixed(1));
+      marks.url.setAttribute('d', 'M' + (x1 + tx + swapX).toFixed(1) + ' ' + (PY + 29) + 'h' + swapW.toFixed(1));
+      fake.highlight.setAttribute('x',tx+swapX-2);fake.highlight.setAttribute('width',swapW+4);
+      var referenceX = x0 + tx + swapX, candidateX = x1 + tx + swapX;
+      referenceMark.setAttribute('d', 'M'+referenceX+' '+(PY+29)+'h'+swapW);
+      comparisonLink.setAttribute('d', 'M'+(referenceX+swapW/2)+' '+(PY+32)+'H'+(candidateX+swapW/2));
       var lx = x1 + pw / 2 + 2, ly = PY + 45;
+      referenceLogo.setAttribute('d', 'M'+(x0+pw/2)+' '+(PY+29)+'a15 15 0 1 1-.01 0');
       marks.logo.setAttribute('d', 'M' + lx + ' ' + (ly - 15) + 'a15 15 0 1 1-.01 0');
       var r = 9, w = pw - 2 * r, h = PH - 2 * r;
       marks.outline.setAttribute('d', 'M' + (x1 + r) + ' ' + PY + 'h' + w + 'a9 9 0 0 1 9 9v' + h + 'a9 9 0 0 1-9 9h-' + w + 'a9 9 0 0 1-9-9v-' + h + 'a9 9 0 0 1 9-9z');
@@ -294,38 +324,41 @@
       render();
     }
     function render() {
-      var c = reduce ? DUR : t % LOOP, a = ease(Math.min(1, c / 600)), s = ease(clamp((c - 1900) / 1200));
-      // Nothing moves between the last pulse and the fade before a replay.
-      var still = !reduce && c > 11700 && c < 13500;
-      if (still && idle) { return; }
-      idle = still;
-      svg.style.opacity = reduce ? 1 : (1 - clamp((c - 13500) / 500)).toFixed(2);
-      real.g.setAttribute('transform', 'translate(' + x0 + ' ' + (6 * (1 - a)).toFixed(1) + ')');
-      real.g.style.opacity = a.toFixed(2);
-      fake.g.style.opacity = clamp((c - 600) / 500).toFixed(2);
-      fake.g.setAttribute('transform', 'translate(' + (x0 + (x1 - x0) * s).toFixed(1) + ' 0)');
-      var sp = clamp((c - 3300) / 2000), sx = 8 + (pw - 16) * ease(sp);
-      pages.forEach(function (p) { p.scan.setAttribute('transform', 'translate(' + sx.toFixed(1) + ' 0)'); p.scan.style.opacity = sp > 0 && sp < 1 ? 1 : 0; });
-      function at(v, len) { return sp > 0 ? clamp((sx - v) / len) : 0; }
-      var u = at(tx + swapX, 14);
-      dash(marks.url, u); fake.swap.setAttribute('fill', u > 0.4 ? AMBER : INK);
-      dash(marks.logo, at(pw / 2 - 12, 36));
-      dash(marks.outline, ease(clamp((c - 5500) / 700)));
-      var tg = clamp((c - 6100) / 400);
-      tag.style.opacity = tg.toFixed(2); tag.setAttribute('transform', 'translate(0 ' + (4 * (1 - tg)).toFixed(1) + ')');
-      var hp = c > 6200 && c < 11600 && !reduce ? ((c - 6200) % 1800) / 1800 : -1, g = 1.5 + hp * 7;
-      halo.setAttribute('visibility', hp < 0 ? 'hidden' : 'visible');
-      if (hp >= 0) {
-        halo.setAttribute('x', x1 - g); halo.setAttribute('y', PY - g); halo.setAttribute('width', pw + 2 * g);
-        halo.setAttribute('height', PH + 2 * g); halo.setAttribute('rx', 9 + g); halo.style.opacity = (0.6 * (1 - hp)).toFixed(2);
-      }
+      var c = reduce ? DUR : t % LOOP;
+      var split = ease(clamp((c-200)/950));
+      var clear = reduce ? 1 : 1-ease(clamp((c-9500)/500));
+      // One anchored reference; a copy pulls away once, then comparison is stationary.
+      real.g.setAttribute('transform','translate('+x0+' 0)');
+      real.g.style.opacity='1';
+      fake.g.setAttribute('transform','translate('+(x0+(x1-x0)*split).toFixed(2)+' 0)');
+      fake.g.style.opacity=(clamp(c/200)*clear).toFixed(3);
+      pages.forEach(function(p){p.scan.style.opacity='0';});
+      // Attention follows corresponding punctuation, making the substitution legible.
+      var address=ease(clamp((c-1450)/450));
+      var relation=ease(clamp((c-1650)/650));
+      var altered=ease(clamp((c-2050)/450));
+      var comparisonFade=reduce?0:1-clamp((c-2900)/600);
+      dash(referenceMark,address);referenceMark.style.opacity=(comparisonFade*clear).toFixed(3);
+      dash(comparisonLink,relation);comparisonLink.style.opacity=(0.32*comparisonFade*clear).toFixed(3);
+      dash(marks.url,altered);fake.highlight.style.opacity=(0.18*altered*clear).toFixed(3);fake.swap.setAttribute('fill',altered>0.1?AMBER:INK);
+      // A second paired comparison distinguishes the copied emblem from the reference.
+      var logo=ease(clamp((c-2800)/650));
+      dash(referenceLogo,logo);referenceLogo.style.opacity=((reduce?0:0.5*(1-clamp((c-3650)/650)))*clear).toFixed(3);
+      dash(marks.logo,logo);
+      dash(marks.outline,ease(clamp((c-3700)/700)));
+      Object.keys(marks).forEach(function(k){marks[k].style.opacity=clear.toFixed(3);});
+      var tg=ease(clamp((c-4350)/350));
+      tag.style.opacity=(tg*clear).toFixed(3);
+      tag.setAttribute('transform','translate(0 '+(2*(1-tg)).toFixed(2)+')');
+      // No repeated halo: a long quiet result is the reward for the reveal.
+      halo.setAttribute('visibility','hidden');
     }
     return {
       layout: layout,
       // Re-measure on every open: the address font may have loaded since.
       open: function () { t = 0; layout(); },
       tick: function (dt) { t += dt; render(); },
-      setPaused: function () {}
+      setPaused: function () { if (reduce) { render(); } }
     };
   }
 
