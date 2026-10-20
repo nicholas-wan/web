@@ -323,25 +323,6 @@
  window.addEventListener('resize',warm);warm();
 })();
 
-/* A persistent stop control also works for touch and keyboard users. */
-(() => {
- const timeline=document.querySelector('.journal-chronology'),mobile=document.querySelector('.mobile-journal-list');
- const bar=document.createElement('div');bar.className='travel-tour-controls';bar.setAttribute('role','group');bar.setAttribute('aria-label','Journal animation controls');
- const pause=document.createElement('button');pause.type='button';pause.textContent='Pause tour';pause.setAttribute('aria-pressed','false');
- pause.addEventListener('click',()=>{const paused=timeline.classList.toggle('tour-paused');pause.setAttribute('aria-pressed',String(paused));pause.textContent=paused?'Resume tour':'Pause tour';timeline.dispatchEvent(new Event('tour-pause'));});
- bar.append(pause);
- let index=0;
- timeline.addEventListener('timeline-destination',event=>{index=[...timeline.querySelectorAll('.chronology-trip')].findIndex(a=>a.getAttribute('href')===event.detail.href);});
- ['Previous','Next','Replay'].forEach((text,i)=>{const button=document.createElement('button');button.type='button';button.textContent=text;button.addEventListener('click',()=>{
-  const links=[...timeline.querySelectorAll('.chronology-trip')];const selected=matchMedia('(max-width:736px)').matches?[...mobile.querySelectorAll('.mobile-journal-row')].findIndex(row=>row.querySelector('.is-active')||row.classList.contains('mobile-selected')):links.findIndex(link=>link.classList.contains('journal-is-selected'));if(selected>=0)index=selected;index=(index+(i===0?-1:i===1?1:0)+links.length)%links.length;
-  if(matchMedia('(max-width:736px)').matches){timeline.dispatchEvent(new CustomEvent('tour-step',{detail:{index}}));return;}
-  const link=links[index];timeline.dispatchEvent(new CustomEvent('timeline-destination',{detail:{href:link.getAttribute('href')}}));
-  const scroller=timeline.querySelector('.chronology-scroll');scroller.scrollLeft+=link.getBoundingClientRect().left-scroller.getBoundingClientRect().left-scroller.clientWidth/2;
-  requestAnimationFrame(()=>window.polishTimelineReplay(index));
- });bar.append(button);});timeline.before(bar);
- const heading=document.querySelector('.travel-archive-heading');const sync=()=>bar.hidden=heading.hidden;new MutationObserver(sync).observe(heading,{attributes:true,attributeFilter:['hidden']});sync();
-})();
-
 /* CSS backgrounds ignore loading=lazy: attach the full vector map on approach. */
 (() => {
  const atlas=document.querySelector('.travel-atlas__layout');

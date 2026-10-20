@@ -9782,12 +9782,8 @@ html.timeline-review{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 @media(min-width:737px){.timeline-review .chronology-trip.lane-1 .chronology-name{top:26px}}
 /* Reserve the offscreen map without painting its background during opening. */
 
-#main>.travel-tour-controls{padding:0 2rem 1rem;border:0;display:flex;flex-wrap:wrap;gap:.5rem}
-#main>.travel-tour-controls[hidden]{display:none}
-.travel-tour-controls button{min-height:44px;padding:0 10px;font-size:12px;letter-spacing:0;text-transform:none;box-shadow:none;color:#285f50;text-decoration:underline;text-underline-offset:3px}
 img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity:0}
 .travel-card__image:has(img[data-journal-src]),.travel-card__image:has(.journal-photo-pending),.travel-card__image:has(.journal-photo-failed){background:#f1f5f2}
-@media(max-width:736px){#main>.travel-tour-controls{display:none}}
 /* Narrow tablets keep every stop visible with room for wrapped dates. */
 @media(min-width:737px) and (max-width:980px){
  .timeline-review .chronology-date{max-width:calc(100% - 16px);text-wrap:balance}
@@ -9905,4 +9901,18 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .authored-scene .mm-loop{opacity:0!important;transition:none}
  .authored-scene .mm-fx *{animation:none!important}
 }
+/* Desktop timeline scenes sit on the same per-scene skies as the phone tiles (20 Oct 2026). */
+.timeline-review .journal-chronology .authored-scene{border-radius:10px;overflow:hidden}
+.timeline-review .journal-chronology .authored-scene[data-scene="0"]{background:linear-gradient(#dde6f2,#f5f7fb)}
+.timeline-review .journal-chronology .authored-scene[data-scene="1"]{background:linear-gradient(#e0ecf1,#f8dcc4 58%,#e6eeec 82%)}
+.timeline-review .journal-chronology .authored-scene[data-scene="2"]{background:linear-gradient(#d3d4ec,#f5dfd3)}
+.timeline-review .journal-chronology .authored-scene[data-scene="3"]{background:linear-gradient(#cfe5f1,#f7f9f8 70%)}
+.timeline-review .journal-chronology .authored-scene[data-scene="4"]{background:linear-gradient(#d8e8ef,#f2f5ef)}
+.timeline-review .journal-chronology .authored-scene[data-scene="5"]{background:linear-gradient(#dfe4ea,#f0f2f3)}
+.timeline-review .journal-chronology .authored-scene[data-scene="6"]{background:linear-gradient(#d3e8f2,#f2f7f4)}
+.timeline-review .journal-chronology .authored-scene[data-scene="7"]{background:linear-gradient(#dfe3e8,#f3f1ee)}
+.timeline-review .journal-chronology .authored-scene[data-scene="8"]{background:linear-gradient(#bfbbe0,#f1c7a4)}
+.timeline-review .journal-chronology .authored-scene[data-scene="9"]{background:linear-gradient(#d9e7d5,#f3f6ec)}
+.timeline-review .journal-chronology .mm-dusk-tile{display:inline}
+.timeline-review .journal-chronology .mm-dusk-glow{display:none}
 /* Route bundle: travel-navigation:end */

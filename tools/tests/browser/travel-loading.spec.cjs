@@ -7,17 +7,12 @@ test('opening layout and four postcards exist before external scripts arrive',as
  await expect(page.locator('.photo-explore__cards > a')).toHaveCount(4);
  await expect(page.locator('.photo-explore__cards > a').first()).toBeVisible();
 });
-for(const width of [320,390,1366])test(`travel deferred photos and tour controls at ${width}`,async({page})=>{
+for(const width of [320,390,1366])test(`travel deferred photos and no tour controls at ${width}`,async({page})=>{
  await page.setViewportSize({width,height:844});await page.goto('/travel');
  const hidden=page.locator(width<=736?'.travel-grid > .travel-card img':'.mobile-journal-card img');
  expect(await hidden.evaluateAll(es=>es.every(e=>!e.getAttribute('src')))).toBe(true);
- if(width>736){
- await expect(page.getByRole('button',{name:'Pause tour',exact:true})).toBeVisible();
- await page.getByRole('button',{name:'Pause tour',exact:true}).click();
- await expect(page.locator('.journal-chronology')).toHaveClass(/tour-paused/);
- await page.waitForTimeout(700);await expect(page.locator('.authored-scene.is-active')).toHaveCount(0);
- await page.getByRole('button',{name:'Next',exact:true}).click();
- }else await expect(page.locator('.travel-tour-controls')).toBeHidden();
+ // Tour controls were removed (20 Oct 2026); the tour stops for hover, focus, hidden tabs and reduced motion.
+ await expect(page.locator('.travel-tour-controls')).toHaveCount(0);
  const photo=page.locator(width<=736?'.mobile-journal-card img':'.travel-card.preview-selected img').filter({visible:true}).first();
  await photo.scrollIntoViewIfNeeded();await expect.poll(()=>photo.evaluate(e=>e.naturalWidth)).toBeGreaterThan(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth)).toBeLessThanOrEqual(1);

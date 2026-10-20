@@ -30,14 +30,14 @@
     'usa-canada': {
       title: 'USA & Canada',
       dates: '10 – 28 October 2023',
-      image: 'images/travel/2023_usa_canada/cover_photo.jpg',
-      imageAlt: 'New York skyline'
+      image: 'images/travel/2023_usa_canada/day9/falls2.jpg',
+      imageAlt: 'Niagara Falls from the Canadian side'
     },
     europe: {
       title: 'Europe',
       dates: '22 October – 1 November 2022',
-      image: 'images/travel/2022_europe/day2/paris3-card.jpg',
-      imageAlt: 'Eiffel Tower in Paris'
+      image: 'images/travel/2022_europe/day2/paris16-search-4x3.webp',
+      imageAlt: 'Eiffel Tower lit gold against the night sky'
     },
     germany: {
       title: 'Germany',
