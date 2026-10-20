@@ -7,16 +7,15 @@
   var reduced = matchMedia('(prefers-reduced-motion: reduce)');
   var onScreen = false;
   var seen = new WeakSet();
-  // Touch screens have no hover replay, so the two previews take turns while visible.
+  // Touch screens have no hover replay, so the two previews replay together while visible.
   var touch = matchMedia('(hover: none)');
-  var timer = 0, turn = 0;
+  var timer = 0;
   function syncPause() { nav.classList.toggle('is-paused', document.hidden || !onScreen); loop(); }
   function loop() {
     clearTimeout(timer);
     if (!touch.matches || reduced.matches || document.hidden || !onScreen) return;
-    var links = nav.querySelectorAll('a');
-    play(links[turn++ % links.length]);
-    timer = setTimeout(loop, 2400);
+    nav.querySelectorAll('a').forEach(play);
+    timer = setTimeout(loop, 3200);
   }
   function play(link) {
     if (reduced.matches || document.hidden || !onScreen) return;

@@ -9285,9 +9285,10 @@ html .page-skills #main > .post { border-top:0; }
 .portal-art{display:block;position:relative;align-self:center;width:148px;height:88px;flex:0 0 88px}
 .portal-route svg{display:block;width:100%;height:100%;overflow:visible;fill:#327b70}
 .portal-route path{fill:none;stroke-width:1.2;stroke:#aac9c0}
+.portal-route .route-arrive{fill:none;stroke:#c38a3c;stroke-width:.8;opacity:0;transform-box:fill-box;transform-origin:center}
 .portal-route .route-guide{stroke-dasharray:2 4}
-.portal-route .route-ink{stroke:#327b70;stroke-dasharray:1;stroke-dashoffset:0}
-.portal-route .route-traveller{fill:#c38a3c}
+.portal-route .route-ink{stroke:#327b70;stroke-width:1.7;stroke-dasharray:1;stroke-dashoffset:0}
+.portal-route .route-traveller{fill:#c38a3c;stroke:#fff;stroke-width:.6}
 .portal-arrow{position:absolute;right:14px;bottom:25px;font-size:16px;color:#52867d}
 .portal-stack img{position:absolute;left:42px;top:15px;width:65px;height:49px;object-fit:cover;border:2px solid #fff;border-radius:2px;box-shadow:0 1px 5px #173b3326;transform-origin:50% 90%}
 .portal-stack img:nth-child(1){transform:translate(-9px,-1px) rotate(-12deg)}
@@ -9295,6 +9296,8 @@ html .page-skills #main > .post { border-top:0; }
 .portal-stack img:nth-child(3){transform:translate(0,4px)}
 .travel-portal.is-playing .route-ink{animation:portal-draw 1.8s ease-in-out both}
 .travel-portal.is-playing .route-traveller{offset-path:path('M38.44 13.82Q52 -1 65.68 17.01');cx:0;cy:0;animation:portal-travel 1.8s ease-in-out both}
+.travel-portal.is-playing .route-arrive{animation:portal-ping 2.4s ease-out both}
+@keyframes portal-ping{0%,72%{opacity:0;transform:scale(1)}76%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(3.2)}}
 .travel-portal.is-playing .portal-stack img:nth-child(1){animation:portal-left 1.6s ease-in-out both}
 .travel-portal.is-playing .portal-stack img:nth-child(2){animation:portal-right 1.6s ease-in-out both}
 .travel-portal.is-playing .portal-stack img:nth-child(3){animation:portal-front 1.6s ease-in-out both}
@@ -9462,7 +9465,7 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes da-cologne-mid{0%,25%,100%{opacity:0}42%,84%{opacity:.95}}
 @keyframes da-cologne-upper{0%,43%,100%{opacity:0}60%,84%{opacity:.95}}
 @keyframes da-paris-sky{0%,100%{opacity:.15}28%,82%{opacity:.65}}
-@keyframes da-paris-light{0%,12%,100%{opacity:0}30%,84%{opacity:1}}
+@keyframes da-paris-light{0%,100%{opacity:0}10%,86%{opacity:1}}
 @media(prefers-reduced-motion:reduce){.authored-scene[data-depth="architecture"] *{animation:none!important}}
 
 .da-bridge-car{opacity:0}.da-bridge-fog-back{opacity:.5}.da-bridge-fog-front{opacity:.6}
@@ -9826,7 +9829,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene.is-active .mm-fx .mm-star,.authored-scene.is-active .mm-fx .mm-flake,.authored-scene.is-active .mm-fx .mm-drop,.authored-scene.is-active .mm-fx .mm-leaf{animation-duration:var(--d)!important}
 .mm-loop{opacity:0;transition:opacity .6s ease}
 .authored-scene.is-active .mm-loop{opacity:1}
-.authored-scene.is-active .mm-sparkle{transition-delay:1.6s}
+.authored-scene.is-active .mm-sparkle{transition-delay:.3s}
 .mm-flake{fill:#fff;stroke:#b9c6d5;stroke-width:.25}
 .mm-snow-back .mm-flake{stroke:#c3cedb}
 .authored-scene.is-active .mm-flake{animation:mm-fall var(--d) linear var(--del) infinite}
@@ -9840,7 +9843,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes mm-sun{0%{transform:translateY(0);opacity:1}72%{transform:translateY(22px);opacity:1}73%{transform:translateY(0);opacity:0}100%{transform:translateY(0);opacity:1}}
 .mm-paris-dusk{opacity:.25}
 .authored-scene.is-active .mm-paris-dusk{animation:mm-dusk var(--scene-duration,6200ms) ease-in-out both}
-@keyframes mm-dusk{0%,100%{opacity:.25}35%,82%{opacity:1}}
+@keyframes mm-dusk{0%,100%{opacity:.25}18%,84%{opacity:1}}
 .mm-swan-body{fill:#2d3135}
 .mm-swan-neck{stroke:#2d3135;stroke-width:1.5;stroke-linecap:round;fill:none}
 .mm-swan-beak{stroke:#c4473b;stroke-width:1.1;stroke-linecap:round}
