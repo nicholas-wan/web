@@ -9804,6 +9804,17 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .timeline-review .compact-journals .travel-card__image img{object-position:var(--focus,50% 50%)}
 .timeline-review .journal-neighbour img{object-position:var(--thumb-focus,var(--focus,50% 50%))}
 }
+/* Wide screens: a taller 4:3 photo (267x200) fills the empty strip under short excerpts; Show all rises into the
+   space under the right-hand neighbour, so the whole preview block keeps its height. */
+@media(min-width:1100px){
+.timeline-review .compact-journals:not(.journals-expanded)>.travel-card,.timeline-review .compact-journals:not(.journals-expanded)>.travel-card.preview-selected{grid-template-columns:267px minmax(0,1fr)!important;min-height:200px!important;grid-template-rows:1fr auto auto 1fr!important}
+.timeline-review .compact-journals:not(.journals-expanded)>.travel-card>header{grid-row:2}
+.timeline-review .compact-journals:not(.journals-expanded)>.travel-card>p{grid-row:3;padding-top:12px!important}
+.timeline-review .compact-journals:not(.journals-expanded)>.travel-card>.travel-card__image{grid-row:1/5!important}
+.timeline-review .compact-journals:not(.journals-expanded) .travel-card__image{width:267px;height:200px}
+.timeline-review #main>.compact-journals:not(.journals-expanded)+.journal-preview-controls{margin-top:-40px!important;background:linear-gradient(transparent 40px,#f3f7f3 40px)!important;position:relative;z-index:2;pointer-events:none}
+.timeline-review #main>.compact-journals:not(.journals-expanded)+.journal-preview-controls button{pointer-events:auto}
+}
 /* Scene motion layers and phone tiles (20 Oct 2026; ported from the v5 motion prototype). Each scene carries one
    journal-grounded motion in its SVG (.mm-fx). Particles keep their own period (6.2s / n) so they are back in phase when a
    scene repeats; particle groups fade in once. Phones show 128x96 tiles on the sage tint, cropped to each landmark with the
@@ -9867,6 +9878,17 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene{--tile:128px;width:var(--tile)!important;height:calc(var(--tile)*.75)!important;min-width:0;overflow:hidden;border-radius:12px;background:#f1f6f2}
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene>svg{width:calc(var(--tile)*var(--vw,120)/var(--cw))!important;height:calc(var(--tile)*var(--vh,80)/var(--cw))!important;max-width:none;margin:calc(var(--tile)*(var(--vy,0) - var(--cy))/var(--cw)) 0 0 calc(var(--tile)*(var(--vx,0) - var(--cx))/var(--cw))}
  .mobile-journal-row .mm-dusk-tile{display:inline}
+ /* Each phone tile sits on its own soft sky (Fuji overcast, as in fuji1). */
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="0"]{background:linear-gradient(#dde6f2,#f5f7fb)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="1"]{background:linear-gradient(#e0ecf1,#f8dcc4)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="2"]{background:linear-gradient(#d3d4ec,#f5dfd3)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="3"]{background:linear-gradient(#cfe5f1,#eef6f7)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="4"]{background:linear-gradient(#d8e8ef,#f2f5ef)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="5"]{background:linear-gradient(#d3dae3,#eef0f1)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="6"]{background:linear-gradient(#d3e8f2,#f2f7f4)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="7"]{background:linear-gradient(#dfe3e8,#f3f1ee)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="8"]{background:linear-gradient(#3e4a78,#a86f8c)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="9"]{background:linear-gradient(#d9e7d5,#f3f6ec)}
  .mobile-journal-row .mm-dusk-glow{display:none}
 }
 @media(max-width:360px){
