@@ -9919,7 +9919,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#c3d8e6,#e7eff2 60%,#f2f4f1)}
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="7"]::before{background:linear-gradient(#bfc7d1,#d6dbe1 48%,#eaebeb 76%,#f2f1ee)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="7"]::before{background:linear-gradient(#2c5e9f,#4f82bf 40%,#93b5da 70%,#d8e4ee)}
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#5f74a3,#9aa9c9 55%,#e3c9a6)}
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#d5e1d6,#eef2ea)}
 }
@@ -9947,7 +9947,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .timeline-review .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#c3d8e6,#e7eff2 60%,#f2f4f1)}
 .timeline-review .journal-chronology .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
 .timeline-review .journal-chronology .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
-.timeline-review .journal-chronology .authored-scene[data-scene="7"]::before{background:linear-gradient(#bfc7d1,#d6dbe1 48%,#eaebeb 76%,#f2f1ee)}
+.timeline-review .journal-chronology .authored-scene[data-scene="7"]::before{background:linear-gradient(#2c5e9f,#4f82bf 40%,#93b5da 70%,#d8e4ee)}
 .timeline-review .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#5f74a3,#9aa9c9 55%,#e3c9a6)}
 .timeline-review .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#d5e1d6,#eef2ea)}
 /* Each sky follows that trip's real light (20 Oct 2026). Paris is the one night tile, so its navy stays at full strength at rest. */
