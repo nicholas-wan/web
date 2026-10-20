@@ -104,7 +104,8 @@ for (const width of [737, 768, 844, 981, 1366, 1920]) {
     const cardHrefs = await page.locator('.travel-grid .travel-card__image').evaluateAll(es => es.map(e => e.getAttribute('href')));
     expect([...hrefs].sort()).toEqual([...cardHrefs].sort());
     const starts = await trips.evaluateAll(es => es.map(e => e.dataset.start));
-    expect(starts).toEqual([...starts].sort());
+    // Newest trip first (20 Oct 2026).
+    expect(starts).toEqual([...starts].sort().reverse());
     for (const trip of [trips.first(), trips.last()]) {
       // Keep a stationary pointer from generating a hover as scrolling restores
       // the timeline; this assertion exercises keyboard focus independently.

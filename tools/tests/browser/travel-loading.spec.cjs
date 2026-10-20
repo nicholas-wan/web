@@ -19,7 +19,7 @@ for(const width of [320,390,1366])test(`travel deferred photos and no tour contr
  if(width<=736){const link=page.locator('.mobile-journal-card .travel-card__image').first();expect(await link.evaluate(e=>e.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);expect(await link.evaluate(e=>parseFloat(getComputedStyle(e.querySelector('.mobile-photo-cta')).fontSize))).toBeGreaterThanOrEqual(12);}
 });
 test('travel image failure preserves geometry and readable journal links',async({page})=>{
- await page.setViewportSize({width:390,height:844});await page.route('**/seoul-winter-banner*',r=>r.abort());await page.goto('/travel');const row=page.locator('.mobile-journal-row').first();await row.scrollIntoViewIfNeeded();await expect(row.locator('img')).toHaveClass(/journal-photo-failed/);await expect(row.getByRole('link',{name:'Read journal'})).toBeVisible();expect(await row.locator('.travel-card__image').evaluate(e=>e.getBoundingClientRect().height)).toBe(150);
+ await page.setViewportSize({width:390,height:844});await page.route('**/seoul-winter-banner*',r=>r.abort());await page.goto('/travel');const row=page.locator('.mobile-journal-row').filter({hasText:'Seoul'});await row.scrollIntoViewIfNeeded();await expect(row.locator('img')).toHaveClass(/journal-photo-failed/);await expect(row.getByRole('link',{name:'Read journal'})).toBeVisible();expect(await row.locator('.travel-card__image').evaluate(e=>e.getBoundingClientRect().height)).toBe(150);
 });
 
 test.describe('mobile reading animation',()=>{
