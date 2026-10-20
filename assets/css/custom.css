@@ -9901,18 +9901,25 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .authored-scene .mm-loop{opacity:0!important;transition:none}
  .authored-scene .mm-fx *{animation:none!important}
 }
-/* Desktop timeline scenes sit on the same per-scene skies as the phone tiles (20 Oct 2026). */
-.timeline-review .journal-chronology .authored-scene{border-radius:10px;overflow:hidden}
-.timeline-review .journal-chronology .authored-scene[data-scene="0"]{background:linear-gradient(#dde6f2,#f5f7fb)}
-.timeline-review .journal-chronology .authored-scene[data-scene="1"]{background:linear-gradient(#e0ecf1,#f8dcc4 58%,#e6eeec 82%)}
-.timeline-review .journal-chronology .authored-scene[data-scene="2"]{background:linear-gradient(#d3d4ec,#f5dfd3)}
-.timeline-review .journal-chronology .authored-scene[data-scene="3"]{background:linear-gradient(#cfe5f1,#f7f9f8 70%)}
-.timeline-review .journal-chronology .authored-scene[data-scene="4"]{background:linear-gradient(#d8e8ef,#f2f5ef)}
-.timeline-review .journal-chronology .authored-scene[data-scene="5"]{background:linear-gradient(#dfe4ea,#f0f2f3)}
-.timeline-review .journal-chronology .authored-scene[data-scene="6"]{background:linear-gradient(#d3e8f2,#f2f7f4)}
-.timeline-review .journal-chronology .authored-scene[data-scene="7"]{background:linear-gradient(#dfe3e8,#f3f1ee)}
-.timeline-review .journal-chronology .authored-scene[data-scene="8"]{background:linear-gradient(#bfbbe0,#f1c7a4)}
-.timeline-review .journal-chronology .authored-scene[data-scene="9"]{background:linear-gradient(#d9e7d5,#f3f6ec)}
-.timeline-review .journal-chronology .mm-dusk-tile{display:inline}
+/* Desktop timeline scenes sit on the same per-scene skies as the phone tiles (20 Oct 2026). The sky rests at half
+   strength and comes up to full while its scene plays, is hovered or is selected; the artwork itself never fades. */
+.timeline-review .journal-chronology .authored-scene{position:relative;border-radius:10px;overflow:hidden}
+.timeline-review .journal-chronology .authored-scene::before{content:"";position:absolute;inset:0;opacity:.5;transition:opacity .5s ease}
+.timeline-review .journal-chronology .authored-scene>svg{position:relative}
+.timeline-review .journal-chronology .authored-scene[data-scene="0"]::before{background:linear-gradient(#dde6f2,#f5f7fb)}
+.timeline-review .journal-chronology .authored-scene[data-scene="1"]::before{background:linear-gradient(#e0ecf1,#f8dcc4 58%,#e6eeec 82%)}
+.timeline-review .journal-chronology .authored-scene[data-scene="2"]::before{background:linear-gradient(#d3d4ec,#f5dfd3)}
+.timeline-review .journal-chronology .authored-scene[data-scene="3"]::before{background:linear-gradient(#cfe5f1,#f7f9f8 70%)}
+.timeline-review .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#d8e8ef,#f2f5ef)}
+.timeline-review .journal-chronology .authored-scene[data-scene="5"]::before{background:linear-gradient(#dfe4ea,#f0f2f3)}
+.timeline-review .journal-chronology .authored-scene[data-scene="6"]::before{background:linear-gradient(#d3e8f2,#f2f7f4)}
+.timeline-review .journal-chronology .authored-scene[data-scene="7"]::before{background:linear-gradient(#dfe3e8,#f3f1ee)}
+.timeline-review .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#bfbbe0,#f1c7a4)}
+.timeline-review .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#d9e7d5,#f3f6ec)}
+.timeline-review .journal-chronology .mm-dusk-tile{display:inline;opacity:.5;transition:opacity .5s ease}
 .timeline-review .journal-chronology .mm-dusk-glow{display:none}
+.timeline-review .journal-chronology .authored-scene.is-active::before,.timeline-review .journal-chronology .chronology-trip:hover .authored-scene::before,.timeline-review .journal-chronology .chronology-trip:focus-visible .authored-scene::before,.timeline-review .journal-chronology .chronology-trip.journal-is-selected .authored-scene::before,.timeline-review .journal-chronology .authored-scene.is-active .mm-dusk-tile,.timeline-review .journal-chronology .chronology-trip:hover .authored-scene .mm-dusk-tile,.timeline-review .journal-chronology .chronology-trip:focus-visible .authored-scene .mm-dusk-tile,.timeline-review .journal-chronology .chronology-trip.journal-is-selected .authored-scene .mm-dusk-tile{opacity:1}
+/* The hover/selected card hugs the tile: no white band above it, matching corners. */
+.timeline-review .journal-chronology .chronology-name{padding-top:0;margin-top:3px;border-radius:10px}
+@media(prefers-reduced-motion:reduce){.timeline-review .journal-chronology .authored-scene::before,.timeline-review .journal-chronology .mm-dusk-tile{transition:none}}
 /* Route bundle: travel-navigation:end */
