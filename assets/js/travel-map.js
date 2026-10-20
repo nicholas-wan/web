@@ -36,8 +36,8 @@
     europe: {
       title: 'Europe',
       dates: '22 October – 1 November 2022',
-      image: 'images/travel/2022_europe/day2/paris16-search-4x3.webp',
-      imageAlt: 'Eiffel Tower lit gold against the night sky'
+      image: 'images/travel/2022_europe/day7/switzerland10.jpeg',
+      imageAlt: 'Snow-capped peaks and rocky ridges at Mount Titlis'
     },
     germany: {
       title: 'Germany',
