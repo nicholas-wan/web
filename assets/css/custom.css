@@ -9877,17 +9877,26 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene{--tile:128px;width:var(--tile)!important;height:calc(var(--tile)*.75)!important;min-width:0;overflow:hidden;border-radius:12px;background:#f1f6f2}
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene>svg{width:calc(var(--tile)*var(--vw,120)/var(--cw))!important;height:calc(var(--tile)*var(--vh,80)/var(--cw))!important;max-width:none;margin:calc(var(--tile)*(var(--vy,0) - var(--cy))/var(--cw)) 0 0 calc(var(--tile)*(var(--vx,0) - var(--cx))/var(--cw))}
  .mobile-journal-row .mm-dusk-tile{display:inline}
+ /* Soft resting skies; the scene that is playing comes up to full colour with a sage ring. */
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene{position:relative;background:none!important;transition:box-shadow .4s ease}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene::before{content:"";position:absolute;inset:0;opacity:.55;transition:opacity .5s ease}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene>svg{position:relative}
+ .mobile-journal-row .mm-dusk-tile{opacity:.55;transition:opacity .5s ease}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene.is-active::before,.timeline-review.mobile-variant-a .mobile-journal-row .authored-scene.is-active .mm-dusk-tile{opacity:1}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene.is-active{box-shadow:0 0 0 2px #a8c8b6}
+ /* The tile lines up with the top of its journal photo. */
+ .timeline-review.mobile-variant-a .mobile-journal-row .chronology-trip{padding-top:0!important}
  /* Each phone tile sits on its own soft sky (Fuji overcast, as in fuji1). */
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="0"]{background:linear-gradient(#dde6f2,#f5f7fb)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="1"]{background:linear-gradient(#e0ecf1,#f8dcc4 58%,#e6eeec 82%)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="2"]{background:linear-gradient(#d3d4ec,#f5dfd3)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="3"]{background:linear-gradient(#cfe5f1,#f7f9f8 70%)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="4"]{background:linear-gradient(#d8e8ef,#f2f5ef)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="5"]{background:linear-gradient(#dfe4ea,#f0f2f3)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="6"]{background:linear-gradient(#d3e8f2,#f2f7f4)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="7"]{background:linear-gradient(#dfe3e8,#f3f1ee)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="8"]{background:linear-gradient(#bfbbe0,#f1c7a4)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="9"]{background:linear-gradient(#d9e7d5,#f3f6ec)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="0"]::before{background:linear-gradient(#dde6f2,#f5f7fb)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="1"]::before{background:linear-gradient(#e0ecf1,#f8dcc4 58%,#e6eeec 82%)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="2"]::before{background:linear-gradient(#d3d4ec,#f5dfd3)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="3"]::before{background:linear-gradient(#cfe5f1,#f7f9f8 70%)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#d8e8ef,#f2f5ef)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="5"]::before{background:linear-gradient(#dfe4ea,#f0f2f3)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="6"]::before{background:linear-gradient(#d3e8f2,#f2f7f4)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="7"]::before{background:linear-gradient(#dfe3e8,#f3f1ee)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#bfbbe0,#f1c7a4)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#d9e7d5,#f3f6ec)}
  .mobile-journal-row .mm-dusk-glow{display:none}
 }
 @media(max-width:360px){
@@ -9898,6 +9907,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene{--tile:118px}
 }
 @media(prefers-reduced-motion:reduce){
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene::before,.mobile-journal-row .mm-dusk-tile{opacity:1;transition:none}
  .authored-scene .mm-loop{opacity:0!important;transition:none}
  .authored-scene .mm-fx *{animation:none!important}
 }

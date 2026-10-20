@@ -293,11 +293,12 @@
  const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let timer,active,frame;
  function clear(){clearTimeout(timer);if(active)active.art.classList.remove('is-active');active=null;}
  function play(entry){clear();active=entry;void entry.art.getBoundingClientRect();entry.art.classList.add('is-active');timer=setTimeout(()=>{clear();update();},Number(entry.art.dataset.duration)||6200);}
- // Repeat the scene nearest the reader; do not tour unrelated visible rows.
+ // Repeat the scene nearest where phone readers look (about 40% down the screen); the playing scene
+ // keeps a 28px advantage so it does not flicker between two rows mid-scroll.
  function update(){
   if(!media.matches||reduced.matches||document.hidden||list.hidden){clear();return;}
   let nearest=null,distance=Infinity;
-  entries.forEach(entry=>{const box=entry.art.getBoundingClientRect(),visible=Math.min(innerHeight,box.bottom)-Math.max(0,box.top);if(!box.height||visible<box.height/2)return;const delta=Math.abs((box.top+box.bottom)/2-innerHeight/2);if(delta<distance){nearest=entry;distance=delta;}});
+  entries.forEach(entry=>{const box=entry.art.getBoundingClientRect(),visible=Math.min(innerHeight,box.bottom)-Math.max(0,box.top);if(!box.height||visible<box.height/2)return;const delta=Math.abs((box.top+box.bottom)/2-innerHeight*.4)-(entry===active?28:0);if(delta<distance){nearest=entry;distance=delta;}});
   if(nearest!==active){if(nearest)play(nearest);else clear();}
  }
  function requestUpdate(){if(frame)return;frame=requestAnimationFrame(()=>{frame=0;update();});}
