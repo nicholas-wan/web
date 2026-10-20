@@ -234,8 +234,11 @@ foreach ($page in $pages) {
     # 225 -> 256: every journal tile now carries a descriptive alt sentence instead of
     # a copy of its caption (Oct 2026); travel_2023_usacanada.html, the largest journal
     # at 213 tiles, grew from 221 KB to 235 KB.
-    if ($page.Length -gt 256KB) { throw "$($page.Name) exceeds the 256 KB generated-HTML budget." }
-    Warn-BudgetHeadroom "$($page.Name) HTML" $page.Length 256KB
+    # 256 -> 320 (21 Oct 2026, owner): the ten timeline scenes were redrawn to hold up
+    # at 5x in the "look closer" viewer, and travel.html inlines them. SVG compresses
+    # roughly 6-8x over the wire, so the transfer cost is a few KB, not the raw delta.
+    if ($page.Length -gt 320KB) { throw "$($page.Name) exceeds the 320 KB generated-HTML budget." }
+    Warn-BudgetHeadroom "$($page.Name) HTML" $page.Length 320KB
 }
 
 if ($navSignatures.Count -ne 1) { throw "Generated pages do not share one consistent navigation block." }

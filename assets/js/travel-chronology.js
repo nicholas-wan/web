@@ -285,13 +285,15 @@
   const row=document.createElement('article');row.className='mobile-journal-row';const icon=trip.cloneNode(true);icon.removeAttribute('aria-controls');icon.hidden=false;
   icon.querySelector('.chronology-preview-cue')?.remove();icon.classList.remove('journal-is-selected');icon.removeAttribute('aria-describedby');
   const art=icon.querySelector('.authored-scene');art.classList.remove('is-active');
-  // The desktop SVG remains in the DOM, so local paint-server IDs must differ.
-  art.querySelectorAll('[id]').forEach(el=>{const old=el.id;el.id='mobile-'+old;art.querySelectorAll('*').forEach(n=>{[...n.attributes].forEach(a=>{if(a.value.includes('url(#'+old+')'))n.setAttribute(a.name,a.value.replaceAll('url(#'+old+')','url(#mobile-'+old+')'));});});});
+  // One copy of each scene: the phone row borrows the desktop SVG instead of duplicating it.
+  const home=trip.querySelector('.authored-scene'),svg=home.querySelector('svg');art.querySelector('svg').remove();
   const card=original.cloneNode(true);card.className='mobile-journal-card';card.removeAttribute('style');card.removeAttribute('data-reveal');card.querySelectorAll('noscript').forEach(n=>n.remove());card.querySelector('img').sizes='(max-width:736px) calc(100vw - 154px), 800px';card.querySelector('.actions')?.remove();card.querySelector('header p')?.remove();
   const photo=card.querySelector('a.travel-card__image,a.image');if(photo){const cue=document.createElement('span');cue.className='mobile-photo-cta';cue.textContent='Read journal →';photo.setAttribute('aria-label','Read journal — '+trip.querySelector('.chronology-label').textContent);cue.setAttribute('aria-hidden','true');photo.append(cue);}
-  row.append(icon,card);list.append(row);return {row,icon,art,index:i,visible:false};
+  row.append(icon,card);list.append(row);return {row,icon,art,home,svg,index:i,visible:false};
  }).filter(Boolean);grid.before(list);
  const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let timer,active,frame;
+ // Each scene's single SVG lives in whichever presentation is showing (phone rail or desktop timeline).
+ const share=()=>entries.forEach(e=>(media.matches?e.art:e.home).append(e.svg));share();media.addEventListener('change',share);
  function clear(){clearTimeout(timer);if(active)active.art.classList.remove('is-active');active=null;}
  function play(entry){clear();active=entry;void entry.art.getBoundingClientRect();entry.art.classList.add('is-active');timer=setTimeout(()=>{clear();update();},Number(entry.art.dataset.duration)||6200);}
  // Repeat the scene nearest where phone readers look (about 40% down the screen); the playing scene
@@ -340,7 +342,7 @@
  loupe.addEventListener('click',()=>{if(!scene)return;const trip=scene.closest('.chronology-trip'),art=scene.cloneNode(true);
   art.style.background=getComputedStyle(scene,'::before').backgroundImage;
   // The original may sit in a hidden presentation, so paint-server IDs must be the clone's own.
-  art.querySelectorAll('[id]').forEach(el=>{const old=el.id;el.id='zoom-'+old;art.querySelectorAll('*').forEach(n=>[...n.attributes].forEach(a=>{if(a.value.includes('url(#'+old+')'))n.setAttribute(a.name,a.value.replaceAll('url(#'+old+')','url(#zoom-'+old+')'));}));});
+  art.querySelectorAll('[id]').forEach(el=>{const old=el.id;el.id='zoom-'+old;art.querySelectorAll('*').forEach(n=>[...n.attributes].forEach(a=>{if(a.value.includes('url(#'+old+')'))n.setAttribute(a.name,a.value.replaceAll('url(#'+old+')','url(#zoom-'+old+')'));else if(a.value==='#'+old)n.setAttribute(a.name,'#zoom-'+old);}));});
   art.classList.add('is-active');box.replaceChildren(art);
   name.textContent=trip.querySelector('.chronology-label').textContent;date.textContent=trip.querySelector('.chronology-date').textContent;link.href=trip.getAttribute('href');
   viewer.showModal();
