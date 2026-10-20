@@ -9431,6 +9431,14 @@ html .page-skills #main > .post { border-top:0; }
 
 
 
+/* Paris at night: the searchlight sweeps, one beam shortening as the other turns toward us. */
+.authored-scene.is-active .cm-beacon path:first-child{animation:cm-beam-r var(--scene-duration,6200ms) ease-in-out both;transform-origin:60px 10.6px}
+.authored-scene.is-active .cm-beacon path:last-child{animation:cm-beam-l var(--scene-duration,6200ms) ease-in-out both;transform-origin:60px 10.6px}
+@keyframes cm-beam-r{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.3);opacity:.4}}
+@keyframes cm-beam-l{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(1.5);opacity:1}}
+/* New York harbour: the gaps in the island's reflection drift. */
+.authored-scene.is-active .ny-bands{animation:ny-bands var(--scene-duration,6400ms) ease-in-out both}
+@keyframes ny-bands{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:-7}}
 /* Perth water: the boathouse reflection wobbles as its wavy gaps drift; a few glints drift with it. */
 .authored-scene.is-active .pw-bands{animation:pw-bands var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .pw-ripples{animation:pw-ripples var(--scene-duration,6200ms) ease-in-out both}
@@ -9878,16 +9886,16 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  /* The tile lines up with the top of its journal photo. */
  .timeline-review.mobile-variant-a .mobile-journal-row .chronology-trip{padding-top:0!important}
  /* Each phone tile sits on its own soft sky (Fuji overcast, as in fuji1). */
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="0"]::before{background:linear-gradient(#dde6f2,#f5f7fb)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="1"]::before{background:linear-gradient(#e0ecf1,#f8dcc4 58%,#e6eeec 82%)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="2"]::before{background:linear-gradient(#d3d4ec,#f5dfd3)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="3"]::before{background:linear-gradient(#cfe5f1,#f7f9f8 70%)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#d8e8ef,#f2f5ef)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="5"]::before{background:linear-gradient(#dfe4ea,#f0f2f3)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="6"]::before{background:linear-gradient(#d3e8f2,#f2f7f4)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="7"]::before{background:linear-gradient(#dfe3e8,#f3f1ee)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#bfbbe0,#f1c7a4)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#d9e7d5,#f3f6ec)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="0"]::before{background:linear-gradient(#d9dfe6,#eef1f4)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="1"]::before{background:linear-gradient(#bcd2e2,#e8ddc9 62%,#f0ebe0)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="2"]::before{background:linear-gradient(#081226,#0a172d 45%,#111b33 78%,#1b2440)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="3"]::before{background:linear-gradient(#b7d4e8,#e3eef3 65%,#f3f6f4)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#c3d8e6,#e7eff2 60%,#f2f4f1)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="7"]::before{background:linear-gradient(#d6dbe1,#ecedee 60%,#f2f1ee)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#5f74a3,#9aa9c9 55%,#e3c9a6)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#d5e1d6,#eef2ea)}
  .mobile-journal-row .mm-dusk-glow{display:none}
 }
 @media(max-width:360px){
@@ -9907,16 +9915,18 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .timeline-review .journal-chronology .authored-scene{position:relative;border-radius:10px;overflow:hidden}
 .timeline-review .journal-chronology .authored-scene::before{content:"";position:absolute;inset:0;opacity:.5;transition:opacity .5s ease}
 .timeline-review .journal-chronology .authored-scene>svg{position:relative}
-.timeline-review .journal-chronology .authored-scene[data-scene="0"]::before{background:linear-gradient(#dde6f2,#f5f7fb)}
-.timeline-review .journal-chronology .authored-scene[data-scene="1"]::before{background:linear-gradient(#e0ecf1,#f8dcc4 58%,#e6eeec 82%)}
-.timeline-review .journal-chronology .authored-scene[data-scene="2"]::before{background:linear-gradient(#d3d4ec,#f5dfd3)}
-.timeline-review .journal-chronology .authored-scene[data-scene="3"]::before{background:linear-gradient(#cfe5f1,#f7f9f8 70%)}
-.timeline-review .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#d8e8ef,#f2f5ef)}
-.timeline-review .journal-chronology .authored-scene[data-scene="5"]::before{background:linear-gradient(#dfe4ea,#f0f2f3)}
-.timeline-review .journal-chronology .authored-scene[data-scene="6"]::before{background:linear-gradient(#d3e8f2,#f2f7f4)}
-.timeline-review .journal-chronology .authored-scene[data-scene="7"]::before{background:linear-gradient(#dfe3e8,#f3f1ee)}
-.timeline-review .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#bfbbe0,#f1c7a4)}
-.timeline-review .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#d9e7d5,#f3f6ec)}
+.timeline-review .journal-chronology .authored-scene[data-scene="0"]::before{background:linear-gradient(#d9dfe6,#eef1f4)}
+.timeline-review .journal-chronology .authored-scene[data-scene="1"]::before{background:linear-gradient(#bcd2e2,#e8ddc9 62%,#f0ebe0)}
+.timeline-review .journal-chronology .authored-scene[data-scene="2"]::before{background:linear-gradient(#081226,#0a172d 45%,#111b33 78%,#1b2440)}
+.timeline-review .journal-chronology .authored-scene[data-scene="3"]::before{background:linear-gradient(#b7d4e8,#e3eef3 65%,#f3f6f4)}
+.timeline-review .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#c3d8e6,#e7eff2 60%,#f2f4f1)}
+.timeline-review .journal-chronology .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
+.timeline-review .journal-chronology .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
+.timeline-review .journal-chronology .authored-scene[data-scene="7"]::before{background:linear-gradient(#d6dbe1,#ecedee 60%,#f2f1ee)}
+.timeline-review .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#5f74a3,#9aa9c9 55%,#e3c9a6)}
+.timeline-review .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#d5e1d6,#eef2ea)}
+/* Each sky follows that trip's real light (20 Oct 2026). Paris is the one night tile, so its navy stays at full strength at rest. */
+.timeline-review .journal-chronology .authored-scene[data-scene="2"]::before,.timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="2"]::before{opacity:1}
 .timeline-review .journal-chronology .mm-dusk-tile{display:inline;opacity:.5;transition:opacity .5s ease}
 .timeline-review .journal-chronology .mm-dusk-glow{display:none}
 .timeline-review .journal-chronology .authored-scene.is-active::before,.timeline-review .journal-chronology .chronology-trip:hover .authored-scene::before,.timeline-review .journal-chronology .chronology-trip:focus-visible .authored-scene::before,.timeline-review .journal-chronology .chronology-trip.journal-is-selected .authored-scene::before,.timeline-review .journal-chronology .authored-scene.is-active .mm-dusk-tile,.timeline-review .journal-chronology .chronology-trip:hover .authored-scene .mm-dusk-tile,.timeline-review .journal-chronology .chronology-trip:focus-visible .authored-scene .mm-dusk-tile,.timeline-review .journal-chronology .chronology-trip.journal-is-selected .authored-scene .mm-dusk-tile{opacity:1}
