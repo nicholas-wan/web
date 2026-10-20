@@ -42,14 +42,14 @@
     germany: {
       title: 'Germany',
       dates: '6 – 28 April 2024',
-      image: 'images/travel/2024_germany/germany_banner_card.jpg',
-      imageAlt: 'Germany travel photograph'
+      image: 'images/travel/2024_germany/dusseldorf/dusseldorf4.jpg',
+      imageAlt: 'Tree-lined Königsallee canal in Düsseldorf'
     },
     japan: {
       title: 'Japan',
       dates: '23 October – 8 November 2025',
-      image: 'images/travel/2025_japan/day14_hakone/fuji1.jpg',
-      imageAlt: 'Mount Fuji framed by autumn trees'
+      image: 'images/travel/2025_japan/day14_hakone/hakone1.jpg',
+      imageAlt: 'Red lakeside torii at Hakone Shrine'
     },
     seoul: {
       title: 'Seoul',
@@ -717,12 +717,11 @@
     var availableHeight = Math.max(120, viewport.clientHeight - (isFullscreen ? 190 : 105));
     var widthScale = routeWidth > 1 ? availableWidth / routeWidth : 9;
     var heightScale = routeHeight > 1 ? availableHeight / routeHeight : 9;
-    var targetScale = Math.min(9, Math.max(STOP_SCALE + 0.45, Math.min(widthScale, heightScale)));
+    var targetScale = Math.min(MAX_SCALE, Math.max(STOP_SCALE + 0.45, Math.min(widthScale, heightScale)));
     var centreLatitude = stops.reduce(function (total, stop) { return total + stop[3]; }, 0) / stops.length;
     var centreLongitude = stops.reduce(function (total, stop) { return total + stop[4]; }, 0) / stops.length;
-    // In the phone overlay the bottom sheet occupies the lower band, so centre
-    // the route on the region above it; low stops (Australia) were being buried.
-    flyTo(centreLatitude, centreLongitude, targetScale, isFullscreen ? -95 : 0);
+    // Reserve the bottom sheet only while it is open.
+    flyTo(centreLatitude, centreLongitude, targetScale, isFullscreen && detailCard && !detailCard.hidden ? -95 : 0);
   };
 
   var closePointDetails = function (returnFocus, immediate) {

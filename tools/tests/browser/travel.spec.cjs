@@ -34,7 +34,9 @@ for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], 
     for (const trip of trips) {
       await picker.selectOption(trip);
       await settled(page);
-      await page.getByRole('button', { name: 'Zoom in', exact: true }).click();
+      const zoomIn = page.getByRole('button', { name: 'Zoom in', exact: true });
+      // A tightly clustered trip may already fit at the maximum zoom.
+      if (await zoomIn.isEnabled()) await zoomIn.click();
       await settled(page);
       const stop = page.locator('.travel-map__detail.is-trip-active:not(.is-label-offscreen) .travel-map__detail-label, .travel-map__label-list:not([hidden]) a').filter({ visible: true }).first();
       if (trip && await stop.count()) {

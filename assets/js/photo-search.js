@@ -27,7 +27,7 @@
 		titles[a.dataset.tag] = a.dataset.title;
 	});
 	var trips = {}, tags = [], photos = null, coverTopics = {}, failed = false, tiers;
-	var timer = 0, saveTimer = 0, limit = PAGE, collapsed = false, tripFilter = '';
+	var timer = 0, saveTimer = 0, limit = PAGE, collapsed = false, tripFilter = '', related = false;
 
 	function fold(value) {
 		return String(value).toLowerCase().normalize('NFD')
@@ -133,6 +133,7 @@
 
 	function search(terms) {
 		var tier = [[], []];
+		var subject = tags.find(function(tag) { return tag.keys.indexOf(terms.join(' ')) >= 0; });
 		fuzzyTerms = [];
 		var rows = photos.map(function(photo) {
 			return terms.map(function(term) { return termScore(photo, term); });
@@ -155,7 +156,7 @@
 				score += best[0] * weight[t];
 				why.push(terms[t] + (best[1] === 4 ? ' (related tag)' : best[1] > 1 ? ' (in description)' : ''));
 			});
-			if (why.length) tier[why.length === terms.length ? 0 : 1].push({ photo: photos[i], score: score, why: why });
+			if (why.length) tier[why.length === terms.length && (!subject || photos[i].tags.indexOf(subject.tag) >= 0) ? 0 : 1].push({ photo: photos[i], score: score, why: why });
 		});
 		return tier.map(rank);
 	}
@@ -413,7 +414,8 @@
 		renderedQuery = input.value;
 		var shown = 0, html = '', sentence = [], runs = [], counts = {};
 		// Legend chips, one per trip in run order; a pressed one narrows the grid.
-		tiers.forEach(function(hits) {
+		var displayed = tiers[0].length && !related ? [tiers[0], []] : tiers;
+		displayed.forEach(function(hits) {
 			hits.forEach(function(hit) {
 				var trip = hit.photo.trip;
 				if (!counts[trip]) runs.push(trip);
@@ -424,7 +426,7 @@
 			return '<li><button type="button" class="photo-search__chip" data-trip="' + escape(trip) + '" aria-pressed="' + (trip === tripFilter) + '">' +
 				escape(tripLabel(trip)) + ' <span>' + counts[trip] + '</span></button></li>';
 		}).join('') + '</ul>';
-		var visible = tiers.map(function(hits) {
+		var visible = displayed.map(function(hits) {
 			return hits.filter(function(hit) { return !tripFilter || hit.photo.trip === tripFilter; });
 		});
 		var full = visible[0].length, total = full + visible[1].length;
@@ -433,18 +435,19 @@
 			hits = hits.slice(0, limit - shown);
 			if (!hits.length) return;
 			shown += hits.length;
-			html += (tier ? '<h3 class="photo-results__tier">Partial matches</h3>' : visible[1].length ? '<h3 class="sr-only">Full matches</h3>' : '') +
+			html += (tier ? '<h3 class="photo-results__tier">Related photos</h3>' : visible[1].length ? '<h3 class="sr-only">Full matches</h3>' : '') +
 				'<ul class="photo-results__grid">' + hits.map(function(hit) { return card(hit.photo, terms, tier && hit.why); }).join('') + '</ul>';
 		});
 		if (full) sentence.push(plural(full, 'photo matches', 'photos match') + (terms.length > 1 ? ' all terms' : ''));
-		if (total > full) sentence.push(plural(total - full, 'partial match', 'partial matches'));
+		if (total > full) sentence.push(plural(total - full, 'related photo', 'related photos'));
 		if (tripFilter) sentence.push(tripLabel(tripFilter) + ' only');
 		if (!total) {
 			sentence.push('No photos for \u2018' + query + '\u2019');
-			html = '<div class="photo-results__empty"><p>Try a popular subject instead:</p>' +
-				chipList(tags.slice(0, 6), 'Popular tags', true) +
+			html = '<div class="photo-results__empty"><p>Try another subject:</p>' +
+				chipList(['temple', 'mountain', 'food', 'cat', 'sunset', 'waterfall'].filter(function(name) { return tags.some(function(tag) { return tag.tag === name && tag.count; }); }).map(function(name) { return { tag: name }; }), 'Subjects to explore', true) +
 				'<button type="button" class="button photo-results__clear" data-clear>Clear search</button></div>';
 		}
+		if (tiers[0].length && tiers[1].length && !related) html += '<button type="button" class="photo-search__chip" data-related>Show related photos (' + tiers[1].length + ')</button>';
 		list.innerHTML = html;
 		status.textContent = sentence.join(' \u00b7 ');
 		more.hidden = shown >= total;
@@ -480,6 +483,7 @@
 		}
 		limit = PAGE;
 		tripFilter = '';
+		related = false;
 		tiers = search(terms);
 		render(terms, query);
 		// A query with hits that the visitor pauses on becomes a recent search.
@@ -502,13 +506,18 @@
 		if (event.target.closest('.photo-hit')) remember(input.value.trim());
 		if (!button) return;
 		var tag = button.getAttribute('data-tag'), trip = button.getAttribute('data-trip');
-		if ((button === more || trip) && input.value !== renderedQuery) { run(); input.focus(); return; }
+		if ((button === more || trip || button.hasAttribute('data-related')) && input.value !== renderedQuery) { run(); input.focus(); return; }
 		var redraw = function() { render(unique(tokens(input.value)), input.value.trim()); };
 		if (tag) {
 			var match = tags.find(function(item) { return item.tag === tag; });
 			input.value = (button.hasAttribute('data-replace') || !match ? tag : (completeTag(input.value, match) || { value: tag }).value) + ' ';
 			run();
 			input.focus();
+		} else if (button.hasAttribute('data-related')) {
+			var firstRelated = tiers[0].filter(function(hit) { return !tripFilter || hit.photo.trip === tripFilter; }).length;
+			related = true; limit = Math.max(limit, firstRelated + PAGE);
+			redraw();
+			(hits()[firstRelated] || hits()[0] || input).focus();
 		} else if (button === more) {
 			var from = hits().length;
 			limit += PAGE;
