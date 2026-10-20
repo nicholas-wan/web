@@ -9431,6 +9431,26 @@ html .page-skills #main > .post { border-top:0; }
 
 
 
+/* Look closer: a frosted loupe on the scene a reader is on; it opens the scene large. */
+.mobile-journal-row{position:relative}
+.scene-loupe{position:absolute;z-index:7;width:22px;height:22px;margin:0;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.3);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);box-shadow:none;cursor:zoom-in;opacity:0;transform:scale(.8);transition:opacity .18s ease,transform .18s ease;pointer-events:none}
+.scene-loupe.is-shown,.scene-loupe:focus-visible{opacity:.7;transform:none;pointer-events:auto}
+.scene-loupe:hover,.scene-loupe:focus-visible{opacity:1;background:rgba(255,255,255,.7)}
+.scene-loupe:focus-visible{outline:2px solid #347d6c;outline-offset:2px}
+.scene-loupe,.scene-viewer__close{min-width:0!important;min-height:0!important;box-sizing:border-box}
+.scene-loupe{height:22px!important}
+.scene-loupe::after{content:"";position:absolute;inset:-11px}
+.scene-viewer__close{height:34px!important}
+.scene-loupe svg{width:12px;height:12px;fill:none;stroke:#2f5d52;stroke-width:1.5;stroke-linecap:round}
+.scene-viewer{position:fixed;inset:0;margin:auto;height:fit-content;width:min(92vw,760px);max-width:none;max-height:none;border:0;padding:16px 16px 12px;border-radius:20px;background:#f6f8f5;box-shadow:0 24px 70px rgba(10,25,20,.35)}
+.scene-viewer::backdrop{background:rgba(14,26,22,.55);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+.scene-viewer .authored-scene{display:block;width:100%!important;height:auto!important;aspect-ratio:3/2;margin:0;border-radius:14px;overflow:hidden}
+.scene-viewer .authored-scene>svg{width:100%!important;height:100%!important;margin:0!important}
+.scene-viewer .mm-dusk-tile{display:inline;opacity:1}
+.scene-viewer__meta{display:flex;flex-wrap:wrap;align-items:baseline;gap:.25rem .6rem;margin:12px 4px 0;font-size:.95rem;color:#3f524c}
+.scene-viewer__meta strong{color:#184c40;font-size:1.05rem}
+.scene-viewer__meta a{margin-left:auto;color:#2f6f5f;font-weight:600}
+.scene-viewer__close{position:absolute;top:24px;right:24px;width:34px;height:34px;min-width:0;margin:0;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:none;color:#2f5d52;font-size:20px;line-height:34px;text-align:center;cursor:pointer;z-index:2}
 /* Paris at night: the searchlight sweeps, one beam shortening as the other turns toward us. */
 .authored-scene.is-active .cm-beacon path:first-child{animation:cm-beam-r var(--scene-duration,6200ms) ease-in-out both;transform-origin:60px 10.6px}
 .authored-scene.is-active .cm-beacon path:last-child{animation:cm-beam-l var(--scene-duration,6200ms) ease-in-out both;transform-origin:60px 10.6px}

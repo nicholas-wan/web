@@ -222,6 +222,50 @@ test.describe('destination scene interactions', () => {
     expect(await page.locator('.journal-chronology .authored-scene').evaluateAll(es => es.flatMap(e => e.getAnimations({ subtree: true })).filter(a => a.playState === 'running').length)).toBe(0);
   });
 
+  test('a quiet loupe opens the scene a reader is on without changing the tile link', async ({ page }) => {
+    await page.setViewportSize({ width: 1366, height: 1080 });
+    await page.goto('/travel');
+    await page.locator('.journal-chronology').scrollIntoViewIfNeeded();
+    const loupe = page.locator('.scene-loupe');
+    await expect(loupe).toHaveCount(0);
+    await page.locator('.journal-chronology a[href="travel_2022_europe"] .authored-scene').hover();
+    await expect(loupe).toHaveClass(/is-shown/);
+    await expect(loupe).toHaveAttribute('aria-label', 'Look closer at Europe');
+    await loupe.click();
+    const viewer = page.locator('dialog.scene-viewer');
+    await expect(viewer).toHaveJSProperty('open', true);
+    await expect(viewer.locator('svg .da-paris-light')).toHaveCount(1);
+    await expect(viewer.locator('.scene-viewer__meta a')).toHaveAttribute('href', 'travel_2022_europe');
+    expect(await viewer.locator('svg').evaluate(svg => svg.getBoundingClientRect().width)).toBeGreaterThan(500);
+    await page.keyboard.press('Escape');
+    await expect(viewer).toHaveJSProperty('open', false);
+    await page.mouse.move(0, 0);
+    await page.locator('.journal-chronology a[href="travel_2024_germany"]').focus();
+    await page.keyboard.press('Tab');
+    await expect(loupe).toBeFocused();
+    await expect(loupe).toHaveAttribute('aria-label', 'Look closer at Germany');
+    await page.keyboard.press('Enter');
+    await expect(viewer).toHaveJSProperty('open', true);
+    await expect(viewer.locator('svg .da-cologne-lower').first()).toBeAttached();
+  });
+
+  test('phones offer the loupe on a tapped scene even with reduced motion', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/travel');
+    const row = page.locator('.mobile-journal-row').filter({ has: page.locator('a[href="travel_2023_perth"]') });
+    await row.scrollIntoViewIfNeeded();
+    await row.locator('.authored-scene').click();
+    const loupe = row.locator('.scene-loupe');
+    await expect(loupe).toHaveClass(/is-shown/);
+    await loupe.click();
+    const viewer = page.locator('dialog.scene-viewer');
+    await expect(viewer).toHaveJSProperty('open', true);
+    // The clone carries its own paint servers, so it renders even where the source is hidden.
+    expect(await viewer.locator('svg').evaluate(svg => [...svg.querySelectorAll('[id]')].every(el => el.id.startsWith('zoom-')))).toBe(true);
+    await viewer.locator('.scene-viewer__close').click();
+    await expect(viewer).toHaveJSProperty('open', false);
+  });
+
   test('changing reduced-motion preference stops a scene and prevents replay', async ({ page }) => {
     await page.setViewportSize({ width: 1366, height: 1080 });
     await page.goto('/travel');

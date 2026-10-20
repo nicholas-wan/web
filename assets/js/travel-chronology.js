@@ -311,6 +311,45 @@
 
 })();
 
+/* Look closer (21 Oct 2026): a quiet loupe appears on the scene a reader is on (hover or focus on
+   desktop, the playing scene on phones); it opens that scene large in a dialog. Opt-in only. */
+(() => {
+ const scenes=[...document.querySelectorAll('.chronology-trip .authored-scene')];
+ if(!scenes.length||!window.HTMLDialogElement)return;
+ const loupe=document.createElement('button');loupe.type='button';loupe.className='scene-loupe';
+ loupe.innerHTML='<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="4.4"/><path d="m10.1 10.1 3.6 3.6"/></svg>';
+ const viewer=document.createElement('dialog');viewer.className='scene-viewer';
+ viewer.innerHTML='<button class="scene-viewer__close" type="button" aria-label="Close">&times;</button><div class="scene-viewer__art"></div><p class="scene-viewer__meta"><strong></strong><span></span><a>Read journal &rarr;</a></p>';
+ document.body.append(viewer);
+ const box=viewer.children[1],[name,date,link]=viewer.children[2].children,phone=matchMedia('(max-width:736px)');
+ let scene=null,hide,loop;
+ const place=s=>{clearTimeout(hide);scene=s;const trip=s.closest('.chronology-trip');if(trip.nextSibling!==loupe)trip.after(loupe);
+  const r=s.getBoundingClientRect(),p=loupe.offsetParent.getBoundingClientRect();
+  loupe.style.left=(r.right-p.left-28)+'px';loupe.style.top=(r.top-p.top+6)+'px';
+  loupe.setAttribute('aria-label','Look closer at '+trip.querySelector('.chronology-label').textContent);loupe.classList.add('is-shown');};
+ const away=e=>{if(e&&(e.relatedTarget===loupe||loupe.contains(e.relatedTarget)))return;hide=setTimeout(()=>loupe.classList.remove('is-shown'),300);};
+ scenes.forEach(s=>{const trip=s.closest('.chronology-trip');
+  trip.addEventListener('pointerenter',e=>{if(e.pointerType!=='touch')place(s);});trip.addEventListener('pointerleave',away);
+  trip.addEventListener('focus',()=>place(s));trip.addEventListener('blur',away);
+  // A tap also places it, so phones still offer it when reduced motion stops playback.
+  trip.addEventListener('click',()=>{if(phone.matches)place(s);});});
+ loupe.addEventListener('pointerenter',()=>clearTimeout(hide));loupe.addEventListener('pointerleave',away);loupe.addEventListener('blur',away);
+ // Phones have no hover: the loupe rides on whichever scene is playing.
+ new MutationObserver(list=>list.forEach(m=>{if(phone.matches&&m.target.classList.contains('is-active')&&m.target.closest('.mobile-journal-row'))place(m.target);}))
+  .observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
+ loupe.addEventListener('click',()=>{if(!scene)return;const trip=scene.closest('.chronology-trip'),art=scene.cloneNode(true);
+  art.style.background=getComputedStyle(scene,'::before').backgroundImage;
+  // The original may sit in a hidden presentation, so paint-server IDs must be the clone's own.
+  art.querySelectorAll('[id]').forEach(el=>{const old=el.id;el.id='zoom-'+old;art.querySelectorAll('*').forEach(n=>[...n.attributes].forEach(a=>{if(a.value.includes('url(#'+old+')'))n.setAttribute(a.name,a.value.replaceAll('url(#'+old+')','url(#zoom-'+old+')'));}));});
+  art.classList.add('is-active');box.replaceChildren(art);
+  name.textContent=trip.querySelector('.chronology-label').textContent;date.textContent=trip.querySelector('.chronology-date').textContent;link.href=trip.getAttribute('href');
+  viewer.showModal();
+  loop=setInterval(()=>{art.classList.remove('is-active');void art.getBoundingClientRect();art.classList.add('is-active');},(Number(scene.dataset.duration)||6200)+1500);});
+ viewer.children[0].addEventListener('click',()=>viewer.close());
+ viewer.addEventListener('click',e=>{if(e.target===viewer)viewer.close();});
+ viewer.addEventListener('close',()=>{clearInterval(loop);box.replaceChildren();});
+})();
+
 /* Keep photos outside the reading area inert, including the hidden presentation. */
 (() => {
  const images=new Set(document.querySelectorAll('img[data-journal-src]'));
