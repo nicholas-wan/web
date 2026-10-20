@@ -9407,8 +9407,8 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes cl-tower-light{0%,12%{opacity:0;transform:translateY(0)}25%{opacity:.8}75%{opacity:.8;transform:translateY(-65px)}90%,100%{opacity:0;transform:translateY(-65px)}}
 @media(prefers-reduced-motion:reduce){.authored-scene [class^="cl-"]{animation:none!important}}
 
-.corrected-nature.is-active .cn-perth-ripple-a{animation:cn-ripple-a var(--polish-duration) ease-in-out both}
-.corrected-nature.is-active .cn-perth-ripple-b{animation:cn-ripple-b var(--polish-duration) ease-in-out both}
+
+
 .corrected-nature.is-active .cn-perth-flag{animation:mm-flag var(--scene-duration,6200ms) ease-in-out both;transform-origin:28px 25px}
 
 
@@ -9428,12 +9428,17 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes dn-foliage{0%,100%{transform:rotate(0)}23%{transform:rotate(6deg)}47%{transform:rotate(-4deg)}72%{transform:rotate(3deg)}88%{transform:rotate(-1deg)}}
 @media(prefers-reduced-motion:reduce){.depth-nature-panda *,.depth-nature-fuji *{animation:none!important}}
 
-.depth-nature .dn-reflections{opacity:.22}
-.depth-nature.is-active .dn-reflect-a{animation:dn-reflect-a var(--polish-duration) ease-in-out both}
-.depth-nature.is-active .dn-reflect-b{animation:dn-reflect-b var(--polish-duration) ease-in-out both}
-.depth-nature.is-active .dn-reflect-c{animation:dn-reflect-a var(--polish-duration) ease-in-out reverse both}
-@keyframes dn-reflect-a{0%,100%{opacity:1;transform:translateX(0)}40%{opacity:.35;transform:translateX(1.8px)}72%{opacity:.65;transform:translateX(-.8px)}}
-@keyframes dn-reflect-b{0%,100%{opacity:1;transform:translateX(0)}30%{opacity:.9;transform:translateX(-1px)}65%{opacity:.25;transform:translateX(2px)}}
+
+
+
+/* Perth water: the boathouse reflection wobbles as its wavy gaps drift; a few glints drift with it. */
+.authored-scene.is-active .pw-bands{animation:pw-bands var(--scene-duration,6200ms) ease-in-out both}
+.authored-scene.is-active .pw-ripples{animation:pw-ripples var(--scene-duration,6200ms) ease-in-out both}
+@keyframes pw-bands{0%,100%{transform:translateX(0)}50%{transform:translateX(-4px)}}
+@keyframes pw-ripples{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(1.6px);opacity:.75}}
+@media(prefers-reduced-motion:reduce){.pw-bands,.pw-ripples{animation:none!important}}
+
+
 .depth-nature-fuji.is-active .cn-fuji-cloud-a{animation:dn-cloud-clear var(--polish-duration) linear both}
 @keyframes dn-cloud-clear{0%{transform:translateX(0);opacity:1}45%{transform:translateX(16px);opacity:.8}75%{transform:translateX(29px);opacity:0}76%{transform:translateX(0);opacity:0}100%{transform:translateX(0);opacity:1}}
 
@@ -9493,8 +9498,8 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes cr-glint{0%,10%{opacity:0}22%,48%{opacity:1}60%{opacity:.6}70%,84%{opacity:.9}96%,100%{opacity:0}}
 /* Water and flag carry Perth's motion while the building remains fixed. */
 
-@keyframes cn-ripple-a{0%,100%{transform:translateX(0);opacity:1}30%{transform:translateX(8px);opacity:.5}65%{transform:translateX(-3px);opacity:.95}}
-@keyframes cn-ripple-b{0%,100%{transform:translateX(0);opacity:1}40%{transform:translateX(-7px);opacity:.4}78%{transform:translateX(4px);opacity:.9}}
+
+
 @media(prefers-reduced-motion:reduce){.authored-scene.is-active *{animation:none!important}}
 
 /* B: both leaves share identical timing and scale, hinged at opposite outer posts. */
@@ -9527,7 +9532,7 @@ html.timeline-review{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 .timeline-review .travel-atlas--map .photo-explore__map-heading{margin-top:0}
 .timeline-review .da-paris-light{stroke:#ba842c;stroke-width:1.35}
 .timeline-review .da-cologne-lower,.timeline-review .da-cologne-mid,.timeline-review .da-cologne-upper{fill:#e7b959}
-.timeline-review .cn-perth-ripple-a,.timeline-review .cn-perth-ripple-b{stroke:#749aa5;stroke-width:1.15}
+
 @media(prefers-reduced-motion:reduce){.timeline-review .authored-scene *{animation:none!important}}
 .timeline-review #main>.journal-preview-controls{display:flex;align-items:end;justify-content:space-between;gap:20px;padding:14px 40px!important;border-top:0}
 .journal-preview-controls label{margin:0;font-size:12px;color:#42695f;flex:1;max-width:470px}
@@ -9828,11 +9833,11 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .mm-swan-body{fill:#2d3135}
 .mm-swan-neck{stroke:#2d3135;stroke-width:1.5;stroke-linecap:round;fill:none}
 .mm-swan-beak{stroke:#c4473b;stroke-width:1.1;stroke-linecap:round}
-.mm-wake{stroke:#7fa8b8;stroke-width:.7;fill:none;opacity:0}
+.mm-wake{stroke:#eef5f6;stroke-width:.6;fill:none;opacity:0}
 .authored-scene.is-active .mm-swan{animation:mm-swan var(--scene-duration,6200ms) linear both}
 .authored-scene.is-active .mm-wake{animation:mm-wake var(--scene-duration,6200ms) linear both}
-@keyframes mm-swan{0%{transform:translateX(0);opacity:1}72%{transform:translateX(-46px);opacity:1}78%{transform:translateX(-50px);opacity:0}80%{transform:translateX(16px);opacity:0}100%{transform:translateX(0);opacity:1}}
-@keyframes mm-wake{0%{opacity:0}6%,70%{opacity:.9}76%,100%{opacity:0}}
+@keyframes mm-swan{0%{transform:translateX(0) scaleX(1)}44%{transform:translateX(-22px) scaleX(1)}50%{transform:translateX(-22px) scaleX(-1)}94%{transform:translateX(0) scaleX(-1)}100%{transform:translateX(0) scaleX(1)}}
+@keyframes mm-wake{0%,46%,50%,96%,100%{opacity:0}8%,40%,58%,88%{opacity:.75}}
 
 @keyframes mm-flag{0%,100%{transform:skewY(0)}10%,42%,74%{transform:skewY(22deg) scaleX(.7)}26%,58%,88%{transform:skewY(-16deg) scaleX(1.08)}}
 .mm-drop{stroke:#6f88a0;stroke-width:.9;stroke-linecap:round;opacity:.8}
