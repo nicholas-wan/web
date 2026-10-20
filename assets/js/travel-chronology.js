@@ -84,7 +84,8 @@
     clearTimeout(entry.intent);
     entry.run++;
     entry.art.classList.remove('is-active');
-    entry.art.getAnimations({ subtree: true }).forEach(animation => animation.cancel());
+    // Cancel motion only; transitions let the sky fade back to its resting strength.
+    entry.art.getAnimations({ subtree: true }).forEach(animation => animation.animationName && animation.cancel());
     if (active === entry) active = null;
   };
   const stopGuide = (preserve = null) => {

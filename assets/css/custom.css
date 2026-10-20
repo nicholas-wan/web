@@ -9397,10 +9397,10 @@ html .page-skills #main > .post { border-top:0; }
 
 @media(prefers-reduced-motion:reduce){.authored-scene[data-corrected="architecture"] *{animation:none!important}}
 
-.cl-gull{transform:translate(17px,19px)}.cl-wing{transform-origin:0 0}
+.cl-gull{transform:translate(17px,9px)}.cl-wing{transform-origin:0 0}
 .authored-scene.is-active .cl-gull{animation:cl-gull var(--polish-duration) linear both}
 .authored-scene.is-active .cl-wing{animation:cl-wing var(--polish-duration) ease-in-out both}
-@keyframes cl-gull{0%{transform:translate(17px,19px);opacity:1}24%{transform:translate(52px,14px)}50%{transform:translate(91px,15px)}76%{transform:translate(132px,19px);opacity:1}76.1%{transform:translate(132px,19px);opacity:0}76.2%{transform:translate(-12px,20px);opacity:0}76.3%{transform:translate(-12px,20px);opacity:1}100%{transform:translate(17px,19px);opacity:1}}
+@keyframes cl-gull{0%{transform:translate(17px,9px);opacity:1}24%{transform:translate(52px,7.5px)}50%{transform:translate(91px,8px)}76%{transform:translate(132px,9.5px);opacity:1}76.1%{transform:translate(132px,9.5px);opacity:0}76.2%{transform:translate(-12px,9.5px);opacity:0}76.3%{transform:translate(-12px,9.5px);opacity:1}100%{transform:translate(17px,9px);opacity:1}}
 @keyframes cl-wing{0%,5%,22%,40%,100%{transform:scaleY(1)}13%,31%{transform:scaleY(-.3)}50%,68%{transform:scaleY(.9)}}
 .cl-tower-light{opacity:0}
 .authored-scene.is-active .cl-tower-light{animation:cl-tower-light var(--polish-duration) ease both}
@@ -9417,7 +9417,7 @@ html .page-skills #main > .post { border-top:0; }
 
 
 @keyframes cn-cloud-b{0%,100%{transform:translateX(0);opacity:1}51%{transform:translateX(11px);opacity:.6}80%{transform:translateX(3px);opacity:.9}}
-@keyframes cn-light{0%,100%{opacity:0}26%{opacity:.03}62%{opacity:.22}83%{opacity:.1}}
+@keyframes cn-light{0%,30%,100%{opacity:0}62%,72%{opacity:.5}88%{opacity:.15}}
 
 @media(prefers-reduced-motion:reduce){.corrected-nature *{animation:none!important}}
 
@@ -9432,8 +9432,8 @@ html .page-skills #main > .post { border-top:0; }
 .depth-nature.is-active .dn-reflect-a{animation:dn-reflect-a var(--polish-duration) ease-in-out both}
 .depth-nature.is-active .dn-reflect-b{animation:dn-reflect-b var(--polish-duration) ease-in-out both}
 .depth-nature.is-active .dn-reflect-c{animation:dn-reflect-a var(--polish-duration) ease-in-out reverse both}
-@keyframes dn-reflect-a{0%,100%{opacity:.9;transform:translateX(0)}40%{opacity:.35;transform:translateX(1.8px)}72%{opacity:.65;transform:translateX(-.8px)}}
-@keyframes dn-reflect-b{0%,100%{opacity:.65;transform:translateX(0)}30%{opacity:.9;transform:translateX(-1px)}65%{opacity:.25;transform:translateX(2px)}}
+@keyframes dn-reflect-a{0%,100%{opacity:1;transform:translateX(0)}40%{opacity:.35;transform:translateX(1.8px)}72%{opacity:.65;transform:translateX(-.8px)}}
+@keyframes dn-reflect-b{0%,100%{opacity:1;transform:translateX(0)}30%{opacity:.9;transform:translateX(-1px)}65%{opacity:.25;transform:translateX(2px)}}
 .depth-nature-fuji.is-active .cn-fuji-cloud-a{animation:dn-cloud-clear var(--polish-duration) linear both}
 @keyframes dn-cloud-clear{0%{transform:translateX(0);opacity:1}45%{transform:translateX(16px);opacity:.8}75%{transform:translateX(29px);opacity:0}76%{transform:translateX(0);opacity:0}100%{transform:translateX(0);opacity:1}}
 
@@ -9446,7 +9446,7 @@ html .page-skills #main > .post { border-top:0; }
 .authored-scene.is-active .da-cologne-upper{animation:da-cologne-upper var(--scene-duration,6200ms) ease both}
 
 
-@keyframes da-paris-light{0%,100%{opacity:0}10%,86%{opacity:1}}
+@keyframes da-paris-light{0%,100%{opacity:0}10%{opacity:1}82%{opacity:1;animation-timing-function:ease-in-out}}
 @media(prefers-reduced-motion:reduce){.authored-scene[data-depth="architecture"] *{animation:none!important}}
 
 /* Golden Gate from Battery Spencer (3D, 20 Oct 2026). Car lights follow the
@@ -9465,10 +9465,10 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes gg-car-c{0%{opacity:0;transform:translate(100.21px,38.03px) scale(0.31)}46%{transform:translate(100.21px,38.03px) scale(0.31);opacity:0}50.5%{transform:translate(97.89px,38.44px) scale(0.33);opacity:1}55%{transform:translate(95.22px,38.91px) scale(0.36);opacity:1}59.5%{transform:translate(92.13px,39.46px) scale(0.39);opacity:1}64%{transform:translate(88.51px,40.1px) scale(0.42);opacity:1}68.5%{transform:translate(84.22px,40.87px) scale(0.46);opacity:1}73%{transform:translate(79.03px,41.79px) scale(0.51);opacity:1}77.5%{transform:translate(72.65px,42.92px) scale(0.57);opacity:1}82%{transform:translate(64.6px,44.35px) scale(0.64);opacity:1}86.5%{transform:translate(54.13px,46.21px) scale(0.74);opacity:1}91%{transform:translate(39.96px,48.72px) scale(0.87);opacity:1}95.5%{transform:translate(19.72px,52.31px) scale(1.05);opacity:1}100%{transform:translate(-11.59px,57.87px) scale(1.34);opacity:1}}
 @media(prefers-reduced-motion:reduce){.gg-car{animation:none!important;opacity:0}.gg-fog,.gg-fog-front{animation:none!important}}
 
-/* Two complete lighting events within a single 6.2-second scene. */
-@keyframes da-cologne-lower{0%,5%,43%,51%,93%,100%{opacity:0}13%,35%,59%,85%{opacity:1}}
-@keyframes da-cologne-mid{0%,12%,44%,58%,94%,100%{opacity:0}21%,35%,67%,85%{opacity:.95}}
-@keyframes da-cologne-upper{0%,20%,45%,66%,95%,100%{opacity:0}29%,35%,75%,85%{opacity:.95}}
+/* Windows light tier by tier, hold, then fade out together over the last second. */
+@keyframes da-cologne-lower{0%,3%{opacity:0}13%,84%{opacity:1}100%{opacity:0}}
+@keyframes da-cologne-mid{0%,13%{opacity:0}24%,84%{opacity:.95}100%{opacity:0}}
+@keyframes da-cologne-upper{0%,24%{opacity:0}36%,84%{opacity:.95}100%{opacity:0}}
 
 .depth-sydney .dl-ferry{transform:translateX(-34px)}
 .depth-sydney.is-active .dl-ferry{animation:dl-ferry-pass var(--polish-duration,6800ms) linear both}
@@ -9489,12 +9489,12 @@ html .page-skills #main > .post { border-top:0; }
 @media(prefers-reduced-motion:reduce){.depth-canton .dl-tram,.depth-canton .dl-tram-front,.depth-canton .dl-tram-rear{animation:none!important}.depth-canton .dl-tram{offset-distance:0%}.depth-canton .dl-tram-rear{visibility:hidden}.depth-canton .dl-tram-front{visibility:visible}}
 
 .authored-scene.is-active *{animation-duration:var(--scene-duration,6200ms)!important}
-/* Hold a readable torch highlight, then give it a second soft glint. */
-@keyframes cr-glint{0%,8%,100%{opacity:0}20%,48%{opacity:.85}57%{opacity:.25}66%,85%{opacity:.7}95%{opacity:0}}
+/* A soft torch halo fades in, dips, swells again and fades out. */
+@keyframes cr-glint{0%,10%{opacity:0}22%,48%{opacity:1}60%{opacity:.6}70%,84%{opacity:.9}96%,100%{opacity:0}}
 /* Water and flag carry Perth's motion while the building remains fixed. */
 
-@keyframes cn-ripple-a{0%,100%{transform:translateX(0);opacity:.8}30%{transform:translateX(8px);opacity:.5}65%{transform:translateX(-3px);opacity:.95}}
-@keyframes cn-ripple-b{0%,100%{transform:translateX(0);opacity:.8}40%{transform:translateX(-7px);opacity:.4}78%{transform:translateX(4px);opacity:.9}}
+@keyframes cn-ripple-a{0%,100%{transform:translateX(0);opacity:1}30%{transform:translateX(8px);opacity:.5}65%{transform:translateX(-3px);opacity:.95}}
+@keyframes cn-ripple-b{0%,100%{transform:translateX(0);opacity:1}40%{transform:translateX(-7px);opacity:.4}78%{transform:translateX(4px);opacity:.9}}
 @media(prefers-reduced-motion:reduce){.authored-scene.is-active *{animation:none!important}}
 
 /* B: both leaves share identical timing and scale, hinged at opposite outer posts. */
@@ -9528,7 +9528,6 @@ html.timeline-review{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 .timeline-review .da-paris-light{stroke:#ba842c;stroke-width:1.35}
 .timeline-review .da-cologne-lower,.timeline-review .da-cologne-mid,.timeline-review .da-cologne-upper{fill:#e7b959}
 .timeline-review .cn-perth-ripple-a,.timeline-review .cn-perth-ripple-b{stroke:#749aa5;stroke-width:1.15}
-.timeline-review .cr-liberty-glint{fill:#f2c459}
 @media(prefers-reduced-motion:reduce){.timeline-review .authored-scene *{animation:none!important}}
 .timeline-review #main>.journal-preview-controls{display:flex;align-items:end;justify-content:space-between;gap:20px;padding:14px 40px!important;border-top:0}
 .journal-preview-controls label{margin:0;font-size:12px;color:#42695f;flex:1;max-width:470px}
@@ -9805,12 +9804,12 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
    scene repeats; particle groups fade in once. Phones show 128x96 tiles on the sage tint, cropped to each landmark with the
    wrapper's --cx/--cy/--cw (and --vx/--vy/--vw/--vh for a non-default viewBox). */
 .authored-scene[data-scene="2"] .da-paris-sky{display:none}
-.mm-star{fill:#fff;stroke:#a8741c;stroke-width:.45;opacity:0;transform-box:fill-box;transform-origin:center}
+.mm-star{fill:#fffaf0;stroke:none;opacity:0;transform-box:fill-box;transform-origin:center}
 .authored-scene.is-active .mm-star{animation:mm-twinkle var(--d) ease-in-out var(--del) infinite}
 @keyframes mm-twinkle{0%,50%,100%{opacity:0;transform:scale(.25)}70%{opacity:1;transform:scale(1)}85%{opacity:.35;transform:scale(.6)}}
 .authored-scene.is-active .mm-fx .mm-star,.authored-scene.is-active .mm-fx .mm-flake,.authored-scene.is-active .mm-fx .mm-drop,.authored-scene.is-active .mm-fx .mm-leaf{animation-duration:var(--d)!important}
-.mm-loop{opacity:0;transition:opacity .6s ease}
-.authored-scene.is-active .mm-loop{opacity:1}
+.mm-loop{opacity:0}
+.authored-scene.is-active .mm-loop{opacity:1;transition:opacity .6s ease}
 .authored-scene.is-active .mm-sparkle{transition-delay:.3s}
 .mm-flake{fill:#fff;stroke:#b9c6d5;stroke-width:.25}
 .mm-snow-back .mm-flake{stroke:#c3cedb}
@@ -9833,7 +9832,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene.is-active .mm-swan{animation:mm-swan var(--scene-duration,6200ms) linear both}
 .authored-scene.is-active .mm-wake{animation:mm-wake var(--scene-duration,6200ms) linear both}
 @keyframes mm-swan{0%{transform:translateX(0);opacity:1}72%{transform:translateX(-46px);opacity:1}78%{transform:translateX(-50px);opacity:0}80%{transform:translateX(16px);opacity:0}100%{transform:translateX(0);opacity:1}}
-@keyframes mm-wake{0%,70%{opacity:.9}76%,90%{opacity:0}100%{opacity:.9}}
+@keyframes mm-wake{0%{opacity:0}6%,70%{opacity:.9}76%,100%{opacity:0}}
 
 @keyframes mm-flag{0%,100%{transform:skewY(0)}10%,42%,74%{transform:skewY(22deg) scaleX(.7)}26%,58%,88%{transform:skewY(-16deg) scaleX(1.08)}}
 .mm-drop{stroke:#6f88a0;stroke-width:.9;stroke-linecap:round;opacity:.8}
@@ -9851,9 +9850,10 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .mm-river path{stroke:#ec8fb5;stroke-width:.9;stroke-linecap:round;opacity:0}
 .authored-scene.is-active .mm-led{animation:mm-led var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .mm-river path{animation:mm-river var(--scene-duration,6200ms) ease-in-out both}
-.authored-scene.is-active .mm-river path+path{animation-delay:-.4s}
+.authored-scene.is-active .mm-river path+path{animation-name:mm-river-b}
 @keyframes mm-led{0%,100%{opacity:.12;fill:#ff8fb5}15%{opacity:.45;fill:#ff8fb5}50%{opacity:.5;fill:#a283ee}85%{opacity:.45;fill:#ff8fb5}}
 @keyframes mm-river{0%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}20%{opacity:.85}50%{transform:translateX(4px);stroke:#9a79e8}80%{opacity:.85;stroke:#ec8fb5}}
+@keyframes mm-river-b{0%,6%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}26%{opacity:.85}56%{transform:translateX(4px);stroke:#9a79e8}86%{opacity:.85;stroke:#ec8fb5}}
 @media(max-width:736px){
  .timeline-review.mobile-variant-a .mobile-journal-row{grid-template-columns:128px minmax(0,1fr);column-gap:10px}
  .timeline-review.mobile-variant-a .mobile-journal-row::before{left:63px}
