@@ -7,7 +7,17 @@
   var reduced = matchMedia('(prefers-reduced-motion: reduce)');
   var onScreen = false;
   var seen = new WeakSet();
-  function syncPause() { nav.classList.toggle('is-paused', document.hidden || !onScreen); }
+  // Touch screens have no hover replay, so the two previews take turns while visible.
+  var touch = matchMedia('(hover: none)');
+  var timer = 0, turn = 0;
+  function syncPause() { nav.classList.toggle('is-paused', document.hidden || !onScreen); loop(); }
+  function loop() {
+    clearTimeout(timer);
+    if (!touch.matches || reduced.matches || document.hidden || !onScreen) return;
+    var links = nav.querySelectorAll('a');
+    play(links[turn++ % links.length]);
+    timer = setTimeout(loop, 2400);
+  }
   function play(link) {
     if (reduced.matches || document.hidden || !onScreen) return;
     link.classList.remove('is-playing');
@@ -17,7 +27,7 @@
   var observer = new IntersectionObserver(function (entries) {
     onScreen = entries[0].isIntersecting;
     syncPause();
-    if (onScreen) nav.querySelectorAll('a').forEach(function (link) {
+    if (onScreen && !touch.matches) nav.querySelectorAll('a').forEach(function (link) {
       if (!seen.has(link)) { seen.add(link); play(link); }
     });
   }, { threshold: .5 });

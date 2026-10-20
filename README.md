@@ -362,6 +362,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Phones: card is a bottom sheet above region controls; chosen marker stays clear of it.
 - Zoom-out floor: desktop = cropped opening view; tablets may show the full map.
 - Phones (≤520px): no inline world strip; a teaser opens a full-screen overlay (fit-to-height floor, region jump chips).
+- Travel shortcuts (20 Oct 2026): Read journals precedes Explore map. On touch screens the two previews take turns every 2.4 s while the row is visible, pausing offscreen, in hidden tabs and under reduced motion; desktop plays each once on arrival and replays on hover or keyboard focus.
 - Lower phone map teaser stays static (18 Oct 2026) to avoid competing with the top animated map shortcut; its overlay action is unchanged.
 - Teaser art and coordinates share one 1200:624 surface at 188%, route centred, flush with the media top; keep endpoint margins.
 - Action row: `Explore the map`, `10 trips · 12 regions`, one dot-line-chevron cue. Do not restore gesture instructions, the northeast arrow or a full-width CTA.
