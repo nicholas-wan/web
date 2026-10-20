@@ -9760,7 +9760,7 @@ html.timeline-review{--timeline-icon-width:152px;--timeline-icon-height:101px;--
  .timeline-review.mobile-variant-a .mobile-journal-row .chronology-trip{min-height:0;padding:22px 0 8px!important}
  .timeline-review.mobile-variant-a .mobile-journal-card header,.timeline-review.mobile-variant-a .mobile-read{display:none!important}
  .timeline-review.mobile-variant-a .mobile-journal-card>a.image,.timeline-review.mobile-variant-a .mobile-journal-card>.travel-card__image{height:150px;aspect-ratio:auto;margin:0 0 10px!important}
- .timeline-review.mobile-variant-a .mobile-journal-card img{height:150px!important;aspect-ratio:auto}
+ .timeline-review.mobile-variant-a .mobile-journal-card img{height:150px!important;aspect-ratio:auto;object-position:var(--thumb-focus,var(--focus,50% 50%))}
  .timeline-review.mobile-variant-a .mobile-journal-card>p{-webkit-line-clamp:2;line-height:1.45!important}
  .timeline-review.mobile-variant-a .mobile-journal-row:last-child::before{height:100px}
 }
