@@ -9743,7 +9743,7 @@ html .page-skills #main > .post { border-top:0; }
 
 /* Local full-page sizing and small-scale motion. */
 .journal-neighbour{display:none}
-html.timeline-review{--timeline-icon-width:136px;--timeline-icon-height:91px;--timeline-line:167px;--timeline-inset:78px}
+html.timeline-review{--timeline-icon-width:152px;--timeline-icon-height:101px;--timeline-line:177px;--timeline-inset:84px}
 .timeline-review .authored-scene,.timeline-review .authored-scene>svg{width:var(--timeline-icon-width);height:var(--timeline-icon-height);flex-shrink:0}
 .timeline-review .chronology-track{height:calc(var(--timeline-icon-height)*2 + 168px)}
 .timeline-review .chronology-line{top:var(--timeline-line);left:var(--timeline-inset);right:var(--timeline-inset)}
@@ -9764,7 +9764,6 @@ html.timeline-review{--timeline-icon-width:136px;--timeline-icon-height:91px;--t
 .timeline-review .da-cologne-lower,.timeline-review .da-cologne-mid,.timeline-review .da-cologne-upper{fill:#e7b959}
 .timeline-review .cn-perth-ripple-a,.timeline-review .cn-perth-ripple-b{stroke:#749aa5;stroke-width:1.15}
 .timeline-review .cr-liberty-glint{fill:#f2c459}
-.timeline-review .cn-fuji-cloud-a{fill:#b6c9cb}
 .timeline-review .depth-nature-panda.is-active .dn-panda-feed{animation-name:timeline-feeding}
 @keyframes timeline-feeding{0%,100%{transform:translateY(0) rotate(0)}22%{transform:translateY(0) rotate(-10deg)}30%,70%{transform:translateY(0) rotate(-8deg)}82%{transform:translateY(1px) rotate(-3deg)}}
 @media(prefers-reduced-motion:reduce){.timeline-review .authored-scene *{animation:none!important}.timeline-review .dn-panda-feed{transform:none}}

@@ -94,7 +94,8 @@ for (const width of [737, 768, 844, 981, 1366, 1920]) {
       return { width: art.width, height: art.height, fits: art.left >= scroll.left - 1 && art.right <= scroll.right + 1 && art.top >= scroll.top - 1 && art.bottom <= scroll.bottom + 1, gap };
     }));
     for (const scene of scenes) {
-      if(width>=981){expect(scene.width).toBeCloseTo(136,0);expect(scene.height).toBeCloseTo(91,0);}
+      if(width>=1366){expect(scene.width).toBeCloseTo(152,0);expect(scene.height).toBeCloseTo(101,0);}
+      else if(width>=981){expect(scene.width).toBeGreaterThanOrEqual(136);expect(scene.width).toBeLessThanOrEqual(152);expect(scene.height).toBeCloseTo(Math.round(scene.width*2/3),0);}
       else {expect(scene.width).toBeGreaterThanOrEqual(100);expect(scene.width).toBeLessThanOrEqual(136);expect(scene.height).toBeCloseTo(Math.round(scene.width*2/3),0);}
       expect(scene.fits).toBe(true);
       expect(scene.gap).toBeGreaterThanOrEqual(5);

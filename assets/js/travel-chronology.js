@@ -238,7 +238,7 @@
  let previousWidth=0;
  function fit(){
   const available=scroller.clientWidth;if(!available||available===previousWidth)return;previousWidth=available;
-  const width=Math.min(136,Math.floor((available-16)/5.5)),height=Math.round(width*2/3),inset=width/2+8;
+  const width=Math.min(152,Math.floor((available-16)/5.5)),height=Math.round(width*2/3),inset=width/2+8;
   root.style.setProperty('--timeline-icon-width',width+'px');root.style.setProperty('--timeline-icon-height',height+'px');
   root.style.setProperty('--timeline-line',(height+(matchMedia('(max-width:980px)').matches?100:76))+'px');root.style.setProperty('--timeline-inset',inset+'px');
   track.style.minWidth='0';
