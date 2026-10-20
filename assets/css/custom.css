@@ -9492,8 +9492,8 @@ html .page-skills #main > .post { border-top:0; }
 .depth-sydney.is-active .dl-ferry-foam{animation:dl-ferry-foam var(--polish-duration,6800ms) linear both}
 @keyframes dl-ferry-pass{from{transform:translateX(-34px)}to{transform:translateX(134px)}}
 @keyframes dl-ferry-foam{from{stroke-dashoffset:0}to{stroke-dashoffset:24}}
-.depth-sydney.is-active .dl-sydney-glint{animation:dl-sydney-glint calc(var(--polish-duration,6800ms) / 2) ease-in-out 2 both}
-@keyframes dl-sydney-glint{0%,100%{opacity:.7;transform:translateX(0)}50%{opacity:.2;transform:translateX(1.2px)}}
+.depth-sydney.is-active .dl-sydney-glint{animation:dl-sydney-glint var(--polish-duration,6800ms) ease-in-out both}
+@keyframes dl-sydney-glint{0%,50%,100%{opacity:.7;transform:translateX(0)}25%,75%{opacity:.2;transform:translateX(1.2px)}}
 @media(prefers-reduced-motion:reduce){.depth-sydney .dl-ferry{animation:none!important;transform:translateX(42px)}.depth-sydney .dl-ferry-foam,.depth-sydney .dl-sydney-glint{animation:none!important}}
 .depth-canton .dl-tram{offset-path:path('M54.3 22 A5.7 1.75 0 0 1 65.7 22 A5.7 1.75 0 0 1 54.3 22');offset-distance:0%;offset-rotate:0deg;offset-anchor:0px 0px}
 .depth-canton.is-active .dl-tram{animation:dl-tram var(--polish-duration,4000ms) linear both}
