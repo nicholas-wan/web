@@ -192,10 +192,12 @@
 .is-playing .sp-brand .sp-crop { animation: sp-reveal 0.5s 1.3s forwards; }
 .is-playing .sp-brand .sp-samples { animation: sp-sample 1.05s 1.5s both; }
 .is-playing .sp-brand .sp-features { animation: sp-arrive 0.6s 1.7s both; }
-/* The first arrow waits until the patches have landed, so they never cross it. */
-.is-playing .sp-brand .sp-features .sp-arrow { animation: sp-arrive 0.4s 2.45s both; }
-.is-playing .sp-brand .sp-model { animation: sp-arrive 0.5s 2.4s both; }
-.is-playing .sp-brand .sp-result { animation: sp-arrive 0.6s 3.1s both; }
+/* The first arrow waits until the patches have landed, so they never cross
+   it; the model and the category then follow a beat apart, so the chain
+   reads as passing left to right. */
+.is-playing .sp-brand .sp-features .sp-arrow { animation: sp-arrive 0.4s 2.3s both; }
+.is-playing .sp-brand .sp-model { animation: sp-arrive 0.5s 2.55s both; }
+.is-playing .sp-brand .sp-result { animation: sp-arrive 0.6s 3.15s both; }
 .is-still .sp-brand .sp-card { transform: none; }
 .is-still .sp-brand .sp-crop,
 .is-still .sp-brand .sp-features,
@@ -212,29 +214,33 @@
   100% { opacity: 0; transform: translateX(116px); }
 }
 
-/* The League: the second profile slides out from under the first, a line
-   links the two photos, teal frames and feature strips show the match, and
-   Review lands. */
+/* The League: one profile sits centred, like the Shopee card, then the pair
+   parts, the second sliding out from under the first; a line links the two
+   photos, teal frames and feature strips show the match, and Review lands. */
 .league-brand-scene .lg-label {
   font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
   font-size: 12px;
   font-weight: 700;
   fill: #ffffff;
 }
+.league-brand-scene .lg-original { transform: translateX(97px); }
+.league-brand-scene .lg-copy { transform: translateX(-97px); }
 .league-brand-scene .lg-frame,
 .league-brand-scene .lg-vector,
 .league-brand-scene .lg-review { opacity: 0; }
-.is-playing .league-brand-scene .lg-copy { animation: lg-separate 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s both; }
+.is-playing .league-brand-scene .lg-original,
+.is-playing .league-brand-scene .lg-copy { animation: lg-part 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards; }
 .is-playing .league-brand-scene .lg-link { stroke-dasharray: 88; stroke-dashoffset: 88; animation: lg-line 0.6s ease 1.3s both; }
 .is-playing .league-brand-scene .lg-frame { animation: lg-reveal 0.5s ease 1.6s both; }
 .is-playing .league-brand-scene .lg-vector-0 { animation: lg-strip-left 0.5s ease 1.9s both; }
 .is-playing .league-brand-scene .lg-vector-1 { animation: lg-strip-right 0.5s ease 2.05s both; }
 .is-playing .league-brand-scene .lg-review { animation: lg-rise 0.5s ease 2.4s both; }
+.is-still .league-brand-scene .lg-original,
 .is-still .league-brand-scene .lg-copy,
 .is-still .league-brand-scene .lg-frame,
 .is-still .league-brand-scene .lg-vector,
 .is-still .league-brand-scene .lg-review { opacity: 1; transform: none; }
-@keyframes lg-separate { from { transform: translateX(-194px); } to { transform: none; } }
+@keyframes lg-part { to { transform: none; } }
 @keyframes lg-line { to { stroke-dashoffset: 0; } }
 @keyframes lg-reveal { to { opacity: 1; } }
 @keyframes lg-strip-left { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
