@@ -9404,7 +9404,7 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes cl-wing{0%,5%,22%,40%,100%{transform:scaleY(1)}13%,31%{transform:scaleY(-.3)}50%,68%{transform:scaleY(.9)}}
 .cl-tower-light{opacity:0}
 .authored-scene.is-active .cl-tower-light{animation:cl-tower-light var(--polish-duration) ease both}
-@keyframes cl-tower-light{0%,12%{opacity:0;transform:translateY(0)}25%{opacity:.8}75%{opacity:.8;transform:translateY(-65px)}90%,100%{opacity:0;transform:translateY(-65px)}}
+@keyframes cl-tower-light{0%,12%{opacity:0;transform:translateY(0)}25%{opacity:.22}75%{opacity:.22;transform:translateY(-65px)}90%,100%{opacity:0;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){.authored-scene [class^="cl-"]{animation:none!important}}
 
 
@@ -9885,13 +9885,13 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .mm-dusk-stars circle{fill:#fffbe8;opacity:.7}
 
 
-.mm-led{fill:#ff8fb5;opacity:.12}
-.mm-river path{stroke:#ec8fb5;stroke-width:.9;stroke-linecap:round;opacity:0}
+.mm-led{fill:#db9bcf;opacity:.12}
+.mm-river path{stroke:#dcb8d9;stroke-width:.9;stroke-linecap:round;opacity:0}
 .authored-scene.is-active .mm-led{animation:mm-led var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .mm-river path{animation:mm-river var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .mm-river path+path{animation-name:mm-river-b}
-@keyframes mm-led{0%,100%{opacity:.12;fill:#ff8fb5}15%{opacity:.45;fill:#ff8fb5}50%{opacity:.5;fill:#a283ee}85%{opacity:.45;fill:#ff8fb5}}
-@keyframes mm-river{0%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}20%{opacity:.85}50%{transform:translateX(.8px);stroke:#9a79e8}80%{opacity:.85;stroke:#ec8fb5}}
+@keyframes mm-led{0%,100%{opacity:.12;fill:#db9bcf}50%{opacity:.16;fill:#db9bcf}}
+@keyframes mm-river{0%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}20%{opacity:.85}50%{transform:translateX(.8px);stroke:#c8b4ec}80%{opacity:.85;stroke:#ec8fb5}}
 @keyframes mm-river-b{0%,6%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}26%{opacity:.85}56%{transform:translateX(-.8px);stroke:#9a79e8}86%{opacity:.85;stroke:#ec8fb5}}
 @media(max-width:736px){
  .timeline-review.mobile-variant-a .mobile-journal-row{grid-template-columns:128px minmax(0,1fr);column-gap:10px}
@@ -9920,7 +9920,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="7"]::before{background:linear-gradient(#2c5e9f,#4f82bf 40%,#93b5da 70%,#d8e4ee)}
- .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#5f74a3,#9aa9c9 55%,#e3c9a6)}
+ .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
  .timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#d5e1d6,#eef2ea)}
 }
 @media(max-width:360px){
@@ -9948,7 +9948,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .timeline-review .journal-chronology .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
 .timeline-review .journal-chronology .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
 .timeline-review .journal-chronology .authored-scene[data-scene="7"]::before{background:linear-gradient(#2c5e9f,#4f82bf 40%,#93b5da 70%,#d8e4ee)}
-.timeline-review .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#5f74a3,#9aa9c9 55%,#e3c9a6)}
+.timeline-review .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
 .timeline-review .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#d5e1d6,#eef2ea)}
 /* Each sky follows that trip's real light (20 Oct 2026). Paris is the one night tile, so its navy stays at full strength at rest. */
 .timeline-review .journal-chronology .authored-scene[data-scene="2"]::before,.timeline-review.mobile-variant-a .mobile-journal-row .authored-scene[data-scene="2"]::before{opacity:1}
