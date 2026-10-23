@@ -5475,6 +5475,13 @@ body:not(.page-home) #wrapper.fade-in::before {
   scroll-margin-top: var(--travel-nav-offset, 7rem);
 }
 
+/* Keep the day's date above its heading in view too (24 Oct 2026). travel-nav.js clears it, but
+   the browser's own post-load anchor jump reads as visitor scrolling and cancels that correction,
+   so deep links landed with the date under the toolbar. The date-to-heading gap is 30-34px. */
+:is(.guangzhou-day__date, .travel-journal__date) + [id^="trip-section-"] {
+  scroll-margin-top: calc(var(--travel-nav-offset, 7rem) + 34px);
+}
+
 .travel-section-nav {
   position: sticky;
   top: 0;
@@ -5640,6 +5647,17 @@ a.travel-jump-group__label {
 @media screen and (max-width: 980px) {
   [id^="trip-section-"] {
     scroll-margin-top: var(--travel-nav-offset, 4rem);
+  }
+
+  :is(.guangzhou-day__date, .travel-journal__date) + [id^="trip-section-"] {
+    scroll-margin-top: calc(var(--travel-nav-offset, 4rem) + 34px);
+  }
+
+  /* At 320px long dates wrap to two lines (62px). */
+  @media (max-width: 359px) {
+    :is(.guangzhou-day__date, .travel-journal__date) + [id^="trip-section-"] {
+      scroll-margin-top: calc(var(--travel-nav-offset, 4rem) + 62px);
+    }
   }
 
   .travel-section-nav {

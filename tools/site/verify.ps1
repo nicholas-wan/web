@@ -314,7 +314,8 @@ if ([regex]::Matches($travelDeferredMarkup, 'data-journal-src="').Count -ne 10 -
 }
 
 # 30 -> 31: journal lede leading and the Australia hero gap and intro treatment (Oct 2026).
-Assert-FileSizeBudget 'assets\css\travel-journal.css' 31
+# 31 -> 32 (24 Oct 2026): routes folded at build time, and deep links keep each day's date in view.
+Assert-FileSizeBudget 'assets\css\travel-journal.css' 32
 # Photo search styles live in their own route bundle because travel-map-page.css
 # sits within a few hundred bytes of its cap (Oct 2026).
 # 10 -> 11: partial-match reason line, Oct 2026.

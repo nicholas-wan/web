@@ -82,3 +82,24 @@ test('DPR-3 phones use small journal tiles while the lightbox and zoom retain de
     }
   } finally { await context.close(); }
 });
+
+test('phone deep links land with the day date visible below the toolbar', async ({ browser }) => {
+  // The browser's own post-load anchor jump cancels travel-nav.js's correction, so
+  // scroll-margin-top alone must clear the date above each heading (24 Oct 2026).
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await context.newPage();
+  for (const target of ['travel_2023_perth#trip-section-9', 'travel_2025_japan#trip-section-4', 'travel_2017_seoul#trip-section-2']) {
+    await page.goto('about:blank');
+    await page.goto('/' + target);
+    const id = target.split('#')[1];
+    // Let fonts, images and the landing correction settle, then check where it rests.
+    await page.waitForTimeout(2500);
+    expect(await page.evaluate(id => {
+      const heading = document.getElementById(id);
+      const date = heading.previousElementSibling.getBoundingClientRect().top;
+      const toolbar = document.querySelector('.travel-section-nav').getBoundingClientRect().bottom;
+      return date >= toolbar && heading.getBoundingClientRect().top < innerHeight / 3;
+    }, id)).toBe(true);
+  }
+  await context.close();
+});
