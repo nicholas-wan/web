@@ -307,7 +307,7 @@ Assert-FileSizeBudget 'assets\js\travel-chronology.js' 30
 $chronologySource = Get-Content -LiteralPath (Join-Path $dist 'assets/js/travel-chronology.js') -Raw -Encoding UTF8
 if ($chronologySource -notmatch "track.style.minWidth='0'") { throw 'Travel timeline must fit the page instead of requiring horizontal scrolling.' }
 $travelDeferredMarkup = Get-Content -LiteralPath (Join-Path $dist 'travel.html') -Raw -Encoding UTF8
-if ($travelDeferredMarkup -notmatch "(?s)<head>.*?classList.add\('timeline-review','polish-travel','mobile-variant-a'\).*?</head>") { throw 'Travel must apply its layout before first paint.' }
+if ($travelDeferredMarkup -notmatch "(?s)<head>.*?classList.add\('travel-timeline','travel-phone-rail'\).*?</head>") { throw 'Travel must apply its layout before first paint.' }
 
 if ([regex]::Matches($travelDeferredMarkup, 'data-journal-src="').Count -ne 10 -or [regex]::Matches($travelDeferredMarkup, 'data-journal-srcset="').Count -ne 10) {
     throw 'Travel must defer all ten responsive journal covers until their visible presentation approaches.'

@@ -73,7 +73,7 @@
       title: 'Perth',
       dates: '28 June – 8 July 2023',
       image: 'images/travel/2023_perth/perth_card.jpg',
-      imageAlt: 'Perth travel photograph'
+      imageAlt: 'Turquoise bay and rocky shore near Perth, with Perth lettered across the sky'
     },
     australia: {
       title: 'Australia',

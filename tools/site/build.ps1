@@ -1148,7 +1148,7 @@ foreach ($page in $pages) {
     if ($tripOrder -contains $slug) { $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/raleway-400-latin.woff2" as="font" type="font/woff2" crossorigin />' }
     if ($bannerPreload) { $preloadMarkup += "`n" + $bannerPreload }
     # Apply approved Travel geometry before first paint, not after its runtime downloads.
-    $travelLayoutBootstrap = if ($slug -eq 'travel') { "    <script>document.documentElement.classList.add('timeline-review','polish-travel','mobile-variant-a');</script>" } else { '' }
+    $travelLayoutBootstrap = if ($slug -eq 'travel') { "    <script>document.documentElement.classList.add('travel-timeline','travel-phone-rail');</script>" } else { '' }
     $template = @"
 <!DOCTYPE HTML>
 <html lang="en">

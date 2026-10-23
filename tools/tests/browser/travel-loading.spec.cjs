@@ -2,8 +2,8 @@ const {test,expect}=require('@playwright/test');
 test('opening layout and four postcards exist before external scripts arrive',async({page})=>{
  await page.route('**/*.js*',route=>route.abort());
  await page.goto('/travel');
- await expect(page.locator('html')).toHaveClass(/timeline-review/);
- await expect(page.locator('html')).toHaveClass(/mobile-variant-a/);
+ await expect(page.locator('html')).toHaveClass(/travel-timeline/);
+ await expect(page.locator('html')).toHaveClass(/travel-phone-rail/);
  await expect(page.locator('.photo-explore__cards > a')).toHaveCount(4);
  await expect(page.locator('.photo-explore__cards > a').first()).toBeVisible();
 });

@@ -230,12 +230,14 @@
 })();
 
 (()=>{
- const root=document.documentElement;root.classList.add('timeline-review','polish-travel');
+ const root=document.documentElement;root.classList.add('travel-timeline');
  const timeline=document.querySelector('.journal-chronology');
  const track=timeline.querySelector('.chronology-track');
  const links=[...track.querySelectorAll('.chronology-trip')];
  // Fit all ten stops within one view; dates carry time, spacing carries order.
  const scroller=timeline.querySelector('.chronology-scroll');
+ // Year marks start each year's run on the line, so the alternating lanes still read in order.
+ const years=links.map((link,i)=>{const year=link.dataset.start.slice(0,4);if(i&&links[i-1].dataset.start.startsWith(year))return null;const mark=document.createElement('span');mark.className='chronology-year';mark.setAttribute('aria-hidden','true');mark.textContent=year;track.append(mark);return mark;});
  let previousWidth=0;
  function fit(){
   const available=scroller.clientWidth;if(!available||available===previousWidth)return;previousWidth=available;
@@ -243,7 +245,7 @@
   root.style.setProperty('--timeline-icon-width',width+'px');root.style.setProperty('--timeline-icon-height',height+'px');
   root.style.setProperty('--timeline-line',(height+(matchMedia('(max-width:980px)').matches?100:76))+'px');root.style.setProperty('--timeline-inset',inset+'px');
   track.style.minWidth='0';
-  links.forEach((link,i)=>{const fraction=i/(links.length-1);link.style.left='calc('+fraction*100+'% + '+(inset-2*inset*fraction)+'px)';});
+  links.forEach((link,i)=>{const fraction=i/(links.length-1),left='calc('+fraction*100+'% + '+(inset-2*inset*fraction)+'px)';link.style.left=left;if(years[i])years[i].style.left=left;});
  }
  new ResizeObserver(fit).observe(scroller);fit();
  const grid=document.querySelector('.travel-grid'),map=document.querySelector('.travel-atlas__layout'),heading=document.querySelector('.photo-explore__map-heading');
@@ -278,7 +280,7 @@
 
 (()=>{
  const root=document.documentElement,source=document.querySelector('.journal-chronology'),grid=document.querySelector('.travel-grid');if(!source||!grid)return;
- root.classList.add('mobile-variant-a');
+ root.classList.add('travel-phone-rail');
  const list=document.createElement('section');list.className='mobile-journal-list';list.setAttribute('aria-label','Travel journals timeline');
  const entries=[...source.querySelectorAll('.chronology-trip')].map((trip,i)=>{
   const original=[...grid.querySelectorAll('.travel-card')].find(c=>c.querySelector('a').getAttribute('href')===trip.getAttribute('href'));if(!original)return null;
