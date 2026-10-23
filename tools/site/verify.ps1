@@ -256,7 +256,8 @@ foreach ($copiedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'asset
         'assets/js/gallery.js', 'assets/js/travel-nav.js', 'assets/js/travel-map.js',
         'assets/js/personal-timeline.js', 'assets/js/scramble-reveal.js',
         'assets/js/travel-discovery.js', 'assets/js/photo-search.js', 'assets/js/page-transitions.js',
-        'assets/js/anomaly-peek.js', 'assets/js/travel-shortcuts.js', 'assets/js/travel-chronology.js')) {
+        'assets/js/anomaly-peek.js', 'assets/js/travel-shortcuts.js', 'assets/js/travel-chronology.js',
+        'assets/css/internship-peek.css', 'assets/js/internship-peek.js')) {
     Assert-DistMatchesSource $copiedAsset
 }
 
