@@ -268,7 +268,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Japan's editorial hero: left-aligned `Travel journal` eyebrow, title, dates, lede, above a full-bleed text-free Arakurayama banner (`day14_hakone/fuji2.jpg`, also in the gallery, owner choice) at `50% 52%`. No title over the photo.
 - Banners: `clamp(16rem, 28vw, 22rem)`, 22rem wrapper cap (owner-approved); phones keep own heights and contain-fit wrappers. Shared pale placeholder; wide contain-fit art sizes its mobile wrapper to natural ratio. Never a dark wrapper background (black flash).
 - Crops use focal-point custom properties. Tall collage cards reserve two 4:3 desktop rows plus 1rem gutter via width-based padding; phones reset it. Tall-grid checks cover every such journal.
-- `gallery.js`: gallery `role="list"` labelled `N photos`; tiles `role="listitem"`.
+- `gallery.js`: gallery `role="list"` labelled `N photos`; tiles `role="listitem"`. Only galleries within 900px of the viewport measure their tiles (24 Oct 2026); far ones show `1 / N` from the markup and measure on approach, so load never reads every tile in the journal.
 - Phone galleries: counter and previous/next arrows in flow above photos; native swipe, unfaded next-tile preview, no swipe hint or edge mask; arrows stop at ends, disabled for single photos; reduced motion jumps; counter shows nearest tile/total, last included at the scroll limit.
 - Phone bricks: `content-visibility: visible`, no intrinsic placeholder (the 320px estimate stretches rows). Keep lazy loading.
 - Desktop narrative max 70ch. Single-photo days stay quarter-width tiles (owner decision).
@@ -477,6 +477,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 
 - **No SEO, analytics or resume-PDF work (owner decision, Jul 2026):** no og tags, structured data or tracking. The League "1 year internship" note is intentional.
 - **Declined from the Oct 2026 site critique:** every item is in [Owner preferences](#owner-preferences); do not propose them again.
+- **Phone main-thread time: measured, mostly the page itself (24 Oct 2026, do not retry blindly).** At 4x CPU on a 390px phone, journals block for about 140-315ms after load, mostly the first full layout and the first style pass of markup the scripts add. `content-visibility: auto` on `section.guangzhou-day` was tried and dropped: blocking time was the same with days skipped, laid out, or removed entirely. What did help, by A/B against the previous build: `page-transitions.js` skips its per-heading style reads on phones (titles are only named at 981px+), far galleries no longer measure on load, and `travel-seeds.js` skips its mid-parse layout read on phones (Japan 310 -> 263ms, Guangzhou 239 -> 209ms, USA & Canada 344 -> 315ms, Travel 207 -> 187ms).
 - **Build size: measured, no easy win (do not retry).**
   - JPEGs are q40–42; recompressing is break-even or worse (1600px cap enlarges them).
   - JPEG→WebP refuted (net growth); only the 9 banners (q82) have headroom.

@@ -9,9 +9,14 @@
     var list = [];
     var mark = document.querySelector('#nav .nav-active-mark');
     if (mark) list.push(mark);
+    // Titles are only named at 981px and up (custom.css), so phones skip the style
+    // reads: a journal has one <h2> per day and each read cost a style recalc.
+    if (!window.matchMedia('(min-width: 981px)').matches) return list;
     var titles = document.querySelectorAll('#main h1, #main h2');
-    for (var i = 0; i < titles.length; i++) {
-      titles[i].style.viewTransitionName = '';
+    var i;
+    // Clear every inline name before reading any, so the reads share one recalc.
+    for (i = 0; i < titles.length; i++) titles[i].style.viewTransitionName = '';
+    for (i = 0; i < titles.length; i++) {
       if (getComputedStyle(titles[i]).viewTransitionName === 'page-title') list.push(titles[i]);
     }
     return list;

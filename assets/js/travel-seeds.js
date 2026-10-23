@@ -11,9 +11,9 @@
   while (pool.length && cards.length < 4) cards.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0].cloneNode(true));
   document.querySelectorAll('[data-explore-action], .photo-explore__hint').forEach(function (b) { b.hidden = false; });
   var cardGrid = document.querySelector('.photo-explore__cards');
-  var cardWidth = parseFloat(getComputedStyle(cardGrid).gridTemplateColumns) - 2;
   // Phones cap the slot at 160px, like journal tiles, so DPR-3 screens take the 480w file, not 800w.
-  var slot = matchMedia('(max-width: 736px)').matches ? Math.min(cardWidth, 160) : cardWidth;
+  // On phones the slot is that cap (travel-discovery.js refines it once laid out), so skip the read: mid-parse it forced a layout (Oct 2026).
+  var slot = matchMedia('(max-width: 736px)').matches ? 160 : parseFloat(getComputedStyle(cardGrid).gridTemplateColumns) - 2;
   cards.forEach(function (a) { a.querySelector('img').sizes = Math.max(1, slot) + 'px'; });
   cardGrid.replaceChildren.apply(cardGrid, cards);
   // Only attached, initially visible images are eager; template images stay inert.

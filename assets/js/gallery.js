@@ -913,9 +913,13 @@
     if (galleryWarmup) {
       galleryWarmers.set(gallery, function (near) {
         nearViewport = near;
-        if (near) warmAhead(measure());
+        if (near) apply(measure());
       });
       galleryWarmup.observe(gallery);
+      // Far galleries start from what the markup says (scrolled to the first photo) and measure
+      // once they come near: reading every tile of every gallery on load forced a long layout on
+      // phones (USA & Canada, Oct 2026).
+      apply({ nearest: 0, start: true, end: tiles.length < 2, scrollable: tiles.length > 1 });
     }
 
     /* Split so a resize can read every gallery before writing any: alternating
@@ -926,6 +930,7 @@
       scrollFrame = requestAnimationFrame(function () { scrollFrame = null; apply(measure()); });
     }, { passive: true });
     galleryRefreshers.push(function () {
+      if (!nearViewport) return function () {};
       var state = measure();
       return function () { apply(state); };
     });
