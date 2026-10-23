@@ -3119,7 +3119,7 @@ body.is-map-fullscreen .travel-atlas__layout {
 @media screen and (max-width: 480px) {
   .page-travel-journal header.major > .date {
     gap: 0.5rem;
-    font-size: 0.8rem;
+    font-size: max(var(--text-floor), 0.8rem);
   }
 }
 
@@ -3161,6 +3161,9 @@ body.is-map-fullscreen .travel-atlas__layout {
   line-height: 1.65;
   text-align: center;
   text-wrap: balance;
+  /* Upright like Japan's (24 Oct 2026): the theme's italic header <p> was the only use of the
+     46 KB Merriweather 300 italic file on eight journals. */
+  font-style: normal;
 }
 
 .travel-journal__hero-image,
@@ -3668,7 +3671,14 @@ body.is-map-fullscreen .travel-atlas__layout {
     text-align: left;
   }
 
-  .guangzhou-day__route--collapsible .guangzhou-route__more {
+  /* Routes arrive folded from the build (Add-RouteSummaries), so the full list never paints and
+     then collapses (Perth CLS, Oct 2026). noscript.css shows it again without JavaScript. */
+  .guangzhou-day__route:not(.is-expanded) > .travel-route-summary ~ .guangzhou-route {
+    display: none;
+  }
+
+  .guangzhou-day__route--collapsible .guangzhou-route__more,
+  .travel-route-summary ~ .guangzhou-route__more {
     display: inline-flex;
     min-height: 3rem;
     align-items: center;
@@ -5020,6 +5030,8 @@ body:not(.page-home) #wrapper.fade-in::before {
     background: rgba(255, 255, 255, 0.94);
     box-shadow: 0 0.18rem 0.8rem rgba(3, 14, 30, 0.2);
     color: #212931;
+    /* The theme sets 0.8rem (11.7px) on phones; keep the 12px phone floor. */
+    font-size: max(var(--text-floor), 0.8rem);
   }
 
   .page-home #navPanelToggle {
@@ -5921,7 +5933,7 @@ a.travel-jump-group__label {
 }
 
 .site-pager__link > strong {
-  font-size: 0.8rem;
+  font-size: max(var(--text-floor), 0.8rem);
 }
 
 .travel-pagination a::after,
@@ -7828,7 +7840,7 @@ body.page-home #intro {
 .japan-journal .japan-journal__intro > .date {
   display: block;
   margin: 0 0 0.85rem;
-  font: 700 0.78rem/1.4 var(--font-display);
+  font: 700 max(var(--text-floor), 0.78rem)/1.4 var(--font-display);
   text-transform: uppercase;
 }
 
@@ -9644,7 +9656,7 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 .travel-timeline .travel-portals{max-width:390px;gap:10px}
 .travel-timeline .travel-portals .travel-portal{padding:6px 12px 10px}
 .travel-timeline .portal-label{font-size:13px}
-.travel-timeline .portal-label small{font-size:11px;margin-top:3px}
+.travel-timeline .portal-label small{font-size:max(var(--text-floor),11px);margin-top:3px}
 .travel-timeline .portal-art{height:66px;flex-basis:66px;width:120px}
 .travel-timeline .portal-stack img{left:29px;top:8px}
 .travel-timeline .photo-explore{margin-top:14px!important;margin-bottom:16px!important}
@@ -9653,7 +9665,7 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 .travel-timeline .photo-explore__card img{height:105px;aspect-ratio:auto}
 .travel-timeline .photo-explore__caption{padding:8px 12px;gap:3px}
 .travel-timeline .photo-explore__caption strong{font-size:15px;line-height:1.3}
-.travel-timeline .photo-explore__caption>span{font-size:11px;line-height:1.4}
+.travel-timeline .photo-explore__caption>span{font-size:max(var(--text-floor),11px);line-height:1.4}
 .travel-timeline #main>.travel-atlas:first-child{padding-bottom:18px!important}
 .travel-timeline #main>.travel-archive-heading{padding-top:20px!important;padding-bottom:18px!important}
 @media(min-width:737px){
@@ -9670,7 +9682,7 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
  .travel-timeline .photo-explore__card img{width:60px;height:76px;flex:0 0 60px}
  .travel-timeline .photo-explore__caption{padding:7px;justify-content:center;gap:4px}
  .travel-timeline .photo-explore__caption strong{font-size:13px}
- .travel-timeline .photo-explore__caption>span{font-size:10px;margin-top:0}
+ .travel-timeline .photo-explore__caption>span{font-size:max(var(--text-floor),10px);margin-top:0}
 }
 .travel-timeline #main>.travel-archive-heading{margin-top:8px!important;min-height:0}
 .travel-timeline #main>.travel-archive-heading h2{margin:0!important}
@@ -9688,7 +9700,7 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
  .travel-timeline .photo-explore__card img{width:100%;height:100px;flex:0 0 100px}
  .travel-timeline .photo-explore__caption{padding:7px 9px;gap:4px}
  .travel-timeline .photo-explore__caption strong{font-size:14px}
- .travel-timeline .photo-explore__caption>span{font-size:11px}
+ .travel-timeline .photo-explore__caption>span{font-size:max(var(--text-floor),11px)}
 }
 /* Restore the reviewed photo crop; compact the surrounding UI instead. */
 .travel-timeline .photo-explore__card img{height:auto;aspect-ratio:1.6;flex:none;width:100%;object-fit:cover}
@@ -9705,7 +9717,7 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
  .travel-timeline .portal-art{width:120px;height:76px;flex:0 0 120px}
  .travel-timeline .portal-stack img{left:29px;top:10px}
  .travel-timeline .portal-label{font-size:14px}
- .travel-timeline .portal-label small{font-size:11px}
+ .travel-timeline .portal-label small{font-size:max(var(--text-floor),11px)}
  .travel-timeline .portal-arrow{right:10px;bottom:12px}
 }
 @media(min-width:981px) and (max-width:1200px){

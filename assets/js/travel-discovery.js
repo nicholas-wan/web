@@ -15,7 +15,8 @@
   var imageObserver = new ResizeObserver(function () {
     document.querySelectorAll('.photo-explore__cards img').forEach(function (img) {
       var width = img.getBoundingClientRect().width;
-      if (width) img.sizes = width + 'px';
+      // Phones cap at 160px (the journal-tile slot) so DPR-3 screens take the 480w file.
+      if (width) img.sizes = (matchMedia('(max-width: 736px)').matches ? Math.min(width, 160) : width) + 'px';
     });
   });
   imageObserver.observe(cardGrid);

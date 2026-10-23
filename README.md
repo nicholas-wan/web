@@ -67,6 +67,8 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 - Banner `sizes`: `100vw` on phones, `calc(100vw - 176px)` to 1024px, `1024px` to 1680px, `1366px` above.
 - Banners get a `-1200` tier (`make-responsive-variants.py --banners-only`, q82 JPEG / q80 WebP, kept only if it saves a fifth) for DPR-3 phones. Seoul and Guangzhou are excluded (2:1 art).
 - Journal tiles use a density-capped `160px` phone slot and a `20vw` desktop slot; non-journal galleries keep `800px`. No images are recompressed.
+- The same `160px` phone cap (24 Oct 2026) applies to Browse photos postcards (`travel-seeds.js`, `travel-discovery.js`), search tiles (`photo-search.js`) and the phone journal list photos (`travel-chronology.js`). The list photos are 224px wide, so DPR-3 phones get about 2.1x density; the owner accepted that softening for roughly 460 KB less per full scroll.
+- The three Read journals shortcut photos have dedicated 200px WebP copies (`*-200.webp`, made from the originals with Pillow at q80, 24 Oct 2026, owner-approved), about 22 KB instead of 133 KB.
 - Journal animations use `data-poster`, not `poster`, which loads eagerly. `gallery.js` attaches it near the viewport; `travel-map.js` reads either.
 
 ### CSS and JavaScript
@@ -262,7 +264,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - `<title>` "Nicholas Wan - {label} Trip"; meta "Nicholas Wan's [Place] travel journal from [Month YYYY]: [stops]."; 404 title "Nicholas Wan - …", cards use nav names.
 - Atlas uses journal labels (Perth, Europe, Silicon Valley, Seoul), region in brackets where a journal has two pins.
 - Chengdu & Zhangjiajie captions: place names only (owner decision).
-- Hero: title-case upright Raleway, `clamp(2.25rem, 6vw, 3.5rem)`; lede 1.65 leading, `text-wrap: balance`; date 1.5rem above; desktop article top padding 2.5rem. Keep artwork banners.
+- Hero: title-case upright Raleway, `clamp(2.25rem, 6vw, 3.5rem)`; lede 1.65 leading, `text-wrap: balance`, upright (24 Oct 2026: the theme's italic was the only use of the 46 KB Merriweather 300 italic file); date 1.5rem above; desktop article top padding 2.5rem. Keep artwork banners.
 - Japan's editorial hero: left-aligned `Travel journal` eyebrow, title, dates, lede, above a full-bleed text-free Arakurayama banner (`day14_hakone/fuji2.jpg`, also in the gallery, owner choice) at `50% 52%`. No title over the photo.
 - Banners: `clamp(16rem, 28vw, 22rem)`, 22rem wrapper cap (owner-approved); phones keep own heights and contain-fit wrappers. Shared pale placeholder; wide contain-fit art sizes its mobile wrapper to natural ratio. Never a dark wrapper background (black flash).
 - Crops use focal-point custom properties. Tall collage cards reserve two 4:3 desktop rows plus 1rem gutter via width-based padding; phones reset it. Tall-grid checks cover every such journal.
@@ -273,6 +275,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Day headings keep full titles; optional `data-nav-label` sets the pill; build prefixes D0, D1…. One pill group in section order; only Australia splits (Melbourne, Sydney); no country grouping in `build.ps1`. Chapter/place journals keep their meaning. Every day (departures, repeats) stays reachable.
 - Route subtitles use `--color-ink-600`. Every route box is labelled `Route` and gets the shared enhancement.
 - Phone routes: first and last stop plus "View all N stops"; summary joins name and `<small>` subtitle with a middle dot (`樟宜机场 · Zhāngyí Jīchǎng → …`), name alone if none. Expanded: full bilingual numbered timeline; collapsed stops hidden from assistive tech. Desktop keeps wrapped expansion.
+- Routes arrive folded (24 Oct 2026): `Add-RouteSummaries` in `build.ps1` emits the summary, route id and `View all N stops` button, and `custom.css` hides the list on phones until it is expanded, so it never paints in full and then collapses (Perth CLS 0.061) and phones skip Merriweather 700. `noscript.css` shows the full list without JavaScript; `travel-nav.js` only builds a summary for markup that lacks one.
 - Phone route summary and Australia's intro are left-aligned. Australia keeps its lede-less header, 2.5rem bottom margin, day-note intro.
 - Lightbox: at most five decoded viewing-size images; closing releases them.
 - Show a prepared image at once; else the tile, while the fitted image loads at high priority and one directional neighbour at low priority in parallel. After decode, prepare two ahead, one behind.

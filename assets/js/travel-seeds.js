@@ -12,7 +12,9 @@
   document.querySelectorAll('[data-explore-action], .photo-explore__hint').forEach(function (b) { b.hidden = false; });
   var cardGrid = document.querySelector('.photo-explore__cards');
   var cardWidth = parseFloat(getComputedStyle(cardGrid).gridTemplateColumns) - 2;
-  cards.forEach(function (a) { a.querySelector('img').sizes = Math.max(1, cardWidth) + 'px'; });
+  // Phones cap the slot at 160px, like journal tiles, so DPR-3 screens take the 480w file, not 800w.
+  var slot = matchMedia('(max-width: 736px)').matches ? Math.min(cardWidth, 160) : cardWidth;
+  cards.forEach(function (a) { a.querySelector('img').sizes = Math.max(1, slot) + 'px'; });
   cardGrid.replaceChildren.apply(cardGrid, cards);
   // Only attached, initially visible images are eager; template images stay inert.
   cards.forEach(function (a) {

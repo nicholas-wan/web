@@ -235,6 +235,8 @@
 	function thumbnail(photo) {
 		var grid = document.querySelector('.photo-explore__cards');
 		var width = (parseFloat(getComputedStyle(grid).gridTemplateColumns) || 480) - 2;
+		// Phones cap at the 160px journal-tile slot so DPR-3 screens take the 480w file.
+		if (matchMedia('(max-width: 736px)').matches) width = Math.min(width, 160);
 		var sources = photo.variants ? photo.thumb + ' 480w, ' + photo.src + ' ' + photo.w + 'w' : '';
 		if (photo.variants === 2) sources += ', ' + photo.thumb.replace('-480.', '-800.') + ' 800w';
 		return '<img loading="lazy" decoding="async"' +

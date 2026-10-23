@@ -115,7 +115,8 @@ test('visible postcards are eager and high-density previews select larger images
   await responsive.evaluate(img => img.decode());
   expect(await responsive.evaluate(img => img.currentSrc !== new URL(img.getAttribute('src'), location.href).href)).toBe(true);
   await page.setViewportSize({ width: 390, height: 844 });
-  await expect.poll(() => responsive.evaluate(img => Math.abs(parseFloat(img.sizes) - img.getBoundingClientRect().width))).toBeLessThan(1);
+  // Phones cap the slot at the 160px journal-tile size so DPR-3 screens take the 480w file (24 Oct 2026).
+  await expect.poll(() => responsive.evaluate(img => Math.abs(parseFloat(img.sizes) - Math.min(160, img.getBoundingClientRect().width)))).toBeLessThan(1);
   await context.close();
 });
 

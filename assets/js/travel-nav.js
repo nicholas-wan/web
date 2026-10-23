@@ -360,17 +360,21 @@
       group.appendChild(button);
     }
     group.classList.add('guangzhou-day__route--collapsible');
-    var summary = document.createElement('p');
-    summary.className = 'travel-route-summary';
-    // Name plus its pinyin/English subtitle, so the collapsed phone summary is
-    // not native script alone (Oct 2026); older journals may have no <small>.
-    var place = function (stop) {
-      var small = stop.querySelector('small');
-      var name = stop.querySelector('span').textContent.trim();
-      return small && small.textContent.trim() ? name + ' \u00B7 ' + small.textContent.trim() : name;
-    };
-    summary.textContent = place(stops[0]) + (stops.length > 1 ? ' \u2192 ' + place(stops[stops.length - 1]) : '');
-    group.insertBefore(summary, route);
+    // The build emits the summary (Add-RouteSummaries) so routes arrive folded;
+    // this fallback only runs on markup that skipped it.
+    if (!group.querySelector('.travel-route-summary')) {
+      var summary = document.createElement('p');
+      summary.className = 'travel-route-summary';
+      // Name plus its pinyin/English subtitle, so the collapsed phone summary is
+      // not native script alone (Oct 2026); older journals may have no <small>.
+      var place = function (stop) {
+        var small = stop.querySelector('small');
+        var name = stop.querySelector('span').textContent.trim();
+        return small && small.textContent.trim() ? name + ' \u00B7 ' + small.textContent.trim() : name;
+      };
+      summary.textContent = place(stops[0]) + (stops.length > 1 ? ' \u2192 ' + place(stops[stops.length - 1]) : '');
+      group.insertBefore(summary, route);
+    }
     route.id = 'journal-route-' + index;
     button.removeAttribute('aria-haspopup');
     button.setAttribute('aria-controls', route.id);

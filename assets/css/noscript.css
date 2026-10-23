@@ -35,3 +35,16 @@
 }
 
 .travel-map-teaser__projection{background-image:url("../../images/travel/world-map.svg")}
+
+/* Journal routes: the build folds them on phones; without JavaScript nothing can unfold them. */
+
+	@media screen and (max-width: 600px) {
+		.guangzhou-day__route:not(.is-expanded) > .travel-route-summary ~ .guangzhou-route {
+			display: grid;
+		}
+
+		.travel-route-summary,
+		.guangzhou-route__more {
+			display: none !important;
+		}
+	}

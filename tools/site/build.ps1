@@ -569,6 +569,38 @@ function Add-GalleryAltText([string]$Markup, [string]$Slug) {
     })
 }
 
+# Phones show each route as "first stop -> last stop" plus "View all N stops". travel-nav.js used to
+# build that after load, so the full list painted first and then folded (Perth CLS 0.061, Oct 2026),
+# and its bold stop names pulled in Merriweather 700. The build now emits the summary and button;
+# custom.css hides the list on phones until it is expanded, and noscript.css shows it without JS.
+function Add-RouteSummaries([string]$Markup, [string]$Slug) {
+    if ($tripOrder -notcontains $Slug) { return $Markup }
+    $state = @{ Index = 0 }
+    $groups = [regex]::Matches($Markup, 'class="[^"]*\bguangzhou-day__route\b').Count
+    $place = {
+        param($stop)
+        $name = ([regex]::Replace($stop.Groups['name'].Value, '<[^>]+>', '')).Trim()
+        $small = ([regex]::Replace($stop.Groups['small'].Value, '<[^>]+>', '')).Trim()
+        if ($small) { return "$name &middot; $small" } else { return $name }
+    }
+    $result = [regex]::Replace($Markup, '(?s)(?<open><div class="[^"]*\bguangzhou-day__route\b[^"]*">\s*<strong>[^<]*</strong>\s*)<div class="(?<routeClass>[^"]*\bguangzhou-route\b[^"]*)">(?<stops>(?:(?!</div>).)*?)</div>(?<gap>\s*)(?:<button class="(?<buttonClass>[^"]*\bguangzhou-route__more\b[^"]*)"[^>]*>.*?</button>\s*)?</div>', {
+        param($match)
+        $id = "journal-route-$($state.Index)"
+        $state.Index++
+        $stops = [regex]::Matches($match.Groups['stops'].Value, '(?s)<span class="[^"]*\bguangzhou-route__stop\b[^"]*">\s*<span>(?<name>.*?)</span>\s*(?:<small>(?<small>.*?)</small>)?')
+        if ($stops.Count -eq 0) { throw "A route on $Slug has no stops." }
+        $summary = & $place $stops[0]
+        if ($stops.Count -gt 1) { $summary += ' &rarr; ' + (& $place $stops[$stops.Count - 1]) }
+        $label = if ($stops.Count -eq 1) { 'View all 1 stop' } else { "View all $($stops.Count) stops" }
+        $buttonClass = if ($match.Groups['buttonClass'].Success) { $match.Groups['buttonClass'].Value } else { 'travel-route__more guangzhou-route__more' }
+        return $match.Groups['open'].Value + "<p class=`"travel-route-summary`">$summary</p>`n    " +
+            "<div class=`"$($match.Groups['routeClass'].Value)`" id=`"$id`">$($match.Groups['stops'].Value)</div>$($match.Groups['gap'].Value)" +
+            "<button class=`"$buttonClass`" type=`"button`" aria-expanded=`"false`" aria-controls=`"$id`">$label</button>`n  </div>"
+    })
+    if ($state.Index -ne $groups) { throw "Folded $($state.Index) of $groups routes on $Slug; check the route markup." }
+    return $result
+}
+
 function Convert-MainLandmark([string]$Markup) {
     $updated = [regex]::Replace($Markup, '<div id="main"([^>]*)>', '<main id="main"$1>', 1)
     $closingIndex = $updated.LastIndexOf('</div>')
@@ -1065,6 +1097,7 @@ foreach ($page in $pages) {
     }
     $main = Add-ImagePerformanceAttributes $main (Join-Path $root "images") $sourceImageIndex ($tripOrder -contains $slug)
     $main = Add-GalleryAltText $main $slug
+    $main = Add-RouteSummaries $main $slug
     if ($slug -eq 'travel') {
         # Native lazy loading may fetch every rail photo on slow connections.
         # Keep responsive sources inert until the visible presentation approaches.
