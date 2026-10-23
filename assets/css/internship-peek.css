@@ -1,0 +1,348 @@
+/* Owner-approved compact internship previews. Scenes are conceptual illustrations. */
+/* Anomaly peek (Oct 2026, owner-approved after a lab trial): three chips at the foot of the Cyber Detection Analytics card,
+   each with a tiny live preview, opening one small chart card at a time
+   below the chips. Brand teal for normal, the card's outcome amber for
+   anything flagged, ink for every label. */
+
+/* The chip row: its own row after the tags, unpositioned so the cards
+   position against the card itself. */
+.page-experience .case-study--internship .internship-demo-peek {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+/* The call to action: one line above the chips, a bold teal invitation and
+   a muted "hover/tap a chart" so it reads as something to do. */
+.page-experience .case-study--internship .internship-demo-peek__hint {
+  flex-basis: 100%;
+  margin: 0.25rem 0 0;
+  color: #68727e;
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: max(var(--text-floor, 0px), 0.8rem);
+  line-height: 1.35;
+  text-align: left;
+}
+.page-experience .case-study--internship .internship-demo-peek__hint strong { color: #0c6663; font-weight: 700; }
+.internship-demo-peek__hint-touch { display: none; }
+@media (hover: none) {
+  .internship-demo-peek__hint-hover { display: none; }
+  .internship-demo-peek__hint-touch { display: inline; }
+}
+
+.page-experience .case-study--internship .internship-demo-peek__chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: auto;
+  padding: 0.3rem 0.75rem 0.3rem 0.4rem;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px #cfdcda, 0 1px 2px rgba(7, 19, 21, 0.06);
+  color: #20343d !important;
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: max(var(--text-floor, 0px), 0.78rem);
+  font-weight: 700;
+  letter-spacing: normal;
+  line-height: 1.3;
+  text-transform: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: box-shadow var(--motion-fast, 150ms) ease, transform var(--motion-fast, 150ms) ease;
+}
+.page-experience .case-study--internship .internship-demo-peek__chip[aria-expanded="true"] {
+  box-shadow: inset 0 0 0 1px #11807d, 0 4px 12px rgba(12, 102, 99, 0.14);
+  color: #0c6663 !important;
+}
+@media (hover: hover) {
+  .page-experience .case-study--internship .internship-demo-peek__chip:hover {
+    box-shadow: inset 0 0 0 1px #11807d, 0 4px 12px rgba(12, 102, 99, 0.14);
+    color: #0c6663 !important;
+    transform: translateY(-1px);
+  }
+}
+/* Wide desktops: three chips as wide as the widest one (equal 1fr columns
+   in a fit-content grid), thumbnail and label centred, and a small arrow at
+   the right that nudges on hover, a cue that the chip opens something. */
+@media screen and (min-width: 981px) {
+  .page-experience .case-study--internship > .internship-demo-peek {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: fit-content;
+    max-width: 100%;
+  }
+  .page-experience .case-study--internship .internship-demo-peek__hint { grid-column: 1 / -1; }
+  .page-experience .case-study--internship .internship-demo-peek__chip { min-width: 0; }
+  .page-experience .case-study--internship .internship-demo-peek__chip > .internship-demo-peek__mini { margin-left: auto; }
+  .page-experience .case-study--internship .internship-demo-peek__chip::after {
+    content: "";
+    flex: none;
+    width: 0.4rem;
+    height: 0.4rem;
+    margin: 0 0.15rem 0 auto;
+    border-top: 1.6px solid currentColor;
+    border-right: 1.6px solid currentColor;
+    opacity: 0.5;
+    transform: rotate(45deg);
+    transition: transform var(--motion-fast, 150ms) ease, opacity var(--motion-fast, 150ms) ease;
+  }
+  .page-experience .case-study--internship .internship-demo-peek__chip:hover::after,
+  .page-experience .case-study--internship .internship-demo-peek__chip[aria-expanded="true"]::after {
+    opacity: 1;
+    transform: translateX(2px) rotate(45deg);
+  }
+}
+.page-experience .case-study--internship .internship-demo-peek__chip:focus-visible {
+  outline: 2px solid #128a86;
+  outline-offset: 3px;
+}
+/* The nudge: once the previews come to rest, each chip glows once, a beat
+   apart, to invite a hover or tap. Never repeats while you watch. */
+.page-experience .case-study--internship .internship-demo-peek__chip.is-nudging {
+  animation: peek-nudge 900ms var(--ease-standard, ease-out) 1;
+}
+.page-experience .case-study--internship .internship-demo-peek__chip.is-nudging + .internship-demo-peek__chip.is-nudging { animation-delay: 160ms; }
+/* Only the peak is keyed, so the glow starts and ends on whatever shadow
+   the chip has (resting, hover or open). */
+@keyframes peek-nudge {
+  40% { box-shadow: inset 0 0 0 1px #11807d, 0 0 0 5px rgba(17, 128, 125, 0.16); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-experience .case-study--internship .internship-demo-peek__chip.is-nudging { animation: none; }
+}
+/* The first chip breathes while the card is on screen until any chart is
+   opened (owner-approved Oct 2026); reduced motion holds a teal outline. */
+.page-experience .case-study--internship .internship-demo-peek__chip.is-breathing {
+  animation: peek-breathe 2.6s ease-in-out infinite;
+}
+@keyframes peek-breathe {
+  50% { box-shadow: inset 0 0 0 1.5px #11807d, 0 0 0 5px rgba(17, 128, 125, 0.14); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-experience .case-study--internship .internship-demo-peek__chip.is-breathing {
+    animation: none;
+    box-shadow: inset 0 0 0 1.5px #11807d;
+  }
+}
+/* Touch: a 44px tap area without a taller chip. */
+@media (pointer: coarse) {
+  .page-experience .case-study--internship .internship-demo-peek__chip::before {
+    content: "";
+    position: absolute;
+    inset: -0.55rem -0.2rem;
+  }
+}
+.internship-demo-peek__mini {
+  display: block;
+  flex: none;
+  /* Drawn at 78x24 (from 48x14, Oct 2026) in a slightly deeper well, so the
+     thumbnails read at a glance and invite a click. */
+  width: 86px;
+  height: 28px;
+  padding: 2px 4px;
+  border-radius: 999px;
+  background: #e9f4f2;
+  box-shadow: inset 0 0 0 1px rgba(17, 128, 125, 0.12);
+  overflow: visible;
+}
+.mini-band { fill: rgba(17, 128, 125, 0.14); }
+.mini-line { fill: none; stroke: #11807d; stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; }
+.mini-flag { fill: #c46d1c; stroke: #ffffff; stroke-width: 1; }
+.mini-edge { stroke: rgba(17, 128, 125, 0.4); stroke-width: 1; }
+.mini-odd { fill: none; stroke: #c46d1c; stroke-width: 1.2; stroke-dasharray: 2 1.5; }
+.mini-node { fill: #11807d; stroke: #ffffff; stroke-width: 1; }
+.mini-ring { fill: none; stroke: #c46d1c; stroke-width: 1; }
+.mini-node.is-odd { fill: #c46d1c; }
+.mini-packet { fill: #11807d; opacity: 0.7; }
+
+/* The chart cards: absolutely placed below the chip row by the script, so
+   opening one never moves the page or covers the writeup above. */
+.page-experience .case-study--internship .internship-demo-card {
+  position: absolute;
+  z-index: 30;
+  width: min(24rem, calc(100% - 1.5rem));
+  padding: 0.85rem 1rem 0.7rem;
+  border: 1px solid #dce6e5;
+  border-radius: 0.6rem;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(7, 19, 21, 0.16);
+  text-align: left;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity var(--motion-standard, 220ms) ease, transform var(--motion-standard, 220ms) var(--ease-standard, ease), visibility 0s linear var(--motion-standard, 220ms);
+}
+.page-experience .case-study--internship .internship-demo-card.is-open {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition: opacity var(--motion-standard, 220ms) ease, transform var(--motion-standard, 220ms) var(--ease-standard, ease), visibility 0s;
+}
+.page-experience .case-study--internship .internship-demo-card__title {
+  margin: 0 0 0.3rem;
+  color: #68727e;
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: max(var(--text-floor, 0px), 0.7rem);
+  font-weight: 700;
+  letter-spacing: var(--eyebrow-tracking, 0.12em);
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+.page-experience .case-study--internship .internship-demo-card__plot { position: relative; }
+.page-experience .case-study--internship .internship-demo-card__plot svg { display: block; overflow: visible; }
+.page-experience .case-study--internship .internship-demo-card__note {
+  margin: 0.35rem 0 0;
+  text-align: left;
+  color: #596273;
+  font-size: max(var(--text-floor, 0px), 0.78rem);
+  line-height: 1.45;
+}
+
+/* Chart marks (shared by both cards). */
+.peek-band { fill: rgba(17, 128, 125, 0.12); }
+.peek-mid { fill: none; stroke: rgba(17, 128, 125, 0.3); stroke-width: 1; }
+.peek-axis { stroke: #d7e4e2; stroke-width: 1; }
+.peek-line { fill: none; stroke: #11807d; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.peek-flag { fill: #c46d1c; stroke: #ffffff; stroke-width: 2; }
+.peek-label {
+  fill: #20343d;
+  stroke: #ffffff;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke;
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.peek-pulse {
+  fill: none;
+  stroke: #c46d1c;
+  stroke-width: 1.5;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: peek-pulse 1600ms var(--ease-standard, ease-out) infinite;
+}
+svg.is-paused .peek-pulse { animation-play-state: paused; }
+svg.is-drawing .peek-flag,
+svg.is-drawing .peek-label,
+svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
+@keyframes peek-pulse {
+  from { opacity: 0.9; transform: scale(1); }
+  to { opacity: 0; transform: scale(3.2); }
+}
+.peek-edge { stroke: rgba(17, 128, 125, 0.28); stroke-width: 1; }
+.peek-node { fill: #11807d; stroke: #ffffff; stroke-width: 2; transition: fill var(--motion-standard, 220ms) ease; }
+.peek-node.is-odd { fill: #c46d1c; }
+.peek-packet { fill: #11807d; opacity: 0.75; }
+.peek-odd { stroke: #c46d1c; stroke-width: 1.5; stroke-dasharray: 4 3; stroke-linecap: round; }
+.peek-odd-packet { fill: #c46d1c; }
+.peek-ring { fill: none; stroke: #c46d1c; stroke-width: 1.5; }
+/* Phishing domains: the address-bar text and the "Phishing" tag. */
+.peek-url,
+.peek-tag {
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
+.peek-url { fill: #20343d; }
+.peek-tag { fill: #ffffff; letter-spacing: 0.03em; }
+
+@media (prefers-reduced-motion: reduce) {
+  .peek-pulse { animation: none; }
+  .page-experience .case-study--internship .internship-demo-card,
+  .page-experience .case-study--internship .internship-demo-card.is-open { transition: none; transform: none; }
+}
+/* Phones: no hover, little width, and a floating card would cover the next
+   section. The chips become two equal halves under the call-to-action line,
+   and a tap opens that chart inline, straight below the chips, pushing the
+   page down rather than covering anything. The row stays last in the card. */
+@media screen and (max-width: 736px) {
+  .page-experience .case-study--internship > .internship-demo-peek { grid-row: 6; }
+  .internship-demo-peek__hint-hover { display: none; }
+  .internship-demo-peek__hint-touch { display: inline; }
+}
+/* Phones and tablets: three equal tiles in one row, thumbnail above a
+   centred label, top aligned so the thumbnails line up when one label is a
+   line shorter. Wide desktops use equal-width chips instead. */
+@media screen and (max-width: 980px) {
+  .page-experience .case-study--internship > .internship-demo-peek {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 0.45rem;
+  }
+  .page-experience .case-study--internship .internship-demo-peek__hint { grid-column: 1 / -1; margin: 0.15rem 0 0; }
+  .page-experience .case-study--internship .internship-demo-peek__chip::after { display: none; }
+  .page-experience .case-study--internship .internship-demo-peek__chip {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    min-width: 0;
+    padding: 0.5rem 0.3rem 0.45rem;
+    border-radius: 0.6rem;
+    line-height: 1.2;
+    white-space: normal;
+    text-align: center;
+  }
+  .page-experience .case-study--internship .internship-demo-card { grid-column: 1 / -1; }
+}
+/* Phone tiles are about 93px wide: a slightly smaller thumbnail keeps a margin. */
+@media screen and (max-width: 736px) {
+  .internship-demo-peek__mini { width: 78px; height: 25px; }
+}
+/* Phones and touch tablets: with no hover to preview, a tap pins the card,
+   and a pinned floating card would sit over Early career. So the card opens
+   inline below the chips (internship-demo-peek.js matches this query), and the chips
+   themselves are 44px tall. */
+@media screen and (max-width: 736px), screen and (hover: none) {
+  .page-experience .case-study--internship .internship-demo-peek__chip {
+    min-height: 44px;
+    transform: none;
+  }
+  .page-experience .case-study--internship .internship-demo-peek__chip::before { display: none; }
+  .page-experience .case-study--internship .internship-demo-card {
+    position: static;
+    width: auto;
+    display: none;
+    margin-top: 0.15rem;
+    box-shadow: none;
+    transform: none;
+  }
+  .page-experience .case-study--internship .internship-demo-card.is-open {
+    display: block;
+    animation: internship-demo-card-in var(--motion-standard, 220ms) ease both;
+  }
+}
+/* Touch tablets keep the chip row; the card takes its own line (the margin
+   fills the rest of it) at the desktop card's width. */
+@media screen and (min-width: 737px) and (hover: none) {
+  .page-experience .case-study--internship .internship-demo-card {
+    flex: none;
+    width: min(24rem, 100%);
+    margin-right: calc(100% - min(24rem, 100%));
+  }
+}
+@keyframes internship-demo-card-in { from { opacity: 0; } }
+/* The narrowest phones: a shorter mini leaves room for the longer chip names. */
+@media screen and (max-width: 374px) {
+  /* Border-box: slim padding so the chart itself draws at 36x11. */
+  .page-experience .case-study--internship .internship-demo-peek__mini { width: 60px; height: 20px; padding: 1px 2px; }
+  /* A two-line note is the tallest any card gets here, so all three match. */
+  .page-experience .case-study--internship .internship-demo-card__note { min-height: 2.9em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-experience .case-study--internship .internship-demo-card.is-open { animation: none; }
+}
+
+.page-experience .case-study--internship .internship-demo-peek{position:relative;display:block;margin-top:.7rem;width:100%;}.page-experience .case-study--internship .internship-demo-peek__hint{margin:0 0 .45rem}.page-experience .case-study--internship .internship-demo-peek__chip{width:auto;min-height:36px;flex-direction:row;border-radius:999px;padding:.3rem .75rem .3rem .4rem}.page-experience .case-study--internship .internship-demo-card{top:calc(100% + 8px);left:0;width:min(390px,100%);}.internship-demo-card__plot{height:130px}.internship-demo-card__plot>svg{width:100%;height:130px}.internship-demo-peek__mini svg{display:block;width:78px;height:24px}.page-experience #multilingual-nlp .internship-demo-peek__mini{background:#fff1eb;box-shadow:inset 0 0 0 1px #ee4d2d22}.page-experience #trust-safety .internship-demo-peek__mini{background:#f1f5f4}.internship-demo-peek__hint-touch{display:none}.mockup-source{font:12px/1.5 'Source Sans Pro',sans-serif;color:#68727e;margin-top:1rem}.mockup-source a{color:inherit}@media(max-width:736px),(hover:none){.page-experience .case-study--internship .internship-demo-peek__chip{min-height:44px}.page-experience .case-study--internship .internship-demo-card{position:static;margin-top:8px}.internship-demo-peek__hint-hover{display:none}.internship-demo-peek__hint-touch{display:inline}}.page-experience #trust-safety .internship-demo-card{width:min(390px,100%)}#trust-safety .internship-demo-card__plot{height:130px}#trust-safety .internship-demo-card__plot>svg{height:130px}#trust-safety .internship-demo-card__note{margin-top:12px}@media(max-width:736px){#trust-safety .internship-demo-card{padding:12px}}
+
+.sp-brand{display:block;width:100%;height:130px;overflow:visible;font-family:Arial,sans-serif}.sp-brand .sp-samples{opacity:0}.is-playing .sp-brand .sp-samples{animation:spSample 1.05s 1.5s both}@keyframes spSample{0%{opacity:0;transform:none}20%{opacity:1;transform:none}80%{opacity:1;transform:translate(116px,-4px)}100%{opacity:0;transform:translate(116px,-4px)}}.sp-brand .sp-card{transform:translateX(76px)}.sp-brand .sp-crop,.sp-brand .sp-features,.sp-brand .sp-model,.sp-brand .sp-result,.sp-brand .sp-wire{opacity:0}.is-playing .sp-brand .sp-card{animation:spSplit .9s .4s ease-in-out forwards}.is-playing .sp-brand .sp-crop{animation:spReveal .5s 1.4s forwards}.is-playing .sp-brand .sp-features{animation:spResult .6s 2s both}.is-playing .sp-brand .sp-model{animation:spReveal .5s 2.6s forwards}.is-playing .sp-brand .sp-wire{animation:spReveal .5s 2.9s forwards}.is-playing .sp-brand .sp-result{animation:spResult .6s 3.5s both}.is-still .sp-brand .sp-card{transform:none}.is-still .sp-brand .sp-crop,.is-still .sp-brand .sp-features,.is-still .sp-brand .sp-model,.is-still .sp-brand .sp-result,.is-still .sp-brand .sp-wire{opacity:1;transform:none}@keyframes spSplit{to{transform:translateX(0)}}@keyframes spReveal{to{opacity:1}}@keyframes spResult{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}@media(prefers-reduced-motion:reduce){.sp-brand *{animation:none!important}.sp-brand .sp-card{transform:none}.sp-brand .sp-crop,.sp-brand .sp-features,.sp-brand .sp-model,.sp-brand .sp-result,.sp-brand .sp-wire{opacity:1;transform:none}}
+
+.league-brand-scene{display:block;width:100%;height:130px;overflow:visible}.league-brand-scene .lg-signal{opacity:0}.is-playing .league-brand-scene .lg-copy{animation:lg-separate 1.5s cubic-bezier(.2,.8,.2,1) .3s both}.is-playing .league-brand-scene .lg-signal{animation:lg-reveal .6s ease 2.5s both}.is-playing .league-brand-scene .lg-link{stroke-dasharray:80;stroke-dashoffset:80;animation:lg-line .8s ease 1.8s both}.is-still .league-brand-scene .lg-copy{animation:none;translate:0 0;opacity:1}.is-still .league-brand-scene .lg-signal{animation:none;opacity:1}.is-still .league-brand-scene .lg-link{animation:none;stroke-dashoffset:0} .is-playing .league-brand-scene .lg-vector-0{animation:lg-feature-left .8s ease 2.5s both}.is-playing .league-brand-scene .lg-vector-1{animation:lg-feature-right .8s ease 2.65s both}.is-still .league-brand-scene .lg-vector{animation:none;translate:0 0}@keyframes lg-feature-left{from{translate:-18px 0}to{translate:0 0}}@keyframes lg-feature-right{from{translate:18px 0}to{translate:0 0}}@keyframes lg-separate{from{translate:-194px 0;opacity:0}to{translate:0 0;opacity:1}}@keyframes lg-reveal{to{opacity:1}}@keyframes lg-line{to{stroke-dashoffset:0}}@media(prefers-reduced-motion:reduce){.is-playing .league-brand-scene .lg-vector{animation:none;translate:0 0}.is-playing .league-brand-scene .lg-copy{animation:none;translate:0 0;opacity:1}.is-playing .league-brand-scene .lg-signal{animation:none;opacity:1}.is-playing .league-brand-scene .lg-link{animation:none;stroke-dashoffset:0}}

@@ -726,10 +726,10 @@ $canvasJs = $mainJsSource.Substring($canvasStart, $canvasEnd - $canvasStart).Tri
 $sharedMainJs = ($mainJsSource.Substring(0, $canvasStart).TrimEnd() + "`n`n" + $mainJsSource.Substring($canvasEnd).TrimStart())
 
 $assetVersions = @{}
-foreach ($file in @('icons.css', 'main.css', 'noscript.css')) {
+foreach ($file in @('icons.css', 'main.css', 'noscript.css', 'internship-peek.css')) {
     $assetVersions["assets/css/$file"] = Get-FileContentVersion (Join-Path $root "assets\css\$file")
 }
-foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'travel-shortcuts.js', 'travel-chronology.js')) {
+foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'travel-shortcuts.js', 'travel-chronology.js')) {
     $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
 }
 $assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
@@ -1155,7 +1155,7 @@ foreach ($page in $pages) {
     $travelDiscoveryScript = if ($slug -eq 'travel') { "<script src=`"$(Get-AssetRef 'assets/js/travel-discovery.js')`"></script>" } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { "<script src=`"$(Get-AssetRef 'assets/js/personal-timeline.js')`"></script>" } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { "<script src=`"$(Get-AssetRef 'assets/js/scramble-reveal.js')`"></script>" } else { "" }
-    $anomalyPeekScript = if ($slug -eq 'experience') { "<script src=`"$(Get-AssetRef 'assets/js/anomaly-peek.js')`"></script>" } else { "" }
+    $anomalyPeekScript = if ($slug -eq 'experience') { "<script src=`"$(Get-AssetRef 'assets/js/anomaly-peek.js')`"></script><script src=`"$(Get-AssetRef 'assets/js/internship-peek.js')`"></script>" } else { "" }
     $gameScript = if ($slug -eq 'index') { "<script src=`"$(Get-AssetRef 'assets/js/game.js')`"></script>" } else { "" }
     $listingEffectsScript = if ($slug -in @('skills', 'travel')) { "<script src=`"$(Get-AssetRef 'assets/js/listing-effects.js')`"></script>" } else { "" }
     $journalProgressScript = if ($tripOrder -contains $slug) { "<script src=`"$(Get-AssetRef 'assets/js/journal-progress.js')`"></script>" } else { "" }
@@ -1167,7 +1167,7 @@ foreach ($page in $pages) {
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-map-page.css')`" />" }
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-search.css')`" />"; $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-navigation.css')`" />" }
     if ($tripOrder -contains $slug) { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-journal.css')`" />" }
-    if ($slug -eq 'experience') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/experience-page.css')`" />" }
+    if ($slug -eq 'experience') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/experience-page.css')`" /><link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/internship-peek.css')`" />" }
     if ($slug -eq 'personal') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/personal-page.css')`" />" }
     if ($slug -eq 'skills') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/skills-page.css')`" />" }
     $routeStylesheetMarkup = $routeStylesheets -join "`n"
@@ -1254,8 +1254,8 @@ if ($imageDimensionCacheDirty) {
 }
 
 # Publish only runtime assets used by the generated Pages site.
-$runtimeCss = @("icons.css", "main.css", "noscript.css")
-$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "travel-shortcuts.js", "travel-chronology.js")
+$runtimeCss = @("icons.css", "main.css", "noscript.css", "internship-peek.css")
+$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "travel-shortcuts.js", "travel-chronology.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCss) {
