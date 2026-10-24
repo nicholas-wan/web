@@ -48,6 +48,10 @@ for (const width of [320, 375, 768, 1024, 1366, 1920]) {
       let node;
       while ((node = walker.nextNode())) {
         if (!node.textContent.trim()) continue;
+        // The peek scenes' labels live in a card that floats below the chip
+        // on wider screens, past the entry by design; internship-peek.spec
+        // checks that card on its own.
+        if (node.parentElement.closest('.internship-demo-card')) continue;
         const range = document.createRange();
         range.selectNodeContents(node);
         for (const rect of range.getClientRects()) {
