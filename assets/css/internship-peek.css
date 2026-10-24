@@ -513,16 +513,21 @@
 /* The League, second peek: an A/B test of two designs for a "Most
    compatible" label. Randomise, Measure. The same profile on two League
    iPhones (the risky-profile phone at 0.75): A with a violet border and a
-   tab, B with a rose heart badge; they appear first and B's heart beats.
+   tab, B with a rose heart badge; they appear in turn and B's heart beats.
    Arms have their own colours, carried by their letters, lanes, users (a
-   user takes its arm's colour as it leaves the die) and hills. Each hill is
-   where that design's match rate probably lies: as its users land it
-   narrows smoothly (1/sqrt(users), the count running on between arrivals)
-   and grows taller (same area) while its centre glides along a spline and
-   settles, so the two start wide and overlapping and end clearly apart.
-   With the last user (3.65s) and a beat (4.00s), B's hill deepens and its
-   heart beats again. Axes are titled (How likely, Match rate) and the hills
-   named (A · Border, B · Badge), with no numbers, zones or verdict (owner). Base styles
+   user takes its arm's colour as it leaves the die) and hills. Everything
+   moves on single eased curves so nothing steps (owner: "it has to look
+   continuous"): users leave every 0.3s, each dropping on translate while it
+   runs on transform, so it rounds the corner without stopping, and lands on
+   its lane's front (the lane fills on one curve and each user's --dx is
+   where the front is when it arrives). Each hill is where that design's
+   match rate probably lies: over its arm's arrivals plus a short tail it
+   grows from the axis, narrows and glides to its place on one curve, its
+   label with it, so the two start flat and overlapping and end clearly
+   apart. Once B's hill settles (6.50s) its fill deepens, its outline
+   thickens and its heart beats again. Axes are titled (How likely, Match
+   rate) and the hills named (A · Border, B · Badge), with no numbers,
+   zones or verdict (owner). Base styles
    are the final frame. Generated from per-arm centres and widths. */
 .lgab-scene .lgab-cap text { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 12px; font-weight: 700; fill: #4f6a63; }
 .lgab-scene .lgab-t { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 10px; font-weight: 700; fill: #4f6a63; }
@@ -553,269 +558,60 @@
    outline keeps its width however the curve is stretched. */
 .lgab-scene .lgab-hill-line { fill: none; stroke-width: 1.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
 .lgab-scene .lgab-hill-a .lgab-hill-line { stroke: #6352c6; }
-.lgab-scene .lgab-hill-b .lgab-hill-line { stroke: #c23f6e; }
+.lgab-scene .lgab-hill-b .lgab-hill-line { stroke: #c23f6e; stroke-width: 2.2; }
 .lgab-scene .lgab-hill-a .lgab-hill-area { fill: #6352c6; fill-opacity: .16; }
 .lgab-scene .lgab-hill-b .lgab-hill-area { fill: #c23f6e; fill-opacity: .3; }
-.lgab-scene .lgab-hill-a { transform: translate(226px, 118px) scale(16, 72); }
-.lgab-scene .lgab-hill-b { transform: translate(290px, 118px) scale(16, 72); }
-.lgab-scene .lgab-tag-a { transform: translate(226px, 41.5px); }
-.lgab-scene .lgab-tag-b { transform: translate(290px, 41.5px); }
+.lgab-scene .lgab-hill { transform: scale(16, 72); }
+.lgab-scene .lgab-hx-a, .lgab-scene .lgab-tx-a { transform: translateX(226px); }
+.lgab-scene .lgab-hx-b, .lgab-scene .lgab-tx-b { transform: translateX(290px); }
 
 /* Playing: the designs first, then the traffic; each hill steps with its
    own arm's arrivals. */
-.is-playing .lgab-scene .lgab-frame-g { animation: lgab-frame .4s cubic-bezier(.22,1,.36,1) 0.25s both; }
-.is-playing .lgab-scene .lgab-badge-g { animation: lgab-pop .35s cubic-bezier(.3,1.5,.6,1) 0.25s both; }
-.is-playing .lgab-scene .lgab-heart { animation: lgab-beat .5s ease-in-out .65s both, lgab-beat-win .55s ease-in-out 4.00s; }
-.is-playing .lgab-scene .lgab-u { animation: lgab-to 0.6s cubic-bezier(.45,0,.3,1) both; }
-.is-playing .lgab-scene .lgab-fill-a { animation: lgab-fill-a 4.0s linear both; }
-.is-playing .lgab-scene .lgab-fill-b { animation: lgab-fill-b 4.0s linear both; }
-.is-playing .lgab-scene .lgab-hill-a { animation: lgab-hill-a 4.0s linear both, lgab-show .2s ease 1.25s both; }
-.is-playing .lgab-scene .lgab-hill-b { animation: lgab-hill-b 4.0s linear both, lgab-show .2s ease 1.41s both; }
-.is-playing .lgab-scene .lgab-tag-a { animation: lgab-tag-a 4.0s linear both, lgab-show .2s ease 1.25s both; }
-.is-playing .lgab-scene .lgab-tag-b { animation: lgab-tag-b 4.0s linear both, lgab-show .2s ease 1.41s both; }
-.is-playing .lgab-scene .lgab-hill-b .lgab-hill-area { animation: lgab-deepen .35s ease 4.00s both; }
+.is-playing .lgab-scene .lgab-frame-g { animation: lgab-frame .6s cubic-bezier(.22,1,.36,1) .25s both; }
+.is-playing .lgab-scene .lgab-badge-g { animation: lgab-pop .6s cubic-bezier(.22,1,.36,1) .55s both; }
+.is-playing .lgab-scene .lgab-heart { animation: lgab-beat .5s ease-in-out 1.05s both, lgab-beat-win .9s ease-in-out 6.50s; }
+.is-playing .lgab-scene .lgab-u { animation-name: lgab-drop, lgab-run; animation-duration: 1.3s; animation-timing-function: linear; animation-fill-mode: both; }
+.is-playing .lgab-scene .lgab-fill-a { animation: lgab-fill 4.35s cubic-bezier(0.3,0,0.7,1) 1.65s both; }
+.is-playing .lgab-scene .lgab-fill-b { animation: lgab-fill 4.35s cubic-bezier(0.3,0,0.7,1) 1.95s both; }
+.is-playing .lgab-scene .lgab-hill-a { animation: lgab-narrow 4.50s cubic-bezier(.4,0,.4,1) 1.80s both; }
+.is-playing .lgab-scene .lgab-hx-a { animation: lgab-x-a 4.50s cubic-bezier(.4,0,.4,1) 1.80s both, lgab-show .4s ease 1.80s both; }
+.is-playing .lgab-scene .lgab-tx-a { animation: lgab-x-a 4.50s cubic-bezier(.4,0,.4,1) 1.80s both, lgab-show .8s ease 2.70s both; }
+.is-playing .lgab-scene .lgab-hill-b { animation: lgab-narrow 4.50s cubic-bezier(.4,0,.4,1) 2.10s both; }
+.is-playing .lgab-scene .lgab-hx-b { animation: lgab-x-b 4.50s cubic-bezier(.4,0,.4,1) 2.10s both, lgab-show .4s ease 2.10s both; }
+.is-playing .lgab-scene .lgab-tx-b { animation: lgab-x-b 4.50s cubic-bezier(.4,0,.4,1) 2.10s both, lgab-show .8s ease 3.00s both; }
+.is-playing .lgab-scene .lgab-hill-b .lgab-hill-area { animation: lgab-deepen .6s ease 6.50s both; }
+.is-playing .lgab-scene .lgab-hill-b .lgab-hill-line { animation: lgab-bolden .6s ease 6.50s both; }
 
+@keyframes lgab-narrow { from { transform: scale(29.21, 4); } to { transform: scale(16, 72); } }
+@keyframes lgab-fill { 0% { stroke-dashoffset: 44px; opacity: 0; } 4% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
 @keyframes lgab-show { from { opacity: 0; } to { opacity: 1; } }
-@keyframes lgab-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+@keyframes lgab-pop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
 @keyframes lgab-frame { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
 @keyframes lgab-beat { 0%, 100% { transform: none; } 35% { transform: scale(1.35); } 60% { transform: scale(.95); } }
-@keyframes lgab-beat-win { 0%, 100% { transform: none; } 35% { transform: scale(1.5); } 60% { transform: scale(.95); } }
+@keyframes lgab-beat-win { 0%, 100% { transform: none; } 45% { transform: scale(1.2); } }
+@keyframes lgab-bolden { from { stroke-width: 1.6; } to { stroke-width: 2.2; } }
 @keyframes lgab-deepen { from { fill-opacity: .16; } to { fill-opacity: .3; } }
-/* A user drops from the icon, passes under the die, takes its arm's colour
-   and runs along its arm's track to the fill's front, where it merges. */
-@keyframes lgab-to {
-  0% { opacity: 0; transform: translate(0, -9px); }
-  18% { opacity: 1; transform: translate(0, -6px); }
-  38% { transform: translate(0, 0); fill: #4f6a63; }
-  50% { fill: var(--c); }
-  92% { opacity: 1; transform: translate(var(--dx), 0); fill: var(--c); }
-  100% { opacity: 0; transform: translate(var(--dx), 0); fill: var(--c); }
+/* A user drops from the icon (on translate) while it starts to run along
+   its arm's track (on transform), so the corner is one rounded move with
+   no stop; it takes its arm's colour as it leaves the die and lands on the
+   fill's front, where it merges. */
+@keyframes lgab-drop {
+  0% { translate: 0 -9px; opacity: 0; animation-timing-function: cubic-bezier(.45,0,.55,1); }
+  18% { opacity: 1; }
+  40% { translate: 0 0; }
+  92% { opacity: 1; }
+  100% { translate: 0 0; opacity: 0; }
 }
-@keyframes lgab-fill-a {
-  0% { stroke-dashoffset: 44px; opacity: 0; }
-  27.550% { stroke-dashoffset: 44px; opacity: 0; }
-  27.800% { stroke-dashoffset: 44px; opacity: 1; }
-  31.300% { stroke-dashoffset: 38.500px; opacity: 1; }
-  43.300% { stroke-dashoffset: 33.000px; opacity: 1; }
-  51.300% { stroke-dashoffset: 27.500px; opacity: 1; }
-  55.300% { stroke-dashoffset: 22.000px; opacity: 1; }
-  63.300% { stroke-dashoffset: 16.500px; opacity: 1; }
-  75.300% { stroke-dashoffset: 11.000px; opacity: 1; }
-  83.300% { stroke-dashoffset: 5.500px; opacity: 1; }
-  87.300% { stroke-dashoffset: 0.000px; opacity: 1; }
-  100% { stroke-dashoffset: 0px; opacity: 1; }
+@keyframes lgab-run {
+  0%, 30% { transform: translateX(0); fill: #4f6a63; animation-timing-function: cubic-bezier(.45,0,.55,1); }
+  45% { fill: var(--c); }
+  92%, 100% { transform: translateX(var(--dx)); fill: var(--c); }
 }
-@keyframes lgab-fill-b {
-  0% { stroke-dashoffset: 44px; opacity: 0; }
-  31.550% { stroke-dashoffset: 44px; opacity: 0; }
-  31.800% { stroke-dashoffset: 44px; opacity: 1; }
-  35.300% { stroke-dashoffset: 38.500px; opacity: 1; }
-  39.300% { stroke-dashoffset: 33.000px; opacity: 1; }
-  47.300% { stroke-dashoffset: 27.500px; opacity: 1; }
-  59.300% { stroke-dashoffset: 22.000px; opacity: 1; }
-  67.300% { stroke-dashoffset: 16.500px; opacity: 1; }
-  71.300% { stroke-dashoffset: 11.000px; opacity: 1; }
-  79.300% { stroke-dashoffset: 5.500px; opacity: 1; }
-  91.300% { stroke-dashoffset: 0.000px; opacity: 1; }
-  100% { stroke-dashoffset: 0px; opacity: 1; }
+@keyframes lgab-x-a {
+  from { transform: translateX(250px); }
+  to { transform: translateX(226px); }
 }
-@keyframes lgab-hill-a {
-  0.000% { transform: translate(250px, 118px) scale(29.21, 39.44); }
-  31.300% { transform: translate(250px, 118px) scale(29.21, 39.44); }
-  32.550% { transform: translate(249.08px, 118px) scale(28.72, 40.11); }
-  33.800% { transform: translate(247.83px, 118px) scale(28.25, 40.78); }
-  35.050% { transform: translate(246.32px, 118px) scale(27.8, 41.44); }
-  36.300% { transform: translate(244.65px, 118px) scale(27.37, 42.09); }
-  37.550% { transform: translate(242.9px, 118px) scale(26.96, 42.72); }
-  38.800% { transform: translate(241.13px, 118px) scale(26.57, 43.35); }
-  40.050% { transform: translate(239.45px, 118px) scale(26.2, 43.97); }
-  41.300% { transform: translate(237.92px, 118px) scale(25.84, 44.58); }
-  42.550% { transform: translate(236.63px, 118px) scale(25.5, 45.18); }
-  43.800% { transform: translate(235.48px, 118px) scale(25.1, 45.89); }
-  45.050% { transform: translate(234.46px, 118px) scale(24.63, 46.77); }
-  46.300% { transform: translate(233.77px, 118px) scale(24.19, 47.62); }
-  47.550% { transform: translate(233.29px, 118px) scale(23.77, 48.47); }
-  48.800% { transform: translate(232.91px, 118px) scale(23.37, 49.3); }
-  50.050% { transform: translate(232.52px, 118px) scale(22.99, 50.11); }
-  51.300% { transform: translate(232px, 118px) scale(22.63, 50.91); }
-  52.550% { transform: translate(230.58px, 118px) scale(21.95, 52.48); }
-  53.800% { transform: translate(229.13px, 118px) scale(21.33, 54); }
-  55.050% { transform: translate(228.11px, 118px) scale(20.76, 55.48); }
-  56.300% { transform: translate(227.91px, 118px) scale(20.44, 56.35); }
-  57.550% { transform: translate(228.03px, 118px) scale(20.19, 57.06); }
-  58.800% { transform: translate(228.31px, 118px) scale(19.94, 57.77); }
-  60.050% { transform: translate(228.64px, 118px) scale(19.7, 58.47); }
-  61.300% { transform: translate(228.91px, 118px) scale(19.47, 59.15); }
-  62.550% { transform: translate(229.04px, 118px) scale(19.25, 59.83); }
-  63.800% { transform: translate(228.95px, 118px) scale(19.07, 60.42); }
-  65.050% { transform: translate(228.74px, 118px) scale(18.93, 60.86); }
-  66.300% { transform: translate(228.44px, 118px) scale(18.79, 61.31); }
-  67.550% { transform: translate(228.07px, 118px) scale(18.66, 61.74); }
-  68.800% { transform: translate(227.67px, 118px) scale(18.53, 62.18); }
-  70.050% { transform: translate(227.25px, 118px) scale(18.4, 62.61); }
-  71.300% { transform: translate(226.85px, 118px) scale(18.27, 63.04); }
-  72.550% { transform: translate(226.5px, 118px) scale(18.15, 63.47); }
-  73.800% { transform: translate(226.21px, 118px) scale(18.03, 63.89); }
-  75.050% { transform: translate(226.02px, 118px) scale(17.91, 64.31); }
-  76.300% { transform: translate(225.95px, 118px) scale(17.75, 64.9); }
-  77.550% { transform: translate(226.05px, 118px) scale(17.58, 65.52); }
-  78.800% { transform: translate(226.27px, 118px) scale(17.42, 66.14); }
-  80.050% { transform: translate(226.54px, 118px) scale(17.26, 66.75); }
-  81.300% { transform: translate(226.8px, 118px) scale(17.1, 67.35); }
-  82.550% { transform: translate(226.97px, 118px) scale(16.95, 67.95); }
-  83.800% { transform: translate(226.96px, 118px) scale(16.75, 68.78); }
-  85.050% { transform: translate(226.65px, 118px) scale(16.47, 69.95); }
-  86.300% { transform: translate(226.23px, 118px) scale(16.2, 71.09); }
-  87.300% { transform: translate(226px, 118px) scale(16, 72); }
-  100.000% { transform: translate(226px, 118px) scale(16, 72); }
-}
-@keyframes lgab-tag-a {
-  0.000% { transform: translate(250px, 74.06px); }
-  31.300% { transform: translate(250px, 74.06px); }
-  32.550% { transform: translate(249.08px, 73.39px); }
-  33.800% { transform: translate(247.83px, 72.72px); }
-  35.050% { transform: translate(246.32px, 72.06px); }
-  36.300% { transform: translate(244.65px, 71.41px); }
-  37.550% { transform: translate(242.9px, 70.78px); }
-  38.800% { transform: translate(241.13px, 70.15px); }
-  40.050% { transform: translate(239.45px, 69.53px); }
-  41.300% { transform: translate(237.92px, 68.92px); }
-  42.550% { transform: translate(236.63px, 68.32px); }
-  43.800% { transform: translate(235.48px, 67.61px); }
-  45.050% { transform: translate(234.46px, 66.73px); }
-  46.300% { transform: translate(233.77px, 65.88px); }
-  47.550% { transform: translate(233.29px, 65.03px); }
-  48.800% { transform: translate(232.91px, 64.2px); }
-  50.050% { transform: translate(232.52px, 63.39px); }
-  51.300% { transform: translate(232px, 62.59px); }
-  52.550% { transform: translate(230.58px, 61.02px); }
-  53.800% { transform: translate(229.13px, 59.5px); }
-  55.050% { transform: translate(228.11px, 58.02px); }
-  56.300% { transform: translate(227.91px, 57.15px); }
-  57.550% { transform: translate(228.03px, 56.44px); }
-  58.800% { transform: translate(228.31px, 55.73px); }
-  60.050% { transform: translate(228.64px, 55.03px); }
-  61.300% { transform: translate(228.91px, 54.35px); }
-  62.550% { transform: translate(229.04px, 53.67px); }
-  63.800% { transform: translate(228.95px, 53.08px); }
-  65.050% { transform: translate(228.74px, 52.64px); }
-  66.300% { transform: translate(228.44px, 52.19px); }
-  67.550% { transform: translate(228.07px, 51.76px); }
-  68.800% { transform: translate(227.67px, 51.32px); }
-  70.050% { transform: translate(227.25px, 50.89px); }
-  71.300% { transform: translate(226.85px, 50.46px); }
-  72.550% { transform: translate(226.5px, 50.03px); }
-  73.800% { transform: translate(226.21px, 49.61px); }
-  75.050% { transform: translate(226.02px, 49.19px); }
-  76.300% { transform: translate(225.95px, 48.6px); }
-  77.550% { transform: translate(226.05px, 47.98px); }
-  78.800% { transform: translate(226.27px, 47.36px); }
-  80.050% { transform: translate(226.54px, 46.75px); }
-  81.300% { transform: translate(226.8px, 46.15px); }
-  82.550% { transform: translate(226.97px, 45.55px); }
-  83.800% { transform: translate(226.96px, 44.72px); }
-  85.050% { transform: translate(226.65px, 43.55px); }
-  86.300% { transform: translate(226.23px, 42.41px); }
-  87.300% { transform: translate(226px, 41.5px); }
-  100.000% { transform: translate(226px, 41.5px); }
-}
-@keyframes lgab-hill-b {
-  0.000% { transform: translate(268px, 118px) scale(29.21, 39.44); }
-  35.300% { transform: translate(268px, 118px) scale(29.21, 39.44); }
-  36.550% { transform: translate(271.4px, 118px) scale(27.8, 41.44); }
-  37.800% { transform: translate(276.14px, 118px) scale(26.57, 43.35); }
-  39.050% { transform: translate(279.67px, 118px) scale(25.5, 45.18); }
-  40.300% { transform: translate(280.18px, 118px) scale(24.91, 46.24); }
-  41.550% { transform: translate(279.67px, 118px) scale(24.45, 47.11); }
-  42.800% { transform: translate(278.66px, 118px) scale(24.02, 47.96); }
-  44.050% { transform: translate(277.48px, 118px) scale(23.61, 48.8); }
-  45.300% { transform: translate(276.46px, 118px) scale(23.22, 49.62); }
-  46.550% { transform: translate(275.94px, 118px) scale(22.84, 50.43); }
-  47.800% { transform: translate(276.13px, 118px) scale(22.53, 51.12); }
-  49.050% { transform: translate(276.68px, 118px) scale(22.3, 51.65); }
-  50.300% { transform: translate(277.5px, 118px) scale(22.08, 52.17); }
-  51.550% { transform: translate(278.51px, 118px) scale(21.87, 52.68); }
-  52.800% { transform: translate(279.65px, 118px) scale(21.66, 53.19); }
-  54.050% { transform: translate(280.85px, 118px) scale(21.45, 53.7); }
-  55.300% { transform: translate(282.04px, 118px) scale(21.25, 54.2); }
-  56.550% { transform: translate(283.15px, 118px) scale(21.06, 54.7); }
-  57.800% { transform: translate(284.12px, 118px) scale(20.87, 55.19); }
-  59.050% { transform: translate(284.88px, 118px) scale(20.69, 55.67); }
-  60.300% { transform: translate(285.58px, 118px) scale(20.44, 56.35); }
-  61.550% { transform: translate(286.07px, 118px) scale(20.19, 57.06); }
-  62.800% { transform: translate(286.36px, 118px) scale(19.94, 57.77); }
-  64.050% { transform: translate(286.53px, 118px) scale(19.7, 58.47); }
-  65.300% { transform: translate(286.66px, 118px) scale(19.47, 59.15); }
-  66.550% { transform: translate(286.84px, 118px) scale(19.25, 59.83); }
-  67.800% { transform: translate(287.27px, 118px) scale(18.96, 60.77); }
-  69.050% { transform: translate(288.04px, 118px) scale(18.55, 62.09); }
-  70.300% { transform: translate(288.71px, 118px) scale(18.17, 63.38); }
-  71.550% { transform: translate(289.01px, 118px) scale(17.85, 64.52); }
-  72.800% { transform: translate(288.96px, 118px) scale(17.68, 65.15); }
-  74.050% { transform: translate(288.76px, 118px) scale(17.52, 65.77); }
-  75.300% { transform: translate(288.5px, 118px) scale(17.35, 66.38); }
-  76.550% { transform: translate(288.24px, 118px) scale(17.2, 66.99); }
-  77.800% { transform: translate(288.04px, 118px) scale(17.04, 67.59); }
-  79.050% { transform: translate(287.99px, 118px) scale(16.89, 68.19); }
-  80.300% { transform: translate(288.07px, 118px) scale(16.79, 68.62); }
-  81.550% { transform: translate(288.22px, 118px) scale(16.69, 69.01); }
-  82.800% { transform: translate(288.42px, 118px) scale(16.6, 69.4); }
-  84.050% { transform: translate(288.67px, 118px) scale(16.51, 69.79); }
-  85.300% { transform: translate(288.94px, 118px) scale(16.42, 70.18); }
-  86.550% { transform: translate(289.21px, 118px) scale(16.33, 70.56); }
-  87.800% { transform: translate(289.47px, 118px) scale(16.24, 70.94); }
-  89.050% { transform: translate(289.71px, 118px) scale(16.15, 71.32); }
-  90.300% { transform: translate(289.89px, 118px) scale(16.07, 71.7); }
-  91.300% { transform: translate(290px, 118px) scale(16, 72); }
-  100.000% { transform: translate(290px, 118px) scale(16, 72); }
-}
-@keyframes lgab-tag-b {
-  0.000% { transform: translate(268px, 74.06px); }
-  35.300% { transform: translate(268px, 74.06px); }
-  36.550% { transform: translate(271.4px, 72.06px); }
-  37.800% { transform: translate(276.14px, 70.15px); }
-  39.050% { transform: translate(279.67px, 68.32px); }
-  40.300% { transform: translate(280.18px, 67.26px); }
-  41.550% { transform: translate(279.67px, 66.39px); }
-  42.800% { transform: translate(278.66px, 65.54px); }
-  44.050% { transform: translate(277.48px, 64.7px); }
-  45.300% { transform: translate(276.46px, 63.88px); }
-  46.550% { transform: translate(275.94px, 63.07px); }
-  47.800% { transform: translate(276.13px, 62.38px); }
-  49.050% { transform: translate(276.68px, 61.85px); }
-  50.300% { transform: translate(277.5px, 61.33px); }
-  51.550% { transform: translate(278.51px, 60.82px); }
-  52.800% { transform: translate(279.65px, 60.31px); }
-  54.050% { transform: translate(280.85px, 59.8px); }
-  55.300% { transform: translate(282.04px, 59.3px); }
-  56.550% { transform: translate(283.15px, 58.8px); }
-  57.800% { transform: translate(284.12px, 58.31px); }
-  59.050% { transform: translate(284.88px, 57.83px); }
-  60.300% { transform: translate(285.58px, 57.15px); }
-  61.550% { transform: translate(286.07px, 56.44px); }
-  62.800% { transform: translate(286.36px, 55.73px); }
-  64.050% { transform: translate(286.53px, 55.03px); }
-  65.300% { transform: translate(286.66px, 54.35px); }
-  66.550% { transform: translate(286.84px, 53.67px); }
-  67.800% { transform: translate(287.27px, 52.73px); }
-  69.050% { transform: translate(288.04px, 51.41px); }
-  70.300% { transform: translate(288.71px, 50.12px); }
-  71.550% { transform: translate(289.01px, 48.98px); }
-  72.800% { transform: translate(288.96px, 48.35px); }
-  74.050% { transform: translate(288.76px, 47.73px); }
-  75.300% { transform: translate(288.5px, 47.12px); }
-  76.550% { transform: translate(288.24px, 46.51px); }
-  77.800% { transform: translate(288.04px, 45.91px); }
-  79.050% { transform: translate(287.99px, 45.31px); }
-  80.300% { transform: translate(288.07px, 44.88px); }
-  81.550% { transform: translate(288.22px, 44.49px); }
-  82.800% { transform: translate(288.42px, 44.1px); }
-  84.050% { transform: translate(288.67px, 43.71px); }
-  85.300% { transform: translate(288.94px, 43.32px); }
-  86.550% { transform: translate(289.21px, 42.94px); }
-  87.800% { transform: translate(289.47px, 42.56px); }
-  89.050% { transform: translate(289.71px, 42.18px); }
-  90.300% { transform: translate(289.89px, 41.8px); }
-  91.300% { transform: translate(290px, 41.5px); }
-  100.000% { transform: translate(290px, 41.5px); }
+@keyframes lgab-x-b {
+  from { transform: translateX(268px); }
+  to { transform: translateX(290px); }
 }
