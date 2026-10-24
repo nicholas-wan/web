@@ -95,7 +95,7 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await expect(chip(ab)).toHaveText('A/B test a badge');
  // Simple on purpose (owner): no numbers, test jargon or verdict.
  const words=await ab.locator('svg.lgab-scene text').allTextContents();
- expect(words).toEqual(expect.arrayContaining(['Likely match rate','Most compatible']));
+ expect(words).toEqual(expect.arrayContaining(['Match rate by design','How likely','Match rate','A · Border','B · Badge','Most compatible']));
  expect(words.join(' ')).not.toMatch(/\bCI\b|Ship|better|confidence|\d+%/);
  await expect(ab.locator('.lgab-badge')).toHaveCount(2);
  await expect(ab.locator('.lgab-hill')).toHaveCount(2);
