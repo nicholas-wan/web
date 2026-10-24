@@ -12,8 +12,11 @@
   const touch = matchMedia('(max-width: 736px), (hover: none)');
   const REPLAY = 10000, FADE = 240, GRACE = 130;
   // Phones keep the cards display:none until a tap, which would leave the
-  // scenes' faces unrequested until a scene had already started.
-  if (document.fonts) ['400 11px Figtree', '500 11px Figtree', '700 11px Figtree', 'italic 900 8px "League Mark"', '8px "League Serif"', 'italic 8px "League Serif"'].forEach(f => document.fonts.load(f));
+  // scenes' faces unrequested until a scene had already started. Warm them
+  // once the page has loaded, so they never compete with the text's fonts.
+  const warmFonts = () => { if (document.fonts) ['400 11px Figtree', '500 11px Figtree', '700 11px Figtree', 'italic 900 8px "League Mark"', '8px "League Serif"', 'italic 8px "League Serif"'].forEach(f => document.fonts.load(f)); };
+  if (document.readyState === 'complete') warmFonts();
+  else addEventListener('load', warmFonts, { once: true });
   let active = null, pinned = null, hovered = null, leaveTimer = null, pointer = { x: -1, y: -1 };
 
   const card = r => r.querySelector('.internship-demo-card');
