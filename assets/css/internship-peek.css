@@ -172,77 +172,93 @@
   .internship-demo-card__plot > svg { transition: none; }
 }
 
-/* Shopee: the product card slides left, a crop frames the photo, patches
-   lift off the shoe onto the feature grid, then model and category arrive.
-   The script adds is-playing, or is-still under reduced motion, which holds
-   every group on its final frame. Scene labels are set in 360 scene units,
-   so they render at 12-13px on desktop and a little under on phones. */
+/* Shopee: the listing card slides left, a frame picks out the title, its
+   words lift one by one into a word box, then model and attributes arrive.
+   Text is the subject; the product photo is a small thumbnail. The script
+   adds is-playing, or is-still under reduced motion, which holds every group
+   on its final frame. Scene labels are set in 360 scene units, so they
+   render at 12-13px on desktop and a little under on phones. */
 .sp-brand { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
 .sp-brand .sp-label { font-size: 12px; font-weight: 700; fill: #79564a; }
 .sp-brand .sp-value { font-size: 13px; font-weight: 700; fill: #c84024; }
+.sp-brand .sp-tag { font-size: 10.5px; font-weight: 700; fill: #a0583f; }
+.sp-brand .sp-title { font-size: 11px; font-weight: 700; fill: #20343d; }
+.sp-brand .sp-title--alt { font-size: 9.5px; font-weight: 400; fill: #6b7280; }
 .sp-brand .sp-arrow { fill: none; stroke: #cf7a5c; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
 .sp-brand .sp-card { transform: translateX(108.5px); }
 .sp-brand .sp-crop,
-.sp-brand .sp-samples,
-.sp-brand .sp-features,
-.sp-brand .sp-features .sp-arrow,
+.sp-brand .sp-chip,
+.sp-brand .sp-words,
+.sp-brand .sp-words .sp-arrow,
 .sp-brand .sp-model,
 .sp-brand .sp-result { opacity: 0; }
 .is-playing .sp-brand .sp-card { animation: sp-split 0.9s 0.4s ease-in-out forwards; }
 .is-playing .sp-brand .sp-crop { animation: sp-reveal 0.5s 1.3s forwards; }
-.is-playing .sp-brand .sp-samples { animation: sp-sample 1.05s 1.5s both; }
-.is-playing .sp-brand .sp-features { animation: sp-arrive 0.6s 1.7s both; }
-/* The first arrow waits until the patches have landed, so they never cross
-   it; the model and the category then follow a beat apart, so the chain
-   reads as passing left to right. */
-.is-playing .sp-brand .sp-features .sp-arrow { animation: sp-arrive 0.4s 2.3s both; }
-.is-playing .sp-brand .sp-model { animation: sp-arrive 0.5s 2.55s both; }
-.is-playing .sp-brand .sp-result { animation: sp-arrive 0.6s 3.15s both; }
+.is-playing .sp-brand .sp-chip-1 { animation: sp-chip-1 1.05s 1.9s both; }
+.is-playing .sp-brand .sp-chip-2 { animation: sp-chip-2 1.05s 1.7s both; }
+/* The words lift last-to-first, so a moving chip never crosses a parked one. */
+.is-playing .sp-brand .sp-chip-3 { animation: sp-chip-3 1.05s 1.5s both; }
+.is-playing .sp-brand .sp-words { animation: sp-arrive 0.6s 1.7s both; }
+/* The first arrow waits until the last word has landed, so none crosses it;
+   the model and the attributes then follow a beat apart. */
+.is-playing .sp-brand .sp-words .sp-arrow { animation: sp-arrive 0.4s 2.6s both; }
+.is-playing .sp-brand .sp-model { animation: sp-arrive 0.5s 2.85s both; }
+.is-playing .sp-brand .sp-result { animation: sp-arrive 0.6s 3.45s both; }
 .is-still .sp-brand .sp-card { transform: none; }
 .is-still .sp-brand .sp-crop,
-.is-still .sp-brand .sp-features,
-.is-still .sp-brand .sp-features .sp-arrow,
+.is-still .sp-brand .sp-words,
+.is-still .sp-brand .sp-words .sp-arrow,
 .is-still .sp-brand .sp-model,
 .is-still .sp-brand .sp-result { opacity: 1; }
 @keyframes sp-split { to { transform: translateX(0); } }
 @keyframes sp-reveal { to { opacity: 1; } }
 @keyframes sp-arrive { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes sp-sample {
+@keyframes sp-chip-1 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translateX(116px); }
-  100% { opacity: 0; transform: translateX(116px); }
+  80% { opacity: 1; transform: translate(114px, 10.5px); }
+  100% { opacity: 0; transform: translate(114px, 10.5px); }
+}
+@keyframes sp-chip-2 {
+  0% { opacity: 0; transform: none; }
+  20% { opacity: 1; transform: none; }
+  80% { opacity: 1; transform: translate(77px, 25px); }
+  100% { opacity: 0; transform: translate(77px, 25px); }
+}
+@keyframes sp-chip-3 {
+  0% { opacity: 0; transform: none; }
+  20% { opacity: 1; transform: none; }
+  80% { opacity: 1; transform: translate(58.5px, 39.5px); }
+  100% { opacity: 0; transform: translate(58.5px, 39.5px); }
 }
 
-/* The League: one profile sits centred, like the Shopee card, then the pair
-   parts, the second sliding out from under the first; a line links the two
-   photos, teal frames and feature strips show the match, and Review lands. */
+/* The League: one profile's photo, bio and account rows are framed in turn,
+   each feeds a signal bar (amber for a concern, teal for fine), the bars sum
+   into a risk gauge, and Review lands. Many signals, not just the photo. */
 .league-brand-scene .lg-label {
   font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
   font-size: 12px;
   font-weight: 700;
   fill: #ffffff;
 }
-.league-brand-scene .lg-original { transform: translateX(97px); }
-.league-brand-scene .lg-copy { transform: translateX(-97px); }
 .league-brand-scene .lg-frame,
-.league-brand-scene .lg-vector,
 .league-brand-scene .lg-review { opacity: 0; }
-.is-playing .league-brand-scene .lg-original,
-.is-playing .league-brand-scene .lg-copy { animation: lg-part 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards; }
-.is-playing .league-brand-scene .lg-link { stroke-dasharray: 88; stroke-dashoffset: 88; animation: lg-line 0.6s ease 1.3s both; }
-.is-playing .league-brand-scene .lg-frame { animation: lg-reveal 0.5s ease 1.6s both; }
-.is-playing .league-brand-scene .lg-vector-0 { animation: lg-strip-left 0.5s ease 1.9s both; }
-.is-playing .league-brand-scene .lg-vector-1 { animation: lg-strip-right 0.5s ease 2.05s both; }
-.is-playing .league-brand-scene .lg-review { animation: lg-rise 0.5s ease 2.4s both; }
-.is-still .league-brand-scene .lg-original,
-.is-still .league-brand-scene .lg-copy,
+.league-brand-scene .lg-bar { transform: scaleX(0); transform-box: fill-box; transform-origin: left center; }
+.league-brand-scene .lg-gauge { stroke-dasharray: 88; stroke-dashoffset: 88; }
+.is-playing .league-brand-scene .lg-frame-1 { animation: lg-reveal 0.4s ease 0.3s both; }
+.is-playing .league-brand-scene .lg-frame-2 { animation: lg-reveal 0.4s ease 0.6s both; }
+.is-playing .league-brand-scene .lg-frame-3 { animation: lg-reveal 0.4s ease 0.9s both; }
+.is-playing .league-brand-scene .lg-bar-1 { animation: lg-fill 0.6s ease 0.7s both; }
+.is-playing .league-brand-scene .lg-bar-2 { animation: lg-fill 0.6s ease 0.95s both; }
+.is-playing .league-brand-scene .lg-bar-3 { animation: lg-fill 0.6s ease 1.2s both; }
+.is-playing .league-brand-scene .lg-bar-4 { animation: lg-fill 0.6s ease 1.45s both; }
+.is-playing .league-brand-scene .lg-gauge { animation: lg-gauge 0.8s ease 1.9s both; }
+.is-playing .league-brand-scene .lg-review { animation: lg-rise 0.5s ease 2.8s both; }
 .is-still .league-brand-scene .lg-frame,
-.is-still .league-brand-scene .lg-vector,
 .is-still .league-brand-scene .lg-review { opacity: 1; transform: none; }
-@keyframes lg-part { to { transform: none; } }
-@keyframes lg-line { to { stroke-dashoffset: 0; } }
+.is-still .league-brand-scene .lg-bar { transform: none; }
+.is-still .league-brand-scene .lg-gauge { stroke-dashoffset: 16; }
 @keyframes lg-reveal { to { opacity: 1; } }
-@keyframes lg-strip-left { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
-@keyframes lg-strip-right { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+@keyframes lg-fill { to { transform: scaleX(1); } }
+@keyframes lg-gauge { to { stroke-dashoffset: 16; } }
 @keyframes lg-rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
