@@ -199,6 +199,9 @@
 .sp-brand .sp-price { font-size: 11px; font-weight: 700; fill: #ee4d2d; }
 .sp-brand .sp-fine--strike { font-size: 8px; }
 .sp-brand .sp-chip-text { fill: #b8381c; }
+/* The Chinese and Thai chips pick up their row's bold as they lift, so they
+   land as an exact copy of it. */
+.sp-brand .sp-title--alt.sp-chip-text { font-weight: 700; }
 .sp-brand .sp-fine { font-size: 8.5px; fill: #8a8f8c; }
 .sp-brand .sp-fine--strike { fill: #b0b4b1; text-decoration: line-through; }
 .sp-brand .sp-fine--dark { font-size: 9px; fill: #4a4f4d; }
@@ -270,36 +273,44 @@
   45% { transform: scale(1.6); fill: #ff7a5c; }
   100% { transform: scale(1); }
 }
-/* Each chip flies from its word on the listing to its row in the word box. */
+/* Each chip flies from its word on the listing to its row in the word
+   column and lands as that row's word: it scales about its own text anchor
+   to the row's size (the title is 11, rows are 9.5) and its anchor lands on
+   the row word's (x 154.5), so the crossfade into the row never jumps. */
+.sp-brand .sp-chip-1 { transform-box: view-box; transform-origin: 8px 86px; }
+.sp-brand .sp-chip-2 { transform-box: view-box; transform-origin: 44.25px 86px; }
+.sp-brand .sp-chip-3 { transform-box: view-box; transform-origin: 65.3px 86px; }
+.sp-brand .sp-chip-4 { transform-box: view-box; transform-origin: 8px 97.5px; }
+.sp-brand .sp-chip-5 { transform-box: view-box; transform-origin: 52.6px 97.5px; }
 @keyframes sp-chip-1 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(146.5px, -35.5px); }
-  100% { opacity: 0; transform: translate(146.5px, -35.5px); }
+  80% { opacity: 1; transform: translate(146.5px, -35.6px) scale(0.864); }
+  100% { opacity: 0; transform: translate(146.5px, -35.6px) scale(0.864); }
 }
 @keyframes sp-chip-2 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(111.75px, -21.5px); }
-  100% { opacity: 0; transform: translate(111.75px, -21.5px); }
+  80% { opacity: 1; transform: translate(110.25px, -21.6px) scale(0.864); }
+  100% { opacity: 0; transform: translate(110.25px, -21.6px) scale(0.864); }
 }
 @keyframes sp-chip-3 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(90.7px, -7.5px); }
-  100% { opacity: 0; transform: translate(90.7px, -7.5px); }
+  80% { opacity: 1; transform: translate(89.2px, -7.6px) scale(0.864); }
+  100% { opacity: 0; transform: translate(89.2px, -7.6px) scale(0.864); }
 }
 @keyframes sp-chip-4 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(146.5px, -5.5px); }
-  100% { opacity: 0; transform: translate(146.5px, -5.5px); }
+  80% { opacity: 1; transform: translate(146.5px, -4.9px); }
+  100% { opacity: 0; transform: translate(146.5px, -4.9px); }
 }
 @keyframes sp-chip-5 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(103.4px, 8.5px); }
-  100% { opacity: 0; transform: translate(103.4px, 8.5px); }
+  80% { opacity: 1; transform: translate(101.9px, 8.9px); }
+  100% { opacity: 0; transform: translate(101.9px, 8.9px); }
 }
 
 /* The League: one profile on an iPhone (dark screen, black-and-white first

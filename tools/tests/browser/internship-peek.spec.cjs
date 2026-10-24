@@ -72,6 +72,22 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  for(const rect of await shopee.locator('.sp-chip rect').all())expect(await rect.getAttribute('fill-opacity')).toBeNull();
  await shopee.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
+ // Each flying word lands as an exact copy of its row's word (same left edge,
+ // width and baseline), so the handover into the word column never jumps.
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await chip(shopee).click();
+ await expect(card(shopee)).toHaveClass(/is-playing/);
+ const landings=await shopee.evaluate(root=>{
+  // Settle the word column first, then hold each chip at its landing mark.
+  root.querySelector('.internship-demo-card').getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=8000;});
+  return [1,2,3,4,5].map(i=>{
+  const c=root.querySelector('.sp-chip-'+i),a=c.getAnimations()[0];
+  a.pause();a.currentTime=a.effect.getTiming().delay+a.effect.getTiming().duration*0.8;
+  const t=c.querySelector('text').getBoundingClientRect(),w=root.querySelector('.sp-slot-'+i+' .sp-word').getBoundingClientRect();
+  return Math.max(Math.abs(t.left-w.left),Math.abs(t.right-w.right),Math.abs(t.bottom-w.bottom));
+ });});
+ for(const gap of landings)expect(gap).toBeLessThan(0.6);
+ await chip(shopee).click();
  await expect(chip(league)).toHaveAttribute('aria-expanded','false');
  await expect(card(league)).toHaveAttribute('inert','');
 });
