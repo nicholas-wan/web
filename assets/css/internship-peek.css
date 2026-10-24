@@ -512,8 +512,8 @@
 
 /* The League, second peek: an A/B test of two designs for a "Most
    compatible" label. Randomise, Measure. The same profile on two League
-   iPhones (the risky-profile phone at 0.75): A with a violet border and a
-   tab, B with a rose heart badge; they appear in turn and B's heart beats.
+   iPhones (the risky-profile phone at 0.75): A with a titled violet frame
+   that draws itself on, B with a rose heart badge; they appear in turn and B's heart beats.
    Arms have their own colours, carried by their letters, lanes, users (a
    user takes its arm's colour as it leaves the die) and hills. Everything
    moves on single eased curves so nothing steps (owner: "it has to look
@@ -555,7 +555,8 @@
 .lgab-scene .lgab-key { font-family: "League Serif", Georgia, serif; font-style: italic; font-size: 3.6px; fill: #a6a6a6; }
 .lgab-scene .lgab-val { font-family: "Figtree", Helvetica, sans-serif; font-size: 3.6px; font-weight: 400; fill: #111; }
 .lgab-scene .lgab-time { font-family: "Figtree", Helvetica, sans-serif; font-size: 3.3px; font-weight: 700; fill: #111; }
-.lgab-scene .lgab-badge-g, .lgab-scene .lgab-frame-g, .lgab-scene .lgab-heart { transform-box: fill-box; transform-origin: center; }
+.lgab-scene .lgab-frame-line { stroke-dasharray: 1 1; stroke-dashoffset: 0; }
+.lgab-scene .lgab-badge-g, .lgab-scene .lgab-heart { transform-box: fill-box; transform-origin: center; }
 /* A hill is a unit bell curve (sd 1, height 1) placed by its transform; the
    outline keeps its width however the curve is stretched. */
 .lgab-scene .lgab-hill-line { fill: none; stroke-width: 1.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
@@ -569,7 +570,10 @@
 
 /* Playing: the designs first, then the traffic; each hill steps with its
    own arm's arrivals. */
-.is-playing .lgab-scene .lgab-frame-g { animation: lgab-frame .6s cubic-bezier(.22,1,.36,1) .25s both; }
+.is-playing .lgab-scene .lgab-mat { animation: lgab-show .3s ease .25s both; }
+.is-playing .lgab-scene .lgab-frame-line { animation: lgab-draw .9s cubic-bezier(.45,0,.25,1) .3s both; }
+.is-playing .lgab-scene .lgab-frame-plate { animation: lgab-show .01s linear 1.18s both; }
+.is-playing .lgab-scene .lgab-frame-text { animation: lgab-show .4s ease 1.18s both; }
 .is-playing .lgab-scene .lgab-badge-g { animation: lgab-pop .6s cubic-bezier(.22,1,.36,1) .55s both; }
 .is-playing .lgab-scene .lgab-heart { animation: lgab-beat .5s ease-in-out 1.05s both, lgab-beat-win .9s ease-in-out 6.50s; }
 .is-playing .lgab-scene .lgab-u { animation: lgab-deal-1 1s linear both; }
@@ -606,7 +610,7 @@
 @keyframes lgab-fill { 0% { stroke-dashoffset: 44px; opacity: 0; } 6% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
 @keyframes lgab-show { from { opacity: 0; } to { opacity: 1; } }
 @keyframes lgab-pop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
-@keyframes lgab-frame { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+@keyframes lgab-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes lgab-beat { 0%, 100% { transform: none; } 35% { transform: scale(1.35); } 60% { transform: scale(.95); } }
 @keyframes lgab-beat-win { 0%, 100% { transform: none; } 45% { transform: scale(1.2); } }
 @keyframes lgab-bolden { from { stroke-width: 1.6; } to { stroke-width: 2.2; } }
