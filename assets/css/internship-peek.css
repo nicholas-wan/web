@@ -510,74 +510,84 @@
 @keyframes lg-rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes lg-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
 
-/* The League, second peek: an A/B test of a "Most compatible" badge, built
-   from three designers and three reviewers over three rounds, then put on
-   League phones (owner request). Both arms are 0.75-scale copies of the
-   risky-profile phone.
-   Randomise, Measure, Decide, with the two arms on League iPhones (the
-   live scene's phone at 0.75). The badge pops onto B's photo first (the
-   one change). Then users, what is randomised, flow from the people icon
-   through the die and run out to their arm's fill, over its phone,
-   which grows towards its planned-sample end tick. Each arrival
-   narrows the 95% confidence interval for B - A one step (half-width
-   exactly 20*sqrt(16/n); the centre's wobble shrinks with n). Its lower end
-   moves above zero only with the last user, when the planned sample is
-   complete (3.65s), and it turns teal in that same moment; then Ship B
-   lands under the rule that has been on screen from the start. */
+/* The League, second peek: an A/B test of two designs for a "Most
+   compatible" label. Randomise, Measure. The same profile on two League
+   iPhones (the risky-profile phone at 0.75): A with a violet border and a
+   tab, B with a rose heart badge; they appear first and B's heart beats.
+   Arms have their own colours, carried by their letters, lanes, users (a
+   user takes its arm's colour as it leaves the die) and hills. Each hill is
+   where that design's match rate probably lies: as each of its users lands
+   it steps narrower (1/sqrt(users)) and taller (same area) and its centre
+   settles, so the two start wide and overlapping and end clearly apart.
+   With the last user (3.65s) and a beat (4.00s), B's hill deepens and its
+   heart beats again. No axis numbers, zones or verdict (owner). Base styles
+   are the final frame. Generated from per-arm centres and widths. */
 .lgab-scene .lgab-cap text { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 12px; font-weight: 700; fill: #4f6a63; }
 .lgab-scene .lgab-t { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 10px; font-weight: 700; fill: #4f6a63; }
-.lgab-scene .lgab-arm { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 11px; font-weight: 900; fill: #4f6a63; }
+.lgab-scene .lgab-s { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 9px; font-weight: 700; fill: #6f857f; }
+.lgab-scene .lgab-arm { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 11px; font-weight: 900; }
+.lgab-scene .lgab-a { fill: #6352c6; }
+.lgab-scene .lgab-b { fill: #c23f6e; }
 .lgab-scene .lgab-badge { font-family: "Figtree", Helvetica, sans-serif; font-weight: 700; fill: #fff; }
-.lgab-scene .lgab-label { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 13px; font-weight: 700; fill: #fff; }
-.lgab-scene .lgab-line { fill: none; stroke: #849a93; stroke-width: 1.2; stroke-linecap: round; }
-.lgab-scene .lgab-axis { fill: none; stroke: #cfdad7; stroke-width: 1.2; stroke-linecap: round; }
+.lgab-scene .lgab-line { fill: none; stroke: #4f6a63; stroke-width: 1.4; stroke-linecap: round; }
+.lgab-scene .lgab-more { fill: none; stroke: #6f857f; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+.lgab-scene .lgab-base { fill: none; stroke: #4f6a63; stroke-width: 1.2; stroke-linecap: round; }
 .lgab-scene .lgab-people { fill: none; stroke: #4f6a63; stroke-width: 1.1; stroke-linecap: round; }
 .lgab-scene .lgab-end { fill: none; stroke: #4f6a63; stroke-width: 1.6; stroke-linecap: round; }
-.lgab-scene .lgab-fill { fill: none; stroke: #6b827b; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 44px 100px; stroke-dashoffset: 0; }
+.lgab-scene .lgab-fill { fill: none; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 44px 100px; stroke-dashoffset: 0; }
+.lgab-scene .lgab-fill-a { stroke: #6352c6; }
+.lgab-scene .lgab-fill-b { stroke: #c23f6e; }
 .lgab-scene .lgab-u { fill: #4f6a63; opacity: 0; }
-/* The phone's lettering, as in the live League scene (same subset fonts). */
+/* The phone's lettering, as in the live League scene (same subset fonts),
+   a size up so the profile fills the screen. */
 .lgab-scene .lgab-mark { font-family: "League Mark", Georgia, serif; font-style: italic; font-weight: 900; fill: #111; }
-.lgab-scene .lgab-name { font-family: "League Serif", Georgia, serif; font-size: 7.8px; fill: #111; }
-.lgab-scene .lgab-detail { font-family: "League Serif", Georgia, serif; font-style: italic; font-size: 3.9px; fill: #222; }
-.lgab-scene .lgab-key { font-family: "League Serif", Georgia, serif; font-style: italic; font-size: 3px; fill: #a6a6a6; }
-.lgab-scene .lgab-val { font-family: "Figtree", Helvetica, sans-serif; font-size: 2.9px; font-weight: 400; fill: #111; }
+.lgab-scene .lgab-name { font-family: "League Serif", Georgia, serif; font-size: 9px; fill: #111; }
+.lgab-scene .lgab-detail { font-family: "League Serif", Georgia, serif; font-style: italic; font-size: 4.5px; fill: #222; }
+.lgab-scene .lgab-key { font-family: "League Serif", Georgia, serif; font-style: italic; font-size: 3.6px; fill: #a6a6a6; }
+.lgab-scene .lgab-val { font-family: "Figtree", Helvetica, sans-serif; font-size: 3.6px; font-weight: 400; fill: #111; }
 .lgab-scene .lgab-time { font-family: "Figtree", Helvetica, sans-serif; font-size: 3.3px; font-weight: 700; fill: #111; }
-.lgab-scene .lgab-badge-g { transform-box: fill-box; transform-origin: center; }
-.lgab-scene .lgab-ci-bar { transform-box: fill-box; transform-origin: center; transform: translateX(-3px) scaleX(0.4); }
-.lgab-scene .lgab-ci-lo { transform: translateX(-23px); }
-.lgab-scene .lgab-ci-hi { transform: translateX(17px); }
-.lgab-scene .lgab-ci-est { transform: translateX(-3px); }
-.lgab-scene .lgab-ci-bar, .lgab-scene .lgab-ci-est { fill: #11807d; }
-.lgab-scene .lgab-ci-lo, .lgab-scene .lgab-ci-hi { fill: none; stroke: #11807d; stroke-width: 1.8; stroke-linecap: round; }
+.lgab-scene .lgab-badge-g, .lgab-scene .lgab-frame-g, .lgab-scene .lgab-heart { transform-box: fill-box; transform-origin: center; }
+/* A hill is a unit bell curve (sd 1, height 1) placed by its transform; the
+   outline keeps its width however the curve is stretched. */
+.lgab-scene .lgab-hill-line { fill: none; stroke-width: 1.6; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.lgab-scene .lgab-hill-a .lgab-hill-line { stroke: #6352c6; }
+.lgab-scene .lgab-hill-b .lgab-hill-line { stroke: #c23f6e; }
+.lgab-scene .lgab-hill-a .lgab-hill-area { fill: #6352c6; fill-opacity: .16; }
+.lgab-scene .lgab-hill-b .lgab-hill-area { fill: #c23f6e; fill-opacity: .3; }
+.lgab-scene .lgab-hill-a { transform: translate(226px, 118px) scale(16, 82); }
+.lgab-scene .lgab-hill-b { transform: translate(290px, 118px) scale(16, 82); }
+.lgab-scene .lgab-tag-a { transform: translate(226px, 31.5px); }
+.lgab-scene .lgab-tag-b { transform: translate(290px, 31.5px); }
 
-/* Playing: the badge first, then the traffic; the interval steps with the
-   arrivals and stays grey until the planned sample is in. */
+/* Playing: the designs first, then the traffic; each hill steps with its
+   own arm's arrivals. */
+.is-playing .lgab-scene .lgab-frame-g { animation: lgab-frame .4s cubic-bezier(.22,1,.36,1) 0.25s both; }
 .is-playing .lgab-scene .lgab-badge-g { animation: lgab-pop .35s cubic-bezier(.3,1.5,.6,1) 0.25s both; }
+.is-playing .lgab-scene .lgab-heart { animation: lgab-beat .5s ease-in-out .65s both, lgab-beat-win .55s ease-in-out 4.00s; }
 .is-playing .lgab-scene .lgab-u { animation: lgab-to 0.6s cubic-bezier(.45,0,.3,1) both; }
 .is-playing .lgab-scene .lgab-fill-a { animation: lgab-fill-a 4.0s linear both; }
 .is-playing .lgab-scene .lgab-fill-b { animation: lgab-fill-b 4.0s linear both; }
-.is-playing .lgab-scene .lgab-ci { animation: lgab-show .15s ease 2.05s both; }
-.is-playing .lgab-scene .lgab-ci-bar { animation: lgab-bar 4.0s linear both, lgab-teal-fill .15s ease 3.65s both; }
-.is-playing .lgab-scene .lgab-ci-lo  { animation: lgab-lo 4.0s linear both, lgab-teal-stroke .15s ease 3.65s both; }
-.is-playing .lgab-scene .lgab-ci-hi  { animation: lgab-hi 4.0s linear both, lgab-teal-stroke .15s ease 3.65s both; }
-.is-playing .lgab-scene .lgab-ci-est { animation: lgab-est 4.0s linear both, lgab-teal-fill .15s ease 3.65s both; }
-.is-playing .lgab-scene .lgab-arrow  { animation: lgab-slide .3s ease-out 3.85s both; }
-.is-playing .lgab-scene .lgab-ship   { animation: lgab-rise .4s cubic-bezier(.22,1,.36,1) 4.00s both; }
+.is-playing .lgab-scene .lgab-hill-a { animation: lgab-hill-a 4.0s ease-in-out both, lgab-show .2s ease 1.25s both; }
+.is-playing .lgab-scene .lgab-hill-b { animation: lgab-hill-b 4.0s ease-in-out both, lgab-show .2s ease 1.41s both; }
+.is-playing .lgab-scene .lgab-tag-a { animation: lgab-tag-a 4.0s ease-in-out both, lgab-show .2s ease 1.25s both; }
+.is-playing .lgab-scene .lgab-tag-b { animation: lgab-tag-b 4.0s ease-in-out both, lgab-show .2s ease 1.41s both; }
+.is-playing .lgab-scene .lgab-hill-b .lgab-hill-area { animation: lgab-deepen .35s ease 4.00s both; }
 
-@keyframes lgab-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
 @keyframes lgab-show { from { opacity: 0; } to { opacity: 1; } }
-@keyframes lgab-rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-@keyframes lgab-slide { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: none; } }
-@keyframes lgab-teal-fill { from { fill: #a7b6b1; } to { fill: #11807d; } }
-@keyframes lgab-teal-stroke { from { stroke: #a7b6b1; } to { stroke: #11807d; } }
-/* A user drops from the icon, passes under the die and runs along its
-   arm's track to the fill's front, where it merges. */
+@keyframes lgab-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+@keyframes lgab-frame { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+@keyframes lgab-beat { 0%, 100% { transform: none; } 35% { transform: scale(1.35); } 60% { transform: scale(.95); } }
+@keyframes lgab-beat-win { 0%, 100% { transform: none; } 35% { transform: scale(1.5); } 60% { transform: scale(.95); } }
+@keyframes lgab-deepen { from { fill-opacity: .16; } to { fill-opacity: .3; } }
+/* A user drops from the icon, passes under the die, takes its arm's colour
+   and runs along its arm's track to the fill's front, where it merges. */
 @keyframes lgab-to {
   0% { opacity: 0; transform: translate(0, -9px); }
   18% { opacity: 1; transform: translate(0, -6px); }
-  38% { transform: translate(0, 0); }
-  92% { opacity: 1; transform: translate(var(--dx), 0); }
-  100% { opacity: 0; transform: translate(var(--dx), 0); }
+  38% { transform: translate(0, 0); fill: #4f6a63; }
+  50% { fill: var(--c); }
+  92% { opacity: 1; transform: translate(var(--dx), 0); fill: var(--c); }
+  100% { opacity: 0; transform: translate(var(--dx), 0); fill: var(--c); }
 }
 @keyframes lgab-fill-a {
   0% { stroke-dashoffset: 44px; opacity: 0; }
@@ -607,99 +617,83 @@
   91.300% { stroke-dashoffset: 0.000px; opacity: 1; }
   100% { stroke-dashoffset: 0px; opacity: 1; }
 }
-@keyframes lgab-bar {
-  0% { transform: translateX(1.00px) scaleX(0.6532); }
-  55.300% { transform: translateX(1.00px) scaleX(0.6532); }
-  58.300% { transform: translateX(-8.00px) scaleX(0.6047); }
-  59.300% { transform: translateX(-8.00px) scaleX(0.6047); }
-  62.300% { transform: translateX(-1.00px) scaleX(0.5657); }
-  63.300% { transform: translateX(-1.00px) scaleX(0.5657); }
-  66.300% { transform: translateX(-6.50px) scaleX(0.5333); }
-  67.300% { transform: translateX(-6.50px) scaleX(0.5333); }
-  70.300% { transform: translateX(-2.00px) scaleX(0.5060); }
-  71.300% { transform: translateX(-2.00px) scaleX(0.5060); }
-  74.300% { transform: translateX(-6.00px) scaleX(0.4824); }
-  75.300% { transform: translateX(-6.00px) scaleX(0.4824); }
-  78.300% { transform: translateX(-3.50px) scaleX(0.4619); }
-  79.300% { transform: translateX(-3.50px) scaleX(0.4619); }
-  82.300% { transform: translateX(-5.50px) scaleX(0.4438); }
-  83.300% { transform: translateX(-5.50px) scaleX(0.4438); }
-  86.300% { transform: translateX(-5.00px) scaleX(0.4276); }
-  87.300% { transform: translateX(-5.00px) scaleX(0.4276); }
-  90.300% { transform: translateX(-5.70px) scaleX(0.4131); }
-  91.300% { transform: translateX(-5.70px) scaleX(0.4131); }
-  94.300% { transform: translateX(-3.00px) scaleX(0.4000); }
-  100% { transform: translateX(-3.00px) scaleX(0.4000); }
+@keyframes lgab-hill-a {
+  0% { transform: translate(250px, 118px) scale(29.21, 44.91); }
+  31.300% { transform: translate(250px, 118px) scale(29.21, 44.91); }
+  34.800% { transform: translate(250px, 118px) scale(29.21, 44.91); }
+  43.300% { transform: translate(250px, 118px) scale(29.21, 44.91); }
+  46.800% { transform: translate(236px, 118px) scale(25.3, 51.86); }
+  51.300% { transform: translate(236px, 118px) scale(25.3, 51.86); }
+  54.800% { transform: translate(232px, 118px) scale(22.63, 57.98); }
+  55.300% { transform: translate(232px, 118px) scale(22.63, 57.98); }
+  58.800% { transform: translate(228px, 118px) scale(20.66, 63.52); }
+  63.300% { transform: translate(228px, 118px) scale(20.66, 63.52); }
+  66.800% { transform: translate(229px, 118px) scale(19.12, 68.61); }
+  75.300% { transform: translate(229px, 118px) scale(19.12, 68.61); }
+  78.800% { transform: translate(226px, 118px) scale(17.89, 73.34); }
+  83.300% { transform: translate(226px, 118px) scale(17.89, 73.34); }
+  86.800% { transform: translate(227px, 118px) scale(16.87, 77.79); }
+  87.300% { transform: translate(227px, 118px) scale(16.87, 77.79); }
+  90.800% { transform: translate(226px, 118px) scale(16, 82); }
+  100% { transform: translate(226px, 118px) scale(16, 82); }
 }
-@keyframes lgab-lo {
-  0% { transform: translateX(-31.66px); }
-  55.300% { transform: translateX(-31.66px); }
-  58.300% { transform: translateX(-38.24px); }
-  59.300% { transform: translateX(-38.24px); }
-  62.300% { transform: translateX(-29.28px); }
-  63.300% { transform: translateX(-29.28px); }
-  66.300% { transform: translateX(-33.17px); }
-  67.300% { transform: translateX(-33.17px); }
-  70.300% { transform: translateX(-27.30px); }
-  71.300% { transform: translateX(-27.30px); }
-  74.300% { transform: translateX(-30.12px); }
-  75.300% { transform: translateX(-30.12px); }
-  78.300% { transform: translateX(-26.59px); }
-  79.300% { transform: translateX(-26.59px); }
-  82.300% { transform: translateX(-27.69px); }
-  83.300% { transform: translateX(-27.69px); }
-  86.300% { transform: translateX(-26.38px); }
-  87.300% { transform: translateX(-26.38px); }
-  90.300% { transform: translateX(-26.36px); }
-  91.300% { transform: translateX(-26.36px); }
-  94.300% { transform: translateX(-23.00px); }
-  100% { transform: translateX(-23.00px); }
+@keyframes lgab-tag-a {
+  0% { transform: translate(250px, 68.59px); }
+  31.300% { transform: translate(250px, 68.59px); }
+  34.800% { transform: translate(250px, 68.59px); }
+  43.300% { transform: translate(250px, 68.59px); }
+  46.800% { transform: translate(236px, 61.64px); }
+  51.300% { transform: translate(236px, 61.64px); }
+  54.800% { transform: translate(232px, 55.52px); }
+  55.300% { transform: translate(232px, 55.52px); }
+  58.800% { transform: translate(228px, 49.98px); }
+  63.300% { transform: translate(228px, 49.98px); }
+  66.800% { transform: translate(229px, 44.89px); }
+  75.300% { transform: translate(229px, 44.89px); }
+  78.800% { transform: translate(226px, 40.16px); }
+  83.300% { transform: translate(226px, 40.16px); }
+  86.800% { transform: translate(227px, 35.71px); }
+  87.300% { transform: translate(227px, 35.71px); }
+  90.800% { transform: translate(226px, 31.5px); }
+  100% { transform: translate(226px, 31.5px); }
 }
-@keyframes lgab-hi {
-  0% { transform: translateX(33.66px); }
-  55.300% { transform: translateX(33.66px); }
-  58.300% { transform: translateX(22.24px); }
-  59.300% { transform: translateX(22.24px); }
-  62.300% { transform: translateX(27.28px); }
-  63.300% { transform: translateX(27.28px); }
-  66.300% { transform: translateX(20.17px); }
-  67.300% { transform: translateX(20.17px); }
-  70.300% { transform: translateX(23.30px); }
-  71.300% { transform: translateX(23.30px); }
-  74.300% { transform: translateX(18.12px); }
-  75.300% { transform: translateX(18.12px); }
-  78.300% { transform: translateX(19.59px); }
-  79.300% { transform: translateX(19.59px); }
-  82.300% { transform: translateX(16.69px); }
-  83.300% { transform: translateX(16.69px); }
-  86.300% { transform: translateX(16.38px); }
-  87.300% { transform: translateX(16.38px); }
-  90.300% { transform: translateX(14.96px); }
-  91.300% { transform: translateX(14.96px); }
-  94.300% { transform: translateX(17.00px); }
-  100% { transform: translateX(17.00px); }
+@keyframes lgab-hill-b {
+  0% { transform: translate(268px, 118px) scale(29.21, 44.91); }
+  35.300% { transform: translate(268px, 118px) scale(29.21, 44.91); }
+  38.800% { transform: translate(268px, 118px) scale(29.21, 44.91); }
+  39.300% { transform: translate(268px, 118px) scale(29.21, 44.91); }
+  42.800% { transform: translate(280px, 118px) scale(25.3, 51.86); }
+  47.300% { transform: translate(280px, 118px) scale(25.3, 51.86); }
+  50.800% { transform: translate(276px, 118px) scale(22.63, 57.98); }
+  59.300% { transform: translate(276px, 118px) scale(22.63, 57.98); }
+  62.800% { transform: translate(285px, 118px) scale(20.66, 63.52); }
+  67.300% { transform: translate(285px, 118px) scale(20.66, 63.52); }
+  70.800% { transform: translate(287px, 118px) scale(19.12, 68.61); }
+  71.300% { transform: translate(287px, 118px) scale(19.12, 68.61); }
+  74.800% { transform: translate(289px, 118px) scale(17.89, 73.34); }
+  79.300% { transform: translate(289px, 118px) scale(17.89, 73.34); }
+  82.800% { transform: translate(288px, 118px) scale(16.87, 77.79); }
+  91.300% { transform: translate(288px, 118px) scale(16.87, 77.79); }
+  94.800% { transform: translate(290px, 118px) scale(16, 82); }
+  100% { transform: translate(290px, 118px) scale(16, 82); }
 }
-@keyframes lgab-est {
-  0% { transform: translateX(1.00px); }
-  55.300% { transform: translateX(1.00px); }
-  58.300% { transform: translateX(-8.00px); }
-  59.300% { transform: translateX(-8.00px); }
-  62.300% { transform: translateX(-1.00px); }
-  63.300% { transform: translateX(-1.00px); }
-  66.300% { transform: translateX(-6.50px); }
-  67.300% { transform: translateX(-6.50px); }
-  70.300% { transform: translateX(-2.00px); }
-  71.300% { transform: translateX(-2.00px); }
-  74.300% { transform: translateX(-6.00px); }
-  75.300% { transform: translateX(-6.00px); }
-  78.300% { transform: translateX(-3.50px); }
-  79.300% { transform: translateX(-3.50px); }
-  82.300% { transform: translateX(-5.50px); }
-  83.300% { transform: translateX(-5.50px); }
-  86.300% { transform: translateX(-5.00px); }
-  87.300% { transform: translateX(-5.00px); }
-  90.300% { transform: translateX(-5.70px); }
-  91.300% { transform: translateX(-5.70px); }
-  94.300% { transform: translateX(-3.00px); }
-  100% { transform: translateX(-3.00px); }
+@keyframes lgab-tag-b {
+  0% { transform: translate(268px, 68.59px); }
+  35.300% { transform: translate(268px, 68.59px); }
+  38.800% { transform: translate(268px, 68.59px); }
+  39.300% { transform: translate(268px, 68.59px); }
+  42.800% { transform: translate(280px, 61.64px); }
+  47.300% { transform: translate(280px, 61.64px); }
+  50.800% { transform: translate(276px, 55.52px); }
+  59.300% { transform: translate(276px, 55.52px); }
+  62.800% { transform: translate(285px, 49.98px); }
+  67.300% { transform: translate(285px, 49.98px); }
+  70.800% { transform: translate(287px, 44.89px); }
+  71.300% { transform: translate(287px, 44.89px); }
+  74.800% { transform: translate(289px, 40.16px); }
+  79.300% { transform: translate(289px, 40.16px); }
+  82.800% { transform: translate(288px, 35.71px); }
+  91.300% { transform: translate(288px, 35.71px); }
+  94.800% { transform: translate(290px, 31.5px); }
+  100% { transform: translate(290px, 31.5px); }
 }

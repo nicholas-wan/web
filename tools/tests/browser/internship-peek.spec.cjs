@@ -88,18 +88,22 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await shopee.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
  // The League's second peek, the A/B test, opens on its final frame: both
- // arms, the rule, the interval in teal and Ship B.
+ // designs (A's border, B's badge) and two match-rate hills, apart.
  const ab=peek(page,'league-ab');
  await ab.dispatchEvent('mouseenter');
  await expect(card(ab)).toHaveClass(/is-still/);
  await expect(chip(ab)).toHaveText('A/B test a badge');
- // No bare "CI": the rule and the interval are spelled out for readers.
+ // Simple on purpose (owner): no numbers, test jargon or verdict.
  const words=await ab.locator('svg.lgab-scene text').allTextContents();
- expect(words).toEqual(expect.arrayContaining(['Ship B if the whole','interval is above 0','95% confidence','interval']));
- expect(words.join(' ')).not.toMatch(/\bCI\b/);
- await expect(ab.locator('.lgab-ship')).toHaveCSS('opacity','1');
- await expect(ab.locator('.lgab-badge')).toBeVisible();
- await expect(ab.locator('.lgab-cap text')).toHaveText(['Randomise','Measure','Decide']);
+ expect(words).toEqual(expect.arrayContaining(['Likely match rate','Most compatible']));
+ expect(words.join(' ')).not.toMatch(/\bCI\b|Ship|better|confidence|\d+%/);
+ await expect(ab.locator('.lgab-badge')).toHaveCount(2);
+ await expect(ab.locator('.lgab-hill')).toHaveCount(2);
+ const peaks=await ab.locator('.lgab-hill').evaluateAll(hs=>hs.map(h=>h.getBoundingClientRect()));
+ // Each hill spans 8 standard deviations; centres 4 apart barely overlap.
+ const mid=b=>b.left+b.width/2;
+ expect(mid(peaks[1])-mid(peaks[0])).toBeGreaterThan(peaks[0].width*.4);
+ await expect(ab.locator('.lgab-cap text')).toHaveText(['Randomise','Measure']);
  await ab.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
  // Each flying word lands as an exact copy of its row's word (same left edge,
