@@ -49,6 +49,7 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await league.dispatchEvent('mouseenter');
  await expect(card(league)).toHaveClass(/is-still/);
  await expect(league.locator('.lg-review')).toHaveCSS('opacity','1');
+ await expect(league.locator('.lg-needle')).toHaveCSS('transform',/matrix\(-0\.84/);
  await page.keyboard.press('Escape');
  await expect(chip(league)).toHaveAttribute('aria-expanded','false');
  await expect(card(league)).toHaveAttribute('inert','');
@@ -63,6 +64,11 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
   await expect(chip(shopee)).toHaveAttribute('aria-expanded','true');
   await expect(card(shopee)).toHaveCSS('position','static');
   await expect(shopee.locator('.sp-result')).toHaveCSS('opacity','1');
+  // The floating return-to-top steps aside while a card is open on phones.
+  const toTop=page.locator('#return-to-top');
+  await expect(toTop).toHaveClass(/is-visible/);
+  await expect(toTop).toHaveCSS('opacity','0');
+  await expect(toTop).toHaveCSS('pointer-events','none');
   // One tap on the other chip opens it, even though closing Shopee moves the chip.
   await chip(league).click();
   await expect(chip(league)).toHaveAttribute('aria-expanded','true');
@@ -77,5 +83,7 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
   }
   await chip(league).click();
   await expect(chip(league)).toHaveAttribute('aria-expanded','false');
+  await expect(toTop).toHaveCSS('pointer-events','auto');
+  await expect(toTop).toHaveCSS('opacity','0.6');
  }
 });
