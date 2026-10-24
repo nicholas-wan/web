@@ -119,11 +119,11 @@
   transform: none;
   transition: opacity var(--motion-standard, 220ms) ease, transform var(--motion-standard, 220ms) var(--ease-standard, ease), visibility 0s;
 }
-.internship-demo-card__plot { height: 130px; }
+.internship-demo-card__plot { height: 150px; }
 .internship-demo-card__plot > svg {
   display: block;
   width: 100%;
-  height: 130px;
+  height: 150px;
   overflow: visible;
   transition: opacity 240ms ease;
 }
@@ -181,77 +181,129 @@
   .internship-demo-card__plot > svg { transition: none; }
 }
 
-/* Shopee: the listing card slides left, a frame picks out the title, its
-   words are highlighted and lift one by one into a word box, then model and
-   attributes arrive.
-   Text is the subject; the product photo is a small thumbnail. The script
-   adds is-playing, or is-still under reduced motion, which holds every group
-   on its final frame. Scene labels are set in 360 scene units, so they
-   render at 12-13px on desktop and a little under on phones. */
+/* Shopee: a product page (image, price, title, rating, shipping badges and
+   a spec row) slides left, a frame picks out the title block, and every word
+   in it, Indonesian, Chinese and Thai alike, is highlighted and lifts into a
+   word box whose rows carry a language code. The model then pulses (a wave
+   runs through its edges and layers) and the spec table fills, row by row.
+   Text is the subject; the product photo is a banner. The script adds
+   is-playing, or is-still under reduced motion, which holds every group on
+   its final frame. Scene labels are set in 360 scene units, so they render at
+   12-13px on desktop and a little under on phones; the listing's own price,
+   rating and badge text is smaller, as it is on a real listing. */
 .sp-brand { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
 .sp-brand .sp-label { font-size: 12px; font-weight: 700; fill: #79564a; }
-.sp-brand .sp-value { font-size: 13px; font-weight: 700; fill: #c84024; }
-.sp-brand .sp-tag { font-size: 10.5px; font-weight: 700; fill: #a0583f; }
 .sp-brand .sp-title { font-size: 11px; font-weight: 700; fill: #20343d; }
-.sp-brand .sp-title--alt { font-size: 9.5px; font-weight: 400; fill: #6b7280; }
+.sp-brand .sp-title--alt { font-size: 9.5px; font-weight: 400; fill: #4b5563; }
+.sp-brand .sp-price { font-size: 11px; font-weight: 700; fill: #ee4d2d; }
+.sp-brand .sp-fine--strike { font-size: 8px; }
+.sp-brand .sp-chip-text { fill: #b8381c; }
+.sp-brand .sp-fine { font-size: 8.5px; fill: #8a8f8c; }
+.sp-brand .sp-fine--strike { fill: #b0b4b1; text-decoration: line-through; }
+.sp-brand .sp-fine--dark { font-size: 9px; fill: #4a4f4d; }
+.sp-brand .sp-badge { font-size: 8px; font-weight: 700; fill: #c84024; }
+.sp-brand .sp-badge--ship { fill: #00a58f; }
+.sp-brand .sp-code { font-size: 7px; font-weight: 700; fill: #fff; letter-spacing: 0.02em; }
+.sp-brand .sp-word { font-size: 9.5px; font-weight: 700; fill: #8a3a24; }
+.sp-brand .sp-key { font-size: 8.5px; font-weight: 600; fill: #a0583f; }
+.sp-brand .sp-value { font-size: 9.5px; font-weight: 700; fill: #c84024; }
 .sp-brand .sp-arrow { fill: none; stroke: #cf7a5c; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
-.sp-brand .sp-card { transform: translateX(108.5px); }
+.sp-brand .sp-edge { stroke-dasharray: 2.5 2; }
+.sp-brand .sp-nodes circle { transform-box: fill-box; transform-origin: center; }
+.sp-brand .sp-card { transform: translateX(120px); }
 .sp-brand .sp-crop,
 .sp-brand .sp-chip,
 .sp-brand .sp-slot,
 .sp-brand .sp-words,
 .sp-brand .sp-words .sp-arrow,
 .sp-brand .sp-model,
-.sp-brand .sp-result { opacity: 0; }
+.sp-brand .sp-result,
+.sp-brand .sp-row { opacity: 0; }
 .is-playing .sp-brand .sp-card { animation: sp-split 0.9s 0.4s ease-in-out forwards; }
 .is-playing .sp-brand .sp-crop { animation: sp-reveal 0.4s 1.2s forwards; }
-.is-playing .sp-brand .sp-chip-1 { animation: sp-chip-1 1.05s 1.9s both; }
-.is-playing .sp-brand .sp-chip-2 { animation: sp-chip-2 1.05s 1.7s both; }
-/* The words lift last-to-first, so a moving chip never crosses a parked one. */
-.is-playing .sp-brand .sp-chip-3 { animation: sp-chip-3 1.05s 1.5s both; }
+/* The words lift last-to-first (Thai, Chinese, then the Indonesian title
+   right to left), so a moving chip never crosses a parked one. */
+.is-playing .sp-brand .sp-chip-5 { animation: sp-chip-5 1.05s 1.5s both; }
+.is-playing .sp-brand .sp-chip-4 { animation: sp-chip-4 1.05s 1.7s both; }
+.is-playing .sp-brand .sp-chip-3 { animation: sp-chip-3 1.05s 1.9s both; }
+.is-playing .sp-brand .sp-chip-2 { animation: sp-chip-2 1.05s 2.1s both; }
+.is-playing .sp-brand .sp-chip-1 { animation: sp-chip-1 1.05s 2.3s both; }
 .is-playing .sp-brand .sp-words { animation: sp-arrive 0.6s 1.7s both; }
-/* The box opens empty; each slot fills as its word lands (the chip's 80%
+/* The box opens empty; each row fills as its word lands (the chip's 80%
    mark), so the handoff reads as one motion. */
-.is-playing .sp-brand .sp-slot-3 { animation: sp-reveal 0.3s 2.3s both; }
-.is-playing .sp-brand .sp-slot-2 { animation: sp-reveal 0.3s 2.5s both; }
-.is-playing .sp-brand .sp-slot-1 { animation: sp-reveal 0.3s 2.7s both; }
+.is-playing .sp-brand .sp-slot-5 { animation: sp-reveal 0.3s 2.34s both; }
+.is-playing .sp-brand .sp-slot-4 { animation: sp-reveal 0.3s 2.54s both; }
+.is-playing .sp-brand .sp-slot-3 { animation: sp-reveal 0.3s 2.74s both; }
+.is-playing .sp-brand .sp-slot-2 { animation: sp-reveal 0.3s 2.94s both; }
+.is-playing .sp-brand .sp-slot-1 { animation: sp-reveal 0.3s 3.14s both; }
 /* The first arrow waits until the last word has landed, so none crosses it;
-   the model and the attributes then follow a beat apart. */
-.is-playing .sp-brand .sp-words .sp-arrow { animation: sp-arrive 0.4s 2.85s both; }
-.is-playing .sp-brand .sp-model { animation: sp-arrive 0.5s 3.1s both; }
-.is-playing .sp-brand .sp-result { animation: sp-arrive 0.6s 3.7s both; }
+   the model follows, thinks (edges flow, layers pulse in turn) and the spec
+   table fills a row at a time. */
+.is-playing .sp-brand .sp-words .sp-arrow { animation: sp-arrive 0.4s 3.3s both; }
+.is-playing .sp-brand .sp-model { animation: sp-arrive 0.5s 3.5s both; }
+.is-playing .sp-brand .sp-edge { animation: sp-flow 1.3s 3.9s linear both; }
+.is-playing .sp-brand .sp-nodes--in circle { animation: sp-pulse 0.55s 3.9s ease-out both; }
+.is-playing .sp-brand .sp-nodes--mid circle { animation: sp-pulse 0.55s 4.25s ease-out both; }
+.is-playing .sp-brand .sp-nodes--out circle { animation: sp-pulse 0.55s 4.6s ease-out both; }
+.is-playing .sp-brand .sp-result { animation: sp-arrive 0.6s 4.9s both; }
+.is-playing .sp-brand .sp-row-1 { animation: sp-arrive 0.4s 5s both; }
+.is-playing .sp-brand .sp-row-2 { animation: sp-arrive 0.4s 5.15s both; }
+.is-playing .sp-brand .sp-row-3 { animation: sp-arrive 0.4s 5.3s both; }
+.is-playing .sp-brand .sp-row-4 { animation: sp-arrive 0.4s 5.45s both; }
 .is-still .sp-brand .sp-card { transform: none; }
 .is-still .sp-brand .sp-crop,
 .is-still .sp-brand .sp-slot,
 .is-still .sp-brand .sp-words,
 .is-still .sp-brand .sp-words .sp-arrow,
 .is-still .sp-brand .sp-model,
-.is-still .sp-brand .sp-result { opacity: 1; }
+.is-still .sp-brand .sp-result,
+.is-still .sp-brand .sp-row { opacity: 1; }
 @keyframes sp-split { to { transform: translateX(0); } }
 @keyframes sp-reveal { to { opacity: 1; } }
 @keyframes sp-arrive { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes sp-flow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -27; } }
+@keyframes sp-pulse {
+  0% { transform: scale(1); fill: #ee4d2d; }
+  45% { transform: scale(1.6); fill: #ff7a5c; }
+  100% { transform: scale(1); }
+}
+/* Each chip flies from its word on the listing to its row in the word box. */
 @keyframes sp-chip-1 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(112px, 10.5px); }
-  100% { opacity: 0; transform: translate(112px, 10.5px); }
+  80% { opacity: 1; transform: translate(146.5px, -39.5px); }
+  100% { opacity: 0; transform: translate(146.5px, -39.5px); }
 }
 @keyframes sp-chip-2 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(75.5px, 25px); }
-  100% { opacity: 0; transform: translate(75.5px, 25px); }
+  80% { opacity: 1; transform: translate(111.75px, -25.5px); }
+  100% { opacity: 0; transform: translate(111.75px, -25.5px); }
 }
 @keyframes sp-chip-3 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(56.7px, 39.5px); }
-  100% { opacity: 0; transform: translate(56.7px, 39.5px); }
+  80% { opacity: 1; transform: translate(90.7px, -11.5px); }
+  100% { opacity: 0; transform: translate(90.7px, -11.5px); }
+}
+@keyframes sp-chip-4 {
+  0% { opacity: 0; transform: none; }
+  20% { opacity: 1; transform: none; }
+  80% { opacity: 1; transform: translate(146.5px, -9.5px); }
+  100% { opacity: 0; transform: translate(146.5px, -9.5px); }
+}
+@keyframes sp-chip-5 {
+  0% { opacity: 0; transform: none; }
+  20% { opacity: 1; transform: none; }
+  80% { opacity: 1; transform: translate(103.4px, 4.5px); }
+  100% { opacity: 0; transform: translate(103.4px, 4.5px); }
 }
 
-/* The League: one profile's photo, bio and account rows are framed in turn,
-   each feeds a signal bar (amber for a concern, teal for fine), the bars sum
-   into a risk gauge whose needle sweeps with the fill, and Review lands. Many signals, not just the photo. */
+/* The League: one profile on an iPhone (dark screen, black-and-white first
+   photo, serif name, teal heart, as in the real app). Its photo, bio and
+   account rows are framed in turn, each feeds a signal bar (amber for a
+   concern, teal for fine), the bars sum into a risk gauge whose needle sweeps
+   with the fill, and Review lands. Many signals, not just the photo. */
 .league-brand-scene .lg-label {
   font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
   font-size: 12px;
@@ -264,7 +316,7 @@
 .league-brand-scene .lg-gauge { stroke-dasharray: 88; stroke-dashoffset: 88; }
 /* The needle rests at zero and sweeps with the fill, so the arc reads as a
    dial rather than a progress ring. */
-.league-brand-scene .lg-needle { transform-box: view-box; transform-origin: 308px 74px; }
+.league-brand-scene .lg-needle { transform-box: view-box; transform-origin: 290px 76px; }
 .is-playing .league-brand-scene .lg-frame-1 { animation: lg-reveal 0.4s ease 0.3s both; }
 .is-playing .league-brand-scene .lg-frame-2 { animation: lg-reveal 0.4s ease 0.6s both; }
 .is-playing .league-brand-scene .lg-frame-3 { animation: lg-reveal 0.4s ease 0.9s both; }
