@@ -315,9 +315,9 @@
 .league-brand-scene .lg-key,
 .league-brand-scene .lg-end,
 .league-brand-scene .lg-status { font-family: Georgia, "Times New Roman", serif; }
-.league-brand-scene .lg-sub { font-size: 5.2px; font-style: italic; fill: #5b6664; }
-.league-brand-scene .lg-key { font-size: 4.8px; font-style: italic; fill: #8a9592; }
-.league-brand-scene .lg-end { font-size: 4.2px; font-weight: 700; fill: #c9a53d; letter-spacing: 0.04em; }
+.league-brand-scene .lg-sub { font-size: 4.4px; font-style: italic; fill: #5c6664; }
+.league-brand-scene .lg-key { font-size: 4px; font-style: italic; fill: #8a9391; }
+.league-brand-scene .lg-end { font-size: 3.9px; font-weight: 700; fill: #c9a53d; letter-spacing: 0.04em; }
 .league-brand-scene .lg-status { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 5px; font-weight: 700; fill: #1c1e20; }
 .league-brand-scene .lg-status--light { fill: #fff; }
 .league-brand-scene .lg-frame,
