@@ -300,33 +300,22 @@
   100% { opacity: 0; transform: translate(103.4px, 8.5px); }
 }
 
-/* The League: one profile on an iPhone (dark screen, black-and-white first
-   photo, serif name, teal heart, as in the real app). Its photo, bio and
-   account rows are framed in turn, each feeds a signal bar (amber for a
-   concern, teal for fine), the bars sum into a risk gauge whose needle sweeps
-   with the fill, and Review lands. Many signals, not just the photo. */
+/* The League: one profile's photo, bio and account rows are framed in turn,
+   each feeds a signal bar (amber for a concern, teal for fine), the bars sum
+   into a risk gauge whose needle sweeps with the fill, and Review lands. Many signals, not just the photo. */
 .league-brand-scene .lg-label {
   font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
   font-size: 12px;
   font-weight: 700;
   fill: #ffffff;
 }
-.league-brand-scene .lg-sub,
-.league-brand-scene .lg-key,
-.league-brand-scene .lg-end,
-.league-brand-scene .lg-status { font-family: Georgia, "Times New Roman", serif; }
-.league-brand-scene .lg-sub { font-size: 4.4px; font-style: italic; fill: #5c6664; }
-.league-brand-scene .lg-key { font-size: 4px; font-style: italic; fill: #8a9391; }
-.league-brand-scene .lg-end { font-size: 3.9px; font-weight: 700; fill: #c9a53d; letter-spacing: 0.04em; }
-.league-brand-scene .lg-status { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 5px; font-weight: 700; fill: #1c1e20; }
-.league-brand-scene .lg-status--light { fill: #fff; }
 .league-brand-scene .lg-frame,
 .league-brand-scene .lg-review { opacity: 0; }
 .league-brand-scene .lg-bar { transform: scaleX(0); transform-box: fill-box; transform-origin: left center; }
 .league-brand-scene .lg-gauge { stroke-dasharray: 88; stroke-dashoffset: 88; }
 /* The needle rests at zero and sweeps with the fill, so the arc reads as a
    dial rather than a progress ring. */
-.league-brand-scene .lg-needle { transform-box: view-box; transform-origin: 290px 76px; }
+.league-brand-scene .lg-needle { transform-box: view-box; transform-origin: 308px 74px; }
 .is-playing .league-brand-scene .lg-frame-1 { animation: lg-reveal 0.4s ease 0.3s both; }
 .is-playing .league-brand-scene .lg-frame-2 { animation: lg-reveal 0.4s ease 0.6s both; }
 .is-playing .league-brand-scene .lg-frame-3 { animation: lg-reveal 0.4s ease 0.9s both; }
