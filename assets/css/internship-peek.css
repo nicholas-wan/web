@@ -182,10 +182,11 @@
 }
 
 /* Shopee: a product page (image, price, title, rating, shipping badges and
-   a spec row) slides left, a frame picks out the title block, and every word
-   in it, Indonesian, Chinese and Thai alike, is highlighted and lifts into a
-   word box whose rows carry a language code. The model then pulses (a wave
-   runs through its edges and layers) and the spec table fills, row by row.
+   a spec row) slides left, a selection highlight picks out the title block,
+   and every word in it, Indonesian, Chinese and Thai alike, lifts as an
+   opaque chip into a word column whose rows carry a language code (no outer
+   box: the rows group them). The model then pulses (a wave lights its
+   hairline edges and layers in turn) and the spec table fills, row by row.
    Text is the subject; the product photo is a banner. The script adds
    is-playing, or is-still under reduced motion, which holds every group on
    its final frame. Scene labels are set in 360 scene units, so they render at
@@ -209,7 +210,6 @@
 .sp-brand .sp-key { font-size: 8.5px; font-weight: 600; fill: #a0583f; }
 .sp-brand .sp-value { font-size: 9.5px; font-weight: 700; fill: #c84024; }
 .sp-brand .sp-arrow { fill: none; stroke: #cf7a5c; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
-.sp-brand .sp-edge { stroke-dasharray: 2.5 2; }
 .sp-brand .sp-nodes circle { transform-box: fill-box; transform-origin: center; }
 .sp-brand .sp-card { transform: translateX(120px); }
 .sp-brand .sp-crop,
@@ -238,11 +238,12 @@
 .is-playing .sp-brand .sp-slot-2 { animation: sp-reveal 0.3s 2.94s both; }
 .is-playing .sp-brand .sp-slot-1 { animation: sp-reveal 0.3s 3.14s both; }
 /* The first arrow waits until the last word has landed, so none crosses it;
-   the model follows, thinks (edges flow, layers pulse in turn) and the spec
+   the model follows, thinks (edges light, layers pulse in turn) and the spec
    table fills a row at a time. */
 .is-playing .sp-brand .sp-words .sp-arrow { animation: sp-arrive 0.4s 3.3s both; }
 .is-playing .sp-brand .sp-model { animation: sp-arrive 0.5s 3.5s both; }
-.is-playing .sp-brand .sp-edge { animation: sp-flow 1.3s 3.9s linear both; }
+.is-playing .sp-brand .sp-edge { animation: sp-glow 0.55s 3.9s ease-out both; }
+.is-playing .sp-brand .sp-edge--out { animation: sp-glow 0.55s 4.35s ease-out both; }
 .is-playing .sp-brand .sp-nodes--in circle { animation: sp-pulse 0.55s 3.9s ease-out both; }
 .is-playing .sp-brand .sp-nodes--mid circle { animation: sp-pulse 0.55s 4.25s ease-out both; }
 .is-playing .sp-brand .sp-nodes--out circle { animation: sp-pulse 0.55s 4.6s ease-out both; }
@@ -262,7 +263,8 @@
 @keyframes sp-split { to { transform: translateX(0); } }
 @keyframes sp-reveal { to { opacity: 1; } }
 @keyframes sp-arrive { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
-@keyframes sp-flow { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -27; } }
+/* Solid hairline edges light up as the wave passes each layer. */
+@keyframes sp-glow { 0%, 100% { stroke: #f2cbbd; } 40% { stroke: #ee6a48; } }
 @keyframes sp-pulse {
   0% { transform: scale(1); fill: #ee4d2d; }
   45% { transform: scale(1.6); fill: #ff7a5c; }
@@ -309,7 +311,8 @@
       box. The bars are inputs, one neutral colour: the model decides.
    2. Classify: the three wires merge into a small decision tree whose leaves
       are the two classes (teal fine, amber risky). The profile's route
-      lights down the tree, node by node, and lands on an amber leaf.
+      lights down the tree, node by node, and lands on an amber leaf,
+      which keeps a ring.
    3. Flag: the risk dial (teal low, a hard step into amber high) sweeps with
       its needle, Review lands and the same flag pins to the photo's corner.
    Amber appears only once the model has spoken. Links sit under the phone;
@@ -329,9 +332,11 @@
 .league-brand-scene .lg-frame,
 .league-brand-scene .lg-head,
 .league-brand-scene .lg-review,
-.league-brand-scene .lg-badge { opacity: 0; }
+.league-brand-scene .lg-badge,
+.league-brand-scene .lg-pick { opacity: 0; }
 .league-brand-scene .lg-frame,
 .league-brand-scene .lg-node,
+.league-brand-scene .lg-pick,
 .league-brand-scene .lg-badge { transform-box: fill-box; transform-origin: center; }
 .league-brand-scene .lg-bar { transform: scaleX(0); transform-box: fill-box; transform-origin: left center; }
 /* Gaps longer than the dash and a start just past it keep round caps from
@@ -360,6 +365,7 @@
 .is-playing .league-brand-scene .lg-route    { animation: lg-draw 0.5s linear 2.35s both; }
 .is-playing .league-brand-scene .lg-node-2   { animation: lg-pulse 0.4s ease-out 2.55s both; }
 .is-playing .league-brand-scene .lg-leaf     { animation: lg-pulse 0.45s ease-out 2.82s both; }
+.is-playing .league-brand-scene .lg-pick     { animation: lg-pop 0.35s cubic-bezier(.3,1.5,.6,1) 2.95s both; }
 .is-playing .league-brand-scene .lg-wire-out { animation: lg-draw 0.25s ease-out 2.95s both; }
 .is-playing .league-brand-scene .lg-head     { animation: lg-show 0.15s ease 3.15s both; }
 /* Beat 3: dial, Review, flag. */
@@ -372,7 +378,8 @@
 
 .is-still .league-brand-scene .lg-head,
 .is-still .league-brand-scene .lg-review,
-.is-still .league-brand-scene .lg-badge { opacity: 1; transform: none; }
+.is-still .league-brand-scene .lg-badge,
+.is-still .league-brand-scene .lg-pick { opacity: 1; transform: none; }
 .is-still .league-brand-scene .lg-bar { transform: none; }
 .is-still .league-brand-scene .lg-link,
 .is-still .league-brand-scene .lg-wire,

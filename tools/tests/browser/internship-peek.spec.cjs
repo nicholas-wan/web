@@ -59,6 +59,18 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await expect(league.locator('.lg-route')).toHaveCSS('stroke-dashoffset','0px');
  await expect(league.locator('.lg-caps text')).toHaveText(['Signals','Model','Risk']);
  await expect(league.locator('.lg-badge')).toHaveCSS('opacity','1');
+ await expect(league.locator('.lg-pick')).toHaveCSS('opacity','1');
+ await page.keyboard.press('Escape');
+ // Shopee's final frame: the title highlight and every word row, with solid
+ // model edges and chips that hide what they pass over.
+ await shopee.dispatchEvent('mouseenter');
+ await expect(card(shopee)).toHaveClass(/is-still/);
+ await expect(shopee.locator('.sp-crop')).toHaveCSS('opacity','1');
+ await expect(shopee.locator('.sp-slot')).toHaveCount(5);
+ for(const slot of await shopee.locator('.sp-slot').all())await expect(slot).toHaveCSS('opacity','1');
+ for(const edge of await shopee.locator('.sp-edge').all())await expect(edge).toHaveCSS('stroke-dasharray','none');
+ for(const rect of await shopee.locator('.sp-chip rect').all())expect(await rect.getAttribute('fill-opacity')).toBeNull();
+ await shopee.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
  await expect(chip(league)).toHaveAttribute('aria-expanded','false');
  await expect(card(league)).toHaveAttribute('inert','');
