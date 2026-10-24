@@ -272,32 +272,32 @@
 @keyframes sp-chip-1 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(146.5px, -39.5px); }
-  100% { opacity: 0; transform: translate(146.5px, -39.5px); }
+  80% { opacity: 1; transform: translate(146.5px, -35.5px); }
+  100% { opacity: 0; transform: translate(146.5px, -35.5px); }
 }
 @keyframes sp-chip-2 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(111.75px, -25.5px); }
-  100% { opacity: 0; transform: translate(111.75px, -25.5px); }
+  80% { opacity: 1; transform: translate(111.75px, -21.5px); }
+  100% { opacity: 0; transform: translate(111.75px, -21.5px); }
 }
 @keyframes sp-chip-3 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(90.7px, -11.5px); }
-  100% { opacity: 0; transform: translate(90.7px, -11.5px); }
+  80% { opacity: 1; transform: translate(90.7px, -7.5px); }
+  100% { opacity: 0; transform: translate(90.7px, -7.5px); }
 }
 @keyframes sp-chip-4 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(146.5px, -9.5px); }
-  100% { opacity: 0; transform: translate(146.5px, -9.5px); }
+  80% { opacity: 1; transform: translate(146.5px, -5.5px); }
+  100% { opacity: 0; transform: translate(146.5px, -5.5px); }
 }
 @keyframes sp-chip-5 {
   0% { opacity: 0; transform: none; }
   20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(103.4px, 4.5px); }
-  100% { opacity: 0; transform: translate(103.4px, 4.5px); }
+  80% { opacity: 1; transform: translate(103.4px, 8.5px); }
+  100% { opacity: 0; transform: translate(103.4px, 8.5px); }
 }
 
 /* The League: one profile on an iPhone (dark screen, black-and-white first
@@ -315,7 +315,7 @@
 .league-brand-scene .lg-key,
 .league-brand-scene .lg-end,
 .league-brand-scene .lg-status { font-family: Georgia, "Times New Roman", serif; }
-.league-brand-scene .lg-sub { font-size: 6px; font-style: italic; fill: #5b6664; }
+.league-brand-scene .lg-sub { font-size: 5.2px; font-style: italic; fill: #5b6664; }
 .league-brand-scene .lg-key { font-size: 4.8px; font-style: italic; fill: #8a9592; }
 .league-brand-scene .lg-end { font-size: 4.2px; font-weight: 700; fill: #c9a53d; letter-spacing: 0.04em; }
 .league-brand-scene .lg-status { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 5px; font-weight: 700; fill: #1c1e20; }
