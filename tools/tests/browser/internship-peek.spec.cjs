@@ -61,12 +61,15 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await expect(league.locator('.lg-caps text')).toHaveText(['Signals','Model','Risk']);
  await expect(league.locator('.lg-badge')).toHaveCSS('opacity','1');
  await expect(league.locator('.lg-pick')).toHaveCSS('opacity','1');
- // Only the chosen leaf is lit; the stacked mark and the name are outlines.
+ // Only the chosen leaf is lit; the phone's lettering is live text in the
+ // League's own fonts (glyph-only subsets), not outlines.
  await expect(league.locator('.lg-leaf')).toHaveCSS('opacity','1');
  await expect(league.locator('.lg-leafc')).toHaveCSS('opacity','0.35');
- await expect(league.locator('.lg-wordmark path')).toHaveCount(2);
- await expect(league.locator('.lg-name')).toHaveCount(1);
- await expect(league.locator('text')).toHaveCount(4);
+ await expect(league.locator('.lg-mark text')).toHaveText(['THE','league']);
+ await expect(league.locator('.lg-name')).toHaveText('James M.');
+ await expect(league.locator('.lg-key text')).toHaveText(['Education','Profession','Interests','Groups']);
+ await expect(league.locator('.lg-seps rect')).toHaveCount(await league.locator('.lg-sep').count());
+ expect(await page.evaluate(async()=>{await document.fonts.ready;return ['italic 900 8px "League Mark"','8px "League Serif"','italic 8px "League Serif"'].every(f=>document.fonts.check(f));})).toBe(true);
  await page.keyboard.press('Escape');
  // Shopee's final frame: the title highlight and every word row, with solid
  // model edges and chips that hide what they pass over.

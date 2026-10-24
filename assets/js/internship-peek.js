@@ -12,8 +12,8 @@
   const touch = matchMedia('(max-width: 736px), (hover: none)');
   const REPLAY = 10000, FADE = 240, GRACE = 130;
   // Phones keep the cards display:none until a tap, which would leave the
-  // Shopee listing's faces unrequested until its scene had already started.
-  if (document.fonts) ['400', '500', '700'].forEach(w => document.fonts.load(`${w} 11px Figtree`));
+  // scenes' faces unrequested until a scene had already started.
+  if (document.fonts) ['400 11px Figtree', '500 11px Figtree', '700 11px Figtree', 'italic 900 8px "League Mark"', '8px "League Serif"', 'italic 8px "League Serif"'].forEach(f => document.fonts.load(f));
   let active = null, pinned = null, hovered = null, leaveTimer = null, pointer = { x: -1, y: -1 };
 
   const card = r => r.querySelector('.internship-demo-card');

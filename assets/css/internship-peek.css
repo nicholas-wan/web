@@ -329,11 +329,13 @@
   100% { opacity: 0; transform: translate(100.97px, 8.9px); }
 }
 
-/* The League: one profile on an iPhone (dark screen, black-and-white first
-   photo, dark x and teal heart, as in the real app). The stacked THE / league
-   mark and the name are outlines (Playfair Display Black Italic and Libre
-   Baskerville, the closest free matches for the logo and the app's name
-   serif), so no font loads and no platform swaps them. Three beats,
+/* The League: one profile on an iPhone, drawn to the app's profile screen
+   (white screen, black-and-white inset photo, outlined gold x and teal heart
+   beside a centred name, grey italic labels, dark tab bar). The phone's
+   lettering is live text, which renders crisper than outlines at this size,
+   in glyph-only subsets of the nearest free matches: Playfair Display Black
+   Italic for the stacked mark, Libre Baskerville and its italic for the
+   profile (about 6.6 KB in all), and the Shopee scene's Figtree for the time. Three beats,
    captioned Signals, Model and Risk like Shopee's:
    1. Read: photo, bio and account are framed one at a time, 0.7s apart.
       Each frame draws a line out (from under the bezel) to its own signal
@@ -347,6 +349,20 @@
       its needle, Review lands and then the same flag pins to the photo.
    Amber appears only once the model has spoken. Links sit under the phone;
    the x and heart sit above the frames. */
+@font-face { font-family: "Figtree"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/figtree-400-bullet.woff2") format("woff2"); unicode-range: U+2022; }
+@font-face { font-family: "League Mark"; font-style: italic; font-weight: 900; font-display: swap; src: url("../fonts/playfair-900-italic-league.woff2") format("woff2"); }
+@font-face { font-family: "League Serif"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/librebaskerville-400-league.woff2") format("woff2"); }
+@font-face { font-family: "League Serif"; font-style: italic; font-weight: 400; font-display: swap; src: url("../fonts/librebaskerville-400-italic-league.woff2") format("woff2"); }
+.league-brand-scene .lg-mark { font-family: "League Mark", Georgia, serif; font-style: italic; font-weight: 900; fill: #111; }
+.league-brand-scene .lg-name { font-family: "League Serif", Georgia, serif; font-size: 7.8px; fill: #111; }
+.league-brand-scene .lg-detail { font-family: "League Serif", Georgia, serif; font-style: italic; font-size: 3.9px; fill: #222; }
+.league-brand-scene .lg-key { font-family: "League Serif", Georgia, serif; font-style: italic; font-size: 3px; fill: #a6a6a6; }
+/* Values in the app's plain sans; interests and groups are separated by
+   small squares, drawn over the font's bullet (kept, unseen, as the spacer). */
+.league-brand-scene .lg-val { font-family: "Figtree", Helvetica, sans-serif; font-size: 2.9px; font-weight: 400; fill: #111; }
+.league-brand-scene .lg-sep { fill: transparent; }
+.league-brand-scene .lg-more { fill: #3ccfc6; }
+.league-brand-scene .lg-time { font-family: "Figtree", Helvetica, sans-serif; font-size: 3.3px; font-weight: 700; fill: #111; }
 .league-brand-scene .lg-label {
   font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
   font-size: 13px;
