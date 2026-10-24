@@ -50,13 +50,14 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await expect(card(league)).toHaveClass(/is-still/);
  await expect(league.locator('.lg-review')).toHaveCSS('opacity','1');
  await expect(league.locator('.lg-needle')).toHaveCSS('transform',/matrix\(-0\.83/);
- // Three signals: each frame's line is drawn to its bar, the two concerns
- // hold their amber frames, and the flag is pinned to the photo.
+ // Three signals: each frame's line is drawn to its bar, no frame is left on
+ // the phone, the classifier's route is drawn to its leaf, and the flag is
+ // pinned to the photo.
  await expect(league.locator('.lg-bar')).toHaveCount(3);
  for(const link of await league.locator('.lg-link').all())await expect(link).toHaveCSS('stroke-dashoffset','0px');
- await expect(league.locator('.lg-hot')).toHaveCount(2);
- for(const hot of await league.locator('.lg-hot').all())await expect(hot).toHaveCSS('opacity','1');
- await expect(league.locator('.lg-frame-1')).toHaveCSS('opacity','0');
+ for(const frame of await league.locator('.lg-frame').all())await expect(frame).toHaveCSS('opacity','0');
+ await expect(league.locator('.lg-route')).toHaveCSS('stroke-dashoffset','0px');
+ await expect(league.locator('.lg-caps text')).toHaveText(['Signals','Model','Risk']);
  await expect(league.locator('.lg-badge')).toHaveCSS('opacity','1');
  await page.keyboard.press('Escape');
  await expect(chip(league)).toHaveAttribute('aria-expanded','false');

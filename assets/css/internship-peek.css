@@ -301,83 +301,93 @@
 }
 
 /* The League: one profile on an iPhone (dark screen, black-and-white first
-   photo, serif name, dark x and teal heart, as in the real app). Three beats:
+   photo, serif name, dark x and teal heart, as in the real app). Three beats,
+   captioned Signals, Model and Risk like Shopee's:
    1. Read: photo, bio and account are framed one at a time; each frame draws
-      a line out (from under the bezel) to its own signal bar, which fills.
-      Once the bar is full, the frame takes its colour: amber for a concern,
-      teal for fine. The swap is a hard cut (the amber copy re-locks with a
-      small scale pop and the teal copy drops out on the same frame), so no
-      frame ever mixes the two colours.
-   2. Combine: the three bars' wires merge into one arrow, and the risk dial
-      (teal low, a hard step into amber high) fills with its needle.
-   3. Flag: Review lands and the same flag pins to the photo's corner.
-   Links sit under the phone; the x and heart sit above the frames. */
+      a line out (from under the bezel) to its own signal bar, which fills,
+      and lets go as the next locks, so the phone never carries more than one
+      box. The bars are inputs, one neutral colour: the model decides.
+   2. Classify: the three wires merge into a small decision tree whose leaves
+      are the two classes (teal fine, amber risky). The profile's route
+      lights down the tree, node by node, and lands on an amber leaf.
+   3. Flag: the risk dial (teal low, a hard step into amber high) sweeps with
+      its needle, Review lands and the same flag pins to the photo's corner.
+   Amber appears only once the model has spoken. Links sit under the phone;
+   the x and heart sit above the frames. */
 .league-brand-scene .lg-label {
   font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
   font-size: 13px;
   font-weight: 700;
   fill: #ffffff;
 }
+.league-brand-scene .lg-caps text {
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  fill: #4f6a63;
+}
 .league-brand-scene .lg-frame,
-.league-brand-scene .lg-hot,
 .league-brand-scene .lg-head,
 .league-brand-scene .lg-review,
 .league-brand-scene .lg-badge { opacity: 0; }
 .league-brand-scene .lg-frame,
-.league-brand-scene .lg-hot,
+.league-brand-scene .lg-node,
 .league-brand-scene .lg-badge { transform-box: fill-box; transform-origin: center; }
 .league-brand-scene .lg-bar { transform: scaleX(0); transform-box: fill-box; transform-origin: left center; }
 /* Gaps longer than the dash and a start just past it keep round caps from
    leaving a dot before a line draws. */
 .league-brand-scene .lg-link,
-.league-brand-scene .lg-wire { stroke-dasharray: 100 104; stroke-dashoffset: 102; }
+.league-brand-scene .lg-wire,
+.league-brand-scene .lg-route { stroke-dasharray: 100 104; stroke-dashoffset: 102; }
 .league-brand-scene .lg-gauge { stroke-dasharray: 104 110; stroke-dashoffset: 106; }
 /* The needle rests at zero and sweeps with the fill (same easing). */
 .league-brand-scene .lg-needle { transform-box: view-box; transform-origin: 300px 78px; }
 
 /* Beat 1: three signals, 0.45s apart. Frame locks on, line draws, bar fills,
-   then (for a concern) the frame turns amber. */
-.is-playing .league-brand-scene .lg-frame-1 { animation: lg-lock 0.3s cubic-bezier(.22,1,.36,1) 0.2s both, lg-hide 0.01s step-start 1.05s forwards; }
-.is-playing .league-brand-scene .lg-link-1  { animation: lg-draw 0.3s ease-in-out 0.4s both; }
-.is-playing .league-brand-scene .lg-bar-1   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 0.6s both; }
-.is-playing .league-brand-scene .lg-hot-1   { animation: lg-swap 0.3s cubic-bezier(.22,1,.36,1) 1.05s forwards; }
-.is-playing .league-brand-scene .lg-frame-2 { animation: lg-lock 0.3s cubic-bezier(.22,1,.36,1) 0.65s both; }
-.is-playing .league-brand-scene .lg-link-2  { animation: lg-draw 0.3s ease-in-out 0.85s both; }
-.is-playing .league-brand-scene .lg-bar-2   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 1.05s both; }
-.is-playing .league-brand-scene .lg-frame-3 { animation: lg-lock 0.3s cubic-bezier(.22,1,.36,1) 1.1s both, lg-hide 0.01s step-start 1.95s forwards; }
-.is-playing .league-brand-scene .lg-link-3  { animation: lg-draw 0.3s ease-in-out 1.3s both; }
-.is-playing .league-brand-scene .lg-bar-3   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 1.5s both; }
-.is-playing .league-brand-scene .lg-hot-3   { animation: lg-swap 0.3s cubic-bezier(.22,1,.36,1) 1.95s forwards; }
-/* Beat 2: combine. */
-.is-playing .league-brand-scene .lg-wire     { animation: lg-draw 0.35s ease-in 2.05s both; }
-.is-playing .league-brand-scene .lg-wire-out { animation: lg-draw 0.25s ease-out 2.35s both; }
-.is-playing .league-brand-scene .lg-head     { animation: lg-show 0.15s ease 2.55s both; }
+   frame lets go. */
+.is-playing .league-brand-scene .lg-frame-1 { animation: lg-scan 0.6s cubic-bezier(.22,1,.36,1) 0.2s both; }
+.is-playing .league-brand-scene .lg-link-1  { animation: lg-draw 0.3s ease-in-out 0.35s both; }
+.is-playing .league-brand-scene .lg-bar-1   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 0.55s both; }
+.is-playing .league-brand-scene .lg-frame-2 { animation: lg-scan 0.6s cubic-bezier(.22,1,.36,1) 0.65s both; }
+.is-playing .league-brand-scene .lg-link-2  { animation: lg-draw 0.3s ease-in-out 0.8s both; }
+.is-playing .league-brand-scene .lg-bar-2   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 1s both; }
+.is-playing .league-brand-scene .lg-frame-3 { animation: lg-scan 0.6s cubic-bezier(.22,1,.36,1) 1.1s both; }
+.is-playing .league-brand-scene .lg-link-3  { animation: lg-draw 0.3s ease-in-out 1.25s both; }
+.is-playing .league-brand-scene .lg-bar-3   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 1.45s both; }
+/* Beat 2: wires into the tree, then the route: root, branch, leaf. */
+.is-playing .league-brand-scene .lg-wire     { animation: lg-draw 0.35s ease-in 1.95s both; }
+.is-playing .league-brand-scene .lg-node-1   { animation: lg-pulse 0.4s ease-out 2.3s both; }
+.is-playing .league-brand-scene .lg-route    { animation: lg-draw 0.5s linear 2.35s both; }
+.is-playing .league-brand-scene .lg-node-2   { animation: lg-pulse 0.4s ease-out 2.55s both; }
+.is-playing .league-brand-scene .lg-leaf     { animation: lg-pulse 0.45s ease-out 2.82s both; }
+.is-playing .league-brand-scene .lg-wire-out { animation: lg-draw 0.25s ease-out 2.95s both; }
+.is-playing .league-brand-scene .lg-head     { animation: lg-show 0.15s ease 3.15s both; }
+/* Beat 3: dial, Review, flag. */
 .is-playing .league-brand-scene .lg-gauge,
-.is-playing .league-brand-scene .lg-needle { animation: 0.8s cubic-bezier(.3,1.25,.55,1) 2.6s both; }
+.is-playing .league-brand-scene .lg-needle { animation: 0.8s cubic-bezier(.3,1.25,.55,1) 3.2s both; }
 .is-playing .league-brand-scene .lg-gauge  { animation-name: lg-gauge; }
 .is-playing .league-brand-scene .lg-needle { animation-name: lg-needle; }
-/* Beat 3: flag. Ends at about 3.75s. */
-.is-playing .league-brand-scene .lg-review { animation: lg-rise 0.4s cubic-bezier(.22,1,.36,1) 3.2s both; }
-.is-playing .league-brand-scene .lg-badge  { animation: lg-pop 0.4s cubic-bezier(.3,1.5,.6,1) 3.35s both; }
+.is-playing .league-brand-scene .lg-review { animation: lg-rise 0.4s cubic-bezier(.22,1,.36,1) 3.8s both; }
+.is-playing .league-brand-scene .lg-badge  { animation: lg-pop 0.4s cubic-bezier(.3,1.5,.6,1) 3.95s both; }
 
-.is-still .league-brand-scene .lg-frame,
-.is-still .league-brand-scene .lg-hot,
 .is-still .league-brand-scene .lg-head,
 .is-still .league-brand-scene .lg-review,
 .is-still .league-brand-scene .lg-badge { opacity: 1; transform: none; }
-/* The amber copies replace the teal frames on the two concerns. */
-.is-still .league-brand-scene .lg-frame-1,
-.is-still .league-brand-scene .lg-frame-3 { opacity: 0; }
 .is-still .league-brand-scene .lg-bar { transform: none; }
 .is-still .league-brand-scene .lg-link,
-.is-still .league-brand-scene .lg-wire { stroke-dashoffset: 0; }
+.is-still .league-brand-scene .lg-wire,
+.is-still .league-brand-scene .lg-route { stroke-dashoffset: 0; }
 .is-still .league-brand-scene .lg-gauge { stroke-dashoffset: 19; }
 .is-still .league-brand-scene .lg-needle { transform: rotate(147deg); }
 
-@keyframes lg-lock { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+@keyframes lg-scan {
+  0% { opacity: 0; transform: scale(1.06); }
+  30% { opacity: 1; transform: none; }
+  75% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: none; }
+}
+@keyframes lg-pulse { 0%, 100% { transform: scale(1); } 45% { transform: scale(1.7); } }
 @keyframes lg-show { to { opacity: 1; } }
-@keyframes lg-hide { from, to { opacity: 0; } }
-@keyframes lg-swap { from { opacity: 1; transform: scale(1.04); } to { opacity: 1; transform: none; } }
 @keyframes lg-draw { to { stroke-dashoffset: 0; } }
 @keyframes lg-fill { to { transform: scaleX(1); } }
 @keyframes lg-gauge { to { stroke-dashoffset: 19; } }
