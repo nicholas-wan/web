@@ -90,7 +90,57 @@
   background: #fff1eb;
   box-shadow: inset 0 0 0 1px rgba(238, 77, 45, 0.13);
 }
-.internship-demo-peek[data-company="league"] .internship-demo-peek__mini { background: #f1f5f4; }
+.internship-demo-peek[data-company="league"] .internship-demo-peek__mini,
+.internship-demo-peek[data-company="league-ab"] .internship-demo-peek__mini { background: #f1f5f4; }
+/* The League row carries two peeks, laid out like the phishing charts: the
+   chips side by side, each as wide as the wider one (equal columns in a
+   fit-content grid), thumbnail and label centred with the arrow at the right;
+   both cards open in one shared slot below the row. The peeks themselves
+   have no box (display: contents), so their chips and cards are placed by
+   the row's grid; the script still treats each as one peek. */
+.page-experience .case-study--internship .internship-demo-peeks {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 0.7rem;
+}
+.page-experience .case-study--internship .internship-demo-peeks > .internship-demo-peek { display: contents; }
+.internship-demo-peeks > .internship-demo-peek:nth-child(1) > .internship-demo-peek__chip { grid-column: 1; grid-row: 1; }
+.internship-demo-peeks > .internship-demo-peek:nth-child(2) > .internship-demo-peek__chip { grid-column: 2; grid-row: 1; }
+.page-experience .case-study--internship .internship-demo-peeks .internship-demo-card { grid-column: 1 / -1; grid-row: 2; }
+.page-experience .case-study--internship .internship-demo-peeks .internship-demo-peek__chip { min-width: 0; }
+.internship-demo-peeks .internship-demo-peek__mini { margin-left: auto; }
+.page-experience .case-study--internship .internship-demo-peeks .internship-demo-peek__chip::after { margin-left: auto; }
+/* Desktop: the shared card slot is the chip row, which is only as wide as
+   its two chips, so the card takes the full shared 28rem instead of the
+   row's width. */
+@media screen and (min-width: 981px) and (hover: hover) {
+  .page-experience .case-study--internship .internship-demo-peeks .internship-demo-card { width: min(28rem, calc(100vw - 2rem)); }
+}
+/* Phones and tablets: two equal tiles across the row, thumbnail above a
+   centred label, as the phishing charts do. */
+@media screen and (max-width: 980px) {
+  .page-experience .case-study--internship .internship-demo-peeks {
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+  .page-experience .case-study--internship .internship-demo-peeks .internship-demo-peek__chip {
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    padding: 0.5rem 0.3rem 0.45rem;
+    border-radius: 0.6rem;
+    line-height: 1.2;
+    white-space: normal;
+    text-align: center;
+  }
+  .page-experience .case-study--internship .internship-demo-peeks .internship-demo-peek__chip::after { display: none; }
+  .internship-demo-peeks .internship-demo-peek__mini { margin-left: 0; }
+}
 
 /* The card: just the scene, floating below the chip on desktop. It holds
    nothing to click, so it lets the pointer through: the next row's chip
@@ -101,7 +151,9 @@
   top: calc(100% + 8px);
   left: 0;
   z-index: 30;
-  width: min(390px, 100%);
+  /* 28rem, the size the anomaly chart cards share, so all six charts on
+     Experience take the same space and grow together on wide screens. */
+  width: min(28rem, 100%);
   padding: 0.5rem 0.85rem;
   border: 1px solid #dce6e5;
   border-radius: 0.6rem;
@@ -119,11 +171,13 @@
   transform: none;
   transition: opacity var(--motion-standard, 220ms) ease, transform var(--motion-standard, 220ms) var(--ease-standard, ease), visibility 0s;
 }
-.internship-demo-card__plot { height: 150px; }
+/* The plot keeps the scenes' 360:150 shape and scales with the card, so the
+   scenes grow with it rather than sitting in a fixed 150px band. */
 .internship-demo-card__plot > svg {
   display: block;
   width: 100%;
-  height: 150px;
+  height: auto;
+  aspect-ratio: 360 / 150;
   overflow: visible;
   transition: opacity 240ms ease;
 }
@@ -455,3 +509,197 @@
 @keyframes lg-needle { to { transform: rotate(147deg); } }
 @keyframes lg-rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes lg-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+
+/* The League, second peek: an A/B test of a "Most compatible" badge, built
+   from three designers and three reviewers over three rounds, then put on
+   League phones (owner request). Both arms are 0.75-scale copies of the
+   risky-profile phone.
+   Randomise, Measure, Decide, with the two arms on League iPhones (the
+   live scene's phone at 0.75). The badge pops onto B's photo first (the
+   one change). Then users, what is randomised, flow from the people icon
+   through the die and run out to their arm's fill, over its phone,
+   which grows towards its planned-sample end tick. Each arrival
+   narrows the 95% confidence interval for B - A one step (half-width
+   exactly 20*sqrt(16/n); the centre's wobble shrinks with n). Its lower end
+   moves above zero only with the last user, when the planned sample is
+   complete (3.65s), and it turns teal in that same moment; then Ship B
+   lands under the rule that has been on screen from the start. */
+.lgab-scene .lgab-cap text { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 12px; font-weight: 700; fill: #4f6a63; }
+.lgab-scene .lgab-t { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 10px; font-weight: 700; fill: #4f6a63; }
+.lgab-scene .lgab-arm { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 11px; font-weight: 900; fill: #4f6a63; }
+.lgab-scene .lgab-badge { font-family: "Figtree", Helvetica, sans-serif; font-weight: 700; fill: #fff; }
+.lgab-scene .lgab-label { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 13px; font-weight: 700; fill: #fff; }
+.lgab-scene .lgab-line { fill: none; stroke: #849a93; stroke-width: 1.2; stroke-linecap: round; }
+.lgab-scene .lgab-axis { fill: none; stroke: #cfdad7; stroke-width: 1.2; stroke-linecap: round; }
+.lgab-scene .lgab-people { fill: none; stroke: #4f6a63; stroke-width: 1.1; stroke-linecap: round; }
+.lgab-scene .lgab-end { fill: none; stroke: #4f6a63; stroke-width: 1.6; stroke-linecap: round; }
+.lgab-scene .lgab-fill { fill: none; stroke: #6b827b; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 44px 100px; stroke-dashoffset: 0; }
+.lgab-scene .lgab-u { fill: #4f6a63; opacity: 0; }
+/* The phone's lettering, as in the live League scene (same subset fonts). */
+.lgab-scene .lgab-mark { font-family: "League Mark", Georgia, serif; font-style: italic; font-weight: 900; fill: #111; }
+.lgab-scene .lgab-name { font-family: "League Serif", Georgia, serif; font-size: 7.8px; fill: #111; }
+.lgab-scene .lgab-detail { font-family: "League Serif", Georgia, serif; font-style: italic; font-size: 3.9px; fill: #222; }
+.lgab-scene .lgab-key { font-family: "League Serif", Georgia, serif; font-style: italic; font-size: 3px; fill: #a6a6a6; }
+.lgab-scene .lgab-val { font-family: "Figtree", Helvetica, sans-serif; font-size: 2.9px; font-weight: 400; fill: #111; }
+.lgab-scene .lgab-time { font-family: "Figtree", Helvetica, sans-serif; font-size: 3.3px; font-weight: 700; fill: #111; }
+.lgab-scene .lgab-badge-g { transform-box: fill-box; transform-origin: center; }
+.lgab-scene .lgab-ci-bar { transform-box: fill-box; transform-origin: center; transform: translateX(-3px) scaleX(0.4); }
+.lgab-scene .lgab-ci-lo { transform: translateX(-23px); }
+.lgab-scene .lgab-ci-hi { transform: translateX(17px); }
+.lgab-scene .lgab-ci-est { transform: translateX(-3px); }
+.lgab-scene .lgab-ci-bar, .lgab-scene .lgab-ci-est { fill: #11807d; }
+.lgab-scene .lgab-ci-lo, .lgab-scene .lgab-ci-hi { fill: none; stroke: #11807d; stroke-width: 1.8; stroke-linecap: round; }
+
+/* Playing: the badge first, then the traffic; the interval steps with the
+   arrivals and stays grey until the planned sample is in. */
+.is-playing .lgab-scene .lgab-badge-g { animation: lgab-pop .35s cubic-bezier(.3,1.5,.6,1) 0.25s both; }
+.is-playing .lgab-scene .lgab-u { animation: lgab-to 0.6s cubic-bezier(.45,0,.3,1) both; }
+.is-playing .lgab-scene .lgab-fill-a { animation: lgab-fill-a 4.0s linear both; }
+.is-playing .lgab-scene .lgab-fill-b { animation: lgab-fill-b 4.0s linear both; }
+.is-playing .lgab-scene .lgab-ci { animation: lgab-show .15s ease 2.05s both; }
+.is-playing .lgab-scene .lgab-ci-bar { animation: lgab-bar 4.0s linear both, lgab-teal-fill .15s ease 3.65s both; }
+.is-playing .lgab-scene .lgab-ci-lo  { animation: lgab-lo 4.0s linear both, lgab-teal-stroke .15s ease 3.65s both; }
+.is-playing .lgab-scene .lgab-ci-hi  { animation: lgab-hi 4.0s linear both, lgab-teal-stroke .15s ease 3.65s both; }
+.is-playing .lgab-scene .lgab-ci-est { animation: lgab-est 4.0s linear both, lgab-teal-fill .15s ease 3.65s both; }
+.is-playing .lgab-scene .lgab-arrow  { animation: lgab-slide .3s ease-out 3.85s both; }
+.is-playing .lgab-scene .lgab-ship   { animation: lgab-rise .4s cubic-bezier(.22,1,.36,1) 4.00s both; }
+
+@keyframes lgab-pop { from { opacity: 0; transform: scale(.4); } to { opacity: 1; transform: none; } }
+@keyframes lgab-show { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lgab-rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes lgab-slide { from { opacity: 0; transform: translateX(-4px); } to { opacity: 1; transform: none; } }
+@keyframes lgab-teal-fill { from { fill: #a7b6b1; } to { fill: #11807d; } }
+@keyframes lgab-teal-stroke { from { stroke: #a7b6b1; } to { stroke: #11807d; } }
+/* A user drops from the icon, passes under the die and runs along its
+   arm's track to the fill's front, where it merges. */
+@keyframes lgab-to {
+  0% { opacity: 0; transform: translate(0, -9px); }
+  18% { opacity: 1; transform: translate(0, -6px); }
+  38% { transform: translate(0, 0); }
+  92% { opacity: 1; transform: translate(var(--dx), 0); }
+  100% { opacity: 0; transform: translate(var(--dx), 0); }
+}
+@keyframes lgab-fill-a {
+  0% { stroke-dashoffset: 44px; opacity: 0; }
+  27.550% { stroke-dashoffset: 44px; opacity: 0; }
+  27.800% { stroke-dashoffset: 44px; opacity: 1; }
+  31.300% { stroke-dashoffset: 38.500px; opacity: 1; }
+  43.300% { stroke-dashoffset: 33.000px; opacity: 1; }
+  51.300% { stroke-dashoffset: 27.500px; opacity: 1; }
+  55.300% { stroke-dashoffset: 22.000px; opacity: 1; }
+  63.300% { stroke-dashoffset: 16.500px; opacity: 1; }
+  75.300% { stroke-dashoffset: 11.000px; opacity: 1; }
+  83.300% { stroke-dashoffset: 5.500px; opacity: 1; }
+  87.300% { stroke-dashoffset: 0.000px; opacity: 1; }
+  100% { stroke-dashoffset: 0px; opacity: 1; }
+}
+@keyframes lgab-fill-b {
+  0% { stroke-dashoffset: 44px; opacity: 0; }
+  31.550% { stroke-dashoffset: 44px; opacity: 0; }
+  31.800% { stroke-dashoffset: 44px; opacity: 1; }
+  35.300% { stroke-dashoffset: 38.500px; opacity: 1; }
+  39.300% { stroke-dashoffset: 33.000px; opacity: 1; }
+  47.300% { stroke-dashoffset: 27.500px; opacity: 1; }
+  59.300% { stroke-dashoffset: 22.000px; opacity: 1; }
+  67.300% { stroke-dashoffset: 16.500px; opacity: 1; }
+  71.300% { stroke-dashoffset: 11.000px; opacity: 1; }
+  79.300% { stroke-dashoffset: 5.500px; opacity: 1; }
+  91.300% { stroke-dashoffset: 0.000px; opacity: 1; }
+  100% { stroke-dashoffset: 0px; opacity: 1; }
+}
+@keyframes lgab-bar {
+  0% { transform: translateX(1.00px) scaleX(0.6532); }
+  55.300% { transform: translateX(1.00px) scaleX(0.6532); }
+  58.300% { transform: translateX(-8.00px) scaleX(0.6047); }
+  59.300% { transform: translateX(-8.00px) scaleX(0.6047); }
+  62.300% { transform: translateX(-1.00px) scaleX(0.5657); }
+  63.300% { transform: translateX(-1.00px) scaleX(0.5657); }
+  66.300% { transform: translateX(-6.50px) scaleX(0.5333); }
+  67.300% { transform: translateX(-6.50px) scaleX(0.5333); }
+  70.300% { transform: translateX(-2.00px) scaleX(0.5060); }
+  71.300% { transform: translateX(-2.00px) scaleX(0.5060); }
+  74.300% { transform: translateX(-6.00px) scaleX(0.4824); }
+  75.300% { transform: translateX(-6.00px) scaleX(0.4824); }
+  78.300% { transform: translateX(-3.50px) scaleX(0.4619); }
+  79.300% { transform: translateX(-3.50px) scaleX(0.4619); }
+  82.300% { transform: translateX(-5.50px) scaleX(0.4438); }
+  83.300% { transform: translateX(-5.50px) scaleX(0.4438); }
+  86.300% { transform: translateX(-5.00px) scaleX(0.4276); }
+  87.300% { transform: translateX(-5.00px) scaleX(0.4276); }
+  90.300% { transform: translateX(-5.70px) scaleX(0.4131); }
+  91.300% { transform: translateX(-5.70px) scaleX(0.4131); }
+  94.300% { transform: translateX(-3.00px) scaleX(0.4000); }
+  100% { transform: translateX(-3.00px) scaleX(0.4000); }
+}
+@keyframes lgab-lo {
+  0% { transform: translateX(-31.66px); }
+  55.300% { transform: translateX(-31.66px); }
+  58.300% { transform: translateX(-38.24px); }
+  59.300% { transform: translateX(-38.24px); }
+  62.300% { transform: translateX(-29.28px); }
+  63.300% { transform: translateX(-29.28px); }
+  66.300% { transform: translateX(-33.17px); }
+  67.300% { transform: translateX(-33.17px); }
+  70.300% { transform: translateX(-27.30px); }
+  71.300% { transform: translateX(-27.30px); }
+  74.300% { transform: translateX(-30.12px); }
+  75.300% { transform: translateX(-30.12px); }
+  78.300% { transform: translateX(-26.59px); }
+  79.300% { transform: translateX(-26.59px); }
+  82.300% { transform: translateX(-27.69px); }
+  83.300% { transform: translateX(-27.69px); }
+  86.300% { transform: translateX(-26.38px); }
+  87.300% { transform: translateX(-26.38px); }
+  90.300% { transform: translateX(-26.36px); }
+  91.300% { transform: translateX(-26.36px); }
+  94.300% { transform: translateX(-23.00px); }
+  100% { transform: translateX(-23.00px); }
+}
+@keyframes lgab-hi {
+  0% { transform: translateX(33.66px); }
+  55.300% { transform: translateX(33.66px); }
+  58.300% { transform: translateX(22.24px); }
+  59.300% { transform: translateX(22.24px); }
+  62.300% { transform: translateX(27.28px); }
+  63.300% { transform: translateX(27.28px); }
+  66.300% { transform: translateX(20.17px); }
+  67.300% { transform: translateX(20.17px); }
+  70.300% { transform: translateX(23.30px); }
+  71.300% { transform: translateX(23.30px); }
+  74.300% { transform: translateX(18.12px); }
+  75.300% { transform: translateX(18.12px); }
+  78.300% { transform: translateX(19.59px); }
+  79.300% { transform: translateX(19.59px); }
+  82.300% { transform: translateX(16.69px); }
+  83.300% { transform: translateX(16.69px); }
+  86.300% { transform: translateX(16.38px); }
+  87.300% { transform: translateX(16.38px); }
+  90.300% { transform: translateX(14.96px); }
+  91.300% { transform: translateX(14.96px); }
+  94.300% { transform: translateX(17.00px); }
+  100% { transform: translateX(17.00px); }
+}
+@keyframes lgab-est {
+  0% { transform: translateX(1.00px); }
+  55.300% { transform: translateX(1.00px); }
+  58.300% { transform: translateX(-8.00px); }
+  59.300% { transform: translateX(-8.00px); }
+  62.300% { transform: translateX(-1.00px); }
+  63.300% { transform: translateX(-1.00px); }
+  66.300% { transform: translateX(-6.50px); }
+  67.300% { transform: translateX(-6.50px); }
+  70.300% { transform: translateX(-2.00px); }
+  71.300% { transform: translateX(-2.00px); }
+  74.300% { transform: translateX(-6.00px); }
+  75.300% { transform: translateX(-6.00px); }
+  78.300% { transform: translateX(-3.50px); }
+  79.300% { transform: translateX(-3.50px); }
+  82.300% { transform: translateX(-5.50px); }
+  83.300% { transform: translateX(-5.50px); }
+  86.300% { transform: translateX(-5.00px); }
+  87.300% { transform: translateX(-5.00px); }
+  90.300% { transform: translateX(-5.70px); }
+  91.300% { transform: translateX(-5.70px); }
+  94.300% { transform: translateX(-3.00px); }
+  100% { transform: translateX(-3.00px); }
+}

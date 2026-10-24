@@ -4656,11 +4656,12 @@ body.is-map-fullscreen .travel-atlas__layout {
 .mini-packet { fill: #11807d; opacity: 0.7; }
 
 /* The chart cards: absolutely placed below the chip row by the script, so
-   opening one never moves the page or covers the writeup above. */
+   opening one never moves the page or covers the writeup above. 28rem, the
+   one size every chart card on Experience shares (internship-peek.css). */
 .page-experience #cloud-analytics .anomaly-card {
   position: absolute;
   z-index: 30;
-  width: min(24rem, calc(100% - 1.5rem));
+  width: min(28rem, calc(100% - 1.5rem));
   padding: 0.85rem 1rem 0.7rem;
   border: 1px solid #dce6e5;
   border-radius: 0.6rem;
@@ -4822,8 +4823,8 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
 @media screen and (min-width: 737px) and (hover: none) {
   .page-experience #cloud-analytics .anomaly-card {
     flex: none;
-    width: min(24rem, 100%);
-    margin-right: calc(100% - min(24rem, 100%));
+    width: min(28rem, 100%);
+    margin-right: calc(100% - min(28rem, 100%));
   }
 }
 @keyframes anomaly-card-in { from { opacity: 0; } }

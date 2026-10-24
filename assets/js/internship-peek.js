@@ -112,8 +112,10 @@
   });
   // The chip row leaving the viewport closes its card; the top margin keeps
   // a card that still hangs into view open while its chip has scrolled off.
+  // It watches the chip: a peek laid out by a shared row has no box itself.
   const observer = new IntersectionObserver(entries => entries.forEach(e => {
-    if (!e.isIntersecting && active === e.target) { pinned = null; close(active); }
+    const r = e.target.closest('.internship-demo-peek');
+    if (!e.isIntersecting && active === r) { pinned = null; close(active); }
   }), { rootMargin: '220px 0px 0px 0px' });
-  roots.forEach(r => observer.observe(r));
+  roots.forEach(r => observer.observe(chip(r)));
 })();

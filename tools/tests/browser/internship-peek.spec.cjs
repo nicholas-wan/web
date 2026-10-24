@@ -87,6 +87,21 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await expect(shopee.locator('.sp-value').first()).toHaveCSS('fill','rgb(34, 34, 34)');
  await shopee.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
+ // The League's second peek, the A/B test, opens on its final frame: both
+ // arms, the rule, the interval in teal and Ship B.
+ const ab=peek(page,'league-ab');
+ await ab.dispatchEvent('mouseenter');
+ await expect(card(ab)).toHaveClass(/is-still/);
+ await expect(chip(ab)).toHaveText('A/B test a badge');
+ // No bare "CI": the rule and the interval are spelled out for readers.
+ const words=await ab.locator('svg.lgab-scene text').allTextContents();
+ expect(words).toEqual(expect.arrayContaining(['Ship B if the whole','interval is above 0','95% confidence','interval']));
+ expect(words.join(' ')).not.toMatch(/\bCI\b/);
+ await expect(ab.locator('.lgab-ship')).toHaveCSS('opacity','1');
+ await expect(ab.locator('.lgab-badge')).toBeVisible();
+ await expect(ab.locator('.lgab-cap text')).toHaveText(['Randomise','Measure','Decide']);
+ await ab.dispatchEvent('mouseleave');
+ await page.keyboard.press('Escape');
  // Each flying word lands as an exact copy of its row's word (same left edge,
  // width and baseline), so the handover into the word column never jumps.
  await page.emulateMedia({reducedMotion:'no-preference'});
