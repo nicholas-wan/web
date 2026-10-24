@@ -343,6 +343,11 @@ foreach ($merriweatherCut in @('merriweather-300-latin', 'merriweather-700-latin
 # Source Sans Pro 700 is a static latin instance of the ~170 KB Source Sans 3
 # variable font (README.md, "Fonts"); the variable file must never ship.
 Assert-FileSizeBudget 'assets\fonts\source-sans-pro-700-latin.woff2' 20
+# The Shopee peek's Figtree cuts are static, ASCII-only instances of the
+# ~62 KB variable font (README.md, "Fonts"); the variable file must never ship.
+foreach ($figtreeCut in @('figtree-400-ascii', 'figtree-500-ascii', 'figtree-700-ascii')) {
+    Assert-FileSizeBudget "assets\fonts\$figtreeCut.woff2" 8
+}
 $mainCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\main.css') -Raw -Encoding UTF8
 if ($sharedCustomCss -notmatch '--font-display:\s*"Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;' -or $mainCss -notmatch '(?s)@font-face\s*\{[^}]*font-family:\s*"Source Sans Fallback";[^}]*font-weight:\s*600 900;[^}]*src:\s*local\("Arial Bold"\)[^}]*size-adjust:\s*8[0-9]%') { throw 'The display stack must name the size-adjusted "Source Sans Fallback" face (Oct 2026 cold-load reflow fix).' }
 if ($sharedCustomCss -match 'Route bundle:|Travel destination atlas|Guangzhou journal|Travel journal navigation\.|Japan editorial title|Quiet Skills-card treatment') { throw 'Generated shared custom.css still contains a route-owned block.' }

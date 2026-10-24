@@ -184,34 +184,42 @@
 /* Shopee: a product page (image, price, title, rating, shipping badges and
    a spec row) slides left, a selection highlight picks out the title block,
    and every word in it, Indonesian, Chinese and Thai alike, lifts as an
-   opaque chip into a word column whose rows carry a language code (no outer
-   box: the rows group them). The model then pulses (a wave lights its
-   hairline edges and layers in turn) and the spec table fills, row by row.
-   Text is the subject; the product photo is a banner. The script adds
-   is-playing, or is-still under reduced motion, which holds every group on
-   its final frame. Scene labels are set in 360 scene units, so they render at
-   12-13px on desktop and a little under on phones; the listing's own price,
-   rating and badge text is smaller, as it is on a real listing. */
-.sp-brand { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
-.sp-brand .sp-label { font-size: 12px; font-weight: 700; fill: #79564a; }
-.sp-brand .sp-title { font-size: 11px; font-weight: 700; fill: #20343d; }
+   opaque chip, slides along its own line clear of the listing, and lands as
+   its row in a word column whose rows carry a language code (no outer box:
+   the rows group them). The model then thinks (a wave lights its hairline
+   edges and layers in turn) and the spec list fills, row by row.
+   Text is the subject; the product photo is a banner. The listing and the
+   spec list are set in Figtree, the closest free match for Shopee's own
+   face (Shopee 2021), in the app's weights: regular meta and labels, medium
+   title and values, bold price. Scene captions stay in Source Sans, like the
+   League's. The script adds is-playing, or is-still under reduced motion,
+   which holds every group on its final frame. Scene labels are set in 360
+   scene units, so they render at 12-13px on desktop and a little under on
+   phones; the listing's own price, rating and badge text is smaller, as it
+   is on a real listing. */
+@font-face { font-family: "Figtree"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/figtree-400-ascii.woff2") format("woff2"); unicode-range: U+0020-007E; }
+@font-face { font-family: "Figtree"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/figtree-500-ascii.woff2") format("woff2"); unicode-range: U+0020-007E; }
+@font-face { font-family: "Figtree"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/figtree-700-ascii.woff2") format("woff2"); unicode-range: U+0020-007E; }
+.sp-brand { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
+.sp-brand .sp-label { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 12px; font-weight: 700; fill: #79564a; }
+.sp-brand .sp-title { font-size: 11px; font-weight: 500; fill: #20343d; }
 .sp-brand .sp-title--alt { font-size: 9.5px; font-weight: 400; fill: #4b5563; }
 .sp-brand .sp-price { font-size: 11px; font-weight: 700; fill: #ee4d2d; }
-.sp-brand .sp-fine--strike { font-size: 8px; }
-.sp-brand .sp-chip-text { fill: #b8381c; }
-/* The Chinese and Thai chips pick up their row's bold as they lift, so they
-   land as an exact copy of it. */
-.sp-brand .sp-title--alt.sp-chip-text { font-weight: 700; }
-.sp-brand .sp-fine { font-size: 8.5px; fill: #8a8f8c; }
-.sp-brand .sp-fine--strike { fill: #b0b4b1; text-decoration: line-through; }
+.sp-brand .sp-price-cur { font-size: 8px; }
+/* A chip and its row word share one colour, so the handover is invisible. */
+.sp-brand .sp-chip-text,
+.sp-brand .sp-word { fill: #9a3720; }
+.sp-brand .sp-fine { font-size: 8.5px; font-weight: 400; fill: #8a8f8c; }
 .sp-brand .sp-fine--dark { font-size: 9px; fill: #4a4f4d; }
+.sp-brand .sp-fine--section { font-size: 8.5px; font-weight: 500; fill: #4a4f4d; }
 .sp-brand .sp-badge { font-size: 8px; font-weight: 700; fill: #c84024; }
-.sp-brand .sp-fine--ship { font-size: 9px; font-weight: 600; fill: #00a58f; }
-.sp-brand .sp-counter { font-size: 5.5px; font-weight: 600; fill: #fff; }
-.sp-brand .sp-code { font-size: 7px; font-weight: 700; fill: #fff; letter-spacing: 0.02em; }
-.sp-brand .sp-word { font-size: 9.5px; font-weight: 700; fill: #8a3a24; }
-.sp-brand .sp-key { font-size: 8.5px; font-weight: 600; fill: #a0583f; }
-.sp-brand .sp-value { font-size: 9.5px; font-weight: 700; fill: #c84024; }
+.sp-brand .sp-fine--ship { font-size: 9px; font-weight: 500; fill: #00a58f; }
+.sp-brand .sp-counter { font-size: 5.5px; font-weight: 500; fill: #fff; }
+.sp-brand .sp-code { font-size: 7px; font-weight: 700; fill: #fff; }
+.sp-brand .sp-word { font-size: 9.5px; font-weight: 500; }
+.sp-brand .sp-word--alt { font-weight: 400; }
+.sp-brand .sp-key { font-size: 8.5px; font-weight: 400; fill: #8a8f8c; }
+.sp-brand .sp-value { font-size: 9.5px; font-weight: 500; fill: #222; }
 .sp-brand .sp-arrow { fill: none; stroke: #cf7a5c; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
 .sp-brand .sp-nodes circle { transform-box: fill-box; transform-origin: center; }
 .sp-brand .sp-card { transform: translateX(120px); }
@@ -226,35 +234,35 @@
 .is-playing .sp-brand .sp-card { animation: sp-split 0.9s 0.4s ease-in-out forwards; }
 .is-playing .sp-brand .sp-crop { animation: sp-reveal 0.4s 1.2s forwards; }
 /* The words lift last-to-first (Thai, Chinese, then the Indonesian title
-   right to left), so a moving chip never crosses a parked one. */
-.is-playing .sp-brand .sp-chip-5 { animation: sp-chip-5 1.05s 1.5s both; }
-.is-playing .sp-brand .sp-chip-4 { animation: sp-chip-4 1.05s 1.7s both; }
-.is-playing .sp-brand .sp-chip-3 { animation: sp-chip-3 1.05s 1.9s both; }
-.is-playing .sp-brand .sp-chip-2 { animation: sp-chip-2 1.05s 2.1s both; }
-.is-playing .sp-brand .sp-chip-1 { animation: sp-chip-1 1.05s 2.3s both; }
+   right to left), 0.28s apart, so at most three are in the air. */
+.is-playing .sp-brand .sp-chip-5 { animation: sp-chip-5 0.9s 1.8s both; }
+.is-playing .sp-brand .sp-chip-4 { animation: sp-chip-4 0.9s 2.08s both; }
+.is-playing .sp-brand .sp-chip-3 { animation: sp-chip-3 0.9s 2.36s both; }
+.is-playing .sp-brand .sp-chip-2 { animation: sp-chip-2 0.9s 2.64s both; }
+.is-playing .sp-brand .sp-chip-1 { animation: sp-chip-1 0.9s 2.92s both; }
 .is-playing .sp-brand .sp-words { animation: sp-arrive 0.6s 1.7s both; }
-/* The box opens empty; each row fills as its word lands (the chip's 80%
+/* The column opens empty; each row fills as its word lands (the chip's 82%
    mark), so the handoff reads as one motion. */
-.is-playing .sp-brand .sp-slot-5 { animation: sp-reveal 0.3s 2.34s both; }
-.is-playing .sp-brand .sp-slot-4 { animation: sp-reveal 0.3s 2.54s both; }
-.is-playing .sp-brand .sp-slot-3 { animation: sp-reveal 0.3s 2.74s both; }
-.is-playing .sp-brand .sp-slot-2 { animation: sp-reveal 0.3s 2.94s both; }
-.is-playing .sp-brand .sp-slot-1 { animation: sp-reveal 0.3s 3.14s both; }
+.is-playing .sp-brand .sp-slot-5 { animation: sp-reveal 0.3s 2.54s both; }
+.is-playing .sp-brand .sp-slot-4 { animation: sp-reveal 0.3s 2.82s both; }
+.is-playing .sp-brand .sp-slot-3 { animation: sp-reveal 0.3s 3.1s both; }
+.is-playing .sp-brand .sp-slot-2 { animation: sp-reveal 0.3s 3.38s both; }
+.is-playing .sp-brand .sp-slot-1 { animation: sp-reveal 0.3s 3.66s both; }
 /* The first arrow waits until the last word has landed, so none crosses it;
-   the model follows, thinks (edges light, layers pulse in turn) and the spec
-   table fills a row at a time. */
-.is-playing .sp-brand .sp-words .sp-arrow { animation: sp-arrive 0.4s 3.3s both; }
-.is-playing .sp-brand .sp-model { animation: sp-arrive 0.5s 3.5s both; }
-.is-playing .sp-brand .sp-edge { animation: sp-glow 0.55s 3.9s ease-out both; }
-.is-playing .sp-brand .sp-edge--out { animation: sp-glow 0.55s 4.35s ease-out both; }
-.is-playing .sp-brand .sp-nodes--in circle { animation: sp-pulse 0.55s 3.9s ease-out both; }
-.is-playing .sp-brand .sp-nodes--mid circle { animation: sp-pulse 0.55s 4.25s ease-out both; }
-.is-playing .sp-brand .sp-nodes--out circle { animation: sp-pulse 0.55s 4.6s ease-out both; }
-.is-playing .sp-brand .sp-result { animation: sp-arrive 0.6s 4.9s both; }
-.is-playing .sp-brand .sp-row-1 { animation: sp-arrive 0.4s 5s both; }
-.is-playing .sp-brand .sp-row-2 { animation: sp-arrive 0.4s 5.15s both; }
-.is-playing .sp-brand .sp-row-3 { animation: sp-arrive 0.4s 5.3s both; }
-.is-playing .sp-brand .sp-row-4 { animation: sp-arrive 0.4s 5.45s both; }
+   the model follows, thinks (edges light, layers pulse in turn) and, once
+   the spec list has settled, it fills a row at a time. */
+.is-playing .sp-brand .sp-words .sp-arrow { animation: sp-arrive 0.4s 3.9s both; }
+.is-playing .sp-brand .sp-model { animation: sp-arrive 0.5s 4.1s both; }
+.is-playing .sp-brand .sp-edge { animation: sp-glow 0.55s 4.5s ease-out both; }
+.is-playing .sp-brand .sp-edge--out { animation: sp-glow 0.55s 4.95s ease-out both; }
+.is-playing .sp-brand .sp-nodes--in circle { animation: sp-pulse 0.55s 4.5s ease-out both; }
+.is-playing .sp-brand .sp-nodes--mid circle { animation: sp-pulse 0.55s 4.85s ease-out both; }
+.is-playing .sp-brand .sp-nodes--out circle { animation: sp-pulse 0.55s 5.2s ease-out both; }
+.is-playing .sp-brand .sp-result { animation: sp-arrive 0.5s 5.5s both; }
+.is-playing .sp-brand .sp-row-1 { animation: sp-row 0.35s 5.95s both; }
+.is-playing .sp-brand .sp-row-2 { animation: sp-row 0.35s 6.08s both; }
+.is-playing .sp-brand .sp-row-3 { animation: sp-row 0.35s 6.21s both; }
+.is-playing .sp-brand .sp-row-4 { animation: sp-row 0.35s 6.34s both; }
 .is-still .sp-brand .sp-card { transform: none; }
 .is-still .sp-brand .sp-crop,
 .is-still .sp-brand .sp-slot,
@@ -266,66 +274,77 @@
 @keyframes sp-split { to { transform: translateX(0); } }
 @keyframes sp-reveal { to { opacity: 1; } }
 @keyframes sp-arrive { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes sp-row { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: none; } }
 /* Solid hairline edges light up as the wave passes each layer. */
 @keyframes sp-glow { 0%, 100% { stroke: #f2cbbd; } 40% { stroke: #ee6a48; } }
+/* Nodes rest pale and brighten only as the wave passes them. */
 @keyframes sp-pulse {
-  0% { transform: scale(1); fill: #ee4d2d; }
-  45% { transform: scale(1.6); fill: #ff7a5c; }
-  100% { transform: scale(1); }
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(1.35); fill: #ff7a5c; }
 }
-/* Each chip flies from its word on the listing to its row in the word
-   column and lands as that row's word: it scales about its own text anchor
-   to the row's size (the title is 11, rows are 9.5) and its anchor lands on
-   the row word's (x 154.5), so the crossfade into the row never jumps. */
+/* Each chip lifts off its word (a small rise and scale; the chips layer
+   carries a soft shadow), slides along its own line until it clears the
+   listing's text (x 97), so it never crosses the price or badge, then
+   travels to its row and lands as that row's word: it scales about its own
+   text anchor to the row's size (the title is 11, rows are 9.5) and its
+   anchor lands on the row word's (x 154.5), so the crossfade never jumps. */
 .sp-brand .sp-chip-1 { transform-box: view-box; transform-origin: 8px 86px; }
-.sp-brand .sp-chip-2 { transform-box: view-box; transform-origin: 44.25px 86px; }
-.sp-brand .sp-chip-3 { transform-box: view-box; transform-origin: 65.3px 86px; }
+.sp-brand .sp-chip-2 { transform-box: view-box; transform-origin: 46.05px 86px; }
+.sp-brand .sp-chip-3 { transform-box: view-box; transform-origin: 66.64px 86px; }
 .sp-brand .sp-chip-4 { transform-box: view-box; transform-origin: 8px 97.5px; }
-.sp-brand .sp-chip-5 { transform-box: view-box; transform-origin: 52.6px 97.5px; }
+.sp-brand .sp-chip-5 { transform-box: view-box; transform-origin: 53.53px 97.5px; }
 @keyframes sp-chip-1 {
   0% { opacity: 0; transform: none; }
-  20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(146.5px, -35.6px) scale(0.864); }
+  12% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
+  45% { transform: translate(89px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
+  82%, 92% { opacity: 1; transform: translate(146.5px, -35.6px) scale(0.864); }
   100% { opacity: 0; transform: translate(146.5px, -35.6px) scale(0.864); }
 }
 @keyframes sp-chip-2 {
   0% { opacity: 0; transform: none; }
-  20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(110.25px, -21.6px) scale(0.864); }
-  100% { opacity: 0; transform: translate(110.25px, -21.6px) scale(0.864); }
+  12% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
+  45% { transform: translate(50.95px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
+  82%, 92% { opacity: 1; transform: translate(108.45px, -21.6px) scale(0.864); }
+  100% { opacity: 0; transform: translate(108.45px, -21.6px) scale(0.864); }
 }
 @keyframes sp-chip-3 {
   0% { opacity: 0; transform: none; }
-  20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(89.2px, -7.6px) scale(0.864); }
-  100% { opacity: 0; transform: translate(89.2px, -7.6px) scale(0.864); }
+  12% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
+  45% { transform: translate(30.36px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
+  82%, 92% { opacity: 1; transform: translate(87.86px, -7.6px) scale(0.864); }
+  100% { opacity: 0; transform: translate(87.86px, -7.6px) scale(0.864); }
 }
 @keyframes sp-chip-4 {
   0% { opacity: 0; transform: none; }
-  20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(146.5px, -4.9px); }
+  12% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
+  45% { transform: translate(89px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
+  82%, 92% { opacity: 1; transform: translate(146.5px, -4.9px); }
   100% { opacity: 0; transform: translate(146.5px, -4.9px); }
 }
 @keyframes sp-chip-5 {
   0% { opacity: 0; transform: none; }
-  20% { opacity: 1; transform: none; }
-  80% { opacity: 1; transform: translate(101.9px, 8.9px); }
-  100% { opacity: 0; transform: translate(101.9px, 8.9px); }
+  12% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
+  45% { transform: translate(43.47px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
+  82%, 92% { opacity: 1; transform: translate(100.97px, 8.9px); }
+  100% { opacity: 0; transform: translate(100.97px, 8.9px); }
 }
 
 /* The League: one profile on an iPhone (dark screen, black-and-white first
-   photo, serif name, dark x and teal heart, as in the real app). Three beats,
+   photo, dark x and teal heart, as in the real app). The stacked THE / league
+   mark and the name are outlines (Playfair Display Black Italic and Libre
+   Baskerville, the closest free matches for the logo and the app's name
+   serif), so no font loads and no platform swaps them. Three beats,
    captioned Signals, Model and Risk like Shopee's:
-   1. Read: photo, bio and account are framed one at a time; each frame draws
-      a line out (from under the bezel) to its own signal bar, which fills,
-      and lets go as the next locks, so the phone never carries more than one
-      box. The bars are inputs, one neutral colour: the model decides.
+   1. Read: photo, bio and account are framed one at a time, 0.7s apart.
+      Each frame draws a line out (from under the bezel) to its own signal
+      bar, which fills, and lets go as the next locks, so the phone never
+      carries more than one box. The bars are inputs, one neutral colour.
    2. Classify: the three wires merge into a small decision tree whose leaves
-      are the two classes (teal fine, amber risky). The profile's route
-      lights down the tree, node by node, and lands on an amber leaf,
-      which keeps a ring.
+      are the two classes (teal fine, amber risky), dim until decided. The
+      profile's route lights down the tree, node by node, and lands on an
+      amber leaf, which lights and keeps a ring; the scene holds there.
    3. Flag: the risk dial (teal low, a hard step into amber high) sweeps with
-      its needle, Review lands and the same flag pins to the photo's corner.
+      its needle, Review lands and then the same flag pins to the photo.
    Amber appears only once the model has spoken. Links sit under the phone;
    the x and heart sit above the frames. */
 .league-brand-scene .lg-label {
@@ -357,40 +376,48 @@
 .league-brand-scene .lg-route { stroke-dasharray: 100 104; stroke-dashoffset: 102; }
 .league-brand-scene .lg-gauge { stroke-dasharray: 104 110; stroke-dashoffset: 106; }
 /* The needle rests at zero and sweeps with the fill (same easing). */
-.league-brand-scene .lg-needle { transform-box: view-box; transform-origin: 300px 78px; }
+.league-brand-scene .lg-needle { transform-box: view-box; transform-origin: 300px 74px; }
+/* The leaves name the two classes but stay dim until the route lands on
+   one, so amber is not on screen before the model has decided. */
+.league-brand-scene .lg-leafc,
+.league-brand-scene .lg-leaf { opacity: .35; }
 
-/* Beat 1: three signals, 0.45s apart. Frame locks on, line draws, bar fills,
-   frame lets go. */
-.is-playing .league-brand-scene .lg-frame-1 { animation: lg-scan 0.6s cubic-bezier(.22,1,.36,1) 0.2s both; }
-.is-playing .league-brand-scene .lg-link-1  { animation: lg-draw 0.3s ease-in-out 0.35s both; }
-.is-playing .league-brand-scene .lg-bar-1   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 0.55s both; }
-.is-playing .league-brand-scene .lg-frame-2 { animation: lg-scan 0.6s cubic-bezier(.22,1,.36,1) 0.65s both; }
-.is-playing .league-brand-scene .lg-link-2  { animation: lg-draw 0.3s ease-in-out 0.8s both; }
-.is-playing .league-brand-scene .lg-bar-2   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 1s both; }
-.is-playing .league-brand-scene .lg-frame-3 { animation: lg-scan 0.6s cubic-bezier(.22,1,.36,1) 1.1s both; }
-.is-playing .league-brand-scene .lg-link-3  { animation: lg-draw 0.3s ease-in-out 1.25s both; }
-.is-playing .league-brand-scene .lg-bar-3   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 1.45s both; }
-/* Beat 2: wires into the tree, then the route: root, branch, leaf. */
-.is-playing .league-brand-scene .lg-wire     { animation: lg-draw 0.35s ease-in 1.95s both; }
-.is-playing .league-brand-scene .lg-node-1   { animation: lg-pulse 0.4s ease-out 2.3s both; }
-.is-playing .league-brand-scene .lg-route    { animation: lg-draw 0.5s linear 2.35s both; }
-.is-playing .league-brand-scene .lg-node-2   { animation: lg-pulse 0.4s ease-out 2.55s both; }
-.is-playing .league-brand-scene .lg-leaf     { animation: lg-pulse 0.45s ease-out 2.82s both; }
-.is-playing .league-brand-scene .lg-pick     { animation: lg-pop 0.35s cubic-bezier(.3,1.5,.6,1) 2.95s both; }
-.is-playing .league-brand-scene .lg-wire-out { animation: lg-draw 0.25s ease-out 2.95s both; }
-.is-playing .league-brand-scene .lg-head     { animation: lg-show 0.15s ease 3.15s both; }
-/* Beat 3: dial, Review, flag. */
+/* Beat 1: three signals, 0.7s apart, so the eye can follow each from the
+   phone to its bar. Frame locks on, line draws, bar fills, frame lets go. */
+.is-playing .league-brand-scene .lg-frame-1 { animation: lg-scan 0.8s cubic-bezier(.22,1,.36,1) 0.2s both; }
+.is-playing .league-brand-scene .lg-link-1  { animation: lg-draw 0.3s ease-in-out 0.4s both; }
+.is-playing .league-brand-scene .lg-bar-1   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 0.6s both; }
+.is-playing .league-brand-scene .lg-frame-2 { animation: lg-scan 0.8s cubic-bezier(.22,1,.36,1) 0.9s both; }
+.is-playing .league-brand-scene .lg-link-2  { animation: lg-draw 0.3s ease-in-out 1.1s both; }
+.is-playing .league-brand-scene .lg-bar-2   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 1.3s both; }
+.is-playing .league-brand-scene .lg-frame-3 { animation: lg-scan 0.8s cubic-bezier(.22,1,.36,1) 1.6s both; }
+.is-playing .league-brand-scene .lg-link-3  { animation: lg-draw 0.3s ease-in-out 1.8s both; }
+.is-playing .league-brand-scene .lg-bar-3   { animation: lg-fill 0.45s cubic-bezier(.22,1,.36,1) 2s both; }
+/* Beat 2: wires into the tree, then the route: root, branch, leaf. The leaf
+   lights and keeps a ring, and the scene holds on it for half a second
+   before the dial moves, so the decision is read where it is made. */
+.is-playing .league-brand-scene .lg-wire     { animation: lg-draw 0.35s ease-in 2.45s both; }
+.is-playing .league-brand-scene .lg-node-1   { animation: lg-pulse 0.4s ease-out 2.8s both; }
+.is-playing .league-brand-scene .lg-route    { animation: lg-draw 0.5s linear 2.85s both; }
+.is-playing .league-brand-scene .lg-node-2   { animation: lg-pulse 0.4s ease-out 3.05s both; }
+.is-playing .league-brand-scene .lg-leaf     { animation: lg-pulse 0.45s ease-out 3.32s both, lg-show 0.2s ease 3.32s both; }
+.is-playing .league-brand-scene .lg-pick     { animation: lg-pop 0.35s cubic-bezier(.3,1.5,.6,1) 3.45s both; }
+.is-playing .league-brand-scene .lg-wire-out { animation: lg-draw 0.25s ease-out 3.95s both; }
+.is-playing .league-brand-scene .lg-head     { animation: lg-show 0.15s ease 4.15s both; }
+/* Beat 3: dial, Review, then the flag pins to the photo once Review has
+   settled, so the two never compete. */
 .is-playing .league-brand-scene .lg-gauge,
-.is-playing .league-brand-scene .lg-needle { animation: 0.8s cubic-bezier(.3,1.25,.55,1) 3.2s both; }
+.is-playing .league-brand-scene .lg-needle { animation: 0.8s cubic-bezier(.3,1.25,.55,1) 4.2s both; }
 .is-playing .league-brand-scene .lg-gauge  { animation-name: lg-gauge; }
 .is-playing .league-brand-scene .lg-needle { animation-name: lg-needle; }
-.is-playing .league-brand-scene .lg-review { animation: lg-rise 0.4s cubic-bezier(.22,1,.36,1) 3.8s both; }
-.is-playing .league-brand-scene .lg-badge  { animation: lg-pop 0.4s cubic-bezier(.3,1.5,.6,1) 3.95s both; }
+.is-playing .league-brand-scene .lg-review { animation: lg-rise 0.4s cubic-bezier(.22,1,.36,1) 4.8s both; }
+.is-playing .league-brand-scene .lg-badge  { animation: lg-pop 0.4s cubic-bezier(.3,1.5,.6,1) 5.3s both; }
 
 .is-still .league-brand-scene .lg-head,
 .is-still .league-brand-scene .lg-review,
 .is-still .league-brand-scene .lg-badge,
-.is-still .league-brand-scene .lg-pick { opacity: 1; transform: none; }
+.is-still .league-brand-scene .lg-pick,
+.is-still .league-brand-scene .lg-leaf { opacity: 1; transform: none; }
 .is-still .league-brand-scene .lg-bar { transform: none; }
 .is-still .league-brand-scene .lg-link,
 .is-still .league-brand-scene .lg-wire,

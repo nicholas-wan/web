@@ -11,6 +11,9 @@
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const touch = matchMedia('(max-width: 736px), (hover: none)');
   const REPLAY = 10000, FADE = 240, GRACE = 130;
+  // Phones keep the cards display:none until a tap, which would leave the
+  // Shopee listing's faces unrequested until its scene had already started.
+  if (document.fonts) ['400', '500', '700'].forEach(w => document.fonts.load(`${w} 11px Figtree`));
   let active = null, pinned = null, hovered = null, leaveTimer = null, pointer = { x: -1, y: -1 };
 
   const card = r => r.querySelector('.internship-demo-card');

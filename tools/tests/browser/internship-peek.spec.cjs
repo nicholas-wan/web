@@ -49,6 +49,7 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await league.dispatchEvent('mouseenter');
  await expect(card(league)).toHaveClass(/is-still/);
  await expect(league.locator('.lg-review')).toHaveCSS('opacity','1');
+ await expect(league.locator('.lg-review')).toHaveText('Risky profile');
  await expect(league.locator('.lg-needle')).toHaveCSS('transform',/matrix\(-0\.83/);
  // Three signals: each frame's line is drawn to its bar, no frame is left on
  // the phone, the classifier's route is drawn to its leaf, and the flag is
@@ -60,6 +61,12 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await expect(league.locator('.lg-caps text')).toHaveText(['Signals','Model','Risk']);
  await expect(league.locator('.lg-badge')).toHaveCSS('opacity','1');
  await expect(league.locator('.lg-pick')).toHaveCSS('opacity','1');
+ // Only the chosen leaf is lit; the stacked mark and the name are outlines.
+ await expect(league.locator('.lg-leaf')).toHaveCSS('opacity','1');
+ await expect(league.locator('.lg-leafc')).toHaveCSS('opacity','0.35');
+ await expect(league.locator('.lg-wordmark path')).toHaveCount(2);
+ await expect(league.locator('.lg-name')).toHaveCount(1);
+ await expect(league.locator('text')).toHaveCount(4);
  await page.keyboard.press('Escape');
  // Shopee's final frame: the title highlight and every word row, with solid
  // model edges and chips that hide what they pass over.
@@ -70,6 +77,11 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  for(const slot of await shopee.locator('.sp-slot').all())await expect(slot).toHaveCSS('opacity','1');
  for(const edge of await shopee.locator('.sp-edge').all())await expect(edge).toHaveCSS('stroke-dasharray','none');
  for(const rect of await shopee.locator('.sp-chip rect').all())expect(await rect.getAttribute('fill-opacity')).toBeNull();
+ // The listing is set in Figtree (Shopee's own face is not free), in the
+ // app's weights: medium title, regular meta, a dark value column.
+ expect(await page.evaluate(async()=>{await document.fonts.ready;return ['400','500','700'].every(w=>document.fonts.check(w+' 11px Figtree'));})).toBe(true);
+ await expect(shopee.locator('.sp-card .sp-title').first()).toHaveCSS('font-weight','500');
+ await expect(shopee.locator('.sp-value').first()).toHaveCSS('fill','rgb(34, 34, 34)');
  await shopee.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
  // Each flying word lands as an exact copy of its row's word (same left edge,
@@ -82,7 +94,7 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
   root.querySelector('.internship-demo-card').getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=8000;});
   return [1,2,3,4,5].map(i=>{
   const c=root.querySelector('.sp-chip-'+i),a=c.getAnimations()[0];
-  a.pause();a.currentTime=a.effect.getTiming().delay+a.effect.getTiming().duration*0.8;
+  a.pause();a.currentTime=a.effect.getTiming().delay+a.effect.getTiming().duration*0.87;
   const t=c.querySelector('text').getBoundingClientRect(),w=root.querySelector('.sp-slot-'+i+' .sp-word').getBoundingClientRect();
   return Math.max(Math.abs(t.left-w.left),Math.abs(t.right-w.right),Math.abs(t.bottom-w.bottom));
  });});
