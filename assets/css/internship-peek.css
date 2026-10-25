@@ -518,22 +518,22 @@
    compatible" label. Randomise, Measure. The same profile on two League
    iPhones (the risky-profile phone at 0.75): A with a violet border and a
    tab, B with a rose heart badge; they appear in turn and B's heart beats.
-   Arms have their own colours, carried by their letters, lanes, users (a
-   user takes its arm's colour as it leaves the die) and hills. Everything
-   moves on single eased curves so nothing steps (owner: "it has to look
-   continuous"): the die rocks slowly and deals a user every 0.3s; each
-   starts hidden behind it as a light bead, slides out (farther ones a little
-   longer) and lands on its lane's front, turning the bar's colour on the way
-   so it melts in, its curve ending at the front's speed; each lane fills on
-   one curve from its first landing to its last. Each hill is where that design's
-   match rate probably lies: over its arm's arrivals plus a short tail it
-   grows from the axis, narrows and glides to its place on one curve, its
-   label with it, so the two start flat and overlapping and end clearly
-   apart. Once B's hill settles (6.50s) its fill deepens, its outline
-   thickens and its heart beats again. Axes are titled (How likely, Match
-   rate) and the hills named (A · Border, B · Badge), with no numbers,
+   Arms have their own colours, carried by their letters, lanes, users and
+   hills. Everything runs on one model so nothing steps (owner: "it has to
+   look continuous"): the die rocks slowly and deals a user every 0.24s;
+   each leaves from behind it as a light bead and rides its lane at one
+   shared speed, like a conveyor, so dots keep their spacing, then eases
+   onto the lane's front at the front's own speed, turning the bar's colour
+   so it lands as the tip. Each lane fills on one curve from its first
+   arrival to its last, and its hill (where that design's match rate
+   probably lies) grows from the axis, narrows and glides on that very
+   curve, its label riding the peak, so the chart moves with its bar and the
+   two hills start flat and overlapping and end clearly apart. Once B's
+   hill settles its fill deepens, its outline thickens and its heart beats
+   again. Axes are titled (How likely, Match rate) and the hills named
+   (A · Border, B · Badge), with no numbers,
    zones or verdict (owner). Base styles
-   are the final frame. Generated from per-arm centres and widths. */
+   are the final frame; the motion is generated (see the block's note). */
 .lgab-scene .lgab-cap text { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 12px; font-weight: 700; fill: #4f6a63; }
 .lgab-scene .lgab-t { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 10px; font-weight: 700; fill: #4f6a63; }
 .lgab-scene .lgab-s { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 9px; font-weight: 700; fill: #6f857f; }
@@ -549,7 +549,7 @@
 .lgab-scene .lgab-fill { fill: none; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 44px 100px; stroke-dashoffset: 0; }
 .lgab-scene .lgab-fill-a { stroke: #6352c6; }
 .lgab-scene .lgab-fill-b { stroke: #c23f6e; }
-.lgab-scene .lgab-u { fill: var(--c); opacity: 0; }
+.lgab-scene .lgab-u { opacity: 0; }
 .lgab-scene .lgab-die { transform-box: fill-box; transform-origin: center; }
 /* The phone's lettering, as in the live League scene (same subset fonts),
    a size up so the profile fills the screen. */
@@ -571,96 +571,79 @@
 .lgab-scene .lgab-hx-a, .lgab-scene .lgab-tx-a { transform: translateX(226px); }
 .lgab-scene .lgab-hx-b, .lgab-scene .lgab-tx-b { transform: translateX(290px); }
 
-/* Playing: the designs first, then the traffic; each hill moves on one
-   curve over its own arm's arrivals. */
-.is-playing .lgab-scene .lgab-frame-g { animation: lgab-frame .6s cubic-bezier(.22,1,.36,1) .25s both; }
-.is-playing .lgab-scene .lgab-badge-g { animation: lgab-pop .6s cubic-bezier(.22,1,.36,1) .55s both; }
-.is-playing .lgab-scene .lgab-heart { animation: lgab-beat .5s ease-in-out 1.05s both, lgab-beat-win .9s ease-in-out 6.50s; }
-.is-playing .lgab-scene .lgab-u { animation: lgab-deal-1 1s linear both; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(1) { animation-name: lgab-deal-1; animation-duration: 0.58s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(2) { animation-name: lgab-deal-2; animation-duration: 0.58s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(3) { animation-name: lgab-deal-3; animation-duration: 0.59s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(4) { animation-name: lgab-deal-4; animation-duration: 0.68s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(5) { animation-name: lgab-deal-5; animation-duration: 0.68s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(6) { animation-name: lgab-deal-6; animation-duration: 0.85s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(7) { animation-name: lgab-deal-7; animation-duration: 0.95s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(8) { animation-name: lgab-deal-8; animation-duration: 0.95s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(9) { animation-name: lgab-deal-9; animation-duration: 1.18s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(10) { animation-name: lgab-deal-10; animation-duration: 1.18s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(11) { animation-name: lgab-deal-11; animation-duration: 1.29s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(12) { animation-name: lgab-deal-12; animation-duration: 1.45s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(13) { animation-name: lgab-deal-13; animation-duration: 1.45s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(14) { animation-name: lgab-deal-14; animation-duration: 1.54s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(15) { animation-name: lgab-deal-15; animation-duration: 1.55s; }
-.is-playing .lgab-scene .lgab-users circle:nth-of-type(16) { animation-name: lgab-deal-16; animation-duration: 1.55s; }
+/* Generated by tools/scenes/league-ab-motion.py, which explains the model:
+   edit and rerun it rather than this block. Playing: the designs first
+   (eased out gently, no snap), then the traffic. */
+.is-playing .lgab-scene .lgab-frame-g { animation: lgab-frame .7s cubic-bezier(.33,1,.68,1) .25s both; }
+.is-playing .lgab-scene .lgab-badge-g { animation: lgab-pop .7s cubic-bezier(.33,1,.68,1) .55s both; }
+.is-playing .lgab-scene .lgab-heart { animation: lgab-beat .5s ease-in-out 1s both, lgab-beat-win .9s ease-in-out 6.181s; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(1) { animation: lgab-deal-1 0.503s 1.2s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(2) { animation: lgab-deal-2 0.503s 1.44s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(3) { animation: lgab-deal-3 0.505s 1.68s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(4) { animation: lgab-deal-4 0.602s 1.92s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(5) { animation: lgab-deal-5 0.602s 2.16s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(6) { animation: lgab-deal-6 0.76s 2.4s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(7) { animation: lgab-deal-7 0.85s 2.64s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(8) { animation: lgab-deal-8 0.85s 2.88s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(9) { animation: lgab-deal-9 1.037s 3.12s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(10) { animation: lgab-deal-10 1.037s 3.36s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(11) { animation: lgab-deal-11 1.13s 3.6s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(12) { animation: lgab-deal-12 1.304s 3.84s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(13) { animation: lgab-deal-13 1.304s 4.08s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(14) { animation: lgab-deal-14 1.44s 4.32s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(15) { animation: lgab-deal-15 1.481s 4.56s both; }
+.is-playing .lgab-scene .lgab-users circle:nth-of-type(16) { animation: lgab-deal-16 1.481s 4.8s both; }
+.is-playing .lgab-scene .lgab-die { animation: lgab-rock 4.2s linear 0.95s both; }
+.is-playing .lgab-scene .lgab-fill-a { animation: lgab-fill 4.338s cubic-bezier(0.2,0,0.8,1) 1.503s both, lgab-show .12s linear 1.503s both; }
+.is-playing .lgab-scene .lgab-hill-a { animation: lgab-narrow 4.338s cubic-bezier(0.2,0,0.8,1) 1.503s both; }
+.is-playing .lgab-scene .lgab-hx-a { animation: lgab-x-a 4.338s cubic-bezier(0.2,0,0.8,1) 1.503s both, lgab-show .4s ease 1.503s both; }
+.is-playing .lgab-scene .lgab-tx-a { animation: lgab-tx-a 4.338s cubic-bezier(0.2,0,0.8,1) 1.503s both, lgab-show .6s ease 2.103s both; }
+.is-playing .lgab-scene .lgab-fill-b { animation: lgab-fill 4.338s cubic-bezier(0.2,0,0.8,1) 1.743s both, lgab-show .12s linear 1.743s both; }
+.is-playing .lgab-scene .lgab-hill-b { animation: lgab-narrow 4.338s cubic-bezier(0.2,0,0.8,1) 1.743s both; }
+.is-playing .lgab-scene .lgab-hx-b { animation: lgab-x-b 4.338s cubic-bezier(0.2,0,0.8,1) 1.743s both, lgab-show .4s ease 1.743s both; }
+.is-playing .lgab-scene .lgab-tx-b { animation: lgab-tx-b 4.338s cubic-bezier(0.2,0,0.8,1) 1.743s both, lgab-show .6s ease 2.343s both; }
+.is-playing .lgab-scene .lgab-hill-b .lgab-hill-area { animation: lgab-deepen .6s ease 6.181s both; }
+.is-playing .lgab-scene .lgab-hill-b .lgab-hill-line { animation: lgab-bolden .6s ease 6.181s both; }
 
-.is-playing .lgab-scene .lgab-die { animation: lgab-rock 4.88s linear 1.01s both; }
-.is-playing .lgab-scene .lgab-fill-a { animation: lgab-fill 4.20s cubic-bezier(0.4,0,0.6,1) 1.80s both; }
-.is-playing .lgab-scene .lgab-fill-b { animation: lgab-fill 4.20s cubic-bezier(0.4,0,0.6,1) 2.10s both; }
-.is-playing .lgab-scene .lgab-hill-a { animation: lgab-narrow 4.50s cubic-bezier(.4,0,.4,1) 1.80s both; }
-.is-playing .lgab-scene .lgab-hx-a { animation: lgab-x-a 4.50s cubic-bezier(.4,0,.4,1) 1.80s both, lgab-show .4s ease 1.80s both; }
-.is-playing .lgab-scene .lgab-tx-a { animation: lgab-tx-a 4.50s cubic-bezier(.4,0,.4,1) 1.80s both, lgab-show .8s ease 2.70s both; }
-.is-playing .lgab-scene .lgab-hill-b { animation: lgab-narrow 4.50s cubic-bezier(.4,0,.4,1) 2.10s both; }
-.is-playing .lgab-scene .lgab-hx-b { animation: lgab-x-b 4.50s cubic-bezier(.4,0,.4,1) 2.10s both, lgab-show .4s ease 2.10s both; }
-.is-playing .lgab-scene .lgab-tx-b { animation: lgab-tx-b 4.50s cubic-bezier(.4,0,.4,1) 2.10s both, lgab-show .8s ease 3.00s both; }
-.is-playing .lgab-scene .lgab-hill-b .lgab-hill-area { animation: lgab-deepen .6s ease 6.50s both; }
-.is-playing .lgab-scene .lgab-hill-b .lgab-hill-line { animation: lgab-bolden .6s ease 6.50s both; }
-
-@keyframes lgab-narrow { from { transform: scale(29.21, 4); } to { transform: scale(16, 72); } }
-@keyframes lgab-fill { 0% { stroke-dashoffset: 44px; opacity: 0; } 6% { opacity: 1; } 100% { stroke-dashoffset: 0; opacity: 1; } }
 @keyframes lgab-show { from { opacity: 0; } to { opacity: 1; } }
-@keyframes lgab-pop { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: none; } }
-@keyframes lgab-frame { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+@keyframes lgab-pop { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes lgab-frame { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: none; } }
 @keyframes lgab-beat { 0%, 100% { transform: none; } 35% { transform: scale(1.35); } 60% { transform: scale(.95); } }
 @keyframes lgab-beat-win { 0%, 100% { transform: none; } 45% { transform: scale(1.2); } }
 @keyframes lgab-bolden { from { stroke-width: 1.6; } to { stroke-width: 2.2; } }
 @keyframes lgab-deepen { from { fill-opacity: .16; } to { fill-opacity: .3; } }
-/* The die deals a user: hidden behind the die, it slides out on one eased
-   move whose end speed is its lane front's, carries on with the front as it
-   fades, and turns from a light bead to the bar's colour by 25%. Generated
-   per user (distance, end speed). The die rocks as a slow eased sine. */
-@keyframes lgab-deal-1 { 0% { transform: translateX(0); fill: #6352c6; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,1); } 25% { fill: #6352c6; } 85% { transform: translateX(-6px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-6px); opacity: 0; } }
-@keyframes lgab-deal-2 { 0% { transform: translateX(0); fill: #c23f6e; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,1); } 25% { fill: #c23f6e; } 85% { transform: translateX(6px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(6px); opacity: 0; } }
-@keyframes lgab-deal-3 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.94); } 25% { fill: #c23f6e; } 85% { transform: translateX(6.48px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(6.76px); opacity: 0; } }
-@keyframes lgab-deal-4 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.86); } 25% { fill: #6352c6; } 85% { transform: translateX(-10.37px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-11.37px); opacity: 0; } }
-@keyframes lgab-deal-5 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.86); } 25% { fill: #c23f6e; } 85% { transform: translateX(10.37px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(11.37px); opacity: 0; } }
-@keyframes lgab-deal-6 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.85); } 25% { fill: #6352c6; } 85% { transform: translateX(-17.98px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-19.91px); opacity: 0; } }
-@keyframes lgab-deal-7 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.85); } 25% { fill: #6352c6; } 85% { transform: translateX(-22.82px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-25.23px); opacity: 0; } }
-@keyframes lgab-deal-8 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.85); } 25% { fill: #c23f6e; } 85% { transform: translateX(22.82px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(25.23px); opacity: 0; } }
-@keyframes lgab-deal-9 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.87); } 25% { fill: #6352c6; } 85% { transform: translateX(-33.18px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-36.17px); opacity: 0; } }
-@keyframes lgab-deal-10 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.87); } 25% { fill: #c23f6e; } 85% { transform: translateX(33.18px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(36.17px); opacity: 0; } }
-@keyframes lgab-deal-11 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.89); } 25% { fill: #c23f6e; } 85% { transform: translateX(38.02px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(40.96px); opacity: 0; } }
-@keyframes lgab-deal-12 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.93); } 25% { fill: #6352c6; } 85% { transform: translateX(-45.63px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-47.76px); opacity: 0; } }
-@keyframes lgab-deal-13 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.93); } 25% { fill: #c23f6e; } 85% { transform: translateX(45.63px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(47.76px); opacity: 0; } }
-@keyframes lgab-deal-14 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,0.98); } 25% { fill: #6352c6; } 85% { transform: translateX(-49.52px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-50.26px); opacity: 0; } }
-@keyframes lgab-deal-15 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,1); } 25% { fill: #6352c6; } 85% { transform: translateX(-50px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-50px); opacity: 0; } }
-@keyframes lgab-deal-16 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: cubic-bezier(.45,0,0.75,1); } 25% { fill: #c23f6e; } 85% { transform: translateX(50px); opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(50px); opacity: 0; } }
-
+@keyframes lgab-fill { from { stroke-dashoffset: 44px; } to { stroke-dashoffset: 0; } }
+@keyframes lgab-narrow { from { transform: scale(29.21, 4); } to { transform: scale(16, 72); } }
+/* A label rides its hill's peak: 68 lower at the start, 4.5 above it throughout. */
+@keyframes lgab-x-a { from { transform: translateX(250px); } to { transform: translateX(226px); } }
+@keyframes lgab-tx-a { from { transform: translate(250px, 68px); } to { transform: translate(226px, 0); } }
+@keyframes lgab-x-b { from { transform: translateX(268px); } to { transform: translateX(290px); } }
+@keyframes lgab-tx-b { from { transform: translate(268px, 68px); } to { transform: translate(290px, 0); } }
+@keyframes lgab-deal-1 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: linear; } 33.122% { fill: #a99fe6; animation-timing-function: linear; } 10.497% { transform: translateX(-2.375px); animation-timing-function: cubic-bezier(.3333,0.667,.6667,1); } 60.221% { transform: translateX(-8px); fill: #6352c6; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-8px); fill: #6352c6; opacity: 0; } }
+@keyframes lgab-deal-2 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: linear; } 33.122% { fill: #e891b2; animation-timing-function: linear; } 10.497% { transform: translateX(2.375px); animation-timing-function: cubic-bezier(.3333,0.667,.6667,1); } 60.221% { transform: translateX(8px); fill: #c23f6e; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(8px); fill: #c23f6e; opacity: 0; } }
+@keyframes lgab-deal-3 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: linear; } 33.206% { fill: #e891b2; animation-timing-function: linear; } 10.841% { transform: translateX(2.462px); animation-timing-function: cubic-bezier(.3333,0.591,.6667,0.924); } 60.374% { transform: translateX(8.812px); fill: #c23f6e; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(9.973px); fill: #c23f6e; opacity: 0; } }
+@keyframes lgab-deal-4 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: linear; } 36.734% { fill: #a99fe6; animation-timing-function: linear; } 25.277% { transform: translateX(-6.85px); animation-timing-function: cubic-bezier(.3333,0.541,.6667,0.874); } 66.79% { transform: translateX(-13.783px); fill: #6352c6; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-15.876px); fill: #6352c6; opacity: 0; } }
+@keyframes lgab-deal-5 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: linear; } 36.734% { fill: #e891b2; animation-timing-function: linear; } 25.277% { transform: translateX(6.85px); animation-timing-function: cubic-bezier(.3333,0.541,.6667,0.874); } 66.79% { transform: translateX(13.783px); fill: #c23f6e; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(15.876px); fill: #c23f6e; opacity: 0; } }
+@keyframes lgab-deal-6 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: linear; } 40.524% { fill: #a99fe6; animation-timing-function: linear; } 40.782% { transform: translateX(-13.946px); animation-timing-function: cubic-bezier(.3333,0.525,.6667,0.858); } 73.681% { transform: translateX(-21.092px); fill: #6352c6; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-23.527px); fill: #6352c6; opacity: 0; } }
+@keyframes lgab-deal-7 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: linear; } 42.052% { fill: #a99fe6; animation-timing-function: linear; } 47.031% { transform: translateX(-17.98px); animation-timing-function: cubic-bezier(.3333,0.521,.6667,0.855); } 76.458% { transform: translateX(-25.173px); fill: #6352c6; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-27.681px); fill: #6352c6; opacity: 0; } }
+@keyframes lgab-deal-8 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: linear; } 42.052% { fill: #e891b2; animation-timing-function: linear; } 47.031% { transform: translateX(17.98px); animation-timing-function: cubic-bezier(.3333,0.521,.6667,0.855); } 76.458% { transform: translateX(25.173px); fill: #c23f6e; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(27.681px); fill: #c23f6e; opacity: 0; } }
+@keyframes lgab-deal-9 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: linear; } 44.391% { fill: #a99fe6; animation-timing-function: linear; } 56.599% { transform: translateX(-26.408px); animation-timing-function: cubic-bezier(.3333,0.521,.6667,0.854); } 80.711% { transform: translateX(-33.609px); fill: #6352c6; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-36.129px); fill: #6352c6; opacity: 0; } }
+@keyframes lgab-deal-10 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: linear; } 44.391% { fill: #e891b2; animation-timing-function: linear; } 56.599% { transform: translateX(26.408px); animation-timing-function: cubic-bezier(.3333,0.521,.6667,0.854); } 80.711% { transform: translateX(33.609px); fill: #c23f6e; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(36.129px); fill: #c23f6e; opacity: 0; } }
+@keyframes lgab-deal-11 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: linear; } 45.266% { fill: #e891b2; animation-timing-function: linear; } 60.178% { transform: translateX(30.602px); animation-timing-function: cubic-bezier(.3333,0.524,.6667,0.857); } 82.301% { transform: translateX(37.765px); fill: #c23f6e; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(40.225px); fill: #c23f6e; opacity: 0; } }
+@keyframes lgab-deal-12 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: linear; } 46.564% { fill: #a99fe6; animation-timing-function: linear; } 65.488% { transform: translateX(-38.425px); animation-timing-function: cubic-bezier(.3333,0.538,.6667,0.871); } 84.661% { transform: translateX(-45.397px); fill: #6352c6; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-47.552px); fill: #6352c6; opacity: 0; } }
+@keyframes lgab-deal-13 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: linear; } 46.564% { fill: #e891b2; animation-timing-function: linear; } 65.488% { transform: translateX(38.425px); animation-timing-function: cubic-bezier(.3333,0.538,.6667,0.871); } 84.661% { transform: translateX(45.397px); fill: #c23f6e; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(47.552px); fill: #c23f6e; opacity: 0; } }
+@keyframes lgab-deal-14 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: linear; } 47.359% { fill: #a99fe6; animation-timing-function: linear; } 68.741% { transform: translateX(-44.531px); animation-timing-function: cubic-bezier(.3333,0.584,.6667,0.918); } 86.107% { transform: translateX(-50.95px); fill: #6352c6; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-52.221px); fill: #6352c6; opacity: 0; } }
+@keyframes lgab-deal-15 { 0% { transform: translateX(0); fill: #a99fe6; opacity: 1; animation-timing-function: linear; } 47.57% { fill: #a99fe6; animation-timing-function: linear; } 69.606% { transform: translateX(-46.375px); animation-timing-function: cubic-bezier(.3333,0.667,.6667,1); } 86.492% { transform: translateX(-52px); fill: #6352c6; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(-52px); fill: #6352c6; opacity: 0; } }
+@keyframes lgab-deal-16 { 0% { transform: translateX(0); fill: #e891b2; opacity: 1; animation-timing-function: linear; } 47.57% { fill: #e891b2; animation-timing-function: linear; } 69.606% { transform: translateX(46.375px); animation-timing-function: cubic-bezier(.3333,0.667,.6667,1); } 86.492% { transform: translateX(52px); fill: #c23f6e; opacity: 1; animation-timing-function: linear; } 100% { transform: translateX(52px); fill: #c23f6e; opacity: 0; } }
 @keyframes lgab-rock {
   0% { transform: rotate(0deg); animation-timing-function: ease-in-out; }
-  8.20% { transform: rotate(1.78deg); animation-timing-function: ease-in-out; }
-  24.60% { transform: rotate(-4deg); animation-timing-function: ease-in-out; }
-  41.01% { transform: rotate(4deg); animation-timing-function: ease-in-out; }
-  57.41% { transform: rotate(-4deg); animation-timing-function: ease-in-out; }
-  73.81% { transform: rotate(4deg); animation-timing-function: ease-in-out; }
-  90.22% { transform: rotate(-2.12deg); animation-timing-function: ease-in-out; }
+  11.111% { transform: rotate(-2.667deg); animation-timing-function: ease-in-out; }
+  22.222% { transform: rotate(4deg); animation-timing-function: ease-in-out; }
+  33.333% { transform: rotate(-4deg); animation-timing-function: ease-in-out; }
+  44.444% { transform: rotate(4deg); animation-timing-function: ease-in-out; }
+  55.556% { transform: rotate(-4deg); animation-timing-function: ease-in-out; }
+  66.667% { transform: rotate(4deg); animation-timing-function: ease-in-out; }
+  77.778% { transform: rotate(-4deg); animation-timing-function: ease-in-out; }
+  88.889% { transform: rotate(2.667deg); animation-timing-function: ease-in-out; }
   100% { transform: rotate(0deg); }
-}
-@keyframes lgab-x-a {
-  from { transform: translateX(250px); }
-  to { transform: translateX(226px); }
-}
-@keyframes lgab-x-b {
-  from { transform: translateX(268px); }
-  to { transform: translateX(290px); }
-}
-/* A label rides its hill's peak: the hill's height runs 4 to 72 on the same
-   curve, so the label starts 68 lower and keeps 4.5 above the peak. */
-@keyframes lgab-tx-a {
-  from { transform: translate(250px, 68px); }
-  to { transform: translate(226px, 0); }
-}
-@keyframes lgab-tx-b {
-  from { transform: translate(268px, 68px); }
-  to { transform: translate(290px, 0); }
 }

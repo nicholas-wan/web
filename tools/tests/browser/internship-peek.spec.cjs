@@ -104,6 +104,18 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  const mid=b=>b.left+b.width/2;
  expect(mid(peaks[1])-mid(peaks[0])).toBeGreaterThan(peaks[0].width*.4);
  await expect(ab.locator('.lgab-cap text')).toHaveText(['Randomise','Measure']);
+ // While playing, each hill and its label run on exactly their lane's curve,
+ // so the chart moves with its bar (tools/scenes/league-ab-motion.py).
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await ab.dispatchEvent('mouseleave');
+ await page.keyboard.press('Escape');
+ await ab.dispatchEvent('mouseenter');
+ await expect(card(ab)).toHaveClass(/is-playing/);
+ const timing=await ab.evaluate(root=>['a','b'].map(k=>['.lgab-fill-','.lgab-hill-','.lgab-hx-','.lgab-tx-'].map(sel=>{
+  const t=root.querySelector(sel+k).getAnimations()[0].effect.getTiming();return [t.delay,t.duration,t.easing].join();
+ })));
+ for(const arm of timing)expect(new Set(arm).size).toBe(1);
+ await page.emulateMedia({reducedMotion:'reduce'});
  await ab.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
  // Each flying word lands as an exact copy of its row's word (same left edge,
