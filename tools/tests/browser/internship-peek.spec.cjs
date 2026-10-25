@@ -181,3 +181,37 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
   await expect(toTop).toHaveCSS('opacity','0.6');
  }
 });
+
+test('agentic AI peek: a dark hunt scene that previews, holds its final frame, fits, and flags only a lead',async({page})=>{
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('/experience');
+ const root=peek(page,'agentic');
+ await expect(chip(root)).toHaveText('Hunt from a report');
+ await root.dispatchEvent('mouseenter');
+ await expect(card(root)).toHaveClass(/is-still/);
+ // Generic, illustrative content (README): a lead for analyst review, never a
+ // real intrusion, malware name or internal component name.
+ const words=(await root.locator('svg.ah-scene text').allTextContents()).join(' ');
+ for(const s of ['T1053.005','Scheduled Task','EventCode=','\WinTaskUpdate','root-level','Flagged','Analyst review','Supervisor agent'])expect(words).toContain(s);
+ expect(words).not.toMatch(/SysUpdate|Evidence found|SPL crafter|Post-query|Splunk|\d+ hits/);
+ // Every line stays inside the 360-unit scene.
+ const right=await root.evaluate(r=>Math.max(...[...r.querySelectorAll('svg.ah-scene text')].map(t=>{const b=t.getBBox();return b.x+b.width;})));
+ expect(right).toBeLessThanOrEqual(358);
+ await root.dispatchEvent('mouseleave');
+ await page.keyboard.press('Escape');
+ // Playing, the story ends about when its siblings do.
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await root.dispatchEvent('mouseenter');
+ await expect(card(root)).toHaveClass(/is-playing/);
+ const end=await card(root).evaluate(c=>Math.max(...c.getAnimations({subtree:true}).map(a=>a.effect.getComputedTiming().endTime)));
+ expect(end).toBeLessThanOrEqual(6500);
+ await root.dispatchEvent('mouseleave');
+ await page.keyboard.press('Escape');
+ // Phones: a tap opens it inline.
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/experience');
+ await chip(root).click();
+ await expect(chip(root)).toHaveAttribute('aria-expanded','true');
+ await expect(card(root)).toHaveCSS('position','static');
+ expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+});

@@ -5,7 +5,7 @@
    The scenes are conceptual illustrations. All replay every 10s while on
    screen and hold their final frame under reduced motion. */
 
-.page-experience .case-study--internship .internship-demo-peek {
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -15,7 +15,7 @@
 }
 
 /* The chip: thumbnail, label and a small arrow that says it opens something. */
-.page-experience .case-study--internship .internship-demo-peek__chip {
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek__chip {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -37,7 +37,7 @@
   cursor: pointer;
   transition: box-shadow var(--motion-fast, 150ms) ease, transform var(--motion-fast, 150ms) ease;
 }
-.page-experience .case-study--internship .internship-demo-peek__chip::after {
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek__chip::after {
   content: "";
   flex: none;
   width: 0.4rem;
@@ -49,26 +49,26 @@
   transform: rotate(45deg);
   transition: transform var(--motion-fast, 150ms) ease, opacity var(--motion-fast, 150ms) ease;
 }
-.page-experience .case-study--internship .internship-demo-peek__chip[aria-expanded="true"] {
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek__chip[aria-expanded="true"] {
   box-shadow: inset 0 0 0 1px #11807d, 0 4px 12px rgba(12, 102, 99, 0.14);
   color: #0c6663 !important;
 }
-.page-experience .case-study--internship .internship-demo-peek__chip[aria-expanded="true"]::after {
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek__chip[aria-expanded="true"]::after {
   opacity: 1;
   transform: translateX(2px) rotate(45deg);
 }
 @media (hover: hover) {
-  .page-experience .case-study--internship .internship-demo-peek__chip:hover {
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek__chip:hover {
     box-shadow: inset 0 0 0 1px #11807d, 0 4px 12px rgba(12, 102, 99, 0.14);
     color: #0c6663 !important;
     transform: translateY(-1px);
   }
-  .page-experience .case-study--internship .internship-demo-peek__chip:hover::after {
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek__chip:hover::after {
     opacity: 1;
     transform: translateX(2px) rotate(45deg);
   }
 }
-.page-experience .case-study--internship .internship-demo-peek__chip:focus-visible {
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek__chip:focus-visible {
   outline: 2px solid #128a86;
   outline-offset: 3px;
 }
@@ -98,7 +98,7 @@
    both cards open in one shared slot below the row. The peeks themselves
    have no box (display: contents), so their chips and cards are placed by
    the row's grid; the script still treats each as one peek. */
-.page-experience .case-study--internship .internship-demo-peeks {
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks {
   position: relative;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -107,28 +107,28 @@
   max-width: 100%;
   margin-top: 0.7rem;
 }
-.page-experience .case-study--internship .internship-demo-peeks > .internship-demo-peek { display: contents; }
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks > .internship-demo-peek { display: contents; }
 .internship-demo-peeks > .internship-demo-peek:nth-child(1) > .internship-demo-peek__chip { grid-column: 1; grid-row: 1; }
 .internship-demo-peeks > .internship-demo-peek:nth-child(2) > .internship-demo-peek__chip { grid-column: 2; grid-row: 1; }
-.page-experience .case-study--internship .internship-demo-peeks .internship-demo-card { grid-column: 1 / -1; grid-row: 2; }
-.page-experience .case-study--internship .internship-demo-peeks .internship-demo-peek__chip { min-width: 0; }
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks .internship-demo-card { grid-column: 1 / -1; grid-row: 2; }
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks .internship-demo-peek__chip { min-width: 0; }
 .internship-demo-peeks .internship-demo-peek__mini { margin-left: auto; }
-.page-experience .case-study--internship .internship-demo-peeks .internship-demo-peek__chip::after { margin-left: auto; }
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks .internship-demo-peek__chip::after { margin-left: auto; }
 /* Desktop: the shared card slot is the chip row, which is only as wide as
    its two chips, so the card takes the full shared 28rem instead of the
    row's width. */
 @media screen and (min-width: 981px) and (hover: hover) {
-  .page-experience .case-study--internship .internship-demo-peeks .internship-demo-card { width: min(28rem, calc(100vw - 2rem)); }
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks .internship-demo-card { width: min(28rem, calc(100vw - 2rem)); }
 }
 /* Phones and tablets: two equal tiles across the row, thumbnail above a
    centred label, as the phishing charts do. */
 @media screen and (max-width: 980px) {
-  .page-experience .case-study--internship .internship-demo-peeks {
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks {
     width: 100%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 0.45rem;
   }
-  .page-experience .case-study--internship .internship-demo-peeks .internship-demo-peek__chip {
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks .internship-demo-peek__chip {
     flex-direction: column;
     justify-content: flex-start;
     gap: 0.3rem;
@@ -138,7 +138,7 @@
     white-space: normal;
     text-align: center;
   }
-  .page-experience .case-study--internship .internship-demo-peeks .internship-demo-peek__chip::after { display: none; }
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks .internship-demo-peek__chip::after { display: none; }
   .internship-demo-peeks .internship-demo-peek__mini { margin-left: 0; }
 }
 
@@ -146,7 +146,7 @@
    nothing to click, so it lets the pointer through: the next row's chip
    stays hoverable underneath it, and the script keeps the preview open
    while the pointer is over the card. */
-.page-experience .case-study--internship .internship-demo-card {
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-card {
   position: absolute;
   top: calc(100% + 8px);
   left: 0;
@@ -165,7 +165,7 @@
   pointer-events: none;
   transition: opacity var(--motion-standard, 220ms) ease, transform var(--motion-standard, 220ms) var(--ease-standard, ease), visibility 0s linear var(--motion-standard, 220ms);
 }
-.page-experience .case-study--internship .internship-demo-card.is-open {
+.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-card.is-open {
   visibility: visible;
   opacity: 1;
   transform: none;
@@ -189,11 +189,11 @@
    below the chip (internship-peek.js matches this query), and the chip
    itself is 44px tall. */
 @media screen and (max-width: 736px), screen and (hover: none) {
-  .page-experience .case-study--internship .internship-demo-peek__chip {
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek__chip {
     min-height: 44px;
     transform: none;
   }
-  .page-experience .case-study--internship .internship-demo-card {
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-card {
     position: static;
     display: none;
     margin-top: 8px;
@@ -204,7 +204,7 @@
     pointer-events: auto;
     transition: none;
   }
-  .page-experience .case-study--internship .internship-demo-card.is-open {
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-card.is-open {
     display: block;
     animation: internship-demo-card-in var(--motion-standard, 220ms) ease both;
   }
@@ -223,11 +223,11 @@
    slimmer card keeps the scene as large as it can be. */
 @media screen and (max-width: 374px) {
   .internship-demo-peek__mini { width: 72px; height: 24px; padding: 1px 3px; }
-  .page-experience .case-study--internship .internship-demo-card { padding: 0.5rem; }
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-card { padding: 0.5rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .page-experience .case-study--internship .internship-demo-card,
-  .page-experience .case-study--internship .internship-demo-card.is-open {
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-card,
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-card.is-open {
     transition: none;
     transform: none;
     animation: none;
@@ -637,3 +637,426 @@
   85.714% { transform: rotate(2.667deg); animation-timing-function: ease-in-out; }
   100% { transform: rotate(0deg); }
 }
+
+/* The Agentic AI peek (25 Oct 2026): the same chip-and-card peek on the dark
+   #agentic-ai card, "Hunt from a report": an agent run in which a supervisor
+   hands one hunt down four agents from the owner's architecture deck. The
+   threat intel agent highlights "scheduled tasks" in a ransomware report and
+   maps it to T1053.005 Scheduled Task; the hypothesis agent writes a testable
+   "may" hypothesis; the SPL crafter's query takes 4698 from it; post-query
+   analysis flags one root-level task that is not in the baseline, as
+   Evidence found, for analyst review. The scene is dark to match the card
+   (its tokens: #071315, #0e2024, #24464b, #28d7c5, #b8f2eb, amber #ffb869,
+   the card's own outcome colour). Chosen from three designs by three
+   independent reviews; see README. */
+.page-experience #agentic-ai .internship-demo-peek { grid-column: 1 / -1; margin-top: 1.4rem; }
+.page-experience #agentic-ai .internship-demo-peek__chip {
+  background: #0e2024;
+  box-shadow: inset 0 0 0 1px #24464b, 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: #e6f4f1 !important;
+}
+.page-experience #agentic-ai .internship-demo-peek__chip[aria-expanded="true"] {
+  box-shadow: inset 0 0 0 1px #28d7c5, 0 4px 14px rgba(40, 215, 197, 0.16);
+  color: #b8f2eb !important;
+}
+@media (hover: hover) {
+  .page-experience #agentic-ai .internship-demo-peek__chip:hover {
+    box-shadow: inset 0 0 0 1px #28d7c5, 0 4px 14px rgba(40, 215, 197, 0.16);
+    color: #b8f2eb !important;
+  }
+}
+.page-experience #agentic-ai .internship-demo-peek__chip:focus-visible { outline-color: #28d7c5; }
+.page-experience #agentic-ai .internship-demo-peek__mini { background: #071315; box-shadow: inset 0 0 0 1px #24464b; }
+.page-experience #agentic-ai .internship-demo-card {
+  border-color: #24464b;
+  background: linear-gradient(180deg, #102428 0%, #0c1c1f 100%);
+  box-shadow: inset 0 1px 0 rgba(184, 242, 235, 0.05), 0 16px 36px rgba(0, 0, 0, 0.45);
+}
+@media screen and (max-width: 736px), screen and (hover: none) {
+  .page-experience #agentic-ai .internship-demo-card { box-shadow: inset 0 1px 0 rgba(184, 242, 235, 0.05); }
+}
+/* agentic-hunt:start */
+/* Generated by tools/scenes/agentic-hunt-motion.cjs: edit and rerun it. */
+.ah-scene { font-family: "Figtree", "Source Sans Pro", Helvetica, sans-serif; }
+.ah-scene .ah-edge { stroke: #24464b; stroke-width: .9; fill: none; }
+.ah-scene .ah-lit { stroke: #28d7c5; stroke-width: .9; fill: none; transform-box: fill-box; transform-origin: 50% 0; }
+.ah-scene .ah-sup { fill: #0e2024; stroke: #9db4b3; stroke-width: 1; }
+.ah-scene .ah-suplab { font-size: 9px; font-weight: 500; fill: #9db4b3; }
+.ah-scene .ah-node { fill: #28d7c5; stroke: #28d7c5; stroke-width: 1; }
+.ah-scene .ah-n4 { fill: #ffb869; stroke: #ffb869; }
+.ah-scene .ah-ring { fill: none; stroke: #ffb869; stroke-width: .8; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.ah-scene .ah-bead { opacity: 0; }
+.ah-scene .ah-lab { font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; font-size: 12px; font-weight: 700; fill: #d8e6e4; }
+.ah-scene .ah-doc { opacity: 0; }
+.ah-scene .ah-docbox { fill: #071315; stroke: #24464b; stroke-width: 1; }
+.ah-scene .ah-bars rect { fill: #3a6f73; opacity: .55; }
+.ah-scene .ah-title { font-size: 10px; font-weight: 500; fill: #d8e6e4; }
+.ah-scene .ah-qtext { font-size: 10px; fill: #a9bfbe; }
+.ah-scene .ah-phrase { fill: #e8fffb; }
+.ah-scene .ah-hl { fill: #28d7c5; fill-opacity: .2; transform-box: fill-box; transform-origin: 0 50%; }
+.ah-scene .ah-arrow { fill: none; stroke: #6f9d9c; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; }
+.ah-scene .ah-rim { fill: none; stroke-linecap: round; stroke-dasharray: 126.1 400; stroke-dashoffset: 0; }
+.ah-scene .ah-rim-edge { stroke: #2a8f86; stroke-width: 15.6; }
+.ah-scene .ah-rim-fill { stroke: #12363a; stroke-width: 14; }
+.ah-scene .ah-chiptext { font-size: 10px; fill: #e8fffb; opacity: 0; }
+.ah-scene .ah-mono { font-family: Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace; font-size: 10px; fill: #d8e6e4; }
+.ah-scene .ah-id { fill: #b8f2eb; }
+.ah-scene .ah-dot { font-size: 10px; fill: #9db4b3; }
+.ah-scene .ah-tname { font-size: 10px; font-weight: 500; fill: #e8fffb; }
+.ah-scene .ah-wipe, .ah-scene .ah-pillclip { transform-box: view-box; }
+.ah-scene .ah-hyp { font-size: 10.5px; fill: #d8e6e4; }
+.ah-scene .ah-key { fill: #b8f2eb; }
+.ah-scene .ah-code { fill: #071315; stroke: #24464b; stroke-width: 1; }
+.ah-scene .ah-f { fill: #9db4b3; }
+.ah-scene .ah-op { fill: #6f9d9c; }
+.ah-scene .ah-v { fill: #b8f2eb; }
+.ah-scene .ah-kw { fill: #28d7c5; }
+.ah-scene .ah-token { opacity: 0; }
+.ah-scene .ah-token rect { fill: #12363a; stroke: #2a8f86; stroke-width: .8; }
+.ah-scene .ah-toksans { font-size: 10.5px; fill: #e8fffb; }
+.ah-scene .ah-tokmono { fill: #e8fffb; opacity: 0; }
+.ah-scene .ah-valid path { fill: none; stroke: #28d7c5; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+.ah-scene .ah-valid text { font-size: 9.5px; font-weight: 500; fill: #9db4b3; }
+.ah-scene .ah-res { fill: #9db4b3; }
+.ah-scene .ah-res-hit { fill: #f4f2ea; }
+.ah-scene .ah-hit { fill: #ffb869; fill-opacity: .12; }
+.ah-scene .ah-hitbar { fill: #ffb869; }
+.ah-scene .ah-note { font-size: 9.5px; font-weight: 500; fill: #ffb869; }
+.ah-scene .ah-verdict rect { fill: #ffb869; }
+.ah-scene .ah-verdict text { font-size: 9.5px; font-weight: 700; fill: #071315; }
+.ah-scene .ah-review rect { fill: #0e2024; stroke: #3a6f73; stroke-width: .9; }
+.ah-scene .ah-review circle, .ah-scene .ah-review path { fill: none; stroke: #b8f2eb; stroke-width: .9; stroke-linecap: round; }
+.ah-scene .ah-review text { font-size: 9.5px; font-weight: 500; fill: #b8f2eb; }
+
+/* timeline */
+@keyframes ah-k0 {
+  0.000% { transform: translate(0px, 0px) }
+  1.136% { transform: translate(0px, 0px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  7.955% { transform: translate(0px, 12.8px) }
+  39.091% { transform: translate(0px, 12.8px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  47.045% { transform: translate(0px, 41.3px) }
+  64.773% { transform: translate(0px, 41.3px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  72.727% { transform: translate(0px, 67.8px) }
+  92.045% { transform: translate(0px, 67.8px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: translate(0px, 123.8px) }
+}
+@keyframes ah-k1 {
+  0.000% { opacity: 0; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  0.977% { opacity: 1 }
+  92.187% { opacity: 1; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 0 }
+}
+@keyframes ah-k2 {
+  0.000% { transform: scaleY(0) }
+  14.286% { transform: scaleY(0); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: scaleY(1) }
+}
+@keyframes ah-k3 {
+  0.000% { transform: scaleY(0) }
+  83.092% { transform: scaleY(0); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: scaleY(1) }
+}
+@keyframes ah-k4 {
+  0.000% { transform: scaleY(0) }
+  89.063% { transform: scaleY(0); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: scaleY(1) }
+}
+@keyframes ah-k5 {
+  0.000% { transform: scaleY(0) }
+  92.045% { transform: scaleY(0); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: scaleY(1) }
+}
+@keyframes ah-k6 {
+  0.000% { fill: #0e2024; stroke: #3a6f73 }
+  46.000% { fill: #0e2024; stroke: #3a6f73; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { fill: #28d7c5; stroke: #28d7c5 }
+}
+@keyframes ah-k7 {
+  0.000% { fill: #0e2024; stroke: #3a6f73 }
+  87.838% { fill: #0e2024; stroke: #3a6f73; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { fill: #28d7c5; stroke: #28d7c5 }
+}
+@keyframes ah-k8 {
+  0.000% { fill: #0e2024; stroke: #3a6f73 }
+  91.940% { fill: #0e2024; stroke: #3a6f73; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { fill: #28d7c5; stroke: #28d7c5 }
+}
+@keyframes ah-k9 {
+  0.000% { fill: #0e2024; stroke: #3a6f73 }
+  83.594% { fill: #0e2024; stroke: #3a6f73; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  88.867% { fill: #28d7c5; stroke: #28d7c5 }
+  92.187% { fill: #28d7c5; stroke: #28d7c5; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { fill: #ffb869; stroke: #ffb869 }
+}
+@keyframes ah-k10 {
+  0.000% { opacity: 0; transform: scale(1) }
+  85.333% { opacity: 0; transform: scale(1); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  87.000% { opacity: 0.6; transform: scale(1.5); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 0; transform: scale(2.7) }
+}
+@keyframes ah-k11 {
+  0.000% { fill: #4f7477 }
+  9.009% { fill: #4f7477; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  22.523% { fill: #f4f2ea }
+  81.982% { fill: #f4f2ea; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { fill: #d8e6e4 }
+}
+@keyframes ah-k12 {
+  0.000% { fill: #4f7477 }
+  57.313% { fill: #4f7477; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  66.269% { fill: #f4f2ea }
+  88.060% { fill: #f4f2ea; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { fill: #d8e6e4 }
+}
+@keyframes ah-k13 {
+  0.000% { fill: #4f7477 }
+  67.033% { fill: #4f7477; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  73.626% { fill: #f4f2ea }
+  91.209% { fill: #f4f2ea; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { fill: #d8e6e4 }
+}
+@keyframes ah-k14 {
+  0.000% { fill: #4f7477 }
+  73.024% { fill: #4f7477; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  78.179% { fill: #f4f2ea }
+  93.127% { fill: #f4f2ea; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { fill: #d8e6e4 }
+}
+@keyframes ah-k15 {
+  0.000% { opacity: 0; transform: translate(0px, 3px) }
+  4.167% { opacity: 0; transform: translate(0px, 3px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  33.333% { opacity: 1; transform: translate(0px, 0px) }
+  70.833% { opacity: 1; transform: translate(0px, 0px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { opacity: 0; transform: translate(0px, -2px) }
+}
+@keyframes ah-k16 {
+  0.000% { opacity: 0; transform: translate(0px, 3px) }
+  12.500% { opacity: 0; transform: translate(0px, 3px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+@keyframes ah-k17 {
+  0.000% { opacity: 0; transform: translate(0px, 3px) }
+  12.500% { opacity: 0; transform: translate(0px, 3px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+@keyframes ah-k18 {
+  0.000% { transform: scaleX(0) }
+  43.750% { transform: scaleX(0); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: scaleX(1) }
+}
+@keyframes ah-k19 {
+  0.000% { fill: #c4d6d4 }
+  62.500% { fill: #c4d6d4; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { fill: #e8fffb }
+}
+@keyframes ah-k20 {
+  0.000% { opacity: 0 }
+  83.333% { opacity: 0; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1 }
+}
+@keyframes ah-k21 {
+  0.000% { transform: translate(-56.1px, 0px) }
+  71.250% { transform: translate(-56.1px, 0px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: translate(0px, 0px) }
+}
+@keyframes ah-k22 {
+  0.000% { transform: translate(0px, 14.4px) }
+  71.429% { transform: translate(0px, 14.4px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: translate(0px, 0px) }
+}
+@keyframes ah-k23 {
+  0.000% { stroke-dashoffset: 64.5 }
+  85.106% { stroke-dashoffset: 64.5; animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { stroke-dashoffset: 0 }
+}
+@keyframes ah-k24 {
+  0.000% { opacity: 1 }
+  91.860% { opacity: 1; animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { opacity: 0 }
+}
+@keyframes ah-k25 {
+  0.000% { opacity: 0 }
+  89.011% { opacity: 0; animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { opacity: 1 }
+}
+@keyframes ah-k26 {
+  0.000% { opacity: 0; transform: translate(16px, 0px) }
+  85.106% { opacity: 0; transform: translate(16px, 0px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+@keyframes ah-k27 {
+  0.000% { transform: translate(64.5px, 0px) }
+  85.106% { transform: translate(64.5px, 0px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: translate(0px, 0px) }
+}
+@keyframes ah-k28 {
+  0.000% { opacity: 0; transform: translate(-3px, 0px) }
+  81.281% { opacity: 0; transform: translate(-3px, 0px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+@keyframes ah-k29 {
+  0.000% { transform: translate(-226.8px, 0px) }
+  81.148% { transform: translate(-226.8px, 0px); animation-timing-function: cubic-bezier(.45,0,.55,1) }
+  100.000% { transform: translate(0px, 0px) }
+}
+@keyframes ah-k30 {
+  0.000% { transform: translate(-190px, 0px) }
+  85.315% { transform: translate(-190px, 0px); animation-timing-function: cubic-bezier(.45,0,.55,1) }
+  100.000% { transform: translate(0px, 0px) }
+}
+@keyframes ah-k31 {
+  0.000% { opacity: 0; transform: translate(0px, 2px) }
+  90.909% { opacity: 0; transform: translate(0px, 2px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+@keyframes ah-k32 {
+  0.000% { transform: translate(-178.4px, 0px) }
+  85.795% { transform: translate(-178.4px, 0px); animation-timing-function: cubic-bezier(.45,0,.55,1) }
+  100.000% { transform: translate(0px, 0px) }
+}
+@keyframes ah-k33 {
+  0.000% { transform: translate(-219px, 0px) }
+  88.835% { transform: translate(-219px, 0px); animation-timing-function: cubic-bezier(.45,0,.55,1) }
+  100.000% { transform: translate(0px, 0px) }
+}
+@keyframes ah-k34 {
+  0.000% { opacity: 0 }
+  83.243% { opacity: 0; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  86.486% { opacity: 1 }
+  95.676% { opacity: 1; animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { opacity: 0 }
+}
+@keyframes ah-k35 {
+  0.000% { opacity: 0 }
+  89.014% { opacity: 0; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  92.958% { opacity: 1 }
+  95.775% { opacity: 1; animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { opacity: 0 }
+}
+@keyframes ah-k36 {
+  0.000% { opacity: 1 }
+  93.567% { opacity: 1; animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { opacity: 0 }
+}
+@keyframes ah-k37 {
+  0.000% { opacity: 0 }
+  93.567% { opacity: 0; animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { opacity: 1 }
+}
+@keyframes ah-k38 {
+  0.000% { transform: translate(-20.25px, 0px) }
+  87.079% { transform: translate(-20.25px, 0px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: translate(0px, 0px) }
+}
+@keyframes ah-k39 {
+  0.000% { transform: translate(0px, -15px) }
+  87.079% { transform: translate(0px, -15px); animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { transform: translate(0px, 0px) }
+}
+@keyframes ah-k40 {
+  0.000% { opacity: 0 }
+  95.628% { opacity: 0; animation-timing-function: cubic-bezier(.65,0,.35,1) }
+  100.000% { opacity: 1 }
+}
+@keyframes ah-k41 {
+  0.000% { opacity: 0; transform: translate(-3px, 0px) }
+  91.031% { opacity: 0; transform: translate(-3px, 0px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+@keyframes ah-k42 {
+  0.000% { opacity: 0; transform: translate(0px, 3px) }
+  91.775% { opacity: 0; transform: translate(0px, 3px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+@keyframes ah-k43 {
+  0.000% { opacity: 0; transform: translate(0px, 3px) }
+  91.915% { opacity: 0; transform: translate(0px, 3px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+@keyframes ah-k44 {
+  0.000% { opacity: 0; transform: translate(0px, 3px) }
+  92.050% { opacity: 0; transform: translate(0px, 3px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+@keyframes ah-k45 {
+  0.000% { opacity: 0 }
+  92.187% { opacity: 0; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1 }
+}
+@keyframes ah-k46 {
+  0.000% { opacity: 0 }
+  92.187% { opacity: 0; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1 }
+}
+@keyframes ah-k47 {
+  0.000% { opacity: 0 }
+  92.187% { opacity: 0; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1 }
+}
+@keyframes ah-k48 {
+  0.000% { fill: #9db4b3 }
+  92.187% { fill: #9db4b3; animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { fill: #f4f2ea }
+}
+@keyframes ah-k49 {
+  0.000% { opacity: 0; transform: translate(0px, 4px) }
+  92.222% { opacity: 0; transform: translate(0px, 4px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+@keyframes ah-k50 {
+  0.000% { opacity: 0; transform: translate(0px, 4px) }
+  92.446% { opacity: 0; transform: translate(0px, 4px); animation-timing-function: cubic-bezier(.33,1,.68,1) }
+  100.000% { opacity: 1; transform: translate(0px, 0px) }
+}
+.is-playing .ah-scene .ah-bead { animation: ah-k0 4.4s linear both, ah-k1 5.12s linear both; }
+.is-playing .ah-scene .ah-e1 { animation: ah-k2 0.35s linear both; }
+.is-playing .ah-scene .ah-e2 { animation: ah-k3 2.07s linear both; }
+.is-playing .ah-scene .ah-e3 { animation: ah-k4 3.2s linear both; }
+.is-playing .ah-scene .ah-e4 { animation: ah-k5 4.4s linear both; }
+.is-playing .ah-scene .ah-n1 { animation: ah-k6 0.5s linear both; }
+.is-playing .ah-scene .ah-n2 { animation: ah-k7 2.2199999999999998s linear both; }
+.is-playing .ah-scene .ah-n3 { animation: ah-k8 3.35s linear both; }
+.is-playing .ah-scene .ah-n4 { animation: ah-k9 5.12s linear both; }
+.is-playing .ah-scene .ah-ring { animation: ah-k10 6s linear both; }
+.is-playing .ah-scene .ah-s1 { animation: ah-k11 2.22s linear both; }
+.is-playing .ah-scene .ah-s2 { animation: ah-k12 3.35s linear both; }
+.is-playing .ah-scene .ah-s3 { animation: ah-k13 4.55s linear both; }
+.is-playing .ah-scene .ah-s4 { animation: ah-k14 5.82s linear both; }
+.is-playing .ah-scene .ah-doc { animation: ah-k15 1.2s linear both; }
+.is-playing .ah-scene .ah-title { animation: ah-k16 0.39999999999999997s linear both; }
+.is-playing .ah-scene .ah-quote { animation: ah-k17 0.39999999999999997s linear both; }
+.is-playing .ah-scene .ah-hl { animation: ah-k18 0.8s linear both; }
+.is-playing .ah-scene .ah-phrase { animation: ah-k19 0.8s linear both; }
+.is-playing .ah-scene .ah-chip { animation: ah-k20 1.2s linear both; }
+.is-playing .ah-scene .ah-chipx { animation: ah-k21 1.6s linear both; }
+.is-playing .ah-scene .ah-chipy { animation: ah-k22 1.4s linear both; }
+.is-playing .ah-scene .ah-rim { animation: ah-k23 1.88s linear both; }
+.is-playing .ah-scene .ah-chiptext { animation: ah-k24 1.7200000000000002s linear both; }
+.is-playing .ah-scene .ah-tname { animation: ah-k25 1.82s linear both; }
+.is-playing .ah-scene .ah-id, .is-playing .ah-scene .ah-dot { animation: ah-k26 1.88s linear both; }
+.is-playing .ah-scene .ah-pillclip { animation: ah-k27 1.88s linear both; }
+.is-playing .ah-scene .ah-arrow { animation: ah-k28 2.03s linear both; }
+.is-playing .ah-scene .ah-w-h1 { animation: ah-k29 2.44s linear both; }
+.is-playing .ah-scene .ah-w-h2 { animation: ah-k30 2.86s linear both; }
+.is-playing .ah-scene .ah-code { animation: ah-k31 3.3s linear both; }
+.is-playing .ah-scene .ah-w-q1 { animation: ah-k32 3.52s linear both; }
+.is-playing .ah-scene .ah-w-q2 { animation: ah-k33 4.12s linear both; }
+.is-playing .ah-scene .ah-token { animation: ah-k34 3.7s linear both; }
+.is-playing .ah-scene .ah-tokrim { animation: ah-k35 3.5500000000000003s linear both; }
+.is-playing .ah-scene .ah-toksans { animation: ah-k36 3.42s linear both; }
+.is-playing .ah-scene .ah-tokmono { animation: ah-k37 3.42s linear both; }
+.is-playing .ah-scene .ah-tokx { animation: ah-k38 3.56s linear both; }
+.is-playing .ah-scene .ah-toky { animation: ah-k39 3.56s linear both; }
+.is-playing .ah-scene .ah-code4698 { animation: ah-k40 3.66s linear both; }
+.is-playing .ah-scene .ah-valid { animation: ah-k41 4.46s linear both; }
+.is-playing .ah-scene .ah-r1 { animation: ah-k42 4.62s linear both; }
+.is-playing .ah-scene .ah-r2 { animation: ah-k43 4.7s linear both; }
+.is-playing .ah-scene .ah-r3 { animation: ah-k44 4.78s linear both; }
+.is-playing .ah-scene .ah-hit { animation: ah-k45 5.12s linear both; }
+.is-playing .ah-scene .ah-hitbar { animation: ah-k46 5.12s linear both; }
+.is-playing .ah-scene .ah-note { animation: ah-k47 5.12s linear both; }
+.is-playing .ah-scene .ah-res-hit { animation: ah-k48 5.12s linear both; }
+.is-playing .ah-scene .ah-verdict { animation: ah-k49 5.4s linear both; }
+.is-playing .ah-scene .ah-review { animation: ah-k50 5.56s linear both; }
+@media (prefers-reduced-motion: reduce) { .is-playing .ah-scene * { animation: none !important; } }
+/* agentic-hunt:end */
