@@ -182,38 +182,55 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
  }
 });
 
-test('agentic AI peek: a dark hunt scene that previews, holds its final frame, fits, and flags only a lead',async({page})=>{
+test('agentic AI peek: a dark agent console that previews, holds its final frame, fits the card, and hands only a lead to an analyst',async({page})=>{
+ const panel=root=>root.locator('.hunt-panel');
+ // Measured once the card's opening zoom has settled.
+ const fits=root=>expect(async()=>{
+  const c=await card(root).boundingBox(),p=await panel(root).boundingBox();
+  expect(p.x).toBeGreaterThanOrEqual(c.x-0.5);
+  expect(p.x+p.width).toBeLessThanOrEqual(c.x+c.width+0.5);
+  expect(p.y+p.height).toBeLessThanOrEqual(c.y+c.height+0.5);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ }).toPass({timeout:3000});
+ await page.setViewportSize({width:1366,height:768});
  await page.emulateMedia({reducedMotion:'reduce'});
  await page.goto('/experience');
  const root=peek(page,'agentic');
  await expect(chip(root)).toHaveText('Hunt from a report');
  await root.dispatchEvent('mouseenter');
  await expect(card(root)).toHaveClass(/is-still/);
- // Generic, illustrative content (README): a lead for analyst review, never a
- // real intrusion, malware name or internal component name.
- const words=(await root.locator('svg.ah-scene text').allTextContents()).join(' ');
- for(const s of ['T1053.005','Scheduled Task','EventCode=','\WinTaskUpdate','root-level','Flagged','Analyst review','Supervisor agent'])expect(words).toContain(s);
- expect(words).not.toMatch(/SysUpdate|Evidence found|SPL crafter|Post-query|Splunk|\d+ hits/);
- // Every line stays inside the 360-unit scene.
- const right=await root.evaluate(r=>Math.max(...[...r.querySelectorAll('svg.ah-scene text')].map(t=>{const b=t.getBBox();return b.x+b.width;})));
- expect(right).toBeLessThanOrEqual(358);
+ // The final frame (README): three techniques resolved, the re-planned query,
+ // one task flagged as a lead and handed to the Analyst, with the last caption.
+ const c2=panel(root).locator('.c2');
+ const words=await panel(root).textContent();
+ for(const s of ['T1053.005','Scheduled Task','Flagged','covered by a recent hunt','Valid negative','EventCode=4698','\\WinTaskUpdate','root-level','not in baseline','Analyst','request_review','Hands it to an analyst, with the evidence'])expect(words).toContain(s);
+ const label=await c2.getAttribute('aria-label');
+ expect(label.startsWith('An illustrative hunt.')).toBe(true);
+ // Generic and unquestionable: no real malware, internal component names,
+ // product names, counts, token counts or the card's days-to-hours claim.
+ const forbidden=/SysUpdate|Evidence found|SPL crafter|Post-query|Splunk|days to hours|\d+ hits|tokens?\b/i;
+ expect(words).not.toMatch(forbidden);
+ expect(label).not.toMatch(forbidden);
+ await expect(panel(root).locator('.c2-line--fin')).toHaveText('Hands it to an analyst, with the evidence');
+ await fits(root);
  await root.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
- // Playing, the story ends about when its siblings do.
+ // Playing, the story ends at about 35s, under 40s; the replay waits for it.
  await page.emulateMedia({reducedMotion:'no-preference'});
  await root.dispatchEvent('mouseenter');
  await expect(card(root)).toHaveClass(/is-playing/);
- const end=await card(root).evaluate(c=>Math.max(...c.getAnimations({subtree:true}).map(a=>a.effect.getComputedTiming().endTime)));
- expect(end).toBeLessThanOrEqual(6500);
+ const end=await card(root).evaluate(c=>Math.max(...c.getAnimations({subtree:true}).map(a=>a.effect.getComputedTiming().endTime).filter(Number.isFinite)));
+ expect(end).toBeGreaterThan(10000);
+ expect(end).toBeLessThan(40000);
  await root.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
- // Phones: a tap opens it inline.
+ // Phones: a tap opens it inline, inside the card, with no sideways scroll.
  await page.setViewportSize({width:390,height:844});
  await page.goto('/experience');
  await chip(root).click();
  await expect(chip(root)).toHaveAttribute('aria-expanded','true');
  await expect(card(root)).toHaveCSS('position','static');
- expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ await fits(root);
 });
 
 test('phone charts stay open while the page scrolls and a finger lands elsewhere; the chip closes them',async({page})=>{

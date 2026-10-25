@@ -34,8 +34,8 @@ COL_CX = COL_X + ROW_W / 2
 import sys
 NOTE_F, NOTE_P = 13.0, 16.5   # notes: the anomaly cards' note style (Merriweather 300)
 WORDS_NOTE_BELOW = 'above' not in sys.argv
-NOTES = {'words': ('Words from all', 'three languages.'),
-         'model': ('Predicts attributes', 'from the words.'),
+NOTES = {'words': ('Titles often mix', 'three languages.'),
+         'model': ('One model reads', 'every language.'),
          'attrs': ('Fills in the', 'product specs.')}
 # 'Words' heads its column (the space above the rows is otherwise empty),
 # so its note never meets the arrow down to the model.

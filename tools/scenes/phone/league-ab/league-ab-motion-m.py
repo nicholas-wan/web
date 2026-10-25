@@ -144,7 +144,7 @@ TITLE_Y, TOP, BASE, XLAB = 196.0, 204.0, 291.0, 305.0
 SX, SY = (X1 - X0) / 168, (BASE - TOP) / 90   # the plot, scaled from the desktop's 168 x 90
 STEPS = [  # caption, note lines, the figure's vertical centre it sits beside
     ("Randomise", ["Each user", "sees A or B", "at random."], None),
-    ("Measure", ["Hills show each", "design’s likely", "match rate."], None),
+    ("Measure", ["B’s match rate", "is higher, and", "it’s significant."], None),
 ]
 
 
@@ -202,7 +202,7 @@ def html(L):
     hills = re.sub(r'(class="lgab-hill-area" d=")[^"]*"', lambda m: m.group(1) + "M" + pts + 'Z"', hills)
     hills = re.sub(r'(class="lgab-hill-line" d=")[^"]*"', lambda m: m.group(1) + "M" + pts + '"', hills)
     label = re.search(r'aria-label="([^"]*)"', svg).group(1)
-    label += " Both designs are variants, A and B; each curve shows where that design's match rate likely lies."
+    label += " Both designs are variants, A and B; each curve shows where that design's match rate likely lies; B's is higher, and the difference is statistically significant."
     b, top = L["base"], L["top"]
     ly = -(72 * SY + 4.5)
     (c1, n1, _), (c2, n2, _) = STEPS

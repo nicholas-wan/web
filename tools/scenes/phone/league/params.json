@@ -1,4 +1,4 @@
 { "H": 318, "phoneS": 1.7, "phoneX": 4, "phoneY": 22, "midS": 1.46, "iconX": 147, "modelY": 125,
   "linkFrom": [52, 90, 113], "dialS": 1.28, "dialY": 224, "pillS": 1.04, "pillY": 246,
   "capTop": 34, "capY": 276, "outGap": 4, "sigCx": 186, "noteGap": 18, "noteLead": 16,
-  "notes": [["Photo, bio", "and interests."], ["A classifier", "weighs all three."], ["Risky profiles go", "to manual review."]] }
+  "notes": [["Clues like the", "photo and bio."], ["A classifier", "weighs the clues."], ["Risky profiles go", "to manual review."]] }
