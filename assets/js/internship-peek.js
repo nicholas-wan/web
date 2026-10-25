@@ -3,14 +3,15 @@
    stays hoverable under it), and the preview stays open while the pointer is
    over the chip row or the card. On phones and touch (the stylesheet's inline
    branch) a tap opens the card in place. Scenes replay every 10s while on
-   screen, with a short fade before each restart; reduced motion holds the
+   screen (longer if a scene needs it to hold its final frame for 3s), with a
+   short fade before each restart; reduced motion holds the
    final frame. */
 (() => {
   const roots = [...document.querySelectorAll('.internship-demo-peek')];
   if (!roots.length) return;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const touch = matchMedia('(max-width: 736px), (hover: none)');
-  const REPLAY = 10000, FADE = 240, GRACE = 130;
+  const REPLAY = 10000, HOLD = 3000, FADE = 240, GRACE = 130;
   // Phones keep the cards display:none until a tap, which would leave the
   // scenes' faces unrequested until a scene had already started. Warm them
   // once the page has loaded, so they never compete with the text's fonts.
@@ -58,7 +59,9 @@
     c.classList.add('is-open');
     chip(r).setAttribute('aria-expanded', 'true');
     play(r);
-    r.loop = setInterval(() => { if (!document.hidden && onScreen(c)) replay(r); }, REPLAY);
+    // A scene longer than REPLAY allows still holds its final frame for HOLD.
+    const end = Math.max(0, ...c.getAnimations({ subtree: true }).map(a => a.effect.getComputedTiming().endTime).filter(Number.isFinite));
+    r.loop = setInterval(() => { if (!document.hidden && onScreen(c)) replay(r); }, Math.max(REPLAY, end + HOLD));
   }
   // The pointer has left the chip row and the card: after a short grace a
   // pinned card returns, otherwise the preview closes.

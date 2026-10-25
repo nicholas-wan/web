@@ -12,8 +12,12 @@ One model drives everything, so nothing steps:
   conveyor, every dot at the same SPEED, so dots in a lane keep their
   spacing and none catches another. Over the last DOCK seconds it eases,
   at a constant deceleration, to the lane front's own speed and lands on
-  it. It turns from a light bead to the bar's colour over the end of its
-  trip, so it lands as the bar's tip and fades there unseen.
+  it. It turns from a light bead to the bar's colour late in its cruise, so
+  it brakes as the bar's tip (no pale spot on the tip), then rides the tip,
+  solid, and vanishes under the same-coloured bar end.
+- A lane's bar appears at once under its first bead and moves off at that
+  bead's landing speed: its curve starts at its average speed rather than
+  from rest, so no bar is ever a still dot (rejected twice by the owner).
 - Each lane front fills on one eased curve from its first arrival to its
   last; the arm's hill grows, narrows and glides on the very same curve, so
   the chart moves exactly with its bar.
@@ -27,11 +31,11 @@ CSS = ROOT / "assets" / "css" / "internship-peek.css"
 HTML = ROOT / "experience.html"
 
 ARMS = "abbabaababbabaab"         # the random assignment, A or B per user
-FIRST, DEAL = 1.2, 0.24          # first deal (s) and the gap between deals
-SPEED, DOCK = 45.0, 0.25         # every dot's speed (units/s); its easing in
+FIRST, DEAL = 1.2, 0.30          # first deal (s) and the gap between deals
+SPEED, DOCK = 30.0, 0.30         # every dot's speed (units/s); its easing in
 MERGE = 0.2                      # a landed dot rides the tip this long, fading
 GAP, LANE = 8.0, 44.0            # die centre to lane start; lane length
-EASE = (0.2, 0, 0.8, 1)          # lanes and hills: soft ends, near-even middle
+EASE = (0.25, 0.25, 0.7, 1)      # lanes and hills: start moving, soft end
 LIGHT = {"a": "#a99fe6", "b": "#e891b2"}
 DARK = {"a": "#6352c6", "b": "#c23f6e"}
 SIGN = {"a": -1, "b": 1}
@@ -129,7 +133,7 @@ def css(dots, span):
         f".is-playing .lgab-scene .lgab-heart {{ animation: lgab-beat .5s ease-in-out 1s both, lgab-beat-win .9s ease-in-out {f(win)}s; }}",
     ]
     for i, d in enumerate(dots, 1):
-        out.append(f".is-playing .lgab-scene .lgab-users circle:nth-of-type({i}) {{ animation: lgab-deal-{i} {f(d['arrive'] - d['launch'] + MERGE)}s {f(d['launch'])}s both; }}")
+        out.append(f".is-playing .lgab-scene .lgab-users circle:nth-of-type({i}) {{ animation: lgab-deal-{i} {f(d['arrive'] - d['launch'] + MERGE)}s {f(d['launch'])}s backwards; }}")
     # The die rocks as a slow sine, a swing per two deals, easing in and out.
     start, end = FIRST - 0.25, dots[-1]["launch"] + 0.35
     half = 2 * DEAL
@@ -138,7 +142,7 @@ def css(dots, span):
     out.append(f".is-playing .lgab-scene .lgab-die {{ animation: lgab-rock {f(end - start)}s linear {f(start)}s both; }}")
     for k in "ab":
         s, e = span[k]
-        out.append(f".is-playing .lgab-scene .lgab-fill-{k} {{ animation: lgab-fill {f(e - s)}s {ease} {f(s)}s both, lgab-show .12s linear {f(s)}s both; }}")
+        out.append(f".is-playing .lgab-scene .lgab-fill-{k} {{ animation: lgab-fill {f(e - s)}s {ease} {f(s)}s both, lgab-show .001s linear {f(s)}s both; }}")
         out.append(f".is-playing .lgab-scene .lgab-hill-{k} {{ animation: lgab-narrow {f(e - s)}s {ease} {f(s)}s both; }}")
         out.append(f".is-playing .lgab-scene .lgab-hx-{k} {{ animation: lgab-x-{k} {f(e - s)}s {ease} {f(s)}s both, lgab-show .4s ease {f(s)}s both; }}")
         out.append(f".is-playing .lgab-scene .lgab-tx-{k} {{ animation: lgab-tx-{k} {f(e - s)}s {ease} {f(s)}s both, lgab-show .6s ease {f(s + 0.6)}s both; }}")
@@ -164,8 +168,9 @@ def css(dots, span):
         out.append(f"@keyframes lgab-tx-{k} {{ from {{ transform: translate({x0}px, {rise}px); }} to {{ transform: translate({x1}px, 0); }} }}")
     # A dot: a linear cruise, then the dock (constant deceleration from SPEED
     # to the front's speed v1: a cubic-bezier with its handles at thirds), the
-    # colour turning over the last 45% of the trip, then riding the tip while
-    # it fades.
+    # colour turning from 60% of the cruise to its end, then riding the tip,
+    # solid; fill-mode backwards drops it to the base opacity 0 at the end,
+    # under the bar's same-coloured end.
     for i, d in enumerate(dots, 1):
         trip = d["arrive"] - d["launch"]
         total = trip + MERGE
@@ -176,13 +181,17 @@ def css(dots, span):
         sg = SIGN[d["arm"]]
         xc, x, xe = sg * (d["dist"] - d["dock"]), sg * d["dist"], sg * (d["dist"] + d["v1"] * MERGE)
         light, dark = LIGHT[d["arm"]], DARK[d["arm"]]
+        # A dot whose cruise is too short to turn colour once clear of the
+        # die (8 units) stays dark throughout, so no half-pale bead pokes out.
+        if 0.6 * (trip - DOCK) < 8 / SPEED:
+            light = dark
         out.append(
             f"@keyframes lgab-deal-{i} {{ "
             f"0% {{ transform: translateX(0); fill: {light}; opacity: 1; animation-timing-function: linear; }} "
-            f"{f(land * 0.55)}% {{ fill: {light}; animation-timing-function: linear; }} "
-            f"{f(cruise)}% {{ transform: translateX({f(xc)}px); animation-timing-function: cubic-bezier(.3333,{f(y1)},.6667,{f(y2)}); }} "
+            f"{f(cruise * 0.6)}% {{ fill: {light}; animation-timing-function: linear; }} "
+            f"{f(cruise)}% {{ transform: translateX({f(xc)}px); fill: {dark}; animation-timing-function: cubic-bezier(.3333,{f(y1)},.6667,{f(y2)}); }} "
             f"{f(land)}% {{ transform: translateX({f(x)}px); fill: {dark}; opacity: 1; animation-timing-function: linear; }} "
-            f"100% {{ transform: translateX({f(xe)}px); fill: {dark}; opacity: 0; }} }}"
+            f"100% {{ transform: translateX({f(xe)}px); fill: {dark}; opacity: 1; }} }}"
         )
     frames = ["@keyframes lgab-rock {", "  0% { transform: rotate(0deg); animation-timing-function: ease-in-out; }"]
     for j in range(1, n):
