@@ -50,7 +50,7 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await expect(card(league)).toHaveClass(/is-still/);
  await expect(league.locator('.lg-review')).toHaveCSS('opacity','1');
  await expect(league.locator('.lg-review')).toHaveText('Risky profile');
- await expect(league.locator('.lg-needle')).toHaveCSS('transform',/matrix\(-0\.83/);
+ await expect(league.locator('.lg-needle')).toHaveCSS('transform',/matrix\(-0\.97/);
  // Three signals: each frame's line is drawn to its bar, no frame is left on
  // the phone, the classifier's route is drawn to its leaf, and the flag is
  // pinned to the photo.
@@ -100,9 +100,11 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await expect(ab.locator('.lgab-badge')).toHaveCount(2);
  await expect(ab.locator('.lgab-hill')).toHaveCount(2);
  const peaks=await ab.locator('.lgab-hill').evaluateAll(hs=>hs.map(h=>h.getBoundingClientRect()));
- // Each hill spans 8 standard deviations; centres 4 apart barely overlap.
- const mid=b=>b.left+b.width/2;
- expect(mid(peaks[1])-mid(peaks[0])).toBeGreaterThan(peaks[0].width*.4);
+ // Each hill spans 8 standard deviations; centres 2.75 apart overlap a
+ // little but stand apart (owner: "a bit closer in terms of result").
+ const mid=b=>b.left+b.width/2,gap=mid(peaks[1])-mid(peaks[0]);
+ expect(gap).toBeGreaterThan(peaks[0].width*.3);
+ expect(gap).toBeLessThan(peaks[0].width*.4);
  await expect(ab.locator('.lgab-cap text')).toHaveText(['Randomise','Measure']);
  // While playing, each hill and its label run on exactly their lane's curve,
  // so the chart moves with its bar (tools/scenes/league-ab-motion.py).

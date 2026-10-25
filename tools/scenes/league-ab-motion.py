@@ -39,7 +39,7 @@ EASE = (0.25, 0.25, 0.7, 1)      # lanes and hills: start moving, soft end
 LIGHT = {"a": "#a99fe6", "b": "#e891b2"}
 DARK = {"a": "#6352c6", "b": "#c23f6e"}
 SIGN = {"a": -1, "b": 1}
-HILL = {"sd": (29.21, 16), "h": (4, 72), "a": (250, 226), "b": (268, 290)}
+HILL = {"sd": (29.21, 16), "h": (4, 72), "a": (250, 236), "b": (268, 280)}
 WIN_AFTER = 0.1                  # B's hill settles, then it deepens and beats
 
 
