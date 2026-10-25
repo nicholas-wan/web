@@ -2,7 +2,7 @@
    internship row that opens a small branded scene. Desktop: hover or focus
    previews, click pins, Escape or an outside click closes, and the card
    floats below the chip. Phones and touch: a tap opens the card inline.
-   The scenes are conceptual illustrations. Both replay every 10s while on
+   The scenes are conceptual illustrations. All replay every 10s while on
    screen and hold their final frame under reduced motion. */
 
 .page-experience .case-study--internship .internship-demo-peek {
@@ -289,14 +289,15 @@
 .is-playing .sp-brand .sp-crop { animation: sp-reveal 0.4s 1.2s forwards; }
 /* The words lift last-to-first (Thai, Chinese, then the Indonesian title
    right to left), 0.28s apart, so at most three are in the air. */
-.is-playing .sp-brand .sp-chip-5 { animation: sp-chip-5 0.9s 1.8s both; }
-.is-playing .sp-brand .sp-chip-4 { animation: sp-chip-4 0.9s 2.08s both; }
-.is-playing .sp-brand .sp-chip-3 { animation: sp-chip-3 0.9s 2.36s both; }
-.is-playing .sp-brand .sp-chip-2 { animation: sp-chip-2 0.9s 2.64s both; }
-.is-playing .sp-brand .sp-chip-1 { animation: sp-chip-1 0.9s 2.92s both; }
+.is-playing .sp-brand .sp-chip-5 { animation: sp-chip-5 1.2s 1.8s both; }
+.is-playing .sp-brand .sp-chip-4 { animation: sp-chip-4 1.2s 2.08s both; }
+.is-playing .sp-brand .sp-chip-3 { animation: sp-chip-3 1.2s 2.36s both; }
+.is-playing .sp-brand .sp-chip-2 { animation: sp-chip-2 1.2s 2.64s both; }
+.is-playing .sp-brand .sp-chip-1 { animation: sp-chip-1 1.2s 2.92s both; }
 .is-playing .sp-brand .sp-words { animation: sp-arrive 0.6s 1.7s both; }
-/* The column opens empty; each row fills as its word lands (the chip's 82%
-   mark), so the handoff reads as one motion. */
+/* The column opens empty; each row fills as its word lands (the chip's 61.5%
+   mark), so the handoff reads as one motion. The chips sit under the column,
+   so a word in flight passes behind rows that have already landed. */
 .is-playing .sp-brand .sp-slot-5 { animation: sp-reveal 0.3s 2.54s both; }
 .is-playing .sp-brand .sp-slot-4 { animation: sp-reveal 0.3s 2.82s both; }
 .is-playing .sp-brand .sp-slot-3 { animation: sp-reveal 0.3s 3.1s both; }
@@ -341,7 +342,9 @@
    listing's text (x 97), so it never crosses the price or badge, then
    travels to its row and lands as that row's word: it scales about its own
    text anchor to the row's size (the title is 11, rows are 9.5) and its
-   anchor lands on the row word's (x 154.5), so the crossfade never jumps. */
+   anchor lands on the row word's (x 154.5), so the crossfade never jumps.
+   It holds there until its row has fully faded in over it, then fades: a
+   chip that left first let the word blink pale as it landed. */
 .sp-brand .sp-chip-1 { transform-box: view-box; transform-origin: 8px 86px; }
 .sp-brand .sp-chip-2 { transform-box: view-box; transform-origin: 46.05px 86px; }
 .sp-brand .sp-chip-3 { transform-box: view-box; transform-origin: 66.64px 86px; }
@@ -349,37 +352,37 @@
 .sp-brand .sp-chip-5 { transform-box: view-box; transform-origin: 53.53px 97.5px; }
 @keyframes sp-chip-1 {
   0% { opacity: 0; transform: none; }
-  12% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
-  45% { transform: translate(89px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
-  82%, 92% { opacity: 1; transform: translate(146.5px, -35.6px) scale(0.864); }
+  9% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
+  33.75% { transform: translate(89px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
+  61.5%, 86.5% { opacity: 1; transform: translate(146.5px, -35.6px) scale(0.864); }
   100% { opacity: 0; transform: translate(146.5px, -35.6px) scale(0.864); }
 }
 @keyframes sp-chip-2 {
   0% { opacity: 0; transform: none; }
-  12% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
-  45% { transform: translate(50.95px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
-  82%, 92% { opacity: 1; transform: translate(108.45px, -21.6px) scale(0.864); }
+  9% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
+  33.75% { transform: translate(50.95px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
+  61.5%, 86.5% { opacity: 1; transform: translate(108.45px, -21.6px) scale(0.864); }
   100% { opacity: 0; transform: translate(108.45px, -21.6px) scale(0.864); }
 }
 @keyframes sp-chip-3 {
   0% { opacity: 0; transform: none; }
-  12% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
-  45% { transform: translate(30.36px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
-  82%, 92% { opacity: 1; transform: translate(87.86px, -7.6px) scale(0.864); }
+  9% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
+  33.75% { transform: translate(30.36px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
+  61.5%, 86.5% { opacity: 1; transform: translate(87.86px, -7.6px) scale(0.864); }
   100% { opacity: 0; transform: translate(87.86px, -7.6px) scale(0.864); }
 }
 @keyframes sp-chip-4 {
   0% { opacity: 0; transform: none; }
-  12% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
-  45% { transform: translate(89px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
-  82%, 92% { opacity: 1; transform: translate(146.5px, -4.9px); }
+  9% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
+  33.75% { transform: translate(89px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
+  61.5%, 86.5% { opacity: 1; transform: translate(146.5px, -4.9px); }
   100% { opacity: 0; transform: translate(146.5px, -4.9px); }
 }
 @keyframes sp-chip-5 {
   0% { opacity: 0; transform: none; }
-  12% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
-  45% { transform: translate(43.47px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
-  82%, 92% { opacity: 1; transform: translate(100.97px, 8.9px); }
+  9% { opacity: 1; transform: translate(0, -1.2px) scale(1.05); animation-timing-function: ease-in; }
+  33.75% { transform: translate(43.47px, -1.2px) scale(1.05); animation-timing-function: ease-out; }
+  61.5%, 86.5% { opacity: 1; transform: translate(100.97px, 8.9px); }
   100% { opacity: 0; transform: translate(100.97px, 8.9px); }
 }
 
@@ -400,7 +403,8 @@
       profile's route lights down the tree, node by node, and lands on an
       amber leaf, which lights and keeps a ring; the scene holds there.
    3. Flag: the risk dial (teal low, a hard step into amber high) sweeps with
-      its needle, Review lands and then the same flag pins to the photo.
+      its needle, the Risky profile pill lands and then the same flag pins to
+      the photo.
    Amber appears only once the model has spoken. Links sit under the phone;
    the x and heart sit above the frames. */
 @font-face { font-family: "Figtree"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/figtree-400-bullet.woff2") format("woff2"); unicode-range: U+2022; }
@@ -474,7 +478,7 @@
 .is-playing .league-brand-scene .lg-pick     { animation: lg-pop 0.35s cubic-bezier(.3,1.5,.6,1) 3.45s both; }
 .is-playing .league-brand-scene .lg-wire-out { animation: lg-draw 0.25s ease-out 3.95s both; }
 .is-playing .league-brand-scene .lg-head     { animation: lg-show 0.15s ease 4.15s both; }
-/* Beat 3: dial, Review, then the flag pins to the photo once Review has
+/* Beat 3: dial, Risky profile, then the flag pins to the photo once the pill has
    settled, so the two never compete. */
 .is-playing .league-brand-scene .lg-gauge,
 .is-playing .league-brand-scene .lg-needle { animation: 0.8s cubic-bezier(.3,1.25,.55,1) 4.2s both; }
@@ -567,8 +571,8 @@
 .lgab-scene .lgab-hx-a, .lgab-scene .lgab-tx-a { transform: translateX(226px); }
 .lgab-scene .lgab-hx-b, .lgab-scene .lgab-tx-b { transform: translateX(290px); }
 
-/* Playing: the designs first, then the traffic; each hill steps with its
-   own arm's arrivals. */
+/* Playing: the designs first, then the traffic; each hill moves on one
+   curve over its own arm's arrivals. */
 .is-playing .lgab-scene .lgab-frame-g { animation: lgab-frame .6s cubic-bezier(.22,1,.36,1) .25s both; }
 .is-playing .lgab-scene .lgab-badge-g { animation: lgab-pop .6s cubic-bezier(.22,1,.36,1) .55s both; }
 .is-playing .lgab-scene .lgab-heart { animation: lgab-beat .5s ease-in-out 1.05s both, lgab-beat-win .9s ease-in-out 6.50s; }
@@ -595,10 +599,10 @@
 .is-playing .lgab-scene .lgab-fill-b { animation: lgab-fill 4.20s cubic-bezier(0.4,0,0.6,1) 2.10s both; }
 .is-playing .lgab-scene .lgab-hill-a { animation: lgab-narrow 4.50s cubic-bezier(.4,0,.4,1) 1.80s both; }
 .is-playing .lgab-scene .lgab-hx-a { animation: lgab-x-a 4.50s cubic-bezier(.4,0,.4,1) 1.80s both, lgab-show .4s ease 1.80s both; }
-.is-playing .lgab-scene .lgab-tx-a { animation: lgab-x-a 4.50s cubic-bezier(.4,0,.4,1) 1.80s both, lgab-show .8s ease 2.70s both; }
+.is-playing .lgab-scene .lgab-tx-a { animation: lgab-tx-a 4.50s cubic-bezier(.4,0,.4,1) 1.80s both, lgab-show .8s ease 2.70s both; }
 .is-playing .lgab-scene .lgab-hill-b { animation: lgab-narrow 4.50s cubic-bezier(.4,0,.4,1) 2.10s both; }
 .is-playing .lgab-scene .lgab-hx-b { animation: lgab-x-b 4.50s cubic-bezier(.4,0,.4,1) 2.10s both, lgab-show .4s ease 2.10s both; }
-.is-playing .lgab-scene .lgab-tx-b { animation: lgab-x-b 4.50s cubic-bezier(.4,0,.4,1) 2.10s both, lgab-show .8s ease 3.00s both; }
+.is-playing .lgab-scene .lgab-tx-b { animation: lgab-tx-b 4.50s cubic-bezier(.4,0,.4,1) 2.10s both, lgab-show .8s ease 3.00s both; }
 .is-playing .lgab-scene .lgab-hill-b .lgab-hill-area { animation: lgab-deepen .6s ease 6.50s both; }
 .is-playing .lgab-scene .lgab-hill-b .lgab-hill-line { animation: lgab-bolden .6s ease 6.50s both; }
 
@@ -649,4 +653,14 @@
 @keyframes lgab-x-b {
   from { transform: translateX(268px); }
   to { transform: translateX(290px); }
+}
+/* A label rides its hill's peak: the hill's height runs 4 to 72 on the same
+   curve, so the label starts 68 lower and keeps 4.5 above the peak. */
+@keyframes lgab-tx-a {
+  from { transform: translate(250px, 68px); }
+  to { transform: translate(226px, 0); }
+}
+@keyframes lgab-tx-b {
+  from { transform: translate(268px, 68px); }
+  to { transform: translate(290px, 0); }
 }

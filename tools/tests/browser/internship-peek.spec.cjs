@@ -121,6 +121,15 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
   return Math.max(Math.abs(t.left-w.left),Math.abs(t.right-w.right),Math.abs(t.bottom-w.bottom));
  });});
  for(const gap of landings)expect(gap).toBeLessThan(0.6);
+ // A chip only fades once its row is fully in, so a landing word never
+ // blinks pale; chips pass behind rows that have already landed.
+ const handovers=await shopee.evaluate(root=>[1,2,3,4,5].map(i=>{
+  const c=root.querySelector('.sp-chip-'+i).getAnimations()[0].effect,s=root.querySelector('.sp-slot-'+i).getAnimations()[0].effect;
+  const fade=c.getTiming().delay+c.getTiming().duration*.865,full=s.getTiming().delay+s.getTiming().duration;
+  return fade-full;
+ }));
+ for(const slack of handovers)expect(slack).toBeGreaterThanOrEqual(-5);
+ expect(await shopee.evaluate(root=>!!(root.querySelector('.sp-chips').compareDocumentPosition(root.querySelector('.sp-words'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
  await chip(shopee).click();
  await expect(chip(league)).toHaveAttribute('aria-expanded','false');
  await expect(card(league)).toHaveAttribute('inert','');
