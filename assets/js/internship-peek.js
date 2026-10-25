@@ -2,7 +2,8 @@
    click closes. The desktop card lets the pointer through (so the next chip
    stays hoverable under it), and the preview stays open while the pointer is
    over the chip row or the card. On phones and touch (the stylesheet's inline
-   branch) a tap opens the card in place. Scenes replay every 10s while on
+   branch) a tap opens the card in place, and it stays open while the page
+   scrolls until its chip, another chip or Escape closes it. Scenes replay every 10s while on
    screen (longer if a scene needs it to hold its final frame for 3s), with a
    short fade before each restart; reduced motion holds the
    final frame. */
@@ -25,6 +26,13 @@
   const inside = (el, x, y) => { const b = el.getBoundingClientRect(); return x >= b.left && x <= b.right && y >= b.top && y <= b.bottom; };
   const onScreen = el => { const b = el.getBoundingClientRect(); return b.bottom > 0 && b.top < innerHeight; };
   const inPeek = el => !!(el && el.closest && el.closest('.internship-demo-peek'));
+  // The first internship chip breathes while on screen until any internship
+  // chart is opened, then rests for the visit, as the anomaly peek's does.
+  const breather = roots.find(r => r.closest('.case-study--internship'));
+  let seen = false, breatherShown = false;
+  try { seen = sessionStorage.getItem('internship-peek-seen') === '1'; } catch (e) {}
+  const breathe = () => { if (breather) chip(breather).classList.toggle('is-breathing', breatherShown && !seen); };
+  if (breather) new IntersectionObserver(es => { breatherShown = es[es.length - 1].isIntersecting; breathe(); }, { threshold: 0.5 }).observe(chip(breather));
 
   function play(r) {
     const c = card(r);
@@ -58,6 +66,10 @@
     c.inert = false;
     c.classList.add('is-open');
     chip(r).setAttribute('aria-expanded', 'true');
+    if (!seen && r.closest('.case-study--internship')) {
+      seen = true; breathe();
+      try { sessionStorage.setItem('internship-peek-seen', '1'); } catch (e) {}
+    }
     play(r);
     // A scene longer than REPLAY allows still holds its final frame for HOLD.
     const end = Math.max(0, ...c.getAnimations({ subtree: true }).map(a => a.effect.getComputedTiming().endTime).filter(Number.isFinite));
@@ -99,8 +111,11 @@
     else if (!leaveTimer) scheduleLeave();
   });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') { pinned = null; close(active); } });
+  // Outside presses close a floating (desktop) card. Inline cards (phones,
+  // touch) close only from a chip or Escape: a finger's press outside may be
+  // the start of a scroll, and closing then collapsed the card mid-read.
   document.addEventListener('pointerdown', e => {
-    if (!active || active.contains(e.target)) return;
+    if (!active || touch.matches || e.pointerType !== 'mouse' || active.contains(e.target)) return;
     // A press on another chip is a swap: its click opens that card. Closing
     // here would collapse an inline card under the finger and move the chip
     // before the tap's click lands.
@@ -116,12 +131,14 @@
       else if (!document.hidden && a.playState === 'paused') a.play();
     });
   });
-  // The chip row leaving the viewport closes its card; the top margin keeps
-  // a card that still hangs into view open while its chip has scrolled off.
-  // It watches the chip: a peek laid out by a shared row has no box itself.
+  // On desktop the chip row leaving the viewport closes its floating card; the
+  // top margin keeps a card that still hangs into view open while its chip
+  // has scrolled off. It watches the chip: a peek laid out by a shared row has
+  // no box itself. Inline cards stay open while the page scrolls (owner: charts
+  // opened on a phone must not close on scrolling); off screen they skip replays.
   const observer = new IntersectionObserver(entries => entries.forEach(e => {
     const r = e.target.closest('.internship-demo-peek');
-    if (!e.isIntersecting && active === r) { pinned = null; close(active); }
+    if (!e.isIntersecting && active === r && !touch.matches) { pinned = null; close(active); }
   }), { rootMargin: '220px 0px 0px 0px' });
   roots.forEach(r => observer.observe(chip(r)));
 })();

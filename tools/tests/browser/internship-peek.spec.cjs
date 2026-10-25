@@ -215,3 +215,43 @@ test('agentic AI peek: a dark hunt scene that previews, holds its final frame, f
  await expect(card(root)).toHaveCSS('position','static');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
 });
+
+test('phone charts stay open while the page scrolls and a finger lands elsewhere; the chip closes them',async({page})=>{
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/experience');
+ const touchDown=()=>page.evaluate(()=>document.querySelector('#main').dispatchEvent(new PointerEvent('pointerdown',{pointerType:'touch',bubbles:true})));
+ for(const company of ['shopee','league','league-ab','agentic']){
+  const root=peek(page,company);
+  await chip(root).click();
+  await expect(chip(root)).toHaveAttribute('aria-expanded','true');
+  // A scroll starts with a finger down outside the card, then the chip leaves the screen.
+  await touchDown();
+  await page.evaluate(()=>scrollBy(0,1600));
+  await page.waitForTimeout(150);
+  await expect(chip(root)).toHaveAttribute('aria-expanded','true');
+  await chip(root).evaluate(e=>e.scrollIntoView({block:'center'}));
+  await chip(root).click();
+  await expect(chip(root)).toHaveAttribute('aria-expanded','false');
+ }
+ // The anomaly charts already behave this way; keep them so.
+ const site=page.locator('[data-peek="site"]');
+ await site.evaluate(e=>e.scrollIntoView({block:'center'}));
+ await site.click();
+ await touchDown();
+ await page.evaluate(()=>scrollBy(0,1600));
+ await expect(site).toHaveAttribute('aria-expanded','true');
+});
+
+test('internship rows invite a hover (or a tap on phones), and the first chip breathes until a chart is opened',async({page})=>{
+ await page.goto('/experience');
+ await expect(page.locator('.internship-demo-hint')).toHaveCount(2);
+ await expect(page.locator('.internship-demo-hint').first()).toHaveText('Hover the chart to see it in action',{useInnerText:true});
+ const first=chip(peek(page,'shopee'));
+ await first.scrollIntoViewIfNeeded();
+ await expect(first).toHaveClass(/is-breathing/);
+ await first.hover();
+ await expect(first).not.toHaveClass(/is-breathing/);
+ await page.setViewportSize({width:390,height:844});
+ await page.reload();
+ await expect(page.locator('.internship-demo-hint').nth(1)).toHaveText('Tap a chart to see it in action',{useInnerText:true});
+});
