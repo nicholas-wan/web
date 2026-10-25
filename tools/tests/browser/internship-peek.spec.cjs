@@ -48,43 +48,43 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await page.emulateMedia({reducedMotion:'reduce'});
  await league.dispatchEvent('mouseenter');
  await expect(card(league)).toHaveClass(/is-still/);
- await expect(league.locator('.lg-review')).toHaveCSS('opacity','1');
- await expect(league.locator('.lg-review')).toHaveText('Risky profile');
- await expect(league.locator('.lg-needle')).toHaveCSS('transform',/matrix\(-0\.97/);
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-review')).toHaveCSS('opacity','1');
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-review')).toHaveText('Risky profile');
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-needle')).toHaveCSS('transform',/matrix\(-0\.97/);
  // Three signals: each frame's line is drawn to its bar, no frame is left on
  // the phone, the classifier's route is drawn to its leaf, and the flag is
  // pinned to the photo.
- await expect(league.locator('.lg-bar')).toHaveCount(3);
- for(const link of await league.locator('.lg-link').all())await expect(link).toHaveCSS('stroke-dashoffset','0px');
- for(const frame of await league.locator('.lg-frame').all())await expect(frame).toHaveCSS('opacity','0');
- await expect(league.locator('.lg-route')).toHaveCSS('stroke-dashoffset','0px');
- await expect(league.locator('.lg-caps text')).toHaveText(['Signals','Model','Risk']);
- await expect(league.locator('.lg-badge')).toHaveCSS('opacity','1');
- await expect(league.locator('.lg-pick')).toHaveCSS('opacity','1');
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-bar')).toHaveCount(3);
+ for(const link of await league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-link').all())await expect(link).toHaveCSS('stroke-dashoffset','0px');
+ for(const frame of await league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-frame').all())await expect(frame).toHaveCSS('opacity','0');
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-route')).toHaveCSS('stroke-dashoffset','0px');
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-caps text')).toHaveText(['Signals','Model','Risk']);
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-badge')).toHaveCSS('opacity','1');
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-pick')).toHaveCSS('opacity','1');
  // Only the chosen leaf is lit; the phone's lettering is live text in the
  // League's own fonts (glyph-only subsets), not outlines.
- await expect(league.locator('.lg-leaf')).toHaveCSS('opacity','1');
- await expect(league.locator('.lg-leafc')).toHaveCSS('opacity','0.35');
- await expect(league.locator('.lg-mark text')).toHaveText(['THE','league']);
- await expect(league.locator('.lg-name')).toHaveText('James M.');
- await expect(league.locator('.lg-key text')).toHaveText(['Education','Profession','Interests','Groups']);
- await expect(league.locator('.lg-seps rect')).toHaveCount(await league.locator('.lg-sep').count());
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-leaf')).toHaveCSS('opacity','1');
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-leafc')).toHaveCSS('opacity','0.35');
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-mark text')).toHaveText(['THE','league']);
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-name')).toHaveText('James M.');
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-key text')).toHaveText(['Education','Profession','Interests','Groups']);
+ await expect(league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-seps rect')).toHaveCount(await league.locator('svg.league-brand-scene:not(.league-brand-scene--m) .lg-sep').count());
  expect(await page.evaluate(async()=>{await document.fonts.ready;return ['italic 900 8px "League Mark"','8px "League Serif"','italic 8px "League Serif"'].every(f=>document.fonts.check(f));})).toBe(true);
  await page.keyboard.press('Escape');
  // Shopee's final frame: the title highlight and every word row, with solid
  // model edges and chips that hide what they pass over.
  await shopee.dispatchEvent('mouseenter');
  await expect(card(shopee)).toHaveClass(/is-still/);
- await expect(shopee.locator('.sp-crop')).toHaveCSS('opacity','1');
- await expect(shopee.locator('.sp-slot')).toHaveCount(5);
- for(const slot of await shopee.locator('.sp-slot').all())await expect(slot).toHaveCSS('opacity','1');
- for(const edge of await shopee.locator('.sp-edge').all())await expect(edge).toHaveCSS('stroke-dasharray','none');
- for(const rect of await shopee.locator('.sp-chip rect').all())expect(await rect.getAttribute('fill-opacity')).toBeNull();
+ await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-crop')).toHaveCSS('opacity','1');
+ await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-slot')).toHaveCount(5);
+ for(const slot of await shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-slot').all())await expect(slot).toHaveCSS('opacity','1');
+ for(const edge of await shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-edge').all())await expect(edge).toHaveCSS('stroke-dasharray','none');
+ for(const rect of await shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-chip rect').all())expect(await rect.getAttribute('fill-opacity')).toBeNull();
  // The listing is set in Figtree (Shopee's own face is not free), in the
  // app's weights: medium title, regular meta, a dark value column.
  expect(await page.evaluate(async()=>{await document.fonts.ready;return ['400','500','700'].every(w=>document.fonts.check(w+' 11px Figtree'));})).toBe(true);
- await expect(shopee.locator('.sp-card .sp-title').first()).toHaveCSS('font-weight','500');
- await expect(shopee.locator('.sp-value').first()).toHaveCSS('fill','rgb(34, 34, 34)');
+ await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-card .sp-title').first()).toHaveCSS('font-weight','500');
+ await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-value').first()).toHaveCSS('fill','rgb(34, 34, 34)');
  await shopee.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
  // The League's second peek, the A/B test, opens on its final frame: both
@@ -94,18 +94,18 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await expect(card(ab)).toHaveClass(/is-still/);
  await expect(chip(ab)).toHaveText('A/B test a badge');
  // Simple on purpose (owner): no numbers, test jargon or verdict.
- const words=await ab.locator('svg.lgab-scene text').allTextContents();
+ const words=await ab.locator('svg.lgab-scene:not(.lgab-scene--m) text').allTextContents();
  expect(words).toEqual(expect.arrayContaining(['Match rate by design','How likely','Match rate','A · Border','B · Badge','Most compatible']));
  expect(words.join(' ')).not.toMatch(/\bCI\b|Ship|better|confidence|\d+%/);
- await expect(ab.locator('.lgab-badge')).toHaveCount(2);
- await expect(ab.locator('.lgab-hill')).toHaveCount(2);
- const peaks=await ab.locator('.lgab-hill').evaluateAll(hs=>hs.map(h=>h.getBoundingClientRect()));
+ await expect(ab.locator('svg.lgab-scene:not(.lgab-scene--m) .lgab-badge')).toHaveCount(2);
+ await expect(ab.locator('svg.lgab-scene:not(.lgab-scene--m) .lgab-hill')).toHaveCount(2);
+ const peaks=await ab.locator('svg.lgab-scene:not(.lgab-scene--m) .lgab-hill').evaluateAll(hs=>hs.map(h=>h.getBoundingClientRect()));
  // Each hill spans 8 standard deviations; centres 1.25 apart: B only
  // slightly better (owner: "they have to be even closer").
  const mid=b=>b.left+b.width/2,gap=mid(peaks[1])-mid(peaks[0]);
  expect(gap).toBeGreaterThan(peaks[0].width*.1);
  expect(gap).toBeLessThan(peaks[0].width*.2);
- await expect(ab.locator('.lgab-cap text')).toHaveText(['Randomise','Measure']);
+ await expect(ab.locator('svg.lgab-scene:not(.lgab-scene--m) .lgab-cap text')).toHaveText(['Randomise','Measure']);
  // While playing, each hill and its label run on exactly their lane's curve,
  // so the chart moves with its bar (tools/scenes/league-ab-motion.py).
  await page.emulateMedia({reducedMotion:'no-preference'});
@@ -114,7 +114,7 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await ab.dispatchEvent('mouseenter');
  await expect(card(ab)).toHaveClass(/is-playing/);
  const timing=await ab.evaluate(root=>['a','b'].map(k=>['.lgab-fill-','.lgab-hill-','.lgab-hx-','.lgab-tx-'].map(sel=>{
-  const t=root.querySelector(sel+k).getAnimations()[0].effect.getTiming();return [t.delay,t.duration,t.easing].join();
+  const t=root.querySelector('svg.lgab-scene:not(.lgab-scene--m) '+sel+k).getAnimations()[0].effect.getTiming();return [t.delay,t.duration,t.easing].join();
  })));
  for(const arm of timing)expect(new Set(arm).size).toBe(1);
  await page.emulateMedia({reducedMotion:'reduce'});
@@ -129,21 +129,21 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
   // Settle the word column first, then hold each chip at its landing mark.
   root.querySelector('.internship-demo-card').getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=8000;});
   return [1,2,3,4,5].map(i=>{
-  const c=root.querySelector('.sp-chip-'+i),a=c.getAnimations()[0];
+  const d=root.querySelector('svg.sp-brand:not(.sp-brand--m)'),c=d.querySelector('.sp-chip-'+i),a=c.getAnimations()[0];
   a.pause();a.currentTime=a.effect.getTiming().delay+a.effect.getTiming().duration*0.87;
-  const t=c.querySelector('text').getBoundingClientRect(),w=root.querySelector('.sp-slot-'+i+' .sp-word').getBoundingClientRect();
+  const t=c.querySelector('text').getBoundingClientRect(),w=d.querySelector('.sp-slot-'+i+' .sp-word').getBoundingClientRect();
   return Math.max(Math.abs(t.left-w.left),Math.abs(t.right-w.right),Math.abs(t.bottom-w.bottom));
  });});
  for(const gap of landings)expect(gap).toBeLessThan(0.6);
  // A chip only fades once its row is fully in, so a landing word never
  // blinks pale; chips pass behind rows that have already landed.
  const handovers=await shopee.evaluate(root=>[1,2,3,4,5].map(i=>{
-  const c=root.querySelector('.sp-chip-'+i).getAnimations()[0].effect,s=root.querySelector('.sp-slot-'+i).getAnimations()[0].effect;
+  const d=root.querySelector('svg.sp-brand:not(.sp-brand--m)'),c=d.querySelector('.sp-chip-'+i).getAnimations()[0].effect,s=root.querySelector('.sp-slot-'+i).getAnimations()[0].effect;
   const fade=c.getTiming().delay+c.getTiming().duration*.865,full=s.getTiming().delay+s.getTiming().duration;
   return fade-full;
  }));
  for(const slack of handovers)expect(slack).toBeGreaterThanOrEqual(-5);
- expect(await shopee.evaluate(root=>!!(root.querySelector('.sp-chips').compareDocumentPosition(root.querySelector('.sp-words'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
+ expect(await shopee.evaluate(root=>!!(root.querySelector('svg.sp-brand:not(.sp-brand--m) .sp-chips').compareDocumentPosition(root.querySelector('svg.sp-brand:not(.sp-brand--m) .sp-words'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
  await chip(shopee).click();
  await expect(chip(league)).toHaveAttribute('aria-expanded','false');
  await expect(card(league)).toHaveAttribute('inert','');
@@ -157,7 +157,7 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
   await chip(shopee).click();
   await expect(chip(shopee)).toHaveAttribute('aria-expanded','true');
   await expect(card(shopee)).toHaveCSS('position','static');
-  await expect(shopee.locator('.sp-result')).toHaveCSS('opacity','1');
+  await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-result')).toHaveCSS('opacity','1');
   // The floating return-to-top steps aside while a card is open on phones.
   const toTop=page.locator('#return-to-top');
   await expect(toTop).toHaveClass(/is-visible/);
@@ -242,7 +242,7 @@ test('phone charts stay open while the page scrolls and a finger lands elsewhere
  await expect(site).toHaveAttribute('aria-expanded','true');
 });
 
-test('internship rows invite a hover (or a tap on phones), and the first chip breathes until a chart is opened',async({page})=>{
+test('internship rows invite a hover (or a tap on phones), and the first chip of each row breathes whenever its charts are closed',async({page})=>{
  await page.goto('/experience');
  await expect(page.locator('.internship-demo-hint')).toHaveCount(2);
  await expect(page.locator('.internship-demo-hint').first()).toHaveText('Hover the chart to see it in action',{useInnerText:true});
@@ -251,7 +251,32 @@ test('internship rows invite a hover (or a tap on phones), and the first chip br
  await expect(first).toHaveClass(/is-breathing/);
  await first.hover();
  await expect(first).not.toHaveClass(/is-breathing/);
+ // Closed again, it breathes again.
+ await page.mouse.move(0,0);
+ await expect(chip(peek(page,'shopee'))).toHaveAttribute('aria-expanded','false');
+ await expect(first).toHaveClass(/is-breathing/);
  await page.setViewportSize({width:390,height:844});
  await page.reload();
  await expect(page.locator('.internship-demo-hint').nth(1)).toHaveText('Tap a chart to see it in action',{useInnerText:true});
+});
+
+test('smart zoom: a click near the bottom eases the whole card into view, keeps the chip on screen, and hover never scrolls',async({page})=>{
+ await page.setViewportSize({width:1366,height:768});
+ await page.goto('/experience');
+ const lower=async loc=>{await loc.evaluate(e=>{const r=e.getBoundingClientRect();scrollBy(0,r.bottom-(innerHeight-120));});await page.waitForTimeout(150);};
+ for(const [chipSel,cardSel] of [['[data-company="shopee"] button','#shopee-demo-card'],['[data-company="league-ab"] button','#league-ab-card'],['[data-peek="series"]','#anomaly-card-series']]){
+  const c=page.locator(chipSel);
+  await lower(c);
+  const y=await page.evaluate(()=>scrollY);
+  await c.hover();
+  await page.waitForTimeout(500);
+  expect(await page.evaluate(()=>scrollY)).toBe(y);
+  await c.click();
+  await page.waitForTimeout(1300);
+  const box=await page.locator(cardSel).boundingBox(),chipBox=await c.boundingBox();
+  expect(box.y+box.height).toBeLessThanOrEqual(768);
+  expect(chipBox.y).toBeGreaterThan(0);
+  await page.keyboard.press('Escape');
+  await page.mouse.move(0,0);
+ }
 });

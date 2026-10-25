@@ -1,20 +1,16 @@
 /* Anomaly peek: the flavour of anomaly detection on the Cyber Detection
    Analytics card, kept small until asked for (Oct 2026, owner-approved after
-   a lab trial). Loaded on the Work page only.
-   - A one-line call to action ("Hover a chart to see it catch something")
-     sits above three chips, "Phishing domains" (added Oct 2026, owner-approved),
-     "Statistical baseline" and "Graph analysis", each with a
-     tiny live preview. When the card comes into view the previews play for
-     about four seconds, rest on their amber flags, and each chip glows once.
-     This replays at most every 20 seconds; on screen, they loop every 15.
+   a lab trial). Work page only.
+   - A call to action sits above three chips (Phishing domains, Statistical
+     baseline, Graph analysis), each with a tiny live preview. On arrival the
+     previews play for about four seconds, rest on their amber flags, and each
+     chip glows once; at most every 20s, and every 15s while on screen.
    - Hovering, focusing or tapping a chip opens only that chart, in a card
-     that drops below the chips (never over the writeup). A click or tap pins
-     it; leaving, Escape or a tap elsewhere closes it (on phones and touch
-     tablets the inline card closes from its chip). One open at a time.
-   - A chart animates only while its card is open and on screen, and holds in
-     a hidden tab. Reduced motion (including a change mid-visit): still frames.
-   All data is simulated (and obviously illustrative), so the cards carry
-   no disclaimer. */
+     below the chips (never over the writeup). A click or tap pins it and
+     eases the page to frame it; leaving, Escape or a tap elsewhere closes it
+     (an inline card on phones and touch tablets closes from its chip).
+   - A chart animates only while open and on screen. Reduced motion (even
+     mid-visit): still frames. All data is simulated, so no disclaimer. */
 (function () {
   'use strict';
   var root = document.querySelector('.anomaly-peek');
@@ -145,14 +141,47 @@
     var CYCLE = 6500, GROW = 600, TRAVEL = 900, HOLD = 3600, FADE = 600;
     var W = 0, H = 130, pts = [];
     var edgeEls = EDGES.map(function () { return el('line', { class: 'peek-edge' }, svg); });
-    var odd = el('line', { class: 'peek-odd' }, svg);
+    var odd = el('path', { class: 'peek-odd', fill: 'none' }, svg);
     var nodeEls = NODES.map(function () { return el('circle', { class: 'peek-node', r: 4 }, svg); });
     var packets = [0, 1, 2].map(function () { return el('circle', { class: 'peek-packet', r: 2.2 }, svg); });
     var oddPacket = el('circle', { class: 'peek-odd-packet', r: 3 }, svg);
     var ring = el('circle', { class: 'peek-ring', r: 4 }, svg);
     var label = el('text', { class: 'peek-label', 'text-anchor': 'middle' }, svg);
     label.textContent = 'Unusual link';
-    var gt = GROW + TRAVEL + 1300, nextPacket = 0, live = [];
+    var gt = GROW + TRAVEL + 1300, nextPacket = 0, live = [], bends = [];
+    // Each unusual link bows only as far as it must to miss every other node;
+    // its label sits just above its middle, wherever it crosses the fewest
+    // usual links (review, Oct 2026: it sat on a grey edge by the target).
+    function bez(a, k, b, f) { return lerp(lerp(a, k, f), lerp(k, b, f), f); }
+    function bend(pair, lw) {
+      var a = pts[pair[0]], b = pts[pair[1]], m = lerp(a, b, 0.5), len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+      var nx = (a.y - b.y) / len, ny = (b.x - a.x) / len, best = null;
+      for (var i0 = 0; i0 < 21; i0++) {
+        var s = (i0 % 2 ? -4 : 4) * Math.ceil(i0 / 2);
+        if (best && best.gap >= 14) { break; }
+        var k = { x: m.x + nx * s * 2, y: m.y + ny * s * 2 }, gap = Infinity;
+        for (var i = 1; i < 24; i++) {
+          var q = bez(a, k, b, i / 24);
+          if (q.y < 6 || q.y > H - 6) { gap = -1; }
+          pts.forEach(function (n, j) { if (j !== pair[0] && j !== pair[1]) { gap = Math.min(gap, Math.hypot(q.x - n.x, q.y - n.y)); } });
+        }
+        if (!best || gap > best.gap) { best = { k: k, gap: gap }; }
+      }
+      var k = best.k, lab = null;
+      [0.5, 0.42, 0.58, 0.34, 0.66].forEach(function (f) {
+        var q = bez(a, k, b, f);
+        // Above the curve first; then below, or beside it where it runs steep.
+        [[0, -7], [0, 15], [lw / 2 + 8, 4], [-lw / 2 - 8, 4]].forEach(function (o) {
+          var x = Math.max(lw / 2 + 3, Math.min(W - lw / 2 - 3, q.x + o[0])), y = Math.max(13, Math.min(H - 3, q.y + o[1])), hits = 0;
+          function hit(p) { if (Math.abs(p.x - x) < lw / 2 + 6 && p.y > y - 15 && p.y < y + 6) { hits++; } }
+          EDGES.forEach(function (e) { for (var i = 0; i <= 40; i++) { hit(lerp(pts[e[0]], pts[e[1]], i / 40)); } });
+          for (var i = 0; i <= 60; i++) { hit(bez(a, k, b, i / 60)); }
+          pts.forEach(function (n) { hit(n); hit({ x: n.x, y: n.y - 4 }); hit({ x: n.x, y: n.y + 4 }); });
+          if (!lab || hits < lab.hits) { lab = { x: x, y: y, hits: hits }; }
+        });
+      });
+      return { k: k, lab: lab };
+    }
     function layout() {
       W = Math.round(host.clientWidth) || 300;
       svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
@@ -162,6 +191,9 @@
         edgeEls[k].setAttribute('x2', pts[e[1]].x); edgeEls[k].setAttribute('y2', pts[e[1]].y);
       });
       nodeEls.forEach(function (n, k) { n.setAttribute('cx', pts[k].x); n.setAttribute('cy', pts[k].y); });
+      var lw = 66;
+      try { lw = label.getComputedTextLength() || lw; } catch (e) {}
+      bends = ODD.map(function (pair) { return bend(pair, lw); });
       render(false);
     }
     function render(withPackets) {
@@ -177,16 +209,16 @@
         var q = lerp(pts[p.e[0]], pts[p.e[1]], ease((gt - p.start) / 1100));
         c.setAttribute('cx', q.x.toFixed(1)); c.setAttribute('cy', q.y.toFixed(1)); c.setAttribute('visibility', 'visible');
       });
-      var c = gt % CYCLE, pair = ODD[Math.floor(gt / CYCLE) % ODD.length];
+      var c = gt % CYCLE, pick = Math.floor(gt / CYCLE) % ODD.length, pair = ODD[pick], bd = bends[pick];
       var a = pts[pair[0]], b = pts[pair[1]];
       var fade = c > HOLD ? Math.max(0, 1 - (c - HOLD) / FADE) : 1;
-      var end = lerp(a, b, ease(Math.min(1, c / GROW)));
-      odd.setAttribute('x1', a.x); odd.setAttribute('y1', a.y);
-      odd.setAttribute('x2', end.x.toFixed(1)); odd.setAttribute('y2', end.y.toFixed(1));
+      // Grow along the bow: the first part of the curve, cut at f.
+      var f = ease(Math.min(1, c / GROW)), end = bez(a, bd.k, b, f), kf = lerp(a, bd.k, f);
+      odd.setAttribute('d', 'M' + a.x.toFixed(1) + ' ' + a.y.toFixed(1) + 'Q' + kf.x.toFixed(1) + ' ' + kf.y.toFixed(1) + ' ' + end.x.toFixed(1) + ' ' + end.y.toFixed(1));
       odd.style.opacity = fade.toFixed(3);
       var tp = (c - GROW) / TRAVEL;
       if (tp > 0 && tp < 1) {
-        var q = lerp(a, b, ease(tp));
+        var q = bez(a, bd.k, b, ease(tp));
         oddPacket.setAttribute('cx', q.x.toFixed(1)); oddPacket.setAttribute('cy', q.y.toFixed(1)); oddPacket.setAttribute('visibility', 'visible');
       } else { oddPacket.setAttribute('visibility', 'hidden'); }
       var rp = (c - GROW - TRAVEL) / 1200;
@@ -196,9 +228,8 @@
         ring.setAttribute('visibility', 'visible');
       } else { ring.setAttribute('visibility', 'hidden'); }
       nodeEls.forEach(function (n, k) { n.classList.toggle('is-odd', k === pair[1] && c > GROW + TRAVEL && fade > 0); });
-      // Label on the target node, clear of its ring, never on the busy middle.
-      label.setAttribute('x', Math.max(36, Math.min(W - 36, b.x)).toFixed(1));
-      label.setAttribute('y', (b.y < 30 ? b.y + 22 : b.y - 18).toFixed(1));
+      label.setAttribute('x', bd.lab.x.toFixed(1));
+      label.setAttribute('y', bd.lab.y.toFixed(1));
       label.style.opacity = (c > GROW ? fade : 0).toFixed(3);
     }
     return {
@@ -209,9 +240,12 @@
     };
   }
 
-  // ---- Phishing domains: a copy lifts off a real sign-in page, a matching
-  // comparison links matching features, and marks a dot swapped for a
-  // hyphen and an off logo. Then the copy is outlined.
+  // ---- Phishing domains: a copy lifts off a real sign-in page, matching
+  // features link up, then a dot swapped for a hyphen and an altered logo are
+  // marked and the copy is outlined. A one-line key names each difference as
+  // it shows, its swatch matching the mark, so the pages stay clean (owner,
+  // Oct 2026: the logo is "changed slightly to avoid detection"). Unnumbered:
+  // it names what differs, not the detector's steps.
   var TEAL = '#11807d', AMBER = '#c46d1c', INK = '#20343d', SOFT = '#d7e4e2';
   function dash(node, f) { node.setAttribute('stroke-dashoffset', (1 - f).toFixed(3)); node.setAttribute('visibility', f > 0 ? 'visible' : 'hidden'); }
   function drawable(node) { node.setAttribute('pathLength', 1); node.setAttribute('stroke-dasharray', '1 1'); return node; }
@@ -223,7 +257,8 @@
     el('stop',{offset:0,'stop-color':'#ffffff'},surface);el('stop',{offset:1,'stop-color':'#f4f7f5'},surface);
     var buttonGradient=el('linearGradient',{id:depthId+'button',x1:0,y1:0,x2:0,y2:1},defs);
     el('stop',{offset:0,'stop-color':'#249b91'},buttonGradient);el('stop',{offset:1,'stop-color':'#076b69'},buttonGradient);
-    var W = 0, H = 130, PY = 14, PH = 104, pw = 0, x0 = 4, x1 = 0, t = 0, DUR = 4800, LOOP = 10000;
+    // Pages sit 6 higher than before the key, so the plot keeps its 130.
+    var W = 0, H = 130, PY = 8, PH = 104, pw = 0, x0 = 4, x1 = 0, t = 0, DUR = 4800, LOOP = 10000;
     var pages = [], marks = {}, swapX = 0, swapW = 0, tx = 22, idle = false;
     // A dot swapped for a hyphen (eservices.example.sg -> eservices-example.sg).
     // Narrow bars use the shorter "my" pair rather than cutting the address.
@@ -277,6 +312,20 @@
     var tagBox = el('rect', { width: 64, height: 16, rx: 8, fill: AMBER }, tag);
     var tagText = el('text', { class: 'peek-tag', 'text-anchor': 'middle' }, tag);
     tagText.textContent = 'Phishing';
+    // The key: each entry's swatch repeats its mark (a marked character, a ring).
+    function keyItem(label, ring) {
+      var g = el('g', {}, svg), k = { g: g };
+      if (ring) { el('circle', { cx: 5, cy: -4, r: 4.5, fill: 'none', stroke: AMBER, 'stroke-width': 1.5 }, g); }
+      else {
+        el('rect', { x: 1.5, y: -10, width: 7, height: 11, rx: 1.5, fill: AMBER, opacity: 0.18 }, g);
+        el('path', { d: 'M2 0.5h6', stroke: AMBER, 'stroke-width': 1.5, 'stroke-linecap': 'round' }, g);
+        el('text', { class: 'peek-url', x: 5, y: -1.5, 'text-anchor': 'middle', style: 'fill:' + AMBER }, g).textContent = '-';
+      }
+      k.text = el('text', { class: 'peek-key', x: 15 }, g);
+      k.text.textContent = label;
+      return k;
+    }
+    var legend = [keyItem('Domain squatting', false), keyItem('Altered logo', true)];
     function layout() {
       W = Math.round(host.clientWidth) || 300;
       svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
@@ -294,7 +343,9 @@
         p.box.setAttribute('width', pw);p.shadow.setAttribute('width',pw);
         p.edge.setAttribute('d','M5 '+(PY+8)+'Q5 '+(PY+2)+' 11 '+(PY+2)+'H'+(pw-11));
         p.logo.setAttribute('cx', cx); p.logo.setAttribute('cy', cy);
-        p.tick.setAttribute('d', p.fake ? 'M' + (cx - 5.5) + ' ' + (cy - 1.5) + 'l3 5.5 7.5-7' : 'M' + (cx - 6) + ' ' + cy + 'l4 4 8-9');
+        // The copy's check is tipped 14 degrees: just enough to slip past an exact match.
+        p.tick.setAttribute('d', 'M' + (cx - 6) + ' ' + cy + 'l4 4 8-9');
+        if (p.fake) { p.tick.setAttribute('transform', 'rotate(-14 ' + cx + ' ' + cy + ')'); }
         p.title.setAttribute('x', pw * 0.25); p.title.setAttribute('width', pw * 0.5);
         p.field.setAttribute('width', pw - 24); p.button.setAttribute('width', pw - 24);
       });
@@ -315,6 +366,13 @@
       comparisonLink.setAttribute('d', 'M'+(referenceX+swapW/2)+' '+(PY+32)+'H'+(candidateX+swapW/2));
       var lx = x1 + pw / 2 + 2, ly = PY + 45;
       referenceLogo.setAttribute('d', 'M'+(x0+pw/2)+' '+(PY+29)+'a15 15 0 1 1-.01 0');
+      // The key ends under the copy's right edge, in line with the tag, when it
+      // fits there (into the gap at most); otherwise it centres under both
+      // pages. A tight bar narrows the space between entries rather than wrap.
+      var kw = legend.map(function (k) { var w = 0; try { w = k.text.getComputedTextLength(); } catch (e) {} return 15 + (w || 80); });
+      var kgap = Math.max(8, Math.min(16, W - 4 - kw[0] - kw[1])), kspan = kw[0] + kgap + kw[1];
+      var kx = x1 + pw - kspan >= x0 + pw + 2 ? x1 + pw - kspan : Math.max(2, (W - kspan) / 2);
+      legend[0].x = kx; legend[1].x = kx + kw[0] + kgap;
       marks.logo.setAttribute('d', 'M' + lx + ' ' + (ly - 15) + 'a15 15 0 1 1-.01 0');
       var r = 9, w = pw - 2 * r, h = PH - 2 * r;
       marks.outline.setAttribute('d', 'M' + (x1 + r) + ' ' + PY + 'h' + w + 'a9 9 0 0 1 9 9v' + h + 'a9 9 0 0 1-9 9h-' + w + 'a9 9 0 0 1-9-9v-' + h + 'a9 9 0 0 1 9-9z');
@@ -350,6 +408,11 @@
       var tg=ease(clamp((c-4350)/350));
       tag.style.opacity=(tg*clear).toFixed(3);
       tag.setAttribute('transform','translate(0 '+(2*(1-tg)).toFixed(2)+')');
+      // Each key entry settles in as its own mark finishes, then holds.
+      [ease(clamp((c-2300)/450)),ease(clamp((c-3200)/450))].forEach(function(f,i){
+        legend[i].g.style.opacity=(f*clear).toFixed(3);
+        legend[i].g.setAttribute('transform','translate('+legend[i].x.toFixed(1)+' '+(PY+PH+15+2*(1-f)).toFixed(2)+')');
+      });
       // No repeated halo: a long quiet result is the reward for the reveal.
       halo.setAttribute('visibility','hidden');
     }
@@ -574,37 +637,63 @@
   // now wins; failing that, the last pinned card shows. So hovering the other
   // chip previews it over a pin, and the pin returns when the pointer leaves.
   var stamp = 0;
-  // The first chip breathes while the card is on screen, until any chart is
-  // opened; then it rests for the visit.
-  var seen = false;
-  try { seen = window.sessionStorage.getItem('peek-seen') === '1'; } catch (e) {}
-  function breathe() { charts[keys[0]].chip.classList.toggle('is-breathing', onScreen && !seen); }
+  // The first chip breathes whenever the card is on screen and no chart is
+  // open, so the invitation comes back after a chart is closed (owner, Oct
+  // 2026: "should keep repeating the pulse even after clicked before").
+  function breathe() { charts[keys[0]].chip.classList.toggle('is-breathing', onScreen && !keys.some(function (k) { return charts[k].state.open; })); }
   function update() {
     var want = keys.filter(function (k) { var s = charts[k].state; return !s.dismissed && (s.hovering || s.focus); });
     if (!want.length) { want = keys.filter(function (k) { var s = charts[k].state; return !s.dismissed && s.pinned; }); }
     want.sort(function (x, y) { return charts[y].state.touched - charts[x].state.touched; });
     var show = want[0] || null;
+    // A swap (another chart opening in this one's place) grows the new card
+    // from the old one's height, so the page below doesn't jump.
+    var from = 0;
+    if (show) { keys.forEach(function (k) { if (k !== show && charts[k].state.open) { from = charts[k].pop.offsetHeight; } }); }
     keys.forEach(function (k) {
       var c = charts[k], s = c.state, v = k === show;
       if (v === s.open) { return; }
       s.open = v;
-      c.pop.classList.toggle('is-open', v);
+      if (v) {
+        if (c.motion) { c.motion.cancel(); c.motion = null; }
+        c.pop.classList.add('is-open');
+      } else { hide(c, !!show); }
       c.chip.setAttribute('aria-expanded', String(v));
       // Place first: on phones the card only gets its width once displayed.
       if (v) {
-        place(c); c.chart.open(); wake(c.ticker);
-        if (!seen) { seen = true; breathe(); try { window.sessionStorage.setItem('peek-seen', '1'); } catch (e) {} }
+        place(c); grow(c, from); c.chart.open(); wake(c.ticker);
       }
     });
+    breathe();
   }
   function inside(c, node) { return !!node && (c.pop.contains(node) || c.chip.contains(node)); }
+  // Smart zoom (owner, 25 Oct 2026): window.peekZoom, from internship-peek.js.
+  // An inline card's top margin folds into the row gap above it.
+  function gap(c) { return parseFloat(window.getComputedStyle(c.pop.parentNode).rowGap) || 0; }
+  function grow(c, from) {
+    if (c.motion) { c.motion.cancel(); }
+    var g = window.peekZoom.grow(c.pop, c.chip, inline.matches, from, gap(c));
+    c.height = g.h; c.motion = g.a;
+  }
+  function hide(c, swap) {
+    var pop = c.pop;
+    if (c.motion) { c.motion.cancel(); }
+    c.motion = window.peekZoom.shut(pop, swap, inline.matches, function (late) {
+      if (late && c.state.open) { return; }
+      pop.classList.remove('is-open');
+      pop.style.overflow = pop.style.animation = '';
+    }, gap(c));
+  }
+  function reveal(c) {
+    window.peekZoom.frame([[root.getBoundingClientRect().top, window.peekZoom.top(c.pop) + (c.height || c.pop.offsetHeight)]]);
+  }
 
   keys.forEach(function (k) {
     var c = charts[k], s = c.state;
     [c.chip, c.pop].forEach(function (node) {
       // Inline cards open on click only: hover would push the page about.
       node.addEventListener('pointerenter', function (e) {
-        if (e.pointerType !== 'mouse' || inline.matches) { return; }
+        if (e.pointerType !== 'mouse' || inline.matches || window.peekZoom.lock) { return; }
         window.clearTimeout(s.leave);
         if (!s.hovering) { s.dismissed = false; }
         s.hovering = true;
@@ -632,16 +721,7 @@
         s.pinned = true; s.dismissed = false; s.touched = ++stamp;
       }
       update();
-      if (s.open) {
-        window.requestAnimationFrame(function () {
-          var r = c.pop.getBoundingClientRect(), chipTop = c.chip.getBoundingClientRect().top;
-          if (r.bottom > window.innerHeight) {
-            // Never scroll so far that the chips leave the top of the screen.
-            var by = Math.min(r.bottom - window.innerHeight + 16, chipTop - 8);
-            if (by > 0) { window.scrollBy({ top: by, behavior: reduce ? 'auto' : 'smooth' }); }
-          }
-        });
-      }
+      if (s.open) { window.requestAnimationFrame(function () { if (s.open) { reveal(c); } }); }
     });
   });
   document.addEventListener('keydown', function (e) {

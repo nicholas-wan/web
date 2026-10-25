@@ -4670,16 +4670,19 @@ body.is-map-fullscreen .travel-atlas__layout {
   text-align: left;
   visibility: hidden;
   opacity: 0;
-  transform: translateY(-4px);
+  /* Smart zoom, as the internship peeks: grows out of its chip (the script
+     sets --grow-x), settles at full size, closes faster. */
+  transform: translateY(-6px) scale(0.92);
+  transform-origin: var(--grow-x, 50%) 0;
   pointer-events: none;
-  transition: opacity var(--motion-standard, 220ms) ease, transform var(--motion-standard, 220ms) var(--ease-standard, ease), visibility 0s linear var(--motion-standard, 220ms);
+  transition: opacity 200ms ease, transform 220ms var(--ease-standard, ease), visibility 0s linear 220ms;
 }
 .page-experience #cloud-analytics .anomaly-card.is-open {
   visibility: visible;
   opacity: 1;
   transform: none;
   pointer-events: auto;
-  transition: opacity var(--motion-standard, 220ms) ease, transform var(--motion-standard, 220ms) var(--ease-standard, ease), visibility 0s;
+  transition: opacity 200ms ease, transform 450ms cubic-bezier(0.2, 0, 0, 1), visibility 0s;
 }
 .page-experience #cloud-analytics .anomaly-card__title {
   margin: 0 0 0.3rem;
@@ -4751,6 +4754,14 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
 }
 .peek-url { fill: #20343d; }
 .peek-tag { fill: #ffffff; letter-spacing: 0.03em; }
+/* The one-line key under the copy ("Domain squatting", "Altered logo"):
+   outside the pages, quieter than the address, its swatches carry the amber. */
+.peek-key {
+  fill: #4a5961;
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .peek-pulse { animation: none; }
@@ -4815,7 +4826,8 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
   }
   .page-experience #cloud-analytics .anomaly-card.is-open {
     display: block;
-    animation: anomaly-card-in var(--motion-standard, 220ms) ease both;
+    transform-origin: var(--grow-x, 50%) 0;
+    animation: anomaly-card-in 500ms cubic-bezier(0.2, 0, 0, 1) both;
   }
 }
 /* Touch tablets keep the chip row; the card takes its own line (the margin
@@ -4827,12 +4839,16 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     margin-right: calc(100% - min(28rem, 100%));
   }
 }
-@keyframes anomaly-card-in { from { opacity: 0; } }
+@keyframes anomaly-card-in { from { opacity: 0; transform: scale(0.97); } 40% { opacity: 1; } }
 /* The narrowest phones: a shorter mini leaves room for the longer chip names. */
 @media screen and (max-width: 374px) {
   /* Border-box: slim padding so the chart itself draws at 36x11. */
   .page-experience #cloud-analytics .anomaly-peek__mini { width: 60px; height: 20px; padding: 1px 2px; }
-  /* A two-line note is the tallest any card gets here, so all three match. */
+}
+/* Below 360 the Statistical baseline note wraps (it does up to ~355px), so
+   every note reserves two lines and all three cards match; from 360 all
+   three are one line and need no reserve. */
+@media screen and (max-width: 359px) {
   .page-experience #cloud-analytics .anomaly-card__note { min-height: 2.9em; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -9254,15 +9270,19 @@ html .page-experience .case-study--internship .case-study__tags {
   grid-column: 2;
   grid-row: 2;
   align-self: start;
-  gap: .35rem .85rem;
+  gap: .35rem .45rem;
   margin: .65rem 0 0;
 }
+/* Tags as small quiet pills (owner, 25 Oct 2026: the plain teal tags sat
+   "close to many things", and read like the bold teal call to action under
+   them), as on the work cards, a step smaller. */
 html .page-experience .case-study--internship .case-study__tags li {
-  padding: 0;
+  padding: 0.2rem 0.55rem;
   border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--color-brand-700);
+  border-radius: 999px;
+  background: #edf6f5;
+  color: #285a59;
+  font-size: max(var(--text-floor), 0.72rem);
 }
 @media (max-width: 1100px) and (min-width: 737px) {
   html .page-experience .case-study--internship {
@@ -9289,6 +9309,22 @@ html .page-experience .case-study--internship .case-study__tags li {
   }
   html .page-experience .case-study--internship .company-logo { width: 4rem; }
   html .page-experience .case-study--internship .internship-entry__body { grid-column: 1; grid-row: 2; }
+  /* Phones (owner, 25 Oct 2026: "some weird empty spaces and one line breaks
+     into two"): the logo sits beside the company and role only, and the
+     dates and place run beneath both as one line, so there is no empty
+     column under the logo and no line for the place alone. */
+  html .page-experience .case-study--internship .case-study__company {
+    grid-template-columns: 4rem minmax(0, 1fr);
+    align-items: center;
+    row-gap: 0;
+  }
+  html .page-experience .case-study--internship .case-study__company > span { display: contents; }
+  html .page-experience .case-study--internship .company-logo { grid-column: 1; grid-row: 1 / span 2; align-self: center; }
+  html .page-experience .case-study--internship .case-study__company-label { grid-column: 2; grid-row: 1; align-self: end; }
+  html .page-experience .case-study--internship .case-study__company-role { grid-column: 2; grid-row: 2; align-self: start; }
+  html .page-experience .case-study--internship .case-study__company-meta { grid-column: 1 / -1; grid-row: 3; margin-top: 0.55rem; }
+  html .page-experience .case-study--internship .case-study__company-meta br { display: none; }
+  html .page-experience .case-study--internship .case-study__company-place::before { content: " · "; }
 }
 
 @media(max-width:736px) {
