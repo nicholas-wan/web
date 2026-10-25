@@ -100,11 +100,11 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  await expect(ab.locator('.lgab-badge')).toHaveCount(2);
  await expect(ab.locator('.lgab-hill')).toHaveCount(2);
  const peaks=await ab.locator('.lgab-hill').evaluateAll(hs=>hs.map(h=>h.getBoundingClientRect()));
- // Each hill spans 8 standard deviations; centres 2.75 apart overlap a
- // little but stand apart (owner: "a bit closer in terms of result").
+ // Each hill spans 8 standard deviations; centres 1.25 apart: B only
+ // slightly better (owner: "they have to be even closer").
  const mid=b=>b.left+b.width/2,gap=mid(peaks[1])-mid(peaks[0]);
- expect(gap).toBeGreaterThan(peaks[0].width*.3);
- expect(gap).toBeLessThan(peaks[0].width*.4);
+ expect(gap).toBeGreaterThan(peaks[0].width*.1);
+ expect(gap).toBeLessThan(peaks[0].width*.2);
  await expect(ab.locator('.lgab-cap text')).toHaveText(['Randomise','Measure']);
  // While playing, each hill and its label run on exactly their lane's curve,
  // so the chart moves with its bar (tools/scenes/league-ab-motion.py).
