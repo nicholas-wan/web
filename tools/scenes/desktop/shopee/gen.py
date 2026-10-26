@@ -33,7 +33,7 @@ CAP = 12.0          # caption size, local units (the existing .sp-label 12px)
 LINE = 1.3 * NOTE   # note line pitch
 H = 144             # viewBox height
 NOTES = {'words': ('Breaks the title', 'into tokens.'),
-         'model': ('One model', 'per language.'),
+         'model': ('Predicts the', 'attributes.'),
          'attrs': ('Fills in the', 'product specs.')}
 # widest line of each note at 10 units of Merriweather 300 (measured in Chrome)
 WIDE = {'words': 70.9, 'model': 63.3, 'attrs': 67.7}

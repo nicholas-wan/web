@@ -84,10 +84,10 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
   await expect(shopee.locator(svg+' .sp-code')).toHaveText(['ID','ID','ID','ID']);
   await expect(shopee.locator(svg+' .sp-stack rect')).toHaveCount(4);
   await expect(shopee.locator(svg+' .sp-stack text')).toHaveCount(0);
-  expect(await shopee.locator(svg).getAttribute('aria-label')).toMatch(/one per language/);
+  expect(await shopee.locator(svg).getAttribute('aria-label')).toMatch(/read by a text model/);
   expect(await shopee.locator(svg).textContent()).not.toMatch(/[฀-๿一-鿿]/);
  }
- await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-d-note tspan')).toHaveText(['Breaks the title','into tokens.','One model','per language.','Fills in the','product specs.']);
+ await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-d-note tspan')).toHaveText(['Breaks the title','into tokens.','Predicts the','attributes.','Fills in the','product specs.']);
  for(const slot of await shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-slot').all())await expect(slot).toHaveCSS('opacity','1');
  for(const edge of await shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-edge').all())await expect(edge).toHaveCSS('stroke-dasharray','none');
  for(const rect of await shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-chip rect').all())expect(await rect.getAttribute('fill-opacity')).toBeNull();

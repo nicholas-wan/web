@@ -37,7 +37,7 @@ import sys
 NOTE_F, NOTE_P = 13.0, 16.5   # notes: the anomaly cards' note style (Merriweather 300)
 WORDS_NOTE_BELOW = 'above' not in sys.argv
 NOTES = {'words': ('Breaks the title', 'into tokens.'),
-         'model': ('One model', 'per language.'),
+         'model': ('Predicts the', 'attributes.'),
          'attrs': ('Fills in the', 'product specs.')}
 # 'Words' heads its column (the space above the rows is otherwise empty),
 # so its note never meets the arrow down to the model.
@@ -92,7 +92,7 @@ filt = src[src.index('<filter id="spLift"'):src.index('</filter>') + 9].replace(
 
 out = []
 A = out.append
-A(f'<svg class="sp-brand sp-brand--m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="A Shopee product page with an Indonesian title: its words are tokenised and read by the Indonesian text model, the front one of a stack of models, one per language, which fills the product specifications with Shoes, Running, Men and Sport.">{defs}')
+A(f'<svg class="sp-brand sp-brand--m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="A Shopee product page with an Indonesian title: its words are tokenised and read by a text model, which fills the product specifications with Shoes, Running, Men and Sport.">{defs}')
 A(f'<g class="sp-m-card"><g transform="translate({f(TX)} {f(TY)}) scale({S})">{card}</g></g>')
 
 # chips: outer g animates in scene space; inner g carries the listing transform
