@@ -151,8 +151,12 @@
   .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks .internship-demo-card { width: min(28rem, calc(100vw - 2rem)); }
 }
 /* Phones and tablets: two equal tiles across the row, thumbnail above a
-   centred label, as the phishing charts do. */
+   centred label, as the phishing charts do. A row's single chip (Shopee, the
+   agentic console) keeps its one-line layout but takes the tiles' corners, so
+   every chart chip on the page is the same shape (owner, 26 Oct 2026: "some
+   charts are in rectangles while some in circles"). */
 @media screen and (max-width: 980px) {
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek__chip { border-radius: 0.6rem; }
   .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peeks {
     width: 100%;
     grid-template-columns: repeat(2, minmax(0, 1fr));
