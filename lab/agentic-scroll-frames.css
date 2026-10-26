@@ -1,5 +1,6 @@
-/* A chapter holds its authored frame for one viewport of scrolling. */
-.page-experience .agentic-frames{height:600svh}
+/* Continuous scroll motion, with level intervals that hold each key beat. */
+.page-experience .agentic-frames--agents{height:725svh}
+.page-experience .agentic-frames--detection{height:640svh}
 .agentic-frames .agentic-story__sticky{min-height:0}
 .agentic-frames .agentic-story__count strong{color:#f4f2ea;font-family:"Merriweather",Georgia,serif;font-size:1.35rem;font-weight:300}
 .agentic-frames .agentic-story__narrative{min-height:10.5rem}
@@ -7,8 +8,6 @@
 .agentic-frames .agentic-story__nav [data-dots]{display:flex;gap:.45rem}
 .agentic-frames .agentic-story__nav [data-dots] button{width:7px;height:7px;min-height:0;padding:0;border:0;border-radius:50%;background:#486562;box-shadow:none}
 .agentic-frames .agentic-story__nav [data-dots] button[aria-current=step]{background:#28d7c5;box-shadow:0 0 0 3px rgba(40,215,197,.15)}
-.agentic-frames__console{transition:opacity .18s ease}
-.agentic-frames__console.is-switching{opacity:.18}
 .agentic-frames .agentic-story__foot p{color:#91ada8}
 .page-experience .agentic-frames--detection{border-color:#4d5142;background:radial-gradient(circle at 90% 0%,rgba(255,184,105,.09),transparent 27rem),#091617}
 .agentic-frames--detection .agentic-story__eyebrow,.agentic-frames--detection .agentic-story__kicker{color:#ffb869}
@@ -21,4 +20,3 @@
 .agentic-frames__interlude>a:hover,.agentic-frames__interlude>a:focus-visible{border-color:#0c6663;background:#e5f4f0}
 @media(max-width:980px){.agentic-frames .agentic-story__narrative{min-height:0}}
 @media(max-width:736px){.agentic-frames .agentic-story__count strong{font-size:1rem}.agentic-frames .agentic-story__nav [data-dots]{display:none}.agentic-frames .agentic-story__narrative{min-height:0}.agentic-frames .agentic-story__foot p{font-size:.6rem}.page-experience .agentic-frames__interlude{min-height:58svh;padding:2rem 1.3rem}.agentic-frames__interlude h2{font-size:1.8rem}}
-@media(prefers-reduced-motion:reduce){.agentic-frames__console{transition:none}}

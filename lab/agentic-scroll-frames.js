@@ -1,23 +1,46 @@
 (() => {
-  const sequences = {
-    agents: [
-      ['Supervisor', 'Supervisor picks the hunt.', 'A report becomes three techniques worth checking.', 2.5],
-      ['Hypothesis', 'Hypothesis makes a testable claim.', 'It frames the behaviour the hunt can look for.', 8.7],
-      ['Investigator', 'Investigator checks what was done.', 'PowerShell was covered recently, so the team does not repeat that hunt.', 13.4],
-      ['Detection', 'Detection changes course.', 'When one search cannot answer, it re-plans and checks a better query.', 27.8],
-      ['Analyst', 'The analyst gets a lead.', 'The agent hands over a flagged task and the evidence for review.', 35.5]
-    ],
-    detection: [
-      ['Valid negative', 'A result can still be useful.', 'Only known Run keys appear. The agent records that answer.', 17.2],
-      ['Inconclusive', 'The first search cannot settle it.', 'Scheduled tasks made through the API may not launch schtasks.exe.', 21.3],
-      ['Re-plan', 'Change the question.', 'Detection looks for the task being created through event 4698.', 23.5],
-      ['Validate', 'Check the query before it runs.', 'The revised event 4698 query is validated first.', 27.8],
-      ['Flag', 'Flag a lead for review.', 'A root-level task differs from the baseline. Its evidence goes to an analyst.', 31.6]
-    ]
+  // Time is the authored console's animation clock. Repeated times are reading
+  // holds; the intervals between them scrub the actual motion in both directions.
+  const stories = {
+    agents: {
+      steps: [
+        ['Supervisor', 'Supervisor picks the hunt.', 'A report becomes three techniques worth checking.', 2.5, .6],
+        ['Hypothesis', 'Hypothesis makes a testable claim.', 'It frames the behaviour the hunt can look for.', 8.7, 1.75],
+        ['Investigator', 'Investigator checks what was done.', 'PowerShell was covered recently, so the team does not repeat that hunt.', 13.4, 2.85],
+        ['Detection', 'Detection changes course.', 'When one search cannot answer, it re-plans and checks a better query.', 27.8, 4.6],
+        ['Analyst', 'The analyst gets a lead.', 'The agent hands over a flagged task and the evidence for review.', 35.5, 6]
+      ],
+      points: [[0, 0], [.35, 2.5], [.85, 2.5], [1.5, 8.7], [2, 8.7], [2.6, 13.4], [3.1, 13.4], [4.35, 27.8], [4.85, 27.8], [5.75, 35.5], [6.25, 35.5]],
+      starts: [0, 1.25, 2.38, 3.9, 5.43]
+    },
+    detection: {
+      steps: [
+        ['Valid negative', 'A result can still be useful.', 'Only known Run keys appear. The agent records that answer.', 17.2, .6],
+        ['Inconclusive', 'The first search cannot settle it.', 'Scheduled tasks made through the API may not launch schtasks.exe.', 21.3, 1.75],
+        ['Re-plan', 'Change the question.', 'Detection looks for the task being created through event 4698.', 23.5, 2.75],
+        ['Validate', 'Check the query before it runs.', 'The revised event 4698 query is validated first.', 27.8, 3.95],
+        ['Flag', 'Flag a lead for review.', 'A root-level task differs from the baseline. Its evidence goes to an analyst.', 31.6, 5.15]
+      ],
+      points: [[0, 16], [.35, 17.2], [.85, 17.2], [1.5, 21.3], [2, 21.3], [2.5, 23.5], [3, 23.5], [3.7, 27.8], [4.2, 27.8], [4.9, 31.6], [5.4, 31.6]],
+      starts: [0, 1.25, 2.32, 3.45, 4.65]
+    }
   };
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const clockAt = (points, unit) => {
+    for (let i = 1; i < points.length; i++) {
+      const [end, to] = points[i];
+      if (unit <= end) {
+        const [start, from] = points[i - 1];
+        const p = Math.max(0, Math.min(1, (unit - start) / (end - start)));
+        const ease = p * p * (3 - 2 * p);
+        return from + (to - from) * ease;
+      }
+    }
+    return points[points.length - 1][1];
+  };
   document.querySelectorAll('[data-agentic-frames]').forEach(section => {
-    const steps = sequences[section.dataset.agenticFrames];
+    const {steps, points, starts} = stories[section.dataset.agenticFrames];
+    const total = points[points.length - 1][0];
     const wrap = section.querySelector('.agentic-frames__console');
     const number = section.querySelector('[data-step-number]');
     const kicker = section.querySelector('[data-step-kicker]');
@@ -27,29 +50,22 @@
     const prev = section.querySelector('[data-prev]');
     const next = section.querySelector('[data-next]');
     const fill = section.querySelector('[data-progress-fill]');
-    let animations = [], index = -1, timer = 0, queued = false;
-    const setFrame = (i, first = false) => {
+    let animations = [], index = -1, queued = false;
+    const setText = i => {
       if (i === index) return;
       index = i;
-      clearTimeout(timer);
-      if (!first && !reduced.matches) wrap.classList.add('is-switching');
-      const show = () => {
-        const [agent, heading, body, clock] = steps[i];
-        animations.forEach(animation => { animation.currentTime = clock * 1000; });
-        number.textContent = String(i + 1).padStart(2, '0');
-        kicker.textContent = `${String(i + 1).padStart(2, '0')} / ${agent}`;
-        title.textContent = heading;
-        copy.textContent = body;
-        [...dots.children].forEach((dot, j) => j === i ? dot.setAttribute('aria-current', 'step') : dot.removeAttribute('aria-current'));
-        prev.disabled = i === 0; next.disabled = i === steps.length - 1;
-        requestAnimationFrame(() => wrap.classList.remove('is-switching'));
-      };
-      if (first || reduced.matches) show(); else timer = setTimeout(show, 180);
+      const [agent, heading, body] = steps[i];
+      number.textContent = String(i + 1).padStart(2, '0');
+      kicker.textContent = `${String(i + 1).padStart(2, '0')} / ${agent}`;
+      title.textContent = heading;
+      copy.textContent = body;
+      [...dots.children].forEach((dot, j) => j === i ? dot.setAttribute('aria-current', 'step') : dot.removeAttribute('aria-current'));
+      prev.disabled = i === 0; next.disabled = i === steps.length - 1;
     };
     const jump = i => {
       const top = section.getBoundingClientRect().top + scrollY;
       const travel = section.offsetHeight - innerHeight;
-      scrollTo({top: top + travel * ((i + .18) / steps.length), behavior: reduced.matches ? 'instant' : 'smooth'});
+      scrollTo({top: top + travel * steps[i][4] / total, behavior: reduced.matches ? 'instant' : 'smooth'});
     };
     steps.forEach((step, i) => {
       const dot = document.createElement('button');
@@ -61,16 +77,21 @@
     const update = () => {
       queued = false;
       const rect = section.getBoundingClientRect();
+      if (rect.bottom < -innerHeight || rect.top > innerHeight * 2) return;
       const travel = Math.max(1, rect.height - innerHeight);
       const progress = Math.max(0, Math.min(1, -rect.top / travel));
-      setFrame(Math.min(steps.length - 1, Math.floor(progress * steps.length)));
+      const unit = progress * total;
+      const stage = Math.max(0, starts.findLastIndex(start => unit >= start));
+      const time = reduced.matches ? steps[stage][3] : clockAt(points, unit);
+      animations.forEach(animation => { animation.currentTime = time * 1000; });
+      setText(stage);
       fill.style.width = `${progress * 100}%`;
     };
     const schedule = () => { if (!queued) { queued = true; requestAnimationFrame(update); } };
     requestAnimationFrame(() => {
       animations = wrap.getAnimations({subtree: true}).filter(a => a instanceof CSSAnimation);
       animations.forEach(animation => animation.pause());
-      setFrame(0, true); update();
+      setText(0); update();
       addEventListener('scroll', schedule, {passive: true});
       addEventListener('resize', schedule, {passive: true});
     });
