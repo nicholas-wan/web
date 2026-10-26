@@ -1,6 +1,6 @@
 // Builds scene-d.html and scene-d.css: the desktop League "Spot a risky
 // profile" scene with a bold step caption and a short plain note under each
-// stage, as on phones. Reads the current desktop svg from experience.html
+// stage, as on phones. Reads orig-d.html, the desktop svg before notes (copied from experience.html)
 // (svg.league-brand-scene, not the --m copy), keeps its artwork, classes and
 // timings, and only spaces the three stages out so the notes fit side by
 // side: the phone and signals stay put, the model and the dial with its pill
@@ -20,7 +20,7 @@ const P = {
   noteY: 142,      // first note line baseline
   noteLead: 12.5,
   // Approved wording (identical to the phone scene), one array per stage.
-  notes: [['Clues like the', 'photo and bio.'], ['A classifier', 'weighs the clues.'], ['Risky profiles go', 'to manual review.']],
+  notes: [['Photo, bio and', 'other clues.'], ['A classifier', 'weighs them.'], ['Risky profiles go', 'to manual review.']],
   // Widest line of each note at 1 unit of Merriweather 300 (measured in
   // Chromium with the site's font: 66.7, 80, 83.1 at 10 units).
   noteW: [6.67, 8.0, 8.31],
@@ -36,7 +36,7 @@ if (argH && argH !== P.H) {
 }
 
 // The current desktop svg, nested <svg> (the photo) included.
-const page = fs.readFileSync(path.join(ROOT, 'experience.html'), 'utf8');
+const page = fs.readFileSync(path.join(D, 'orig-d.html'), 'utf8'); // the desktop svg before notes
 const i0 = page.indexOf('<svg class="league-brand-scene"');
 if (i0 < 0) throw new Error('desktop svg not found');
 let depth = 0, i1 = -1;

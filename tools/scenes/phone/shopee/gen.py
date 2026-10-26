@@ -34,8 +34,8 @@ COL_CX = COL_X + ROW_W / 2
 import sys
 NOTE_F, NOTE_P = 13.0, 16.5   # notes: the anomaly cards' note style (Merriweather 300)
 WORDS_NOTE_BELOW = 'above' not in sys.argv
-NOTES = {'words': ('Titles often mix', 'three languages.'),
-         'model': ('One model reads', 'every language.'),
+NOTES = {'words': ('Titles come in', 'many languages.'),
+         'model': ('One model', 'reads them all.'),
          'attrs': ('Fills in the', 'product specs.')}
 # 'Words' heads its column (the space above the rows is otherwise empty),
 # so its note never meets the arrow down to the model.
@@ -153,7 +153,7 @@ for i, (k, v) in enumerate([('Category', 'Shoes'), ('Type', 'Running'), ('Gender
 A(f'<text class="sp-label" x="{f((LIST_X0 + LIST_X1)/2)}" y="{f(CAP_Y)}" text-anchor="middle">Attributes</text>' + note('attrs', 3, (LIST_X0 + LIST_X1)/2, NOTE_Y))
 A('</g>')
 A(filt + '</svg>')
-open(os.path.join(HERE, 'scene-m.html'), 'w', encoding='utf8').write('\n'.join(out) + '\n')
+open(os.path.join(HERE, 'scene-m.html'), 'w', encoding='utf8', newline='\n').write('\n'.join(out) + '\n')
 
 # ---- CSS -------------------------------------------------------------------
 lc = (LIST_X0 + LIST_X1) / 2
@@ -231,5 +231,5 @@ for n, (tx, ty, rx, ry, rw, rh, fill, alt, row, word) in enumerate(CHIPS, 1):
   61.5%, 86.5% {{ opacity: 1; transform: translate({f(gx)}px, {f(gy)}px) scale({k:.4f}); }}
   100% {{ opacity: 0; transform: translate({f(gx)}px, {f(gy)}px) scale({k:.4f}); }}
 }}''')
-open(os.path.join(HERE, 'scene-m.css'), 'w', encoding='utf8').write('\n'.join(css) + '\n')
+open(os.path.join(HERE, 'scene-m.css'), 'w', encoding='utf8', newline='\n').write('\n'.join(css) + '\n')
 print('H', H, 'card offset', f(card_dx), f(card_dy))

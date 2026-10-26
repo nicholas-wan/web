@@ -1,5 +1,6 @@
 # Builds the desktop Shopee scene with step notes (scene-d.html, scene-d.css)
-# from the desktop svg currently in experience.html (svg.sp-brand, not --m).
+# from orig-d.html, the desktop svg.sp-brand as it was before notes (copied
+# from experience.html; refresh it if the scene's artwork changes).
 #
 # The phone scene (tools/scenes/phone/shopee) gives each step a caption and a
 # two-line plain note. On desktop the three steps sit side by side to the
@@ -11,12 +12,12 @@
 # both ends. The listing, the chips and the word column share one wrapper,
 # so the chips still land exactly on their rows.
 #
-# Usage: python gen.py            (reads ../../../../experience.html)
+# Usage: python gen.py            (reads orig-d.html)
 import os, re
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.normpath(os.path.join(HERE, '..', '..', '..', '..'))
-src = open(os.path.join(ROOT, 'experience.html'), encoding='utf8').read()
+src = open(os.path.join(HERE, 'orig-d.html'), encoding='utf8').read()  # the desktop svg before notes
 
 i = src.index('<svg class="sp-brand"')
 depth = 0
@@ -31,8 +32,8 @@ NOTE = 9.8          # note size in viewBox units (about 11.4px at 1366)
 CAP = 12.0          # caption size, local units (the existing .sp-label 12px)
 LINE = 1.3 * NOTE   # note line pitch
 H = 144             # viewBox height
-NOTES = {'words': ('Titles often mix', 'three languages.'),
-         'model': ('One model reads', 'every language.'),
+NOTES = {'words': ('Titles come in', 'many languages.'),
+         'model': ('One model', 'reads them all.'),
          'attrs': ('Fills in the', 'product specs.')}
 # widest line of each note at 10 units of Merriweather 300 (measured in Chrome)
 WIDE = {'words': 77.4, 'model': 78.8, 'attrs': 67.7}

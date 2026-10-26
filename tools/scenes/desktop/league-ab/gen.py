@@ -2,7 +2,7 @@
 
 usage: python -I tools/scenes/desktop/league-ab/gen.py
 
-Reads the current desktop svg from experience.html (read only) and writes
+Reads orig-d.html (the desktop svg before notes, copied from experience.html) and writes
 scene-d.html and scene-d.css next to this file. The artwork, ids, classes and
 motion are untouched inside: the old 360x150 scene is scaled down as one
 group (about 0.92) in a 360x160 svg, the risky-profile card's size, leaving a
@@ -29,7 +29,7 @@ from pathlib import Path
 sys.dont_write_bytecode = True  # touch nothing outside this folder
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[3]
-HTML = ROOT / "experience.html"   # read only
+HTML = HERE / "orig-d.html"   # the desktop svg before notes (from experience.html)
 
 spec = importlib.util.spec_from_file_location("motion", ROOT / "tools" / "scenes" / "league-ab-motion.py")
 motion = importlib.util.module_from_spec(spec)
@@ -54,7 +54,8 @@ STEPS = [  # caption, centre x (the existing captions'), note lines (phone wordi
     ("Randomise", 92, ["Each user sees", "A or B at random."]),
     ("Measure", 255, ["B’s match rate is higher,", "and it’s significant."]),
 ]
-EXTRA = " B's is higher, and the difference is statistically significant."
+# The label's closing words, with the verdict the Measure note now states.
+OLD_END, NEW_END = "until they stand apart, with B's higher.", "until they stand apart: B's match rate is higher, and the difference is statistically significant."
 
 
 def f(x):
@@ -93,9 +94,8 @@ def build(svg):
             f'<tspan x="{f(S * x + TX)}" y="{f(CAP_Y + NOTE_Y + LEAD * j)}">{t}</tspan>' for j, t in enumerate(lines)) + "</text>"
     assert svg.endswith("</svg>")
     svg = svg[: -len("</svg>")] + "</g>" + caps + notes + "</svg>"
-    label = re.search(r'aria-label="([^"]*)"', svg).group(1)
-    if EXTRA.strip() not in label:
-        svg = svg.replace(f'aria-label="{label}"', f'aria-label="{label}{EXTRA}"', 1)
+    assert OLD_END in svg
+    svg = svg.replace(OLD_END, NEW_END, 1)
     return svg
 
 

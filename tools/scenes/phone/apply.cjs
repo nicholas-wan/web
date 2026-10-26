@@ -2,9 +2,9 @@
 //   node tools/scenes/phone/apply.cjs
 // Each folder here generates one phone-only scene (scene-m.html, scene-m.css):
 //   shopee/gen.py, league/gen.cjs, league-ab/league-ab-motion-m.py
-// (rerun a folder's generator after changing its desktop scene; shopee and
-// league read a saved copy of the desktop svg, orig*.html, so refresh that
-// copy first). This script then places each svg right after its desktop svg
+// (shopee and league read a saved copy of the desktop svg as it was before
+// the desktop notes, orig*.html; refresh it only from a notes-free svg, such
+// as tools/scenes/desktop/<scene>/orig-d.html). This script then places each svg right after its desktop svg
 // in experience.html and writes the CSS between the phone-scenes markers in
 // assets/css/internship-peek.css. Phones (<=736px) see the phone svg; wider
 // screens the desktop one; the hidden one never renders or animates.

@@ -221,6 +221,12 @@
 @container c2p (max-width: 300px) {
   .c2-code { font-size: 10.5px; padding: 5px; }
 }
+/* 320px phones (a 252px panel): the chips drop their technique ids and the
+   graph strip draws a little smaller, so nothing is clipped (review, 26 Oct 2026). */
+@container c2p (max-width: 270px) {
+  .c2-cid { display: none; }
+  .c2-g { zoom: .88; }
+}
 
 /* ---- generated (story ends at 34.26s; phones 37.46s) ---- */
 @keyframes c2-k0{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}6.111%{--c2-v:1}94.444%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}

@@ -677,6 +677,7 @@
   85.714% { transform: rotate(2.667deg); animation-timing-function: ease-in-out; }
   100% { transform: rotate(0deg); }
 }
+/* league-ab-motion:end */
 
 /* The Agentic AI peek (owner-approved 26 Oct 2026, after four design rounds;
    see README): the same chip-and-card peek on the dark #agentic-ai card,
@@ -686,6 +687,29 @@
    arriving only at the hand-off. The panel brings its own dark surface, so the
    card is a bare frame around it. */
 .page-experience #agentic-ai .internship-demo-peek { grid-column: 1 / -1; margin-top: 1.4rem; }
+/* The call to action and breathing chip every other chart row has (review,
+   26 Oct 2026), in the card's dark tokens. */
+.page-experience #agentic-ai .internship-demo-hint {
+  grid-column: 1 / -1;
+  margin: 1.4rem 0 0;
+  color: #9db4b3;
+  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-size: max(var(--text-floor, 0px), 0.8rem);
+  line-height: 1.35;
+}
+.page-experience #agentic-ai .internship-demo-hint strong { color: #28d7c5; font-weight: 700; }
+.page-experience #agentic-ai .internship-demo-hint + .internship-demo-peek { margin-top: 0.22rem; }
+@media screen and (max-width: 736px), screen and (hover: none) {
+  .page-experience #agentic-ai .internship-demo-hint .anomaly-peek__hint-hover { display: none; }
+  .page-experience #agentic-ai .internship-demo-hint .anomaly-peek__hint-touch { display: inline; }
+}
+.page-experience #agentic-ai .internship-demo-peek__chip.is-breathing { animation: peek-breathe-dark 2.6s ease-in-out infinite; }
+@keyframes peek-breathe-dark {
+  50% { box-shadow: inset 0 0 0 1.5px #28d7c5, 0 0 0 5px rgba(40, 215, 197, 0.16); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-experience #agentic-ai .internship-demo-peek__chip.is-breathing { animation: none; box-shadow: inset 0 0 0 1.5px #28d7c5; }
+}
 .page-experience #agentic-ai .internship-demo-peek__chip {
   background: #0e2024;
   box-shadow: inset 0 0 0 1px #24464b, 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -713,6 +737,17 @@
 }
 @media screen and (max-width: 736px), screen and (hover: none) {
   .page-experience #agentic-ai .internship-demo-card { box-shadow: none; }
+}
+/* Desktop: the console opens upward, over this card's own writeup, so it
+   never covers the Cyber Detection card below (review, 26 Oct 2026). */
+@media screen and (min-width: 737px) and (hover: hover) {
+  .page-experience #agentic-ai .internship-demo-card {
+    top: auto;
+    bottom: calc(100% + 8px);
+    transform: translateY(6px) scale(0.92);
+    transform-origin: var(--grow-x, 50%) 100%;
+  }
+  .page-experience #agentic-ai .internship-demo-card.is-open { transform: none; }
 }
 /* The replay fades the run for a beat before it starts over. */
 .hunt-panel > .c2 { transition: opacity 240ms ease; }
@@ -941,6 +976,12 @@
 /* the narrowest phones: keep each query line on one line where the font allows */
 @container c2p (max-width: 300px) {
   .c2-code { font-size: 10.5px; padding: 5px; }
+}
+/* 320px phones (a 252px panel): the chips drop their technique ids and the
+   graph strip draws a little smaller, so nothing is clipped (review, 26 Oct 2026). */
+@container c2p (max-width: 270px) {
+  .c2-cid { display: none; }
+  .c2-g { zoom: .88; }
 }
 
 /* ---- generated (story ends at 34.26s; phones 37.46s) ---- */

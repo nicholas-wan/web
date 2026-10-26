@@ -7,7 +7,6 @@
    fading before each restart; reduced motion holds the final frame. */
 (() => {
   const roots = [...document.querySelectorAll('.internship-demo-peek')];
-  if (!roots.length) return;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const touch = matchMedia('(max-width: 736px), (hover: none)');
   const REPLAY = 10000, HOLD = 3000, FADE = 240, GRACE = 130;
@@ -24,15 +23,17 @@
   const inside = (el, x, y) => { const b = el.getBoundingClientRect(); return x >= b.left && x <= b.right && y >= b.top && y <= b.bottom; };
   const onScreen = el => { const b = el.getBoundingClientRect(); return b.bottom > 0 && b.top < innerHeight; };
   const inPeek = el => !!(el && el.closest && el.closest('.internship-demo-peek'));
-  // Each internship row's first chip breathes whenever it is on screen and
-  // none of that row's charts is open, so the invitation comes back after a
-  // chart is closed (owner, 25 Oct 2026: "should keep repeating the pulse
-  // even after clicked before - whenever its closed").
-  const breathers = [...new Set(roots.filter(r => r.closest('.case-study--internship')).map(r => r.closest('.case-study')))]
+  // Each row's first chip breathes while on screen with none of its charts
+  // open (owner, 25 Oct 2026: "keep repeating the pulse ... whenever its closed").
+  const breathers = [...new Set(roots.map(r => r.closest('.case-study')))]
     .map(row => roots.find(r => r.closest('.case-study') === row));
   const shown = new Set();
-  const breathe = () => breathers.forEach(r => chip(r).classList.toggle('is-breathing',
-    shown.has(r) && !(active && active.closest('.case-study') === r.closest('.case-study'))));
+  // All breathing chips share one phase.
+  const breathe = () => breathers.forEach(r => {
+    const b = chip(r), on = shown.has(r) && !(active && active.closest('.case-study') === r.closest('.case-study'));
+    if (on !== b.classList.contains('is-breathing')) b.style.animationDelay = on ? `${-(performance.now() % 2600)}ms` : '';
+    b.classList.toggle('is-breathing', on);
+  });
   if (breathers.length) {
     const io = new IntersectionObserver(es => { es.forEach(e => { const r = e.target.closest('.internship-demo-peek'); if (e.isIntersecting) shown.add(r); else shown.delete(r); }); breathe(); }, { threshold: 0.5 });
     breathers.forEach(r => io.observe(chip(r)));
@@ -68,7 +69,7 @@
     grow(el, chipEl, inline, from, gap = 0) {
       if (from) {
         el.style.animation = 'none';
-        if (!inline) { el.style.transform = 'none'; el.style.transition = 'opacity 120ms ease, visibility 0s'; setTimeout(() => { el.style.transform = el.style.transition = ''; }, 160); }
+        if (!inline) { el.style.transform = 'none'; el.style.transition = 'none'; setTimeout(() => { el.style.transform = el.style.transition = ''; }, 160); }
       }
       const b = chipEl.getBoundingClientRect(), h = el.offsetHeight;
       el.style.setProperty('--grow-x', `${Math.round(b.left + b.width / 2 - layoutLeft(el))}px`);
@@ -100,8 +101,8 @@
       if (Math.abs(by) < 8) return;
       const y = scrollY + by, stops = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
       if (motion.matches) { scrollTo(0, y); return; }
-      let raf = 0, again = 0;
-      const off = () => { cancelAnimationFrame(raf); clearTimeout(again); stops.forEach(e => removeEventListener(e, off)); zoom.stop = () => {}; };
+      let raf = 0, again = 0, end = 0;
+      const off = () => { cancelAnimationFrame(raf); clearTimeout(again); clearTimeout(end); stops.forEach(e => removeEventListener(e, off)); if (zoom.stop === off) { zoom.stop = () => {}; if (native) scrollTo(0, scrollY); } };
       zoom.stop = off;
       stops.forEach(e => addEventListener(e, off, { passive: true }));
       if (native) {
@@ -109,7 +110,7 @@
         // scripted ease stuttered on phones); retried once it has grown.
         scrollTo({ top: y, behavior: 'smooth' });
         if (y > document.documentElement.scrollHeight - innerHeight) again = setTimeout(() => scrollTo({ top: y, behavior: 'smooth' }), 520);
-        setTimeout(off, 1600);
+        end = setTimeout(off, 1600);
         return;
       }
       zoom.lock = true;
@@ -125,7 +126,9 @@
       };
       raf = requestAnimationFrame(step);
     } };
-  addEventListener('mousemove', e => { if (e.movementX || e.movementY) zoom.lock = false; }, { passive: true });
+  let at = '';
+  addEventListener('mousemove', e => { const k = e.clientX + ' ' + e.clientY; if (k !== at) { at = k; zoom.lock = false; } }, { passive: true });
+  if (!roots.length) return;
 
   // `swap`: another card in the same row is opening in its place.
   function close(r, swap) {
@@ -152,7 +155,8 @@
     const c = card(r), grow = (r.finalHeight || c.offsetHeight) - c.offsetHeight, cardBottom = layoutTop(c) + c.offsetHeight + grow;
     const art = r.closest('.case-study'), hint = art && art.querySelector('.internship-demo-hint');
     const a = (art || chip(r)).getBoundingClientRect();
-    zoom.frame([[a.top, Math.max(a.bottom + grow, cardBottom)], [(hint || chip(r)).getBoundingClientRect().top, cardBottom], [c.getBoundingClientRect().top, cardBottom]], touch.matches);
+    const top = c.getBoundingClientRect().top, bottom = Math.max(cardBottom, chip(r).getBoundingClientRect().bottom);
+    zoom.frame([[a.top, Math.max(a.bottom + grow, cardBottom)], [Math.min((hint || chip(r)).getBoundingClientRect().top, top), bottom], [top, cardBottom]], touch.matches);
   }
   function open(r) {
     clearTimeout(leaveTimer);
@@ -161,7 +165,7 @@
     // Swapping between cards in one shared slot (the League row) grows the
     // new card from the old one's height, so the row below doesn't jump.
     const swapFrom = active && active.closest('.case-study') === r.closest('.case-study') ? card(active).offsetHeight : 0;
-    close(active, swapFrom > 0);
+    close(active, swapFrom > 0 || touch.matches);
     active = r;
     const c = card(r);
     if (r.grow) { r.grow.cancel(); r.grow = null; }
@@ -173,9 +177,13 @@
     chip(r).setAttribute('aria-expanded', 'true');
     breathe();
     play(r);
-    // A scene longer than REPLAY allows still holds its final frame for HOLD.
-    const end = Math.max(0, ...c.getAnimations({ subtree: true }).map(a => a.effect.getComputedTiming().endTime).filter(Number.isFinite));
-    r.loop = setInterval(() => { if (!document.hidden && onScreen(c)) replay(r); }, Math.max(REPLAY, end + HOLD));
+    loop(r);
+  }
+  // A scene longer than REPLAY allows still holds its final frame for HOLD.
+  function loop(r) {
+    const c = card(r), end = Math.max(0, ...c.getAnimations({ subtree: true }).map(a => a.effect.getComputedTiming().endTime).filter(Number.isFinite));
+    clearInterval(r.loop);
+    r.loop = setInterval(() => { if (!document.hidden && onScreen(c)) replay(r); }, Math.max(REPLAY, end + HOLD + FADE));
   }
   // The pointer has left the chip row and the card: after a short grace a
   // pinned card returns, otherwise the preview closes.
@@ -218,14 +226,12 @@
   // the start of a scroll, and closing then collapsed the card mid-read.
   document.addEventListener('pointerdown', e => {
     if (!active || touch.matches || e.pointerType !== 'mouse' || active.contains(e.target)) return;
-    // A press on another chip is a swap: its click opens that card. Closing
-    // here would collapse an inline card under the finger and move the chip
-    // before the tap's click lands.
+    // A press on another chip is a swap: its click opens that card.
     if (inPeek(e.target)) return;
     pinned = null;
     close(active);
   });
-  motion.addEventListener('change', () => { if (active) play(active); });
+  motion.addEventListener('change', () => { if (active) { play(active); loop(active); } });
   document.addEventListener('visibilitychange', () => {
     if (!active || !active.getAnimations) return;
     active.getAnimations({ subtree: true }).forEach(a => {
@@ -233,11 +239,9 @@
       else if (!document.hidden && a.playState === 'paused') a.play();
     });
   });
-  // On desktop the chip row leaving the viewport closes its floating card; the
-  // top margin keeps a card that still hangs into view open while its chip
-  // has scrolled off. It watches the chip: a peek laid out by a shared row has
-  // no box itself. Inline cards stay open while the page scrolls (owner: charts
-  // opened on a phone must not close on scrolling); off screen they skip replays.
+  // A floating card closes once its chip is well off screen (it watches the
+  // chip: a peek in a shared row has no box). Inline cards stay open while the
+  // page scrolls (owner: phone charts must not close on scrolling).
   const observer = new IntersectionObserver(entries => entries.forEach(e => {
     const r = e.target.closest('.internship-demo-peek');
     if (!e.isIntersecting && active === r && !touch.matches) { pinned = null; close(active); }

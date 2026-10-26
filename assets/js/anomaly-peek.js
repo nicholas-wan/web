@@ -640,7 +640,12 @@
   // The first chip breathes whenever the card is on screen and no chart is
   // open, so the invitation comes back after a chart is closed (owner, Oct
   // 2026: "should keep repeating the pulse even after clicked before").
-  function breathe() { charts[keys[0]].chip.classList.toggle('is-breathing', onScreen && !keys.some(function (k) { return charts[k].state.open; })); }
+  function breathe() {
+    var b = charts[keys[0]].chip, on = onScreen && !keys.some(function (k) { return charts[k].state.open; });
+    // In phase with the internship chips' breathing.
+    if (on !== b.classList.contains('is-breathing')) { b.style.animationDelay = on ? -(window.performance.now() % 2600) + 'ms' : ''; }
+    b.classList.toggle('is-breathing', on);
+  }
   function update() {
     var want = keys.filter(function (k) { var s = charts[k].state; return !s.dismissed && (s.hovering || s.focus); });
     if (!want.length) { want = keys.filter(function (k) { var s = charts[k].state; return !s.dismissed && s.pinned; }); }

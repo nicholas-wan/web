@@ -221,3 +221,9 @@
 @container c2p (max-width: 300px) {
   .c2-code { font-size: 10.5px; padding: 5px; }
 }
+/* 320px phones (a 252px panel): the chips drop their technique ids and the
+   graph strip draws a little smaller, so nothing is clipped (review, 26 Oct 2026). */
+@container c2p (max-width: 270px) {
+  .c2-cid { display: none; }
+  .c2-g { zoom: .88; }
+}

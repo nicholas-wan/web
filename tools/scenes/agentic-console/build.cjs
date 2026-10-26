@@ -26,7 +26,7 @@ const CAPS = [
   'Reads the report, picks what to hunt',
   'Turns it into a claim it can test',
   'Hunted recently, so not repeated',
-  'Only known Run keys. Still an answer',
+  'Only known Run keys, still an answer',
   'Can’t tell from this, so it re-plans',
   'Checks the query before it runs',
   'Flags one task not in the baseline',
