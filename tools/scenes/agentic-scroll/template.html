@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  <title>Agentic hunt — scroll story mockup</title>
+  <link rel="stylesheet" href="../assets/css/internship-peek.css">
+  <link rel="stylesheet" href="agentic-scroll.css">
+  <script src="agentic-scroll.js" defer></script>
+</head>
+<body>
+  <header class="topbar"><a href="../experience.html#agentic-ai">← Work page</a><span>Interaction study / 01</span></header>
+  <main>
+    <section class="intro" aria-labelledby="story-title">
+      <p class="eyebrow">Agentic threat hunting / prototype</p>
+      <h1 id="story-title">A hunt you can follow.</h1>
+      <p>One report becomes a plan, a search, a course correction and an evidence-backed hand-off. Scroll to move through the run.</p>
+      <a class="start" href="#story">Explore the hunt <span aria-hidden="true">↓</span></a>
+    </section>
+
+    <section class="story" id="story" aria-label="Scroll through an illustrative agentic threat hunt">
+      <div class="sticky">
+        <div class="story-inner">
+          <div class="story-heading">
+            <p class="eyebrow">Illustrative hunt <span aria-hidden="true">/</span> 8 steps</p>
+            <div class="step-number" aria-hidden="true"><span id="step-number">01</span><span class="step-total"> / 08</span></div>
+          </div>
+          <div class="story-grid">
+            <div class="narrative" aria-live="off">
+              <p class="kicker" id="step-kicker">01 / Intake</p>
+              <h2 id="step-title">Start with a report.</h2>
+              <p id="step-copy">The supervisor extracts three techniques worth checking, then delegates the work.</p>
+              <div class="chapter-nav" aria-label="Hunt steps">
+                <button type="button" class="chapter-nav__prev" aria-label="Previous step" disabled>←</button>
+                <div class="chapter-nav__dots" id="chapter-dots"></div>
+                <button type="button" class="chapter-nav__next" aria-label="Next step">→</button>
+              </div>
+            </div>
+            <div class="console-wrap is-playing" id="console-wrap"><div class="hunt-panel"><!-- AGENTIC_SCENE --></div></div>
+          </div>
+          <div class="progress" aria-hidden="true"><span id="progress-fill"></span></div>
+          <p class="scroll-hint">Scroll to advance · scroll up to revisit</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="outro">
+      <p class="eyebrow">End of run</p>
+      <h2>A lead, not a verdict.</h2>
+      <p>The agent hands the flagged task and its evidence to an analyst for review.</p>
+      <a href="../experience.html#agentic-ai">Back to the Work page ↗</a>
+    </section>
+  </main>
+</body>
+</html>
