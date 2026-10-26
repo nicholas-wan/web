@@ -72,11 +72,22 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  expect(await page.evaluate(async()=>{await document.fonts.ready;return ['italic 900 8px "League Mark"','8px "League Serif"','italic 8px "League Serif"'].every(f=>document.fonts.check(f));})).toBe(true);
  await page.keyboard.press('Escape');
  // Shopee's final frame: the title highlight and every word row, with solid
- // model edges and chips that hide what they pass over.
+ // model edges and chips that hide what they pass over. The story is one
+ // model per language (owner, 26 Oct 2026): an Indonesian title, Indonesian
+ // words only, and the Indonesian model in front of its unlabelled siblings.
  await shopee.dispatchEvent('mouseenter');
  await expect(card(shopee)).toHaveClass(/is-still/);
  await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-crop')).toHaveCSS('opacity','1');
- await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-slot')).toHaveCount(5);
+ await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-slot')).toHaveCount(3);
+ for(const svg of ['svg.sp-brand:not(.sp-brand--m)','svg.sp-brand--m']){
+  await expect(shopee.locator(svg+' .sp-word')).toHaveText(['Sepatu','Lari','Pria']);
+  await expect(shopee.locator(svg+' .sp-code')).toHaveText(['ID','ID','ID','ID']);
+  await expect(shopee.locator(svg+' .sp-stack rect')).toHaveCount(4);
+  await expect(shopee.locator(svg+' .sp-stack text')).toHaveCount(0);
+  expect(await shopee.locator(svg).getAttribute('aria-label')).toMatch(/one per language/);
+  expect(await shopee.locator(svg).textContent()).not.toMatch(/[฀-๿一-鿿]/);
+ }
+ await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-d-note tspan')).toHaveText(['Breaks the title','into tokens.','One model','per language.','Fills in the','product specs.']);
  for(const slot of await shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-slot').all())await expect(slot).toHaveCSS('opacity','1');
  for(const edge of await shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-edge').all())await expect(edge).toHaveCSS('stroke-dasharray','none');
  for(const rect of await shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-chip rect').all())expect(await rect.getAttribute('fill-opacity')).toBeNull();
@@ -128,7 +139,7 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  const landings=await shopee.evaluate(root=>{
   // Settle the word column first, then hold each chip at its landing mark.
   root.querySelector('.internship-demo-card').getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=8000;});
-  return [1,2,3,4,5].map(i=>{
+  return [1,2,3].map(i=>{
   const d=root.querySelector('svg.sp-brand:not(.sp-brand--m)'),c=d.querySelector('.sp-chip-'+i),a=c.getAnimations()[0];
   a.pause();a.currentTime=a.effect.getTiming().delay+a.effect.getTiming().duration*0.87;
   const t=c.querySelector('text').getBoundingClientRect(),w=d.querySelector('.sp-slot-'+i+' .sp-word').getBoundingClientRect();
@@ -137,7 +148,7 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  for(const gap of landings)expect(gap).toBeLessThan(0.6);
  // A chip only fades once its row is fully in, so a landing word never
  // blinks pale; chips pass behind rows that have already landed.
- const handovers=await shopee.evaluate(root=>[1,2,3,4,5].map(i=>{
+ const handovers=await shopee.evaluate(root=>[1,2,3].map(i=>{
   const d=root.querySelector('svg.sp-brand:not(.sp-brand--m)'),c=d.querySelector('.sp-chip-'+i).getAnimations()[0].effect,s=root.querySelector('.sp-slot-'+i).getAnimations()[0].effect;
   const fade=c.getTiming().delay+c.getTiming().duration*.865,full=s.getTiming().delay+s.getTiming().duration;
   return fade-full;
@@ -182,7 +193,7 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
  }
 });
 
-test('agentic AI peek: a dark agent console that previews, holds its final frame, fits the card, and hands only a lead to an analyst',async({page})=>{
+test('agentic AI peek: a dark agent console that opens inline on a click, holds its final frame, fits the card, and hands only a lead to an analyst',async({page})=>{
  const panel=root=>root.locator('.hunt-panel');
  // Measured once the card's opening zoom has settled.
  const fits=root=>expect(async()=>{
@@ -197,8 +208,16 @@ test('agentic AI peek: a dark agent console that previews, holds its final frame
  await page.goto('/experience');
  const root=peek(page,'agentic');
  await expect(chip(root)).toHaveText('Hunt from a report');
+ // Desktop: a hover opens nothing (a panel this size would cover the page);
+ // a click opens it inline, pushing the next card down, not covering it.
  await root.dispatchEvent('mouseenter');
+ await expect(chip(root)).toHaveAttribute('aria-expanded','false');
+ const nextTop=()=>page.locator('#cloud-analytics').evaluate(e=>e.getBoundingClientRect().top+scrollY);
+ const before=await nextTop();
+ await chip(root).click();
  await expect(card(root)).toHaveClass(/is-still/);
+ await expect(card(root)).toHaveCSS('position','static');
+ expect(await nextTop()).toBeGreaterThan(before+300);
  // The final frame (README): three techniques resolved, the re-planned query,
  // one task flagged as a lead and handed to the Analyst, with the last caption.
  const c2=panel(root).locator('.c2');
@@ -213,16 +232,20 @@ test('agentic AI peek: a dark agent console that previews, holds its final frame
  expect(label).not.toMatch(forbidden);
  await expect(panel(root).locator('.c2-line--fin')).toHaveText('Hands it to an analyst, with the evidence');
  await fits(root);
- await root.dispatchEvent('mouseleave');
+ // A hover preview elsewhere leaves it open; Escape closes it.
+ await peek(page,'shopee').dispatchEvent('mouseenter');
+ await expect(chip(root)).toHaveAttribute('aria-expanded','true');
+ await peek(page,'shopee').dispatchEvent('mouseleave');
+ await page.waitForTimeout(300);
  await page.keyboard.press('Escape');
+ await expect(chip(root)).toHaveAttribute('aria-expanded','false');
  // Playing, the story ends at about 35s, under 40s; the replay waits for it.
  await page.emulateMedia({reducedMotion:'no-preference'});
- await root.dispatchEvent('mouseenter');
+ await chip(root).click();
  await expect(card(root)).toHaveClass(/is-playing/);
  const end=await card(root).evaluate(c=>Math.max(...c.getAnimations({subtree:true}).map(a=>a.effect.getComputedTiming().endTime).filter(Number.isFinite)));
  expect(end).toBeGreaterThan(10000);
  expect(end).toBeLessThan(40000);
- await root.dispatchEvent('mouseleave');
  await page.keyboard.press('Escape');
  // Phones: a tap opens it inline, inside the card, with no sideways scroll.
  await page.setViewportSize({width:390,height:844});
@@ -261,8 +284,11 @@ test('phone charts stay open while the page scrolls and a finger lands elsewhere
 
 test('internship rows invite a hover (or a tap on phones), and the first chip of each row breathes whenever its charts are closed',async({page})=>{
  await page.goto('/experience');
- await expect(page.locator('.internship-demo-hint')).toHaveCount(2);
- await expect(page.locator('.internship-demo-hint').first()).toHaveText('Hover the chart to see it in action',{useInnerText:true});
+ const hints=page.locator('.case-study--internship .internship-demo-hint');
+ await expect(hints).toHaveCount(2);
+ await expect(hints.first()).toHaveText('Hover the chart to see it in action',{useInnerText:true});
+ // The agentic console opens on a click, and says so.
+ await expect(page.locator('#agentic-ai .internship-demo-hint')).toHaveText('Click the chart to see it in action',{useInnerText:true});
  const first=chip(peek(page,'shopee'));
  await first.scrollIntoViewIfNeeded();
  await expect(first).toHaveClass(/is-breathing/);
@@ -274,7 +300,8 @@ test('internship rows invite a hover (or a tap on phones), and the first chip of
  await expect(first).toHaveClass(/is-breathing/);
  await page.setViewportSize({width:390,height:844});
  await page.reload();
- await expect(page.locator('.internship-demo-hint').nth(1)).toHaveText('Tap a chart to see it in action',{useInnerText:true});
+ await expect(hints.nth(1)).toHaveText('Tap a chart to see it in action',{useInnerText:true});
+ await expect(page.locator('#agentic-ai .internship-demo-hint')).toHaveText('Tap the chart to see it in action',{useInnerText:true});
 });
 
 test('smart zoom: a click near the bottom eases the whole card into view, keeps the chip on screen, and hover never scrolls',async({page})=>{

@@ -16,7 +16,10 @@
   const warmFonts = () => { if (document.fonts) ['400 11px Figtree', '500 11px Figtree', '700 11px Figtree', 'italic 900 8px "League Mark"', '8px "League Serif"', 'italic 8px "League Serif"'].forEach(f => document.fonts.load(f)); };
   if (document.readyState === 'complete') warmFonts();
   else addEventListener('load', warmFonts, { once: true });
-  let active = null, pinned = null, hovered = null, leaveTimer = null, pointer = { x: -1, y: -1 };
+  let active = null, pinned = null, hovered = null, leaveTimer = null, pointer = { x: -1, y: -1 }, docked = null;
+  // Desktop opens the agentic console inline on a click (docked) and keeps it
+  // open beside the hover previews: a popover that size covered the page.
+  const dock = r => !touch.matches && r.dataset.company === 'agentic';
 
   const card = r => r.querySelector('.internship-demo-card');
   const chip = r => r.querySelector('button');
@@ -30,7 +33,7 @@
   const shown = new Set();
   // All breathing chips share one phase.
   const breathe = () => breathers.forEach(r => {
-    const b = chip(r), on = shown.has(r) && !(active && active.closest('.case-study') === r.closest('.case-study'));
+    const b = chip(r), on = shown.has(r) && docked !== r && !(active && active.closest('.case-study') === r.closest('.case-study'));
     if (on !== b.classList.contains('is-breathing')) b.style.animationDelay = on ? `${-(performance.now() % 2600)}ms` : '';
     b.classList.toggle('is-breathing', on);
   });
@@ -49,7 +52,7 @@
     if (motion.matches) return;
     card(r).classList.add('is-fading');
     clearTimeout(r.fade);
-    r.fade = setTimeout(() => { if (active === r) play(r); }, FADE);
+    r.fade = setTimeout(() => { if (active === r || docked === r) play(r); }, FADE);
   }
   // Smart zoom (owner, 25 Oct 2026), shared with anomaly-peek.js as
   // window.peekZoom. grow(): a card grows out of its chip (CSS, --grow-x); an
@@ -185,6 +188,24 @@
     clearInterval(r.loop);
     r.loop = setInterval(() => { if (!document.hidden && onScreen(c)) replay(r); }, Math.max(REPLAY, end + HOLD + FADE));
   }
+  function toggleDock(r) {
+    const c = card(r), on = docked !== r;
+    docked = on ? r : null;
+    chip(r).setAttribute('aria-expanded', on);
+    c.inert = !on;
+    if (r.grow) r.grow.cancel();
+    if (on) {
+      c.classList.add('is-open');
+      const g = zoom.grow(c, chip(r), true, 0);
+      r.finalHeight = g.h; r.grow = g.a;
+      play(r); loop(r);
+      requestAnimationFrame(() => { if (docked === r) reveal(r); });
+    } else {
+      clearInterval(r.loop);
+      r.grow = zoom.shut(c, false, true, late => { if (!late || docked !== r) { c.classList.remove('is-open', 'is-playing', 'is-still', 'is-fading'); c.style.overflow = ''; } });
+    }
+    breathe();
+  }
   // The pointer has left the chip row and the card: after a short grace a
   // pinned card returns, otherwise the preview closes.
   function scheduleLeave() {
@@ -199,20 +220,21 @@
 
   roots.forEach(r => {
     const b = chip(r);
-    r.addEventListener('mouseenter', () => { if (zoom.lock) return; hovered = r; if (!touch.matches) open(r); });
-    r.addEventListener('mouseleave', () => { if (hovered === r) hovered = null; if (!touch.matches) scheduleLeave(); });
+    r.addEventListener('mouseenter', () => { if (zoom.lock || dock(r)) return; hovered = r; if (!touch.matches) open(r); });
+    r.addEventListener('mouseleave', () => { if (hovered === r) hovered = null; if (!touch.matches && !dock(r)) scheduleLeave(); });
     b.addEventListener('focus', () => {
-      if (touch.matches) return;
+      if (touch.matches || dock(r)) return;
       // Keyboard focus moves on for good: another chip's pin is dropped, so
       // it cannot pop back open later from a stray hover.
       if (pinned && pinned !== r) pinned = null;
       open(r);
     });
     b.addEventListener('click', () => {
+      if (dock(r)) return toggleDock(r);
       if (pinned === r) { pinned = null; close(r); }
       else { pinned = r; open(r); requestAnimationFrame(() => { if (active === r) reveal(r); }); }
     });
-    r.addEventListener('focusout', e => { if (!r.contains(e.relatedTarget) && pinned !== r) close(r); });
+    r.addEventListener('focusout', e => { if (!r.contains(e.relatedTarget) && pinned !== r && !dock(r)) close(r); });
   });
   document.addEventListener('mousemove', e => {
     pointer = { x: e.clientX, y: e.clientY };
@@ -220,7 +242,7 @@
     if (inside(card(active), e.clientX, e.clientY)) { clearTimeout(leaveTimer); leaveTimer = null; }
     else if (!leaveTimer) scheduleLeave();
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { pinned = null; close(active); } });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { pinned = null; if (active) close(active); else if (docked) toggleDock(docked); } });
   // Outside presses close a floating (desktop) card. Inline cards (phones,
   // touch) close only from a chip or Escape: a finger's press outside may be
   // the start of a scroll, and closing then collapsed the card mid-read.
@@ -231,7 +253,7 @@
     pinned = null;
     close(active);
   });
-  motion.addEventListener('change', () => { if (active) { play(active); loop(active); } });
+  motion.addEventListener('change', () => [active, docked].forEach(r => { if (r) { play(r); loop(r); } }));
   document.addEventListener('visibilitychange', () => {
     if (!active || !active.getAnimations) return;
     active.getAnimations({ subtree: true }).forEach(a => {

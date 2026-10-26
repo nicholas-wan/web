@@ -32,11 +32,11 @@ NOTE = 9.8          # note size in viewBox units (about 11.4px at 1366)
 CAP = 12.0          # caption size, local units (the existing .sp-label 12px)
 LINE = 1.3 * NOTE   # note line pitch
 H = 144             # viewBox height
-NOTES = {'words': ('Titles come in', 'many languages.'),
-         'model': ('One model', 'reads them all.'),
+NOTES = {'words': ('Breaks the title', 'into tokens.'),
+         'model': ('One model', 'per language.'),
          'attrs': ('Fills in the', 'product specs.')}
 # widest line of each note at 10 units of Merriweather 300 (measured in Chrome)
-WIDE = {'words': 77.4, 'model': 78.8, 'attrs': 67.7}
+WIDE = {'words': 70.9, 'model': 63.3, 'attrs': 67.7}
 k = NOTE / 10
 
 def f(v): return ('%.2f' % v).rstrip('0').rstrip('.')
@@ -52,7 +52,7 @@ MX = model_c - 239 * S
 GUTTER = (attrs_note_l - words_note_r - WIDE['model'] * k) / 2
 
 # ---- vertical layout, local units -----------------------------------------
-CAP_Y = 125.5                              # word rows end at 109
+CAP_Y = 125.5                              # word rows end at 95, the model tag at 101.5
 NOTE_Y = CAP_Y + 1.38 * NOTE / S           # caption to first note line
 PITCH = LINE / S
 

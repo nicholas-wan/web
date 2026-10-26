@@ -13,7 +13,7 @@ src = open(os.path.join(HERE, 'orig.html'), encoding='utf8').read()
 W = 360
 S = 1.45                  # listing scale
 COL_GAP = 26.0            # listing edge to word column (holds the arrow)
-ROW_W0 = 92.0             # code + gap + longest word (59.5) + 6
+ROW_W0 = 92.0             # code + gap + longest word + 6 (kept from the five-word column)
 # centre the composition: equal margins left of the listing and right of the column
 OX = (360 - (2 * 1.45 + 116 * 1.45 + COL_GAP + ROW_W0) - 2 * 1.45) / 2
 TX, TY = OX, -2.0
@@ -24,23 +24,25 @@ F_WORD, F_CODE = 14.5, 11.0
 ROW_H, ROW_P = 18.0, 22.5
 COL_X, ROW_W, CODE_W = L(118, 0)[0] + COL_GAP, ROW_W0, 21.0
 TEXT_X = COL_X + CODE_W + 5.5
-ROWS_TOP = L(0, 83)[1] - (4 * 22.5 + 18) / 2   # arrow meets the title line
-WORDS = [('ID', '#ee4d2d', 'Sepatu', False), ('ID', '#ee4d2d', 'Lari', False), ('ID', '#ee4d2d', 'Pria', False),
-         ('ZH', '#a92f17', '男士跑鞋', True), ('TH', '#b86b00', 'รองเท้าวิ่ง', True)]
+# The listing's three Indonesian words; the model they go to is the
+# Indonesian one, the front card of a stack (one model per language).
+WORDS = [('ID', '#ee4d2d', 'Sepatu', False), ('ID', '#ee4d2d', 'Lari', False), ('ID', '#ee4d2d', 'Pria', False)]
+N = len(WORDS)
+ROWS_TOP = L(0, 88.5)[1] - ((N - 1) * 22.5 + 18) / 2   # arrow meets the title line
 def row_top(i): return ROWS_TOP + i * ROW_P
 def row_base(i, alt): return row_top(i) + ROW_H / 2 + (0.34 if alt else 0.31) * F_WORD
-ROWS_MID = ROWS_TOP + (4 * ROW_P + ROW_H) / 2
+ROWS_MID = ROWS_TOP + ((N - 1) * ROW_P + ROW_H) / 2
 COL_CX = COL_X + ROW_W / 2
 import sys
 NOTE_F, NOTE_P = 13.0, 16.5   # notes: the anomaly cards' note style (Merriweather 300)
 WORDS_NOTE_BELOW = 'above' not in sys.argv
-NOTES = {'words': ('Titles come in', 'many languages.'),
-         'model': ('One model', 'reads them all.'),
+NOTES = {'words': ('Breaks the title', 'into tokens.'),
+         'model': ('One model', 'per language.'),
          'attrs': ('Fills in the', 'product specs.')}
 # 'Words' heads its column (the space above the rows is otherwise empty),
 # so its note never meets the arrow down to the model.
 if WORDS_NOTE_BELOW:     # caption and note under the rows, like the other two steps
-    WORDS_CAP_Y = row_top(4) + ROW_H + 20
+    WORDS_CAP_Y = row_top(N - 1) + ROW_H + 20
     WORDS_NOTE_Y = WORDS_CAP_Y + 17.5
 else:
     WORDS_NOTE_Y = ROWS_TOP - 12 - NOTE_P
@@ -48,11 +50,13 @@ else:
 
 # ---- bottom band -----------------------------------------------------------
 LIST_X0, LIST_X1 = L(2, 0)[0], L(118, 0)[0]
-B_TOP = (WORDS_NOTE_Y + NOTE_P + 6 + 18 + 5 - 4.9) if WORDS_NOTE_BELOW else 223.0   # an 18-unit arrow down to the model
 SPEC_P = 20.0
 SPEC_H = 4 * SPEC_P + 9
-SPEC_MID = B_TOP + SPEC_H / 2
 M = 1.8                    # model scale
+PEEK = 4 * 3               # the sibling cards peek 3 units each above the front one
+# an 18-unit arrow down to the top of the model stack
+B_TOP = (WORDS_NOTE_Y + NOTE_P + 6 + 18 + 5 + PEEK * M - (SPEC_H / 2 - 44 * M / 2)) if WORDS_NOTE_BELOW else 223.0
+SPEC_MID = B_TOP + SPEC_H / 2
 MODEL_CX = COL_CX
 MODEL_CY = SPEC_MID
 CAP_Y = B_TOP + SPEC_H + 20
@@ -61,11 +65,9 @@ H = round(NOTE_Y + NOTE_P + 6)
 
 # ---- chips -----------------------------------------------------------------
 # (listing-space text x, baseline, rect x, y, w, h, fill, alt, row)
-CHIPS = [(8, 86, 7, 77.5, 37.4, 11, '#fbd9cf', False, 0, 'Sepatu'),
-         (46.05, 86, 45.05, 77.5, 19.9, 11, '#fbd9cf', False, 1, 'Lari'),
-         (66.64, 86, 65.64, 77.5, 20.6, 11, '#fbd9cf', False, 2, 'Pria'),
-         (8, 97.5, 7, 89.5, 40, 10.5, '#efd5ce', True, 3, '男士跑鞋'),
-         (53.53, 97.5, 52.53, 89.5, 40.3, 10.5, '#fbe3cd', True, 4, 'รองเท้าวิ่ง')]
+CHIPS = [(8, 92, 7, 83.5, 37.4, 11, '#fbd9cf', False, 0, 'Sepatu'),
+         (46.05, 92, 45.05, 83.5, 19.9, 11, '#fbd9cf', False, 1, 'Lari'),
+         (66.64, 92, 65.64, 83.5, 20.6, 11, '#fbd9cf', False, 2, 'Pria')]
 CLEAR_X = 97               # listing x every chip slides to before it travels
 LIFT = 1.2
 
@@ -90,7 +92,7 @@ filt = src[src.index('<filter id="spLift"'):src.index('</filter>') + 9].replace(
 
 out = []
 A = out.append
-A(f'<svg class="sp-brand sp-brand--m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="A Shopee product page with an Indonesian title and a Chinese and Thai line: every word, in all three languages, is tokenised and read by a text model, which fills the product specifications with Shoes, Running, Men and Sport.">{defs}')
+A(f'<svg class="sp-brand sp-brand--m" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" role="img" aria-label="A Shopee product page with an Indonesian title: its words are tokenised and read by the Indonesian text model, the front one of a stack of models, one per language, which fills the product specifications with Shoes, Running, Men and Sport.">{defs}')
 A(f'<g class="sp-m-card"><g transform="translate({f(TX)} {f(TY)}) scale({S})">{card}</g></g>')
 
 # chips: outer g animates in scene space; inner g carries the listing transform
@@ -117,14 +119,19 @@ A('</g>')
 # left facing the spec list), scaled M about its centre
 def mx(dx): return MODEL_CX + M * dx      # ins at +13 (right), output at -13 (left)
 def my(dy): return MODEL_CY + M * dy
-ins = [(13, d) for d in (-15, -7.5, 0, 7.5, 15)]
-mids = [(0, d) for d in (-11, 0, 11)]
+ins = [(13, d) for d in (-10, 0, 10)]
+mids = [(0, d) for d in (-14, 0, 14)]
 outn = (-13, 0)
 bw, bh = 40 * M, 44 * M
+stack_top = MODEL_CY - bh / 2 - PEEK * M
 in_x = mx(13)
 A('<g class="sp-m-model">')
-dn0 = (WORDS_NOTE_Y + NOTE_P + 6) if WORDS_NOTE_BELOW else (row_top(4) + ROW_H + 8)
-A(f'<path class="sp-arrow sp-m-arrow-2" d="M{f(in_x)} {f(dn0)}V{f(MODEL_CY - bh/2 - 5)}M{f(in_x - 4)} {f(MODEL_CY - bh/2 - 9)}L{f(in_x)} {f(MODEL_CY - bh/2 - 5)}L{f(in_x + 4)} {f(MODEL_CY - bh/2 - 9)}"></path>')
+dn0 = (WORDS_NOTE_Y + NOTE_P + 6) if WORDS_NOTE_BELOW else (row_top(N - 1) + ROW_H + 8)
+A(f'<path class="sp-arrow sp-m-arrow-2" d="M{f(in_x)} {f(dn0)}V{f(stack_top - 5)}M{f(in_x - 4)} {f(stack_top - 9)}L{f(in_x)} {f(stack_top - 5)}L{f(in_x + 4)} {f(stack_top - 9)}"></path>')
+# the sibling models: unlabelled cards behind the front one, each 2 units
+# narrower a side and peeking 3 units higher (back to front)
+A('<g class="sp-stack" fill="#fff">' + ''.join(f'<rect x="{f(MODEL_CX - bw/2 + 2*i*M)}" y="{f(MODEL_CY - bh/2 - 3*i*M)}" width="{f(bw - 4*i*M)}" height="{f(bh)}" rx="{f(4*M)}" stroke="{c}" stroke-width="1.2"></rect>'
+  for i, c in ((4, '#f9e4dd'), (3, '#f7dad0'), (2, '#f5cfc2'), (1, '#f2c4b4'))) + '</g>')
 A(f'<rect x="{f(MODEL_CX - bw/2)}" y="{f(MODEL_CY - bh/2)}" width="{f(bw)}" height="{f(bh)}" rx="{f(4*M)}" fill="#fff" stroke="#efb9a5" stroke-width="1.2"></rect>')
 A(f'<g fill="none" stroke="#f2cbbd" stroke-width="{f(.75*M)}">')
 for (mdx, mdy) in mids:
@@ -135,6 +142,8 @@ A(f'<path class="sp-m-edge sp-m-edge--out" d="{d}"></path></g>')
 A('<g class="sp-nodes sp-m-nodes-in" fill="#f0a086">' + ''.join(f'<circle cx="{f(mx(a))}" cy="{f(my(b))}" r="{f(2.2*M)}"></circle>' for a, b in ins) + '</g>')
 A('<g class="sp-nodes sp-m-nodes-mid" fill="#ea7752">' + ''.join(f'<circle cx="{f(mx(a))}" cy="{f(my(b))}" r="{f(2.4*M)}"></circle>' for a, b in mids) + '</g>')
 A(f'<g class="sp-nodes sp-m-nodes-out" fill="#ee4d2d"><circle cx="{f(mx(outn[0]))}" cy="{f(my(outn[1]))}" r="{f(3*M)}"></circle></g>')
+tw, th = 16 * M, 8.5 * M   # the front card's language tag, on its bottom edge
+A(f'<g class="sp-model-tag"><rect x="{f(MODEL_CX - tw/2)}" y="{f(MODEL_CY + bh/2 - 4*M)}" width="{f(tw)}" height="{f(th)}" rx="{f(2*M)}" fill="#ee4d2d"></rect><text class="sp-code" x="{f(MODEL_CX)}" y="{f(MODEL_CY + bh/2 - 4*M + th/2 + 0.36*F_CODE)}" text-anchor="middle">ID</text></g>')
 A(f'<text class="sp-label" x="{f(MODEL_CX)}" y="{f(CAP_Y)}" text-anchor="middle">Model</text>' + note('model', 2, MODEL_CX, NOTE_Y))
 A('</g>')
 
@@ -180,17 +189,13 @@ css = [f'''/* Shopee, phone only (<=736px): the same scene on a taller canvas
 .is-playing .sp-brand--m .sp-m-note-3 {{ animation: sp-m-reveal 0.5s 5.75s both; }}
 .is-playing .sp-brand--m .sp-m-card {{ animation: sp-m-split 0.9s 0.4s ease-in-out both; }}
 .is-playing .sp-brand--m .sp-m-crop {{ animation: sp-m-reveal 0.4s 1.2s both; }}
-.is-playing .sp-brand--m .sp-m-chip-5 {{ animation: sp-m-chip-5 1.2s 1.8s both; }}
-.is-playing .sp-brand--m .sp-m-chip-4 {{ animation: sp-m-chip-4 1.2s 2.08s both; }}
-.is-playing .sp-brand--m .sp-m-chip-3 {{ animation: sp-m-chip-3 1.2s 2.36s both; }}
-.is-playing .sp-brand--m .sp-m-chip-2 {{ animation: sp-m-chip-2 1.2s 2.64s both; }}
-.is-playing .sp-brand--m .sp-m-chip-1 {{ animation: sp-m-chip-1 1.2s 2.92s both; }}
+.is-playing .sp-brand--m .sp-m-chip-3 {{ animation: sp-m-chip-3 1.2s 1.8s both; }}
+.is-playing .sp-brand--m .sp-m-chip-2 {{ animation: sp-m-chip-2 1.2s 2.2s both; }}
+.is-playing .sp-brand--m .sp-m-chip-1 {{ animation: sp-m-chip-1 1.2s 2.6s both; }}
 .is-playing .sp-brand--m .sp-m-words {{ animation: sp-m-arrive-x 0.6s 1.7s both; }}
-.is-playing .sp-brand--m .sp-m-slot-5 {{ animation: sp-m-reveal 0.3s 2.54s both; }}
-.is-playing .sp-brand--m .sp-m-slot-4 {{ animation: sp-m-reveal 0.3s 2.82s both; }}
-.is-playing .sp-brand--m .sp-m-slot-3 {{ animation: sp-m-reveal 0.3s 3.1s both; }}
-.is-playing .sp-brand--m .sp-m-slot-2 {{ animation: sp-m-reveal 0.3s 3.38s both; }}
-.is-playing .sp-brand--m .sp-m-slot-1 {{ animation: sp-m-reveal 0.3s 3.66s both; }}
+.is-playing .sp-brand--m .sp-m-slot-3 {{ animation: sp-m-reveal 0.3s 2.54s both; }}
+.is-playing .sp-brand--m .sp-m-slot-2 {{ animation: sp-m-reveal 0.3s 2.94s both; }}
+.is-playing .sp-brand--m .sp-m-slot-1 {{ animation: sp-m-reveal 0.3s 3.34s both; }}
 .is-playing .sp-brand--m .sp-m-arrow-1 {{ animation: sp-m-arrive-x 0.4s 3.9s both; }}
 .is-playing .sp-brand--m .sp-m-model {{ animation: sp-m-arrive-y 0.5s 4.1s both; }}
 .is-playing .sp-brand--m .sp-m-edge {{ animation: sp-m-glow 0.55s 4.5s ease-out both; }}

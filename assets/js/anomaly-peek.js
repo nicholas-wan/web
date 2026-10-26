@@ -149,9 +149,8 @@
     var label = el('text', { class: 'peek-label', 'text-anchor': 'middle' }, svg);
     label.textContent = 'Unusual link';
     var gt = GROW + TRAVEL + 1300, nextPacket = 0, live = [], bends = [];
-    // Each unusual link bows only as far as it must to miss every other node;
-    // its label sits just above its middle, wherever it crosses the fewest
-    // usual links (review, Oct 2026: it sat on a grey edge by the target).
+    // An unusual link bows just enough to miss other nodes; its label sits
+    // where it crosses the fewest usual links.
     function bez(a, k, b, f) { return lerp(lerp(a, k, f), lerp(k, b, f), f); }
     function bend(pair, lw) {
       var a = pts[pair[0]], b = pts[pair[1]], m = lerp(a, b, 0.5), len = Math.hypot(b.x - a.x, b.y - a.y) || 1;
@@ -240,12 +239,9 @@
     };
   }
 
-  // ---- Phishing domains: a copy lifts off a real sign-in page, matching
-  // features link up, then a dot swapped for a hyphen and an altered logo are
-  // marked and the copy is outlined. A one-line key names each difference as
-  // it shows, its swatch matching the mark, so the pages stay clean (owner,
-  // Oct 2026: the logo is "changed slightly to avoid detection"). Unnumbered:
-  // it names what differs, not the detector's steps.
+  // ---- Phishing domains: a copy lifts off a real sign-in page; a hyphen for
+  // a dot and an altered logo are marked, each named in a key as it shows
+  // (owner, Oct 2026). Unnumbered: what differs, not the detector's steps.
   var TEAL = '#11807d', AMBER = '#c46d1c', INK = '#20343d', SOFT = '#d7e4e2';
   function dash(node, f) { node.setAttribute('stroke-dashoffset', (1 - f).toFixed(3)); node.setAttribute('visibility', f > 0 ? 'visible' : 'hidden'); }
   function drawable(node) { node.setAttribute('pathLength', 1); node.setAttribute('stroke-dasharray', '1 1'); return node; }
@@ -366,9 +362,8 @@
       comparisonLink.setAttribute('d', 'M'+(referenceX+swapW/2)+' '+(PY+32)+'H'+(candidateX+swapW/2));
       var lx = x1 + pw / 2 + 2, ly = PY + 45;
       referenceLogo.setAttribute('d', 'M'+(x0+pw/2)+' '+(PY+29)+'a15 15 0 1 1-.01 0');
-      // The key ends under the copy's right edge, in line with the tag, when it
-      // fits there (into the gap at most); otherwise it centres under both
-      // pages. A tight bar narrows the space between entries rather than wrap.
+      // The key ends under the copy's right edge when it fits, else centres;
+      // a tight bar narrows the gap between entries rather than wrap.
       var kw = legend.map(function (k) { var w = 0; try { w = k.text.getComputedTextLength(); } catch (e) {} return 15 + (w || 80); });
       var kgap = Math.max(8, Math.min(16, W - 4 - kw[0] - kw[1])), kspan = kw[0] + kgap + kw[1];
       var kx = x1 + pw - kspan >= x0 + pw + 2 ? x1 + pw - kspan : Math.max(2, (W - kspan) / 2);
@@ -522,8 +517,7 @@
   function createMiniSite(svg) {
     var W = 56, H = 18, X0 = 8, X1 = 30;
     svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H); svg.setAttribute('width', W); svg.setAttribute('height', H);
-    // The chart in miniature: a copy slides out from behind a tiny sign-in
-    // page, then its outline and one address mark turn amber.
+    // In miniature: a copy slides out and turns amber.
     function page(fake) {
       var g = el('g', {}, svg), p = { g: g };
       p.box = el('rect', { x: 0, y: 2, width: 18, height: 14, rx: 2.5, fill: '#fff', stroke: '#cfdcda', 'stroke-width': 0.6 }, g);
@@ -579,8 +573,7 @@
       }
     }
   };
-  // While the card stays on screen they replay every 15s, without the glow,
-  // holding while a chart is open or the tab is hidden.
+  // On screen they replay every 15s, without the glow.
   var loopTimer = 0;
   function loopLater() {
     window.clearTimeout(loopTimer);
@@ -625,21 +618,16 @@
     // Phones and touch tablets show the card inline below the chips (CSS),
     // so nothing to place.
     if (inline.matches) { c.pop.style.left = ''; c.pop.style.top = ''; return; }
-    // Below the chip row, left-aligned with the chip and kept inside the card.
-    // The row is unpositioned, so chip and row offsets are both card-relative.
+    // Below the chip row, aligned with the chip, inside the card.
     var pop = c.pop, chip = c.chip;
     var w = pop.offsetWidth, cw = card.clientWidth, padX = 12;
     var left = Math.max(padX, Math.min(cw - w - padX, chip.offsetLeft));
     pop.style.left = left + 'px';
     pop.style.top = (root.offsetTop + root.offsetHeight + 8) + 'px';
   }
-  // One card at a time. Whatever the reader is hovering or focusing right
-  // now wins; failing that, the last pinned card shows. So hovering the other
-  // chip previews it over a pin, and the pin returns when the pointer leaves.
+  // One card at a time: what is hovered or focused wins, else the last pin.
   var stamp = 0;
-  // The first chip breathes whenever the card is on screen and no chart is
-  // open, so the invitation comes back after a chart is closed (owner, Oct
-  // 2026: "should keep repeating the pulse even after clicked before").
+  // The first chip breathes on screen while no chart is open (owner, Oct 2026).
   function breathe() {
     var b = charts[keys[0]].chip, on = onScreen && !keys.some(function (k) { return charts[k].state.open; });
     // In phase with the internship chips' breathing.
@@ -651,8 +639,7 @@
     if (!want.length) { want = keys.filter(function (k) { var s = charts[k].state; return !s.dismissed && s.pinned; }); }
     want.sort(function (x, y) { return charts[y].state.touched - charts[x].state.touched; });
     var show = want[0] || null;
-    // A swap (another chart opening in this one's place) grows the new card
-    // from the old one's height, so the page below doesn't jump.
+    // A swap grows the new card from the old one's height.
     var from = 0;
     if (show) { keys.forEach(function (k) { if (k !== show && charts[k].state.open) { from = charts[k].pop.offsetHeight; } }); }
     keys.forEach(function (k) {
@@ -738,9 +725,8 @@
       s.pinned = false; s.dismissed = true; update();
     });
   });
-  // Outside presses close a floating card: a mouse on press, touch on the tap
-  // itself (click), since a finger's pointerdown may be the start of a scroll.
-  // Inline cards (phones, touch tablets) close from their chip instead.
+  // Outside presses close a floating card (touch on the tap itself, as a
+  // finger's press may start a scroll); inline cards close from their chip.
   function closeOutside(target) {
     if (inline.matches) { return; }
     keys.forEach(function (k) {
