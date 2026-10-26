@@ -1,0 +1,24 @@
+/* A chapter holds its authored frame for one viewport of scrolling. */
+.page-experience .agentic-frames{height:600svh}
+.agentic-frames .agentic-story__sticky{min-height:0}
+.agentic-frames .agentic-story__count strong{color:#f4f2ea;font-family:"Merriweather",Georgia,serif;font-size:1.35rem;font-weight:300}
+.agentic-frames .agentic-story__narrative{min-height:10.5rem}
+.agentic-frames .agentic-story__nav>button{width:44px;min-width:44px;height:44px;min-height:44px;padding:0;border-radius:50%;box-shadow:none;display:grid;place-items:center;letter-spacing:0}
+.agentic-frames .agentic-story__nav [data-dots]{display:flex;gap:.45rem}
+.agentic-frames .agentic-story__nav [data-dots] button{width:7px;height:7px;min-height:0;padding:0;border:0;border-radius:50%;background:#486562;box-shadow:none}
+.agentic-frames .agentic-story__nav [data-dots] button[aria-current=step]{background:#28d7c5;box-shadow:0 0 0 3px rgba(40,215,197,.15)}
+.agentic-frames__console{transition:opacity .18s ease}
+.agentic-frames__console.is-switching{opacity:.18}
+.agentic-frames .agentic-story__foot p{color:#91ada8}
+.page-experience .agentic-frames--detection{border-color:#4d5142;background:radial-gradient(circle at 90% 0%,rgba(255,184,105,.09),transparent 27rem),#091617}
+.agentic-frames--detection .agentic-story__eyebrow,.agentic-frames--detection .agentic-story__kicker{color:#ffb869}
+.agentic-frames--detection .agentic-story__progress span{background:#ffb869}
+.agentic-frames--detection .agentic-story__nav [data-dots] button[aria-current=step]{background:#ffb869;box-shadow:0 0 0 3px rgba(255,184,105,.16)}
+.page-experience .agentic-frames__interlude{grid-column:1/-1;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:75svh;padding:clamp(2rem,7vw,6rem);border:1px solid var(--color-border);border-radius:var(--radius-card);background:#f6f8f6;color:#20343d}
+.agentic-frames__interlude h2{max-width:48rem;margin:1.1rem 0;color:#20343d!important;font-family:"Merriweather",Georgia,serif;font-size:clamp(2rem,4.5vw,4rem);font-weight:300;letter-spacing:-.04em;line-height:1.2;text-align:left;text-transform:none}
+.agentic-frames__interlude>p:not(.agentic-story__kicker){max-width:41rem;margin:.3rem 0 1.4rem;color:#526762;font-family:"Source Sans Pro",Helvetica,sans-serif;font-size:clamp(1rem,1.4vw,1.25rem);line-height:1.6;text-align:left}
+.agentic-frames__interlude>a{display:inline-flex;gap:1.5rem;align-items:center;padding:.65rem 1rem;border:1px solid #71a8a1;border-radius:.55rem;color:#0c6663!important;font-family:"Source Sans Pro",Helvetica,sans-serif;font-size:.85rem;font-weight:700;text-decoration:none}
+.agentic-frames__interlude>a:hover,.agentic-frames__interlude>a:focus-visible{border-color:#0c6663;background:#e5f4f0}
+@media(max-width:980px){.agentic-frames .agentic-story__narrative{min-height:0}}
+@media(max-width:736px){.agentic-frames .agentic-story__count strong{font-size:1rem}.agentic-frames .agentic-story__nav [data-dots]{display:none}.agentic-frames .agentic-story__narrative{min-height:0}.agentic-frames .agentic-story__foot p{font-size:.6rem}.page-experience .agentic-frames__interlude{min-height:58svh;padding:2rem 1.3rem}.agentic-frames__interlude h2{font-size:1.8rem}}
+@media(prefers-reduced-motion:reduce){.agentic-frames__console{transition:none}}
