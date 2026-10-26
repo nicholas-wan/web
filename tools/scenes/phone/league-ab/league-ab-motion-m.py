@@ -202,6 +202,7 @@ def html(L):
     hills = re.sub(r'(class="lgab-hill-area" d=")[^"]*"', lambda m: m.group(1) + "M" + pts + 'Z"', hills)
     hills = re.sub(r'(class="lgab-hill-line" d=")[^"]*"', lambda m: m.group(1) + "M" + pts + '"', hills)
     label = re.search(r'aria-label="([^"]*)"', svg).group(1)
+    label = label.removesuffix(" B's is higher, and the difference is statistically significant.")  # the desktop label may carry it already
     label += " Both designs are variants, A and B; each curve shows where that design's match rate likely lies; B's is higher, and the difference is statistically significant."
     b, top = L["base"], L["top"]
     ly = -(72 * SY + 4.5)

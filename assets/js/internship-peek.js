@@ -52,14 +52,13 @@
   }
   // Smart zoom (owner, 25 Oct 2026), shared with anomaly-peek.js as
   // window.peekZoom. grow(): a card grows out of its chip (CSS, --grow-x); an
-  // inline one unfolds the space below with its padding, border and margin,
-  // so nothing snaps; one replacing another in its slot (`from`, the old
-  // height) neither zooms again nor fades in blank. shut(): a swap goes at
-  // once; an inline card folds away. frame(spans): after a click or tap the
-  // page eases (700-1000ms, cosine) to centre the first [top, bottom] span
-  // (viewport px) that fits, else to put the last one's top near the top, and
-  // stops as soon as the reader scrolls, touches or types. The ease slides
-  // chips under a still mouse, so hovers wait (lock) for the mouse to move.
+  // inline one unfolds the space below, padding and all; a swap in one slot
+  // (`from`, the old height) neither zooms again nor fades in blank. shut(): a
+  // swap goes at once; an inline card folds away. frame(spans): after a click
+  // or tap the page centres the first [top, bottom] span (viewport px) that
+  // fits, else puts the last one's top near the top: a 700-1000ms cosine ease
+  // (touch: the browser's smooth scroll), stopped by any scroll, touch or key.
+  // Hovers wait (lock) until the mouse moves: the ease slides chips under it.
   const layoutTop = el => { const p = el.offsetParent; return (p ? p.getBoundingClientRect().top + p.clientTop : 0) + el.offsetTop; };
   const layoutLeft = el => { const p = el.offsetParent; return (p ? p.getBoundingClientRect().left + p.clientLeft : 0) + el.offsetLeft; };
   const box = (el, gap) => { const cs = getComputedStyle(el); return [
@@ -92,26 +91,36 @@
         return a;
       } else done();
     },
-    frame(spans) {
+    frame(spans, native) {
       zoom.stop();
       const vv = window.visualViewport;
       if (vv && vv.scale > 1.05) return;
-      const vh = vv ? vv.height : innerHeight, M = 16, fit = spans.find(([t, b]) => b - t <= vh - 2 * M);
-      const by = Math.round(fit ? (fit[0] + fit[1]) / 2 - vh / 2 : spans[spans.length - 1][0] - M);
+      const vh = vv ? vv.height : innerHeight, fit = spans.find(([t, b]) => b - t <= vh - 8);
+      const by = Math.round(fit ? (fit[0] + fit[1]) / 2 - vh / 2 : spans[spans.length - 1][0] - 16);
       if (Math.abs(by) < 8) return;
-      if (motion.matches) { scrollBy({ top: by, behavior: 'instant' }); return; }
-      zoom.lock = true;
-      const y0 = scrollY, dur = Math.min(1000, Math.max(700, 650 + Math.abs(by))), stops = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
-      let t0 = null, last = y0, raf = 0;
-      const off = () => { cancelAnimationFrame(raf); stops.forEach(e => removeEventListener(e, off)); zoom.stop = () => {}; };
+      const y = scrollY + by, stops = ['wheel', 'touchstart', 'pointerdown', 'keydown'];
+      if (motion.matches) { scrollTo(0, y); return; }
+      let raf = 0, again = 0;
+      const off = () => { cancelAnimationFrame(raf); clearTimeout(again); stops.forEach(e => removeEventListener(e, off)); zoom.stop = () => {}; };
       zoom.stop = off;
       stops.forEach(e => addEventListener(e, off, { passive: true }));
+      if (native) {
+        // Off the main thread, so it stays smooth while the card grows (a
+        // scripted ease stuttered on phones); retried once it has grown.
+        scrollTo({ top: y, behavior: 'smooth' });
+        if (y > document.documentElement.scrollHeight - innerHeight) again = setTimeout(() => scrollTo({ top: y, behavior: 'smooth' }), 520);
+        setTimeout(off, 1600);
+        return;
+      }
+      zoom.lock = true;
+      const y0 = scrollY, dur = Math.min(1000, Math.max(700, 650 + Math.abs(by)));
+      let t0 = null, last = y0;
       const step = t => {
         if (t0 === null) t0 = t;
         if (Math.abs(scrollY - last) > 2) return off();
         const p = Math.min(1, (t - t0) / dur);
-        last = Math.round(y0 + by * (1 - Math.cos(Math.PI * p)) / 2);
-        scrollTo({ top: last, behavior: 'instant' });
+        scrollTo(0, Math.round(y0 + by * (1 - Math.cos(Math.PI * p)) / 2));
+        last = scrollY; // a page still growing may stop it short
         if (p < 1) raf = requestAnimationFrame(step); else off();
       };
       raf = requestAnimationFrame(step);
@@ -137,15 +146,13 @@
     breathe();
   }
   // Frame the whole entry (owner, 25 Oct 2026: "bring the whole league
-  // section in the center of the screen to see all at once, not just see
-  // the graph"): centre it when it fits; otherwise frame the call to action,
-  // chips and card; failing that, start at the chips. An inline card is still
-  // growing here, so the entry is measured at the card's final height.
+  // section in the center of the screen"), else the call to action, chips
+  // and card, else the card, measured at the card's final height.
   function reveal(r) {
     const c = card(r), grow = (r.finalHeight || c.offsetHeight) - c.offsetHeight, cardBottom = layoutTop(c) + c.offsetHeight + grow;
     const art = r.closest('.case-study'), hint = art && art.querySelector('.internship-demo-hint');
     const a = (art || chip(r)).getBoundingClientRect();
-    zoom.frame([[a.top, Math.max(a.bottom + grow, cardBottom)], [(hint || chip(r)).getBoundingClientRect().top, cardBottom]]);
+    zoom.frame([[a.top, Math.max(a.bottom + grow, cardBottom)], [(hint || chip(r)).getBoundingClientRect().top, cardBottom], [c.getBoundingClientRect().top, cardBottom]], touch.matches);
   }
   function open(r) {
     clearTimeout(leaveTimer);

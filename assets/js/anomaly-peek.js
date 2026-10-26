@@ -685,7 +685,8 @@
     }, gap(c));
   }
   function reveal(c) {
-    window.peekZoom.frame([[root.getBoundingClientRect().top, window.peekZoom.top(c.pop) + (c.height || c.pop.offsetHeight)]]);
+    var bottom = window.peekZoom.top(c.pop) + (c.height || c.pop.offsetHeight);
+    window.peekZoom.frame([[root.getBoundingClientRect().top, bottom], [c.pop.getBoundingClientRect().top, bottom]], inline.matches);
   }
 
   keys.forEach(function (k) {
