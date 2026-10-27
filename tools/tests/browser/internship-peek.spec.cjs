@@ -155,7 +155,9 @@ test('internship peeks: hover previews, click pins, focus drops a foreign pin, E
  }));
  for(const slack of handovers)expect(slack).toBeGreaterThanOrEqual(-5);
  expect(await shopee.evaluate(root=>!!(root.querySelector('svg.sp-brand:not(.sp-brand--m) .sp-chips').compareDocumentPosition(root.querySelector('svg.sp-brand:not(.sp-brand--m) .sp-words'))&Node.DOCUMENT_POSITION_FOLLOWING))).toBe(true);
- await chip(shopee).click();
+ // The previous assertions pause the scene's animations mid-flight, so use
+ // the button's click event to close it without waiting for visual stability.
+ await chip(shopee).dispatchEvent('click');
  await expect(chip(league)).toHaveAttribute('aria-expanded','false');
  await expect(card(league)).toHaveAttribute('inert','');
 });
