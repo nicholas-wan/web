@@ -75,7 +75,9 @@
       shown = key;
       for (const h of holders) names.forEach((n, i) => h.style.setProperty(n, vals[i]));
       for (const [el, i] of late) el.style.visibility = pc[i] > 0 ? '' : 'hidden';
-      if (panel && N > 1) { const o = Math.min(1, pc[1] / 0.3); panel.style.opacity = (1 - o).toFixed(3); panel.style.transform = o ? `scale(${(1 - 0.06 * o).toFixed(4)})` : ''; }
+      // the camera pulls back: the console shrinks into the map (its origin, in the CSS, is where the map's query
+      // step lands) while it fades, so the map reads as the zoomed-out view of what the console just ran
+      if (panel && N > 1) { const o = Math.min(1, pc[1] / 0.45); panel.style.opacity = (1 - o * o).toFixed(3); panel.style.transform = o ? `scale(${(1 - 0.62 * o).toFixed(4)})` : ''; }
     };
     function chase(now) {
       praf = 0;

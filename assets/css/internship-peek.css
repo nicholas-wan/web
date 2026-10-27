@@ -722,7 +722,7 @@
   --q2: clamp(0, calc((var(--hs-p2) - 0.3) / 0.7), 1); --e2: calc(1 - (1 - var(--q2)) * (1 - var(--q2)));
   --out2: clamp(0, calc(var(--hs-p2) / 0.3), 1); --in2: clamp(0, calc((var(--hs-p2) - 0.3) / 0.25), 1);
 }
-.hs-scene.is-measure :is([data-hs-from], .hs-src, .hs-env, .hs-hyp) { transform: none !important; }
+.hs-scene.is-measure :is([data-hs-from], .hs-src, .hs-env, .hs-hyp, .hs-lanes) { transform: none !important; }
 /* the theme styles header text, h3, code and marks; the story sets its own */
 #agentic-ai .hs-story .hs-chead p { font-style: normal; font-weight: 400; }
 #agentic-ai .hs-story .hs-chead .hs-clabel { font-weight: 700; }
@@ -826,7 +826,21 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-env-l dd { margin: 0; color: var(--hs-ink); }
 .hs-env-l dd > span { position: relative; z-index: 0; padding: 0 1px; color: #dcefec; }
 .hs-env-l dd > span::before { content: ""; position: absolute; z-index: -1; inset: 0.08em -3px; border-radius: 5px; background: rgba(40, 215, 197, 0.2); box-shadow: inset 0 -2px 0 rgba(40, 215, 197, 0.75); }
-.hs-env-dim { opacity: 0.5; }
+.hs-env-h { opacity: 0.6; }
+/* sub-hunt lanes, one per technique (the supervisor's split); a technique hunted recently waits */
+.hs-lanes { display: grid; gap: 10px; }
+.hs-lane { position: relative; z-index: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 7px 14px 7px 7px; }
+.hs-lane::before { content: ""; position: absolute; z-index: -1; inset: 0; border: 1px solid var(--hs-cardbd); border-radius: 16px; background: var(--hs-raise); opacity: var(--m, 1); }
+.hs-lane .hs-chip { box-shadow: none; }
+.hs-lane-t { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; font-size: 13px; color: var(--hs-sec); }
+.hs-lane-t b { font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hs-mint); }
+.hs-lane.is-skip { opacity: 0.55; }
+.hs-lane.is-skip .hs-lane-t b { color: var(--hs-sec); }
+/* the hypothesis says what to look for and what is normal here */
+.hs-lo { display: grid; gap: 8px; margin: 14px 0 0; }
+.hs-lo div { display: grid; grid-template-columns: 7.6em minmax(0, 1fr); gap: 10px; align-items: start; font-size: 14px; line-height: 1.45; }
+.hs-lo dt { padding-top: 2px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hs-sec); }
+.hs-lo dd { margin: 0; color: var(--hs-ink); }
 .hs-scope { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px !important; padding-top: 14px; border-top: 1px solid var(--hs-rule); }
 .hs-scope-l { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hs-sec); margin-right: 2px; }
 .hs-fact { padding: 3px 10px; border: 1px solid var(--hs-chipbd); border-radius: 999px; background: var(--hs-chipbg); font-size: 13px; font-weight: 500; color: var(--hs-ink); white-space: nowrap; }
@@ -861,7 +875,7 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-seat-t { display: grid; line-height: 1.35; }
 .hs-seat-t b { font-size: 17px; font-weight: 700; color: var(--hs-ink); }
 .hs-seat-t span { font-size: 14px; color: var(--hs-sec); }
-/* the result rows: plan, query, read; only the reader sees the rows, one finding leaves */
+/* the result rows: plan, query, verdict; only the judge reads the rows, one finding leaves */
 .hs-rows, .hs-kb { width: min(540px, 100%); }
 .hs-pipe { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 16px !important; }
 .hs-pipe span { padding: 3px 11px; border: 1px solid var(--hs-rule); border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--hs-sec); }
@@ -869,41 +883,43 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-pipe i { width: 14px; height: 1px; background: var(--hs-rule); }
 .hs-rows .hs-lab { margin-bottom: 8px !important; }
 .hs-rows-n { margin-left: auto; font-weight: 600; letter-spacing: 0; text-transform: none; font-size: 12.5px; color: var(--hs-dim); }
-#agentic-ai .hs-story .hs-rt { width: 100%; margin: 0; border: 0; border-collapse: collapse; table-layout: fixed; background: none; }
-#agentic-ai .hs-story .hs-rt tr { border: 0; background: none; }
-#agentic-ai .hs-story .hs-rt td {
-  padding: 5px 8px; border: 0; border-top: 1px solid var(--hs-rule); font-family: var(--hs-mono); font-size: 12.5px; line-height: 1.4;
-  color: var(--hs-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+.hs-cnt { display: none; }
+.hs-wall { position: relative; }
+.hs-wr {
+  box-sizing: border-box; display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 8px; margin: 0; padding: 3px 8px;
+  border-top: 1px solid var(--hs-rule); font-family: var(--hs-mono); font-size: 12px; line-height: 1.35; color: var(--hs-ink);
 }
-#agentic-ai .hs-story .hs-rt td:first-child { width: 5.2em; color: var(--hs-sec); }
-#agentic-ai .hs-story .hs-rt tr.hs-rt-x td { color: var(--hs-teal); background: rgba(10, 118, 108, 0.07); font-weight: 600; }
-.hs-rt tr:last-child { opacity: 0.45; }   /* the rest of the 80 */
+.hs-wr span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hs-wr span:first-child { color: var(--hs-sec); }
+.hs-wr.is-x { color: var(--hs-teal); background: rgba(10, 118, 108, 0.08); font-weight: 600; }
+.hs-wr.is-x span:first-child { color: var(--hs-teal); }
 .hs-out { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin-top: 14px !important; padding-top: 12px; border-top: 1px solid var(--hs-rule); font-size: 14.5px; }
 .hs-out .hs-i { align-self: center; font-size: 15px; color: var(--hs-teal); }
 .hs-out span { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--hs-sec); }
 .hs-out b { font-weight: 600; color: var(--hs-ink); }
 .hs-out code { font-family: var(--hs-mono); }
-/* the knowledge base, then three runs of a regression set */
+/* the knowledge base, then the golden set: one run scored per technique against the answer key */
 .hs-kb .hs-lab { margin-bottom: 10px !important; }
 .hs-kbc { display: flex; flex-wrap: wrap; gap: 8px; }
 .hs-kbc span { display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border: 1px solid var(--hs-chipbd); border-radius: 999px; background: var(--hs-chipbg); font-size: 13px; color: var(--hs-ink); }
 .hs-kbc .hs-i { font-size: 14px; color: var(--hs-mint); }
-/* the golden set: one run scored per technique against the answer key (attacked, then left alone) */
 .hs-gold { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--hs-rule); }
 .hs-gold .hs-lab { margin-bottom: 12px !important; }
-.hs-gold .hs-lab .hs-i { color: var(--hs-mint); }
 .hs-cells { display: flex; flex-wrap: wrap; gap: 10px 22px; }
 .hs-cg { display: grid; gap: 6px; }
-.hs-cr { display: flex; gap: 5px; }
+.hs-cr { display: flex; gap: 5px; perspective: 260px; }
 .hs-cgl { font-size: 12px; color: var(--hs-sec); }
-.hs-cell { box-sizing: border-box; display: block; flex: none; width: 24px; height: 24px; border-radius: 5px; border: 1.5px solid var(--hs-teal); }
-.hs-cell.is-c { background: var(--hs-teal); }
-.hs-cell.is-w { background: repeating-linear-gradient(135deg, var(--hs-teal) 0 2px, transparent 2px 5px); }
-.hs-cell.is-m { border-color: var(--hs-dim); background: none; }
-.hs-cell.is-n { border: 1.5px dashed var(--hs-dim); background: var(--hs-chipbg); }
+/* a cell is a slot with its outcome as a face over it (the face flips down onto the slot, live) */
+.hs-cell { box-sizing: border-box; position: relative; display: block; flex: none; width: 24px; height: 24px; border-radius: 5px; border: 1.5px dashed var(--hs-rule); }
+.hs-cell b { box-sizing: border-box; position: absolute; inset: -1.5px; border-radius: inherit; border: 1.5px solid var(--hs-teal); transform-origin: 50% 0; backface-visibility: hidden; }
+.hs-cell.is-c b { background: var(--hs-teal); }
+.hs-cell.is-w b { background: repeating-linear-gradient(135deg, var(--hs-teal) 0 2px, transparent 2px 5px); }
+.hs-cell.is-m b { border-color: var(--hs-dim); background: var(--hs-card); }
+.hs-cell.is-n b { border-style: dashed; border-color: var(--hs-dim); background: var(--hs-chipbg); }
 .hs-key { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 12px !important; font-size: 12px; color: var(--hs-sec); }
 .hs-key span { display: inline-flex; align-items: center; gap: 6px; }
-.hs-key .hs-cell { width: 12px; height: 12px; border-radius: 3px; border-width: 1px; }
+.hs-key .hs-cell { width: 12px; height: 12px; border-radius: 3px; border: 0; }
+.hs-key .hs-cell b { inset: 0; border-width: 1px; }
 .hs-gfoot { margin-top: 10px !important; font-size: 13px; line-height: 1.45; color: var(--hs-body); }
 
 /* ---------------- the workflow map ---------------- */
@@ -924,6 +940,20 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-w-amb text { fill: #ffb869; }
 .hs-w-dot { fill: #28d7c5; opacity: 0; }
 .hs-w-glow { fill: rgba(40, 215, 197, 0.18); opacity: 0; }
+.hs-w-head { fill: #2f6f6b; }
+.hs-w-hl { fill: #2a5658; }
+.hs-w-stub { fill: none; stroke: #2a5658; stroke-width: 1.5; stroke-dasharray: 4 5; }
+.hs-w-lead { fill: #ffb869; }
+@container hs (max-width: 560px) { .hs-w-tall .hs-w-ll { font-size: 15px; } }   /* 12px on a phone's narrowest map */
+/* one hunt's trace: each attempt, its outcome */
+.hs-trace { grid-column: 1 / -1; display: grid; gap: 0; max-width: 560px; margin: 14px auto 0; padding: 0; list-style: none; }
+.hs-trace li { display: grid; grid-template-columns: 4.6em minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 8px 12px; border-top: 1px solid var(--hs-rule); font-size: 14px; line-height: 1.4; }
+.hs-trace li:last-child { border-bottom: 1px solid var(--hs-rule); }
+.hs-tr-n { font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hs-sec); }
+.hs-tr-s { color: var(--hs-ink); }
+.hs-trace b { justify-self: end; padding: 2px 10px; border: 1px solid var(--hs-chipbd); border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--hs-sec); white-space: nowrap; }
+.hs-trace .is-lead b { border-color: var(--hs-ambl); color: var(--hs-amb); }
+.hs-trace .is-keep b { border-color: var(--hs-teal); color: var(--hs-teal); }
 
 /* ---------------- live: the pinned stage ---------------- */
 .hs-scene.is-live .hs-stage { position: sticky; top: 0; height: 100vh; height: 100svh; display: flex; align-items: center; }
@@ -952,111 +982,164 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 /* the objects' stage: as tall as the console, objects placed inside it */
 .hs-scene.is-live .hs-objs--1, .hs-scene.is-live .hs-objs--3 { position: relative; height: var(--hs-objh, clamp(340px, 58svh, 450px)); margin: 0; }
 
-/* 01, live. The chips start on their phrases (the engine measures --hs-dx/--hs-dy) and are pulled out to their
-   column by the scroll, one after another, growing from 0.6 of their size and fading in over the first third of
-   their travel so they never blot the words beside a phrase; the highlight sweeps under each phrase as its chip
-   leaves. Then the report steps back and the environment card rises (p1). Then, as the hypothesis arrives
-   (p2 0.3–0.45), the environment steps up and back to 0.35, still readable, so its three facts can be seen
-   leaving it for the hypothesis's scope row (0.5–1); once they have, it fades to a ghost (0.85–1). */
-.hs-scene--product.is-live .hs-objs { --s2: clamp(0, calc((var(--hs-p2) - 0.3) / 0.15), 1); --out2: clamp(0, calc((var(--hs-p2) - 0.85) / 0.15), 1); --in2: clamp(0, calc((var(--hs-p2) - 0.3) / 0.15), 1); }
+/* 01, live: one object carried through the chapter. 0: the chips start on their phrases (the engine measures
+   --hs-dx/--hs-dy) and are pulled out to their column one after another, done by p0 0.7, before the reader
+   rests at 0.76. 1: the report recedes out of focus; each chip becomes its sub-hunt lane (a lane starts on its
+   chip, measured the same way, and grows its box and label as it travels); the environment card comes into focus
+   beside them, and once it is in, its Hunts row lights and the PowerShell lane is set aside. 2: the other lanes
+   recede; the first lane grows into the hypothesis (done by p2 0.5), then three facts leave the environment for
+   its scope row; the environment recedes last. Receding is a step back and out of focus, never a ghost. */
+.hs-scene--product.is-live .hs-objs {
+  --lt: clamp(0, calc(var(--hs-p1) / 0.12), 1);
+  --st: clamp(0, calc((var(--hs-p1) - 0.78) / 0.12), 1);
+  --h: clamp(0, calc((var(--hs-p2) - 0.04) / 0.46), 1); --he: calc(1 - (1 - var(--h)) * (1 - var(--h)));
+  --r2: clamp(0, calc(var(--hs-p2) / 0.4), 1);
+  --out2: clamp(0, calc((var(--hs-p2) - 0.88) / 0.12), 1);
+}
 .hs-scene.is-live .hs-src {
   position: absolute; inset: 0; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: center; gap: 26px;
-  opacity: calc((1 - 0.9 * var(--out)) * (1 - var(--s2))); transform: translateY(calc(-5% * var(--out))) scale(calc(1 - 0.05 * var(--out)));
+}
+.hs-scene.is-live .hs-doc {
+  opacity: calc(1 - var(--out)); filter: blur(calc(7px * var(--out)));
+  transform: scale(calc(1 - 0.08 * var(--out))); transform-origin: 30% 50%;
 }
 .hs-scene.is-live .hs-chips { flex-direction: column; align-items: flex-start; gap: 12px; position: relative; z-index: 2; }
-.hs-scene--product.is-live :is(.hs-c0, .hs-m0) { --c: clamp(0, calc(var(--hs-p0) / 0.6), 1); }
-.hs-scene--product.is-live :is(.hs-c1, .hs-m1) { --c: clamp(0, calc((var(--hs-p0) - 0.2) / 0.6), 1); }
-.hs-scene--product.is-live :is(.hs-c2, .hs-m2) { --c: clamp(0, calc((var(--hs-p0) - 0.4) / 0.6), 1); }
-.hs-scene--product.is-live .hs-chip {
-  opacity: clamp(0, calc(var(--c) / 0.35), 1); transform-origin: 0 50%; box-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.6);
+.hs-scene--product.is-live :is(.hs-c0, .hs-m0) { --c: clamp(0, calc(var(--hs-p0) / 0.45), 1); }
+.hs-scene--product.is-live :is(.hs-c1, .hs-m1) { --c: clamp(0, calc((var(--hs-p0) - 0.12) / 0.45), 1); }
+.hs-scene--product.is-live :is(.hs-c2, .hs-m2) { --c: clamp(0, calc((var(--hs-p0) - 0.24) / 0.45), 1); }
+.hs-scene--product.is-live .hs-chips > .hs-chip {
+  opacity: calc(clamp(0, calc(var(--c) / 0.35), 1) * (1 - var(--lt))); transform-origin: 0 50%; box-shadow: 0 6px 16px -10px rgba(0, 0, 0, 0.6);
   transform: translate(calc(var(--hs-dx, 0px) * (1 - var(--c))), calc(var(--hs-dy, 0px) * (1 - var(--c)))) scale(calc(0.6 + 0.4 * var(--c)));
 }
 .hs-scene.is-live .hs-doc mark::before { transform: scaleX(var(--c)); }
 .hs-scene.is-live .hs-doc-l { opacity: calc(1 - 0.7 * var(--hs-p0)); }
+.hs-scene.is-live .hs-lanes { position: absolute; inset: 0 auto 0 0; margin: auto 0; width: 49%; height: max-content; z-index: 2; pointer-events: none; }
+.hs-scene.is-live .hs-lane {
+  --m0: clamp(0, calc((var(--hs-p1) - 0.04 - var(--i) * 0.07) / 0.4), 1); --m: calc(1 - (1 - var(--m0)) * (1 - var(--m0)));
+  transform: translate(calc(var(--hs-dx, 0px) * (1 - var(--m))), calc(var(--hs-dy, 0px) * (1 - var(--m))));
+  opacity: calc((1 - 0.8 * var(--r2)) * (1 - 0.45 * var(--st) * var(--skip, 0)));
+  filter: blur(calc(5px * var(--r2)));
+}
+.hs-scene.is-live .hs-lane.is-skip { --skip: 1; }
+.hs-scene.is-live .hs-l0 { opacity: calc(1 - var(--he)); filter: none; }
+.hs-scene.is-live .hs-lane-t b { opacity: clamp(0, calc((var(--m) - 0.55) / 0.35), 1); }
+.hs-scene.is-live .hs-lane .hs-chip { border-color: color-mix(in srgb, var(--hs-chipbd) calc(100% * (1 - var(--m))), transparent); background: color-mix(in srgb, var(--hs-chipbg) calc(100% * (1 - var(--m))), transparent); }
+.hs-scene.is-live .hs-lane-t span { opacity: var(--st); }
 .hs-scene.is-live .hs-env {
-  position: absolute; inset: 0; margin: auto; width: min(500px, 92%); height: max-content; pointer-events: none;
-  opacity: calc(var(--in) * (1 - 0.65 * var(--s2)) * (1 - 0.7 * var(--out2)));
-  transform: translateY(calc(90px * (1 - var(--e)) - 70px * var(--s2))) scale(calc(1 - 0.06 * var(--s2)));
+  position: absolute; inset: 0 0 0 auto; margin: auto 0; width: 48%; height: max-content; pointer-events: none;
+  opacity: calc(var(--in) * (1 - 0.8 * var(--out2))); filter: blur(calc(8px * (1 - var(--in)) + 5px * var(--out2)));
+  transform: translateX(calc(60px * (1 - var(--e)))) scale(calc(1 - 0.05 * var(--out2)));
 }
+.hs-scene.is-live .hs-env-h { opacity: calc(0.45 + 0.55 * clamp(0, calc((var(--hs-p1) - 0.66) / 0.12), 1)); }
 .hs-scene.is-live .hs-hyp {
-  position: absolute; inset: 0; margin: auto; width: min(500px, 92%); height: max-content; pointer-events: none;
-  opacity: var(--in2); transform: translateY(calc(90px * (1 - var(--e2)) + 50px * var(--s2)));
+  position: absolute; inset: 0 auto 0 0; margin: auto 0; width: 58%; height: max-content; z-index: 3; pointer-events: none;
+  opacity: clamp(0, calc(var(--h) / 0.2), 1); transform-origin: 0 50%;
+  transform: translate(calc(var(--hs-dx, 0px) * (1 - var(--he))), calc(var(--hs-dy, 0px) * (1 - var(--he)))) scale(calc(0.4 + 0.6 * var(--he)));
 }
-.hs-scene.is-live .hs-f0 { --c: clamp(0, calc((var(--hs-p2) - 0.5) / 0.2), 1); }
-.hs-scene.is-live .hs-f1 { --c: clamp(0, calc((var(--hs-p2) - 0.65) / 0.2), 1); }
-.hs-scene.is-live .hs-f2 { --c: clamp(0, calc((var(--hs-p2) - 0.8) / 0.2), 1); }
+.hs-scene.is-live .hs-hyp > :not(.hs-lab) { opacity: clamp(0, calc((var(--h) - 0.55) / 0.3), 1); }
+.hs-scene.is-live .hs-f0 { --c: clamp(0, calc((var(--hs-p2) - 0.55) / 0.2), 1); }
+.hs-scene.is-live .hs-f1 { --c: clamp(0, calc((var(--hs-p2) - 0.63) / 0.2), 1); }
+.hs-scene.is-live .hs-f2 { --c: clamp(0, calc((var(--hs-p2) - 0.71) / 0.2), 1); }
 .hs-scene.is-live .hs-fact {
   opacity: clamp(0, calc(var(--c) / 0.15), 1); transform-origin: 0 50%;
-  /* both cards have moved since the offsets were measured at rest (the hypothesis rises and sits 50px lower,
-     the environment steps up 70px), so the start point allows for that */
-  transform: translate(calc(var(--hs-dx, 0px) * (1 - var(--c))), calc((var(--hs-dy, 0px) - 90px * (1 - var(--e2)) - 120px * var(--s2)) * (1 - var(--c)))) scale(calc(0.8 + 0.2 * var(--c)));
+  transform: translate(calc(var(--hs-dx, 0px) * (1 - var(--c))), calc(var(--hs-dy, 0px) * (1 - var(--c)))) scale(calc(0.8 + 0.2 * var(--c)));
 }
-.hs-scene.is-live .hs-scope-l { opacity: clamp(0, calc((var(--hs-p2) - 0.4) / 0.2), 1); }
+.hs-scene.is-live .hs-scope-l { opacity: clamp(0, calc((var(--hs-p2) - 0.5) / 0.15), 1); }
 
-/* 02, live: the console runs as the engine and ends on the checked query; the second frame swaps it for the
-   workflow map. The engine fades the console inline over p1 0–0.3; the "New plan" card lands when the console's
-   clock reaches the end of frame 0 (data-hs-at) and leaves with the console; the map then draws itself with the
-   scroll (the path, the six steps in order, the re-plan loop and its label last). The third frame is one hunt
-   running the path, loop included: the run covers that frame's travel and the exit, resting past the loop at
-   the frame's resting point, and parks on the analyst as the stage lets go. */
-.hs-scene.is-live .hs-console > .hunt-panel { transform-origin: 30% 20%; }
+/* 02, live: the console runs as the engine and ends on the checked query. 1: the camera pulls back, the engine
+   shrinking the console into the map (inline, over p1 0–0.45, toward the query step) while the map draws itself:
+   the path, the steps with their arrowheads in order, then the verdict's exits (the re-plan loop, the logged valid
+   negative, the lead). 2: one hunt runs the path, loop included, over the frame's travel, arriving at the analyst
+   as the reader rests; each step lights as the dot reaches it, and the trace beneath the map logs each attempt as
+   the dot reaches its verdict. The "New plan" card lands when the console's clock reaches the end of frame 0
+   (data-hs-at) and leaves with the console. */
+.hs-scene.is-live .hs-console > .hunt-panel { transform-origin: 78% 62%; }
 .hs-scene.is-live .hs-objs--2 { position: absolute; inset: 0; z-index: 2; display: block; margin: 0; pointer-events: none; }
+.hs-scene.is-live .hs-objs--2 { --lap: var(--hs-p2); --e2m: calc(1 - (1 - clamp(0, calc(var(--hs-p2) / 0.3), 1)) * (1 - clamp(0, calc(var(--hs-p2) / 0.3), 1))); }
 .hs-scene.is-live .hs-objs--2 .hs-card {
-  position: absolute; right: -14px; bottom: -18px; width: min(430px, 66%);
+  position: absolute; right: 12px; bottom: -18px; width: min(430px, 66%);
   opacity: 0; visibility: hidden; transform: translateY(26px); filter: opacity(calc(1 - clamp(0, calc(var(--hs-p1) * 2), 1)));
   transition: opacity 0.25s ease, transform 0.3s ease, visibility 0s linear 0.3s;
 }
 .hs-scene--eng.is-live[data-hs-at="0"] .hs-o2 { opacity: 1; visibility: visible; transform: none; transition: opacity 0.5s ease, transform 0.7s var(--hs-out), visibility 0s; }
-.hs-scene.is-live .hs-wmap { position: absolute; inset: 0; display: grid; place-items: center; opacity: clamp(0, calc((var(--hs-p1) - 0.18) / 0.1), 1); }
+.hs-scene.is-live .hs-wmap {
+  position: absolute; inset: 0; display: grid; place-items: center; opacity: clamp(0, calc((var(--hs-p1) - 0.18) / 0.1), 1);
+  transform: translateY(calc(-13% * var(--e2m))) scale(calc(1 - 0.16 * var(--e2m)));
+}
 .hs-scene.is-live .hs-wmap svg { width: 100%; height: 100%; max-height: 100%; }
 .hs-scene.is-live .hs-w-line { stroke-dasharray: 1; stroke-dashoffset: calc(1 - clamp(0, calc((var(--hs-p1) - 0.25) / 0.45), 1)); }
-.hs-scene.is-live .hs-w-node { --k: 0; --n: clamp(0, calc((var(--hs-p1) - 0.32 - var(--k) * 0.07) / 0.14), 1); opacity: var(--n); transform: scale(calc(0.9 + 0.1 * var(--n))); transform-box: fill-box; transform-origin: center; }
-.hs-scene.is-live .hs-w-n1 { --k: 1; } .hs-scene.is-live .hs-w-n2 { --k: 2; } .hs-scene.is-live .hs-w-n3 { --k: 3; }
-.hs-scene.is-live .hs-w-n4 { --k: 4; } .hs-scene.is-live .hs-w-n5 { --k: 5; }
-.hs-scene.is-live .hs-w-loop { stroke-dasharray: 1; stroke-dashoffset: calc(1 - clamp(0, calc((var(--hs-p1) - 0.78) / 0.2), 1)); }
-.hs-scene.is-live .hs-w-ll { opacity: clamp(0, calc((var(--hs-p1) - 0.9) / 0.1), 1); }
-.hs-scene.is-live :is(.hs-w-dot, .hs-w-glow) { --lap: clamp(0, calc(var(--hs-p2) * 0.66 + var(--hs-pe) * 0.34), 1); opacity: clamp(0, calc(var(--hs-p2) / 0.1), 1); offset-distance: calc(var(--lap) * 100%); offset-rotate: 0deg; }
+.hs-scene.is-live :is(.hs-w-node, .hs-w-head) { --k: 0; --n: clamp(0, calc((var(--hs-p1) - 0.32 - var(--k) * 0.07) / 0.14), 1); opacity: var(--n); }
+.hs-scene.is-live .hs-w-node { transform: scale(calc(0.9 + 0.1 * var(--n))); transform-box: fill-box; transform-origin: center; }
+.hs-scene.is-live :is(.hs-w-n1, .hs-w-h1) { --k: 1; } .hs-scene.is-live :is(.hs-w-n2, .hs-w-h2) { --k: 2; } .hs-scene.is-live :is(.hs-w-n3, .hs-w-h3) { --k: 3; }
+.hs-scene.is-live :is(.hs-w-n4, .hs-w-h4) { --k: 4; } .hs-scene.is-live :is(.hs-w-n5, .hs-w-h5) { --k: 5; }
+.hs-scene.is-live .hs-w-loop { stroke-dasharray: 1; stroke-dashoffset: calc(1 - clamp(0, calc((var(--hs-p1) - 0.74) / 0.16), 1)); }
+.hs-scene.is-live :is(.hs-w-ll, .hs-w-hl, .hs-w-stub) { opacity: clamp(0, calc((var(--hs-p1) - 0.86) / 0.1), 1); }
+.hs-scene.is-live .hs-w-lead { opacity: clamp(0, calc((var(--hs-p1) - 0.9) / 0.1), 1); }
+/* a step lights as the dot reaches it (the analyst's step at the very end of the run) */
+.hs-scene.is-live .hs-w-node { --lit: clamp(0, calc((var(--lap) - min(var(--at), 0.97)) / 0.03), 1); }
+.hs-scene.is-live .hs-w-node rect {
+  fill: rgb(14 calc(32 + 26 * var(--lit)) calc(36 + 22 * var(--lit)));
+  stroke: rgb(calc(47 - 7 * var(--lit)) calc(111 + 104 * var(--lit)) calc(107 + 90 * var(--lit)));
+}
+.hs-scene.is-live .hs-w-amb rect { fill: rgb(calc(26 + 30 * var(--lit)) calc(19 + 20 * var(--lit)) 9); stroke: #ffb869; stroke-width: calc(1.5px + 1px * var(--lit)); }
+.hs-scene.is-live :is(.hs-w-dot, .hs-w-glow) { opacity: calc(clamp(0, calc(var(--hs-p2) / 0.05), 1) * (1 - clamp(0, calc((var(--lap) - 0.95) / 0.04), 1))); offset-distance: calc(var(--lap) * 100%); offset-rotate: 0deg; }
+.hs-scene.is-live .hs-trace { position: absolute; left: 0; right: 0; bottom: 0; margin: 0 auto; width: min(560px, 100%); }
+.hs-scene.is-live .hs-trace li { --a: var(--at); --t: clamp(0, calc((var(--lap) - min(var(--a), 0.97)) / 0.04), 1); opacity: var(--t); transform: translateY(calc(10px * (1 - var(--t)))); }
 
-/* 03, live. -1: nothing; 0: the result rows arrive one by one under the plan-query-read line, the ordinary ones
-   dim, the one that matters stays lit and the finding is passed on beneath them; 1: the rows step back and the
-   knowledge base rises, its entries in turn, then a golden set is scored cell by cell; 2: the knowledge base steps back,
-   the lead rises into its slot, the line grows to the analyst and the analyst scales in, so the story ends on
-   a person at any speed */
+/* 03, live. 0: the result rows pour in under the plan-query-verdict line, then the wall converges on the one row
+   that matters while the count in context falls from 80 to 1, and the finding is passed on beneath it, all by
+   p0 0.74, before the reader rests. 1: the rows recede out of focus and the knowledge base comes into focus, its
+   entries in turn; then the golden set's cells flip down onto their slots one by one, like a scoreboard, and its
+   key and method land last. 2: the knowledge base recedes; the lead unfolds from a single line, the line grows to
+   the analyst and the analyst scales in, so the story ends on a person at any speed. */
+@property --hs-cn { syntax: "<integer>"; inherits: true; initial-value: 80; }
+.hs-scene--trust.is-live .hs-objs {
+  --k0: clamp(0, calc((var(--hs-p0) - 0.42) / 0.24), 1); --k: calc(var(--k0) * var(--k0) * (3 - 2 * var(--k0)));
+  --rh: 22px;
+}
 .hs-scene.is-live :is(.hs-rows, .hs-kb) { position: absolute; inset: 0; margin: auto; height: max-content; pointer-events: none; }
 .hs-scene.is-live .hs-rows {
-  opacity: calc(clamp(0, calc(var(--hs-p0) * 2.5), 1) * (1 - 0.9 * var(--out)) * (1 - var(--out2)));
-  transform: translateY(calc(60px * (1 - var(--hs-p0)) - 5% * var(--out))) scale(calc(1 - 0.05 * var(--out)));
+  opacity: calc(clamp(0, calc(var(--hs-p0) * 3), 1) * (1 - var(--out)));
+  transform: translateY(calc(50px * (1 - clamp(0, calc(var(--hs-p0) * 2), 1)))) scale(calc(1 - 0.07 * var(--out)));
+  filter: blur(calc(7px * var(--out)));
 }
-/* frame 0 settles by p0 0.74: the reader rests on it at p0 0.76 (the pin), so the finding is in place there */
-.hs-scene.is-live .hs-rt tr {
-  --r: clamp(0, calc((var(--hs-p0) - 0.1 - var(--i) * 0.07) / 0.12), 1);
-  --d: clamp(0, calc((var(--hs-p0) - 0.5) / 0.12), 1);
-  opacity: calc(var(--r) * (1 - 0.6 * var(--d))); transform: translateY(calc(8px * (1 - var(--r))));
+.hs-scene.is-live .hs-rows-s { display: none; }
+.hs-scene.is-live .hs-cnt { --hs-cn: calc(80 - 79 * var(--k)); display: inline; }
+.hs-scene.is-live .hs-cnt::after { counter-reset: hs-cn var(--hs-cn); content: counter(hs-cn); color: var(--hs-teal); font-variant-numeric: tabular-nums; }
+.hs-scene.is-live .hs-wall { height: calc(var(--rh) * (var(--n) - (var(--n) - 1) * var(--k))); }
+.hs-scene.is-live .hs-wr {
+  --r: clamp(0, calc((var(--hs-p0) - 0.04 - var(--i) * 0.025) / 0.1), 1);
+  position: absolute; left: 0; right: 0; top: 0; height: var(--rh);
+  transform: translateY(calc(var(--rh) * var(--i) * (1 - var(--k))));
+  opacity: calc(var(--r) * (1 - var(--k)));
 }
-.hs-scene.is-live .hs-rt tr.hs-rt-x { opacity: var(--r); }
-.hs-scene.is-live .hs-rt tr:last-child { opacity: calc(var(--r) * 0.45 * (1 - 0.6 * var(--d))); }
-#agentic-ai .hs-story .hs-scene.is-live .hs-rt tr.hs-rt-x td { background: rgba(10, 118, 108, calc(0.1 * var(--d))); }
-.hs-scene.is-live .hs-out { --o: clamp(0, calc((var(--hs-p0) - 0.58) / 0.16), 1); opacity: var(--o); transform: translateY(calc(-10px * (1 - var(--o)))); }
+.hs-scene.is-live .hs-wr.is-x { z-index: 1; opacity: var(--r); background: rgba(10, 118, 108, calc(0.08 + 0.1 * var(--k))); }
+.hs-scene.is-live .hs-out { --o: clamp(0, calc((var(--hs-p0) - 0.6) / 0.14), 1); opacity: var(--o); transform: translateY(calc(-10px * (1 - var(--o)))); }
 .hs-scene.is-live .hs-kb {
-  opacity: calc(var(--in) * (1 - var(--out2)));   /* gone by the lead's frame: no ghost behind the analyst */
-  transform: translateY(calc(90px * (1 - var(--e)) - 5% * var(--out2))) scale(calc(1 - 0.05 * var(--out2)));
+  opacity: calc(var(--in) * (1 - var(--out2))); filter: blur(calc(8px * (1 - var(--in)) + 6px * var(--out2)));
+  transform: translateY(calc(70px * (1 - var(--e)))) scale(calc(1 - 0.06 * var(--out2)));
 }
-/* the knowledge base's entries, then the golden set scored cell by cell, then its key and the eval line */
-.hs-scene.is-live .hs-kbc span { --r: clamp(0, calc((var(--hs-p1) - 0.35 - var(--i) * 0.05) / 0.1), 1); opacity: var(--r); transform: translateY(calc(6px * (1 - var(--r)))); }
-.hs-scene.is-live .hs-gold { opacity: clamp(0, calc((var(--hs-p1) - 0.5) / 0.08), 1); }
-.hs-scene.is-live .hs-cells .hs-cell { --k: clamp(0, calc((var(--hs-p1) - 0.55 - var(--i) * 0.022) / 0.06), 1); opacity: var(--k); transform: scale(calc(0.6 + 0.4 * var(--k))); }
-.hs-scene.is-live :is(.hs-cgl, .hs-key, .hs-gfoot) { opacity: clamp(0, calc((var(--hs-p1) - 0.86) / 0.12), 1); }
+.hs-scene.is-live .hs-kbc span { --r: clamp(0, calc((var(--hs-p1) - 0.32 - var(--i) * 0.05) / 0.1), 1); opacity: var(--r); transform: translateY(calc(6px * (1 - var(--r)))); }
+.hs-scene.is-live .hs-gold { opacity: clamp(0, calc((var(--hs-p1) - 0.48) / 0.08), 1); }
+.hs-scene.is-live .hs-cells .hs-cell b {
+  --f: clamp(0, calc((var(--hs-p1) - 0.54 - var(--i) * 0.022) / 0.06), 1);
+  transform: rotateX(calc(-90deg * (1 - var(--f)))); opacity: clamp(0, calc(var(--f) * 4), 1);
+}
+.hs-scene.is-live :is(.hs-cgl, .hs-key, .hs-gfoot) { opacity: clamp(0, calc((var(--hs-p1) - 0.84) / 0.12), 1); }
 .hs-scene.is-live .hs-hand { position: absolute; inset: 0; flex-wrap: nowrap; justify-content: center; gap: 0; }
-.hs-scene.is-live .hs-lead { flex: none; opacity: var(--in2); transform: translateY(calc(80px * (1 - var(--e2)))); }
+.hs-scene.is-live .hs-lead {
+  flex: none; opacity: clamp(0, calc(var(--hs-p2) / 0.12), 1); transform: translateY(calc(24px * (1 - var(--e2))));
+  clip-path: inset(calc((50% - 1px) * (1 - var(--e2))) 0 round 16px);
+}
 .hs-scene.is-live .hs-link {
-  display: block; flex: none; width: 70px; height: 2px; margin: 0 14px; border-radius: 1px; background: linear-gradient(90deg, var(--hs-ambl), var(--hs-amb));
+  display: block; flex: none; width: 70px; height: 2px; margin: 0; border-radius: 1px; background: linear-gradient(90deg, var(--hs-ambl), var(--hs-amb));
   transform: scaleX(clamp(0, calc((var(--hs-p2) - 0.58) / 0.22), 1)); transform-origin: 0 50%;
 }
 .hs-scene.is-live .hs-seat {
   --s: clamp(0, calc((var(--hs-p2) - 0.7) / 0.2), 1);
-  flex: none; width: 140px; flex-direction: column; text-align: center; opacity: var(--s); transform: scale(calc(0.86 + 0.14 * var(--s)));
+  flex: none; width: 64px; flex-direction: column; align-items: center; text-align: center; opacity: var(--s); transform: scale(calc(0.86 + 0.14 * var(--s)));
 }
-.hs-scene.is-live .hs-seat-t { justify-items: center; }
+.hs-scene.is-live .hs-seat-t { justify-items: center; white-space: nowrap; }
 .hs-scene--trust.is-live[data-hs-f="2"] .hs-ava::after { animation: hs-halo 1.6s ease-out 0.5s 2 both; }
 @keyframes hs-halo { 0% { opacity: 0; transform: scale(0.85); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(1.25); } }
 /* the light chapter keeps its amber for the analyst's frame; the first two frames stay teal */
@@ -1113,6 +1196,9 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
   .hs-scene.is-live .hs-p { font-size: 1rem; line-height: 1.5; max-width: 40em; }
   .hs-scene.is-live .hs-objs--1, .hs-scene.is-live .hs-objs--3 { height: var(--hs-objh, clamp(300px, 52svh, 440px)); }
   .hs-scene.is-live .hs-objs--2 .hs-card { right: 12px; bottom: 12px; }
+  .hs-scene.is-live .hs-lanes { width: 50%; }
+  .hs-scene.is-live .hs-env { width: 47%; }
+  .hs-scene.is-live .hs-hyp { width: 64%; }
 }
 @container hs (max-width: 560px) {
   .hs-scene.is-live .hs-steps { margin-top: 10px; margin-bottom: 14px; }
@@ -1130,7 +1216,22 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
   /* 01: the report on top, the techniques beneath it; the chips land in place rather than cross its text */
   .hs-scene.is-live .hs-src { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; align-content: center; gap: 12px; }
   .hs-scene.is-live .hs-chips { flex-direction: row; gap: 8px; }
-  .hs-scene--product.is-live .hs-chip { transform: translateY(calc(10px * (1 - var(--c)))); box-shadow: none; }
+  .hs-scene--product.is-live .hs-chips > .hs-chip { transform: translateY(calc(10px * (1 - var(--c)))); box-shadow: none; }
+  /* the lanes on top, the environment beneath them; the hypothesis grows over the lanes */
+  .hs-scene.is-live .hs-lanes { inset: 0 0 auto 0; margin: 0; width: auto; gap: 8px; }
+  .hs-scene.is-live .hs-env { inset: auto 0 0 0; margin: 0; width: auto; }
+  .hs-scene.is-live .hs-hyp { inset: 0 0 auto 0; margin: 0; width: auto; }
+  .hs-lane { padding: 4px 10px 4px 4px; gap: 4px 10px; flex-wrap: nowrap; }
+  .hs-lane-t { font-size: 12px; white-space: nowrap; }
+  .hs-lane-t b { display: none; }
+  .hs-lo div { grid-template-columns: minmax(0, 1fr); gap: 2px; font-size: 13.5px; }
+  .hs-trace li { grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; padding: 7px 8px; font-size: 13px; }
+  .hs-tr-n { grid-column: 1; }
+  .hs-tr-s { grid-column: 1; grid-row: 2; }
+  .hs-trace b { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+  .hs-scene.is-live .hs-trace li { --a: var(--att); }
+  .hs-scene--trust.is-live .hs-objs { --rh: 20px; }
+  .hs-wr { font-size: 12px; padding: 2px 6px; grid-template-columns: 4.6em minmax(0, 1fr); }
   .hs-scene.is-live .hs-doc-l { display: none; }
   /* 02: the card covers the feed, the engine's graph stays in view */
   .hs-scene.is-live .hs-objs--2 .hs-card { left: 8px; right: 8px; bottom: 8px; width: auto; }

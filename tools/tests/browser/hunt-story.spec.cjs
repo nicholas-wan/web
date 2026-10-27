@@ -17,11 +17,11 @@ test('agentic story: without motion, every chapter is a complete static list wit
   await page.locator('#agentic-ai .hs-story').scrollIntoViewIfNeeded();
   await expect(scenes(page)).toHaveCount(3);
   await expect(page.locator('#agentic-ai .hs-scene.is-live')).toHaveCount(0);
-  await expect(page.locator('#agentic-ai .hs-ctitle')).toHaveText(['Grounded in how analysts plan.','Narrow agents, one supervisor.','Context engineering for a small model.']);
-  await expect(page.locator('#agentic-ai .hs-clabel')).toHaveText(['01 Understanding the analyst','02 Designing the workflow','03 Making a small model reliable']);
-  await expect(page.locator('#agentic-ai .hs-step .hs-h')).toHaveText(['The input is scoped before the model sees it.','Grounded in what this environment logs.','Each technique becomes a testable hypothesis.','Each agent gets one job and the tools for it.','Re-plans when inconclusive. Hands leads to a human.','One hunt, traced start to finish.','Narrow the context for each call.','Ground the model, then evaluate it.','Human in the loop at the checkpoints.']);
-  await expect(page.locator('#agentic-ai .hs-cline').first()).toHaveText('An illustrative hunt, built around how analysts plan one.');
-  for(const sel of ['.hs-step','.hs-doc','.hs-env','.hs-hyp','.hs-fact','.hs-o2','.hs-wmap','.hs-rows','.hs-rt-x','.hs-out','.hs-kb','.hs-gold','.hs-cells','.hs-lead','.hs-seat','.hunt-panel .c2']){
+  await expect(page.locator('#agentic-ai .hs-ctitle')).toHaveText(['Built the way hunters plan a hunt.','Narrow agents, one supervisor.','Context engineering for a small model.']);
+  await expect(page.locator('#agentic-ai .hs-clabel')).toHaveText(['01 Understanding the analyst','02 Designing the workflow','03 Making a small model work']);
+  await expect(page.locator('#agentic-ai .hs-step .hs-h')).toHaveText(['One report becomes one hunt per technique.','Tailored to this environment.','Each hypothesis says what to look for, and where.','Each agent has one job.','Every search ends in a verdict: lead, clean or re-plan.','Every attempt is recorded.','Narrow the context for each call.','Ground the model, then test it against an answer key.','Human in the loop at the checkpoints.']);
+  await expect(page.locator('#agentic-ai .hs-cline').first()).toHaveText('An illustrative hunt, from a threat report to a claim it can test.');
+  for(const sel of ['.hs-step','.hs-doc','.hs-env','.hs-hyp','.hs-fact','.hs-lanes','.hs-lo','.hs-o2','.hs-wmap','.hs-trace','.hs-rows','.hs-wr.is-x','.hs-out','.hs-kb','.hs-gold','.hs-cells','.hs-lead','.hs-seat','.hunt-panel .c2']){
    for(const el of await page.locator('#agentic-ai '+sel).all()){await expect(el).toBeVisible();await expect(el).toHaveCSS('opacity','1');}
   }
   const label=await page.locator('#agentic-ai .hunt-panel .c2').getAttribute('aria-label');
@@ -30,7 +30,7 @@ test('agentic story: without motion, every chapter is a complete static list wit
   const words=await page.locator('#agentic-ai .hs-story').textContent();
   expect(words).not.toMatch(FORBIDDEN);
   expect(label).not.toMatch(FORBIDDEN);
-  for(const s of ['event_id = 4698','\\WinTaskUpdate','root-level','not in baseline','Flagged','Checked','Task creation events','Scoped to','Analyst review','Inconclusive · re-plan','Read results','1 task not in baseline','Knowledge base','Golden set','Regression evals','Human review'])expect(words).toContain(s);
+  for(const s of ['event_id = 4698','\\WinTaskUpdate','root-level','not in baseline','Flagged','Checked','Task creation events','Scoped to','Analyst review','Inconclusive · re-plan','Valid negative · logged','Verdict','Sub-hunt 1','Covered recently','Look for','Query handed on','1 task not in baseline','Knowledge base','Golden set','F1 is reported too','Human review'])expect(words).toContain(s);
   expect(await page.content()).not.toMatch(/index=wineventlog|SysUpdate|Splunk/);
   expect(await noSideScroll(page)).toBe(true);
  }
