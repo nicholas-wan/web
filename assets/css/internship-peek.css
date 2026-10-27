@@ -748,6 +748,8 @@
   }
 }
 html.hs-plain .hs-story .hs-chead > * { animation: none; }   /* plain mode (the DSTA logo): no scroll-driven rise */
+#agentic-ai .company-logo--dsta { cursor: pointer; transition: filter 0.25s ease; }
+html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the logo shows plain mode is on */
 @keyframes hs-rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 
 /* ---------------- shared type ---------------- */
