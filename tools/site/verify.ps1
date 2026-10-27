@@ -384,8 +384,9 @@ Assert-FileSizeBudget 'assets\js\anomaly-peek.js' 46
 Assert-FileSizeBudget 'assets\js\photo-search.js' 30
 # hunt-story.js drives the Work page's Agentic AI story (approved 27 Oct 2026). Like photo-search.js
 # it is injected on demand by an inline loader, outside the page's 80 KB <script src> ceiling, so it
-# carries its own budget: 13 KB at launch (scroll clock, frames, controls), with headroom to 16 KB.
-Assert-FileSizeBudget 'assets\js\hunt-story.js' 16
+# carries its own budget: 13 KB at launch (scroll clock, frames, controls); 16 KB once each frame's move
+# was scrubbed by the scroll (27 Oct 2026: progress values, the chase, chip measuring), with headroom to 18 KB.
+Assert-FileSizeBudget 'assets\js\hunt-story.js' 18
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8

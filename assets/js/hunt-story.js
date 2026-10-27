@@ -1,21 +1,14 @@
-/* The Agentic AI story on Experience (hs-; README "Agentic AI story"): three pinned chapters in the dark
-   #agentic-ai card. Each .hs-scene pins its stage while its frames advance with the page's scroll, then lets
-   go; a short title moment scrolls in normally between chapters. Injected on demand by the inline loader
-   after the story (tools/scenes/agentic-story/build.cjs), so it sits outside the page's 80 KB <script src>
-   ceiling; it carries its own budget in verify.ps1.
-   - A frame is a resting point. Scrolling into its short trigger zone plays its transition as a timed
-     animation; then nothing changes for 0.6 screens (the last frame 0.4), so the reader stops and reads.
-     A frame may ask for a longer dwell (data hold, in screens): the console's 8s run gets 1.4, so one
-     Page Down or a steady scroll still leaves the reader on it (review, 27 Oct 2026). Scrolling back rewinds.
-   - Before a chapter pins (frame -1) its objects wait in their opening state; its first frame plays as
-     the stage arrives, so every chapter opens with motion.
-   - The engineering chapter drives the agent console's paused CSS animations from a clock (its first
-     frame plays five beats in 8s). The other chapters set data-hs-f to their frame, and CSS transitions
-     move their objects; the engineering chapter's last frame swaps the console for the design diagram.
-   - Native scrolling is never touched: no snapping, no wheel handling. The dwell is the pause.
-   - Prev/next buttons and dots scroll the page smoothly to a frame's resting point.
-   - While a stage is pinned, body.hs-pinned moves the Menu pill (and, on phones, return-to-top) aside.
-   Base styles are the final state, so no JS, reduced motion or a too-short screen show everything. */
+/* The Agentic AI story on Experience (hs-; README "Agentic AI story"): three pinned chapters in #agentic-ai,
+   injected on demand by the inline loader after the story (tools/scenes/agentic-story/build.cjs). A frame is
+   a resting point; its big move is scrubbed by the scroll (27 Oct 2026, lab/scroll-speed-review.md): three
+   0..1 values go on each chapter's .hs-objs as custom properties (not the scene root: that restyles the
+   console's 300 nodes a frame), --hs-p0 (frame 0's arrival), --hs-pN (frame N's arrival over TRAVEL screens)
+   and --hs-pe (the exit); the CSS drives the moves from them, the console's fade is set inline, and the
+   values chase the scroll (TAU) since wheels scroll in notches. Then nothing changes for the dwell. Chapter 01
+   measures each phrase's offset from its chip (--hs-dx/--hs-dy) so the chips start on their phrases; objects
+   a frame has not reached stay visibility:hidden. The engineering chapter drives the console's paused CSS
+   animations from a clock. Native scrolling is never touched (no snapping, no wheel handling); the buttons
+   and dots scroll smoothly to a frame. Base styles are the final state (no JS, reduced motion, short screens). */
 (() => {
   if (!window.requestAnimationFrame || window.hsStory) return;
   window.hsStory = 1;
@@ -29,10 +22,14 @@
   // scroll geometry, in screens (small viewport heights)
   const GAP = 0.6;    // from one frame's resting point to the next: the dwell
   const LAST = 0.4;   // the last frame's dwell, then the stage lets go
-  const TZ = 0.14;    // a frame starts playing this far before its resting point
-  const HYST = 0.06;  // ...and rewinds only once the reader is this much further back
-  const ENTER = 0.32; // the first frame plays once the stage is this close to pinning
+  const TZ = 0.14;    // a frame's text swaps this far before its resting point
+  const HYST = 0.06;  // ...and swaps back only once the reader is this much further back
+  const ENTER = 0.32; // the first frame starts once the stage is this close to pinning
+  const A0 = 0.1;     // ...and its move completes this far after the pin
+  const TRAVEL = 0.4; // a later frame's move runs over this much scroll before its resting point
+  const TAU = 0.07;   // the chase's time constant, s
   const BACK = 0.6, CATCH = 0.45, MINFEED = 110, MINOBJ = 230;
+  const clamp = x => (x < 0 ? 0 : x > 1 ? 1 : x);
   const probe = document.createElement('div');
   probe.setAttribute('aria-hidden', 'true');
   probe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none';
@@ -58,9 +55,61 @@
     const rest = f => { let u = 0; for (let i = 0; i < f; i++) u += hold(i); return u; };
     const uNow = () => -root.getBoundingClientRect().top / vh;
 
+    // ---------------------------------------------------------------- the scrubbed progress values
+    const names = []; for (let f = 0; f < N; f++) names.push('--hs-p' + f); names.push('--hs-pe');
+    const holders = [...root.querySelectorAll('.hs-objs')];
+    // objects a frame has not reached yet stay hidden: [element, the value that reveals it]
+    const late = [['.hs-hyp', 1], ['.hs-dia', 1], ['.hs-trace', 0]].map(([s, i]) => [root.querySelector(s), i]).filter(x => x[0]);
+    let pt = [], pc = [], praf = 0, plast = 0, shown = '';
+    const targets = u => {
+      const v = [clamp((u + ENTER) / (ENTER + A0))];
+      for (let f = 1; f < N; f++) v.push(clamp((u - (rest(f) - TRAVEL)) / TRAVEL));
+      v.push(clamp((u - rest(N - 1)) / LAST));
+      return v;
+    };
+    const apply = () => {
+      const vals = pc.map(p => p.toFixed(4)), key = vals.join();
+      if (key === shown) return;
+      shown = key;
+      for (const h of holders) names.forEach((n, i) => h.style.setProperty(n, vals[i]));
+      for (const [el, i] of late) el.style.visibility = pc[i] > 0 ? '' : 'hidden';
+      if (panel && N > 1) { const o = Math.min(1, pc[1] / 0.3); panel.style.opacity = (1 - o).toFixed(3); panel.style.transform = o ? `scale(${(1 - 0.06 * o).toFixed(4)})` : ''; }
+    };
+    function chase(now) {
+      praf = 0;
+      if (!live) return;
+      const dt = Math.min(0.05, Math.max(0.001, (now - plast) / 1000));
+      plast = now;
+      const k = 1 - Math.exp(-dt / TAU);
+      let more = false;
+      for (let i = 0; i < pt.length; i++) {
+        const d = pt[i] - pc[i];
+        if (Math.abs(d) < 0.0015) pc[i] = pt[i]; else { pc[i] += d * k; more = true; }
+      }
+      apply();
+      if (more) praf = requestAnimationFrame(chase);
+    }
+    function setP(u, snap) {
+      pt = targets(u);
+      if (snap || !pc.length) { pc = pt.slice(); apply(); if (praf) cancelAnimationFrame(praf); praf = 0; return; }
+      if (!praf) { plast = performance.now() - 16; praf = requestAnimationFrame(chase); }
+    }
+    // chapter 01: where each marked phrase sits relative to its chip at rest (the chip starts there)
+    function measure() {
+      if (!root.querySelector('.hs-m0')) return;
+      root.classList.add('is-measure');
+      for (let i = 0; i < 3; i++) {
+        const mk = root.querySelector('.hs-m' + i), ch = root.querySelector('.hs-c' + i);
+        if (!mk || !ch) continue;
+        const a = mk.getBoundingClientRect(), b = ch.getBoundingClientRect();
+        ch.style.setProperty('--hs-dx', (a.left - b.left).toFixed(1) + 'px');
+        ch.style.setProperty('--hs-dy', (a.top + a.height / 2 - b.top - b.height / 2).toFixed(1) + 'px');
+      }
+      root.classList.remove('is-measure');
+    }
+
     // ---------------------------------------------------------------- the console's clock (as C)
-    // m counts story seconds of motion only (the holds between live spans are skipped); frame -1 is the
-    // story's start (m = 0)
+    // m counts story seconds of motion only (holds between live spans are skipped); frame -1 is m = 0
     let cum = [];
     const index = () => { let s = 0; cum = tl.live.map(([a, b]) => { const c = s; s += b - a; return c; }); };
     const M = x => { let r = 0; tl.live.forEach(([a, b], i) => { if (x >= a) r = cum[i] + Math.min(b, x) - a; }); return r; };
@@ -126,7 +175,7 @@
     // ---------------------------------------------------------------- frames, controls
     function show() {
       const k = Math.max(0, goal);
-      root.dataset.hsF = goal;   // what the CSS keys the objects on
+      root.dataset.hsF = goal;   // what the CSS keys the text on
       steps.forEach((s, i) => s.classList.toggle('is-on', i === k));
       dots.forEach((d, i) => {
         d.classList.toggle('is-done', i < goal);
@@ -152,6 +201,7 @@
       root.classList.toggle('is-off', r.bottom <= 0 || r.top >= vh);
       if (fill) fill.style.transform = `scaleX(${Math.max(0, Math.min(1, u / total)).toFixed(4)})`;
       flag(pinOn, document.body, 'hs-pinned', root, r.top <= 1 && r.bottom >= vh - 1);
+      setP(u);
       const f = pick(u);
       if (f !== goal) setGoal(f);
     }
@@ -176,6 +226,11 @@
       live = false;
       if (raf) cancelAnimationFrame(raf); raf = 0;
       if (queued) cancelAnimationFrame(queued); queued = 0;
+      if (praf) cancelAnimationFrame(praf); praf = 0;
+      pc = []; shown = '';
+      for (const h of holders) names.forEach(n => h.style.removeProperty(n));
+      for (const [el] of late) el.style.visibility = '';
+      if (panel) { panel.style.opacity = ''; panel.style.transform = ''; }
       root.classList.remove('is-live', 'is-playing', 'is-end');
       root.style.height = '';
       ['--hs-feed', '--hs-trim', '--hs-objh'].forEach(p => root.style.removeProperty(p));
@@ -185,8 +240,7 @@
       delete root.dataset.hsAt; delete root.dataset.hsF;
       void root.offsetWidth;
     }
-    // The stage must fit the screen: the console's feed (or the objects' area) gives way, down to a
-    // minimum; if it still doesn't fit, the chapter stays a static list.
+    // the stage must fit the screen: the feed (or the objects' area) gives way, else the chapter stays a list
     function fit() {
       const cs = getComputedStyle(stage);
       const room = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
@@ -203,8 +257,7 @@
       return over <= 0;
     }
     function on() {
-      // A reader already past the story must not move: measure the card, so a browser whose scroll
-      // anchoring has already absorbed the chapter's growth adds nothing (review, 27 Oct 2026).
+      // a reader already past the story must not move (scroll anchoring may have absorbed the growth)
       const card = root.closest('article') || document.body, ref = card.getBoundingClientRect().bottom, above = root.getBoundingClientRect().bottom <= 0;
       start();
       if (above) { const d = card.getBoundingClientRect().bottom - ref; if (Math.abs(d) > 1) scrollBy(0, d); }
@@ -226,6 +279,8 @@
       goal = -1; goal = pick(uNow());
       if (clocked) { m = mEnd(goal); t = tEnd(goal); runR = null; sync(); run(0, 0); }
       root.classList.add('is-jump');   // no transitions on arrival
+      measure();
+      setP(uNow(), true);
       show(); root.dataset.hsAt = goal;
       void root.offsetWidth;
       requestAnimationFrame(() => root.classList.remove('is-jump'));
@@ -243,6 +298,7 @@
     addEventListener('resize', refit);
     if (window.ResizeObserver) new ResizeObserver(refit).observe(list);
     onMotion(on);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (live) measure(); });
     if (clocked) new MutationObserver(() => { if (live && !anims.length) requestAnimationFrame(sync); }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
     on();
   });
