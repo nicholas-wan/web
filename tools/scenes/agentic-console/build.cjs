@@ -1,6 +1,10 @@
-// The agent console in the Agentic AI peek ("Hunt from a report") on Experience (prefix c2-).
+// The agent console on Experience (prefix c2-): the engine in chapter 02 of the Agentic AI story, where
+// assets/js/hunt-story.js drives its paused animations from scroll (the story hides its caption row).
 //   node tools/scenes/agentic-console/build.cjs   writes scene.html and scene.css here
-//   node tools/scenes/agentic-console/apply.cjs   puts them into experience.html and internship-peek.css
+//   node tools/scenes/agentic-console/apply.cjs   puts them into the story in experience.html and into internship-peek.css
+// The story (tools/scenes/agentic-story/build.cjs) mirrors the beat times below and fails on drift: rerun it
+// after changing the timeline. Strings were revised 27 Oct 2026: "only expected entries", "Inconclusive, so it
+// re-plans", and the vendor-neutral pseudo-query event_id = 4698 | count by host, task_name.
 // Story timing, strings and the timeline are below; base.css holds the static (final-frame) styles.
 // Base: the caption-led console (one caption, one focal point per beat). From the annotation-led one: the end
 // is split in two (7a the flag and its evidence; 7b the graph steps back, a bead travels, the Analyst lights
@@ -26,8 +30,8 @@ const CAPS = [
   'Reads the report, picks what to hunt',
   'Turns it into a claim it can test',
   'Hunted recently, so not repeated',
-  'Only known Run keys, still an answer',
-  'Can’t tell from this, so it re-plans',
+  'Only expected entries, still an answer',
+  'Inconclusive, so it re-plans',
   'Checks the query before it runs',
   'Flags one task not in the baseline',
   'Hands it to an analyst, with the evidence',
@@ -37,7 +41,7 @@ const E = [
   { ag: 'sup', ty: 'tool', name: 'extract_ttps', res: 'three techniques' },
   { ag: 'hyp', ty: 'reason', text: 'An adversary may persist on workstations via scheduled tasks that relaunch the payload at logon.', wipe: 1.3 },
   { ag: 'inv', ty: 'tool', name: 'search_past_hunts', res: 'PowerShell · covered by a recent hunt' },
-  { ag: 'det', ty: 'tool', name: 'run_search', res: 'Valid negative · only known Run keys', rk: 'ok' },
+  { ag: 'det', ty: 'tool', name: 'run_search', res: 'Valid negative · only expected entries', rk: 'ok' },
   { ag: 'det', ty: 'tool', name: 'run_search', res: 'Scheduled tasks · Inconclusive', rk: 'inc', sub: 'Tasks made through the Task Scheduler API never launch schtasks.exe.' },
   { ag: 'det', ty: 'reason', text: 'Look for the task being created instead: event 4698.', replan: true, wipe: 1.0 },
   { ag: 'det', ty: 'tool', name: 'check_query', res: 'Query validated', rk: 'ok', code: true },
@@ -169,7 +173,7 @@ function card(e) {
     return `<div class="c2-card c2-card--reason"><span class="c2-row"><span class="c2-tag">Reason</span><b class="c2-who">${a.name}</b>${e.replan ? `<span class="c2-replan">${svgI('loop')}re-plan</span>` : ''}<span class="c2-txt"><span class="c2-wipe">${esc(e.text)}</span></span></span></div>`;
   }
   const icon = `<svg class="c2-si" viewBox="0 0 12 12" aria-hidden="true"><circle class="c2-spin" cx="6" cy="6" r="4.4" pathLength="1"/><path class="c2-tick" d="M3.2 6.3l1.9 1.9 3.7-4" pathLength="1"/></svg>`;
-  const code = e.code ? `<span class="c2-code"><span class="c2-cl c2-cl1">index=wineventlog <b>EventCode</b>=4698</span><span class="c2-cl c2-cl2">| <b>stats</b> count <b>by</b> Computer, TaskName</span></span>` : '';
+  const code = e.code ? `<span class="c2-code"><span class="c2-cl c2-cl1"><b>event_id</b> = 4698</span><span class="c2-cl c2-cl2">| <b>count by</b> host, task_name</span></span>` : '';
   const flag = e.flag ? `<span class="c2-flag">${svgI('flag')}Flagged</span>` : '';
   const sub = e.sub ? `<span class="c2-sub"><span class="c2-wipe">${esc(e.sub)}</span></span>` : '';
   const evid = e.flag ? `<span class="c2-ev"><span class="c2-evr c2-evr1"><span class="c2-mono c2-path"><span class="c2-pdir">\\Microsoft\\Windows\\Chkdsk\\</span><span class="c2-leaf">ProactiveScan</span></span><span class="c2-evn">built-in</span></span><span class="c2-evr c2-evr2"><span class="c2-mono c2-task">\\WinTaskUpdate</span><span class="c2-evn c2-evn--amb">root-level · not in baseline</span></span></span>` : '';
@@ -188,7 +192,7 @@ function entries() {
 }
 
 const chipHtml = CHIPS.map((c, i) => `<span class="c2-chip c2-chip${i}" style="--oc:${c.oc};--ob:${c.ob}"><span class="c2-cid">${c.id}</span><span class="c2-cn">${c.name}</span><span class="c2-co">${c.flag ? svgI('flag') : c.ok ? svgI('tick') : ''}${c.out}</span></span>`).join('');
-const ARIA = 'An illustrative hunt. Agents turn a ransomware report into three techniques to hunt. PowerShell was covered by a recent hunt, so it is not repeated. The Run keys search finds only known activity, a valid negative. For scheduled tasks the first search is inconclusive, so the Detection agent re-plans around event 4698 and checks its query before it runs. It flags one task, \\WinTaskUpdate, root-level and not in the baseline, and hands it to an analyst with the evidence.';
+const ARIA = 'An illustrative hunt. Agents turn a ransomware report into three techniques to hunt. PowerShell was covered by a recent hunt, so it is not repeated. The Run keys search finds only expected entries, a valid negative. For scheduled tasks the first search is inconclusive, so the Detection agent re-plans around event 4698 and checks its query before it runs. It flags one task, \\WinTaskUpdate, root-level and not in the baseline, and hands it to an analyst with the evidence.';
 const html = `<div class="c2" role="img" aria-label="${esc(ARIA)}">
 <div class="c2-head"><span class="c2-rep">${svgI('rep')}<span>Ransomware report</span></span><svg class="c2-arrow" viewBox="0 0 14 12" aria-hidden="true"><path d="M1 6h11M8.5 2.5 12 6l-3.5 3.5"/></svg><span class="c2-chips">${chipHtml}</span></div>
 <div class="c2-cap"><span class="c2-ticks">${CAPS.map((_, i) => `<i class="c2-tk c2-tk${i}${i === CAPS.length - 1 ? ' c2-tk--now' : ''}"></i>`).join('')}</span><span class="c2-lines">${CAPS.map((t, i) => `<span class="c2-line c2-line${i}${i === CAPS.length - 1 ? ' c2-line--fin' : ''}">${esc(t)}</span>`).join('')}</span></div>

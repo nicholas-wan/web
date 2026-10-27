@@ -257,7 +257,7 @@ foreach ($copiedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'asset
         'assets/js/personal-timeline.js', 'assets/js/scramble-reveal.js',
         'assets/js/travel-discovery.js', 'assets/js/photo-search.js', 'assets/js/page-transitions.js',
         'assets/js/anomaly-peek.js', 'assets/js/travel-shortcuts.js', 'assets/js/travel-chronology.js',
-        'assets/css/internship-peek.css', 'assets/js/internship-peek.js')) {
+        'assets/css/internship-peek.css', 'assets/js/internship-peek.js', 'assets/js/hunt-story.js')) {
     Assert-DistMatchesSource $copiedAsset
 }
 
@@ -382,6 +382,10 @@ Assert-FileSizeBudget 'assets\js\anomaly-peek.js' 46
 # 26 -> 30 KB (18 Oct 2026): owner-approved decode-before-swap postcards, bounded
 # loading/retry and stale-intent cancellation; search stays outside the initial-page bundle.
 Assert-FileSizeBudget 'assets\js\photo-search.js' 30
+# hunt-story.js drives the Work page's Agentic AI story (approved 27 Oct 2026). Like photo-search.js
+# it is injected on demand by an inline loader, outside the page's 80 KB <script src> ceiling, so it
+# carries its own budget: 13 KB at launch (scroll clock, frames, controls), with headroom to 16 KB.
+Assert-FileSizeBudget 'assets\js\hunt-story.js' 16
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8
@@ -859,9 +863,24 @@ if ($homeHtml -notmatch '<canvas id="nokey"') { throw "Homepage background anima
 # The Cyber Detection Analytics card ends with three chips that each open one small chart
 # below them (never over the writeup); only the Work page loads the script.
 if ([regex]::Matches($experience, 'data-peek="(site|series|graph)"').Count -ne 3 -or [regex]::Matches($experience, 'data-peek-card="(site|series|graph)"').Count -ne 3 -or $experience -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/anomaly-peek.js'))) { throw "The Work page must carry the three anomaly-peek chips, their three chart cards and anomaly-peek.js." }
+# The Agentic AI story (approved 27 Oct 2026; README "Agentic AI story") replaced the "Hunt from a report"
+# chip peek: three pinned chapters in the #agentic-ai card, with the agent console as the engine in
+# chapter 02. Its script is injected on demand from a versioned data-hs-script, never a <script src>.
+$agenticCard = [regex]::Match($experience, '(?s)<article class="case-study case-study--work" id="agentic-ai">(.*?)</article>').Groups[1].Value
+$agenticStory = [regex]::Match($agenticCard, '(?s)<div class="hs-story".*').Value
+if ($experience -match 'data-company="agentic"|agentic-demo-card|Hunt from a report' -or $agenticCard -match 'internship-demo-(hint|peek)') { throw "The retired agentic chip peek is still on the Work page; the Agentic AI story replaced it." }
+if (-not $agenticStory -or [regex]::Matches($agenticStory, '<section class="hs-scene hs-scene--(product|eng|trust)').Count -ne 3 -or $agenticStory -notmatch '(?s)hs-scene--eng.*?<div class="hs-console"><div class="hunt-panel"><div class="c2" role="img" aria-label="An illustrative hunt\.') { throw "The #agentic-ai card must carry the three-chapter Agentic AI story, with the agent console (its aria-label starting 'An illustrative hunt.') in chapter 02." }
+foreach ($storyLine in @('From a report to a plan.', 'Built for a local model.', 'Analysts make the call.', 'An illustrative hunt, built for a local model running on-premises.')) {
+    if (-not $agenticStory.Contains($storyLine)) { throw "The Agentic AI story is missing its approved line: $storyLine" }
+}
+$huntStoryRef = Get-DistAssetRef 'assets/js/hunt-story.js'
+if ($agenticStory -notmatch ('data-hs-script="' + [regex]::Escape($huntStoryRef) + '"') -or $experience -match '<script\b[^>]*\bsrc="assets/js/hunt-story\.js' -or $agenticCard -notmatch '</div><script>/\* Loads the Agentic AI story') { throw "hunt-story.js must be injected on demand from the story's versioned data-hs-script ($huntStoryRef), never a static <script src>." }
+# Generic and unquestionable (accuracy and disclosure review, Oct 2026): no SIEM vendor syntax, no real
+# malware, no retired wording, and no days-to-hours claim inside the story (the Outcome row stays the only one).
+if ($experience -match 'index=wineventlog|SysUpdate|Splunk|only known Run keys|known activity' -or $agenticStory -match '(?i)days to hours|hours instead of days|\bdays\b|SPL crafter|Post-query|Evidence found|\d+ hits|\btokens?\b') { throw "The Work page carries a forbidden agentic string (SIEM syntax, real malware, retired wording or a days-to-hours claim in the story)." }
+$anomalyPeekJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\anomaly-peek.js') -Raw -Encoding UTF8
 # Phones and touch tablets (Oct 2026): no hover, so a pinned floating card would sit
 # over Early career; the card opens inline instead and the chips are 44px tall.
-$anomalyPeekJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\anomaly-peek.js') -Raw -Encoding UTF8
 if ($anomalyPeekJs -notmatch [regex]::Escape("matchMedia('(max-width: 736px), (hover: none)')") -or $experiencePageCss -notmatch '(?s)@media screen and \(max-width: 736px\), screen and \(hover: none\)\s*\{\s*\.page-experience #cloud-analytics \.anomaly-peek__chip\s*\{[^}]*min-height:\s*44px.*?\.anomaly-card\s*\{[^}]*position:\s*static') { throw "Phones and touch tablets must open the anomaly charts inline below 44px chips." }
 if ($canvasJs -notmatch 'function stepSignal' -or $canvasJs -notmatch "clip\('evenodd'\)") { throw "The homepage canvas must keep its calm signals, clipped out of the hero text." }
 if ($homeHtml -notmatch '<link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon\.png" />' -or $homeHtml -notmatch '<link rel="manifest" href="site\.webmanifest" />') { throw "Home-screen icon or manifest link is missing." }

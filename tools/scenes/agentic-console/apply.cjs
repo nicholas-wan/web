@@ -1,22 +1,24 @@
-// Puts the agent console into the Agentic AI peek on Experience.
+// Puts the agent console into the Agentic AI story on Experience (chapter 02, "Built for a local model").
 //   node tools/scenes/agentic-console/build.cjs && node tools/scenes/agentic-console/apply.cjs
-// Replaces the contents of the agentic card's plot in experience.html with
-// <div class="hunt-panel">scene.html</div>, and writes scene.css between the
-// agentic-console markers in assets/css/internship-peek.css.
+// Replaces the <div class="hunt-panel"> inside the story's engineering chapter (.hs-scene--eng .hs-console)
+// in experience.html with <div class="hunt-panel">scene.html</div>, and writes scene.css between the
+// agentic-console markers in assets/css/internship-peek.css. The story around it is written by
+// tools/scenes/agentic-story/build.cjs, which keeps this panel when it rewrites the story.
 const fs = require('fs'); const path = require('path');
 const root = path.join(__dirname, '..', '..', '..');
 const html = fs.readFileSync(path.join(__dirname, 'scene.html'), 'utf8').trim().replace(/\s*\n\s*/g, ' ');
 const css = fs.readFileSync(path.join(__dirname, 'scene.css'), 'utf8').replace(/\r\n/g, '\n').trim();
 const pageFile = path.join(root, 'experience.html');
 let page = fs.readFileSync(pageFile, 'utf8');
-const PLOT = '<div class="internship-demo-card__plot">';
-const at = page.indexOf(PLOT, page.indexOf('id="agentic-demo-card"'));
-if (at < 0 || page.indexOf('id="agentic-demo-card"') < 0) throw new Error('no agentic card plot in experience.html');
-// the </div> that closes the plot (the panel nests divs, so match by depth)
+const scene = page.indexOf('class="hs-scene hs-scene--eng');
+const slot = scene < 0 ? -1 : page.indexOf('<div class="hs-console">', scene);
+const at = slot < 0 ? -1 : page.indexOf('<div class="hunt-panel">', slot);
+if (at < 0 || at - slot !== '<div class="hs-console">'.length) throw new Error('no console slot in the agentic story (run tools/scenes/agentic-story/build.cjs first)');
+// the </div> that closes the panel (it nests divs, so match by depth)
 const tag = /<div\b|<\/div>/g; tag.lastIndex = at; let depth = 0, m, end = -1;
-while ((m = tag.exec(page))) { depth += m[0] === '</div>' ? -1 : 1; if (!depth) { end = m.index; break; } }
-if (end < 0) throw new Error('unclosed agentic plot');
-page = page.slice(0, at + PLOT.length) + `<div class="hunt-panel">${html}</div>` + page.slice(end);
+while ((m = tag.exec(page))) { depth += m[0] === '</div>' ? -1 : 1; if (!depth) { end = m.index + 6; break; } }
+if (end < 0) throw new Error('unclosed console panel');
+page = page.slice(0, at) + `<div class="hunt-panel">${html}</div>` + page.slice(end);
 fs.writeFileSync(pageFile, page);
 const file = path.join(root, 'assets', 'css', 'internship-peek.css');
 const sheet = fs.readFileSync(file, 'utf8');

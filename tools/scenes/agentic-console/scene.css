@@ -1,4 +1,4 @@
-/* Agent console for the Agentic AI peek (prefix c2-). Base styles = the final frame; motion only while the card is .is-playing. */
+/* Agent console in the Agentic AI story (prefix c2-). Base styles = the final frame; motion only under .is-playing, paused and driven by hunt-story.js. */
 @property --c2-r { syntax: "<number>"; inherits: true; initial-value: 0; }   /* chip in focus */
 @property --c2-hush { syntax: "<number>"; inherits: true; initial-value: 0; } /* stepped back for the hand-off */
 @property --c2-g { syntax: "<number>"; inherits: true; initial-value: 0; }   /* working glow */
