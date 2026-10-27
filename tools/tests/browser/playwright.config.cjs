@@ -3,7 +3,7 @@ module.exports = defineConfig({
   testDir: '.',
   testMatch: '*.spec.cjs',
   timeout: 120000,
-  workers: 1,
+  workers: 2,
   retries: 0,
   reporter: process.env.CI ? [['line'], ['github']] : 'list',
   projects: [

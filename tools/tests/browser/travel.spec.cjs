@@ -1,6 +1,10 @@
 const { test, expect } = require('@playwright/test');
 const audit = require('./geometry.cjs');
 
+// Each geometry check has its own page and viewport; split the long trip sweeps
+// across workers instead of running every viewport in one worker.
+test.describe.configure({ mode: 'parallel' });
+
 async function settled(page) {
   await expect(page.locator('.travel-map__canvas')).toHaveAttribute('data-map-detail', /^(region|area|stop)$/);
   // Covers the map's fly-to, fade and debounced label measurement.
