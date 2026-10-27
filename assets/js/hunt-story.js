@@ -13,7 +13,9 @@
   if (!window.requestAnimationFrame || window.hsStory) return;
   window.hsStory = 1;
   const motion = matchMedia('(prefers-reduced-motion: no-preference)');
-  const onMotion = fn => { if (motion.addEventListener) motion.addEventListener('change', fn); else if (motion.addListener) motion.addListener(fn); };
+  const onMotion = fn => { if (motion.addEventListener) motion.addEventListener('change', fn); else if (motion.addListener) motion.addListener(fn); addEventListener('hs-plain', fn); };
+  // plain mode (html.hs-plain, toggled by the DSTA logo in the inline loader) is treated like reduced motion
+  const moving = () => motion.matches && !document.documentElement.classList.contains('hs-plain');
 
   // ---------------------------------------------------------------- the chapters
   const scenes = [...document.querySelectorAll('.hs-scene')];
@@ -267,7 +269,7 @@
     function start() {
       off();
       sizeKey = innerWidth + 'x' + Math.round(svh());
-      if (!motion.matches) return;
+      if (!moving()) return;
       root.classList.add('is-live', 'is-playing');
       vh = stage.offsetHeight;
       if (!vh || !fit()) return off();

@@ -747,6 +747,7 @@
     .hs-chead > .hs-cline { animation-range: entry 15% entry 90%; }
   }
 }
+html.hs-plain .hs-story .hs-chead > * { animation: none; }   /* plain mode (the DSTA logo): no scroll-driven rise */
 @keyframes hs-rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 
 /* ---------------- shared type ---------------- */
