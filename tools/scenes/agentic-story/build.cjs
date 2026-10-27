@@ -86,19 +86,24 @@ const OBJ_1 = `<div class="hs-objs hs-objs--1"><div class="hs-src">`
   + `<p class="hs-scope"><span class="hs-scope-l">Scoped to</span>${FACTS.map((t, i) => `<span class="hs-fact hs-f${i}" data-hs-from=".hs-e${i}">${t}</span>`).join('')}</p></div></div>`;
 
 // ---------------------------------------------------------------- 02: the console, then the workflow map
-// The steps and the two decisions the workflow makes: an inconclusive search goes back to planning, and a lead
-// goes to a person. Drawn by the scroll; in the last frame one hunt runs the path, loop included. The run is on
-// the loop's own corners, and the dot sits under the pills in DOM order, so it slides beneath them.
+// The steps in the order of the owner's deck (slides 4 and 9, 28 Oct 2026; the map before this ran Plan, Past
+// hunts, Search, Check, which had the history check after planning and the query check after the search): the
+// hypothesis, past hunts checked first, the planner, the query checked before it runs, the results read, and
+// an analyst. Inconclusive results go back to the planner, and a lead goes to a person. Drawn by the scroll; in
+// the last frame one hunt runs the path, loop included. The run is on the loop's own corners, and the dot sits
+// under the pills in DOM order, so it slides beneath them.
 const node = (x, y, w, t, k, amb) => `<g class="hs-w-node hs-w-n${k}${amb ? ' hs-w-amb' : ''}"><rect x="${x - w / 2}" y="${y - 22}" width="${w}" height="44" rx="22"/><text x="${x}" y="${y + 5.5}" text-anchor="middle">${t}</text></g>`;
-const STEPS = ['Plan', 'Past hunts', 'Search', 'Check', 'Lead', 'Analyst review'];
+const STEPS = ['Hypothesis', 'Past hunts', 'Plan', 'Checked query', 'Read results', 'Analyst review'];
 const WIDE = (() => {
-  const y1 = 130, y2 = 300, X = [100, 290, 480], W = 150;
+  // two rows: the first three left to right, the last three right to left; the loop rises from Read results
+  // (bottom middle) into the planner (top right) through the band between the rows, beside the main line
+  const y1 = 130, y2 = 300, X = [100, 290, 480], W = 150, ym = (y1 + y2) / 2, xl = X[2] - 45;
   const main = `M${X[0] + W / 2} ${y1}H${X[1] - W / 2}M${X[1] + W / 2} ${y1}H${X[2] - W / 2}M${X[2]} ${y1 + 22}V${y2 - 22}M${X[2] - W / 2} ${y2}H${X[1] + W / 2}M${X[1] - W / 2} ${y2}H${X[0] + W / 2}`;
-  const loop = `M${X[2]} ${y1 - 22}V${y1 - 80}H${X[0]}V${y1 - 22}`;
-  const run = `M${X[0]} ${y1}H${X[2]}V${y1 - 80}H${X[0]}V${y1}H${X[2]}V${y2}H${X[0]}`;
-  return `<svg class="hs-w hs-w-wide" viewBox="0 20 580 320" aria-hidden="true">`
+  const loop = `M${X[1]} ${y2 - 22}V${ym}H${xl}V${y1 + 22}`;
+  const run = `M${X[0]} ${y1}H${X[2]}V${y2}H${X[1]}V${ym}H${xl}V${y1}H${X[2]}V${y2}H${X[0]}`;
+  return `<svg class="hs-w hs-w-wide" viewBox="0 90 580 250" aria-hidden="true">`
     + `<path class="hs-w-line" pathLength="1" d="${main}"/>`
-    + `<path class="hs-w-loop" pathLength="1" d="${loop}"/><text class="hs-w-ll" x="290" y="${y1 - 88}" text-anchor="middle">Inconclusive · re-plan</text>`
+    + `<path class="hs-w-loop" pathLength="1" d="${loop}"/><text class="hs-w-ll" x="${(X[1] + xl) / 2}" y="${ym + 22}" text-anchor="middle">Inconclusive · re-plan</text>`
     + `<circle class="hs-w-glow" r="11" style="offset-path: path('${run}')"/><circle class="hs-w-dot" r="4.5" style="offset-path: path('${run}')"/>`
     + node(X[0], y1, W, STEPS[0], 0) + node(X[1], y1, W, STEPS[1], 1) + node(X[2], y1, W, STEPS[2], 2)
     + node(X[2], y2, W, STEPS[3], 3) + node(X[1], y2, W, STEPS[4], 4) + node(X[0], y2, W, STEPS[5], 5, 1)
@@ -107,16 +112,17 @@ const WIDE = (() => {
 const TALL = (() => {
   const X = 180, Y = [60, 130, 200, 270, 340, 410], W = 190;
   const main = Y.slice(0, -1).map((y, i) => `M${X} ${y + 20}V${Y[i + 1] - 20}`).join('');
-  const loop = `M${X + 95} ${Y[2]}H${X + 150}V${Y[0]}H${X + 95}`;
-  const run = `M${X} ${Y[0]}V${Y[2]}H${X + 150}V${Y[0]}H${X}V${Y[5]}`;
+  // one column; the loop runs up the right side from Read results to the planner
+  const loop = `M${X + 95} ${Y[4]}H${X + 150}V${Y[2]}H${X + 95}`;
+  const run = `M${X} ${Y[0]}V${Y[4]}H${X + 150}V${Y[2]}H${X}V${Y[5]}`;
   return `<svg class="hs-w hs-w-tall" viewBox="0 0 360 456" aria-hidden="true">`
     + `<path class="hs-w-line" pathLength="1" d="${main}"/>`
-    + `<path class="hs-w-loop" pathLength="1" d="${loop}"/><text class="hs-w-ll" x="${X + 150}" y="${Y[1] + 4}" text-anchor="middle" transform="rotate(90 ${X + 150} ${Y[1]})">Inconclusive · re-plan</text>`
+    + `<path class="hs-w-loop" pathLength="1" d="${loop}"/><text class="hs-w-ll" x="${X + 150}" y="${Y[3] - 4}" text-anchor="middle" transform="rotate(90 ${X + 150} ${Y[3]})">Inconclusive · re-plan</text>`
     + `<circle class="hs-w-glow" r="10" style="offset-path: path('${run}')"/><circle class="hs-w-dot" r="4" style="offset-path: path('${run}')"/>`
     + STEPS.map((t, i) => node(X, Y[i], W, t, i, i === 5)).join('')
     + `</svg>`;
 })();
-const MAP = `<figure class="hs-wmap" role="img" data-hs-late="1" aria-label="The workflow: plan, past hunts, search, check, lead, analyst review. An inconclusive search goes back to planning; a lead goes to a person.">${WIDE}${TALL}</figure>`;
+const MAP = `<figure class="hs-wmap" role="img" data-hs-late="1" aria-label="The workflow: hypothesis, past hunts, plan, checked query, read results, analyst review. An inconclusive result goes back to planning; a lead goes to a person.">${WIDE}${TALL}</figure>`;
 // The query is a neutral pseudo-query (the console's own, 27 Oct 2026), so no SIEM vendor is named.
 const OBJ_2 = `<div class="hs-objs hs-objs--2">`
   + `<div class="hs-card hs-o2"><p class="hs-was">Scheduled tasks <span>Inconclusive</span></p><p class="hs-lab">${ico(I.down)}New plan</p>`
@@ -177,7 +183,7 @@ const CH = [
       // 0.6 a steady scroll or one Page Down left it after about a second (review, 27 Oct 2026).
       { beats: [1, 2, 3, 4, 5], dur: 8, hold: 1.4, h: 'Each agent gets one job and the tools for it.', p: 'Past hunts are checked first. Searches run where the data lives and return only a short result, and each query is checked before it runs.' },
       { beats: [], dur: 1, h: 'Re-plans when inconclusive. Hands leads to a human.', p: 'An inconclusive search goes back to planning. A lead goes to an analyst to review.' },
-      { beats: [], dur: 1, h: 'One hunt, traced start to finish.', p: 'Plan, past hunts, search, re-plan, check, lead, review.' },
+      { beats: [], dur: 1, h: 'One hunt, traced start to finish.', p: 'Hypothesis, past hunts, plan, checked query, results, re-plan, review.' },
     ] },
   // 03's frames are the deck's three challenges in its own words, shortened (owner, 27 Oct 2026: the old
   // context card over a "Telemetry" block was "kind of useless")
