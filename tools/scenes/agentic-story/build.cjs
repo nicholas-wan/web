@@ -6,7 +6,7 @@
 // into the design, to the model, and back to the analyst:
 //   01 Understanding the analyst   "Built around how analysts plan."  the card's dark      report, techniques, environment, hypothesis
 //   02 Designing the workflow      "Each step has one job."           a deeper near-black  the console, then the workflow map and one run
-//   03 Making a small model reliable "Context engineering for a small model." the one switch, to the site's warm light
+//   03 Making the model reliable "Context engineering, evals and human review." the one switch, to the site's warm light
 // This file owns the story's words, objects, the map and the chapter-02 timeline (from the console's beat
 // times, checked against tools/scenes/agentic-console/scene.html, so a console change that moves them fails
 // here). It replaces the existing .hs-story block and the inline loader after it, keeping the console panel
@@ -174,7 +174,7 @@ const OBJ_2 = `<div class="hs-objs hs-objs--2">`
   + `<code class="hs-q">event_id = 4698<br>| count by host, task_name</code><p class="hs-res hs-res--ok">${ico(I.shield)}Checked</p></div>`
   + MAP + TRACE_EL + `</div>`;
 
-// ---------------------------------------------------------------- 03: a small model's three limits, one decision each
+// ---------------------------------------------------------------- 03: the model's three limits, one decision each
 // From the owner's deck, "Engineering Challenges and Design Decisions" (27 Oct 2026): context bloat (raw rows stay
 // with the step that judges them), inconsistent output (grounding in a knowledge base, then testing against an
 // answer key) and compounded errors (a person at the checkpoints), reordered so the story still ends on the
@@ -221,24 +221,24 @@ const CH = [
   // "autonomous" or "memory", which would overclaim.
   { id: 'product', n: '01', label: 'Understanding the analyst', title: 'Built the way hunters plan a hunt.', line: 'An illustrative hunt, from a threat report to a claim it can test.', objs: OBJ_1,
     frames: [
-      { h: 'One report becomes one hunt per technique.', p: 'The techniques are pulled out of the report and duplicates merged. Each runs as its own sub-hunt, so every model call works on one technique.' },
-      { h: 'Tailored to this environment.', p: 'A hypothesis is only testable where the data exists, so what this environment logs and what is normal here come first. A technique hunted recently is not investigated twice.' },
+      { hold: 0.9, h: 'One report becomes one hunt per technique.', p: 'The techniques are pulled out of the report and duplicates merged. Each runs as its own sub-hunt, so every model call works on one technique.' },
+      { hold: 0.8, h: 'Tailored to this environment.', p: 'A hypothesis is only testable where the data exists, so what this environment logs and what is normal here come first. A technique hunted recently is not investigated twice.' },
       { h: 'Each hypothesis says what to look for, and where.', p: 'Written for this environment, with what to look for and what is normal here, so a hunt can confirm it or rule it out.' },
     ] },
   { id: 'eng', n: '02', label: 'Designing the workflow', title: 'Narrow agents, one supervisor.', line: 'Two decisions shaped it: when to re-plan, and when a person steps in.', console: true, objs: OBJ_2,
     frames: [
-      // hold: this frame's dwell in screens (others 0.6). The console's 8s run needs the reader to linger: at
+      // hold: this frame's dwell in screens (others 0.6; denser frames hold longer, owner, 28 Oct 2026). The console's 8s run needs the reader to linger: at
       // 0.6 a steady scroll or one Page Down left it after about a second (review, 27 Oct 2026).
       { beats: [1, 2, 3, 4, 5], dur: 8, hold: 1.4, h: 'Each agent has one job.', p: 'Planning, writing the query and judging the result are separate agents. Past hunts are checked first, and each query is checked against its plan before it runs.' },
-      { beats: [], dur: 1, h: 'Every search ends in a verdict: lead, clean or re-plan.', p: 'A separate step judges what came back. Incomplete coverage goes back to planning, a clean result is logged, and a lead goes to an analyst.' },
+      { beats: [], dur: 1, hold: 0.8, h: 'Every search ends in a verdict: lead, clean or re-plan.', p: 'A separate step judges what came back. Incomplete coverage goes back to planning, a clean result is logged, and a lead goes to an analyst.' },
       { beats: [], dur: 1, h: 'Every attempt is recorded.', p: 'Each plan, its query, its verdict and its review flag are logged, so an analyst can see why the agent re-planned and what it ruled out.' },
     ] },
   // 03's frames are the deck's three challenges in its own words, shortened (owner, 27 Oct 2026: the old
   // context card over a "Telemetry" block was "kind of useless")
-  { id: 'trust', n: '03', label: 'Making a small model work', title: 'Context engineering for a small model.', line: 'On-premises: a small model, large telemetry.', objs: OBJ_3, amber: true,
+  { id: 'trust', n: '03', label: 'Making the model reliable', title: 'Context engineering, evals and human review.', line: 'On-premises: large telemetry, a tight context.', objs: OBJ_3, amber: true,
     frames: [
-      { h: 'Narrow the context for each call.', p: 'Query results are the largest thing in a hunt, so detection logic is split into a planner, a query writer and a judge. Only the judge reads the rows; one short finding is passed on.' },
-      { h: 'Ground the model, then test it against an answer key.', p: 'The same input can give a different answer each run. A knowledge base anchors each answer, and every model runs the same hunt against a reviewer\'s answer key, including techniques nobody attacked.' },
+      { hold: 0.9, h: 'Narrow the context for each call.', p: 'Query results are the largest thing in a hunt, so detection logic is split into a planner, a query writer and a judge. Only the judge reads the rows; one short finding is passed on.' },
+      { hold: 1.0, h: 'Ground the model, then test it against an answer key.', p: 'The same input can give a different answer each run. A knowledge base anchors each answer, and every model runs the same hunt against a reviewer\'s answer key, including techniques nobody attacked.' },
       { h: 'Human in the loop at the checkpoints.', p: 'In a chain of calls, each mistake feeds the next. Plans that need judgement go to an analyst, every verdict carries a review flag, and a search that runs out of attempts is handed over, not looped.' },
     ] },
 ];

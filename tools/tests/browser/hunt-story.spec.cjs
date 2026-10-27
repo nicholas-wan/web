@@ -17,8 +17,8 @@ test('agentic story: without motion, every chapter is a complete static list wit
   await page.locator('#agentic-ai .hs-story').scrollIntoViewIfNeeded();
   await expect(scenes(page)).toHaveCount(3);
   await expect(page.locator('#agentic-ai .hs-scene.is-live')).toHaveCount(0);
-  await expect(page.locator('#agentic-ai .hs-ctitle')).toHaveText(['Built the way hunters plan a hunt.','Narrow agents, one supervisor.','Context engineering for a small model.']);
-  await expect(page.locator('#agentic-ai .hs-clabel')).toHaveText(['01 Understanding the analyst','02 Designing the workflow','03 Making a small model work']);
+  await expect(page.locator('#agentic-ai .hs-ctitle')).toHaveText(['Built the way hunters plan a hunt.','Narrow agents, one supervisor.','Context engineering, evals and human review.']);
+  await expect(page.locator('#agentic-ai .hs-clabel')).toHaveText(['01 Understanding the analyst','02 Designing the workflow','03 Making the model reliable']);
   await expect(page.locator('#agentic-ai .hs-step .hs-h')).toHaveText(['One report becomes one hunt per technique.','Tailored to this environment.','Each hypothesis says what to look for, and where.','Each agent has one job.','Every search ends in a verdict: lead, clean or re-plan.','Every attempt is recorded.','Narrow the context for each call.','Ground the model, then test it against an answer key.','Human in the loop at the checkpoints.']);
   await expect(page.locator('#agentic-ai .hs-cline').first()).toHaveText('An illustrative hunt, from a threat report to a claim it can test.');
   for(const sel of ['.hs-step','.hs-doc','.hs-env','.hs-hyp','.hs-fact','.hs-lanes','.hs-lo','.hs-o2','.hs-wmap','.hs-trace','.hs-rows','.hs-wr.is-x','.hs-out','.hs-kb','.hs-gold','.hs-cells','.hs-lead','.hs-seat','.hunt-panel .c2']){
@@ -64,9 +64,9 @@ test('agentic story: pinned chapters advance with the scroll, rewind, release, a
    const s=at(page,i);
    // Each chapter pins for its frames' dwells and a short release: about one screen, except chapter 02,
    // whose first frame holds 1.4 screens for the console's 8s run (review, 27 Oct 2026).
-   const [screens,want,hold]=await s.evaluate(e=>{const d=JSON.parse(e.getAttribute('data-hs-story'));const n=e.querySelectorAll('.hs-step').length;let u=0.4;for(let k=0;k<n-1;k++)u+=(d.hold&&d.hold[k])||0.6;return [e.offsetHeight/e.querySelector('.hs-stage').offsetHeight-1,u,d.hold?d.hold[0]:0];});
+   const [screens,want,hold]=await s.evaluate(e=>{const d=JSON.parse(e.getAttribute('data-hs-story'));const n=e.querySelectorAll('.hs-step').length;let u=0.5;for(let k=0;k<n-1;k++)u+=(d.hold&&d.hold[k])||0.6;return [e.offsetHeight/e.querySelector('.hs-stage').offsetHeight-1,u,d.hold?d.hold[0]:0];});
    expect(Math.abs(screens-want)).toBeLessThan(0.1);
-   expect(hold).toBe(i===1?1.4:0);
+   expect(hold).toBe(i===1?1.4:0.9);
    const n=await s.locator('.hs-step').count();
    for(let f=0;f<n;f++){
     await rest(page,i,f);

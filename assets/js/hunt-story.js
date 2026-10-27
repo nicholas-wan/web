@@ -22,13 +22,18 @@
   if (!scenes.length) return;
   const canClock = !!Element.prototype.getAnimations;
   // scroll geometry, in screens (small viewport heights)
+  // A frame's words and its objects change together (28 Oct 2026, owner: in the light chapter the verdict and
+  // the rows were gone "before i can reach the key words"; the move used to start 0.26 screens before the text
+  // swapped): a later frame's text swaps as its move starts, the move ends on the resting point, and then nothing
+  // changes for GAP - TRAVEL. The first frame's move runs on past the pin, so it plays on a pinned stage.
   const GAP = 0.6;    // from one frame's resting point to the next: the dwell
-  const LAST = 0.4;   // the last frame's dwell, then the stage lets go
-  const TZ = 0.14;    // a frame's text swaps this far before its resting point
+  const LAST = 0.5;   // the last frame's dwell, then the stage lets go (0.4 until 28 Oct 2026: too quick a release)
+  const TRAVEL = 0.3; // a later frame's move runs over this much scroll before its resting point
+  const TZ = TRAVEL;  // ...and its text swaps where that move starts
   const HYST = 0.06;  // ...and swaps back only once the reader is this much further back
   const ENTER = 0.32; // the first frame starts once the stage is this close to pinning
-  const A0 = 0.1;     // ...and its move completes this far after the pin
-  const TRAVEL = 0.4; // a later frame's move runs over this much scroll before its resting point
+  const A0 = 0.3;     // ...and its move completes this far after the pin (a chapter whose first frame moves
+                      // gives that frame a longer hold, data-hs-story's hold, so it still rests before frame 1)
   const TAU = 0.07;   // the chase's time constant, s
   const BACK = 0.6, CATCH = 0.45, MINFEED = 110, MINOBJ = 230;
   const clamp = x => (x < 0 ? 0 : x > 1 ? 1 : x);
