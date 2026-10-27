@@ -870,7 +870,8 @@ $agenticCard = [regex]::Match($experience, '(?s)<article class="case-study case-
 $agenticStory = [regex]::Match($agenticCard, '(?s)<div class="hs-story".*').Value
 if ($experience -match 'data-company="agentic"|agentic-demo-card|Hunt from a report' -or $agenticCard -match 'internship-demo-(hint|peek)') { throw "The retired agentic chip peek is still on the Work page; the Agentic AI story replaced it." }
 if (-not $agenticStory -or [regex]::Matches($agenticStory, '<section class="hs-scene hs-scene--(product|eng|trust)').Count -ne 3 -or $agenticStory -notmatch '(?s)hs-scene--eng.*?<div class="hs-console"><div class="hunt-panel"><div class="c2" role="img" aria-label="An illustrative hunt\.') { throw "The #agentic-ai card must carry the three-chapter Agentic AI story, with the agent console (its aria-label starting 'An illustrative hunt.') in chapter 02." }
-foreach ($storyLine in @('From a report to a plan.', 'Built for a local model.', 'Analysts make the call.', 'An illustrative hunt, built for a local model running on-premises.')) {
+# Copy revised 27 Oct 2026 (content review): 01's line anchors on the analyst; 02 ends on evaluation; 03 ends on the analyst.
+foreach ($storyLine in @('From a report to a plan.', 'Built for a local model.', 'Analysts make the call.', 'An illustrative hunt, built around how analysts plan one.', 'Every run is measured.', 'Every step is logged.', 'Each lead comes with its evidence.')) {
     if (-not $agenticStory.Contains($storyLine)) { throw "The Agentic AI story is missing its approved line: $storyLine" }
 }
 $huntStoryRef = Get-DistAssetRef 'assets/js/hunt-story.js'

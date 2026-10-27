@@ -5,7 +5,8 @@
    ceiling; it carries its own budget in verify.ps1.
    - A frame is a resting point. Scrolling into its short trigger zone plays its transition as a timed
      animation; then nothing changes for 0.6 screens (the last frame 0.4), so the reader stops and reads.
-     Scrolling back rewinds.
+     A frame may ask for a longer dwell (data hold, in screens): the console's 8s run gets 1.4, so one
+     Page Down or a steady scroll still leaves the reader on it (review, 27 Oct 2026). Scrolling back rewinds.
    - Before a chapter pins (frame -1) its objects wait in their opening state; its first frame plays as
      the stage arrives, so every chapter opens with motion.
    - The engineering chapter drives the agent console's paused CSS animations from a clock (its first
@@ -53,7 +54,8 @@
 
     let live = false, tl = data.d, anims = [], vh = 0, total = 0;
     let goal = -1, m = 0, t = 0, rate = 0, raf = 0, queued = 0, aim = -1, sizeKey = '', sideH = 0;
-    const rest = f => f * GAP;
+    const hold = f => (data.hold && data.hold[f]) || GAP;   // the dwell after frame f's resting point
+    const rest = f => { let u = 0; for (let i = 0; i < f; i++) u += hold(i); return u; };
     const uNow = () => -root.getBoundingClientRect().top / vh;
 
     // ---------------------------------------------------------------- the console's clock (as C)

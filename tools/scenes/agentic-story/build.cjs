@@ -114,30 +114,36 @@ const OBJ_2 = `<div class="hs-objs hs-objs--2">`
   + `<code class="hs-q">event_id = 4698<br>| count by host, task_name</code><p class="hs-res hs-res--ok">${ico(I.shield)}Checked</p></div>`
   + DIA + `</div>`;
 const TRACE = [['Read the report'], ['Wrote a hypothesis'], ['Checked past hunts'], ['Ran the searches'], ['Re-planned one search and checked it'], ['Flagged a lead', 'amb'], ['Analyst review', 'open']];
-const OBJ_3 = `<div class="hs-objs hs-objs--3"><div class="hs-hand">`
+// The trace first, then the lead handed to the analyst: the story ends on a person (27 Oct 2026).
+const OBJ_3 = `<div class="hs-objs hs-objs--3">`
+  + `<div class="hs-card hs-trace"><p class="hs-lab">${ico(I.trace)}Trace</p><ol>${TRACE.map(([t, k], i) => `<li class="hs-tr${k ? ' hs-tr--' + k : ''}" style="--i:${i}">${ico(k === 'open' ? I.person : k === 'amb' ? I.flag : I.check)}<span>${t}</span>${k === 'open' ? '<em>Open</em>' : ''}</li>`).join('')}</ol></div>`
+  + `<div class="hs-hand">`
   + `<div class="hs-card hs-lead"><p class="hs-lead-top"><span class="hs-lab">${ico(I.flag)}Lead</span><span class="hs-badge">Flagged</span></p>`
   + `<p class="hs-lead-n">\\WinTaskUpdate</p><p class="hs-tags"><span>root-level</span><span>not in baseline</span></p>`
   + `<div class="hs-ev"><p class="hs-lab">Evidence</p>${chip('T1053.005', 'Scheduled Task')}<p class="hs-ev-q"><code>event_id = 4698</code><span>${ico(I.check)}Checked</span></p></div></div>`
   + `<span class="hs-link" aria-hidden="true"></span>`
-  + `<div class="hs-seat"><span class="hs-ava">${ico(I.person)}</span><span class="hs-seat-t"><b>Analyst</b><span>Judges the lead</span></span></div></div>`
-  + `<div class="hs-card hs-trace"><p class="hs-lab">${ico(I.trace)}Trace</p><ol>${TRACE.map(([t, k], i) => `<li class="hs-tr${k ? ' hs-tr--' + k : ''}" style="--i:${i}">${ico(k === 'open' ? I.person : k === 'amb' ? I.flag : I.check)}<span>${t}</span>${k === 'open' ? '<em>Open</em>' : ''}</li>`).join('')}</ol></div></div>`;
+  + `<div class="hs-seat"><span class="hs-ava">${ico(I.person)}</span><span class="hs-seat-t"><b>Analyst</b><span>Judges the lead</span></span></div></div></div>`;
 
 // ---------------------------------------------------------------- the chapters (owner-approved copy, 27 Oct 2026)
 const CH = [
-  { id: 'product', n: '01', label: 'Understanding the work', title: 'From a report to a plan.', line: 'An illustrative hunt, built for a local model running on-premises.', objs: OBJ_1,
+  // Copy revised 27 Oct 2026 (content review; owner-approved): 01's line anchors on the analyst's workflow, 02 ends
+  // on evaluation, and 03 ends on the analyst rather than the log. No team, funding or stakeholder claims here.
+  { id: 'product', n: '01', label: 'Understanding the work', title: 'From a report to a plan.', line: 'An illustrative hunt, built around how analysts plan one.', objs: OBJ_1,
     frames: [
       { h: 'Only what’s worth hunting goes in.', p: 'Models reason best over short, focused input, so the agent pulls out just the techniques worth hunting.' },
       { h: 'Each technique becomes a hypothesis.', p: 'A claim a hunt can test.' },
     ] },
   { id: 'eng', n: '02', label: 'Engineering choices', title: 'Built for a local model.', line: 'Each choice keeps the model’s job narrow.', console: true, objs: OBJ_2,
     frames: [
-      { beats: [1, 2, 3, 4, 5], dur: 8, h: 'Each agent has one narrow job.', p: 'Past hunts are checked first. Searches run where the data lives and return only a short result, and each query is checked before it runs.' },
-      { beats: [], dur: 1, h: 'Everything stays <span class="hs-nw">on-premises</span>.', p: 'The agents work through log search and memory, and the traces feed evaluation.' },
+      // hold: this frame's dwell in screens (others 0.6). The console's 8s run needs the reader to linger: at
+      // 0.6 a steady scroll or one Page Down left it after about a second (review, 27 Oct 2026).
+      { beats: [1, 2, 3, 4, 5], dur: 8, hold: 1.4, h: 'Each agent has one narrow job.', p: 'Past hunts are checked first. Searches run where the data lives and return only a short result, and each query is checked before it runs.' },
+      { beats: [], dur: 1, h: 'Every run is measured.', p: 'Traces from each hunt feed evaluation, so changes to the agents are tested, not assumed.' },
     ] },
   { id: 'trust', n: '03', label: 'Keeping people in charge', title: 'Analysts make the call.', line: 'Analyst review points are part of the design.', objs: OBJ_3, amber: true,
     frames: [
-      { h: 'Each lead comes with its evidence.', p: 'An analyst judges every one.' },
       { h: 'Every step is logged.', p: 'So any lead can be traced back and reviewed.' },
+      { h: 'Each lead comes with its evidence.', p: 'An analyst judges every one.' },
     ] },
 ];
 
@@ -180,6 +186,7 @@ CH.forEach(c => {
     };
     story = { narrow: 480, dur: c.frames.map(f => f.dur), d: tl(r3), p: tl(TPh) };
   }
+  if (c.frames.some(f => f.hold)) story.hold = c.frames.map(f => f.hold || 0);
   const steps = c.frames.map(f => `<li class="hs-step"><p class="hs-h">${f.h}</p><p class="hs-p">${f.p}</p></li>`).join('');
   const dots = c.frames.map(f => `<button type="button" class="hs-dot" aria-label="${f.h.replace(/<[^>]+>/g, '').replace(/\.$/, '')}"></button>`).join('');
   html += `<div class="hs-ch hs-ch--${c.id}">`

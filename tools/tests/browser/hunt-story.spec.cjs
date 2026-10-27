@@ -3,8 +3,8 @@
 const {test,expect}=require('@playwright/test');
 const scenes=page=>page.locator('#agentic-ai .hs-scene');
 const at=(page,i)=>page.locator('#agentic-ai .hs-scene').nth(i);
-// Scroll so chapter i rests on frame f (its resting points are 0.6 of its stage height apart).
-const rest=(page,i,f)=>at(page,i).evaluate((s,f)=>{const vh=s.querySelector('.hs-stage').offsetHeight;scrollTo(0,Math.round(s.getBoundingClientRect().top+scrollY+f*0.6*vh+2));},f);
+// Scroll so chapter i rests on frame f (resting points 0.6 of its stage height apart, or a frame's own hold).
+const rest=(page,i,f)=>at(page,i).evaluate((s,f)=>{const vh=s.querySelector('.hs-stage').offsetHeight;const d=JSON.parse(s.getAttribute('data-hs-story'));let u=0;for(let k=0;k<f;k++)u+=(d.hold&&d.hold[k])||0.6;scrollTo(0,Math.round(s.getBoundingClientRect().top+scrollY+u*vh+2));},f);
 const noSideScroll=page=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth);
 const FORBIDDEN=/index=wineventlog|SysUpdate|Splunk|only known|known activity|days to hours|hours instead of days|\bdays\b|SPL crafter|Post-query|Evidence found|\d+ hits|\btokens?\b/i;
 
@@ -19,7 +19,8 @@ test('agentic story: without motion, every chapter is a complete static list wit
   await expect(page.locator('#agentic-ai .hs-scene.is-live')).toHaveCount(0);
   await expect(page.locator('#agentic-ai .hs-ctitle')).toHaveText(['From a report to a plan.','Built for a local model.','Analysts make the call.']);
   await expect(page.locator('#agentic-ai .hs-clabel')).toHaveText(['01 Understanding the work','02 Engineering choices','03 Keeping people in charge']);
-  await expect(page.locator('#agentic-ai .hs-step .hs-h')).toHaveText(['Only what’s worth hunting goes in.','Each technique becomes a hypothesis.','Each agent has one narrow job.','Everything stays on-premises.','Each lead comes with its evidence.','Every step is logged.']);
+  await expect(page.locator('#agentic-ai .hs-step .hs-h')).toHaveText(['Only what’s worth hunting goes in.','Each technique becomes a hypothesis.','Each agent has one narrow job.','Every run is measured.','Every step is logged.','Each lead comes with its evidence.']);
+  await expect(page.locator('#agentic-ai .hs-cline').first()).toHaveText('An illustrative hunt, built around how analysts plan one.');
   for(const sel of ['.hs-step','.hs-doc','.hs-hyp','.hs-o2','.hs-dia','.hs-lead','.hs-seat','.hs-trace','.hunt-panel .c2']){
    for(const el of await page.locator('#agentic-ai '+sel).all()){await expect(el).toBeVisible();await expect(el).toHaveCSS('opacity','1');}
   }
@@ -61,10 +62,11 @@ test('agentic story: pinned chapters advance with the scroll, rewind, release, a
   await expect(page.locator('#agentic-ai .hs-scene.is-live')).toHaveCount(3);
   for(let i=0;i<3;i++){
    const s=at(page,i);
-   // Each chapter pins for about one screen: two frames and a short release.
-   const screens=await s.evaluate(e=>e.offsetHeight/e.querySelector('.hs-stage').offsetHeight-1);
-   expect(screens).toBeGreaterThan(0.9);
-   expect(screens).toBeLessThan(1.1);
+   // Each chapter pins for its frames' dwells and a short release: about one screen, except chapter 02,
+   // whose first frame holds 1.4 screens for the console's 8s run (review, 27 Oct 2026).
+   const [screens,want,hold]=await s.evaluate(e=>{const d=JSON.parse(e.getAttribute('data-hs-story'));const n=e.querySelectorAll('.hs-step').length;let u=0.4;for(let k=0;k<n-1;k++)u+=(d.hold&&d.hold[k])||0.6;return [e.offsetHeight/e.querySelector('.hs-stage').offsetHeight-1,u,d.hold?d.hold[0]:0];});
+   expect(Math.abs(screens-want)).toBeLessThan(0.1);
+   expect(hold).toBe(i===1?1.4:0);
    for(const f of [0,1]){
     await rest(page,i,f);
     await expect(s).toHaveAttribute('data-hs-f',String(f));

@@ -697,7 +697,7 @@
 .hs-ch--eng { --hs-tone: #050e10; --hs-card: linear-gradient(180deg, #0d2023, #0a181b); }
 .hs-ch--trust {
   --hs-tone: #f5f5f2; --hs-ink: #15201f; --hs-body: #44514f; --hs-sec: #5f6d6a; --hs-dim: #8a9592; --hs-rule: #d9ddd6;
-  --hs-teal: #0b7f74; --hs-mint: #0b7f74; --hs-ambt: #a85d0c; --hs-ambl: rgba(214, 140, 50, 0.55); --hs-done: #9cbdb7;
+  --hs-teal: #0a766c; --hs-mint: #0a766c; --hs-ambt: #a85d0c;   /* teal 5.0:1 on the light tone; #0b7f74 was 4.47 */ --hs-ambl: rgba(214, 140, 50, 0.55); --hs-done: #9cbdb7;
   --hs-card: #ffffff; --hs-cardbd: #e1e4dd; --hs-raise: #fbfbf9; --hs-bar: #e4e7e1;
   --hs-shadow: 0 30px 60px -32px rgba(23, 45, 43, 0.3), 0 1px 2px rgba(23, 45, 43, 0.06);
   --hs-chipbg: #f4f6f2; --hs-chipbd: #dfe3dc; --hs-blue: #3456b8; --hs-btnbd: rgba(21, 32, 31, 0.22); --hs-btnink: #15201f; --hs-codebg: #f4f6f2;
@@ -726,7 +726,6 @@
   margin: 0.9rem auto 0 !important; max-width: 13em; font-family: "Merriweather", Georgia, serif; font-weight: 300;
   font-size: clamp(2rem, 5.2cqw, 3.3rem); line-height: 1.1; letter-spacing: -0.025em; text-wrap: balance; text-transform: none;
 }
-.hs-nw { white-space: nowrap; }
 .hs-cline { margin: 0.9rem auto 0 !important; max-width: 30em; font-size: clamp(0.98rem, 1.4cqw, 1.1rem); line-height: 1.55; color: var(--hs-body); text-wrap: balance; }
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
@@ -963,25 +962,27 @@
 @keyframes hs-hit { 0%, 19% { opacity: 0; } 25%, 31% { opacity: 1; } 40%, 100% { opacity: 0; } }
 @keyframes hs-flow { 0% { opacity: 0; transform: translateX(0); } 10% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--x)); } }
 
-/* 03, live. -1: nothing; 0: the lead arrives and is handed to the analyst; 1: the trace of every step */
-.hs-scene.is-live .hs-hand { position: absolute; inset: 0; flex-wrap: nowrap; justify-content: center; gap: 0; transition: opacity 0.4s ease, transform 0.5s var(--hs-out); }
+/* 03, live. -1: nothing; 0: the trace of every step; 1: the trace steps back and the lead is handed to the
+   analyst, so the story ends on a person (copy revised 27 Oct 2026) */
+.hs-scene.is-live .hs-hand { position: absolute; inset: 0; flex-wrap: nowrap; justify-content: center; gap: 0; }
 .hs-scene.is-live .hs-lead { flex: none; opacity: 0; transform: translateY(30px); transition: opacity 0.3s ease, transform 0.3s ease; }
 .hs-scene.is-live .hs-link { display: block; flex: none; width: 70px; height: 2px; margin: 0 14px; border-radius: 1px; background: linear-gradient(90deg, var(--hs-ambl), var(--hs-amb)); transform: scaleX(0); transform-origin: 0 50%; transition: transform 0.3s ease; }
 .hs-scene.is-live .hs-seat { flex: none; width: 140px; flex-direction: column; text-align: center; opacity: 0; transform: translateX(-14px); transition: opacity 0.3s ease, transform 0.3s ease; }
 .hs-scene.is-live .hs-seat-t { justify-items: center; }
-.hs-scene--trust.is-live:not([data-hs-f="-1"]) .hs-lead { opacity: 1; transform: none; transition: opacity 0.7s ease 0.1s, transform 1s var(--hs-out) 0.1s; }
-.hs-scene--trust.is-live:not([data-hs-f="-1"]) .hs-link { transform: none; transition: transform 0.7s var(--hs-out) 1s; }
-.hs-scene--trust.is-live:not([data-hs-f="-1"]) .hs-seat { opacity: 1; transform: none; transition: opacity 0.6s ease 1.4s, transform 0.9s var(--hs-out) 1.4s; }
-.hs-scene--trust.is-live[data-hs-f="0"] .hs-ava::after { animation: hs-halo 1.6s ease-out 1.9s 2 both; }
+.hs-scene--trust.is-live[data-hs-f="1"] .hs-lead { opacity: 1; transform: none; transition: opacity 0.7s ease 0.3s, transform 1s var(--hs-out) 0.3s; }
+.hs-scene--trust.is-live[data-hs-f="1"] .hs-link { transform: none; transition: transform 0.7s var(--hs-out) 1.2s; }
+.hs-scene--trust.is-live[data-hs-f="1"] .hs-seat { opacity: 1; transform: none; transition: opacity 0.6s ease 1.6s, transform 0.9s var(--hs-out) 1.6s; }
+.hs-scene--trust.is-live[data-hs-f="1"] .hs-ava::after { animation: hs-halo 1.6s ease-out 2.1s 2 both; }
 @keyframes hs-halo { 0% { opacity: 0; transform: scale(0.85); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(1.25); } }
 .hs-scene.is-live .hs-trace {
   position: absolute; inset: 0; margin: auto; height: max-content;
   opacity: 0; visibility: hidden; transform: translateY(30px); transition: opacity 0.3s ease, transform 0.3s ease, visibility 0s linear 0.3s;
 }
 .hs-scene.is-live .hs-tr { opacity: 0; transform: translateY(6px); transition: opacity 0.2s ease, transform 0.2s ease; }
-.hs-scene--trust.is-live[data-hs-f="1"] .hs-hand { opacity: 0.1; transform: scale(0.95); }
-.hs-scene--trust.is-live[data-hs-f="1"] .hs-trace { opacity: 1; visibility: visible; transform: none; transition: opacity 0.7s ease 0.3s, transform 1s var(--hs-out) 0.3s, visibility 0s; }
-.hs-scene--trust.is-live[data-hs-f="1"] .hs-tr { opacity: 1; transform: none; transition: opacity 0.5s ease calc(0.6s + var(--i) * 0.14s), transform 0.7s var(--hs-out) calc(0.6s + var(--i) * 0.14s); }
+.hs-scene--trust.is-live:not([data-hs-f="-1"]) .hs-trace { opacity: 1; visibility: visible; transform: none; transition: opacity 0.7s ease 0.1s, transform 1s var(--hs-out) 0.1s, visibility 0s; }
+.hs-scene--trust.is-live:not([data-hs-f="-1"]) .hs-tr { opacity: 1; transform: none; transition: opacity 0.5s ease calc(0.4s + var(--i) * 0.14s), transform 0.7s var(--hs-out) calc(0.4s + var(--i) * 0.14s); }
+/* the trace steps back (as the report does in 01) while the lead goes to the analyst */
+.hs-scene--trust.is-live[data-hs-f="1"] .hs-trace { opacity: 0.1; transform: translateY(-5%) scale(0.95); transition: opacity 0.8s ease, transform 1s var(--hs-out), visibility 0s; }
 
 /* controls (as C, in the chapter's tones) */
 .hs-scene .hs-btn, .hs-scene .hs-dot {
