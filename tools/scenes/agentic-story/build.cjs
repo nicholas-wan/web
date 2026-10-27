@@ -6,7 +6,7 @@
 // into the design, to the model, and back to the analyst:
 //   01 Understanding the analyst   "Built around how analysts plan."  the card's dark      report, techniques, environment, hypothesis
 //   02 Designing the workflow      "Each step has one job."           a deeper near-black  the console, then the workflow map and one run
-//   03 Making a local model work   "Give the model less to read."     the one switch, to the site's warm light
+//   03 Making a small model reliable "Context engineering for a small model." the one switch, to the site's warm light
 // This file owns the story's words, objects, the map and the chapter-02 timeline (from the console's beat
 // times, checked against tools/scenes/agentic-console/scene.html, so a console change that moves them fails
 // here). It replaces the existing .hs-story block and the inline loader after it, keeping the console panel
@@ -123,18 +123,40 @@ const OBJ_2 = `<div class="hs-objs hs-objs--2">`
   + `<code class="hs-q">event_id = 4698<br>| count by host, task_name</code><p class="hs-res hs-res--ok">${ico(I.shield)}Checked</p></div>`
   + MAP + `</div>`;
 
-// ---------------------------------------------------------------- 03: what the model reads, then the analyst
-const CTX = [['Hypothesis', 'Persistence via scheduled tasks on workstations', I.flask], ['Environment', 'Task creation events kept · workstations', I.env], ['Past hunts', 'PowerShell covered recently', I.hist], ['Last result', 'Only expected entries', I.db]];
+// ---------------------------------------------------------------- 03: a small model's three limits, one decision each
+// From the owner's deck, "Engineering Challenges and Design Decisions" (27 Oct 2026): context bloat (raw rows stay
+// in the step that reads them), inconsistent output (grounding in a knowledge base, then regression evals) and compounded
+// errors (a person at the checkpoints), reordered so the story still ends on the analyst. The rows, the knowledge
+// base's entries and the lead are illustrative, in the product's own shapes (a Check result, its review flag).
+const ROWS = [['WS-014', '\\Microsoft\\Windows\\Chkdsk\\ProactiveScan'], ['WS-022', '\\Microsoft\\Windows\\Defrag\\ScheduledDefrag'], ['WS-031', '\\WinTaskUpdate', 1], ['WS-047', '\\Microsoft\\Windows\\UpdateOrchestrator\\Schedule Scan'], ['WS-052', '\\Microsoft\\Office\\OfficeTelemetryAgentLogOn']];
+// The knowledge base is the deck's list. The golden set is the method of the owner's model evaluation (26 Oct
+// 2026: one hunt, 7 techniques attacked and 5 left alone, an adjudicated answer key, every model through the same
+// agents, prompts and data, scored per technique, F1 because accuracy rewards calling everything clean); the run
+// scored on it here is illustrative, and no model or score from that evaluation is on the page.
+const KB = [['Technique notes', I.doc], ['Telemetry catalogue', I.db], ['Environment profile', I.env], ['Past hunts', I.hist]];
+const RUN = 'cccc' + 'w' + 'mm' + 'nnnnn';   // c caught with its own evidence, w wrong evidence, m missed, n correctly clean
+const OUTCOME = { c: 'Caught, own evidence', w: 'Wrong evidence', m: 'Missed', n: 'Correct: no attack' };
+const cells = (from, to) => [...RUN.slice(from, to)].map((k, i) => `<i class="hs-cell is-${k}" style="--i:${from + i}"></i>`).join('');
 const OBJ_3 = `<div class="hs-objs hs-objs--3">`
-  + `<div class="hs-ctxw" data-hs-late="0"><div class="hs-tele" aria-hidden="true"><p class="hs-lab">${ico(I.db)}Telemetry</p><span class="hs-tele-l">${'<i></i>'.repeat(14)}</span><p class="hs-tele-n">Searched where it lives; never read whole</p></div>`
-  + `<div class="hs-card hs-ctx"><p class="hs-lab">${ico(I.ctx)}Context for one step</p><ul>${CTX.map(([k, v, ic], i) => `<li style="--i:${i}">${ico(ic)}<b>${k}</b><span>${v}</span></li>`).join('')}</ul></div></div>`
-  + `<div class="hs-hand" data-hs-late="1">`
-  + `<div class="hs-card hs-lead"><p class="hs-lead-top"><span class="hs-lab">${ico(I.flag)}Lead</span><span class="hs-badge">Flagged</span></p>`
-  + `<p class="hs-lead-n">\\WinTaskUpdate</p><p class="hs-tags"><span>root-level</span><span>not in baseline</span></p>`
+  + `<div class="hs-card hs-rows" data-hs-late="0">`
+  + `<p class="hs-pipe"><span>Plan</span><i aria-hidden="true"></i><span>Query</span><i aria-hidden="true"></i><span class="is-on">Read results</span></p>`
+  + `<p class="hs-lab">${ico(I.db)}Result rows<span class="hs-rows-n">80, read here only</span></p>`
+  + `<table class="hs-rt"><tbody>${ROWS.map(([h, t, x], i) => `<tr style="--i:${i}"${x ? ' class="hs-rt-x"' : ''}><td>${h}</td><td>${t}</td></tr>`).join('')}</tbody></table>`
+  + `<p class="hs-out">${ico(I.down)}<span>Passed on</span><b>1 task not in baseline: <code>\\WinTaskUpdate</code></b></p></div>`
+  + `<div class="hs-card hs-kb" data-hs-late="1"><p class="hs-lab">${ico(I.ctx)}Knowledge base</p>`
+  + `<p class="hs-kbc">${KB.map(([k, ic], i) => `<span style="--i:${i}">${ico(ic)}${k}</span>`).join('')}</p>`
+  + `<div class="hs-gold"><p class="hs-lab">${ico(I.flask)}Golden set<span class="hs-rows-n">adjudicated answer key</span></p>`
+  + `<div class="hs-cells" role="img" aria-label="An illustrative run scored against the golden set: of 7 attacked techniques, 4 caught with their own evidence, 1 flagged with the wrong evidence and 2 missed; all 5 left alone correctly called clean.">`
+  + `<span class="hs-cg"><span class="hs-cr">${cells(0, 7)}</span><span class="hs-cgl">Attacked · 7</span></span>`
+  + `<span class="hs-cg"><span class="hs-cr">${cells(7, 12)}</span><span class="hs-cgl">Left alone · 5</span></span></div>`
+  + `<p class="hs-key" aria-hidden="true">${Object.entries(OUTCOME).map(([k, t]) => `<span><i class="hs-cell is-${k}"></i>${t}</span>`).join('')}</p>`
+  + `<p class="hs-gfoot">Regression evals: same agents, prompts and data for every model, scored on F1, since accuracy rewards calling everything clean.</p></div></div>`
+  + `<div class="hs-hand" data-hs-late="2">`
+  + `<div class="hs-card hs-lead"><p class="hs-lead-top"><span class="hs-lab">${ico(I.flag)}Lead</span><span class="hs-badge">Human review</span></p>`
+  + `<p class="hs-lead-n">\\WinTaskUpdate</p><p class="hs-tags"><span>not in baseline</span><span>medium confidence</span></p>`
   + `<div class="hs-ev"><p class="hs-lab">Evidence</p>${chip('T1053.005', 'Scheduled Task')}<p class="hs-ev-q"><code>event_id = 4698</code><span>${ico(I.check)}Checked</span></p></div></div>`
   + `<span class="hs-link" aria-hidden="true"></span>`
-  + `<div class="hs-seat"><span class="hs-ava">${ico(I.person)}</span><span class="hs-seat-t"><b>Analyst</b><span>Judges the lead</span></span></div></div>`
-  + `<p class="hs-evl" data-hs-late="1">${ico(I.trace)}Traces from every hunt feed evaluation ${ico(I.check)}</p></div>`;
+  + `<div class="hs-seat"><span class="hs-ava">${ico(I.person)}</span><span class="hs-seat-t"><b>Analyst</b><span>Judges the lead</span></span></div></div></div>`;
 
 // ---------------------------------------------------------------- the chapters (owner-approved copy, 28 Oct 2026)
 // Each chapter sells one capability from the CV, in headlines that state a decision (copy review, 28 Oct 2026).
@@ -157,10 +179,13 @@ const CH = [
       { beats: [], dur: 1, h: 'Re-plans when inconclusive. Hands leads to a human.', p: 'An inconclusive search goes back to planning. A lead goes to an analyst to review.' },
       { beats: [], dur: 1, h: 'One hunt, traced start to finish.', p: 'Plan, past hunts, search, re-plan, check, lead, review.' },
     ] },
-  { id: 'trust', n: '03', label: 'Making a local model work', title: 'Context engineering for a local model.', line: 'On-premises, a small context, large telemetry.', objs: OBJ_3, amber: true,
+  // 03's frames are the deck's three challenges in its own words, shortened (owner, 27 Oct 2026: the old
+  // context card over a "Telemetry" block was "kind of useless")
+  { id: 'trust', n: '03', label: 'Making a small model reliable', title: 'Context engineering for a small model.', line: 'On-premises means a smaller model. Each problem it caused became a design decision.', objs: OBJ_3, amber: true,
     frames: [
-      { h: 'Tools return results; the context stays small.', p: 'Searches return a short result. Past hunts and environment facts are fetched just in time, so each step fits a small context.' },
-      { h: 'Traces feed evals. Analysts make the call.', p: 'Every run is evaluated from its traces. Each lead goes to an analyst with its evidence.' },
+      { h: 'Narrow the context for each call.', p: 'Query results are the largest thing in a hunt, so detection logic is split into a planner, a query writer and a result reader. Only the reader sees the rows; a short finding is passed on.' },
+      { h: 'Ground the model, then evaluate it.', p: 'The same input can give a different answer each run. A knowledge base grounds every answer, and regression evals on a golden set, a hunt with an adjudicated answer key, catch drift.' },
+      { h: 'Human in the loop at the checkpoints.', p: 'In a chain of calls, each mistake feeds the next. Plans that need judgement go to an analyst, every verdict carries a review flag, and a search that runs out of attempts is handed over, not looped.' },
     ] },
 ];
 
