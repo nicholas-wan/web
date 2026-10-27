@@ -5,8 +5,8 @@
    console's 300 nodes a frame), --hs-p0 (frame 0's arrival), --hs-pN (frame N's arrival over TRAVEL screens)
    and --hs-pe (the exit); the CSS drives the moves from them, the console's fade is set inline, and the
    values chase the scroll (TAU) since wheels scroll in notches. Then nothing changes for the dwell. Chapter 01
-   measures each phrase's offset from its chip (--hs-dx/--hs-dy) so the chips start on their phrases; objects
-   a frame has not reached stay visibility:hidden. The engineering chapter drives the console's paused CSS
+   measures each data-hs-from element's offset from its source (--hs-dx/--hs-dy) so chips and facts start where
+   they are pulled from; objects a frame has not reached (data-hs-late="N") stay visibility:hidden. The engineering chapter drives the console's paused CSS
    animations from a clock. Native scrolling is never touched (no snapping, no wheel handling); the buttons
    and dots scroll smoothly to a frame. Base styles are the final state (no JS, reduced motion, short screens). */
 (() => {
@@ -59,7 +59,7 @@
     const names = []; for (let f = 0; f < N; f++) names.push('--hs-p' + f); names.push('--hs-pe');
     const holders = [...root.querySelectorAll('.hs-objs')];
     // objects a frame has not reached yet stay hidden: [element, the value that reveals it]
-    const late = [['.hs-hyp', 1], ['.hs-dia', 1], ['.hs-trace', 0]].map(([s, i]) => [root.querySelector(s), i]).filter(x => x[0]);
+    const late = [...root.querySelectorAll('[data-hs-late]')].map(el => [el, +el.dataset.hsLate]);
     let pt = [], pc = [], praf = 0, plast = 0, shown = '';
     const targets = u => {
       const v = [clamp((u + ENTER) / (ENTER + A0))];
@@ -96,11 +96,12 @@
     }
     // chapter 01: where each marked phrase sits relative to its chip at rest (the chip starts there)
     function measure() {
-      if (!root.querySelector('.hs-m0')) return;
+      const movers = [...root.querySelectorAll('[data-hs-from]')];
+      if (!movers.length) return;
       root.classList.add('is-measure');
-      for (let i = 0; i < 3; i++) {
-        const mk = root.querySelector('.hs-m' + i), ch = root.querySelector('.hs-c' + i);
-        if (!mk || !ch) continue;
+      for (const ch of movers) {
+        const mk = root.querySelector(ch.dataset.hsFrom);
+        if (!mk) continue;
         const a = mk.getBoundingClientRect(), b = ch.getBoundingClientRect();
         ch.style.setProperty('--hs-dx', (a.left - b.left).toFixed(1) + 'px');
         ch.style.setProperty('--hs-dy', (a.top + a.height / 2 - b.top - b.height / 2).toFixed(1) + 'px');

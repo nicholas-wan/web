@@ -1,17 +1,20 @@
 // The Agentic AI story on Experience (prefix hs-): three short pinned chapters in the dark #agentic-ai card.
 //   node tools/scenes/agentic-story/build.cjs        writes the story's markup into experience.html
 //   node tools/scenes/agentic-console/apply.cjs      then (re)fills the console inside chapter 02
-// Approved 27 Oct 2026 as mockup E3 (lab/scrolly/e); see README "Agentic AI story". The story runs from the
-// outside world, into the system, and back to people, two frames a chapter:
-//   01 Understanding the work    "From a report to a plan."   the card's dark      report, techniques, hypothesis
-//   02 Engineering choices       "Built for a local model."   a deeper near-black  the console, then one small diagram
-//   03 Keeping people in charge  "Analysts make the call."    the one switch, to the site's warm light
-// This file owns the story's words, objects, diagram and the chapter-02 timeline (from the console's beat
+// Approved 27 Oct 2026 as mockup E3 (lab/scrolly/e); re-aimed 28 Oct 2026 as mockup H (lab/scrolly/h) so each
+// chapter sells one capability from the CV; see README "Agentic AI story". The story runs from the analyst,
+// into the design, to the model, and back to the analyst:
+//   01 Understanding the analyst   "Built around how analysts plan."  the card's dark      report, techniques, environment, hypothesis
+//   02 Designing the workflow      "Each step has one job."           a deeper near-black  the console, then the workflow map and one run
+//   03 Making a local model work   "Give the model less to read."     the one switch, to the site's warm light
+// This file owns the story's words, objects, the map and the chapter-02 timeline (from the console's beat
 // times, checked against tools/scenes/agentic-console/scene.html, so a console change that moves them fails
-// here). It replaces the existing .hs-story block (or, the first time, the old chip peek) and the inline
-// loader after it, keeping the console panel already in the page; apply.cjs owns that panel's contents.
+// here). It replaces the existing .hs-story block and the inline loader after it, keeping the console panel
+// already in the page; apply.cjs owns that panel's contents.
 // Styles: the hand-written "Agentic AI story" section of assets/css/internship-peek.css. Script:
 // assets/js/hunt-story.js, injected on demand by the inline loader (outside the 80 KB <script src> ceiling).
+// Objects a frame has not reached carry data-hs-late="N"; an element with data-hs-from="sel" starts on that
+// element (the engine measures the offset), so chips and facts are pulled from their source by the scroll.
 const fs = require('fs'); const path = require('path');
 const ROOT = path.join(__dirname, '..', '..', '..');
 const r3 = v => +(+v).toFixed(3);
@@ -59,91 +62,105 @@ const I = {
   person: 'M6 5.6a2.1 2.1 0 1 0 0-4.2 2.1 2.1 0 0 0 0 4.2zM2.2 10.8c.4-2.1 1.9-3.3 3.8-3.3s3.4 1.2 3.8 3.3',
   down: 'M6 2v8M3 7l3 3 3-3',
   trace: 'M1.5 9.5h2l1.5-5 2 6 1.5-4h2',
+  env: 'M2 9.5h8M3 9.5V5l3-2.5L9 5v4.5M5 9.5V7h2v2.5',
+  ctx: 'M2.5 2.5h7v7h-7zM4.5 5h3M4.5 7h2',
 };
-const chip = (id, name, c = '') => `<span class="hs-chip${c}"><code>${id}</code>${name}</span>`;
+const chip = (id, name, c = '', from = '') => `<span class="hs-chip${c}"${from ? ` data-hs-from="${from}"` : ''}><code>${id}</code>${name}</span>`;
 
-// ---------------------------------------------------------------- the design (chapter 02's last frame)
-// One small diagram, drawn twice (wide, and tall for phones): an on-premises boundary, the agents' loop
-// around a local model, the tools they work through, and a traces-and-evaluation line.
-const tick = (x, y, s) => `<path class="hs-a-ico" transform="translate(${x} ${y}) scale(${s})" d="${I.check}"/>`;
-const ring = (cx, cy, r, lab) => `<g class="hs-a-loop">`
-  + `<circle class="hs-a-ring" cx="${cx}" cy="${cy}" r="${r}" pathLength="1" transform="rotate(-90 ${cx} ${cy})"/>`
-  + [[0, -r], [r, 0], [0, r], [-r, 0]].map(([dx, dy]) => `<circle class="hs-a-stn" cx="${cx + dx}" cy="${cy + dy}" r="6"/>`).join('')
-  + lab.map(([t, x, y, a]) => `<text class="hs-a-step" x="${x}" y="${y}" text-anchor="${a}">${t}</text>`).join('')
-  + `<text class="hs-a-model" x="${cx}" y="${cy + 7}" text-anchor="middle">Local model</text></g>`
-  + `<g class="hs-a-orbit" style="transform-origin:${cx}px ${cy}px"><circle class="hs-a-glow" cx="${cx}" cy="${cy - r}" r="15"/><circle class="hs-a-dot" cx="${cx}" cy="${cy - r}" r="6.5"/></g>`;
-const pill = (x, y, w, h, t, i, n) => `<g class="hs-a-tool hs-a-t${n}"><rect class="hs-a-pill" x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}"/><rect class="hs-a-hit" x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}"/>`
-  + `<path class="hs-a-ico" transform="translate(${x + 18} ${y + h / 2 - 8}) scale(1.35)" d="${i}"/><text class="hs-a-tl" x="${x + 46}" y="${y + h / 2 + 5.5}">${t}</text></g>`;
-const bound = (x, y, w, h, rx, lx) => `<rect class="hs-a-bound" x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" pathLength="1"/>`
-  + `<g class="hs-a-onprem"><rect x="${lx}" y="${y - 15}" width="150" height="30" rx="15"/><text x="${lx + 75}" y="${y + 5}" text-anchor="middle">On-premises</text></g>`;
-const band = (x1, x2, y, lx, ly) => `<text class="hs-a-bl" x="${lx}" y="${ly}">Traces and evaluation</text><g class="hs-a-band"><line class="hs-a-line" x1="${x1}" y1="${y}" x2="${x2}" y2="${y}"/>`
-  + `<circle class="hs-a-eval" cx="${x2 + 22}" cy="${y}" r="15"/>${tick(x2 + 13, y - 9, 1.5)}`
-  + [0, 1, 2].map(i => `<circle class="hs-a-flow hs-a-f${i}" cx="${x1}" cy="${y}" r="3.5" style="--x:${x2 - x1}px"/>`).join('') + `</g>`;
-const STEPS4 = (cx, cy, r) => [['Plan', cx, cy - r + 32, 'middle'], ['Act', cx + r - 16, cy + 5, 'end'], ['Observe', cx, cy + r - 22, 'middle'], ['Adjust', cx - r + 16, cy + 5, 'start']];
-// Phones: Act and Adjust sit outside the ring, so they clear "Local model" (review, 27 Oct 2026).
-const STEPS4T = (cx, cy, r) => [['Plan', cx, cy - r + 32, 'middle'], ['Act', cx + r + 12, cy + 5, 'start'], ['Observe', cx, cy + r - 22, 'middle'], ['Adjust', cx - r - 12, cy + 5, 'end']];
-const WIDE = `<svg class="hs-dia-w" viewBox="0 0 760 450" preserveAspectRatio="xMidYMid meet" aria-hidden="true">`
-  + bound(12, 24, 736, 410, 30, 40)
-  + ring(280, 210, 142, STEPS4(280, 210, 142))
-  + `<path class="hs-a-wire hs-a-wt" d="M428 210C478 210 474 156 520 156M428 210C478 210 474 264 520 264"/>`
-  + pill(520, 130, 196, 52, 'Log search', I.db, 0) + pill(520, 238, 196, 52, 'Memory', I.hist, 1)
-  + `<path class="hs-a-wire hs-a-drop" d="M280 358V388M618 290V388"/>`
-  + band(56, 680, 388, 56, 374)
-  + `</svg>`;
-const TALL = `<svg class="hs-dia-t" viewBox="0 0 360 456" preserveAspectRatio="xMidYMid meet" aria-hidden="true">`
-  + bound(6, 20, 348, 428, 24, 24)
-  + ring(180, 168, 104, STEPS4T(180, 168, 104))
-  + `<path class="hs-a-wire hs-a-wt" d="M180 286C180 300 96 298 96 314M180 286C180 300 264 298 264 314"/>`
-  + pill(20, 314, 152, 46, 'Log search', I.db, 0) + pill(188, 314, 152, 46, 'Memory', I.hist, 1)
-  + `<path class="hs-a-wire hs-a-drop" d="M180 360V404"/>`
-  + band(28, 296, 404, 28, 390)
-  + `</svg>`;
-const DIA = `<figure class="hs-dia" role="img" aria-label="It runs on-premises. The agents loop around a local model: plan, act, observe, adjust. They work through log search and memory, and the traces feed evaluation.">${WIDE}${TALL}</figure>`;
-
-// ---------------------------------------------------------------- each chapter's objects
+// ---------------------------------------------------------------- 01: the report, its techniques, this environment, the hypothesis
+// The environment rows are illustrative (what is logged, which assets, a baseline, a past hunt); the hypothesis
+// is scoped by three of them, pulled from the card into its scope row.
+const FACTS = ['Task creation events', 'Workstations', 'Task baseline'];
 const OBJ_1 = `<div class="hs-objs hs-objs--1"><div class="hs-src">`
   + `<div class="hs-doc"><p class="hs-lab">${ico(I.doc)}Ransomware report</p>`
   + `<p class="hs-doc-t">After gaining access, the operators <mark class="hs-m0">create a scheduled task</mark> that relaunches the payload at logon. They <mark class="hs-m1">run PowerShell</mark> to stage their tools, and <mark class="hs-m2">add a Run key</mark> so it survives a reboot.</p>`
   + `<span class="hs-doc-l" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>`
-  + `<p class="hs-chips">${chip('T1053.005', 'Scheduled Task', ' hs-c0')}${chip('T1059.001', 'PowerShell', ' hs-c1')}${chip('T1547.001', 'Registry Run Keys', ' hs-c2')}</p></div>`
-  + `<div class="hs-card hs-hyp"><p class="hs-lab hs-lab--hyp">${ico(I.flask)}Hypothesis</p>`
-  + `<p class="hs-hyp-t">An adversary may persist on workstations via scheduled tasks that relaunch the payload at logon.</p></div></div>`;
+  + `<p class="hs-chips">${chip('T1053.005', 'Scheduled Task', ' hs-c0', '.hs-m0')}${chip('T1059.001', 'PowerShell', ' hs-c1', '.hs-m1')}${chip('T1547.001', 'Registry Run Keys', ' hs-c2', '.hs-m2')}</p></div>`
+  + `<div class="hs-card hs-env" data-hs-late="1"><p class="hs-lab">${ico(I.env)}This environment</p><dl class="hs-env-l">`
+  + `<div><dt>Logs</dt><dd><span class="hs-e0">${FACTS[0]}</span> kept</dd></div>`
+  + `<div><dt>Assets</dt><dd><span class="hs-e1">${FACTS[1]}</span> in scope</dd></div>`
+  + `<div><dt>Known</dt><dd><span class="hs-e2">${FACTS[2]}</span> for scheduled tasks</dd></div>`
+  + `<div class="hs-env-dim"><dt>Hunts</dt><dd>PowerShell: covered by a recent hunt</dd></div></dl></div>`
+  + `<div class="hs-card hs-hyp" data-hs-late="2"><p class="hs-lab hs-lab--hyp">${ico(I.flask)}Hypothesis</p>`
+  + `<p class="hs-hyp-t">An adversary may persist on workstations via scheduled tasks that relaunch the payload at logon.</p>`
+  + `<p class="hs-scope"><span class="hs-scope-l">Scoped to</span>${FACTS.map((t, i) => `<span class="hs-fact hs-f${i}" data-hs-from=".hs-e${i}">${t}</span>`).join('')}</p></div></div>`;
+
+// ---------------------------------------------------------------- 02: the console, then the workflow map
+// The steps and the two decisions the workflow makes: an inconclusive search goes back to planning, and a lead
+// goes to a person. Drawn by the scroll; in the last frame one hunt runs the path, loop included. The run is on
+// the loop's own corners, and the dot sits under the pills in DOM order, so it slides beneath them.
+const node = (x, y, w, t, k, amb) => `<g class="hs-w-node hs-w-n${k}${amb ? ' hs-w-amb' : ''}"><rect x="${x - w / 2}" y="${y - 22}" width="${w}" height="44" rx="22"/><text x="${x}" y="${y + 5.5}" text-anchor="middle">${t}</text></g>`;
+const STEPS = ['Plan', 'Past hunts', 'Search', 'Check', 'Lead', 'Analyst review'];
+const WIDE = (() => {
+  const y1 = 130, y2 = 300, X = [100, 290, 480], W = 150;
+  const main = `M${X[0] + W / 2} ${y1}H${X[1] - W / 2}M${X[1] + W / 2} ${y1}H${X[2] - W / 2}M${X[2]} ${y1 + 22}V${y2 - 22}M${X[2] - W / 2} ${y2}H${X[1] + W / 2}M${X[1] - W / 2} ${y2}H${X[0] + W / 2}`;
+  const loop = `M${X[2]} ${y1 - 22}V${y1 - 80}H${X[0]}V${y1 - 22}`;
+  const run = `M${X[0]} ${y1}H${X[2]}V${y1 - 80}H${X[0]}V${y1}H${X[2]}V${y2}H${X[0]}`;
+  return `<svg class="hs-w hs-w-wide" viewBox="0 20 580 320" aria-hidden="true">`
+    + `<path class="hs-w-line" pathLength="1" d="${main}"/>`
+    + `<path class="hs-w-loop" pathLength="1" d="${loop}"/><text class="hs-w-ll" x="290" y="${y1 - 88}" text-anchor="middle">Inconclusive · re-plan</text>`
+    + `<circle class="hs-w-glow" r="11" style="offset-path: path('${run}')"/><circle class="hs-w-dot" r="4.5" style="offset-path: path('${run}')"/>`
+    + node(X[0], y1, W, STEPS[0], 0) + node(X[1], y1, W, STEPS[1], 1) + node(X[2], y1, W, STEPS[2], 2)
+    + node(X[2], y2, W, STEPS[3], 3) + node(X[1], y2, W, STEPS[4], 4) + node(X[0], y2, W, STEPS[5], 5, 1)
+    + `</svg>`;
+})();
+const TALL = (() => {
+  const X = 180, Y = [60, 130, 200, 270, 340, 410], W = 190;
+  const main = Y.slice(0, -1).map((y, i) => `M${X} ${y + 20}V${Y[i + 1] - 20}`).join('');
+  const loop = `M${X + 95} ${Y[2]}H${X + 150}V${Y[0]}H${X + 95}`;
+  const run = `M${X} ${Y[0]}V${Y[2]}H${X + 150}V${Y[0]}H${X}V${Y[5]}`;
+  return `<svg class="hs-w hs-w-tall" viewBox="0 0 360 456" aria-hidden="true">`
+    + `<path class="hs-w-line" pathLength="1" d="${main}"/>`
+    + `<path class="hs-w-loop" pathLength="1" d="${loop}"/><text class="hs-w-ll" x="${X + 150}" y="${Y[1] + 4}" text-anchor="middle" transform="rotate(90 ${X + 150} ${Y[1]})">Inconclusive · re-plan</text>`
+    + `<circle class="hs-w-glow" r="10" style="offset-path: path('${run}')"/><circle class="hs-w-dot" r="4" style="offset-path: path('${run}')"/>`
+    + STEPS.map((t, i) => node(X, Y[i], W, t, i, i === 5)).join('')
+    + `</svg>`;
+})();
+const MAP = `<figure class="hs-wmap" role="img" data-hs-late="1" aria-label="The workflow: plan, past hunts, search, check, lead, analyst review. An inconclusive search goes back to planning; a lead goes to a person.">${WIDE}${TALL}</figure>`;
 // The query is a neutral pseudo-query (the console's own, 27 Oct 2026), so no SIEM vendor is named.
 const OBJ_2 = `<div class="hs-objs hs-objs--2">`
   + `<div class="hs-card hs-o2"><p class="hs-was">Scheduled tasks <span>Inconclusive</span></p><p class="hs-lab">${ico(I.down)}New plan</p>`
   + `<code class="hs-q">event_id = 4698<br>| count by host, task_name</code><p class="hs-res hs-res--ok">${ico(I.shield)}Checked</p></div>`
-  + DIA + `</div>`;
-const TRACE = [['Read the report'], ['Wrote a hypothesis'], ['Checked past hunts'], ['Ran the searches'], ['Re-planned one search and checked it'], ['Flagged a lead', 'amb'], ['Analyst review', 'open']];
-// The trace first, then the lead handed to the analyst: the story ends on a person (27 Oct 2026).
+  + MAP + `</div>`;
+
+// ---------------------------------------------------------------- 03: what the model reads, then the analyst
+const CTX = [['Hypothesis', 'Persistence via scheduled tasks on workstations', I.flask], ['Environment', 'Task creation events kept · workstations', I.env], ['Past hunts', 'PowerShell covered recently', I.hist], ['Last result', 'Only expected entries', I.db]];
 const OBJ_3 = `<div class="hs-objs hs-objs--3">`
-  + `<div class="hs-card hs-trace"><p class="hs-lab">${ico(I.trace)}Trace</p><ol>${TRACE.map(([t, k], i) => `<li class="hs-tr${k ? ' hs-tr--' + k : ''}" style="--i:${i}">${ico(k === 'open' ? I.person : k === 'amb' ? I.flag : I.check)}<span>${t}</span>${k === 'open' ? '<em>Open</em>' : ''}</li>`).join('')}</ol></div>`
-  + `<div class="hs-hand">`
+  + `<div class="hs-ctxw" data-hs-late="0"><div class="hs-tele" aria-hidden="true"><p class="hs-lab">${ico(I.db)}Telemetry</p><span class="hs-tele-l">${'<i></i>'.repeat(14)}</span><p class="hs-tele-n">Searched where it lives; never read whole</p></div>`
+  + `<div class="hs-card hs-ctx"><p class="hs-lab">${ico(I.ctx)}Context for one step</p><ul>${CTX.map(([k, v, ic], i) => `<li style="--i:${i}">${ico(ic)}<b>${k}</b><span>${v}</span></li>`).join('')}</ul></div></div>`
+  + `<div class="hs-hand" data-hs-late="1">`
   + `<div class="hs-card hs-lead"><p class="hs-lead-top"><span class="hs-lab">${ico(I.flag)}Lead</span><span class="hs-badge">Flagged</span></p>`
   + `<p class="hs-lead-n">\\WinTaskUpdate</p><p class="hs-tags"><span>root-level</span><span>not in baseline</span></p>`
   + `<div class="hs-ev"><p class="hs-lab">Evidence</p>${chip('T1053.005', 'Scheduled Task')}<p class="hs-ev-q"><code>event_id = 4698</code><span>${ico(I.check)}Checked</span></p></div></div>`
   + `<span class="hs-link" aria-hidden="true"></span>`
-  + `<div class="hs-seat"><span class="hs-ava">${ico(I.person)}</span><span class="hs-seat-t"><b>Analyst</b><span>Judges the lead</span></span></div></div></div>`;
+  + `<div class="hs-seat"><span class="hs-ava">${ico(I.person)}</span><span class="hs-seat-t"><b>Analyst</b><span>Judges the lead</span></span></div></div>`
+  + `<p class="hs-evl" data-hs-late="1">${ico(I.trace)}Traces from every hunt feed evaluation ${ico(I.check)}</p></div>`;
 
-// ---------------------------------------------------------------- the chapters (owner-approved copy, 27 Oct 2026)
+// ---------------------------------------------------------------- the chapters (owner-approved copy, 28 Oct 2026)
+// Each chapter sells one capability from the CV, in headlines that state a decision (copy review, 28 Oct 2026).
+// The environment claims are the owner's ("accurate as written"). No team, funding or stakeholder claims here.
 const CH = [
-  // Copy revised 27 Oct 2026 (content review; owner-approved): 01's line anchors on the analyst's workflow, 02 ends
-  // on evaluation, and 03 ends on the analyst rather than the log. No team, funding or stakeholder claims here.
-  { id: 'product', n: '01', label: 'Understanding the work', title: 'From a report to a plan.', line: 'An illustrative hunt, built around how analysts plan one.', objs: OBJ_1,
+  // Headlines carry the terms AI product roles name (research, 28 Oct 2026: evals, guardrails and human review,
+  // orchestration, tool access, traces, context engineering, grounding), in plain words; never "RAG",
+  // "autonomous" or "memory", which would overclaim.
+  { id: 'product', n: '01', label: 'Understanding the analyst', title: 'Grounded in how analysts plan.', line: 'An illustrative hunt, built around how analysts plan one.', objs: OBJ_1,
     frames: [
-      { h: 'Only what’s worth hunting goes in.', p: 'Models reason best over short, focused input, so the agent pulls out just the techniques worth hunting.' },
-      { h: 'Each technique becomes a hypothesis.', p: 'A claim a hunt can test.' },
+      { h: 'The input is scoped before the model sees it.', p: 'Models reason best over short, focused input, so the agent pulls out just the techniques worth hunting.' },
+      { h: 'Grounded in what this environment logs.', p: 'A hypothesis is only testable where the data exists. What this environment logs, and what is normal here, comes before any hypothesis.' },
+      { h: 'Each technique becomes a testable hypothesis.', p: 'A claim a hunt can test.' },
     ] },
-  { id: 'eng', n: '02', label: 'Engineering choices', title: 'Built for a local model.', line: 'Each choice keeps the model’s job narrow.', console: true, objs: OBJ_2,
+  { id: 'eng', n: '02', label: 'Designing the workflow', title: 'Narrow agents, one supervisor.', line: 'Two decisions shaped it: when to re-plan, and when a person steps in.', console: true, objs: OBJ_2,
     frames: [
       // hold: this frame's dwell in screens (others 0.6). The console's 8s run needs the reader to linger: at
       // 0.6 a steady scroll or one Page Down left it after about a second (review, 27 Oct 2026).
-      { beats: [1, 2, 3, 4, 5], dur: 8, hold: 1.4, h: 'Each agent has one narrow job.', p: 'Past hunts are checked first. Searches run where the data lives and return only a short result, and each query is checked before it runs.' },
-      { beats: [], dur: 1, h: 'Every run is measured.', p: 'Traces from each hunt feed evaluation, so changes to the agents are tested, not assumed.' },
+      { beats: [1, 2, 3, 4, 5], dur: 8, hold: 1.4, h: 'Each agent gets one job and the tools for it.', p: 'Past hunts are checked first. Searches run where the data lives and return only a short result, and each query is checked before it runs.' },
+      { beats: [], dur: 1, h: 'Re-plans when inconclusive. Hands leads to a human.', p: 'An inconclusive search goes back to planning. A lead goes to an analyst to review.' },
+      { beats: [], dur: 1, h: 'One hunt, traced start to finish.', p: 'Plan, past hunts, search, re-plan, check, lead, review.' },
     ] },
-  { id: 'trust', n: '03', label: 'Keeping people in charge', title: 'Analysts make the call.', line: 'Analyst review points are part of the design.', objs: OBJ_3, amber: true,
+  { id: 'trust', n: '03', label: 'Making a local model work', title: 'Context engineering for a local model.', line: 'On-premises, a small context, large telemetry.', objs: OBJ_3, amber: true,
     frames: [
-      { h: 'Every step is logged.', p: 'So any lead can be traced back and reviewed.' },
-      { h: 'Each lead comes with its evidence.', p: 'An analyst judges every one.' },
+      { h: 'Tools return results; the context stays small.', p: 'Searches return a short result. Past hunts and environment facts are fetched just in time, so each step fits a small context.' },
+      { h: 'Traces feed evals. Analysts make the call.', p: 'Every run is evaluated from its traces. Each lead goes to an analyst with its evidence.' },
     ] },
 ];
 

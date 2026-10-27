@@ -17,11 +17,11 @@ test('agentic story: without motion, every chapter is a complete static list wit
   await page.locator('#agentic-ai .hs-story').scrollIntoViewIfNeeded();
   await expect(scenes(page)).toHaveCount(3);
   await expect(page.locator('#agentic-ai .hs-scene.is-live')).toHaveCount(0);
-  await expect(page.locator('#agentic-ai .hs-ctitle')).toHaveText(['From a report to a plan.','Built for a local model.','Analysts make the call.']);
-  await expect(page.locator('#agentic-ai .hs-clabel')).toHaveText(['01 Understanding the work','02 Engineering choices','03 Keeping people in charge']);
-  await expect(page.locator('#agentic-ai .hs-step .hs-h')).toHaveText(['Only what’s worth hunting goes in.','Each technique becomes a hypothesis.','Each agent has one narrow job.','Every run is measured.','Every step is logged.','Each lead comes with its evidence.']);
+  await expect(page.locator('#agentic-ai .hs-ctitle')).toHaveText(['Grounded in how analysts plan.','Narrow agents, one supervisor.','Context engineering for a local model.']);
+  await expect(page.locator('#agentic-ai .hs-clabel')).toHaveText(['01 Understanding the analyst','02 Designing the workflow','03 Making a local model work']);
+  await expect(page.locator('#agentic-ai .hs-step .hs-h')).toHaveText(['The input is scoped before the model sees it.','Grounded in what this environment logs.','Each technique becomes a testable hypothesis.','Each agent gets one job and the tools for it.','Re-plans when inconclusive. Hands leads to a human.','One hunt, traced start to finish.','Tools return results; the context stays small.','Traces feed evals. Analysts make the call.']);
   await expect(page.locator('#agentic-ai .hs-cline').first()).toHaveText('An illustrative hunt, built around how analysts plan one.');
-  for(const sel of ['.hs-step','.hs-doc','.hs-hyp','.hs-o2','.hs-dia','.hs-lead','.hs-seat','.hs-trace','.hunt-panel .c2']){
+  for(const sel of ['.hs-step','.hs-doc','.hs-env','.hs-hyp','.hs-fact','.hs-o2','.hs-wmap','.hs-ctx','.hs-tele','.hs-lead','.hs-seat','.hs-evl','.hunt-panel .c2']){
    for(const el of await page.locator('#agentic-ai '+sel).all()){await expect(el).toBeVisible();await expect(el).toHaveCSS('opacity','1');}
   }
   const label=await page.locator('#agentic-ai .hunt-panel .c2').getAttribute('aria-label');
@@ -30,7 +30,7 @@ test('agentic story: without motion, every chapter is a complete static list wit
   const words=await page.locator('#agentic-ai .hs-story').textContent();
   expect(words).not.toMatch(FORBIDDEN);
   expect(label).not.toMatch(FORBIDDEN);
-  for(const s of ['event_id = 4698','\\WinTaskUpdate','root-level','not in baseline','Flagged','Checked','Re-planned one search and checked it'])expect(words).toContain(s);
+  for(const s of ['event_id = 4698','\\WinTaskUpdate','root-level','not in baseline','Flagged','Checked','Task creation events','Scoped to','Analyst review','Inconclusive · re-plan','Context for one step','Traces from every hunt feed evaluation'])expect(words).toContain(s);
   expect(await page.content()).not.toMatch(/index=wineventlog|SysUpdate|Splunk/);
   expect(await noSideScroll(page)).toBe(true);
  }
@@ -67,7 +67,8 @@ test('agentic story: pinned chapters advance with the scroll, rewind, release, a
    const [screens,want,hold]=await s.evaluate(e=>{const d=JSON.parse(e.getAttribute('data-hs-story'));const n=e.querySelectorAll('.hs-step').length;let u=0.4;for(let k=0;k<n-1;k++)u+=(d.hold&&d.hold[k])||0.6;return [e.offsetHeight/e.querySelector('.hs-stage').offsetHeight-1,u,d.hold?d.hold[0]:0];});
    expect(Math.abs(screens-want)).toBeLessThan(0.1);
    expect(hold).toBe(i===1?1.4:0);
-   for(const f of [0,1]){
+   const n=await s.locator('.hs-step').count();
+   for(let f=0;f<n;f++){
     await rest(page,i,f);
     await expect(s).toHaveAttribute('data-hs-f',String(f));
     // Chapter 02's first frame plays the console's run (8s); the others are CSS transitions.
@@ -81,7 +82,7 @@ test('agentic story: pinned chapters advance with the scroll, rewind, release, a
    await s.evaluate(e=>scrollTo(0,e.getBoundingClientRect().bottom+scrollY-innerHeight*0.5));
    await page.waitForTimeout(200);
    expect(await s.locator('.hs-stage').evaluate(e=>e.getBoundingClientRect().top)).toBeLessThan(-50);
-   await expect(s).toHaveAttribute('data-hs-f','1');
+   await expect(s).toHaveAttribute('data-hs-f',String(n-1));
   }
   // Rewind: back above the story, every chapter returns to its opening state.
   await rest(page,1,0);

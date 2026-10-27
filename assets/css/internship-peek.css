@@ -666,16 +666,16 @@
 
 /* The Agentic AI story (approved 27 Oct 2026 as mockup E3; README "Agentic AI story"), hand-written.
    Three short chapters in the dark #agentic-ai card, each a title moment and a pinned stage driven by
-   assets/js/hunt-story.js: 01 Understanding the work (report, techniques, hypothesis), 02 Engineering
-   choices (the agent console as the engine, then one small on-premises diagram) and 03 Keeping people in
-   charge (the lead and its evidence handed to an analyst, then the trace). Markup:
+   assets/js/hunt-story.js: 01 Understanding the analyst (report, techniques, this environment, hypothesis),
+   02 Designing the workflow (the agent console as the engine, then the workflow map and one run) and 03
+   Making a local model work (what the model reads, then the lead handed to an analyst). Markup:
    tools/scenes/agentic-story/build.cjs; the console's own styles are the generated block below.
    Colour follows Apple's product pages: small tonal steps between chapters (the card's dark, then a deeper
    near-black), and one deliberate switch to light where the story turns back to people. The tones bleed to
    the card's edges; the card clips them. Teal is the accent throughout; amber marks only the lead.
    Default (no JS, reduced motion, a screen too short to pin): each chapter's frames as a list with its
    objects in their final state. .is-live pins a chapter's stage and keys its objects on data-hs-f
-   (-1 = before it arrives). Prefix hs- (the diagram hs-a-). */
+   (-1 = before it arrives). Prefix hs- (the workflow map hs-w-). */
 .hs-story {
   --hs-tone: transparent; --hs-ink: #f4f2ea; --hs-body: #a9bfbe; --hs-sec: #9db4b3; --hs-dim: #6f8c8a; --hs-rule: #24464b;
   --hs-teal: #28d7c5; --hs-mint: #b8f2eb; --hs-amb: #ffb869; --hs-ambt: #ffb869; --hs-ambl: rgba(255, 184, 105, 0.5); --hs-done: #3b7470;
@@ -709,17 +709,19 @@
 .hs-scene.is-live .hs-stage { pointer-events: none; }
 .hs-scene.is-live .hs-frame { pointer-events: auto; }
 .hs-scene.is-jump *, .hs-scene.is-jump *::before, .hs-scene.is-jump *::after { transition: none !important; }
-.hs-scene.is-measure .hs-chip, .hs-scene.is-measure .hs-src { transform: none !important; }
 /* The engine's progress values, 0 before it writes them (27 Oct 2026, lab/scroll-speed-review.md: a frame's
    big move follows the scroll, so a fast scroll shows a fast move rather than a half-finished fade). A frame's
    arrival steps the outgoing object back first (p1 0–0.3), then the incoming one fades in (0.3–0.55) while it
    travels on an ease-out (0.3–1), so two ghosts never sit on top of each other and a reader who stops mid-way
    sees a legible card a little short of home. Small details still play on a timer on arrival, briefly. */
 .hs-scene.is-live .hs-objs {
-  --hs-p0: 0; --hs-p1: 0; --hs-pe: 0;
+  --hs-p0: 0; --hs-p1: 0; --hs-p2: 0; --hs-pe: 0;
   --q: clamp(0, calc((var(--hs-p1) - 0.3) / 0.7), 1); --e: calc(1 - (1 - var(--q)) * (1 - var(--q)));
   --out: clamp(0, calc(var(--hs-p1) / 0.3), 1); --in: clamp(0, calc((var(--hs-p1) - 0.3) / 0.25), 1);
+  --q2: clamp(0, calc((var(--hs-p2) - 0.3) / 0.7), 1); --e2: calc(1 - (1 - var(--q2)) * (1 - var(--q2)));
+  --out2: clamp(0, calc(var(--hs-p2) / 0.3), 1); --in2: clamp(0, calc((var(--hs-p2) - 0.3) / 0.25), 1);
 }
+.hs-scene.is-measure :is([data-hs-from], .hs-src, .hs-env, .hs-hyp, .hs-ctxw) { transform: none !important; }
 /* the theme styles header text, h3, code and marks; the story sets its own */
 #agentic-ai .hs-story .hs-chead p { font-style: normal; font-weight: 400; }
 #agentic-ai .hs-story .hs-chead .hs-clabel { font-weight: 700; }
@@ -814,6 +816,16 @@
 .hs-hyp { border-color: rgba(40, 215, 197, 0.4); }
 .hs-lab--hyp, .hs-lab--hyp .hs-i { color: var(--hs-teal); }
 .hs-hyp-t { font-family: "Merriweather", Georgia, serif; font-weight: 300; font-size: clamp(18px, 1.35rem, 22px); line-height: 1.5; letter-spacing: -0.01em; color: var(--hs-ink); }
+.hs-env-l { display: grid; gap: 10px; margin: 0; }
+.hs-env-l div { display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 10px; align-items: start; font-size: 14.5px; line-height: 1.45; }
+.hs-env-l dt { padding-top: 2px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hs-sec); }
+.hs-env-l dd { margin: 0; color: var(--hs-ink); }
+.hs-env-l dd > span { position: relative; z-index: 0; padding: 0 1px; color: #dcefec; }
+.hs-env-l dd > span::before { content: ""; position: absolute; z-index: -1; inset: 0.08em -3px; border-radius: 5px; background: rgba(40, 215, 197, 0.2); box-shadow: inset 0 -2px 0 rgba(40, 215, 197, 0.75); }
+.hs-env-dim { opacity: 0.5; }
+.hs-scope { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px !important; padding-top: 14px; border-top: 1px solid var(--hs-rule); }
+.hs-scope-l { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--hs-sec); margin-right: 2px; }
+.hs-fact { padding: 3px 10px; border: 1px solid var(--hs-chipbd); border-radius: 999px; background: var(--hs-chipbg); font-size: 13px; font-weight: 500; color: var(--hs-ink); white-space: nowrap; }
 
 /* 02: the checked query, then the design */
 .hs-objs--2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: 16px; margin-top: 18px; }
@@ -845,46 +857,40 @@
 .hs-seat-t { display: grid; line-height: 1.35; }
 .hs-seat-t b { font-size: 17px; font-weight: 700; color: var(--hs-ink); }
 .hs-seat-t span { font-size: 14px; color: var(--hs-sec); }
-.hs-trace { width: min(440px, 100%); }
-.hs-trace ol { display: grid; gap: 2px; padding: 0; list-style: none; }
-.hs-tr { display: flex; align-items: center; gap: 12px; padding: 7px 0; font-size: 15px; color: var(--hs-ink); }
-.hs-tr + .hs-tr { border-top: 1px solid var(--hs-rule); }
-.hs-tr .hs-i { font-size: 16px; color: var(--hs-teal); stroke-width: 1.6; }
-.hs-tr--amb .hs-i, .hs-tr--open .hs-i { color: var(--hs-ambt); }
-.hs-tr em { margin-left: auto; padding: 2px 10px; border: 1px solid var(--hs-ambl); border-radius: 999px; font-size: 12.5px; font-style: normal; font-weight: 600; color: var(--hs-ambt); }
+.hs-ctxw { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 16px; align-items: center; }
+.hs-tele { box-sizing: border-box; padding: 18px 20px; border: 1px dashed var(--hs-rule); border-radius: 16px; color: var(--hs-dim); }
+.hs-tele .hs-lab, .hs-tele .hs-lab .hs-i { color: var(--hs-dim); }
+.hs-tele-l { display: grid; gap: 7px; margin: 0 0 12px; }
+.hs-tele-l i { display: block; height: 5px; border-radius: 3px; background: var(--hs-bar); }
+.hs-tele-l i:nth-child(3n) { width: 78%; } .hs-tele-l i:nth-child(3n+1) { width: 92%; } .hs-tele-l i:nth-child(4n+2) { width: 64%; }
+.hs-tele-n { font-size: 12.5px; line-height: 1.4; }
+.hs-ctx ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.hs-ctx li { display: grid; grid-template-columns: 16px 7.6em minmax(0, 1fr); gap: 10px; align-items: start; font-size: 14px; line-height: 1.45; }
+.hs-ctx li .hs-i { font-size: 16px; color: var(--hs-mint); margin-top: 2px; }
+.hs-ctx .hs-lab .hs-i { color: var(--hs-ambt); }   /* the light chapter's one warm mark before the analyst */
+.hs-ctx li b { font-weight: 700; color: var(--hs-sec); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; padding-top: 2px; }
+.hs-ctx li span { color: var(--hs-ink); }
+.hs-evl { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--hs-sec); }
+.hs-evl .hs-i { font-size: 16px; color: var(--hs-teal); }
 
-/* ---------------- the design: one calm diagram ---------------- */
-.hs-dia { margin: 0; grid-column: 1 / -1; }
-.hs-dia svg { display: block; width: 100%; height: auto; overflow: visible; font-family: "Figtree", "Source Sans Pro", Helvetica, sans-serif; }
-.hs-dia-w { max-width: 760px; margin: 0 auto; }
-.hs-dia-t { display: none !important; max-width: 400px; margin: 0 auto; }
+/* ---------------- the workflow map ---------------- */
+.hs-wmap { margin: 0; grid-column: 1 / -1; }
+.hs-wmap svg { display: block; width: 100%; height: auto; overflow: visible; font-family: "Figtree", "Source Sans Pro", Helvetica, sans-serif; }
+.hs-w-wide { max-width: 760px; margin: 0 auto; }
+.hs-w-tall { display: none !important; max-width: 400px; margin: 0 auto; }
 @container hs (max-width: 560px) {
-  .hs-dia-w { display: none !important; }
-  .hs-dia-t { display: block !important; }
+  .hs-w-wide { display: none !important; }
+  .hs-w-tall { display: block !important; }
 }
-.hs-a-bound { fill: rgba(40, 215, 197, 0.025); stroke: #2c6563; stroke-width: 1.5; }
-.hs-a-onprem rect { fill: #050e10; stroke: #2c6563; stroke-width: 1.5; }
-.hs-a-onprem text { fill: #28d7c5; font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; }
-.hs-a-ico { fill: none; stroke: #b8f2eb; stroke-width: 1.1; stroke-linecap: round; stroke-linejoin: round; }
-.hs-a-wire { fill: none; stroke: #2a5658; stroke-width: 1.5; }
-.hs-a-drop { stroke-dasharray: 3 5; stroke: #23474a; }
-.hs-a-ring { fill: rgba(40, 215, 197, 0.04); stroke: #2f6f6b; stroke-width: 2; }
-.hs-a-stn { fill: #050e10; stroke: #28d7c5; stroke-width: 2; }
-.hs-a-step { fill: #b8f2eb; font-size: 15px; font-weight: 600; }
-.hs-a-model { fill: #f4f2ea; font-family: "Merriweather", Georgia, serif; font-weight: 300; font-size: 20px; letter-spacing: -0.01em; }
-.hs-a-dot { fill: #28d7c5; }
-.hs-a-glow { fill: rgba(40, 215, 197, 0.18); }
-.hs-a-orbit { transform-box: view-box; }
-.hs-a-pill { fill: #0e2024; stroke: #24464b; stroke-width: 1.3; }
-.hs-a-hit { fill: rgba(40, 215, 197, 0.1); stroke: #28d7c5; stroke-width: 1.5; opacity: 0; }
-.hs-a-tl { fill: #f4f2ea; font-size: 16px; font-weight: 600; }
-.hs-dia-t .hs-a-model { font-size: 17px; }
-.hs-dia-t .hs-a-step { font-size: 14px; }
-.hs-dia-t .hs-a-tl { font-size: 15px; }
-.hs-a-line { stroke: #24464b; stroke-width: 2; }
-.hs-a-bl { fill: #9db4b3; font-size: 14px; font-weight: 600; letter-spacing: 0.02em; text-transform: none; }
-.hs-a-eval { fill: #050e10; stroke: #28d7c5; stroke-width: 1.5; }
-.hs-a-flow { fill: #28d7c5; opacity: 0; }
+.hs-w-line { fill: none; stroke: #2f6f6b; stroke-width: 2; }
+.hs-w-loop { fill: none; stroke: #2a5658; stroke-width: 1.5; stroke-dasharray: 4 5; }
+.hs-w-ll { fill: #9db4b3; font-size: 13px; font-weight: 600; }
+.hs-w-node rect { fill: #0e2024; stroke: #2f6f6b; stroke-width: 1.5; }
+.hs-w-node text { fill: #f4f2ea; font-size: 16px; font-weight: 600; }
+.hs-w-amb rect { fill: #1a1309; stroke: #ffb869; }
+.hs-w-amb text { fill: #ffb869; }
+.hs-w-dot { fill: #28d7c5; opacity: 0; }
+.hs-w-glow { fill: rgba(40, 215, 197, 0.18); opacity: 0; }
 
 /* ---------------- live: the pinned stage ---------------- */
 .hs-scene.is-live .hs-stage { position: sticky; top: 0; height: 100vh; height: 100svh; display: flex; align-items: center; }
@@ -916,10 +922,13 @@
 /* 01, live. The chips start on their phrases (the engine measures --hs-dx/--hs-dy) and are pulled out to their
    column by the scroll, one after another, growing from 0.6 of their size and fading in over the first third of
    their travel so they never blot the words beside a phrase; the highlight sweeps under each phrase as its chip
-   leaves. Then the report steps back and the hypothesis rises 90px into place. */
+   leaves. Then the report steps back and the environment card rises (p1). Then, as the hypothesis arrives
+   (p2 0.3–0.45), the environment steps up and back to 0.35, still readable, so its three facts can be seen
+   leaving it for the hypothesis's scope row (0.5–1); once they have, it fades to a ghost (0.85–1). */
+.hs-scene--product.is-live .hs-objs { --s2: clamp(0, calc((var(--hs-p2) - 0.3) / 0.15), 1); --out2: clamp(0, calc((var(--hs-p2) - 0.85) / 0.15), 1); --in2: clamp(0, calc((var(--hs-p2) - 0.3) / 0.15), 1); }
 .hs-scene.is-live .hs-src {
   position: absolute; inset: 0; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); align-items: center; gap: 26px;
-  opacity: calc(1 - 0.87 * var(--out)); transform: translateY(calc(-5% * var(--out))) scale(calc(1 - 0.05 * var(--out)));
+  opacity: calc((1 - 0.9 * var(--out)) * (1 - var(--s2))); transform: translateY(calc(-5% * var(--out))) scale(calc(1 - 0.05 * var(--out)));
 }
 .hs-scene.is-live .hs-chips { flex-direction: column; align-items: flex-start; gap: 12px; position: relative; z-index: 2; }
 .hs-scene--product.is-live :is(.hs-c0, .hs-m0) { --c: clamp(0, calc(var(--hs-p0) / 0.6), 1); }
@@ -931,17 +940,32 @@
 }
 .hs-scene.is-live .hs-doc mark::before { transform: scaleX(var(--c)); }
 .hs-scene.is-live .hs-doc-l { opacity: calc(1 - 0.7 * var(--hs-p0)); }
+.hs-scene.is-live .hs-env {
+  position: absolute; inset: 0; margin: auto; width: min(500px, 92%); height: max-content; pointer-events: none;
+  opacity: calc(var(--in) * (1 - 0.65 * var(--s2)) * (1 - 0.7 * var(--out2)));
+  transform: translateY(calc(90px * (1 - var(--e)) - 70px * var(--s2))) scale(calc(1 - 0.06 * var(--s2)));
+}
 .hs-scene.is-live .hs-hyp {
   position: absolute; inset: 0; margin: auto; width: min(500px, 92%); height: max-content; pointer-events: none;
-  opacity: var(--in); transform: translateY(calc(90px * (1 - var(--e))));
+  opacity: var(--in2); transform: translateY(calc(90px * (1 - var(--e2)) + 50px * var(--s2)));
 }
+.hs-scene.is-live .hs-f0 { --c: clamp(0, calc((var(--hs-p2) - 0.5) / 0.2), 1); }
+.hs-scene.is-live .hs-f1 { --c: clamp(0, calc((var(--hs-p2) - 0.65) / 0.2), 1); }
+.hs-scene.is-live .hs-f2 { --c: clamp(0, calc((var(--hs-p2) - 0.8) / 0.2), 1); }
+.hs-scene.is-live .hs-fact {
+  opacity: clamp(0, calc(var(--c) / 0.15), 1); transform-origin: 0 50%;
+  /* both cards have moved since the offsets were measured at rest (the hypothesis rises and sits 50px lower,
+     the environment steps up 70px), so the start point allows for that */
+  transform: translate(calc(var(--hs-dx, 0px) * (1 - var(--c))), calc((var(--hs-dy, 0px) - 90px * (1 - var(--e2)) - 120px * var(--s2)) * (1 - var(--c)))) scale(calc(0.8 + 0.2 * var(--c)));
+}
+.hs-scene.is-live .hs-scope-l { opacity: clamp(0, calc((var(--hs-p2) - 0.4) / 0.2), 1); }
 
-/* 02, live: the console runs as the engine and ends on the checked query; the last frame swaps it for the
-   design. The engine fades the console inline over p1 0–0.3; the "New plan" card lands when the console's clock
-   reaches the end of frame 0 (data-hs-at) and leaves with the console; the design then draws itself with the
-   scroll (the boundary, the loop, its labels, the tools, the trace line), and as the reader scrolls out of the
-   chapter one query goes round the loop (plan, act, observe, adjust), the tools light as it passes, and traces
-   flow to evaluation on a timer */
+/* 02, live: the console runs as the engine and ends on the checked query; the second frame swaps it for the
+   workflow map. The engine fades the console inline over p1 0–0.3; the "New plan" card lands when the console's
+   clock reaches the end of frame 0 (data-hs-at) and leaves with the console; the map then draws itself with the
+   scroll (the path, the six steps in order, the re-plan loop and its label last). The third frame is one hunt
+   running the path, loop included: the run covers that frame's travel and the exit, resting past the loop at
+   the frame's resting point, and parks on the analyst as the stage lets go. */
 .hs-scene.is-live .hs-console > .hunt-panel { transform-origin: 30% 20%; }
 .hs-scene.is-live .hs-objs--2 { position: absolute; inset: 0; z-index: 2; display: block; margin: 0; pointer-events: none; }
 .hs-scene.is-live .hs-objs--2 .hs-card {
@@ -950,27 +974,19 @@
   transition: opacity 0.25s ease, transform 0.3s ease, visibility 0s linear 0.3s;
 }
 .hs-scene--eng.is-live[data-hs-at="0"] .hs-o2 { opacity: 1; visibility: visible; transform: none; transition: opacity 0.5s ease, transform 0.7s var(--hs-out), visibility 0s; }
-.hs-scene.is-live .hs-dia { position: absolute; inset: 0; display: grid; place-items: center; opacity: clamp(0, calc((var(--hs-p1) - 0.28) / 0.1), 1); }
-.hs-scene.is-live .hs-dia svg { width: 100%; height: 100%; max-height: 100%; }
-.hs-scene.is-live .hs-a-bound { stroke-dasharray: 1; stroke-dashoffset: calc(1 - clamp(0, calc((var(--hs-p1) - 0.3) / 0.3), 1)); fill-opacity: clamp(0, calc((var(--hs-p1) - 0.45) / 0.3), 1); }
-.hs-scene.is-live .hs-a-ring { stroke-dasharray: 1; stroke-dashoffset: calc(1 - clamp(0, calc((var(--hs-p1) - 0.45) / 0.3), 1)); fill-opacity: clamp(0, calc((var(--hs-p1) - 0.6) / 0.3), 1); }
-.hs-scene.is-live :is(.hs-a-bl, .hs-a-onprem, .hs-a-stn, .hs-a-step, .hs-a-model, .hs-a-wt, .hs-a-drop, .hs-a-band) { opacity: clamp(0, calc((var(--hs-p1) - 0.6) / 0.25), 1); }
-.hs-scene.is-live .hs-a-tool { --t: clamp(0, calc((var(--hs-p1) - 0.68) / 0.22), 1); opacity: var(--t); transform: translateX(calc(-18px * (1 - var(--t)))); }
-/* the lap ends at 0.7 of the exit, so the design rests complete before the stage lets go */
-.hs-scene.is-live .hs-a-orbit, .hs-scene.is-live .hs-a-hit { --lap: clamp(0, calc(var(--hs-pe) / 0.7), 1); }
-.hs-scene.is-live .hs-a-orbit { opacity: clamp(0, calc((var(--hs-p1) - 0.88) / 0.12), 1); transform: rotate(calc(var(--lap) * 360deg)); }
-.hs-scene.is-live .hs-a-hit { opacity: clamp(0, calc(1 - max(calc(var(--lap) - var(--at)), calc(var(--at) - var(--lap))) / 0.09), 1); }
-.hs-scene.is-live .hs-a-t0 .hs-a-hit { --at: 0.27; }
-.hs-scene.is-live .hs-a-t1 .hs-a-hit { --at: 0.37; }
-.hs-scene.is-off .hs-dia * { animation-play-state: paused; }
-.hs-scene--eng.is-live[data-hs-f="1"] .hs-a-flow { animation: hs-flow 4.5s linear 0.6s infinite; }
-.hs-scene--eng.is-live[data-hs-f="1"] .hs-a-f1 { animation-delay: 2.1s; }
-.hs-scene--eng.is-live[data-hs-f="1"] .hs-a-f2 { animation-delay: 3.6s; }
-@keyframes hs-flow { 0% { opacity: 0; transform: translateX(0); } 10% { opacity: 1; } 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--x)); } }
+.hs-scene.is-live .hs-wmap { position: absolute; inset: 0; display: grid; place-items: center; opacity: clamp(0, calc((var(--hs-p1) - 0.18) / 0.1), 1); }
+.hs-scene.is-live .hs-wmap svg { width: 100%; height: 100%; max-height: 100%; }
+.hs-scene.is-live .hs-w-line { stroke-dasharray: 1; stroke-dashoffset: calc(1 - clamp(0, calc((var(--hs-p1) - 0.25) / 0.45), 1)); }
+.hs-scene.is-live .hs-w-node { --k: 0; --n: clamp(0, calc((var(--hs-p1) - 0.32 - var(--k) * 0.07) / 0.14), 1); opacity: var(--n); transform: scale(calc(0.9 + 0.1 * var(--n))); transform-box: fill-box; transform-origin: center; }
+.hs-scene.is-live .hs-w-n1 { --k: 1; } .hs-scene.is-live .hs-w-n2 { --k: 2; } .hs-scene.is-live .hs-w-n3 { --k: 3; }
+.hs-scene.is-live .hs-w-n4 { --k: 4; } .hs-scene.is-live .hs-w-n5 { --k: 5; }
+.hs-scene.is-live .hs-w-loop { stroke-dasharray: 1; stroke-dashoffset: calc(1 - clamp(0, calc((var(--hs-p1) - 0.78) / 0.2), 1)); }
+.hs-scene.is-live .hs-w-ll { opacity: clamp(0, calc((var(--hs-p1) - 0.9) / 0.1), 1); }
+.hs-scene.is-live :is(.hs-w-dot, .hs-w-glow) { --lap: clamp(0, calc(var(--hs-p2) * 0.66 + var(--hs-pe) * 0.34), 1); opacity: clamp(0, calc(var(--hs-p2) / 0.1), 1); offset-distance: calc(var(--lap) * 100%); offset-rotate: 0deg; }
 
-/* 03, live. -1: nothing; 0: the trace rises with the scroll and its rows land one after another; 1: the trace
-   steps back, the lead rises into its slot, the line grows to the analyst and the analyst scales in, so the
-   story ends on a person at any speed (copy revised 27 Oct 2026) */
+/* 03, live. -1: nothing; 0: the context card assembles in front of the telemetry block; 1: both step back,
+   the lead rises into its slot, the line grows to the analyst and the analyst scales in, so the story ends on
+   a person at any speed; the evaluation line lands last */
 .hs-scene.is-live .hs-hand { position: absolute; inset: 0; flex-wrap: nowrap; justify-content: center; gap: 0; }
 .hs-scene.is-live .hs-lead { flex: none; opacity: var(--in); transform: translateY(calc(80px * (1 - var(--e)))); }
 .hs-scene.is-live .hs-link {
@@ -984,12 +1000,25 @@
 .hs-scene.is-live .hs-seat-t { justify-items: center; }
 .hs-scene--trust.is-live[data-hs-f="1"] .hs-ava::after { animation: hs-halo 1.6s ease-out 0.5s 2 both; }
 @keyframes hs-halo { 0% { opacity: 0; transform: scale(0.85); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(1.25); } }
-.hs-scene.is-live .hs-trace {
-  position: absolute; inset: 0; margin: auto; height: max-content;
-  opacity: calc(clamp(0, calc(var(--hs-p0) * 2), 1) * (1 - 0.9 * var(--out)));
-  transform: translateY(calc(70px * (1 - var(--hs-p0)) - 5% * var(--out))) scale(calc(1 - 0.05 * var(--out)));
+/* the telemetry block stays behind and steps back while the context card assembles, row by row (p0); both
+   step back as the lead is handed to the analyst (p1), and the evaluation line lands last */
+.hs-scene.is-live .hs-ctxw {
+  position: absolute; inset: 0; display: block; pointer-events: none;
+  opacity: calc(1 - var(--out)); transform: translateY(calc(-5% * var(--out))) scale(calc(1 - 0.05 * var(--out)));
 }
-.hs-scene.is-live .hs-tr { --r: clamp(0, calc((var(--hs-p0) - 0.35 - var(--i) * 0.07) / 0.12), 1); opacity: var(--r); transform: translateY(calc(6px * (1 - var(--r)))); }
+.hs-scene.is-live .hs-tele {
+  position: absolute; right: 0; top: 4%; width: min(330px, 56%); z-index: 0;
+  opacity: calc(0.95 - 0.55 * var(--hs-p0)); transform: translate(calc(-120px * (1 - var(--hs-p0))), 0) scale(calc(1 - 0.08 * var(--hs-p0)));
+}
+.hs-scene.is-live .hs-ctx {
+  position: absolute; left: 0; bottom: 4%; width: min(420px, 68%); z-index: 1;
+  opacity: clamp(0, calc(var(--hs-p0) * 2), 1); transform: translateY(calc(70px * (1 - var(--hs-p0))));
+}
+.hs-scene.is-live .hs-ctx li { --r: clamp(0, calc((var(--hs-p0) - 0.35 - var(--i) * 0.11) / 0.14), 1); opacity: var(--r); transform: translateY(calc(8px * (1 - var(--r)))); }
+.hs-scene.is-live .hs-evl { position: absolute; left: 0; right: 0; bottom: -6px; justify-content: center; opacity: clamp(0, calc((var(--hs-p1) - 0.86) / 0.14), 1); }
+/* the light chapter keeps its amber for the analyst's frame; the first frame stays teal */
+.hs-scene--trust.is-live:not([data-hs-f="1"]) .hs-fill { background: var(--hs-teal); }
+.hs-scene--trust.is-live:not([data-hs-f="1"]) .hs-dot[aria-current="step"]::before { background: var(--hs-teal); box-shadow: 0 0 0 4px rgba(10, 118, 108, 0.16); }
 
 /* controls (as C, in the chapter's tones) */
 .hs-scene .hs-btn, .hs-scene .hs-dot {
@@ -1073,7 +1102,12 @@
   .hs-ava .hs-i { font-size: 24px; }
   .hs-lead-n { font-size: 19px; }
   .hs-ev { margin-top: 12px; padding-top: 12px; }
-  .hs-tr { padding: 6px 0; font-size: 14px; }
+  .hs-scene.is-live .hs-tele { right: 0; top: 0; width: 60%; transform: translate(calc(-60px * (1 - var(--hs-p0))), 0) scale(calc(1 - 0.08 * var(--hs-p0))); }
+  .hs-scene.is-live .hs-ctx { left: 0; right: 0; top: auto; bottom: 0; width: auto; transform: translateY(calc(50px * (1 - var(--hs-p0)))); }
+  .hs-ctx li { grid-template-columns: 16px minmax(0, 1fr); gap: 2px 10px; font-size: 13px; }
+  .hs-ctx li span { grid-column: 2; }
+  .hs-env-l div { grid-template-columns: 5em minmax(0, 1fr); font-size: 13.5px; }
+  .hs-scene.is-live .hs-evl { bottom: -2px; font-size: 13px; }
 }
 
 /* while a stage is pinned on phones and tablets, the floating Menu pill and return-to-top step away (as C) */
