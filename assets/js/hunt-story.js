@@ -21,20 +21,15 @@
   const scenes = [...document.querySelectorAll('.hs-scene')];
   if (!scenes.length) return;
   const canClock = !!Element.prototype.getAnimations;
-  // scroll geometry, in screens (small viewport heights)
-  // A frame's words and its objects change together (28 Oct 2026, owner: in the light chapter the verdict and
-  // the rows were gone "before i can reach the key words"; the move used to start 0.26 screens before the text
-  // swapped): a later frame's text swaps as its move starts, the move ends on the resting point, and then nothing
-  // changes for GAP - TRAVEL. The first frame's move runs on past the pin, so it plays on a pinned stage.
+  // scroll geometry, in screens (small viewport heights); a frame's words and objects change together
+  // (README "Motion and length")
   const GAP = 0.8;    // from one frame's resting point to the next: the dwell
-  const LAST = 0.5;   // the last frame's dwell, then the stage lets go (0.4 until 28 Oct 2026: too quick a release)
-  const TRAVEL = 0.5; // a later frame's move runs over this much scroll before its resting point (0.3 made the
-                      // moves look rushed, owner, 28 Oct 2026: "some of the scroll animations happen super fast")
+  const LAST = 0.5;   // the last frame's dwell, then the stage lets go
+  const TRAVEL = 0.5; // a later frame's move runs over this much scroll before its resting point
   const TZ = TRAVEL;  // ...and its text swaps where that move starts
   const HYST = 0.06;  // ...and swaps back only once the reader is this much further back
   const ENTER = 0.32; // the first frame starts once the stage is this close to pinning
-  const A0 = 0.3;     // ...and its move completes this far after the pin (a chapter whose first frame moves
-                      // gives that frame a longer hold, data-hs-story's hold, so it still rests before frame 1)
+  const A0 = 0.3;     // ...and its move completes this far after the pin (that frame holds longer)
   const TAU = 0.07;   // the chase's time constant, s
   const BACK = 0.6, CATCH = 0.45, MINFEED = 110, MINOBJ = 230;
   const clamp = x => (x < 0 ? 0 : x > 1 ? 1 : x);
@@ -81,8 +76,7 @@
       shown = key;
       for (const h of holders) names.forEach((n, i) => h.style.setProperty(n, vals[i]));
       for (const [el, i] of late) el.style.visibility = pc[i] > 0 ? '' : 'hidden';
-      // the camera pulls back: the console shrinks into the map (its origin, in the CSS, is where the map's query
-      // step lands) while it fades, so the map reads as the zoomed-out view of what the console just ran
+      // the camera pulls back: the console shrinks toward the map's query step while it fades
       if (panel && N > 1) { const o = Math.min(1, pc[1] / 0.45); panel.style.opacity = (1 - o * o).toFixed(3); panel.style.transform = o ? `scale(${(1 - 0.62 * o).toFixed(4)})` : ''; }
     };
     function chase(now) {
@@ -109,12 +103,14 @@
       const movers = [...root.querySelectorAll('[data-hs-from]')];
       if (!movers.length) return;
       root.classList.add('is-measure');
+      // offsets are applied inside the zoom and the objects' scale
+      const z = (parseFloat(root.style.getPropertyValue('--hs-z')) || 1) * (parseFloat(root.style.getPropertyValue('--hs-oz')) || 1);
       for (const ch of movers) {
         const mk = root.querySelector(ch.dataset.hsFrom);
         if (!mk) continue;
         const a = mk.getBoundingClientRect(), b = ch.getBoundingClientRect();
-        ch.style.setProperty('--hs-dx', (a.left - b.left).toFixed(1) + 'px');
-        ch.style.setProperty('--hs-dy', (a.top + a.height / 2 - b.top - b.height / 2).toFixed(1) + 'px');
+        ch.style.setProperty('--hs-dx', ((a.left - b.left) / z).toFixed(1) + 'px');
+        ch.style.setProperty('--hs-dy', ((a.top + a.height / 2 - b.top - b.height / 2) / z).toFixed(1) + 'px');
       }
       root.classList.remove('is-measure');
     }
@@ -242,19 +238,19 @@
       for (const h of holders) names.forEach(n => h.style.removeProperty(n));
       for (const [el] of late) el.style.visibility = '';
       if (panel) { panel.style.opacity = ''; panel.style.transform = ''; }
-      root.classList.remove('is-live', 'is-playing', 'is-end');
+      root.classList.remove('is-live', 'is-playing', 'is-end', 'is-tight');
       root.style.height = '';
-      ['--hs-feed', '--hs-trim', '--hs-objh'].forEach(p => root.style.removeProperty(p));
+      ['--hs-feed', '--hs-trim', '--hs-objh', '--hs-z', '--hs-oz'].forEach(p => root.style.removeProperty(p));
       steps.forEach(s => s.classList.remove('is-on'));
       anims = [];
       flag(pinOn, document.body, 'hs-pinned', root, false);
       delete root.dataset.hsAt; delete root.dataset.hsF;
       void root.offsetWidth;
     }
-    // the stage must fit the screen: the feed (or the objects' area) gives way, else the chapter stays a list
-    function fit() {
-      const cs = getComputedStyle(stage);
-      const room = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+    // the stage must fit the screen: the feed (or the objects' area) gives way, then the words take a smaller
+    // size (is-tight), then the console zooms out (to 0.7), before the chapter stays a list
+    function squeeze(room) {
+      ['--hs-feed', '--hs-objh'].forEach(p => root.style.removeProperty(p));
       let over = frame.offsetHeight - room;
       const feed = panel && panel.querySelector('.c2-f');
       if (over > 0 && feed) {
@@ -263,6 +259,25 @@
       } else if (over > 0 && !panel) {
         root.style.setProperty('--hs-objh', Math.max(MINOBJ, Math.floor(objs.offsetHeight - over)) + 'px');
         over = frame.offsetHeight - room;
+      }
+      return over;
+    }
+    function fit() {
+      const cs = getComputedStyle(stage);
+      const room = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+      root.classList.remove('is-tight'); ['--hs-z', '--hs-oz'].forEach(p => root.style.removeProperty(p));
+      let over = squeeze(room);
+      if (over > 0) { root.classList.add('is-tight'); over = squeeze(room); }
+      const box = stage.querySelector('.hs-console');
+      if (over > 0 && box) {
+        const h = box.offsetHeight;
+        root.style.setProperty('--hs-z', Math.max(0.7, (h - over) / h).toFixed(3));
+        over = frame.offsetHeight - room;
+      }
+      // an object taller than its area is scaled to fit it, not spilled over the words
+      if (!panel) {
+        const need = Math.max(...[...objs.children].map(k => k.offsetHeight));
+        if (need > objs.clientHeight) root.style.setProperty('--hs-oz', Math.max(0.62, objs.clientHeight / need).toFixed(3));
       }
       root.style.setProperty('--hs-trim', Math.max(0, Math.floor(-over / 2)) + 'px');
       return over <= 0;

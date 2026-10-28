@@ -1001,6 +1001,14 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-fill { display: block; height: 100%; background: var(--hs-teal); transform: scaleX(0); transform-origin: 0 50%; }
 .hs-scene.is-amb .hs-fill { background: var(--hs-amb); }
 
+.hs-scene.is-live :is(.hs-src, .hs-lanes, .hs-env, .hs-hyp, .hs-rows, .hs-kb, .hs-ov, .hs-wmap, .hs-trace, .hs-console > .hunt-panel) { will-change: transform, opacity; }
+/* a short screen (hunt-story.js fit): the frame's words a size smaller, then the console or the objects zoomed out */
+.hs-scene.is-live .hs-console { zoom: var(--hs-z, 1); }
+.hs-scene.is-live .hs-objs:not(.hs-objs--2) > * { scale: var(--hs-oz, 1); }   /* composes with each object's own transform */
+.hs-scene.is-live.is-tight .hs-h { font-size: 22px; line-height: 1.15; margin-bottom: 0.35rem !important; }
+.hs-scene.is-live.is-tight .hs-p { font-size: 13.5px; line-height: 1.4; }
+.hs-scene.is-live.is-tight .hs-steps { margin-top: 4px; margin-bottom: 10px; }
+
 /* the objects' stage: as tall as the console, objects placed inside it */
 .hs-scene.is-live .hs-objs--1, .hs-scene.is-live .hs-objs--3 { position: relative; height: var(--hs-objh, clamp(340px, 58svh, 450px)); margin: 0; }
 
@@ -1245,7 +1253,7 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
   /* the lanes on top, the environment beneath them; the hypothesis grows over the lanes */
   .hs-scene.is-live .hs-lanes { inset: 0 0 auto 0; margin: 0; width: auto; gap: 8px; }
   .hs-scene.is-live .hs-env { inset: auto 0 0 0; margin: 0; width: auto; }
-  .hs-scene.is-live .hs-hyp { inset: 0 0 auto 0; margin: 0; width: auto; }
+  .hs-scene.is-live .hs-hyp { inset: 0 0 auto 0; margin: 0; width: auto; transform-origin: 50% 0; }
   .hs-lane { padding: 4px 10px 4px 4px; gap: 4px 10px; flex-wrap: nowrap; }
   .hs-lane-t { font-size: 12px; white-space: nowrap; }
   .hs-lane-t b { display: none; }
@@ -1289,6 +1297,8 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
   .hs-rows-n { font-size: 12px; }
   .hs-out { font-size: 13.5px; }
   .hs-env-l div { grid-template-columns: 5em minmax(0, 1fr); font-size: 13.5px; }
+  /* phones: no blur while the stage moves (it costs a phone's GPU a repaint each frame, and read as jank) */
+  .hs-scene.is-live :is(.hs-doc, .hs-lane, .hs-env, .hs-rows, .hs-kb, .hs-ov) { filter: none; }
 }
 
 /* while a stage is pinned on phones and tablets, the floating Menu pill and return-to-top step away (as C) */
