@@ -26,9 +26,10 @@
   // the rows were gone "before i can reach the key words"; the move used to start 0.26 screens before the text
   // swapped): a later frame's text swaps as its move starts, the move ends on the resting point, and then nothing
   // changes for GAP - TRAVEL. The first frame's move runs on past the pin, so it plays on a pinned stage.
-  const GAP = 0.6;    // from one frame's resting point to the next: the dwell
+  const GAP = 0.8;    // from one frame's resting point to the next: the dwell
   const LAST = 0.5;   // the last frame's dwell, then the stage lets go (0.4 until 28 Oct 2026: too quick a release)
-  const TRAVEL = 0.3; // a later frame's move runs over this much scroll before its resting point
+  const TRAVEL = 0.5; // a later frame's move runs over this much scroll before its resting point (0.3 made the
+                      // moves look rushed, owner, 28 Oct 2026: "some of the scroll animations happen super fast")
   const TZ = TRAVEL;  // ...and its text swaps where that move starts
   const HYST = 0.06;  // ...and swaps back only once the reader is this much further back
   const ENTER = 0.32; // the first frame starts once the stage is this close to pinning

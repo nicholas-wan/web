@@ -180,7 +180,7 @@ const OBJ_2 = `<div class="hs-objs hs-objs--2">`
 // answer key) and compounded errors (a person at the checkpoints), reordered so the story still ends on the
 // analyst. Each frame transforms its object rather than swapping cards (rework, 28 Oct 2026): the wall of result
 // rows converges into the one row that matters while the count in context falls from 80 to 1; the golden set's
-// cells flip over one by one like a scoreboard; the lead unfolds from a single line and is handed to the analyst.
+// cells flip over one by one like a scoreboard; the hunt's overview assembles for the analyst, who confirms the lead.
 // The rows, the knowledge base and the lead are illustrative, in the product's own shapes (a Check result, its
 // review flag). The golden set is the method of the owner's model evaluation (26 Oct 2026: one hunt, 7 techniques
 // attacked and 5 left alone, a reviewer's answer key, every model through the same hunt, agents, prompts and data,
@@ -191,6 +191,22 @@ const KB = [['Technique notes', I.doc], ['Telemetry catalogue', I.db], ['Environ
 const RUN = 'cccc' + 'w' + 'mm' + 'nnnnn';   // c caught with its own evidence, w wrong evidence, m missed, n correctly clean
 const OUTCOME = { c: 'Caught, own evidence', w: 'Wrong evidence', m: 'Missed', n: 'Correct: no attack' };
 const cells = (from, to) => [...RUN.slice(from, to)].map((k, i) => `<i class="hs-cell is-${k}" style="--i:${from + i}"><b></b></i>`).join('');
+// The analyst's view is the product's hunt overview (owner, 28 Oct 2026: the old lead-and-avatar ending "looks very
+// lame", "check ... H-0010 to see how its done"; th-frontend FindingsOverview): the determination with its verdict bar,
+// the attack chain by tactic in kill-chain order holding all three sub-hunts, the evidence row with its human-review
+// next step, and the analyst's decision. Verdict tones follow the product: No evidence is neutral grey, never green.
+const CHAIN = [['Execution', [['T1059.001', 'PowerShell', 'cov', 'Covered']]], ['Persistence', [['T1053.005', 'Scheduled Task', 'thr', 'Threat'], ['T1547.001', 'Registry Run Keys', 'neg', 'No evidence']]]];
+let chipN = 0;
+const OV = `<div class="hs-card hs-ov" data-hs-late="2">`
+  + `<p class="hs-lab">${ico(I.ctx)}Hunt overview<span class="hs-ov-lt">&nbsp;· 3 techniques hunted</span></p>`
+  + `<p class="hs-ov-h">Threat evidence in 1 of 3 techniques</p>`
+  + `<p class="hs-ov-e">On <span class="hs-ent">WS-031</span>, as <span class="hs-ent">SYSTEM</span>.</p>`
+  + `<p class="hs-ov-bar" aria-hidden="true"><i class="is-thr" style="--i:0"></i><i class="is-neg" style="--i:1"></i><i class="is-cov" style="--i:2"></i></p>`
+  + `<ol class="hs-ov-chain">${CHAIN.map(([tac, fs], i) => `<li class="hs-ov-col${fs.some(f => f[2] === 'thr') ? ' is-thr' : ''}" style="--i:${i}"><p class="hs-ov-t">${tac}<span>${fs.length} technique${fs.length > 1 ? 's' : ''}</span></p>`
+    + fs.map(([id, n, k, v]) => `<span class="hs-ov-chip is-${k}" style="--j:${chipN++}"><span><code>${id}</code><b>${v}</b></span><span class="hs-ov-n">${n}</span></span>`).join('') + `</li>`).join('')}</ol>`
+  + `<div class="hs-ov-row"><code class="hs-ov-id">T1053.005</code><span class="hs-ov-ev"><code>\\WinTaskUpdate</code> not in baseline</span><span class="hs-ov-rv"><b>Human review</b>Check who created the task and what it runs</span></div>`
+  + `<div class="hs-ov-act"><span class="hs-ava">${ico(I.person)}</span><span class="hs-ov-who"><b>Analyst</b><span>Judges the lead</span></span><span class="hs-ov-btns"><span class="hs-ov-b">Dismiss</span><span class="hs-ov-b is-go">${ico(I.check)}Confirm lead</span></span></div>`
+  + `<p class="hs-ov-done">${ico(I.check)}Confirmed by the analyst · query handed to detection engineering</p></div>`;
 const OBJ_3 = `<div class="hs-objs hs-objs--3">`
   + `<div class="hs-card hs-rows" data-hs-late="0" style="--n:${WALL.length};--hit:${HIT}">`
   + `<p class="hs-pipe"><span>Plan</span><i aria-hidden="true"></i><span>Query</span><i aria-hidden="true"></i><span class="is-on">Verdict</span></p>`
@@ -205,12 +221,7 @@ const OBJ_3 = `<div class="hs-objs hs-objs--3">`
   + `<span class="hs-cg"><span class="hs-cr">${cells(7, 12)}</span><span class="hs-cgl">Left alone · 5</span></span></div>`
   + `<p class="hs-key" aria-hidden="true">${Object.entries(OUTCOME).map(([k, t]) => `<span><i class="hs-cell is-${k}"><b></b></i>${t}</span>`).join('')}</p>`
   + `<p class="hs-gfoot">Same hunt, agents, prompts and data for every model; only the model changes. Accuracy alone rewards calling everything clean, so F1 is reported too.</p></div></div>`
-  + `<div class="hs-hand" data-hs-late="2">`
-  + `<div class="hs-card hs-lead"><p class="hs-lead-top"><span class="hs-lab">${ico(I.flag)}Lead</span><span class="hs-badge">Human review</span></p>`
-  + `<p class="hs-lead-n">\\WinTaskUpdate</p><p class="hs-tags"><span>not in baseline</span><span>medium confidence</span></p>`
-  + `<div class="hs-ev"><p class="hs-lab">Evidence</p>${chip('T1053.005', 'Scheduled Task')}<p class="hs-ev-q"><code>event_id = 4698</code><span>${ico(I.check)}Checked</span></p></div></div>`
-  + `<span class="hs-link" aria-hidden="true"></span>`
-  + `<div class="hs-seat"><span class="hs-ava">${ico(I.person)}</span><span class="hs-seat-t"><b>Analyst</b><span>Judges the lead</span></span></div></div></div>`;
+  + OV + `</div>`;
 
 // ---------------------------------------------------------------- the chapters (owner-approved copy, 28 Oct 2026)
 // Each chapter sells one capability from the CV, in headlines that state a decision (copy review, 28 Oct 2026).
@@ -221,24 +232,24 @@ const CH = [
   // "autonomous" or "memory", which would overclaim.
   { id: 'product', n: '01', label: 'Understanding the analyst', title: 'Built the way hunters plan a hunt.', line: 'An illustrative hunt, from a threat report to a claim it can test.', objs: OBJ_1,
     frames: [
-      { hold: 0.9, h: 'One report becomes one hunt per technique.', p: 'The techniques are pulled out of the report and duplicates merged. Each runs as its own sub-hunt, so every model call works on one technique.' },
-      { hold: 0.8, h: 'Tailored to this environment.', p: 'A hypothesis is only testable where the data exists, so what this environment logs and what is normal here come first. A technique hunted recently is not investigated twice.' },
+      { hold: 1.1, h: 'One report becomes one hunt per technique.', p: 'The techniques are pulled out of the report and duplicates merged. Each runs as its own sub-hunt, so every model call works on one technique.' },
+      { hold: 0.9, h: 'Tailored to this environment.', p: 'A hypothesis is only testable where the data exists, so what this environment logs and what is normal here come first. A technique hunted recently is not investigated twice.' },
       { h: 'Each hypothesis says what to look for, and where.', p: 'Written for this environment, with what to look for and what is normal here, so a hunt can confirm it or rule it out.' },
     ] },
   { id: 'eng', n: '02', label: 'Designing the workflow', title: 'Narrow agents, one supervisor.', line: 'Two decisions shaped it: when to re-plan, and when a person steps in.', console: true, objs: OBJ_2,
     frames: [
-      // hold: this frame's dwell in screens (others 0.6; denser frames hold longer, owner, 28 Oct 2026). The console's 8s run needs the reader to linger: at
+      // hold: this frame's dwell in screens (others 0.8: a 0.5-screen move, then a still; denser frames hold longer, owner, 28 Oct 2026). The console's 8s run needs the reader to linger: at
       // 0.6 a steady scroll or one Page Down left it after about a second (review, 27 Oct 2026).
       { beats: [1, 2, 3, 4, 5], dur: 8, hold: 1.4, h: 'Each agent has one job.', p: 'Planning, writing the query and judging the result are separate agents. Past hunts are checked first, and each query is checked against its plan before it runs.' },
-      { beats: [], dur: 1, hold: 0.8, h: 'Every search ends in a verdict: lead, clean or re-plan.', p: 'A separate step judges what came back. Incomplete coverage goes back to planning, a clean result is logged, and a lead goes to an analyst.' },
+      { beats: [], dur: 1, hold: 0.9, h: 'Every search ends in a verdict: lead, clean or re-plan.', p: 'A separate step judges what came back. Incomplete coverage goes back to planning, a clean result is logged, and a lead goes to an analyst.' },
       { beats: [], dur: 1, h: 'Every attempt is recorded.', p: 'Each plan, its query, its verdict and its review flag are logged, so an analyst can see why the agent re-planned and what it ruled out.' },
     ] },
   // 03's frames are the deck's three challenges in its own words, shortened (owner, 27 Oct 2026: the old
   // context card over a "Telemetry" block was "kind of useless")
   { id: 'trust', n: '03', label: 'Making the model reliable', title: 'Context engineering, evals and human review.', line: 'On-premises: large telemetry, a tight context.', objs: OBJ_3, amber: true,
     frames: [
-      { hold: 0.9, h: 'Narrow the context for each call.', p: 'Query results are the largest thing in a hunt, so detection logic is split into a planner, a query writer and a judge. Only the judge reads the rows; one short finding is passed on.' },
-      { hold: 1.0, h: 'Ground the model, then test it against an answer key.', p: 'The same input can give a different answer each run. A knowledge base anchors each answer, and every model runs the same hunt against a reviewer\'s answer key, including techniques nobody attacked.' },
+      { hold: 1.1, h: 'Narrow the context for each call.', p: 'Query results are the largest thing in a hunt, so detection logic is split into a planner, a query writer and a judge. Only the judge reads the rows; one short finding is passed on.' },
+      { hold: 1.2, h: 'Ground the model, then test it against an answer key.', p: 'The same input can give a different answer each run. A knowledge base anchors each answer, and every model runs the same hunt against a reviewer\'s answer key, including techniques nobody attacked.' },
       { h: 'Human in the loop at the checkpoints.', p: 'In a chain of calls, each mistake feeds the next. Plans that need judgement go to an analyst, every verdict carries a review flag, and a search that runs out of attempts is handed over, not looped.' },
     ] },
 ];

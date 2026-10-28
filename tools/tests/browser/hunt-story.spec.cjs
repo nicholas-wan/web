@@ -4,7 +4,7 @@ const {test,expect}=require('@playwright/test');
 const scenes=page=>page.locator('#agentic-ai .hs-scene');
 const at=(page,i)=>page.locator('#agentic-ai .hs-scene').nth(i);
 // Scroll so chapter i rests on frame f (resting points 0.6 of its stage height apart, or a frame's own hold).
-const rest=(page,i,f)=>at(page,i).evaluate((s,f)=>{const vh=s.querySelector('.hs-stage').offsetHeight;const d=JSON.parse(s.getAttribute('data-hs-story'));let u=0;for(let k=0;k<f;k++)u+=(d.hold&&d.hold[k])||0.6;scrollTo(0,Math.round(s.getBoundingClientRect().top+scrollY+u*vh+2));},f);
+const rest=(page,i,f)=>at(page,i).evaluate((s,f)=>{const vh=s.querySelector('.hs-stage').offsetHeight;const d=JSON.parse(s.getAttribute('data-hs-story'));let u=0;for(let k=0;k<f;k++)u+=(d.hold&&d.hold[k])||0.8;scrollTo(0,Math.round(s.getBoundingClientRect().top+scrollY+u*vh+2));},f);
 const noSideScroll=page=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth);
 const FORBIDDEN=/index=wineventlog|SysUpdate|Splunk|only known|known activity|days to hours|hours instead of days|\bdays\b|SPL crafter|Post-query|Evidence found|\d+ hits|\btokens?\b/i;
 
@@ -21,7 +21,7 @@ test('agentic story: without motion, every chapter is a complete static list wit
   await expect(page.locator('#agentic-ai .hs-clabel')).toHaveText(['01 Understanding the analyst','02 Designing the workflow','03 Making the model reliable']);
   await expect(page.locator('#agentic-ai .hs-step .hs-h')).toHaveText(['One report becomes one hunt per technique.','Tailored to this environment.','Each hypothesis says what to look for, and where.','Each agent has one job.','Every search ends in a verdict: lead, clean or re-plan.','Every attempt is recorded.','Narrow the context for each call.','Ground the model, then test it against an answer key.','Human in the loop at the checkpoints.']);
   await expect(page.locator('#agentic-ai .hs-cline').first()).toHaveText('An illustrative hunt, from a threat report to a claim it can test.');
-  for(const sel of ['.hs-step','.hs-doc','.hs-env','.hs-hyp','.hs-fact','.hs-lanes','.hs-lo','.hs-o2','.hs-wmap','.hs-trace','.hs-rows','.hs-wr.is-x','.hs-out','.hs-kb','.hs-gold','.hs-cells','.hs-lead','.hs-seat','.hunt-panel .c2']){
+  for(const sel of ['.hs-step','.hs-doc','.hs-env','.hs-hyp','.hs-fact','.hs-lanes','.hs-lo','.hs-o2','.hs-wmap','.hs-trace','.hs-rows','.hs-wr.is-x','.hs-out','.hs-kb','.hs-gold','.hs-cells','.hs-ov','.hs-ov-chain','.hs-ov-row','.hs-ov-act','.hunt-panel .c2']){
    for(const el of await page.locator('#agentic-ai '+sel).all()){await expect(el).toBeVisible();await expect(el).toHaveCSS('opacity','1');}
   }
   const label=await page.locator('#agentic-ai .hunt-panel .c2').getAttribute('aria-label');
@@ -30,7 +30,7 @@ test('agentic story: without motion, every chapter is a complete static list wit
   const words=await page.locator('#agentic-ai .hs-story').textContent();
   expect(words).not.toMatch(FORBIDDEN);
   expect(label).not.toMatch(FORBIDDEN);
-  for(const s of ['event_id = 4698','\\WinTaskUpdate','root-level','not in baseline','Flagged','Checked','Task creation events','Scoped to','Analyst review','Inconclusive · re-plan','Valid negative · logged','Verdict','Sub-hunt 1','Covered recently','Look for','Query handed on','1 task not in baseline','Knowledge base','Golden set','F1 is reported too','Human review'])expect(words).toContain(s);
+  for(const s of ['event_id = 4698','\\WinTaskUpdate','root-level','not in baseline','Flagged','Checked','Task creation events','Scoped to','Analyst review','Inconclusive · re-plan','Valid negative · logged','Verdict','Sub-hunt 1','Covered recently','Look for','Query handed on','1 task not in baseline','Knowledge base','Golden set','F1 is reported too','Human review','Threat evidence in 1 of 3 techniques','Confirm lead','Confirmed by the analyst'])expect(words).toContain(s);
   expect(await page.content()).not.toMatch(/index=wineventlog|SysUpdate|Splunk/);
   expect(await noSideScroll(page)).toBe(true);
  }
@@ -64,9 +64,9 @@ test('agentic story: pinned chapters advance with the scroll, rewind, release, a
    const s=at(page,i);
    // Each chapter pins for its frames' dwells and a short release: about one screen, except chapter 02,
    // whose first frame holds 1.4 screens for the console's 8s run (review, 27 Oct 2026).
-   const [screens,want,hold]=await s.evaluate(e=>{const d=JSON.parse(e.getAttribute('data-hs-story'));const n=e.querySelectorAll('.hs-step').length;let u=0.5;for(let k=0;k<n-1;k++)u+=(d.hold&&d.hold[k])||0.6;return [e.offsetHeight/e.querySelector('.hs-stage').offsetHeight-1,u,d.hold?d.hold[0]:0];});
+   const [screens,want,hold]=await s.evaluate(e=>{const d=JSON.parse(e.getAttribute('data-hs-story'));const n=e.querySelectorAll('.hs-step').length;let u=0.5;for(let k=0;k<n-1;k++)u+=(d.hold&&d.hold[k])||0.8;return [e.offsetHeight/e.querySelector('.hs-stage').offsetHeight-1,u,d.hold?d.hold[0]:0];});
    expect(Math.abs(screens-want)).toBeLessThan(0.1);
-   expect(hold).toBe(i===1?1.4:0.9);
+   expect(hold).toBe(i===1?1.4:1.1);
    const n=await s.locator('.hs-step').count();
    for(let f=0;f<n;f++){
     await rest(page,i,f);
