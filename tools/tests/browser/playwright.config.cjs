@@ -8,6 +8,7 @@ module.exports = defineConfig({
   reporter: process.env.CI ? [['line'], ['github']] : 'list',
   projects: [
     { name: 'chromium', use: { browserName: 'chromium' } },
+    { name: 'webkit-story', testMatch: /hunt-story(?:-polish)?\.spec\.cjs$/, use: { browserName: 'webkit' } },
     { name: 'webkit-smoke', testMatch: /(?:site-smoke|gallery-accessibility|discovery)\.spec\.cjs$/, use: { browserName: 'webkit' } }
   ],
   use: {

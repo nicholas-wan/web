@@ -751,6 +751,7 @@
 html.hs-plain .hs-story .hs-chead > * { animation: none; }   /* plain mode (the DSTA logo): no scroll-driven rise */
 #agentic-ai .company-logo--dsta { cursor: pointer; transition: filter 0.25s ease; }
 html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the logo shows plain mode is on */
+#agentic-ai .company-logo--dsta:focus-visible { outline: 2px solid #28d7c5; outline-offset: 6px; }
 @keyframes hs-rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
 
 /* ---------------- shared type ---------------- */
@@ -765,6 +766,7 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-p { font-size: max(14px, 0.92rem); line-height: 1.55; }
 .hs-console { margin-top: 2.2rem; position: relative; }
 .hs-nav, .hs-bar { display: none; }
+.hs-status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @container hs (min-width: 940px) {
   .hs-frame { display: grid; grid-template-columns: minmax(0, 1fr) min(820px, calc((100% - var(--hs-gap)) * 0.64)); grid-template-areas: "side console"; column-gap: var(--hs-gap); align-items: center; }
   .hs-side { grid-area: side; min-width: 0; }
@@ -782,7 +784,12 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
   .hs-scene .c2 .c2-wp { visibility: visible; }
 }
 @container c2p (max-width: 480px) {
-  .hs-scene .c2 { grid-template-areas: "head" "graph" "feed"; grid-template-rows: auto 160px var(--hs-feed, 296px); }
+  .hs-scene .c2 { grid-template-areas: "head" "graph" "feed"; grid-template-rows: auto 160px var(--hs-feed, 200px); }
+  .hs-scene .c2-head { padding: 8px 12px 4px; }
+  .hs-scene .c2-chips { display: none; }
+  .hs-scene .c2-g { --gx: calc((100% - 268px) / 2); zoom: 1; }
+  .hs-scene .c2-node .c2-name { font-size: 12px; }
+  .hs-scene .hunt-panel :is(.c2-chip, .c2-cid, .c2-tag, .c2-call, .c2-code, .c2-mono, .c2-evn) { font-size: 12px; }
 }
 
 /* ---------------- objects: shared ---------------- */
@@ -905,7 +912,6 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-pipe i { width: 14px; height: 1px; background: var(--hs-rule); }
 .hs-rows .hs-lab { margin-bottom: 8px !important; }
 .hs-rows-n { margin-left: auto; font-weight: 600; letter-spacing: 0; text-transform: none; font-size: 12.5px; color: var(--hs-dim); }
-.hs-cnt { display: none; }
 .hs-wall { position: relative; }
 .hs-wr {
   box-sizing: border-box; display: grid; grid-template-columns: 5.2em minmax(0, 1fr); gap: 8px; margin: 0; padding: 3px 8px;
@@ -966,7 +972,7 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-w-hl { fill: #2a5658; }
 .hs-w-stub { fill: none; stroke: #2a5658; stroke-width: 1.5; stroke-dasharray: 4 5; }
 .hs-w-lead { fill: #ffb869; }
-@container hs (max-width: 560px) { .hs-w-tall .hs-w-ll { font-size: 15px; } }   /* 12px on a phone's narrowest map */
+@container hs (max-width: 560px) { .hs-w-tall .hs-w-ll { font-size: 16px; } }   /* 12px at a 270px map width */
 /* one hunt's trace: each attempt, its outcome */
 .hs-trace { grid-column: 1 / -1; display: grid; gap: 0; max-width: 560px; margin: 14px auto 0; padding: 0; list-style: none; }
 .hs-trace li { display: grid; grid-template-columns: 4.6em minmax(0, 1fr) auto; gap: 12px; align-items: baseline; padding: 8px 12px; border-top: 1px solid var(--hs-rule); font-size: 14px; line-height: 1.4; }
@@ -1002,9 +1008,8 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-scene.is-amb .hs-fill { background: var(--hs-amb); }
 
 .hs-scene.is-live :is(.hs-src, .hs-lanes, .hs-env, .hs-hyp, .hs-rows, .hs-kb, .hs-ov, .hs-wmap, .hs-trace, .hs-console > .hunt-panel) { will-change: transform, opacity; }
-/* a short screen (hunt-story.js fit): the frame's words a size smaller, then the console or the objects zoomed out */
-.hs-scene.is-live .hs-console { zoom: var(--hs-z, 1); }
-.hs-scene.is-live .hs-objs:not(.hs-objs--2) > * { scale: var(--hs-oz, 1); }   /* composes with each object's own transform */
+/* Short screens use tighter prose and measured artwork space. */
+/* Fit by composition, never by reducing the rendered size of labels. */
 .hs-scene.is-live.is-tight .hs-h { font-size: 22px; line-height: 1.15; margin-bottom: 0.35rem !important; }
 .hs-scene.is-live.is-tight .hs-p { font-size: 13.5px; line-height: 1.4; }
 .hs-scene.is-live.is-tight .hs-steps { margin-top: 4px; margin-bottom: 10px; }
@@ -1088,10 +1093,10 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-scene.is-live .hs-objs--2 { --lap: var(--hs-p2); --e2m: calc(1 - (1 - clamp(0, calc(var(--hs-p2) / 0.3), 1)) * (1 - clamp(0, calc(var(--hs-p2) / 0.3), 1))); }
 .hs-scene.is-live .hs-objs--2 .hs-card {
   position: absolute; right: 12px; bottom: -18px; width: min(430px, 66%);
-  opacity: 0; visibility: hidden; transform: translateY(26px); filter: opacity(calc(1 - clamp(0, calc(var(--hs-p1) * 2), 1)));
-  transition: opacity 0.25s ease, transform 0.3s ease, visibility 0s linear 0.3s;
+  --arrival: clamp(0, calc((var(--hs-run, 0) - 0.88) / 0.12), 1);
+  opacity: calc(var(--arrival) * (1 - clamp(0, calc(var(--hs-p1) * 2), 1)));
+  transform: translateY(calc(18px * (1 - var(--arrival))));
 }
-.hs-scene--eng.is-live[data-hs-at="0"] .hs-o2 { opacity: 1; visibility: visible; transform: none; transition: opacity 0.5s ease, transform 0.7s var(--hs-out), visibility 0s; }
 .hs-scene.is-live .hs-wmap {
   position: absolute; inset: 0; display: grid; place-items: center; opacity: clamp(0, calc((var(--hs-p1) - 0.18) / 0.1), 1);
   transform: translateY(calc(-13% * var(--e2m))) scale(calc(1 - 0.16 * var(--e2m)));
@@ -1122,8 +1127,7 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
    entries in turn; then the golden set's cells flip down onto their slots one by one, like a scoreboard, and its
    key and method land last. 2: the knowledge base recedes and the analyst's hunt overview assembles: the verdict
    bar fills, the attack chain's columns and techniques drop in, the row for review slides in, and the analyst
-   presses Confirm, so the story ends on a person's decision. */
-@property --hs-cn { syntax: "<integer>"; inherits: true; initial-value: 80; }
+   receives the evidence and next investigation for review. */
 .hs-scene--trust.is-live .hs-objs {
   --k0: clamp(0, calc((var(--hs-p0) - 0.55) / 0.27), 1); --k: calc(var(--k0) * var(--k0) * (3 - 2 * var(--k0)));
   --rh: 22px;
@@ -1134,10 +1138,7 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
   transform: translateY(calc(50px * (1 - clamp(0, calc(var(--hs-p0) * 2), 1)))) scale(calc(1 - 0.07 * var(--out)));
   filter: blur(calc(3px * var(--out)));
 }
-.hs-scene.is-live .hs-rows-s { display: none; }
-.hs-scene.is-live .hs-cnt { --hs-cn: calc(80 - 79 * var(--k)); display: inline; }
-.hs-scene.is-live .hs-cnt::after { counter-reset: hs-cn var(--hs-cn); content: counter(hs-cn); color: var(--hs-teal); font-variant-numeric: tabular-nums; }
-.hs-scene.is-live .hs-wall { height: calc(var(--rh) * (var(--n) - (var(--n) - 1) * var(--k))); }
+.hs-scene.is-live .hs-wall { --count: var(--hs-row-count, var(--n)); height: calc(var(--rh) * (var(--count) - (var(--count) - 1) * var(--k))); }
 .hs-scene.is-live .hs-wr {
   --r: clamp(0, calc((var(--hs-p0) - 0.1 - var(--i) * 0.025) / 0.1), 1);
   position: absolute; left: 0; right: 0; top: 0; height: var(--rh);
@@ -1184,7 +1185,7 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
   appearance: none; -webkit-appearance: none; margin: 0; padding: 0; min-width: 0; min-height: 0; background: none; box-shadow: none;
   font: inherit; letter-spacing: 0; text-transform: none; line-height: 0; cursor: pointer; -webkit-tap-highlight-color: transparent;
 }
-.hs-scene .hs-btn { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--hs-btnbd); border-radius: 50%; transition: border-color 0.2s ease, opacity 0.2s ease; }
+.hs-scene .hs-btn { flex: none; display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--hs-btnbd); border-radius: 50%; transition: border-color 0.2s ease, opacity 0.2s ease; }
 .hs-btn svg { width: 16px; height: 16px; fill: none; stroke: var(--hs-btnink); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .hs-scene .hs-btn[aria-disabled="true"] { opacity: 0.32; cursor: default; }
 .hs-scene .hs-dot { display: grid; place-items: center; width: 18px; height: 28px; border: 0; border-radius: 9px; }
@@ -1199,15 +1200,6 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
 .hs-scene .hs-btn:focus, .hs-scene .hs-dot:focus { outline: none; }
 .hs-scene .hs-btn:focus-visible { outline: 2px solid var(--hs-teal); outline-offset: 2px; }
 .hs-scene .hs-dot:focus-visible { outline: 2px solid var(--hs-teal); outline-offset: -4px; }
-
-/* desktop: the pinned content sits about 60px lower, so less empty band shows under the progress bar */
-@container hs (min-width: 940px) {
-  .hs-scene.is-live .hs-stage { box-sizing: border-box; padding-top: min(120px, 15svh); }
-}
-/* ...and that padding is the gap under each title moment, which drops its own */
-@container hsx (min-width: 940px) {
-  .hs-chead { padding-bottom: 0; }
-}
 
 /* ---------------- stacked: text on top, the stage, then the controls ---------------- */
 @container hs (max-width: 939px) {
@@ -1239,7 +1231,7 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
   .hs-scene.is-live .hs-h { font-size: clamp(24px, 1.8rem, 28px); line-height: 1.14; margin-bottom: 0.45rem !important; }
   .hs-scene.is-live .hs-p { font-size: 15px; line-height: 1.45; }
   .hs-scene.is-live .hs-console { margin-bottom: 10px; }
-  .hs-scene .hs-btn { width: 36px; height: 36px; }
+  .hs-scene .hs-btn { width: 44px; height: 44px; }
   .hs-scene.is-live .hs-objs--1, .hs-scene.is-live .hs-objs--3 { height: var(--hs-objh, min(64svh, 470px)); }
   .hs-card { padding: 16px; font-size: 14px; }
   .hs-doc { padding: 16px 16px 14px; }
@@ -1268,6 +1260,11 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
   .hs-scene.is-live .hs-doc-l { display: none; }
   /* 02: the card covers the feed, the engine's graph stays in view */
   .hs-scene.is-live .hs-objs--2 .hs-card { left: 8px; right: 8px; bottom: 8px; width: auto; }
+  .hs-scene.is-live .hs-o2 { padding: 8px; }
+  .hs-scene.is-live .hs-o2 .hs-was { font-size: 12px; padding-bottom: 0; margin-bottom: 4px !important; border: 0; }
+  .hs-scene.is-live .hs-o2 .hs-lab { margin-bottom: 4px !important; }
+  .hs-scene.is-live .hs-o2 .hs-q { padding: 4px 6px; font-size: 12px; line-height: 1.35; }
+  .hs-scene.is-live .hs-o2 .hs-res { margin-top: 4px !important; font-size: 12px; }
   .hs-q { font-size: 12.5px; padding: 10px 11px; }
   /* 03: the overview stacks its review row; the techniques' names give way so the chain fits */
   .hs-ov-e, .hs-ov-lt, .hs-ov-t span, .hs-ov-who span { display: none; }
@@ -1299,6 +1296,67 @@ html.hs-plain #agentic-ai .company-logo--dsta { filter: invert(1); }   /* the lo
   .hs-env-l div { grid-template-columns: 5em minmax(0, 1fr); font-size: 13.5px; }
   /* phones: no blur while the stage moves (it costs a phone's GPU a repaint each frame, and read as jank) */
   .hs-scene.is-live :is(.hs-doc, .hs-lane, .hs-env, .hs-rows, .hs-kb, .hs-ov) { filter: none; }
+
+  /* A phone has its own composition: legible cards and a protected illustration area.
+     Source offsets never send the selected lane through the copy above the stage. */
+  .hs-scene.is-live .hs-objs--1,
+  .hs-scene.is-live .hs-objs--3 { overflow: clip; overflow-clip-margin: 2px; }
+  .hs-card, .hs-doc { padding: 12px; border-radius: 14px; }
+  .hs-lab { font-size: 12px; letter-spacing: 0.08em; margin-bottom: 10px !important; }
+  .hs-doc-t { font-size: 14px; line-height: 1.5; color: var(--hs-body); }
+  .hs-chip { padding: 5px 8px; gap: 6px; }
+  .hs-lane { padding: 2px 4px; gap: 4px; }
+  .hs-lane .hs-chip { line-height: 1.4; }
+  .hs-lane-t { margin-left: auto; }
+  .hs-lane:not(.is-skip) .hs-lane-t { display: none; }
+  .hs-lane.is-skip .hs-chip { font-size: 12px; }
+  .hs-env-l { gap: 7px; }
+  .hs-env-l div { font-size: 13px; gap: 6px; line-height: 1.35; }
+  .hs-env-l dt, .hs-lo dt, .hs-scope-l, .hs-tr-n, .hs-ov-rv b { font-size: 12px; letter-spacing: 0.06em; }
+  .hs-hyp-t { font-size: 18px; line-height: 1.4; }
+  .hs-hyp { padding: 10px; }
+  .hs-lo { margin-top: 10px; gap: 8px; }
+  .hs-lo div { font-size: 13px; line-height: 1.35; }
+  .hs-scope { gap: 6px; padding-top: 10px; margin-top: 10px !important; }
+  .hs-fact { font-size: 12px; padding: 3px 7px; }
+  .hs-scene.is-live .hs-hyp {
+    transform: translateY(calc(max(0px, var(--hs-dy, 0px)) * (1 - var(--he)))) scale(calc(0.94 + 0.06 * var(--he)));
+    opacity: clamp(0, calc((var(--hs-p2) - 0.12) / 0.18), 1);
+  }
+  .hs-scene.is-live .hs-lanes { top: max(0px, calc((100% - var(--hs-lanes-h, 0px) - var(--hs-env-h, 0px) - 20px) / 2)); }
+  .hs-scene.is-live .hs-env { bottom: auto; top: calc(max(0px, (100% - var(--hs-lanes-h, 0px) - var(--hs-env-h, 0px) - 20px) / 2) + var(--hs-lanes-h, 0px) + 20px); }
+  .hs-scene.is-live .hs-lane { opacity: calc((1 - clamp(0, calc(var(--hs-p2) / 0.18), 1)) * (1 - 0.45 * var(--st) * var(--skip, 0))); }
+  .hs-scene.is-live .hs-env { opacity: calc(var(--in) * (1 - clamp(0, calc(var(--hs-p2) / 0.2), 1))); }
+  .hs-scene.is-live .hs-fact { transform: translateY(calc(8px * (1 - var(--c)))); }
+  .hs-kbc { gap: 5px; }
+  .hs-kb { padding: 10px; }
+  .hs-kb > .hs-lab { margin-bottom: 6px !important; }
+  .hs-kbc span { padding: 3px 6px; }
+  .hs-kbc .hs-i { display: none; }
+  .hs-gold { margin-top: 12px; padding-top: 10px; }
+  .hs-gold .hs-lab { flex-wrap: wrap; gap: 4px 6px; }
+  .hs-gold .hs-rows-n { margin-left: 0; text-transform: none; letter-spacing: 0; }
+  .hs-key { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 10px !important; }
+  .hs-gfoot { font-size: 12px; line-height: 1.4; }
+  .hs-ov-row { font-size: 13px; padding: 6px 8px; }
+  .hs-ov-done { font-size: 12px; line-height: 1.4; }
+  .hs-ov-chip > span:first-child { flex-direction: row; flex-wrap: wrap; gap: 0 5px; }
+  /* Fewer illustrative rows carry the same finding; labels retain their authored size. */
+  .hs-rows { --hs-row-count: 8; }
+  .hs-wr:nth-child(n+9) { display: none; }
+  .hs-gold { margin-top: 8px; padding-top: 8px; }
+  .hs-kbc span { padding-block: 2px; }
+  .hs-gold .hs-lab { margin-bottom: 8px !important; }
+  .hs-key { margin-top: 8px !important; }
+  .hs-gfoot { margin-top: 8px !important; }
+  /* Trace takes the map's place on narrow screens: no miniature labels behind a ledger. */
+  .hs-scene.is-live .hs-wmap {
+    transform: none;
+    opacity: calc(clamp(0, calc((var(--hs-p1) - 0.18) / 0.1), 1) * (1 - clamp(0, calc((var(--hs-p2) - 0.25) / 0.2), 1)));
+  }
+  .hs-scene.is-live .hs-objs--2 { --lap: clamp(0, calc(var(--hs-p2) / 0.45), 1); }
+  .hs-scene.is-live .hs-trace { top: 50%; bottom: auto; transform: translateY(-50%); }
+  .hs-scene.is-live .hs-trace li { --t: clamp(0, calc((var(--hs-p2) - 0.48 - var(--at) * 0.3) / 0.15), 1); }
 }
 
 /* while a stage is pinned on phones and tablets, the floating Menu pill and return-to-top step away (as C) */

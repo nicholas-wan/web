@@ -77,18 +77,18 @@ const FACTS = ['Task creation events', 'Workstations', 'Task baseline'];
 const TECH = [['T1053.005', 'Scheduled Task', 'To hunt'], ['T1059.001', 'PowerShell', 'Covered recently'], ['T1547.001', 'Registry Run Keys', 'To hunt']];
 const OBJ_1 = `<div class="hs-objs hs-objs--1"><div class="hs-src">`
   + `<div class="hs-doc"><p class="hs-lab">${ico(I.doc)}Ransomware report</p>`
-  + `<p class="hs-doc-t">After gaining access, the operators <mark class="hs-m0">create a scheduled task</mark> that relaunches the payload at logon. They <mark class="hs-m1">run PowerShell</mark> to stage their tools, and <mark class="hs-m2">add a Run key</mark> so it survives a reboot.</p>`
+  + `<p class="hs-doc-t">The operators <mark class="hs-m0">create a scheduled task</mark> to relaunch a payload at logon, <mark class="hs-m1">run PowerShell</mark> to stage tools, and <mark class="hs-m2">add a Run key</mark> to survive a reboot.</p>`
   + `<span class="hs-doc-l" aria-hidden="true"><i></i><i></i><i></i><i></i></span></div>`
   + `<p class="hs-chips">${TECH.map(([id, n], i) => chip(id, n, ` hs-c${i}`, `.hs-m${i}`)).join('')}</p></div>`
   + `<div class="hs-lanes" data-hs-late="1">${TECH.map(([id, n, s], i) => `<div class="hs-lane hs-l${i}${i === 1 ? ' is-skip' : ''}" data-hs-from=".hs-c${i}" style="--i:${i}">${chip(id, n, ' hs-lchip')}<span class="hs-lane-t"><b>Sub-hunt ${i + 1}</b><span>${s}</span></span></div>`).join('')}</div>`
   + `<div class="hs-card hs-env" data-hs-late="1"><p class="hs-lab">${ico(I.env)}This environment</p><dl class="hs-env-l">`
-  + `<div><dt>Logs</dt><dd><span class="hs-e0">${FACTS[0]}</span> kept</dd></div>`
-  + `<div><dt>Assets</dt><dd><span class="hs-e1">${FACTS[1]}</span> in scope</dd></div>`
-  + `<div><dt>Known</dt><dd><span class="hs-e2">${FACTS[2]}</span> for scheduled tasks</dd></div>`
-  + `<div class="hs-env-h"><dt>Hunts</dt><dd>PowerShell: covered by a recent hunt</dd></div></dl></div>`
+  + `<div><dt>Logs</dt><dd><span class="hs-e0">${FACTS[0]}</span></dd></div>`
+  + `<div><dt>Assets</dt><dd><span class="hs-e1">${FACTS[1]}</span></dd></div>`
+  + `<div><dt>Known</dt><dd><span class="hs-e2">${FACTS[2]}</span></dd></div>`
+  + `<div class="hs-env-h"><dt>Hunts</dt><dd>PowerShell covered recently</dd></div></dl></div>`
   + `<div class="hs-card hs-hyp" data-hs-late="2" data-hs-from=".hs-l0"><p class="hs-lab hs-lab--hyp">${ico(I.flask)}Hypothesis · sub-hunt 1</p>`
-  + `<p class="hs-hyp-t">An adversary may persist on workstations via scheduled tasks that relaunch the payload at logon.</p>`
-  + `<dl class="hs-lo"><div><dt>Look for</dt><dd>A new task that runs at logon, outside the baseline</dd></div><div><dt>Normal here</dt><dd>Built-in tasks recorded in the task baseline</dd></div></dl>`
+  + `<p class="hs-hyp-t">An adversary may use scheduled tasks to relaunch a payload at logon.</p>`
+  + `<dl class="hs-lo"><div><dt>Look for</dt><dd>A new task that runs at logon, outside the baseline</dd></div><div><dt>Normal here</dt><dd>Built-in tasks in the baseline</dd></div></dl>`
   + `<p class="hs-scope"><span class="hs-scope-l">Scoped to</span>${FACTS.map((t, i) => `<span class="hs-fact hs-f${i}" data-hs-from=".hs-e${i}">${t}</span>`).join('')}</p></div></div>`;
 
 // ---------------------------------------------------------------- 02: the console, then the workflow map and its trace
@@ -146,18 +146,18 @@ const WIDE = (() => {
 const TALL = (() => {
   // one column; the loop runs up the right side from the verdict to the planner. The valid-negative exit is
   // left to the trace here: there is no room beside the column for a label at the 12px phone floor.
-  const X = 180, Y = [60, 130, 200, 270, 340, 410], W = 190;
+  const X = 180, Y = [30, 82, 134, 186, 238, 290], W = 190;
   const run = [[X, Y[0]], [X, Y[4]], [X + 150, Y[4]], [X + 150, Y[2]], [X, Y[2]], [X, Y[5]]];
   const L = total(run), at = Y.map(y => r3(along(run, X, y) / L));
   RUN_AT_T = [at[4], r3((along(run.slice(4), X, Y[4]) + total(run.slice(0, 5))) / L), 1];
   const main = Y.slice(0, -1).map((y, i) => `M${X} ${y + 22}V${Y[i + 1] - 22}`).join('');
   const loop = `M${X + 95} ${Y[4]}H${X + 150}V${Y[2]}H${X + 101}`;
-  return `<svg class="hs-w hs-w-tall" viewBox="0 0 360 456" aria-hidden="true">`
+  return `<svg class="hs-w hs-w-tall" viewBox="0 0 360 320" aria-hidden="true">`
     + `<path class="hs-w-line" pathLength="1" d="${main}"/>`
     + Y.slice(1).map((y, i) => `<path class="hs-w-head hs-w-h${i + 1}" d="${head(X, y - 22, "d")}"/>`).join('')
     + `<path class="hs-w-loop" pathLength="1" d="${loop}"/><path class="hs-w-head hs-w-hl" d="${head(X + 95, Y[2], "l")}"/>`
-    + `<text class="hs-w-ll" x="${X + 150}" y="${Y[3] - 4}" text-anchor="middle" transform="rotate(90 ${X + 150} ${Y[3]})">${LOOPL}</text>`
-    + `<text class="hs-w-ll hs-w-lead" x="${X + 12}" y="${Y[4] + 40}">Lead</text>`
+    + `<text class="hs-w-ll" x="${X + 150}" y="${Y[3] - 4}" text-anchor="middle" transform="rotate(90 ${X + 150} ${Y[3]})">Re-plan</text>`
+    + `<text class="hs-w-ll hs-w-lead" x="${X + 108}" y="${Y[5] + 5}">Lead</text>`
     + Y.map((y, i) => node(X, y, W, STEPS[i], i, i === 5, at[i])).join('')
     + `<circle class="hs-w-glow" r="10" style="offset-path: path('${poly(run)}')"/><circle class="hs-w-dot" r="4" style="offset-path: path('${poly(run)}')"/>`
     + `</svg>`;
@@ -179,8 +179,8 @@ const OBJ_2 = `<div class="hs-objs hs-objs--2">`
 // with the step that judges them), inconsistent output (grounding in a knowledge base, then testing against an
 // answer key) and compounded errors (a person at the checkpoints), reordered so the story still ends on the
 // analyst. Each frame transforms its object rather than swapping cards (rework, 28 Oct 2026): the wall of result
-// rows converges into the one row that matters while the count in context falls from 80 to 1; the golden set's
-// cells flip over one by one like a scoreboard; the hunt's overview assembles for the analyst, who confirms the lead.
+// rows converges into a finding passed onward; the golden set's cells flip over one by one like a scoreboard;
+// the hunt's overview assembles with evidence and a concrete next step for the analyst.
 // The rows, the knowledge base and the lead are illustrative, in the product's own shapes (a Check result, its
 // review flag). The golden set is the method of the owner's model evaluation (26 Oct 2026: one hunt, 7 techniques
 // attacked and 5 left alone, a reviewer's answer key, every model through the same hunt, agents, prompts and data,
@@ -189,7 +189,7 @@ const WALL = [['WS-011', '\\Microsoft\\Windows\\Defrag\\ScheduledDefrag'], ['WS-
 const HIT = WALL.findIndex(r => r[2]);
 const KB = [['Technique notes', I.doc], ['Telemetry catalogue', I.db], ['Environment profile', I.env], ['Past hunts', I.hist]];
 const RUN = 'cccc' + 'w' + 'mm' + 'nnnnn';   // c caught with its own evidence, w wrong evidence, m missed, n correctly clean
-const OUTCOME = { c: 'Caught, own evidence', w: 'Wrong evidence', m: 'Missed', n: 'Correct: no attack' };
+const OUTCOME = { c: 'Own evidence', w: 'Wrong evidence', m: 'Missed', n: 'No attack' };
 const cells = (from, to) => [...RUN.slice(from, to)].map((k, i) => `<i class="hs-cell is-${k}" style="--i:${from + i}"><b></b></i>`).join('');
 // The analyst's view is the product's hunt overview (owner, 28 Oct 2026: the old lead-and-avatar ending "looks very
 // lame", "check ... H-0010 to see how its done"; th-frontend FindingsOverview): the determination with its verdict bar,
@@ -205,14 +205,13 @@ const OV = `<div class="hs-card hs-ov" data-hs-late="2">`
   + `<ol class="hs-ov-chain">${CHAIN.map(([tac, fs], i) => `<li class="hs-ov-col${fs.some(f => f[2] === 'thr') ? ' is-thr' : ''}" style="--i:${i}"><p class="hs-ov-t">${tac}<span>${fs.length} technique${fs.length > 1 ? 's' : ''}</span></p>`
     + fs.map(([id, n, k, v]) => `<span class="hs-ov-chip is-${k}" style="--j:${chipN++}"><span><code>${id}</code><b>${v}</b></span><span class="hs-ov-n">${n}</span></span>`).join('') + `</li>`).join('')}</ol>`
   + `<div class="hs-ov-row"><code class="hs-ov-id">T1053.005</code><span class="hs-ov-ev"><code>\\WinTaskUpdate</code> not in baseline</span><span class="hs-ov-rv"><b>Human review</b>Check who created the task and what it runs</span></div>`
-  + `<div class="hs-ov-act"><span class="hs-ava">${ico(I.person)}</span><span class="hs-ov-who"><b>Analyst</b><span>Judges the lead</span></span><span class="hs-ov-btns"><span class="hs-ov-b">Dismiss</span><span class="hs-ov-b is-go">${ico(I.check)}Confirm lead</span></span></div>`
-  + `<p class="hs-ov-done">${ico(I.check)}Confirmed by the analyst · query handed to detection engineering</p></div>`;
+  + `<p class="hs-ov-done">${ico(I.person)}Evidence and query ready for analyst review</p></div>`;
 const OBJ_3 = `<div class="hs-objs hs-objs--3">`
   + `<div class="hs-card hs-rows" data-hs-late="0" style="--n:${WALL.length};--hit:${HIT}">`
   + `<p class="hs-pipe"><span>Plan</span><i aria-hidden="true"></i><span>Query</span><i aria-hidden="true"></i><span class="is-on">Verdict</span></p>`
-  + `<p class="hs-lab">${ico(I.db)}Result rows<span class="hs-rows-n"><span class="hs-rows-s">80, judged here only</span><span class="hs-cnt" aria-hidden="true">In context: </span></span></p>`
+  + `<p class="hs-lab">${ico(I.db)}Result rows<span class="hs-rows-n">Judged here only</span></p>`
   + `<div class="hs-wall">${WALL.map(([h, k, x], i) => `<p class="hs-wr${x ? ' is-x' : ''}" style="--i:${i}"><span>${h}</span><span>${k}</span></p>`).join('')}</div>`
-  + `<p class="hs-out">${ico(I.down)}<span>Passed on</span><b>1 task not in baseline: <code>\\WinTaskUpdate</code></b></p></div>`
+  + `<p class="hs-out">${ico(I.down)}<span>Finding passed onward</span><b>1 task not in baseline: <code>\\WinTaskUpdate</code></b></p></div>`
   + `<div class="hs-card hs-kb" data-hs-late="1"><p class="hs-lab">${ico(I.ctx)}Knowledge base</p>`
   + `<p class="hs-kbc">${KB.map(([k, ic], i) => `<span style="--i:${i}">${ico(ic)}${k}</span>`).join('')}</p>`
   + `<div class="hs-gold"><p class="hs-lab">${ico(I.flask)}Golden set<span class="hs-rows-n">a reviewer's answer key</span></p>`
@@ -220,7 +219,7 @@ const OBJ_3 = `<div class="hs-objs hs-objs--3">`
   + `<span class="hs-cg"><span class="hs-cr">${cells(0, 7)}</span><span class="hs-cgl">Attacked · 7</span></span>`
   + `<span class="hs-cg"><span class="hs-cr">${cells(7, 12)}</span><span class="hs-cgl">Left alone · 5</span></span></div>`
   + `<p class="hs-key" aria-hidden="true">${Object.entries(OUTCOME).map(([k, t]) => `<span><i class="hs-cell is-${k}"><b></b></i>${t}</span>`).join('')}</p>`
-  + `<p class="hs-gfoot">Same hunt, agents, prompts and data for every model; only the model changes. Accuracy alone rewards calling everything clean, so F1 is reported too.</p></div></div>`
+  + `<p class="hs-gfoot">Same hunt, agents, prompts and data; only the model changes. Both accuracy and F1 are reported.</p></div></div>`
   + OV + `</div>`;
 
 // ---------------------------------------------------------------- the chapters (owner-approved copy, 28 Oct 2026)
@@ -232,25 +231,24 @@ const CH = [
   // "autonomous" or "memory", which would overclaim.
   { id: 'product', n: '01', label: 'Understanding the analyst', title: 'Built the way hunters plan a hunt.', line: 'An illustrative hunt, from a threat report to a claim it can test.', objs: OBJ_1,
     frames: [
-      { hold: 1.1, h: 'One report becomes one hunt per technique.', p: 'The techniques are pulled out of the report and duplicates merged. Each runs as its own sub-hunt, so every model call works on one technique.' },
-      { hold: 0.9, h: 'Tailored to this environment.', p: 'A hypothesis is only testable where the data exists, so what this environment logs and what is normal here come first. A technique hunted recently is not investigated twice.' },
-      { h: 'Each hypothesis says what to look for, and where.', p: 'Written for this environment, with what to look for and what is normal here, so a hunt can confirm it or rule it out.' },
+      { hold: 1.1, h: 'One report. A hunt for each technique.', p: 'Techniques are extracted and duplicates merged. Each sub-hunt gives the agents one technique to investigate.' },
+      { hold: 0.9, h: 'Scope each hunt to the environment.', p: 'Available telemetry, assets and known baselines shape the hypothesis. Recently covered techniques are set aside.' },
+      { h: 'Define the evidence the hunt needs.', p: 'Each hypothesis names the behaviour to investigate, the data to search and the baseline to compare against.' },
     ] },
   { id: 'eng', n: '02', label: 'Designing the workflow', title: 'Narrow agents, one supervisor.', line: 'Two decisions shaped it: when to re-plan, and when a person steps in.', console: true, objs: OBJ_2,
     frames: [
-      // hold: this frame's dwell in screens (others 0.8: a 0.5-screen move, then a still; denser frames hold longer, owner, 28 Oct 2026). The console's 8s run needs the reader to linger: at
-      // 0.6 a steady scroll or one Page Down left it after about a second (review, 27 Oct 2026).
-      { beats: [1, 2, 3, 4, 5], dur: 8, hold: 1.4, h: 'Each agent has one job.', p: 'Planning, writing the query and judging the result are separate agents. Past hunts are checked first, and each query is checked against its plan before it runs.' },
-      { beats: [], dur: 1, hold: 0.9, h: 'Every search ends in a verdict: lead, clean or re-plan.', p: 'A separate step judges what came back. Incomplete coverage goes back to planning, a clean result is logged, and a lead goes to an analyst.' },
-      { beats: [], dur: 1, h: 'Every attempt is recorded.', p: 'Each plan, its query, its verdict and its review flag are logged, so an analyst can see why the agent re-planned and what it ruled out.' },
+      // The console's meaningful beats share scroll progress, finishing before the map transition.
+      { beats: [1, 2, 3, 4, 5], hold: 1.4, h: 'Orchestrate specialist agents.', p: 'A supervisor delegates to specialists that form hypotheses, check past hunts and run detection.' },
+      { beats: [], hold: 0.9, h: 'Re-plan when evidence is inconclusive.', p: 'The verdict determines the next step: revise an incomplete search, record a valid negative, or raise a lead for review.' },
+      { beats: [], h: 'Keep every attempt traceable.', p: 'Each attempt retains its plan, query, verdict and review flag, so analysts can follow the investigation.' },
     ] },
   // 03's frames are the deck's three challenges in its own words, shortened (owner, 27 Oct 2026: the old
   // context card over a "Telemetry" block was "kind of useless")
   { id: 'trust', n: '03', label: 'Making the model reliable', title: 'Context engineering, evals and human review.', line: 'On-premises: large telemetry, a tight context.', objs: OBJ_3, amber: true,
     frames: [
-      { hold: 1.1, h: 'Narrow the context for each call.', p: 'Query results are the largest thing in a hunt, so detection logic is split into a planner, a query writer and a judge. Only the judge reads the rows; one short finding is passed on.' },
-      { hold: 1.2, h: 'Ground the model, then test it against an answer key.', p: 'The same input can give a different answer each run. A knowledge base anchors each answer, and every model runs the same hunt against a reviewer\'s answer key, including techniques nobody attacked.' },
-      { h: 'Human in the loop at the checkpoints.', p: 'In a chain of calls, each mistake feeds the next. Plans that need judgement go to an analyst, every verdict carries a review flag, and a search that runs out of attempts is handed over, not looped.' },
+      { hold: 1.1, h: 'Keep each model call focused.', p: 'Only the judge reads the query results. A concise finding passes onward, keeping raw rows out of later calls.' },
+      { hold: 1.2, h: 'Score the evidence behind each verdict.', p: 'Ground calls in the knowledge base. Compare models on reviewed cases, including techniques with no attack.' },
+      { h: 'Give analysts the evidence and next step.', p: 'Review flags and bounded retries keep uncertainty visible. Analysts receive the evidence and a concrete next investigation.' },
     ] },
 ];
 
@@ -291,7 +289,7 @@ CH.forEach(c => {
       const end = c.frames.map(f => (last = f.beats.length ? T(R[f.beats[f.beats.length - 1]]) : last));
       return { live: [1, 2, 3, 4, 5, 6, 7].map(b => [T(P[b]), T(R[b])]), end };
     };
-    story = { narrow: 480, dur: c.frames.map(f => f.dur), d: tl(r3), p: tl(TPh) };
+    story = { narrow: 480, d: tl(r3), p: tl(TPh) };
   }
   if (c.frames.some(f => f.hold)) story.hold = c.frames.map(f => f.hold || 0);
   const steps = c.frames.map(f => `<li class="hs-step"><p class="hs-h">${f.h}</p><p class="hs-p">${f.p}</p></li>`).join('');
@@ -303,14 +301,14 @@ CH.forEach(c => {
     + `<div class="hs-side"><ol class="hs-steps">${steps}</ol>`
     + `<div class="hs-nav"><button type="button" class="hs-btn hs-prev" aria-label="Previous step">${arrow('M13 8H3.5M7.5 4 3.5 8l4 4')}</button><span class="hs-dots">${dots}</span><button type="button" class="hs-btn hs-next" aria-label="Next step">${arrow('M3 8h9.5M8.5 4l4 4-4 4')}</button></div></div>`
     + `<div class="hs-console">${c.console ? panel : ''}${c.objs}</div>`
-    + `<div class="hs-bar" aria-hidden="true"><span class="hs-fill"></span></div>`
+    + `<div class="hs-bar" aria-hidden="true"><span class="hs-fill"></span></div><span class="hs-status" role="status" aria-live="polite"></span>`
     + `</div></div></section></div>`;
 });
 // The story's script is not a <script src> (the page's JavaScript stays under its 80 KB ceiling): this
 // loader injects it once the story is a screen away. build.ps1 versions the data-hs-script URL.
 // It also owns the hidden plain mode: clicking the DSTA logo toggles html.hs-plain (remembered in localStorage),
 // which keeps the story a static list, as under reduced motion; hunt-story.js re-checks on the hs-plain event.
-const loader = `<script>/* Loads the Agentic AI story's script on demand (tools/scenes/agentic-story); the DSTA logo toggles plain mode. */(function(){var s=document.querySelector('.hs-story');if(!s||!s.getAttribute('data-hs-script'))return;var K='hs-plain',h=document.documentElement,l=document.querySelector('.company-logo--dsta');try{if(localStorage.getItem(K))h.classList.add(K)}catch(e){}if(l)l.addEventListener('click',function(){var p=h.classList.toggle(K);try{if(p)localStorage.setItem(K,'1');else localStorage.removeItem(K)}catch(e){}dispatchEvent(new Event(K))});var go=function(){if(s.hsLoaded)return;s.hsLoaded=1;var j=document.createElement('script');j.src=s.getAttribute('data-hs-script');document.head.appendChild(j)};if(!('IntersectionObserver'in window))return go();var o=new IntersectionObserver(function(e){if(e.some(function(x){return x.isIntersecting})){o.disconnect();go()}},{rootMargin:'100% 0px'});o.observe(s)})();</script>`;
+const loader = `<script>/* Loads the Agentic AI story's script on demand (tools/scenes/agentic-story); the DSTA logo toggles plain mode. */(function(){var s=document.querySelector('.hs-story');if(!s||!s.getAttribute('data-hs-script'))return;var K='hs-plain',h=document.documentElement,l=document.querySelector('.company-logo--dsta');try{if(localStorage.getItem(K))h.classList.add(K)}catch(e){}if(l){l.setAttribute('role','button');l.setAttribute('tabindex','0');l.setAttribute('aria-label','Show static story');l.setAttribute('aria-pressed',String(h.classList.contains(K)));l.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();l.click()}});l.addEventListener('click',function(){var p=h.classList.toggle(K);l.setAttribute('aria-pressed',String(p));try{if(p)localStorage.setItem(K,'1');else localStorage.removeItem(K)}catch(e){}dispatchEvent(new Event(K))})}var go=function(){if(s.hsLoaded)return;s.hsLoaded=1;var j=document.createElement('script');j.src=s.getAttribute('data-hs-script');document.head.appendChild(j)};if(!('IntersectionObserver'in window))return go();var o=new IntersectionObserver(function(e){if(e.some(function(x){return x.isIntersecting})){o.disconnect();go()}},{rootMargin:'100% 0px'});o.observe(s)})();</script>`;
 const story = `<div class="hs-story" data-hs-script="assets/js/hunt-story.js">${html}</div>${loader}`;
 page = page.slice(0, from) + story + page.slice(to);
 fs.writeFileSync(FILE, page);

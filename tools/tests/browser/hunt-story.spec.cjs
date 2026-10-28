@@ -4,7 +4,7 @@ const {test,expect}=require('@playwright/test');
 const scenes=page=>page.locator('#agentic-ai .hs-scene');
 const at=(page,i)=>page.locator('#agentic-ai .hs-scene').nth(i);
 // Scroll so chapter i rests on frame f (resting points 0.6 of its stage height apart, or a frame's own hold).
-const rest=(page,i,f)=>at(page,i).evaluate((s,f)=>{const vh=s.querySelector('.hs-stage').offsetHeight;const d=JSON.parse(s.getAttribute('data-hs-story'));let u=0;for(let k=0;k<f;k++)u+=(d.hold&&d.hold[k])||0.8;scrollTo(0,Math.round(s.getBoundingClientRect().top+scrollY+u*vh+2));},f);
+const rest=(page,i,f)=>at(page,i).evaluate((s,f)=>{const vh=s.querySelector('.hs-stage').offsetHeight;const d=JSON.parse(s.getAttribute('data-hs-story'));let u=0;for(let k=0;k<f;k++)u+=(d.hold&&d.hold[k])||0.8;scrollTo(0,Math.round(s.getBoundingClientRect().top+scrollY+(f === 0 ? (d.d ? Math.max(0.3, ((d.hold && d.hold[0]) || 0.8) - 0.62) : 0.3) : u)*vh+2));},f);
 const noSideScroll=page=>page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth);
 const FORBIDDEN=/index=wineventlog|SysUpdate|Splunk|only known|known activity|days to hours|hours instead of days|\bdays\b|SPL crafter|Post-query|Evidence found|\d+ hits|\btokens?\b/i;
 
@@ -19,9 +19,9 @@ test('agentic story: without motion, every chapter is a complete static list wit
   await expect(page.locator('#agentic-ai .hs-scene.is-live')).toHaveCount(0);
   await expect(page.locator('#agentic-ai .hs-ctitle')).toHaveText(['Built the way hunters plan a hunt.','Narrow agents, one supervisor.','Context engineering, evals and human review.']);
   await expect(page.locator('#agentic-ai .hs-clabel')).toHaveText(['01 Understanding the analyst','02 Designing the workflow','03 Making the model reliable']);
-  await expect(page.locator('#agentic-ai .hs-step .hs-h')).toHaveText(['One report becomes one hunt per technique.','Tailored to this environment.','Each hypothesis says what to look for, and where.','Each agent has one job.','Every search ends in a verdict: lead, clean or re-plan.','Every attempt is recorded.','Narrow the context for each call.','Ground the model, then test it against an answer key.','Human in the loop at the checkpoints.']);
+  await expect(page.locator('#agentic-ai .hs-step .hs-h')).toHaveText(['One report. A hunt for each technique.','Scope each hunt to the environment.','Define the evidence the hunt needs.','Orchestrate specialist agents.','Re-plan when evidence is inconclusive.','Keep every attempt traceable.','Keep each model call focused.','Score the evidence behind each verdict.','Give analysts the evidence and next step.']);
   await expect(page.locator('#agentic-ai .hs-cline').first()).toHaveText('An illustrative hunt, from a threat report to a claim it can test.');
-  for(const sel of ['.hs-step','.hs-doc','.hs-env','.hs-hyp','.hs-fact','.hs-lanes','.hs-lo','.hs-o2','.hs-wmap','.hs-trace','.hs-rows','.hs-wr.is-x','.hs-out','.hs-kb','.hs-gold','.hs-cells','.hs-ov','.hs-ov-chain','.hs-ov-row','.hs-ov-act','.hunt-panel .c2']){
+  for(const sel of ['.hs-step','.hs-doc','.hs-env','.hs-hyp','.hs-fact','.hs-lanes','.hs-lo','.hs-o2','.hs-wmap','.hs-trace','.hs-rows','.hs-wr.is-x','.hs-out','.hs-kb','.hs-gold','.hs-cells','.hs-ov','.hs-ov-chain','.hs-ov-row','.hs-ov-done','.hunt-panel .c2']){
    for(const el of await page.locator('#agentic-ai '+sel).all()){await expect(el).toBeVisible();await expect(el).toHaveCSS('opacity','1');}
   }
   const label=await page.locator('#agentic-ai .hunt-panel .c2').getAttribute('aria-label');
@@ -30,7 +30,7 @@ test('agentic story: without motion, every chapter is a complete static list wit
   const words=await page.locator('#agentic-ai .hs-story').textContent();
   expect(words).not.toMatch(FORBIDDEN);
   expect(label).not.toMatch(FORBIDDEN);
-  for(const s of ['event_id = 4698','\\WinTaskUpdate','root-level','not in baseline','Flagged','Checked','Task creation events','Scoped to','Analyst review','Inconclusive · re-plan','Valid negative · logged','Verdict','Sub-hunt 1','Covered recently','Look for','Query handed on','1 task not in baseline','Knowledge base','Golden set','F1 is reported too','Human review','Threat evidence in 1 of 3 techniques','Confirm lead','Confirmed by the analyst'])expect(words).toContain(s);
+  for(const s of ['event_id = 4698','\\WinTaskUpdate','root-level','not in baseline','Flagged','Checked','Task creation events','Scoped to','Analyst review','Inconclusive · re-plan','Valid negative · logged','Verdict','Sub-hunt 1','Covered recently','Look for','Query handed on','1 task not in baseline','Knowledge base','Golden set','Both accuracy and F1 are reported','Human review','Threat evidence in 1 of 3 techniques','Evidence and query ready for analyst review'])expect(words).toContain(s);
   expect(await page.content()).not.toMatch(/index=wineventlog|SysUpdate|Splunk/);
   expect(await noSideScroll(page)).toBe(true);
  }

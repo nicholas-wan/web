@@ -6,8 +6,8 @@
    and --hs-pe (the exit); the CSS drives the moves from them, the console's fade is set inline, and the
    values chase the scroll (TAU) since wheels scroll in notches. Then nothing changes for the dwell. Chapter 01
    measures each data-hs-from element's offset from its source (--hs-dx/--hs-dy) so chips and facts start where
-   they are pulled from; objects a frame has not reached (data-hs-late="N") stay visibility:hidden. The engineering chapter drives the console's paused CSS
-   animations from a clock. Native scrolling is never touched (no snapping, no wheel handling); the buttons
+   they are pulled from; objects a frame has not reached (data-hs-late="N") stay visibility:hidden. The engineering chapter scrubs the console's paused CSS
+   animations with the same scroll clock. Native scrolling is never touched (no snapping, no wheel handling); the buttons
    and dots scroll smoothly to a frame. Base styles are the final state (no JS, reduced motion, short screens). */
 (() => {
   if (!window.requestAnimationFrame || window.hsStory) return;
@@ -31,7 +31,7 @@
   const ENTER = 0.32; // the first frame starts once the stage is this close to pinning
   const A0 = 0.3;     // ...and its move completes this far after the pin (that frame holds longer)
   const TAU = 0.07;   // the chase's time constant, s
-  const BACK = 0.6, CATCH = 0.45, MINFEED = 110, MINOBJ = 230;
+  const MINFEED = 110, MINOBJ = 230;
   const clamp = x => (x < 0 ? 0 : x > 1 ? 1 : x);
   const probe = document.createElement('div');
   probe.setAttribute('aria-hidden', 'true');
@@ -46,6 +46,7 @@
     try { data = JSON.parse(root.getAttribute('data-hs-story')); } catch (e) { return; }
     const stage = root.querySelector('.hs-stage'), frame = root.querySelector('.hs-frame'), list = root.querySelector('.hs-steps');
     const panel = root.querySelector('.hs-console > .hunt-panel'), objs = root.querySelector('.hs-objs');
+    const consoleFeed = panel && panel.querySelector('.c2-f');
     const steps = [...root.querySelectorAll('.hs-step')], dots = [...root.querySelectorAll('.hs-dot')];
     const prev = root.querySelector('.hs-prev'), next = root.querySelector('.hs-next'), fill = root.querySelector('.hs-fill');
     const N = steps.length;
@@ -53,13 +54,15 @@
     if (!stage || !frame || !list || !(panel || objs) || N < 2 || (clocked && !canClock)) return;
 
     let live = false, tl = data.d, anims = [], vh = 0, total = 0;
-    let goal = -1, m = 0, t = 0, rate = 0, raf = 0, queued = 0, aim = -1, sizeKey = '', sideH = 0;
+    let goal = -1, queued = 0, aim = -1, sizeKey = '', sideH = 0;
     const hold = f => (data.hold && data.hold[f]) || GAP;   // the dwell after frame f's resting point
     const rest = f => { let u = 0; for (let i = 0; i < f; i++) u += hold(i); return u; };
+    const openingRest = () => clocked ? Math.max(A0, rest(1) - TRAVEL - 0.12) : A0;
     const uNow = () => -root.getBoundingClientRect().top / vh;
 
     // ---------------------------------------------------------------- the scrubbed progress values
     const names = []; for (let f = 0; f < N; f++) names.push('--hs-p' + f); names.push('--hs-pe');
+    if (clocked) names.push('--hs-run');
     const holders = [...root.querySelectorAll('.hs-objs')];
     // objects a frame has not reached yet stay hidden: [element, the value that reveals it]
     const late = [...root.querySelectorAll('[data-hs-late]')].map(el => [el, +el.dataset.hsLate]);
@@ -68,6 +71,7 @@
       const v = [clamp((u + ENTER) / (ENTER + A0))];
       for (let f = 1; f < N; f++) v.push(clamp((u - (rest(f) - TRAVEL)) / TRAVEL));
       v.push(clamp((u - rest(N - 1)) / LAST));
+      if (clocked) v.push(clamp((u + ENTER) / (ENTER + openingRest())));
       return v;
     };
     const apply = () => {
@@ -78,6 +82,8 @@
       for (const [el, i] of late) el.style.visibility = pc[i] > 0 ? '' : 'hidden';
       // the camera pulls back: the console shrinks toward the map's query step while it fades
       if (panel && N > 1) { const o = Math.min(1, pc[1] / 0.45); panel.style.opacity = (1 - o * o).toFixed(3); panel.style.transform = o ? `scale(${(1 - 0.62 * o).toFixed(4)})` : ''; }
+      if (consoleFeed) consoleFeed.style.opacity = (1 - clamp((pc[N + 1] - 0.72) / 0.16)).toFixed(3);
+      if (clocked) renderConsole();
     };
     function chase(now) {
       praf = 0;
@@ -109,74 +115,50 @@
         const mk = root.querySelector(ch.dataset.hsFrom);
         if (!mk) continue;
         const a = mk.getBoundingClientRect(), b = ch.getBoundingClientRect();
-        ch.style.setProperty('--hs-dx', ((a.left - b.left) / z).toFixed(1) + 'px');
-        ch.style.setProperty('--hs-dy', ((a.top + a.height / 2 - b.top - b.height / 2) / z).toFixed(1) + 'px');
+        // Match the CSS anchor. A phone hypothesis grows from its top edge, not its centre;
+        // centring a tall card on a short lane sent its entrance through the paragraph above.
+        const origin = getComputedStyle(ch).transformOrigin.split(' ').map(parseFloat);
+        const rx = (origin[0] || 0) / (ch.offsetWidth || 1), ry = (origin[1] || 0) / (ch.offsetHeight || 1);
+        ch.style.setProperty('--hs-dx', ((a.left + a.width * rx - b.left - b.width * rx) / z).toFixed(1) + 'px');
+        ch.style.setProperty('--hs-dy', ((a.top + a.height * ry - b.top - b.height * ry) / z).toFixed(1) + 'px');
       }
       root.classList.remove('is-measure');
     }
 
-    // ---------------------------------------------------------------- the console's clock (as C)
-    // m counts story seconds of motion only (holds between live spans are skipped); frame -1 is m = 0
-    let cum = [];
-    const index = () => { let s = 0; cum = tl.live.map(([a, b]) => { const c = s; s += b - a; return c; }); };
-    const M = x => { let r = 0; tl.live.forEach(([a, b], i) => { if (x >= a) r = cum[i] + Math.min(b, x) - a; }); return r; };
-    const T = y => {
-      for (let i = 0; i < tl.live.length; i++) { const [a, b] = tl.live[i]; if (y <= cum[i] + (b - a) + 1e-9) return a + Math.max(0, y - cum[i]); }
-      return tl.live[tl.live.length - 1][1];
-    };
-    const mEnd = f => (f < 0 ? 0 : M(tl.end[f]));
-    const tEnd = f => (f < 0 ? T(0) : tl.end[f]);
-    const spanAt = y => { let i = 0; while (i < cum.length - 1 && y > cum[i] + tl.live[i][1] - tl.live[i][0] + 1e-9) i++; return i; };
-    let runR = null, runAt = 0, runM = 0, waiting = [];
-    function run(r, now) {
-      runR = r; runM = m; runAt = now; waiting = [];
-      const ms = t * 1000;
-      for (const a of anims) {
-        a.pause(); a.playbackRate = r || 1; a.currentTime = ms;
-        if (!r) continue;
-        if (r > 0 ? t < a.hsE : t <= a.hsE) a.play(); else if (r < 0) waiting.push(a);
+    // The console shares the scroll clock with its surrounding objects. Its long pauses are
+    // removed, but every meaningful beat remains reversible and ends before the map arrives.
+    let cum = [], end = 0;
+    function index() {
+      let sum = 0;
+      cum = tl.live.map(([a, b]) => { const start = sum; sum += b - a; return start; });
+      end = tl.live.reduce((sum, [a, b]) => sum + Math.max(0, Math.min(b, tl.end[0]) - a), 0);
+    }
+    function renderConsole() {
+      if (!live || !clocked || !anims.length) return;
+      const p = pc[N + 1] || 0, distance = p * end;
+      let time = tl.end[0];
+      if (p < 1) for (let i = 0; i < tl.live.length; i++) {
+        const [a, b] = tl.live[i];
+        if (distance <= cum[i] + b - a) { time = a + Math.max(0, distance - cum[i]); break; }
       }
+      for (const a of anims) {
+        const nextTime = Math.min(time * 1000, a.hsEnd);
+        // Completed effects need no repeated seek while another beat or the map moves.
+        if (a.hsTime !== nextTime) { a.currentTime = nextTime; a.hsTime = nextTime; }
+      }
+      const at = goal < 0 ? '-1' : goal > 0 || p >= 0.999 ? String(goal) : 'moving';
+      if (root.dataset.hsAt !== at) root.dataset.hsAt = at;
     }
     function sync() {
       if (!live || !clocked) return;
-      const all = panel.getAnimations({ subtree: true }).filter(a => typeof CSSAnimation === 'undefined' || a instanceof CSSAnimation);
-      const held = new Set(anims);
-      if (!all.some(a => !held.has(a)) && !anims.some(a => a.playState === 'idle')) return;
-      anims = [...new Set([...anims.filter(a => a.playState !== 'idle'), ...all])];
-      for (const a of anims) a.hsE = a.effect.getComputedTiming().endTime / 1000;
-      run(0, 0); runR = null;
-      if (m !== mEnd(goal) && !raf) raf = requestAnimationFrame(tick);
-    }
-    function tick(now) {
-      raf = 0;
-      if (!live) return;
-      const g = mEnd(goal), s = goal > 0 ? mEnd(goal - 1) : 0, catching = m < s - 1e-6;
-      const r = m < g ? (catching ? rate : Math.max(0.5, (g - s) / (data.dur[goal] || 1))) : m > g ? -rate : 0;
-      if (r !== runR) run(r, now);
-      else {
-        let nm = runM + r * (now - runAt) / 1000;
-        nm = r > 0 ? Math.min(catching ? s : g, nm) : Math.max(g, nm);
-        const jump = spanAt(nm) !== spanAt(m);
-        m = nm; t = m === g ? tEnd(goal) : T(m);
-        if (m === g) run(0, now);
-        else if (jump) run(r, now);
-        else if (waiting.length) waiting = waiting.filter(a => { if (t > a.hsE) return true; a.currentTime = t * 1000; a.play(); return false; });
-      }
-      if (m !== g) raf = requestAnimationFrame(tick);
-      else root.dataset.hsAt = goal;
+      anims = panel.getAnimations({ subtree: true }).filter(a => typeof CSSAnimation === 'undefined' || a instanceof CSSAnimation);
+      for (const a of anims) { a.pause(); a.hsEnd = a.effect.getComputedTiming().endTime; a.hsTime = null; }
+      renderConsole();
     }
     function setGoal(f) {
       goal = f;
-      if (aim === goal) aim = -1;
       show();
-      if (!clocked) { root.dataset.hsAt = goal; return; }
-      sync();
-      const g = mEnd(goal);
-      if (m < g) { const s = goal > 0 ? mEnd(goal - 1) : 0; rate = Math.max(4, (s - m) / CATCH); }
-      else rate = Math.max(2, (m - g) / BACK);
-      runR = null;
-      if (m !== g) { root.dataset.hsAt = 'moving'; if (!raf) raf = requestAnimationFrame(tick); }
-      else { if (raf) cancelAnimationFrame(raf); raf = 0; t = tEnd(goal); run(0, 0); root.dataset.hsAt = goal; }
+      if (clocked) renderConsole(); else root.dataset.hsAt = goal;
     }
 
     // ---------------------------------------------------------------- frames, controls
@@ -216,7 +198,9 @@
     function jump(f) {
       if (!live || f < 0 || f >= N) return;
       aim = f;
-      const top = scrollY + root.getBoundingClientRect().top + rest(f) * vh;
+      const status = root.querySelector('.hs-status');
+      if (status) status.textContent = `Step ${f + 1} of ${N}: ${steps[f].querySelector('.hs-h').textContent}`;
+      const top = scrollY + root.getBoundingClientRect().top + (f === 0 ? openingRest() : rest(f)) * vh;
       scrollTo({ top: Math.round(top), behavior: 'smooth' });
     }
     const from = () => (aim >= 0 ? aim : Math.max(0, goal));
@@ -231,24 +215,23 @@
     // ---------------------------------------------------------------- on / off
     function off() {
       live = false;
-      if (raf) cancelAnimationFrame(raf); raf = 0;
       if (queued) cancelAnimationFrame(queued); queued = 0;
       if (praf) cancelAnimationFrame(praf); praf = 0;
       pc = []; shown = '';
       for (const h of holders) names.forEach(n => h.style.removeProperty(n));
       for (const [el] of late) el.style.visibility = '';
       if (panel) { panel.style.opacity = ''; panel.style.transform = ''; }
+      if (consoleFeed) consoleFeed.style.opacity = '';
       root.classList.remove('is-live', 'is-playing', 'is-end', 'is-tight');
       root.style.height = '';
-      ['--hs-feed', '--hs-trim', '--hs-objh', '--hs-z', '--hs-oz'].forEach(p => root.style.removeProperty(p));
+      ['--hs-feed', '--hs-trim', '--hs-objh', '--hs-z', '--hs-oz', '--hs-lanes-h', '--hs-env-h'].forEach(p => root.style.removeProperty(p));
       steps.forEach(s => s.classList.remove('is-on'));
       anims = [];
       flag(pinOn, document.body, 'hs-pinned', root, false);
       delete root.dataset.hsAt; delete root.dataset.hsF;
       void root.offsetWidth;
     }
-    // the stage must fit the screen: the feed (or the objects' area) gives way, then the words take a smaller
-    // size (is-tight), then the console zooms out (to 0.7), before the chapter stays a list
+    // Fit the complete composition at readable sizes; short windows retain the static story.
     function squeeze(room) {
       ['--hs-feed', '--hs-objh'].forEach(p => root.style.removeProperty(p));
       let over = frame.offsetHeight - room;
@@ -266,19 +249,28 @@
       const cs = getComputedStyle(stage);
       const room = stage.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
       root.classList.remove('is-tight'); ['--hs-z', '--hs-oz'].forEach(p => root.style.removeProperty(p));
-      let over = squeeze(room);
-      if (over > 0) { root.classList.add('is-tight'); over = squeeze(room); }
-      const box = stage.querySelector('.hs-console');
-      if (over > 0 && box) {
-        const h = box.offsetHeight;
-        root.style.setProperty('--hs-z', Math.max(0.7, (h - over) / h).toFixed(3));
-        over = frame.offsetHeight - room;
-      }
-      // an object taller than its area is scaled to fit it, not spilled over the words
-      if (!panel) {
-        const need = Math.max(...[...objs.children].map(k => k.offsetHeight));
-        if (need > objs.clientHeight) root.style.setProperty('--hs-oz', Math.max(0.62, objs.clientHeight / need).toFixed(3));
-      }
+      const compose = () => {
+        let over = squeeze(room);
+        if (!panel) {
+          let need = Math.max(...[...objs.children].map(k => k.offsetHeight));
+          // Measure the whole composition before choosing a smaller prose layout.
+          if (root.clientWidth <= 560 && root.classList.contains('hs-scene--product')) {
+            const lanes = objs.querySelector('.hs-lanes'), env = objs.querySelector('.hs-env');
+            root.style.setProperty('--hs-lanes-h', lanes.offsetHeight + 'px');
+            root.style.setProperty('--hs-env-h', env.offsetHeight + 'px');
+            const src = objs.querySelector('.hs-src');
+            const sourceHeight = [...src.children].reduce((h, el) => h + el.offsetHeight, 0) + 12;
+            need = Math.max(need, lanes.offsetHeight + env.offsetHeight + 20, sourceHeight);
+          }
+          if (need > objs.clientHeight) {
+            root.style.setProperty('--hs-objh', Math.ceil(need) + 'px');
+            over = frame.offsetHeight - room;
+          }
+        }
+        return over;
+      };
+      let over = compose();
+      if (over > 0) { root.classList.add('is-tight'); over = compose(); }
       root.style.setProperty('--hs-trim', Math.max(0, Math.floor(-over / 2)) + 'px');
       return over <= 0;
     }
@@ -303,11 +295,11 @@
       if (clocked) { tl = panel.clientWidth <= data.narrow ? data.p : data.d; index(); }
       // arrive on the frame for wherever the page is, already at rest there
       goal = -1; goal = pick(uNow());
-      if (clocked) { m = mEnd(goal); t = tEnd(goal); runR = null; sync(); run(0, 0); }
+      if (clocked) sync();
       root.classList.add('is-jump');   // no transitions on arrival
       measure();
       setP(uNow(), true);
-      show(); root.dataset.hsAt = goal;
+      show(); if (clocked) renderConsole(); else root.dataset.hsAt = goal;
       void root.offsetWidth;
       requestAnimationFrame(() => root.classList.remove('is-jump'));
     }
@@ -324,7 +316,7 @@
     addEventListener('resize', refit);
     if (window.ResizeObserver) new ResizeObserver(refit).observe(list);
     onMotion(on);
-    if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (live) measure(); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(on);
     if (clocked) new MutationObserver(() => { if (live && !anims.length) requestAnimationFrame(sync); }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
     on();
   });
