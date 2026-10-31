@@ -195,7 +195,7 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
  }
 });
 
-test('agentic AI chart: a hover previews it like the internship charts, it plays one ~6 s moment in three narrative steps and replays, reduced motion holds the final frame, and phones get the stacked drawing',async({page})=>{
+test('agentic AI chart: a hover previews it like the internship charts, it plays one ~17 s hunt in three narrative steps and replays, reduced motion holds the final frame, and phones get the stacked drawing',async({page})=>{
  const scene=root=>card(root).locator('svg.ag-scene:not(.ag-scene--m)');
  const phoneScene=root=>card(root).locator('svg.ag-scene--m');
  const shown=loc=>loc.evaluate(e=>+getComputedStyle(e).opacity);
@@ -211,10 +211,13 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(card(root)).toHaveCSS('position','absolute');
  await expect(scene(root)).toBeVisible();
  await expect(phoneScene(root)).toBeHidden();
- // Reduced motion holds the final frame: all three steps, the human and the evidence shown.
- for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana'])expect(await shown(scene(root).locator(s))).toBe(1);
+ // Reduced motion holds the final frame: all three steps, the human and the second search's find shown; nothing
+ // transient (the report on its way in, pulses, ripples, glows, the first search's "0 found") is left on screen.
+ for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-found'])expect(await shown(scene(root).locator(s))).toBe(1);
+ for(const s of ['.ag-doc','.ag-none','.ag-pk','.ag-det-dot'])expect(await shown(scene(root).locator(s))).toBe(0);
+ for(const o of await scene(root).locator('.ag-fl, .ag-rip').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
  const words=await scene(root).textContent();
- for(const s of ['From a ransomware report to one lead','Purpose-built agents','Tools to adapt on evidence','Surface to the analyst','Supervisor','Hypothesis','Detection','Report','A supervisor splits the hunt among','The first search comes back empty.',"Empty doesn't mean safe, so the agent",'searches another way.','Agents surface what looks suspicious,','makes the call.'])expect(words).toContain(s);
+ for(const s of ['From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Report','A supervisor splits the hunt among','each given only the tools','and context its one job needs.','Only a human analyst','The first search comes back empty, but',"empty doesn't mean safe. The agent asks",'searches another way.','check query','1 found','Agents surface what looks suspicious,','makes the call.'])expect(words).toContain(s);
  const label=await scene(root).getAttribute('aria-label');
  expect(label.startsWith('An illustrative hunt.')).toBe(true);
  // The hunter's specifics are in the label, not on the chart.
@@ -231,13 +234,13 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  expect(c.width).toBeLessThan(760);
  await root.dispatchEvent('mouseleave');
  await expect(card(root)).not.toHaveClass(/is-open/);
- // Playing: one short moment, replayed by the shared loop; no button, no story panel.
+ // Playing: one hunt told as cause and effect, replayed by the shared loop once the final frame has held; no button, no story panel.
  await page.emulateMedia({reducedMotion:'no-preference'});
  await chip(root).click();
  await expect(card(root)).toHaveClass(/is-playing/);
  const end=await card(root).evaluate(c=>Math.max(...c.getAnimations({subtree:true}).map(a=>a.effect.getComputedTiming().endTime).filter(Number.isFinite)));
- expect(end).toBeGreaterThan(4000);
- expect(end).toBeLessThan(9000);
+ expect(end).toBeGreaterThan(15000);
+ expect(end).toBeLessThan(21000);
  expect(await shown(scene(root).locator('.ag-s2'))).toBeLessThan(1);
  await expect(card(root).locator('.hsk-ctl')).toHaveCount(0);
  await page.keyboard.press('Escape');
