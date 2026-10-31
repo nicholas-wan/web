@@ -17,8 +17,8 @@
 // along the line to the amber human, who makes the call. Report agent last, as in the product (prime-th th-core).
 // The hunter's specifics (schtasks.exe and nothing found; event 4698; \WinTaskUpdate on 1 host, not in the baseline)
 // live in the aria-label only (owner: an evidence tier under each step "doesnt add value").
-// Two SVGs sharing one stylesheet: desktop 640x250, the steps as columns in a 46rem card, the three pictures on one
-// optical centreline; phones 360x360, the steps stacked with smaller pictures and the same beats where they fit.
+// Two SVGs sharing one stylesheet: desktop 640x246, the steps as columns in a 46rem card, the three pictures on one
+// optical centreline; phones 360x344, the steps stacked with smaller pictures and the same beats where they fit.
 // Base styles are the final frame, motion runs only under .is-playing, .is-still holds the final frame; anything
 // transient (pulses, ripples, glows, "0 found") is invisible in the base styles. internship-peek.js replays it once
 // the final frame has held for 3 s. The finish comes from rounds of independent design reviews and blind reads (a
@@ -71,7 +71,7 @@ function picture(i, x, cy, r, rich) {
     // the team: a supervisor over three narrow agents, each labelled with its job; the report drops into the
     // supervisor, a pulse runs to Hypothesis and then to Detection, which lights; Report lights later, in step 3
     const gap = rich ? 60 : r1(r * 2.6), lf = rich ? 9.5 : 8.5, drop = r1(r * 3.4);
-    const ay = rich ? r1(cy + 22) : r1(cy + r * 1.7), sy = r1(ay - drop), ax = [x + (rich ? 26 : r)]; ax[1] = ax[0] + gap; ax[2] = ax[0] + 2 * gap; const scx = ax[1];
+    const ay = rich ? r1(cy + 22) : r1(cy + r * 1.7), sy = r1(ay - drop), ax = [x + (rich ? 22 : r)]; ax[1] = ax[0] + gap; ax[2] = ax[0] + 2 * gap; const scx = ax[1];
     const on = ON, rep = REP;
     const wire = cx => `M${scx} ${sy + r} C${scx} ${sy + r + 8} ${cx} ${ay - r - 8} ${cx} ${ay - r}`;
     let p = ax.map(cx => `<path d="${wire(cx)}" stroke="${C.dim}"/>`).join('');
@@ -99,17 +99,17 @@ function picture(i, x, cy, r, rich) {
     const lr = r + 10, cx = x + lr + 3;
     let p = ripple('ag-rip0', cx, cy, r) + ripple('ag-rip1', cx, cy, r) + ripple('ag-rip2', cx, cy, r) + ripple('ag-rip3', cx, cy, r) +
       flash('ag-fl-arr', cx, cy, r + 4) + node(cx, cy, r, true) +
-      `<path class="ag-loop" d="M${r1(cx + lr * .5)} ${r1(cy - lr * .87)} A${lr} ${lr} 0 1 1 ${r1(cx - lr * .95)} ${r1(cy - lr * .3)}" pathLength="1" stroke="${C.teal}" stroke-width="1.6"/>` +
+      `<path class="ag-loop" d="M${r1(cx + lr * .5)} ${r1(cy - lr * .87)} A${lr} ${lr} 0 1 1 ${r1(cx - lr * .95)} ${r1(cy - lr * .3)}" pathLength="1" stroke="${C.teal}" stroke-width="1.5"/>` +
       `<path class="ag-lh" d="M${r1(cx - lr * .95)} ${r1(cy - lr * .3)} L${r1(cx - lr * .95 + 2.2)} ${r1(cy - lr * .3 + 8)} L${r1(cx - lr * .95 - 6.4)} ${r1(cy - lr * .3 + 5.3)} Z" fill="${C.teal}" stroke="${C.teal}" stroke-width="1" stroke-linejoin="round"/>`;   // tip at the arc's end, base 7 units back along the tangent (0.30, -0.95), 4.5 either side
-    if (!rich) p += `<text class="ag-none" x="${cx}" y="${r1(cy + lr + 14)}" text-anchor="middle" font-size="10" font-weight="600" fill="${C.body}">0 found</text>` +
-      `<text class="ag-found" x="${cx}" y="${r1(cy + lr + 14)}" text-anchor="middle" font-size="10" font-weight="700" fill="${C.teal}">1 found</text>`;
+    if (!rich) p += `<text class="ag-none" x="${cx}" y="${r1(cy + lr + 14)}" text-anchor="middle" font-size="10.5" font-weight="600" fill="${C.body}">0 found</text>` +
+      `<text class="ag-found" x="${cx}" y="${r1(cy + lr + 14)}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${C.teal}">1 found</text>`;
     if (rich) {
       const tx = cx + lr + 12, th = 18, tw = 102, ty0 = cy - th * 1.5 - 6;
       TOOLS.forEach(([ic, name], k) => {
         const ty = r1(ty0 + k * (th + 6)), wire = `M${cx + lr + 2} ${cy} C${cx + lr + 6} ${cy} ${tx - 6} ${ty + th / 2} ${tx} ${ty + th / 2}`;
         const glow = g => `<path class="ag-fl ag-gw ${g}" d="${wire}" stroke="${C.teal}" stroke-width="1.4"/><rect class="ag-fl ${g}" x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="4" fill="${C.teal}" fill-opacity=".12" stroke="${C.teal}"/>`;
-        p += `<g class="ag-tool ag-tool${k}"><path d="${wire}" stroke="${C.line}"/>` +
-          `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="4" fill="${C.chip}" stroke="${C.line}"/>` +
+        p += `<g class="ag-tool ag-tool${k}"><path d="${wire}" stroke="${C.rule}"/>` +
+          `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="4" fill="${C.chip}" stroke="${C.rule}"/>` +
           (k === 0 ? glow('ag-g0a') + glow('ag-g0b') : glow(`ag-g${k}`)) +
           (k === 1 ? icon(ic, tx + 6, ty + 3, 1, C.dim).replace(' class="ag-tick"', '') : '') + `${icon(ic, tx + 6, ty + 3, 1, C.teal)}<text x="${tx + 22}" y="${ty + 12.5}" font-size="10" fill="${C.body}">${name}</text>`;
         // what the search found: none the first time, one the second
@@ -122,20 +122,20 @@ function picture(i, x, cy, r, rich) {
   }
   // the hand-off: a lead card, the finding with its evidence attached, passed along a line to the human
   const R = r1(r * 1.25);
-  const human = cx => `<g class="ag-ana"><circle cx="${cx}" cy="${cy}" r="${R}" fill="${C.node}" stroke="${C.amb}" stroke-width="1.3"/>${icon('ana', r1(cx - 6 * R / 7), r1(cy - 6 * R / 7), r1(R / 7), C.amb)}</g>` +
+  const human = cx => `<g class="ag-ana"><circle cx="${cx}" cy="${cy}" r="${R}" fill="${C.node}" stroke="${C.amb}" stroke-width="1.5"/>${icon('ana', r1(cx - 6 * R / 7), r1(cy - 6 * R / 7), r1(R / 7), C.amb)}</g>` +
     ripple('ag-halo', cx, cy, R, C.amb);
   const packet = (lx0, lx1) => `<circle class="ag-pk" cx="${lx0}" cy="${cy}" r="${rich ? 3 : 2.6}" fill="${C.teal}" style="--dx:${r1(lx1 - lx0)}px"/>`;
   if (!rich) {
-    const fs = r1(R * 1.2 / 8.7), fx = x + 2, lx0 = r1(fx + 12 * fs + 5), lx1 = r1(lx0 + 13), cx = r1(lx1 + 3 + R);   // the human clears the text column at 92
+    const fs = r1(R * 1.2 / 8.7), fx = x + 2, lx0 = r1(fx + 12 * fs + 5), lx1 = r1(lx0 + 14), cx = r1(lx1 + 3 + R);   // the human clears the text column at 92
     return `<rect class="ag-flag" x="${r1(fx - 2)}" y="${r1(cy - 6 * fs - 2)}" width="${r1(12 * fs + 4)}" height="${r1(12 * fs + 4)}" rx="3" fill="${C.chip}" stroke="${C.teal}" stroke-opacity=".7"/><g class="ag-flag" stroke-width="${r1(1.3 / fs)}">${icon('flag', fx, r1(cy - 6.2 * fs), fs, C.teal)}</g><path class="ag-he" d="M${lx0} ${cy} H${lx1}" stroke="${C.teal}" stroke-width="1.3" stroke-dasharray="2 2" stroke-linecap="round"/>` +
       packet(lx0, lx1) + human(cx);
   }
-  const cw = 96, ch = 56, cx0 = x + 2, cy0 = cy - ch / 2, lx0 = cx0 + cw + 6, lx1 = lx0 + 30, cx = lx1 + 5 + R;
-  const lines = [[74, 32], [56, 39], [66, 46]];
+  const cw = 96, ch = 56, cx0 = x - 1.5, cy0 = cy - ch / 2, lx0 = cx0 + cw + 6, lx1 = lx0 + 32, cx = lx1 + 6.5 + R;   // the card's stroke on the heading's edge; the dashes end on a full dash
+  const lines = [[77, 32], [59, 39], [69, 46]];   // the text lines start under the flag's pole
   return `<g class="ag-flag"><rect class="ag-cardf" x="${cx0}" y="${cy0}" width="${cw}" height="${ch}" rx="5" fill="${C.chip}"/>` +
     `<rect class="ag-cardo" x="${cx0}" y="${cy0}" width="${cw}" height="${ch}" rx="5" pathLength="1" stroke="${C.teal}" stroke-opacity=".7"/>` +
     `<g class="ag-lead">${icon('flag', cx0 + 8, cy0 + 7, 1.4, C.teal)}<text x="${cx0 + 28}" y="${cy0 + 19}" font-size="10" font-weight="700" fill="${C.ink}">1 lead</text></g>` +
-    lines.map(([w, dy], k) => `<path class="ag-ln ag-ln${k}" d="M${cx0 + 9} ${cy0 + dy} H${cx0 + w}" pathLength="1" stroke="${C.dim}" stroke-width="2" stroke-linecap="round"/>`).join('') + '</g>' +
+    lines.map(([w, dy], k) => `<path class="ag-ln ag-ln${k}" d="M${cx0 + 12} ${cy0 + dy} H${cx0 + w}" pathLength="1" stroke="${C.dim}" stroke-width="2" stroke-linecap="round"/>`).join('') + '</g>' +
     `<path class="ag-he" d="M${lx0} ${cy} H${lx1}" stroke="${C.teal}" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round"/>` +
     packet(lx0, lx1) + human(cx);
 }
@@ -149,23 +149,23 @@ const open = (cls, w, h) => `<svg class="${cls}" xmlns="http://www.w3.org/2000/s
 
 // desktop: three columns, read left to right; pictures left-aligned with their headings, on one centreline
 function desktop() {
-  const W = 640, H = 250, col = 200, x0 = 16, gap = 8, pcy = 100, titleY = 178, bodyY = 197, lh = 15.5, f = { head: 11.5, hid: 9.5, title: 12.5, body: 10.3 };
+  const W = 640, H = 246, col = 200, x0 = 16, gap = 8, pcy = 100, titleY = 178, bodyY = 197, lh = 15.5, f = { head: 11.5, hid: 9.5, title: 12.5, body: 10.3 };
   const s = [open('ag-scene', W, H), header(W, 23, f.head, f.hid)];
   STEPS.forEach((st, i) => {
     const x = x0 + i * (col + gap);
     s.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}">${picture(i, x + 2, pcy, 13, true)}</g>${title(i, x, titleY, f.title)}${body(st.d, x, bodyY, lh, f.body)}</g>`);
-    if (i < 2) s.push(`<path class="ag-chev ag-chev${i}" d="M${x + col - 9} ${pcy - 5} l4 5 -4 5" stroke="${C.mute}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`);
+    if (i < 2) s.push(`<path class="ag-chev ag-chev${i}" d="M${x + col - 16} ${pcy - 5} l4 5 -4 5" stroke="${C.mute}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`);
   });
   return s.join('') + '</svg>';
 }
 // phones: the steps stacked, a smaller picture beside each, inset like the text, type at 11px or more
 function phone() {
-  const W = 360, H = 360, top = 44, row = 104, px = 20, tx = 92, lh = 17, f = { head: 13, hid: 11, title: 14, body: 13.4 };
+  const W = 360, H = 344, top = 44, row = 104, px = 20, tx = 92, lh = 17, f = { head: 13, hid: 11, title: 14, body: 13.4 };
   const s = [open('ag-scene ag-scene--m', W, H), header(W, 21, f.head, f.hid, true)];
   STEPS.forEach((st, i) => {
     const y = top + i * row, bodyY = y + 34;
-    s.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}">${picture(i, px, y + row / 2 - 6, 9, false)}</g>${title(i, tx, y + 16, f.title)}${body(st.m, tx, bodyY, lh, f.body)}</g>`);
-    if (i < 2) s.push(`<path d="M14 ${y + row - 8} H${W - 14}" stroke="${C.line}"/>`);
+    s.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}">${picture(i, px, y + row / 2 - (i === 1 ? 20 : 13), 9, false)}</g>${title(i, tx, y + 16, f.title)}${body(st.m, tx, bodyY, lh, f.body)}</g>`);
+    if (i < 2) s.push(`<path d="M14 ${y + row - 14} H${W - 14}" stroke="${C.line}"/>`);
   });
   return s.join('') + '</svg>';
 }
@@ -177,26 +177,28 @@ function phone() {
 // checked query, a second search that finds one, the analysis. Step 3: the Report agent lights, the lead card writes
 // itself, then travels to the human.
 const T = {
-  s0: [0.2, .5], doc: [0.5, 1.4], sup: [1.5, .7], c0: [1.8, .7], hyp: [2.3, 1.0], c0r: [3.0, .6], c1: [3.5, .7], det: [4.1, .45], ripdet: [4.1, 1.0], chev0: [4.9, .9],
-  s1: [5.2, .5], arr: [5.4, .9], tool: [[5.7, .35], [6, .35], [6.2, .35]],
+  s0: [0.2, .5], doc: [0.3, 1.4], sup: [1.5, .7], c0: [1.8, .7], hyp: [2.3, 1.0], c0r: [3.0, .6], c1: [3.5, .7], det: [4.1, .45], ripdet: [4.1, 1.0], chev0: [4.9, .9],
+  s1: [5.2, .5], arr: [5.4, .9], tool: [[5.7, .35], [5.95, .35], [6.2, .35]],
   g0a: [6.7, 1.3], rip0: [6.8, 1.1], rip1: [7.1, 1.1], none: [7.7, 3.6],
-  g1: [8.9, 1.2], loop: [8.9, 1.0], tick: [9.4, .5], lh: [9.8, .25],
-  g0b: [10.4, 1.3], rip2: [10.5, 1.1], rip3: [10.8, 1.1], found: [11.2, .45], g2: [11.7, .9], chev1: [12.4, .9],
-  s2: [12.8, .5], c2: [12.9, .6], rep: [13.4, 1.0], cardf: [13.7, .4], cardo: [13.7, .8], lead: [14.2, .35], ln: [[14.4, .35], [14.6, .35], [14.8, .35]],
-  he: [15.2, .4], pk: [15.4, .55], ana: [15.9, .5], halo: [16.3, 1.2],
+  loop: [8.9, 1.0], g1: [9.3, 1.1], tick: [9.55, .5], lh: [9.8, .25],
+  g0b: [10.4, 1.3], rip2: [10.5, 1.1], rip3: [10.8, 1.1], found: [11.3, .45], g2: [11.7, .9], chev1: [12.4, .9],
+  s2: [12.8, .5], c2: [12.9, .6], rep: [13.4, .8], cardf: [13.9, .4], cardo: [13.9, .8], lead: [14.4, .35], ln: [[14.6, .35], [14.75, .35], [14.9, .35]],
+  he: [15.3, .4], pk: [15.5, .55], ana: [16.0, .5], halo: [16.4, 1.1],
 };
 const OUT_EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)';
-const P = '.is-playing svg.ag-scene';
+const P = '.is-playing svg.ag-scene', M = '.is-playing svg.ag-scene--m';
+const sh = ([d, s], by) => [r1(d + by), s];
 const at = ([d, s], name, ez = IO, fill = 'both') => `animation: ${name} ${s}s ${ez} ${d}s ${fill};`;
 const ends = Object.values(T).flatMap(v => Array.isArray(v[0]) ? v : [v]).map(([d, s]) => d + s);
 const css = `/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
-.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 250; }
-.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 360; }
+.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 246; }
+.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 344; }
 @media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
 svg.ag-scene text { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
 svg.ag-scene .ag-i { fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 svg.ag-scene .ag-flag .ag-i { stroke-width: inherit; }
+svg.ag-scene .ag-ana .ag-i { stroke-width: .85; }   /* (scaled R/7, so about the other icons' 1.3-1.8) */
 svg.ag-scene .ag-doc .ag-i { stroke-width: .6; }
 svg.ag-scene path, svg.ag-scene .ag-rip, svg.ag-scene .ag-cardo { fill: none; }
 svg.ag-scene .ag-doc path:first-child { fill: ${C.chip}; }
@@ -204,7 +206,7 @@ svg.ag-scene .ag-c { stroke-width: 2.4; stroke-linecap: round; stroke-dasharray:
 svg.ag-scene .ag-loop, svg.ag-scene .ag-tick, svg.ag-scene .ag-cardo, svg.ag-scene .ag-ln { stroke-dasharray: 1 2; stroke-dashoffset: 0; stroke-linecap: round; }   /* (undrawn, the dash sits wholly before the start, so no round cap shows as a dot) */
 svg.ag-scene .ag-lh { fill: ${C.teal}; stroke-linejoin: round; }
 svg.ag-scene .ag-s, svg.ag-scene .ag-chev, svg.ag-scene .ag-ana { transform-box: fill-box; transform-origin: center; }
-svg.ag-scene .ag-rip, svg.ag-scene .ag-found { transform-box: fill-box; transform-origin: center; }
+svg.ag-scene .ag-rip, svg.ag-scene .ag-found, svg.ag-scene .ag-doc { transform-box: fill-box; transform-origin: center; }
 svg.ag-scene .ag-rip { vector-effect: non-scaling-stroke; }
 /* transient marks: hidden in the final frame, shown only while they play */
 svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .ag-none, svg.ag-scene .ag-pk, svg.ag-scene .ag-det-dot { opacity: 0; }
@@ -224,7 +226,7 @@ svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .a
 @keyframes ag-doc { 0% { opacity: 0; transform: translate(0, -6px); } 25%, 55% { opacity: 1; transform: translate(0, 0); } 100% { opacity: 0; transform: translate(58px, 0) scale(.4); } }
 @keyframes ag-chev { 0%, 100% { stroke: ${C.mute}; transform: none; } 45% { stroke: ${C.teal}; transform: translateX(3px); } }
 @keyframes ag-pk { 0% { opacity: 0; transform: none; } 15%, 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--dx)); } }
-@keyframes ag-pop { 0% { opacity: 0; transform: scale(.6); } 70% { opacity: 1; transform: scale(1.06); } 100% { transform: scale(1); } }
+@keyframes ag-pop { 0% { opacity: 0; transform: scale(.6); } 70% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
 /* step 1: the report drops into the supervisor, which hands Hypothesis its slice and takes its result back, then hands Detection the hunt */
 ${P} .ag-s0 { ${at(T.s0, 'ag-in', OUT_EZ)} }
 ${P} .ag-doc { ${at(T.doc, 'ag-doc', IO, 'none')} }
@@ -270,6 +272,12 @@ ${P} .ag-he { ${at(T.he, 'ag-fade')} }
 ${P} .ag-pk { ${at(T.pk, 'ag-pk', IO, 'none')} }
 ${P} .ag-ana { ${at(T.ana, 'ag-pop', OUT_EZ)} }
 ${P} .ag-halo { ${at(T.halo, 'ag-halo', OUT_EZ, 'none')} }
+/* phones draw no report glyph and no card lines: the supervisor lights sooner and the hand-off follows the flag */
+${M} .ag-fl-sup { ${at(sh(T.sup, -.9), 'ag-flash', IO, 'none')} }
+${M} .ag-he { ${at(sh(T.he, -.7), 'ag-fade')} }
+${M} .ag-pk { ${at(sh(T.pk, -.7), 'ag-pk', IO, 'none')} }
+${M} .ag-ana { ${at(sh(T.ana, -.7), 'ag-pop', OUT_EZ)} }
+${M} .ag-halo { ${at(sh(T.halo, -.7), 'ag-halo', OUT_EZ, 'none')} }
 `;
 fs.writeFileSync(path.join(OUT, 'scene-d.svg'), desktop());
 fs.writeFileSync(path.join(OUT, 'scene-m.svg'), phone());
