@@ -70,9 +70,13 @@ const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent
 // should be "big, right next to the moving dot"); the last number is the step
 const STATUS = [[0.35, 2.0, 'Reading the report', 0], [2.05, 4.1, 'Forming a hypothesis', 0], [4.15, 5.9, 'Detection takes over', 0], [6.0, 7.85, 'Writing a search', 1],
   [7.9, 9.45, 'Search found nothing', 1], [9.5, 11.65, 'Rewriting the search', 1], [11.7, 13.8, 'Searching again', 1], [13.85, 15.75, '1 looks unusual', 1],
-  [15.8, 17.7, 'Writing up the lead', 2], [17.75, 20.0, 'Sent to an analyst', 2]];
+  [15.8, 18.0, 'Writing up the lead', 2], [18.05, 20.3, 'Sent to an analyst', 2]];
 // the second search's count, rolled through on its way to 32
 const CNT = [4, 9, 15, 22, 28];
+// plain words under the jargon while it is on screen (the third round: both reviewers asked for a gloss): what each
+// search looks for, why the first one missed, and what the technique on the card is; [start, end, text] raw seconds
+const GLOSS = [[7.3, 8.6, 'looks for the tool by name'], [8.65, 10.0, 'no match: attackers can skip that tool'], [11.0, 12.2, 'now looks for the action: a new task'], [14.1, 15.5, "one new task doesn't match the rest"]];
+const GLOSS_CARD = 'a known attacker trick', HUNCH = 'Hunch: attackers hide in scheduled tasks';
 
 // a plain agent node: a ring with a dot; the one we follow is solid teal
 const node = (cx, cy, r, on, cls = '') => on
@@ -111,10 +115,15 @@ function picture(i, x, cy, r) {
     JOBS.forEach((j, k) => {
       const ly = ay + r + lf + 3;
       p += `<g class="${k === ON ? 'ag-job-on' : ''}">${label(ax[k], ly, lf, j, 'middle', k === ON ? C.teal : C.mute)}</g>`;
-      if (k === HYP) p += label(ax[k], ly, lf, j, 'middle', C.teal, 'ag-fl ag-fl-hyp');
+      if (k === HYP) p += label(ax[k], ly, lf, j, 'middle', C.teal, 'ag-fl ag-fl-hyp'), rm += `<g class="ag-hyplit"><circle cx="${ax[k]}" cy="${ay}" r="${r}" fill="${C.node}" stroke="${C.teal}" stroke-width="1.4"/><circle cx="${ax[k]}" cy="${ay}" r="${r1(r * .3)}" fill="${C.teal}"/>${label(ax[k], ly, lf, j, 'middle', C.teal)}</g>`;   // the whole path lit in the final frame
       if (k === REP) rm += label(ax[k], ly, lf, j, 'middle', C.teal, 'ag-fl ag-fl-rep') +   // Reporting stays lit through step 3, so it is clear who wrote the lead
         `<g class="ag-replit"><circle cx="${ax[k]}" cy="${ay}" r="${r}" fill="${C.node}" stroke="${C.teal}" stroke-width="1.4"/><circle cx="${ax[k]}" cy="${ay}" r="${r1(r * .3)}" fill="${C.teal}"/>${label(ax[k], ly, lf, j, 'middle', C.teal)}</g>`;
     });
+    // the hypothesis, in plain words: it pops out of Hypothesis under the team, then is drawn into Detection as it lights
+    const hy = r1(ay + 31), hw = 192;
+    rm += `<g class="ag-hunch" style="--hx:${r1(ax[on] - (x + hw / 2))}px;--hy:${r1(ay - hy - 7)}px"><rect class="ag-hunch-p" x="${x}" y="${hy}" width="${hw}" height="15" rx="7.5" fill="${C.chip}" stroke="${C.teal}" stroke-opacity=".6"/>` +
+      `<text class="ag-hunch-t" x="${x + 9}" y="${r1(hy + 10.8)}" font-size="9.5" fill="${C.body}"><tspan font-weight="700" fill="${C.teal}">Hunch:</tspan>${esc(HUNCH.slice(6))}</text>` +
+      `<circle class="ag-hunch-d" cx="${r1(x + hw / 2)}" cy="${r1(hy + 7.5)}" r="3" fill="${C.teal}"/></g>`;
     return `<g class="ag-team">${p}</g>${rm}`;
   }
   if (i === 1) {
@@ -129,7 +138,9 @@ function picture(i, x, cy, r) {
     const tb = (LOOP_END - 16) * Math.PI / 180, back = Math.atan2(cy + lr * Math.sin(tb) - tip[1], cx + lr * Math.cos(tb) - tip[0]);
     const wing = sgn => `${r1(tip[0] + 6 * Math.cos(back + sgn * .7))} ${r1(tip[1] + 6 * Math.sin(back + sgn * .7))}`;
     const head = `M${wing(1)} L${r1(tip[0])} ${r1(tip[1])} L${wing(-1)}`;
-    let p = node(cx, cy, r, true, 'ag-n1') + spin('ag-sp-det', cx, cy, r + 5) +
+    // a faint outline of the agent and its kit from the first frame, so the card is never two-thirds empty
+    let p = `<g class="ag-gh ag-gh1"><circle cx="${cx}" cy="${cy}" r="${r}" stroke="${C.rule}"/>${[0, 1, 2].map(k => `<rect x="${cx + lr + 12}" y="${r1(cy - 33 + k * 24)}" width="102" height="18" rx="4" stroke="${C.rule}"/>`).join('')}</g>` +
+      node(cx, cy, r, true, 'ag-n1') + spin('ag-sp-det', cx, cy, r + 5) +
       `<path class="ag-loop" d="M${pt(-60)} A${lr} ${lr} 0 1 1 ${pt(LOOP_END)}" pathLength="1" stroke="${C.teal}" stroke-width="1.5"/>` +
       `<path class="ag-lh" d="${head}" stroke="${C.teal}" stroke-width="1.5"/>`;
     ANCH[1] = { node: [cx, cy] };
@@ -145,7 +156,7 @@ function picture(i, x, cy, r) {
           (k === 0 ? glow('ag-g0a') + glow('ag-g0b') : glow(`ag-g${k}`)) +
           (k === 1 ? icon(ic, tx + 6, ty + 3, 1, C.dim).replace(' class="ag-tick"', '') : '') + `${icon(ic, tx + 6, ty + 3, 1, C.teal)}<text x="${tx + 22}" y="${ty + 12.5}" font-size="10" fill="${C.body}">${name}</text>`;
         // what the search found: none the first time; the second time the count rolls up to every task created
-        if (k === 0) p += cnt('0 found', 'ag-none', 600, C.body) + CNT.map((v, j) => cnt(v + ' found', 'ag-cnt ag-cnt' + j, 700, C.teal)).join('') + cnt('32 found', 'ag-found', 700, C.teal);
+        if (k === 0) p += cnt('0 found', 'ag-none', 600, C.mute) + CNT.map((v, j) => cnt(v + ' found', 'ag-cnt ag-cnt' + j, 700, C.teal)).join('') + cnt('32 found', 'ag-found', 700, C.teal);
         p += '</g>';
       });
     }
@@ -161,16 +172,19 @@ function picture(i, x, cy, r) {
         const len = r1((f.length + v.length + 5) * MONO);
         p += `<g class="ag-q${k}"><text x="${sx + 6}" y="${base}" font-size="10" font-weight="700" fill="${C.teal}">&#8250;</text>` +
           `<text class="ag-qt" x="${tx0}" y="${base}" font-size="9" textLength="${len}" lengthAdjust="spacing"><tspan fill="${C.body}">${f}</tspan><tspan fill="${C.dim}"> = </tspan><tspan fill="${C.teal}">"${esc(v)}"</tspan></text>` +
+          (k === 0 ? `<path class="ag-qx" d="M${tx0 - 1} ${r1(qy + qh / 2 + .5)} H${r1(tx0 + len + 1)}" pathLength="1" stroke="${C.mute}" stroke-width="1.2"/>` : '') +   // struck through before it goes
           `<rect class="ag-qc" x="${tx0 - .5}" y="${qy + 1.5}" width="${r1(len + 2)}" height="${qh - 3}" fill="${C.chip}"/>` +
           `<rect class="ag-qk" x="${tx0}" y="${qy + 3}" width="1.2" height="${qh - 6}" fill="${C.teal}" style="--w:${len}px"/></g>`;
       });
       let d = '', n = 0; const gx = sx + 8, gs = 6.4, gw = 15 * gs, OUT = 26;   // OUT: the unusual one, 11th along the second row
-      for (let j = 0; j < 32; j++) if (j !== OUT) d += `<circle cx="${r1(gx + (j % 16) * gs)}" cy="${r1(qy + 5.5 + (j >> 4) * 7)}" r="2" fill="${C.dim}" style="--i:${n++}"/>`;
+      for (let j = 0; j < 32; j++) if (j !== OUT) d += `<circle cx="${r1(gx + (j % 16) * gs)}" cy="${r1(qy + 5.5 + (j >> 4) * 7)}" r="2" fill="${C.dim}" style="--i:${n++};--c:${j % 16}"/>`;
       const ox = r1(gx + (OUT % 16) * gs), oy = r1(qy + 12.5);
       ANCH[1].out = [ox, oy];
-      p += `<g class="ag-qd"><g class="ag-qg">${d}<circle cx="${ox}" cy="${oy}" r="2" fill="${C.dim}" style="--i:${OUT}"/></g><rect class="ag-qs" x="${gx - 3}" y="${qy + 2}" width="2" height="${qh - 4}" rx="1" fill="${C.teal}" style="--w:${gw + 6}px"/>` +
+      p += `<g class="ag-qd"><g class="ag-qg">${d}<circle cx="${ox}" cy="${oy}" r="2" fill="${C.dim}" style="--i:${OUT};--c:${OUT % 16}"/></g>` +
+        `<g class="ag-qs" style="--w:${gw + 6}px"><rect x="${gx - 27}" y="${qy + 2}" width="24" height="${qh - 4}" fill="url(#ag-tail)"/><rect x="${gx - 3}" y="${qy + 2}" width="2" height="${qh - 4}" rx="1" fill="${C.teal}"/></g>` +
         `${ripple('ag-qr', ox, oy, 4)}<circle class="ag-qo" cx="${ox}" cy="${oy}" r="3" fill="${C.teal}"/>` +
-        `<text class="ag-qw" x="${r1(gx + gw + 9)}" y="${base}" font-size="9" font-weight="600" fill="${C.teal}">1 unusual</text></g></g>`;
+        `<text class="ag-qw" x="${r1(gx + gw + 9)}" y="${base}" font-size="9" font-weight="600" fill="${C.teal}">1 unusual</text></g></g>` +
+        GLOSS.map(([, , t], j) => `<text class="ag-gl ag-gl${j}" x="${sx}" y="${r1(qy + qh + 12.5)}" font-size="10" fill="${C.mute}">${esc(t)}</text>`).join('');
     }
     return p;
   }
@@ -181,14 +195,17 @@ function picture(i, x, cy, r) {
   const packet = (lx0, lx1) => `<rect class="ag-pk" x="${lx0 - 4.5}" y="${cy - 3.5}" width="9" height="7" rx="1.5" fill="${C.teal}" style="--dx:${r1(lx1 - lx0)}px"/>`;
   const cw = 90, ch = 57, cx0 = x - 1.5, cy0 = cy - ch / 2, lx0 = cx0 + cw + 6, lx1 = lx0 + 53, cx = lx1 + 6.5 + R;   // the card's stroke on the heading's edge; the dashes end on a full dash
   ANCH[2] = { flag: [r1(cx0 + 13), r1(cy0 + 14)] };
+  const ghost = `<g class="ag-gh ag-gh2"><rect x="${cx0}" y="${cy0}" width="${cw}" height="${ch}" rx="5" stroke="${C.rule}"/><path d="M${lx0} ${cy} H${lx1}" stroke="${C.rule}" stroke-dasharray="4 3"/><circle cx="${cx}" cy="${cy}" r="${R}" stroke="${C.rule}"/></g>`;
   // the write-up: the lead and the technique it names; the text starts under the flag's pole
-  return `<g class="ag-flag"><rect class="ag-cardf" x="${cx0}" y="${cy0}" width="${cw}" height="${ch}" rx="5" fill="${C.chip}"/>` +
+  return ghost + `<g class="ag-flag"><rect class="ag-cardf" x="${cx0}" y="${cy0}" width="${cw}" height="${ch}" rx="5" fill="${C.chip}"/>` +
     `<rect class="ag-cardo" x="${cx0}" y="${cy0}" width="${cw}" height="${ch}" rx="5" stroke="${C.teal}" stroke-opacity=".7"/>` +
     `<g class="ag-lead">${icon('flag', cx0 + 7, cy0 + 8, 1.2, C.teal)}<text x="${cx0 + 25}" y="${cy0 + 19}" font-size="10.5" font-weight="700" fill="${C.ink}">1 lead</text></g>` +
     `<text class="ag-ln0" x="${cx0 + 10.5}" y="${cy0 + 34}" font-size="9.5" fill="${C.body}">Scheduled Task</text>` +
     `<text class="ag-ln1" x="${cx0 + 10.5}" y="${cy0 + 46}" font-size="9" letter-spacing=".02em" fill="${C.mute}">T1053.005</text></g>` +
     `<path class="ag-he" d="M${lx0} ${cy} H${lx1}" stroke="${C.teal}" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round"/>` +
-    packet(lx0, lx1) + person(cx, C.dim, 'ag-anw') + person(cx, C.amb, 'ag-ana') + ripple('ag-halo', cx, cy, R, C.amb) + ripple('ag-halo2', cx, cy, R, C.amb);
+    packet(lx0, lx1) + person(cx, C.dim, 'ag-anw') + person(cx, C.amb, 'ag-ana') + ripple('ag-halo', cx, cy, R, C.amb) + ripple('ag-halo2', cx, cy, R, C.amb) +
+    `<text class="ag-glc" x="${cx0 + 1}" y="${r1(cy0 + ch + 13.5)}" font-size="10" fill="${C.mute}">${GLOSS_CARD}</text>` +   // kept in the final frame: the one term a layman can't read
+    `<text class="ag-anl" x="${r1(cx + R)}" y="${r1(cy + R + 16)}" text-anchor="end" font-size="9.5" font-weight="600" fill="${C.amb}">Analyst decides</text>`;   // the human's role, kept in the final frame
 }
 // the followed dot, drawn over everything: from step 1's Detection to step 2's agent, then the unusual result from
 // step 2's grid to the lead card's flag. Each rides two nested groups, one easing across and one easing down, so it
@@ -221,12 +238,12 @@ function header(w, y, fh, phone) {
 // the status line over each step: a spinner and the phrase (pos: where each step's line starts)
 const status = (pos, f) => [0, 1, 2].map(i => { const [x, y] = pos[i];
   return `<g class="ag-st">${spin(`ag-sp-st${i}`, x + 4.5, r1(y - f * .35), 4.5, 1.4)}${STATUS.map(([, , t, st], j) => st === i ? `<text class="ag-st${j}" x="${x + 14}" y="${y}" font-size="${f}" font-weight="600" fill="${C.ink}">${esc(t)}</text>` : '').join('')}</g>`; }).join('');
-const open = (cls, w, h) => `<svg class="${cls}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(ARIA)}"><rect x=".5" y=".5" width="${w - 1}" height="${h - 1}" rx="12" fill="${C.bg}" stroke="${C.rule}"/>`;
+const open = (cls, w, h) => `<svg class="${cls}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(ARIA)}"><defs><linearGradient id="ag-tail" x1="0" x2="1"><stop offset="0" stop-color="${C.teal}" stop-opacity="0"/><stop offset="1" stop-color="${C.teal}" stop-opacity=".35"/></linearGradient></defs><rect x=".5" y=".5" width="${w - 1}" height="${h - 1}" rx="12" fill="${C.bg}" stroke="${C.rule}"/>`;
 
 // desktop: three columns, read left to right, under a band where the status line plays (DH: the card's height); pictures left-aligned with their headings, on one centreline
-const DH = 260;
+const DH = 270;
 function desktop() {
-  const W = 640, H = DH, col = 200, x0 = 16, gap = 8, pcy = 112, titleY = 190, bodyY = 209, lh = 15.5, f = { head: 11.5, hid: 9.5, title: 12.5, body: 10.3 };
+  const W = 640, H = DH, col = 200, x0 = 16, gap = 8, pcy = 112, titleY = 200, bodyY = 219, lh = 15.5, f = { head: 11.5, hid: 9.5, title: 12.5, body: 10.3 };
   const s = [open('ag-scene', W, H), header(W, 23, f.head)];
   STEPS.forEach((st, i) => {
     const x = x0 + i * (col + gap);
@@ -239,7 +256,7 @@ function desktop() {
 // words, so nothing is squeezed (owner, 31 Oct 2026: "on mobile, you can take up more space for the animations. dont
 // need to squeeze"), each centred on the card ("not centered on mobile"); EXT and EXTX are each picture's reach
 // above and below its centreline and left and right of its origin, in the picture's own units
-const PS = 1.4, EXT = [[48, 50], [34, 57], [29, 29]], EXTX = [[-5, 159], [-1, 163.5], [-2, 187.3]];
+const PS = 1.4, EXT = [[48, 70], [34, 70], [29, 48]], EXTX = [[-5, 159], [-1, 163.5], [-2, 187.3]];
 function phone() {
   const W = 360, x = 14, lh = 18.5, f = { head: 13, hid: 11, title: 14.5, body: 13.4 };
   const parts = [], at = [], top = []; let y = 64;
@@ -277,10 +294,10 @@ const T = {
   loop: [9.4, 1.0], lh: [10.3, .25], erase: [9.5, .5], q0out: [10.05, .1], q1: [10.15, .8], k1: [11.6, .15], g1: [11.0, .8], tick: [11.2, .5],
   g0b: [11.75, .9], sw1: [11.75, .45], q1out: [12.2, .15], qd: [12.25, .15], dots: [12.3, .15], cnt: [12.3, .09], found: [12.75, .3],
   g2: [13.2, .9], qs: [13.3, .8], qo: [13.85, .45], qr: [13.85, 1.0], qdim: [14.0, .4], qw: [14.05, .3],
-  h2: [15.6, 1.0],
-  s2: [15.4, .5], c2: [14.9, .6], sprep: [15.9, 1.2], rep: [16.0, .9], card: [16.55, .5], lead: [16.55, .3], ln: [[16.75, .3], [16.9, .3]], he: [17.1, .3], anw: [16.6, .3],
-  antic: [17.6, .35], pk: [17.8, .6], ana: [18.35, .55], halo: [18.45, 1.1], halo2: [18.65, 1.1],
-  dim0: [[5.6, 19.6]], dim1: [[16.2, 19.75]],   // (the team stays back through step 3, only Reporting's marks lit; both return, left to right, once the halos have run)
+  h2: [15.6, 1.3], hunch: [3.6, 1.3], jolt: [7.9, .36], strike: [9.15, .25],
+  s2: [15.4, .5], c2: [14.9, .6], sprep: [15.9, 1.2], rep: [16.0, .9], card: [16.85, .75], lead: [16.85, .3], ln: [[17.05, .3], [17.2, .3]], he: [17.4, .3], anw: [16.9, .3], glc: [17.3, .3],
+  antic: [17.9, .35], pk: [18.1, .6], ana: [18.65, .55], halo: [18.75, 1.1], halo2: [18.95, 1.1], anl: [19.4, .4], hyplit: [19.9, .45],
+  dim0: [[5.6, 19.9]], dim1: [[16.2, 20.05]],   // (the team stays back through step 3, only Reporting's marks lit; both return, left to right, once the halos have run)
 };
 const RISE = 'cubic-bezier(.2,.8,.3,1)', OUT_EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)', SPRING = 'cubic-bezier(.34,1.56,.64,1)', DOWN = 'cubic-bezier(.55,.05,.85,.45)';
 const P = '.is-playing svg.ag-scene', PH = phone();
@@ -299,7 +316,7 @@ const held = ([d, s]) => `${a([d, .12], 'ag-show', 'linear', 'forwards')}, ${hid
 const spinning = ([d, s]) => `animation: ${show([d, .2])}, ${hide([d + s - .25, .25])}, ag-turn .9s linear ${kd(d)}s ${Math.ceil(k(s) / .9)};`;
 // a picture stepping back while another acts, then forward again
 const dimmed = spans => 'animation: ' + spans.map(([d, e]) => `${a([d, .45], 'ag-dimin', 'ease', 'forwards')}, ${a([e, .45], 'ag-dimout', 'ease', 'forwards')}`).join(', ') + ';';
-const ends = Object.entries(T).filter(([n]) => !n.startsWith('dim')).flatMap(([, v]) => Array.isArray(v[0]) ? v : [v]).map(([d, s]) => kd(d + s));   // (the dim spans are [start, end])
+const ends = Object.entries(T).filter(([n]) => !/^(dim|gl)/.test(n)).flatMap(([, v]) => Array.isArray(v[0]) ? v : [v]).map(([d, s]) => kd(d + s));   // (the dim and gloss spans are [start, end])
 const css = `/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
 .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / ${DH}; }
@@ -314,7 +331,7 @@ svg.ag-scene .ag-doc .ag-i { stroke-width: .6; }
 svg.ag-scene path, svg.ag-scene .ag-rip, svg.ag-scene .ag-cardo { fill: none; }
 svg.ag-scene .ag-doc path:first-child { fill: ${C.chip}; }
 svg.ag-scene .ag-c { stroke-width: 3; stroke-linecap: round; stroke-dasharray: .2 2; stroke-opacity: 0; }
-svg.ag-scene .ag-loop, svg.ag-scene .ag-tick, svg.ag-scene .ag-wd { stroke-dasharray: 1 2; stroke-dashoffset: 0; stroke-linecap: round; }   /* (undrawn, the dash sits wholly before the start, so no round cap shows as a dot) */
+svg.ag-scene .ag-loop, svg.ag-scene .ag-tick, svg.ag-scene .ag-wd, svg.ag-scene .ag-qx { stroke-dasharray: 1 2; stroke-dashoffset: 0; stroke-linecap: round; }   /* (undrawn, the dash sits wholly before the start, so no round cap shows as a dot) */
 svg.ag-scene .ag-lh { stroke-linecap: round; stroke-linejoin: round; }
 svg.ag-scene :is(.ag-s, .ag-chev, .ag-ana, .ag-rip, .ag-found, .ag-doc, .ag-supn, .ag-none, .ag-qo, .ag-hc, .ag-spin) { transform-box: fill-box; transform-origin: center; }
 svg.ag-scene .ag-rip { vector-effect: non-scaling-stroke; }
@@ -324,8 +341,11 @@ svg.ag-scene .ag-spin { stroke-dasharray: .25 .75; stroke-linecap: round; }
 svg.ag-scene :is(.ag-none, .ag-cnt, .ag-found) { font-variant-numeric: tabular-nums; }
 svg.ag-scene text.ag-qt { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
 /* transient marks: hidden in the final frame, shown only while they play */
-svg.ag-scene :is(.ag-fl, .ag-rip, .ag-doc, .ag-none, .ag-cnt, .ag-pk, .ag-det-dot, .ag-spin, .ag-q0, .ag-q1, .ag-qc, .ag-qs, .ag-hc, .ag-anw, .ag-replit, .ag-st text) { opacity: 0; }
-svg.ag-scene .ag-qg { opacity: .42; }   /* (the final frame keeps the result row, quiet, with the one unusual result lit: the second review's payoff) */
+svg.ag-scene :is(.ag-fl, .ag-rip, .ag-doc, .ag-none, .ag-cnt, .ag-pk, .ag-det-dot, .ag-spin, .ag-q0, .ag-q1, .ag-qc, .ag-qs, .ag-hc, .ag-anw, .ag-st text, .ag-hunch, .ag-gl, .ag-gh) { opacity: 0; }
+svg.ag-scene .ag-qg circle { opacity: .42; }   /* (the final frame keeps the result row, quiet, with the one unusual result lit) */
+svg.ag-scene .ag-gh { fill: none; stroke-opacity: .6; }
+svg.ag-scene :is(.ag-hunch, .ag-hunch-p) { transform-box: fill-box; transform-origin: center; }
+svg.ag-scene .ag-hunch-d { opacity: 0; }   /* (the final frame keeps the result row, quiet, with the one unusual result lit: the second review's payoff) */
 @keyframes ag-in { from { opacity: 0; transform: translateY(-4px); } }
 @keyframes ag-out { from { opacity: 1; } }
 @keyframes ag-wake { from { opacity: .2; } }
@@ -361,15 +381,18 @@ svg.ag-scene .ag-qg { opacity: .42; }   /* (the final frame keeps the result row
 @keyframes ag-hy1 { 45% { transform: translateY(var(--dip)); } 100% { transform: translateY(var(--dy)); } }
 @keyframes ag-spring { from { transform: scale(.8); } to { transform: none; } }
 @keyframes ag-h1m { 0% { opacity: 0; transform: scale(.35); } 10% { opacity: 1; } 22%, 72% { opacity: .2; } 88% { opacity: 1; transform: scale(.45); } 96% { transform: scale(1.12); } 100% { opacity: 1; transform: scale(1); } }
-@keyframes ag-h2m { 0% { opacity: 0; transform: scale(.75); } 6% { opacity: 1; } 20% { opacity: 1; transform: scale(1.5); } 32%, 72% { opacity: .2; } 85% { opacity: 1; transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes ag-h2m { 0% { opacity: 0; transform: scale(.75); } 6% { opacity: 1; } 25%, 38% { opacity: 1; transform: translateY(-5px) scale(2.2); } 46%, 74% { opacity: .2; } 85% { opacity: 1; transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
 @keyframes ag-h1 { 0% { opacity: 0; transform: scale(.35); } 18% { opacity: 0; } 28% { opacity: 1; } 88% { opacity: 1; transform: scale(.45); } 96% { transform: scale(1.12); } 100% { opacity: 1; transform: scale(1); } }   /* (it appears once clear of the labels and stays small in flight, so it never covers words; full size as it lands) */
-@keyframes ag-h2 { 0% { opacity: 0; transform: scale(.75); } 6% { opacity: 1; } 20%, 85% { transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes ag-h2 { 0% { opacity: 0; transform: scale(.75); } 6% { opacity: 1; } 25%, 38% { transform: translateY(-5px) scale(2.2); } 85% { transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }   /* (it lifts out of the row and swells before it flies) */
 @keyframes ag-grow { from { opacity: 0; transform: scale(.12); } 45% { opacity: 1; } to { opacity: 1; transform: none; } }
 @keyframes ag-antic { 45% { transform: translateX(-5px); } }
+@keyframes ag-hunch { 0% { opacity: 0; transform: translateY(-12px) scale(.6); } 12% { opacity: 1; transform: none; } 70% { opacity: 1; transform: none; } 96% { opacity: 1; transform: translate(var(--hx), var(--hy)); } 100% { opacity: 0; transform: translate(var(--hx), var(--hy)); } }   /* (its words fade, the pill collapses to a dot, and the dot is drawn into Detection) */
+@keyframes ag-collapse { to { opacity: 0; transform: scale(.03, .4); } }
+@keyframes ag-jolt { 20% { transform: translateX(-3px); } 40% { transform: translateX(3px); } 60% { transform: translateX(-2px); } 80% { transform: translateX(2px); } }
 /* the status line: the spinner turns throughout, each phrase rises in and leaves */
-/* (each phrase is gone before the next rises in, so two never overlap) */
+/* (each phrase fades out just before the next rises in: never two at once, never a blank beat) */
 ${[0, 1, 2].map(i => { const mine = STATUS.filter(st => st[3] === i); return `${P} .ag-sp-st${i} { ${spinning([mine[0][0], mine[mine.length - 1][1] - mine[0][0]])} }`; }).join('\n')}
-${STATUS.map(([d, e], j) => `${P} .ag-st${j} { animation: ${a([d, .3], 'ag-say', OUT_EZ, 'forwards')}, ${hide([e - .15, .12])}; }`).join('\n')}
+${STATUS.map(([d, e, , st], j) => { const nx = STATUS[j + 1] && STATUS[j + 1][3] === st ? STATUS[j + 1][0] : e; return `${P} .ag-st${j} { animation: ${a([d + .03, .3], 'ag-say', OUT_EZ, 'forwards')}, ${hide([nx - .12, .12])}; }`; }).join('\n')}
 /* step 1: the wires draw, the report drops into the supervisor, which reads it, sends a pulse to Hypothesis and back, then hands Detection the hunt */
 ${P} .ag-s0 { ${at(T.s0, 'ag-in', OUT_EZ)} }
 ${P} .ag-wd { ${at(T.wd, 'ag-draw')} }
@@ -387,15 +410,21 @@ ${P} .ag-det { ${at(T.det, 'ag-det')} }
 ${P} .ag-det-dot { ${at(T.det, 'ag-out')} }
 ${P} .ag-job-on text { ${at(T.det, 'ag-job')} }
 ${P} .ag-chev { ${at(T.s0, 'ag-fade')} }
+${P} .ag-hunch { ${at(T.hunch, 'ag-hunch', IO, 'none')} }
+${P} .ag-hunch-t { animation: ${hide([T.hunch[0] + .7, .12])}; }
+${P} .ag-hunch-p { ${at([T.hunch[0] + .75, .2], 'ag-collapse', 'cubic-bezier(.55,0,1,.45)', 'forwards')} }
+${P} .ag-hunch-d { ${at([T.hunch[0] + .85, .08], 'ag-show', 'linear')} }
+${P} .ag-gh1 { animation: ag-show .01s linear 0s both, ${hide([5.95, .1])}; }   /* (from the first frame until the agent lands) */
+${P} .ag-gh2 { animation: ag-show .01s linear 0s both, ${hide([T.card[0], .2])}; }
 ${P} .ag-team { ${dimmed(T.dim0)} }
 /* the followed dot: Detection to step 2's agent, then the unusual result to the lead card */
 ${P} .ag-h1 { ${at(T.h1, 'ag-hx', IO)} }
 ${P} .ag-h1 .ag-hy { ${at(T.h1, 'ag-hy1', 'ease-in-out')} }   /* (down under the labels, then up into step 2) */
 ${P} .ag-h1 .ag-hc { animation: ${a(T.h1, 'ag-h1', 'linear')}, ${hide([T.h1[0] + T.h1[1] + .01, .03])}; }   /* (the agent below shows the instant it lands, then the dot goes) */
-${P} .ag-h2 { ${at([T.h2[0] + .2, T.h2[1] - .2], 'ag-hx', IO)} }
-${P} .ag-h2 .ag-hy { ${at([T.h2[0] + .2, T.h2[1] - .2], 'ag-hy', DOWN)} }
+${P} .ag-h2 { ${at([T.h2[0] + .45, T.h2[1] - .45], 'ag-hx', IO)} }
+${P} .ag-h2 .ag-hy { ${at([T.h2[0] + .45, T.h2[1] - .45], 'ag-hy', DOWN)} }
 ${P} .ag-h2 .ag-hc { animation: ${a(T.h2, 'ag-h2', IO)}, ${hide([T.h2[0] + T.h2[1] - .02, .15])}; }
-${[1, 2].map(g => { const t = [T.h2[0] + .06 * g, T.h2[1]], f = [t[0] + .2, t[1] - .2];
+${[1, 2].map(g => { const t = [T.h2[0] + .06 * g, T.h2[1]], f = [t[0] + .45, t[1] - .45];
   return `${P} .ag-h2.ag-tr${g} { ${at(f, 'ag-hx', IO)} }
 ${P} .ag-h2.ag-tr${g} .ag-hy { ${at(f, 'ag-hy', DOWN)} }
 ${P} .ag-h2.ag-tr${g} .ag-hc { animation: ${a(t, 'ag-h2', IO)}, ${hide([t[0] + t[1] - .12, .1])}; }`; }).join('\n')}   /* (two fading ghosts a beat behind, so the eye keeps it) */
@@ -405,9 +434,13 @@ ${P} .ag-h2.ag-tr${g} .ag-hc { animation: ${a(t, 'ag-h2', IO)}, ${hide([t[0] + t
 svg.ag-scene--m :is(.ag-tr1, .ag-tr2) { display: none; }
 /* step 2: the agent lands, writes a search, sends it and finds nothing; loops, rewrites and checks; finds 32, one unusual */
 ${P} .ag-s1 { ${at(T.s1, 'ag-wake', OUT_EZ)} }
-${P} .ag-p1 { animation: ${a([T.s1[0], .4], 'ag-fade')}, ${dimmed(T.dim1).slice(11, -1)}; }
+${P} .ag-p1 { ${dimmed(T.dim1)} }
 ${P} .ag-n1 { ${at(T.n1, 'ag-show', 'linear')} }
-${T.tool.map((t, k) => `${P} .ag-tool${k} { ${at(t, 'ag-in', OUT_EZ)} }`).join('\n')}
+${T.tool.map((t, k) => `${P} .ag-tool${k} { animation: ${a(t, 'ag-in', OUT_EZ)}${k ? '' : ', ' + a(T.jolt, 'ag-jolt', 'linear', 'none')}; }`).join('\n')}
+${P} .ag-qx { ${at(T.strike, 'ag-draw', OUT_EZ)} }
+${GLOSS.map(([d, e], j) => `${P} .ag-gl${j} { animation: ${a([d + .03, .25], 'ag-say', OUT_EZ, 'forwards')}, ${hide([e - .12, .12])}; }`).join('\n')}
+${P} .ag-glc { ${at(T.glc, 'ag-say', OUT_EZ)} }
+${P} .ag-hyplit { ${at(T.hyplit, 'ag-show', 'ease')} }
 ${P} .ag-sp-det { ${spinning(T.spdet)} }
 ${P} .ag-q { animation: ${show(T.q)}; }
 /* (jump-none: the last step lands before the end, since a plain steps() held forwards can stop a step short) */
@@ -429,17 +462,16 @@ ${P} .ag-sw1 { ${at(T.sw1, 'ag-comet', 'linear', 'none')} }
 ${CNT.map((v, j) => `${P} .ag-cnt${j} { animation: ${a([T.cnt[0] + j * T.cnt[1], .01], 'ag-show', 'linear', 'forwards')}, ${hide([T.cnt[0] + (j + 1) * T.cnt[1], .01])}; }`).join('\n')}
 ${P} .ag-found { ${at(T.found, 'ag-land', OUT_EZ)} }
 ${P} .ag-qd { animation: ${show(T.qd)}; }
-${P} .ag-qg circle { animation: ag-show ${k(T.dots[1])}s linear calc(${kd(T.dots[0])}s + var(--i) * ${k(.02)}s) both; }
-${P} .ag-qg { animation: ${a(T.qdim, 'ag-dimin', 'ease')}; }
+${P} .ag-qg circle { animation: ag-show ${k(T.dots[1])}s linear calc(${kd(T.dots[0])}s + var(--i) * ${k(.02)}s) both, ag-dimin ${k(.3)}s ease calc(${kd(T.qs[0] + .05)}s + (var(--c) * 6.4 + 3) / 102 * ${k(T.qs[1])}s) forwards; }   /* (a wave: each steps back as the scan passes it) */
 ${P} .ag-g2 { ${at(T.g2, 'ag-flash', IO, 'none')} }
 ${P} .ag-qs { ${at(T.qs, 'ag-scan', 'linear', 'none')} }
 ${P} .ag-qo { ${at(T.qo, 'ag-pop', OUT_EZ)} }
 ${P} .ag-qr { ${at(T.qr, 'ag-rip', OUT_EZ, 'none')} }
 ${P} .ag-qw { animation: ${a(T.qw, 'ag-fade')}, ${hide([T.h2[0] - .15, .12])}, ${a([T.h2[0] + .9, .3], 'ag-show', 'linear', 'forwards')}; }   /* (out of the dots' way as they launch) */
-${P} .ag-replit { animation: ${a([T.rep[0], .2], 'ag-show', 'linear', 'forwards')}, ${hide([T.dim0[0][1], .45])}; }
+${P} .ag-replit { ${at([T.rep[0], .2], 'ag-show', 'linear')} }   /* (lit into the final frame: the whole path, Detection found it and Reporting wrote it up) */
+${P} .ag-anl { ${at(T.anl, 'ag-in', OUT_EZ)} }   /* (once the halos have run, so they never cross it) */
 /* step 3: Reporting writes it up as the dot flies in; the card grows from it; the hand-off, and the human lights */
 ${P} .ag-s2 { ${at(T.s2, 'ag-wake', OUT_EZ)} }
-${P} .ag-p2 { ${at([T.s2[0], .4], 'ag-fade')} }
 ${P} .ag-c2 { ${at(T.c2, 'ag-comet', 'linear', 'none')} }
 ${P} .ag-sp-rep { ${spinning(T.sprep)} }
 ${P} .ag-fl-rep { ${at(T.rep, 'ag-flash', IO, 'none')} }
