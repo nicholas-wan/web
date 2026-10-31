@@ -48,12 +48,13 @@ const r1 = v => +v.toFixed(1);
 const STEPS = [
   { title: 'Purpose-built agents', d: ['A supervisor splits the hunt among', 'narrow agents, each given only the tools', 'and context its one job needs.'],
     m: ['A supervisor splits the hunt among narrow', 'agents, each given only the tools and context', 'its one job needs.'] },
-  { title: 'Equipped to adapt', d: ['The first search comes back empty, but', "empty doesn't mean safe. The agent asks", 'what it missed and searches another way.'],
-    m: ['The first search comes back empty, but empty', "doesn't mean safe. The agent asks what it", 'missed and searches another way.'] },
-  { title: 'Surface to the analyst', d: ['Agents surface what looks suspicious,', 'evidence attached. Only a human analyst', 'makes the call.'],
-    m: ['Agents surface what looks suspicious, evidence', 'attached. Only a human analyst makes the call.'] },
+  { title: 'Equipped to adapt', d: ['No results can mean a bad query, not a', 'safe network. So the agent rewrites it,', 'checks the fix and searches again.'],
+    m: ['No results can mean a bad query, not a safe network.', 'So the agent rewrites it, checks the fix and', 'searches again.'] },
+  { title: 'Surface to the analyst', d: ['Agents flag what looks suspicious, with', 'the evidence attached. Only a human', 'analyst makes the call.'],
+    m: ['Agents flag what looks suspicious, with the evidence', 'attached. Only a human analyst makes the call.'] },
 ];
 const JOBS = ['Hypothesis', 'Detection', 'Report'], HYP = 0, ON = 1, REP = 2;   // the product's own agents, the three that read best (prime-th th-core: hypothesis, detection_logic, report); Detection searches
+const LOOP_END = 200;   // degrees, clockwise from the right: where the loop's arc ends and its arrowhead points up
 const TOOLS = [['search', 'search'], ['check', 'check query'], ['bars', 'analyse results']];   // the Detection agent's own steps (past hunts is the Hypothesis agent's tool)
 const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each given only the tools and context its one job needs: forming a hypothesis, writing and running the detection logic, reporting. Agents carry tools and skills. The Detection agent\'s first search, for schtasks.exe, comes back empty, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the agent asks whether its search could have missed the threat, checks a new query and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline. The Report agent writes it up with the evidence attached, and only a human analyst makes the call.';
 
@@ -95,10 +96,17 @@ function picture(i, x, cy, r) {
     // the acting agent, the same teal dot, with its kit of tools; it searches (a ripple), finds none, loops back,
     // checks its new query, searches again and finds one, then analyses the results
     const lr = r + 10, cx = x + lr + 3;
+    // the arc runs clockwise from 60 degrees above the right to just above the left; its arrowhead is two strokes
+    // either side of the tangent at the end, like a retry icon (owner: "the arrow on 2nd chart still looks weird")
+    const pt = (deg, d = 0) => { const t = deg * Math.PI / 180; return `${r1(cx + lr * Math.cos(t) + d * -Math.sin(t))} ${r1(cy + lr * Math.sin(t) + d * Math.cos(t))}`; };
+    const t1 = LOOP_END * Math.PI / 180, tip = [cx + lr * Math.cos(t1), cy + lr * Math.sin(t1)];
+    const tb = (LOOP_END - 16) * Math.PI / 180, back = Math.atan2(cy + lr * Math.sin(tb) - tip[1], cx + lr * Math.cos(tb) - tip[0]);
+    const wing = sgn => `${r1(tip[0] + 6 * Math.cos(back + sgn * .7))} ${r1(tip[1] + 6 * Math.sin(back + sgn * .7))}`;
+    const head = `M${wing(1)} L${r1(tip[0])} ${r1(tip[1])} L${wing(-1)}`;
     let p = ripple('ag-rip0', cx, cy, r) + ripple('ag-rip1', cx, cy, r) + ripple('ag-rip2', cx, cy, r) + ripple('ag-rip3', cx, cy, r) +
       flash('ag-fl-arr', cx, cy, r + 4) + node(cx, cy, r, true) +
-      `<path class="ag-loop" d="M${r1(cx + lr * .5)} ${r1(cy - lr * .87)} A${lr} ${lr} 0 1 1 ${r1(cx - lr * .95)} ${r1(cy - lr * .3)}" pathLength="1" stroke="${C.teal}" stroke-width="1.5"/>` +
-      `<path class="ag-lh" d="M${r1(cx - lr * .95)} ${r1(cy - lr * .3)} L${r1(cx - lr * .95 + 2.2)} ${r1(cy - lr * .3 + 8)} L${r1(cx - lr * .95 - 6.4)} ${r1(cy - lr * .3 + 5.3)} Z" fill="${C.teal}" stroke="${C.teal}" stroke-width="1" stroke-linejoin="round"/>`;   // tip at the arc's end, base 7 units back along the tangent (0.30, -0.95), 4.5 either side
+      `<path class="ag-loop" d="M${pt(-60)} A${lr} ${lr} 0 1 1 ${pt(LOOP_END)}" pathLength="1" stroke="${C.teal}" stroke-width="1.5"/>` +
+      `<path class="ag-lh" d="${head}" stroke="${C.teal}" stroke-width="1.5"/>`;
     {
       const tx = cx + lr + 12, th = 18, tw = 102, ty0 = cy - th * 1.5 - 6;
       TOOLS.forEach(([ic, name], k) => {
@@ -121,12 +129,13 @@ function picture(i, x, cy, r) {
   const human = cx => `<g class="ag-ana"><circle cx="${cx}" cy="${cy}" r="${R}" fill="${C.node}" stroke="${C.amb}" stroke-width="1.5"/>${icon('ana', r1(cx - 6 * R / 7), r1(cy - 6 * R / 7), r1(R / 7), C.amb)}</g>` +
     ripple('ag-halo', cx, cy, R, C.amb);
   const packet = (lx0, lx1) => `<circle class="ag-pk" cx="${lx0}" cy="${cy}" r="3" fill="${C.teal}" style="--dx:${r1(lx1 - lx0)}px"/>`;
-  const cw = 96, ch = 56, cx0 = x - 1.5, cy0 = cy - ch / 2, lx0 = cx0 + cw + 6, lx1 = lx0 + 32, cx = lx1 + 6.5 + R;   // the card's stroke on the heading's edge; the dashes end on a full dash
-  const lines = [[77, 32], [59, 39], [69, 46]];   // the text lines start under the flag's pole
+  const cw = 90, ch = 57, cx0 = x - 1.5, cy0 = cy - ch / 2, lx0 = cx0 + cw + 6, lx1 = lx0 + 53, cx = lx1 + 6.5 + R;   // the card's stroke on the heading's edge; the dashes end on a full dash
+  // the write-up: the lead and the technique it names; the text starts under the flag's pole
   return `<g class="ag-flag"><rect class="ag-cardf" x="${cx0}" y="${cy0}" width="${cw}" height="${ch}" rx="5" fill="${C.chip}"/>` +
     `<rect class="ag-cardo" x="${cx0}" y="${cy0}" width="${cw}" height="${ch}" rx="5" pathLength="1" stroke="${C.teal}" stroke-opacity=".7"/>` +
-    `<g class="ag-lead">${icon('flag', cx0 + 8, cy0 + 7, 1.4, C.teal)}<text x="${cx0 + 28}" y="${cy0 + 19}" font-size="10" font-weight="700" fill="${C.ink}">1 lead</text></g>` +
-    lines.map(([w, dy], k) => `<path class="ag-ln ag-ln${k}" d="M${cx0 + 12} ${cy0 + dy} H${cx0 + w}" pathLength="1" stroke="${C.dim}" stroke-width="2" stroke-linecap="round"/>`).join('') + '</g>' +
+    `<g class="ag-lead">${icon('flag', cx0 + 7, cy0 + 8, 1.2, C.teal)}<text x="${cx0 + 25}" y="${cy0 + 19}" font-size="10.5" font-weight="700" fill="${C.ink}">1 lead</text></g>` +
+    `<text class="ag-ln0" x="${cx0 + 10.5}" y="${cy0 + 34}" font-size="9.5" fill="${C.body}">Scheduled Task</text>` +
+    `<text class="ag-ln1" x="${cx0 + 10.5}" y="${cy0 + 46}" font-size="9" letter-spacing=".02em" fill="${C.mute}">T1053.005</text></g>` +
     `<path class="ag-he" d="M${lx0} ${cy} H${lx1}" stroke="${C.teal}" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round"/>` +
     packet(lx0, lx1) + human(cx);
 }
@@ -138,23 +147,23 @@ const body = (lines, x, y, lh, f) => lines.map((t, j) => `<text x="${x}" y="${r1
 const MARK = ['M14 2.2A10 10 0 0 1 21.8 10L18.97 10A7.25 7.25 0 0 0 14 5.03ZM21.8 14A10 10 0 0 1 14 21.8L14 18.97A7.25 7.25 0 0 0 18.97 14ZM10 21.8A10 10 0 0 1 2.2 14L5.03 14A7.25 7.25 0 0 0 10 18.97ZM2.2 10A10 10 0 0 1 10 2.2L10 5.03A7.25 7.25 0 0 0 5.03 10Z', 'M12 6L18 12L12 18L6 12Z'];
 const logo = (x, y, s) => `<g class="ag-logo"><rect x="${x}" y="${y}" width="${s}" height="${s}" rx="${r1(s * .25)}" fill="${C.node}" stroke="${C.rule}"/>` +
   `<g transform="translate(${r1(x + s * .17)} ${r1(y + s * .17)}) scale(${+(s * .66 / 24).toFixed(4)})">${MARK.map(d => `<path d="${d}"/>`).join('')}</g></g>`;
-// the header: the product line, what the viewer is looking at, and for the hunter the technique; phones stack the
-// headline under the product line
+// the header: the product line and what the viewer is looking at (the technique is on the lead card); phones stack
+// the headline under the product line
 const PRODUCT = 'Agentic Threat Hunting', HEADLINE = 'From a ransomware report to one lead';
-function header(w, y, fh, fid, phone) {
+function header(w, y, fh, phone) {
   const s = r1(fh * (phone ? 1.45 : 1.25)), sx = 16 + s + 6, line = phone ? y + 35 : y + 11;
   // the divider is a glyph in the same line of text, so it keeps its place whichever font loads
   let h = `<g class="ag-head">${logo(16, r1(y - s + fh * (phone ? .38 : .3)), s)}<text x="${sx}" y="${y}" font-size="${fh}" font-weight="700" fill="${C.ink}">${PRODUCT}` +
     (phone ? '</text>' : `<tspan dx="8" font-weight="400" fill="${C.dim}">|</tspan><tspan dx="8" font-weight="400" fill="${C.body}">${HEADLINE}</tspan></text>`);
   if (phone) h += `<text x="16" y="${y + 21}" font-size="${r1(fh - .5)}" fill="${C.body}">${HEADLINE}</text>`;
-  return h + `<text x="${w - 16}" y="${y}" text-anchor="end" font-size="${fid}" fill="${C.mute}">${phone ? 'T1053.005' : 'T1053.005 · Scheduled Task'}</text></g><path d="M16 ${line} H${w - 16}" stroke="${C.line}"/>`;
+  return h + `</g><path d="M16 ${line} H${w - 16}" stroke="${C.line}"/>`;
 }
 const open = (cls, w, h) => `<svg class="${cls}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(ARIA)}"><rect x=".5" y=".5" width="${w - 1}" height="${h - 1}" rx="12" fill="${C.bg}" stroke="${C.rule}"/>`;
 
 // desktop: three columns, read left to right; pictures left-aligned with their headings, on one centreline
 function desktop() {
   const W = 640, H = 246, col = 200, x0 = 16, gap = 8, pcy = 100, titleY = 178, bodyY = 197, lh = 15.5, f = { head: 11.5, hid: 9.5, title: 12.5, body: 10.3 };
-  const s = [open('ag-scene', W, H), header(W, 23, f.head, f.hid)];
+  const s = [open('ag-scene', W, H), header(W, 23, f.head)];
   STEPS.forEach((st, i) => {
     const x = x0 + i * (col + gap);
     s.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}">${picture(i, x + 2, pcy, 13)}</g>${title(i, x, titleY, f.title)}${body(st.d, x, bodyY, lh, f.body)}</g>`);
@@ -164,19 +173,21 @@ function desktop() {
 }
 // phones: the steps stacked, each with the desktop's full picture (labels, kit, lead card) drawn larger above its
 // words, so nothing is squeezed (owner, 31 Oct 2026: "on mobile, you can take up more space for the animations. dont
-// need to squeeze"); EXT is each picture's reach above and below its centreline, in the picture's own units
-const PS = 1.4, EXT = [[48, 50], [34, 34], [29, 29]];
+// need to squeeze"), each centred on the card ("not centered on mobile"); EXT and EXTX are each picture's reach
+// above and below its centreline and left and right of its origin, in the picture's own units
+const PS = 1.4, EXT = [[48, 50], [34, 34], [29, 29]], EXTX = [[-5, 159], [-1, 163.5], [-2, 187.3]];
 function phone() {
   const W = 360, x = 14, lh = 18.5, f = { head: 13, hid: 11, title: 14.5, body: 13.4 };
   const parts = []; let y = 64;
   STEPS.forEach((st, i) => {
     const cy = r1(y + 26 + EXT[i][0] * PS), ty = r1(cy + EXT[i][1] * PS + 22), by = r1(ty + 22);
-    parts.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}"><g transform="translate(${x} ${cy}) scale(${PS})">${picture(i, 2, 0, 13)}</g></g>${title(i, x + 2, ty, f.title)}${body(st.m, x + 2, by, lh, f.body)}</g>`);
+    const px = r1(W / 2 - PS * (EXTX[i][0] + EXTX[i][1]) / 2 - PS * 2);
+    parts.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}"><g transform="translate(${px} ${cy}) scale(${PS})">${picture(i, 2, 0, 13)}</g></g>${title(i, x + 2, ty, f.title)}${body(st.m, x + 2, by, lh, f.body)}</g>`);
     y = r1(by + (st.m.length - 1) * lh + 22);
     if (i < 2) parts.push(`<path d="M14 ${y} H${W - 14}" stroke="${C.line}"/>`);
   });
   const H = r1(y + 2);
-  return { svg: open('ag-scene ag-scene--m', W, H) + header(W, 25, f.head, f.hid, true) + parts.join('') + '</svg>', H };
+  return { svg: open('ag-scene ag-scene--m', W, H) + header(W, 25, f.head, true) + parts.join('') + '</svg>', H };
 }
 
 // ---------------------------------------------------------------- motion (one stylesheet for both drawings)
@@ -191,7 +202,7 @@ const T = {
   g0a: [6.7, 1.3], rip0: [6.8, 1.1], rip1: [7.1, 1.1], none: [7.7, 3.6],
   loop: [8.9, 1.0], g1: [9.3, 1.1], tick: [9.55, .5], lh: [9.8, .25],
   g0b: [10.4, 1.3], rip2: [10.5, 1.1], rip3: [10.8, 1.1], found: [11.3, .45], g2: [11.7, .9], chev1: [12.4, .9],
-  s2: [12.8, .5], c2: [12.9, .6], rep: [13.4, .8], cardf: [13.9, .4], cardo: [13.9, .8], lead: [14.4, .35], ln: [[14.6, .35], [14.75, .35], [14.9, .35]],
+  s2: [12.8, .5], c2: [12.9, .6], rep: [13.4, .8], cardf: [13.9, .4], cardo: [13.9, .8], lead: [14.4, .35], ln: [[14.6, .35], [14.8, .35]],
   he: [15.3, .4], pk: [15.5, .55], ana: [16.0, .5], halo: [16.4, 1.1],
 };
 const OUT_EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)';
@@ -212,8 +223,8 @@ svg.ag-scene .ag-doc .ag-i { stroke-width: .6; }
 svg.ag-scene path, svg.ag-scene .ag-rip, svg.ag-scene .ag-cardo { fill: none; }
 svg.ag-scene .ag-doc path:first-child { fill: ${C.chip}; }
 svg.ag-scene .ag-c { stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: .16 2; stroke-opacity: 0; }
-svg.ag-scene .ag-loop, svg.ag-scene .ag-tick, svg.ag-scene .ag-cardo, svg.ag-scene .ag-ln { stroke-dasharray: 1 2; stroke-dashoffset: 0; stroke-linecap: round; }   /* (undrawn, the dash sits wholly before the start, so no round cap shows as a dot) */
-svg.ag-scene .ag-lh { fill: ${C.teal}; stroke-linejoin: round; }
+svg.ag-scene .ag-loop, svg.ag-scene .ag-tick, svg.ag-scene .ag-cardo { stroke-dasharray: 1 2; stroke-dashoffset: 0; stroke-linecap: round; }   /* (undrawn, the dash sits wholly before the start, so no round cap shows as a dot) */
+svg.ag-scene .ag-lh { stroke-linecap: round; stroke-linejoin: round; }
 svg.ag-scene .ag-s, svg.ag-scene .ag-chev, svg.ag-scene .ag-ana { transform-box: fill-box; transform-origin: center; }
 svg.ag-scene .ag-rip, svg.ag-scene .ag-found, svg.ag-scene .ag-doc { transform-box: fill-box; transform-origin: center; }
 svg.ag-scene .ag-rip { vector-effect: non-scaling-stroke; }
@@ -271,12 +282,11 @@ ${P} .ag-chev1 { ${at(T.chev1, 'ag-chev', IO, 'none')} }
 /* step 3: the Report agent lights and the lead card writes itself; the lead travels to the human */
 ${P} .ag-s2 { ${at(T.s2, 'ag-wake', OUT_EZ)} }
 ${P} .ag-p2 { ${at(T.s2, 'ag-fade')} }
-/* phones: the waiting pictures show faintly with their words, so a tall empty block never looks unloaded */
-${P}.ag-scene--m .ag-p1, ${P}.ag-scene--m .ag-p2 { animation-name: ag-wake; }
 ${P} .ag-flag { ${at(T.cardf, 'ag-fade')} }
 ${P} .ag-cardo { ${at(T.cardo, 'ag-draw')} }
 ${P} .ag-lead { ${at(T.lead, 'ag-fade')} }
-${T.ln.map((t, k) => `${P} .ag-ln${k} { ${at(t, 'ag-draw')} }`).join('\n')}
+${P} .ag-ln0 { ${at(T.ln[0], 'ag-fade')} }
+${P} .ag-ln1 { ${at(T.ln[1], 'ag-fade')} }
 ${P} .ag-c2 { ${at(T.c2, 'ag-comet', 'linear', 'none')} }
 ${P} .ag-fl-rep { ${at(T.rep, 'ag-flash', IO, 'none')} }
 ${P} .ag-he { ${at(T.he, 'ag-fade')} }

@@ -12,8 +12,8 @@ svg.ag-scene .ag-doc .ag-i { stroke-width: .6; }
 svg.ag-scene path, svg.ag-scene .ag-rip, svg.ag-scene .ag-cardo { fill: none; }
 svg.ag-scene .ag-doc path:first-child { fill: #0a191c; }
 svg.ag-scene .ag-c { stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: .16 2; stroke-opacity: 0; }
-svg.ag-scene .ag-loop, svg.ag-scene .ag-tick, svg.ag-scene .ag-cardo, svg.ag-scene .ag-ln { stroke-dasharray: 1 2; stroke-dashoffset: 0; stroke-linecap: round; }   /* (undrawn, the dash sits wholly before the start, so no round cap shows as a dot) */
-svg.ag-scene .ag-lh { fill: #28d7c5; stroke-linejoin: round; }
+svg.ag-scene .ag-loop, svg.ag-scene .ag-tick, svg.ag-scene .ag-cardo { stroke-dasharray: 1 2; stroke-dashoffset: 0; stroke-linecap: round; }   /* (undrawn, the dash sits wholly before the start, so no round cap shows as a dot) */
+svg.ag-scene .ag-lh { stroke-linecap: round; stroke-linejoin: round; }
 svg.ag-scene .ag-s, svg.ag-scene .ag-chev, svg.ag-scene .ag-ana { transform-box: fill-box; transform-origin: center; }
 svg.ag-scene .ag-rip, svg.ag-scene .ag-found, svg.ag-scene .ag-doc { transform-box: fill-box; transform-origin: center; }
 svg.ag-scene .ag-rip { vector-effect: non-scaling-stroke; }
@@ -73,14 +73,11 @@ svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .a
 /* step 3: the Report agent lights and the lead card writes itself; the lead travels to the human */
 .is-playing svg.ag-scene .ag-s2 { animation: ag-wake 0.5s cubic-bezier(.22,1,.36,1) 12.8s both; }
 .is-playing svg.ag-scene .ag-p2 { animation: ag-fade 0.5s cubic-bezier(.45,0,.25,1) 12.8s both; }
-/* phones: the waiting pictures show faintly with their words, so a tall empty block never looks unloaded */
-.is-playing svg.ag-scene.ag-scene--m .ag-p1, .is-playing svg.ag-scene.ag-scene--m .ag-p2 { animation-name: ag-wake; }
 .is-playing svg.ag-scene .ag-flag { animation: ag-fade 0.4s cubic-bezier(.45,0,.25,1) 13.9s both; }
 .is-playing svg.ag-scene .ag-cardo { animation: ag-draw 0.8s cubic-bezier(.45,0,.25,1) 13.9s both; }
 .is-playing svg.ag-scene .ag-lead { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 14.4s both; }
-.is-playing svg.ag-scene .ag-ln0 { animation: ag-draw 0.35s cubic-bezier(.45,0,.25,1) 14.6s both; }
-.is-playing svg.ag-scene .ag-ln1 { animation: ag-draw 0.35s cubic-bezier(.45,0,.25,1) 14.75s both; }
-.is-playing svg.ag-scene .ag-ln2 { animation: ag-draw 0.35s cubic-bezier(.45,0,.25,1) 14.9s both; }
+.is-playing svg.ag-scene .ag-ln0 { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 14.6s both; }
+.is-playing svg.ag-scene .ag-ln1 { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 14.8s both; }
 .is-playing svg.ag-scene .ag-c2 { animation: ag-comet 0.6s linear 12.9s none; }
 .is-playing svg.ag-scene .ag-fl-rep { animation: ag-flash 0.8s cubic-bezier(.45,0,.25,1) 13.4s none; }
 .is-playing svg.ag-scene .ag-he { animation: ag-fade 0.4s cubic-bezier(.45,0,.25,1) 15.3s both; }
