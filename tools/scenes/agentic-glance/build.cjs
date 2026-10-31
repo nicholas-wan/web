@@ -46,8 +46,8 @@ const r1 = v => +v.toFixed(1);
 
 // the three steps: a title and plain lines (wrapped for each layout)
 const STEPS = [
-  { title: 'Purpose-built agents', d: ['A supervisor splits the hunt among', 'narrow agents, each given only the tools', 'and context its one job needs.'],
-    m: ['A supervisor splits the hunt among narrow', 'agents, each given only the tools and context', 'its one job needs.'] },
+  { title: 'Purpose-built agents', d: ['A local model does best with one job, so', 'each narrow agent gets only the tools', 'and context that job needs.'],
+    m: ['A local model does best with one job, so each', 'narrow agent gets only the tools and context', 'that job needs.'] },
   { title: 'Equipped to adapt', d: ['No results can mean a bad query, not a', 'safe network. So the agent rewrites it,', 'checks the fix and searches again.'],
     m: ['No results can mean a bad query, not a safe network.', 'So the agent rewrites it, checks the fix and', 'searches again.'] },
   { title: 'Surface to the analyst', d: ['Agents flag what looks suspicious, with', 'the evidence attached. Only a human', 'analyst makes the call.'],
@@ -56,7 +56,7 @@ const STEPS = [
 const JOBS = ['Hypothesis', 'Detection', 'Report'], HYP = 0, ON = 1, REP = 2;   // the product's own agents, the three that read best (prime-th th-core: hypothesis, detection_logic, report); Detection searches
 const LOOP_END = 200;   // degrees, clockwise from the right: where the loop's arc ends and its arrowhead points up
 const TOOLS = [['search', 'search'], ['check', 'check query'], ['bars', 'analyse results']];   // the Detection agent's own steps (past hunts is the Hypothesis agent's tool)
-const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each given only the tools and context its one job needs: forming a hypothesis, writing and running the detection logic, reporting. Agents carry tools and skills. The Detection agent\'s first search, for schtasks.exe, comes back empty, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the agent asks whether its search could have missed the threat, checks a new query and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline. The Report agent writes it up with the evidence attached, and only a human analyst makes the call.';
+const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each given only the tools and context its one job needs, because a local model does best with one job: forming a hypothesis, writing and running the detection logic, reporting. Agents carry tools and skills. The Detection agent\'s first search, for schtasks.exe, comes back empty, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the agent asks whether its search could have missed the threat, checks a new query and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline. The Report agent writes it up with the evidence attached, and only a human analyst makes the call.';
 
 // a plain agent node: a ring with a dot; the one we follow is solid teal
 const node = (cx, cy, r, on, cls = '') => on
