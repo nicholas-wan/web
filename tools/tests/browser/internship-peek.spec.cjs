@@ -230,7 +230,7 @@ test('agentic AI peek: opens inline on a click, plays one ~22 s run with a statu
  await expect(ctl(root)).toBeHidden();
  const c2=panel(root).locator('.c2');
  const words=await panel(root).textContent();
- for(const s of ['Scheduled Task','Flagged','covered by a recent hunt','Valid negative','4698','\\WinTaskUpdate','1 host · not in baseline','Analyst','request_review','Hands it to an analyst, with the evidence','Local LLM · on-premises','1 lead for analyst review · 1 valid negative · 1 set aside'])expect(words).toContain(s);
+ for(const s of ['Scheduled Task','Flagged','covered by a recent hunt','Valid negative','4698','\\WinTaskUpdate','1 host · not in baseline','Analyst','request_review','Agents raise leads; analysts keep the call','Context engineering','Local LLM · on-premises','1 lead for analyst review · 1 valid negative · 1 set aside'])expect(words).toContain(s);
  const label=await c2.getAttribute('aria-label');
  expect(label.startsWith('An illustrative hunt.')).toBe(true);
  // Generic and unquestionable: no real malware, internal component names, product names,

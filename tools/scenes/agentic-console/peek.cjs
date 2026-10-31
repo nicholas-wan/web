@@ -15,30 +15,33 @@ const FIRST = [0, 3, 7];                               // the console entry each
 const TALLY = '1 lead for analyst review · 1 valid negative · 1 set aside';
 const r2 = v => +v.toFixed(2);
 
-// ---------------------------------------------------------------- the story panel, one scene per beat
+// ---------------------------------------------------------------- the story panel, one scene per beat: the console is the
+// product; the panel is his commentary on it, one decision per beat, each a claim the card's writeup makes
 // Parts arrive at the beat's start (--s, generated) plus their own offset (--t), timed to land with the matching
 // console entry; resting styles are each scene's finished state, so pause, reduced motion and the end need nothing.
 // (one class attribute per element: a second one is ignored, and with it the part's animation)
 const a = (t, cls = '') => `class="hsk-a${cls ? ' ' + cls : ''}" style="--t:${t}s"`;
 const tick = '<svg class="hsk-tk" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 6.3l2 2 4-4.3"/></svg>';
 const flag = '<svg class="hsk-tk" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 10.6V1.9h6L7.6 4.1 9 6.3H3"/></svg>';
-const top = (h, why) => `<p class="hsk-h">${h}</p><p class="hsk-why">${why}</p>`;
+// each beat: an eyebrow naming a claim from the card's writeup, the decision as its headline, and why, in his voice
+// (owner, 31 Oct 2026, of the product-voiced lines: "now it is selling the product instead of me")
+const top = (k, h, why) => `<p class="hsk-k">${k}</p><p class="hsk-h">${h}</p><p class="hsk-why">${why}</p>`;
 const SCENES = [
   // 1 plan the hunt (~7 s), in the console's order: phrases become techniques, the Hypothesis agent writes at
   // ~2 s, the Investigator checks past hunts at ~4.3 s
-  top('From a report to a hypothesis it can test', 'Past hunts are checked first; recently covered techniques are set aside.')
+  top('Context engineering', 'Scope the hunt before the model reasons', 'I feed the agents past hunts with the report, so a local model reasons only about what is new and testable.')
   + `<p ${a(0.2, 'hsk-doc')}>…<mark ${a(0.6, 'mk')}>create a scheduled task</mark> … <mark ${a(1.0, 'mk')}>run PowerShell</mark> … <mark ${a(1.4, 'mk')}>add a Run key</mark>…</p>`
   + `<p class="hsk-ids"><code ${a(1.2)}>Scheduled Task</code><code ${a(1.6, 'is-out')}>PowerShell<b class="hsk-a" style="--t:4.6s">hunted recently</b></code><code ${a(2)}>Run Keys</code></p>`
   + `<dl class="hsk-kv hsk-a" style="--t:2.4s"><div><dt>Hypothesis</dt><dd>A new task runs at logon, outside the baseline</dd></div></dl>`,
   // 2 catch a blind spot (~10 s): one clean negative, one search that couldn't have seen it, the re-plan, the check
   //   (the checked query lands with the console's result at ~7.8 s and holds two seconds before beat 3)
-  top('Zero results can be a blind spot, not a negative', 'The verdict sets the next step: revise, record or raise a lead.')
+  top('Guardrails and evaluation', 'A verdict for every search, not a result count', 'I set the verdict rules: a negative must show the telemetry could have seen it, or the agent re-plans.')
   + `<ul class="hsk-rows"><li ${a(0.5)}><span>Run keys vs baseline</span><b class="is-ok hsk-a" style="--t:1.2s">${tick}Valid negative</b></li>`
   + `<li ${a(2.1)}><span>process = schtasks.exe</span><b class="is-warn hsk-a" style="--t:2.7s">0 results</b></li></ul>`
   + `<p class="hsk-note hsk-a" style="--t:3.6s">Tasks made through the Task Scheduler API never launch schtasks.exe.</p>`
   + `<p class="hsk-src"><span class="hsk-a" style="--t:5.2s">Re-plan: event 4698 · a task was created</span><b class="hsk-a" style="--t:7.5s">${tick}Query checked against this telemetry</b></p>`,
   // 3 hand off (~6 s and the end): the rare task stands out, with its evidence and the next step
-  top('Hands it to an analyst, with the evidence', 'Agents raise leads, not verdicts; an analyst decides what it is.')
+  top('Analyst review points', 'Agents raise leads; analysts keep the call', 'I put the review point before anything is acted on, and made the evidence the hand-off.')
   + `<ul class="hsk-bars"><li><span>\\Microsoft\\…\\ProactiveScan</span><i ${a(0.4, 'gr')}></i><b>in baseline</b></li>`
   + `<li><span>\\Microsoft\\…\\ScheduledDefrag</span><i ${a(0.6, 'gr')}></i><b>in baseline</b></li>`
   + `<li class="is-lead"><span>\\WinTaskUpdate</span><i ${a(0.8, 'gr')}></i><b>1 host</b></li></ul>`
