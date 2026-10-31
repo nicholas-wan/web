@@ -194,7 +194,7 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
  }
 });
 
-test('agentic AI chart: a hover previews it like the internship charts, it plays one ~13 s hunt in three narrative steps and replays, reduced motion holds the final frame, and phones get the stacked drawing',async({page})=>{
+test('agentic AI chart: a hover previews it like the internship charts, it plays one ~16 s hunt in three narrative steps and replays, reduced motion holds the final frame, and phones get the stacked drawing',async({page})=>{
  const scene=root=>card(root).locator('svg.ag-scene:not(.ag-scene--m)');
  const phoneScene=root=>card(root).locator('svg.ag-scene--m');
  const shown=loc=>loc.evaluate(e=>+getComputedStyle(e).opacity);
@@ -213,7 +213,7 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  // Reduced motion holds the final frame: all three steps, the human and the second search's find shown; nothing
  // transient (the report on its way in, pulses, ripples, glows, spinners, the typed queries, the first search's "0 found") is left on screen; the result row stays, with its one unusual result lit.
  for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-found','.ag-qo','.ag-qw','.ag-replit','.ag-anl'])expect(await shown(scene(root).locator(s))).toBe(1);
- for(const s of ['.ag-doc','.ag-none','.ag-pk','.ag-det-dot','.ag-q0','.ag-q1','.ag-hunch','.ag-gl0','.ag-gl3','.ag-gh1'])expect(await shown(scene(root).locator(s))).toBe(0);
+ for(const s of ['.ag-doc','.ag-none','.ag-pk','.ag-det-dot','.ag-q0','.ag-q1','.ag-hunch','.ag-gl0','.ag-gl2','.ag-gh1'])expect(await shown(scene(root).locator(s))).toBe(0);
  for(const o of await scene(root).locator('.ag-fl, .ag-rip, .ag-spin, .ag-lc').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
  const words=await scene(root).textContent();
  for(const s of ['Agentic Threat Hunting','From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Report','A local model does best with one job, so','each narrow agent gets only the tools','and context that job needs.','Only a human','No results can mean a bad query, not a','safe network. So the agent rewrites it,','checks the fix and searches again.','check query','32 found','Agents flag what looks suspicious, with','analyst makes the call.','Scheduled Task','T1053.005'])expect(words).toContain(s);
