@@ -1,7 +1,7 @@
 /* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
-.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 296; }
-.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 470; }
+.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 250; }
+.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 360; }
 @media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
 svg.ag-scene text { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
 svg.ag-scene .ag-m { font-family: Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace; }
@@ -23,17 +23,13 @@ svg.ag-scene .ag-s { transform-box: fill-box; }
 .is-playing svg.ag-scene .ag-c1 { animation: ag-comet .7s linear 0.5s none; }
 .is-playing svg.ag-scene .ag-det { animation: ag-det .4s cubic-bezier(.45,0,.25,1) 1s both; }
 .is-playing svg.ag-scene .ag-job-on text { animation: ag-job .4s cubic-bezier(.45,0,.25,1) 1s both; }
-.is-playing svg.ag-scene .ag-ev0 { animation: ag-fade .35s cubic-bezier(.45,0,.25,1) 1.1s both; }
-.is-playing svg.ag-scene .ag-evr0 { animation: ag-fade .35s cubic-bezier(.45,0,.25,1) 1.9s both; }
 .is-playing svg.ag-scene .ag-s1 { animation: ag-in .45s cubic-bezier(.22,1,.36,1) 2.6s both; }
 .is-playing svg.ag-scene .ag-tool0 { animation: ag-fade .3s cubic-bezier(.45,0,.25,1) 2.8s both; }
 .is-playing svg.ag-scene .ag-tool1 { animation: ag-fade .3s cubic-bezier(.45,0,.25,1) 3s both; }
 .is-playing svg.ag-scene .ag-tool2 { animation: ag-fade .3s cubic-bezier(.45,0,.25,1) 3.2s both; }
 .is-playing svg.ag-scene .ag-loop { animation: ag-draw .7s cubic-bezier(.45,0,.25,1) 2.9s both; }
 .is-playing svg.ag-scene .ag-lh { animation: ag-fade .25s cubic-bezier(.45,0,.25,1) 3.5s both; }
-.is-playing svg.ag-scene .ag-ev1, .is-playing svg.ag-scene .ag-evr1 { animation: ag-fade .35s cubic-bezier(.45,0,.25,1) 3.7s both; }
 .is-playing svg.ag-scene .ag-s2 { animation: ag-in .45s cubic-bezier(.22,1,.36,1) 4.8s both; }
 .is-playing svg.ag-scene .ag-flag { animation: ag-fade .3s cubic-bezier(.45,0,.25,1) 4.9s both; }
 .is-playing svg.ag-scene .ag-he { animation: ag-fade .3s cubic-bezier(.45,0,.25,1) 5.2s both; }
 .is-playing svg.ag-scene .ag-ana { animation: ag-fade .4s cubic-bezier(.22,1,.36,1) 5.4s both; }
-.is-playing svg.ag-scene .ag-ev2, .is-playing svg.ag-scene .ag-evr2 { animation: ag-fade .35s cubic-bezier(.45,0,.25,1) 5.6s both; }

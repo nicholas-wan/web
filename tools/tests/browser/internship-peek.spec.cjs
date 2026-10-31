@@ -212,11 +212,13 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(scene(root)).toBeVisible();
  await expect(phoneScene(root)).toBeHidden();
  // Reduced motion holds the final frame: all three steps, the human and the evidence shown.
- for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-evr2'])expect(await shown(scene(root).locator(s))).toBe(1);
+ for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana'])expect(await shown(scene(root).locator(s))).toBe(1);
  const words=await scene(root).textContent();
- for(const s of ['How one hunt ran','Purpose-built agents','Tools to adapt on evidence','Surface to the analyst','Supervisor','Hypothesis','Detection','Report','A supervisor splits the hunt among','The first search comes back empty.',"Empty doesn't mean safe, so the agent",'searches another way.','Agents surface what looks suspicious,','makes the call.','EVIDENCE','process = schtasks.exe','0 results','event 4698','a task being created','\WinTaskUpdate','1 host · not in baseline'])expect(words).toContain(s);
+ for(const s of ['From a ransomware report to one lead','Purpose-built agents','Tools to adapt on evidence','Surface to the analyst','Supervisor','Hypothesis','Detection','Report','A supervisor splits the hunt among','The first search comes back empty.',"Empty doesn't mean safe, so the agent",'searches another way.','Agents surface what looks suspicious,','makes the call.'])expect(words).toContain(s);
  const label=await scene(root).getAttribute('aria-label');
  expect(label.startsWith('An illustrative hunt.')).toBe(true);
+ // The hunter's specifics are in the label, not on the chart.
+ for(const s of ['schtasks.exe','event 4698','\\WinTaskUpdate','human analyst'])expect(label).toContain(s);
  // Generic and unquestionable: no real malware, internal component names, product names, counts of hits,
  // a root-level path as the reason, or the card's days-to-hours claim.
  const forbidden=/SysUpdate|Evidence found|SPL crafter|Post-query|Splunk|root-level|days to hours|\bdays\b|\d+ hits|tokens?\b/i;

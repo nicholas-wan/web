@@ -12,10 +12,10 @@
 // Step 2, tools to adapt on evidence: the acting agent with its kit; empty doesn't mean safe, so it asks whether
 // its search could have missed it and searches another way (the loop). Step 3, surface to the analyst: agents
 // surface what looks suspicious with the evidence attached (a lead card passed along a line to the human), and a
-// human analyst makes the call. The hunter's evidence sits under each step in small type (schtasks.exe and
-// 0 results; event 4698, a task being created; \WinTaskUpdate on 1 host, not in the baseline).
-// Two SVGs sharing one stylesheet: desktop 640x296, the steps as columns in a 46rem card, the three pictures on one
-// optical centreline; phones 360x470, the steps stacked with smaller pictures. Base styles are the final frame,
+// human analyst makes the call. The hunter's specifics (schtasks.exe and 0 results; event 4698; \WinTaskUpdate on
+// 1 host, not in the baseline) live in the aria-label only (owner: an evidence tier under each step "doesnt add value").
+// Two SVGs sharing one stylesheet: desktop 640x250, the steps as columns in a 46rem card, the three pictures on one
+// optical centreline; phones 360x360, the steps stacked with smaller pictures. Base styles are the final frame,
 // motion runs only under .is-playing, .is-still holds the final frame. About 6 s, then internship-peek.js replays
 // it every 10 s like the others. The finish comes from rounds of independent design reviews and blind reads (a
 // reader with no brief says what the picture tells them): only the numbered headings bold; plain identical agent
@@ -79,7 +79,7 @@ function picture(i, x, cy, r, rich) {
     const lr = r + 10, cx = x + lr + 3;
     let p = node(cx, cy, r, true) +
       `<path class="ag-loop" d="M${r1(cx + lr * .5)} ${r1(cy - lr * .87)} A${lr} ${lr} 0 1 1 ${r1(cx - lr * .95)} ${r1(cy - lr * .3)}" pathLength="1" stroke="${C.teal}" stroke-width="1.6"/>` +
-      `<path class="ag-lh" d="M${r1(cx - lr * .95 - 5)} ${r1(cy - lr * .3 - 6)} L${r1(cx - lr * .95 + 1)} ${r1(cy - lr * .3 + 1)} L${r1(cx - lr * .95 + 6.5)} ${r1(cy - lr * .3 - 3.5)} Z" fill="${C.teal}" stroke="${C.teal}" stroke-width="1"/>`;
+      `<path class="ag-lh" d="M${r1(cx - lr * .95)} ${r1(cy - lr * .3)} L${r1(cx - lr * .95 + 2.2)} ${r1(cy - lr * .3 + 8)} L${r1(cx - lr * .95 - 6.4)} ${r1(cy - lr * .3 + 5.3)} Z" fill="${C.teal}" stroke="${C.teal}" stroke-width="1" stroke-linejoin="round"/>`;   // tip at the arc's end, base 7 units back along the tangent (0.30, -0.95), 4.5 either side
     if (rich) {
       const tx = cx + lr + 12, th = 18, tw = 84, ty0 = cy - th * 1.5 - 6;
       TOOLS.forEach(([ic, name], k) => {
@@ -114,28 +114,28 @@ const evidence = (i, x, y, f) =>
   `<text class="ag-evr ag-evr${i}" x="${x}" y="${r1(y + f * 2.75)}" font-size="${f}" font-weight="600" fill="${C.ink}">${esc(STEPS[i].ev[1])}</text>`;
 // the header: what the viewer is looking at, and for the hunter the report and technique
 const header = (w, y, fh, fid, short) =>
-  `<g class="ag-head">${icon('rep', 16, y - 10, 1.05, C.mute)}<text x="32" y="${y}" font-size="${fh}" font-weight="700" fill="${C.ink}">How one hunt ran</text>` +
-  `<text x="${w - 16}" y="${y}" text-anchor="end" font-size="${fid}" fill="${C.mute}">${short ? 'Ransomware report · T1053.005' : 'Ransomware report · T1053.005 Scheduled Task'}</text></g><path d="M16 ${y + 11} H${w - 16}" stroke="${C.line}"/>`;
+  `<g class="ag-head">${icon('rep', 16, y - 10, 1.05, C.mute)}<text x="32" y="${y}" font-size="${fh}" font-weight="700" fill="${C.ink}">From a ransomware report to one lead</text>` +
+  `<text x="${w - 16}" y="${y}" text-anchor="end" font-size="${fid}" fill="${C.mute}">${short ? 'T1053.005' : 'T1053.005 · Scheduled Task'}</text></g><path d="M16 ${y + 11} H${w - 16}" stroke="${C.line}"/>`;
 const open = (cls, w, h) => `<svg class="${cls}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(ARIA)}"><rect x=".5" y=".5" width="${w - 1}" height="${h - 1}" rx="12" fill="${C.bg}" stroke="${C.rule}"/>`;
 
 // desktop: three columns, read left to right; pictures left-aligned with their headings, on one centreline
 function desktop() {
-  const W = 640, H = 296, col = 200, x0 = 16, gap = 8, pcy = 100, titleY = 178, bodyY = 197, lh = 15.5, f = { head: 11.5, hid: 9.5, title: 12.5, body: 10.3, ev: 9 };
+  const W = 640, H = 250, col = 200, x0 = 16, gap = 8, pcy = 100, titleY = 178, bodyY = 197, lh = 15.5, f = { head: 11.5, hid: 9.5, title: 12.5, body: 10.3, ev: 9 };
   const s = [open('ag-scene', W, H), header(W, 23, f.head, f.hid)];
   STEPS.forEach((st, i) => {
     const x = x0 + i * (col + gap);
-    s.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}">${picture(i, x + 2, pcy, 13, true)}</g>${title(i, x, titleY, f.title)}${body(st.d, x, bodyY, lh, f.body)}${evidence(i, x, r1(bodyY + 3 * lh + 5), f.ev)}</g>`);
+    s.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}">${picture(i, x + 2, pcy, 13, true)}</g>${title(i, x, titleY, f.title)}${body(st.d, x, bodyY, lh, f.body)}</g>`);
     if (i < 2) s.push(`<path class="ag-chev" d="M${x + col - 9} ${pcy - 5} l4 5 -4 5" stroke="${C.mute}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`);
   });
   return s.join('') + '</svg>';
 }
 // phones: the steps stacked, a smaller picture beside each, inset like the text, type at 11px or more
 function phone() {
-  const W = 360, H = 470, top = 44, row = 142, px = 20, tx = 92, lh = 17, f = { head: 13, hid: 11, title: 14, body: 13.4, ev: 13 };
+  const W = 360, H = 360, top = 44, row = 104, px = 20, tx = 92, lh = 17, f = { head: 13, hid: 11, title: 14, body: 13.4, ev: 13 };
   const s = [open('ag-scene ag-scene--m', W, H), header(W, 21, f.head, f.hid, true)];
   STEPS.forEach((st, i) => {
     const y = top + i * row, bodyY = y + 34;
-    s.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}">${picture(i, px, y + row / 2 - 6, 9, false)}</g>${title(i, tx, y + 16, f.title)}${body(st.m, tx, bodyY, lh, f.body)}${evidence(i, tx, r1(bodyY + st.m.length * lh + 3), f.ev)}</g>`);
+    s.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}">${picture(i, px, y + row / 2 - 6, 9, false)}</g>${title(i, tx, y + 16, f.title)}${body(st.m, tx, bodyY, lh, f.body)}</g>`);
     if (i < 2) s.push(`<path d="M14 ${y + row - 8} H${W - 14}" stroke="${C.line}"/>`);
   });
   return s.join('') + '</svg>';
@@ -148,8 +148,8 @@ const OUT_EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)';
 const P = '.is-playing svg.ag-scene';
 const css = `/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
-.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 296; }
-.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 470; }
+.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 250; }
+.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 360; }
 @media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
 svg.ag-scene text { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
 svg.ag-scene .ag-m { font-family: Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace; }
@@ -171,22 +171,18 @@ ${P} .ag-s0 { animation: ag-in .45s ${OUT_EZ} ${T.s0}s both; }
 ${P} .ag-c1 { animation: ag-comet .7s linear ${T.c1}s none; }
 ${P} .ag-det { animation: ag-det .4s ${IO} ${T.det}s both; }
 ${P} .ag-job-on text { animation: ag-job .4s ${IO} ${T.det}s both; }
-${P} .ag-ev0 { animation: ag-fade .35s ${IO} ${T.ev0}s both; }
-${P} .ag-evr0 { animation: ag-fade .35s ${IO} ${T.r0}s both; }
 ${P} .ag-s1 { animation: ag-in .45s ${OUT_EZ} ${T.s1}s both; }
 ${P} .ag-tool0 { animation: ag-fade .3s ${IO} ${T.tool[0]}s both; }
 ${P} .ag-tool1 { animation: ag-fade .3s ${IO} ${T.tool[1]}s both; }
 ${P} .ag-tool2 { animation: ag-fade .3s ${IO} ${T.tool[2]}s both; }
 ${P} .ag-loop { animation: ag-draw .7s ${IO} ${T.loop}s both; }
 ${P} .ag-lh { animation: ag-fade .25s ${IO} ${T.lh}s both; }
-${P} .ag-ev1, ${P} .ag-evr1 { animation: ag-fade .35s ${IO} ${T.ev1}s both; }
 ${P} .ag-s2 { animation: ag-in .45s ${OUT_EZ} ${T.s2}s both; }
 ${P} .ag-flag { animation: ag-fade .3s ${IO} ${T.flag}s both; }
 ${P} .ag-he { animation: ag-fade .3s ${IO} ${T.he}s both; }
 ${P} .ag-ana { animation: ag-fade .4s ${OUT_EZ} ${T.ana}s both; }
-${P} .ag-ev2, ${P} .ag-evr2 { animation: ag-fade .35s ${IO} ${T.ev2}s both; }
 `;
 fs.writeFileSync(path.join(OUT, 'scene-d.svg'), desktop());
 fs.writeFileSync(path.join(OUT, 'scene-m.svg'), phone());
 fs.writeFileSync(path.join(OUT, 'scene.css'), css);
-console.log('wrote scene-d.svg', desktop().length, 'scene-m.svg', phone().length, 'scene.css', css.length, 'ends ~', (T.ev2 + 0.35).toFixed(1) + 's');
+console.log('wrote scene-d.svg', desktop().length, 'scene-m.svg', phone().length, 'scene.css', css.length, 'ends ~', (T.ana + 0.4).toFixed(1) + 's');
