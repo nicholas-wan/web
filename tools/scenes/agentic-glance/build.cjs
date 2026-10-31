@@ -12,7 +12,7 @@
 // each narrow agent in the product's order, Hypothesis first, then Detection, which lights and keeps the hunt.
 // Step 2, equipped to adapt (defined tool access, guardrails): the agent's kit arrives; its first search comes back
 // with none ("0 found", held: the hinge of the story); empty doesn't mean safe, so it loops back, checks its new
-// query (the tick draws) and searches another way, and "0 found" turns into "1 found"; then it analyses the results. Step 3, surface to the analyst (analyst
+// query (the tick draws) and searches another way, and "0 found" turns into "32 found", every task created; then it analyses them and one is unusual. Step 3, surface to the analyst (analyst
 // review points): the Report agent back in step 1 lights, the lead card writes itself, and the lead travels
 // along the line to the amber human, who makes the call. Report agent last, as in the product (prime-th th-core).
 // The hunter's specifics (schtasks.exe and nothing found; event 4698; \WinTaskUpdate on 1 host, not in the baseline)
@@ -62,7 +62,7 @@ const TOOLS = [['search', 'search'], ['check', 'check query'], ['bars', 'analyse
 // the two searches the agent writes, in no SIEM's syntax (the verifier's rule): the tool the obvious hunt looks for,
 // then the event a task's creation logs whichever tool made it; MONO is a character's width at 9px, fixed by textLength
 const QUERIES = [['process', 'schtasks.exe'], ['event', 'task created']], MONO = 5.4;
-const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each given only the tools and context its one job needs, because a local model does best with one job: forming a hypothesis, writing and running the detection logic, reporting. Agents carry tools and skills. The Detection agent\'s first search, for schtasks.exe, comes back empty, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the agent asks whether its search could have missed the threat, checks a new query and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline. The Reporting agent writes it up with the evidence attached, and only a human analyst makes the call.';
+const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each given only the tools and context its one job needs, because a local model does best with one job: forming a hypothesis, writing and running the detection logic, reporting. Agents carry tools and skills. The Detection agent\'s first search, for schtasks.exe, comes back empty, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the agent asks whether its search could have missed the threat, checks a new query and searches another way, around event 4698, a task being created. That returns every task created; analysing them surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline. The Reporting agent writes it up with the evidence attached, and only a human analyst makes the call.';
 
 // a plain agent node: a ring with a dot; the one we follow is solid teal
 const node = (cx, cy, r, on, cls = '') => on
@@ -90,10 +90,10 @@ function picture(i, x, cy, r) {
     p += ripple('ag-rip-det', ax[on], ay, r) + node(scx, sy, r, false) + [0, 1, 2].map(k => node(ax[k], ay, r, k === on, k === on ? 'ag-det' : '')).join('') +
       `<circle class="ag-det-dot" cx="${ax[on]}" cy="${ay}" r="${r1(r * .3)}" fill="${C.dim}"/>`;   // until it lights, Detection looks like the others
     p += flash('ag-fl-sup', scx, sy, r) + flash('ag-fl-hyp', ax[HYP], ay, r) + flash('ag-fl-rep', ax[rep], ay, r) +
-      spin('ag-sp-sup', scx, sy, r + 4) + spin('ag-sp-hyp', ax[HYP], ay, r + 4) + spin('ag-sp-rep', ax[rep], ay, r + 4);
+      spin('ag-sp-sup', scx, sy, r + 3) + spin('ag-sp-hyp', ax[HYP], ay, r + 3) + spin('ag-sp-rep', ax[rep], ay, r + 3);
     // the threat report itself, labelled, left of the supervisor, before it slides in
     p += `<g class="ag-doc">${icon('rep', r1(scx - 70), r1(sy - 23), 2, C.ink)}${label(scx - 58, r1(sy + 12), 9, 'Threat report')}</g>`;   // the label under the page, so it never reads on one line with Supervisor
-    p += label(scx, sy - r - 5, lf, 'Supervisor');
+    p += label(scx, sy - r - 7, lf, 'Supervisor');
     JOBS.forEach((j, k) => {
       const ly = ay + r + lf + 3;
       p += `<g class="${k === ON ? 'ag-job-on' : ''}">${label(ax[k], ly, lf, j, 'middle', k === ON ? C.teal : C.mute)}</g>`;
@@ -129,7 +129,7 @@ function picture(i, x, cy, r) {
           (k === 1 ? `<text class="ag-rw" x="${tx + 22}" y="${ty + 12.5}" font-size="10" font-weight="600" fill="${C.teal}">rewrite query</text>` : '');
         // what the search found: none the first time, one the second
         if (k === 0) p += `<text class="ag-none" x="${tx + tw - 7}" y="${ty + 12.5}" text-anchor="end" font-size="9.5" font-weight="600" fill="${C.body}">0 found</text>` +
-          `<text class="ag-found" x="${tx + tw - 7}" y="${ty + 12.5}" text-anchor="end" font-size="9.5" font-weight="700" fill="${C.teal}">1 found</text>`;
+          `<text class="ag-found" x="${tx + tw - 7}" y="${ty + 12.5}" text-anchor="end" font-size="9.5" font-weight="700" fill="${C.teal}">32 found</text>`;
         p += '</g>';
       });
     }
@@ -235,21 +235,21 @@ function phone() {
 // Reporting), and the query is written out under the kit before each search runs (q0, q1), selected and replaced in
 // between (sel, q0out), and folds into the analysis dots (qd) once the second search finds one.
 const T = {
-  s0: [0.2, .5], doc: [0.2, 2.0], sup: [2.0, .7], spsup: [1.9, 1.0], c0: [2.3, .7], hyp: [2.8, 1.0], sphyp: [2.8, 1.0], c0r: [3.5, .6], c1: [4.0, .7], det: [4.6, .45], ripdet: [4.6, 1.0], chev0: [5.4, .9],
-  s1: [5.7, .5], arr: [5.9, .9], tool: [[6.2, .35], [6.45, .35], [6.7, .35]],
-  spdet: [6.8, 3.2], q: [6.9, .3], q0: [7.1, .8], k0: [8.0, .15],
-  g0a: [8.0, 1.3], rip0: [8.1, 1.1], rip1: [8.4, 1.1], none: [8.9, 1.1],
+  s0: [0.2, .5], doc: [0.2, 2.0], sup: [2.0, .7], spsup: [1.9, 1.0], c0: [2.3, .7], hyp: [2.8, 1.0], sphyp: [2.8, 1.0], c0r: [3.5, .6], c1: [4.0, .7], det: [4.6, .45], ripdet: [4.6, 1.0], chev0: [5.0, .9],
+  s1: [5.3, .5], arr: [5.5, .9], tool: [[5.8, .35], [6.05, .35], [6.3, .35]],
+  spdet: [6.4, 3.6], q: [6.5, .3], q0: [6.7, .8], k0: [7.6, .15],
+  g0a: [7.6, 1.3], rip0: [7.7, 1.1], rip1: [8.0, 1.1], none: [8.5, 1.5],
   loop: [10.0, 1.0], lh: [10.9, .25], rw: [10.1, 1.5], sel: [10.2, .15], q0out: [10.8, .15], q1: [10.9, .8], k1: [11.9, .15], g1: [11.5, 1.0], tick: [11.7, .5],
   g0b: [12.4, 1.3], rip2: [12.5, 1.1], rip3: [12.8, 1.1], found: [13.3, .45],
-  q1out: [13.8, .15], g2: [13.8, .9], qd: [14.0, .2], qs: [14.1, .8], qo: [14.65, .45], qr: [14.65, 1.0], qw: [14.85, .3], chev1: [14.7, .9], qout: [16.4, .4],
-  s2: [15.1, .5], c2: [15.2, .6], rep: [15.7, .8], sprep: [15.6, 1.1], cardf: [16.2, .4], cardo: [16.2, .8], lead: [16.7, .35], ln: [[16.9, .3], [17.1, .3]],
+  q1out: [13.8, .15], g2: [13.8, .9], qd: [14.0, .2], qs: [14.1, .8], qo: [14.65, .45], qr: [14.65, 1.0], qw: [14.85, .3], chev1: [15.0, .9], qout: [17.4, .4],
+  s2: [15.5, .5], c2: [15.6, .6], rep: [16.1, .8], sprep: [16.0, 1.1], cardf: [16.6, .4], cardo: [16.6, .8], lead: [17.1, .35], ln: [[17.3, .3], [17.5, .3]],
   he: [17.9, .4], pk: [18.1, .55], ana: [18.6, .5], halo: [19.0, 1.1],
 };
 const OUT_EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)';
 const P = '.is-playing svg.ag-scene', PH = phone();
-// PACE scales the whole timeline at once, keeping its rhythm (owner, 31 Oct 2026: "make the animation faster"; 0.7
-// since the queries were written out, so it still plays in about 14 s)
-const PACE = 0.7, k = v => +(v * PACE).toFixed(3);
+// PACE scales the whole timeline at once, keeping its rhythm (owner, 31 Oct 2026: "make the animation faster", then,
+// once the queries were written out, "maybe animation can speed up more even slightly": about 12.7 s)
+const PACE = 0.63, k = v => +(v * PACE).toFixed(3);
 const a = ([d, s], name, ez = IO, fill = 'both') => `${name} ${k(s)}s ${ez} ${k(d)}s ${fill}`;
 const at = (t, name, ez, fill) => `animation: ${a(t, name, ez, fill)};`;
 // a window on a transient mark: shown from one moment, hidden at another (several animations, one element)
@@ -310,6 +310,7 @@ svg.ag-scene .ag-qo { transform-box: fill-box; transform-origin: center; }
 /* step 1: the report drops into the supervisor, which hands Hypothesis its slice and takes its result back, then hands Detection the hunt */
 ${P} .ag-s0 { ${at(T.s0, 'ag-in', OUT_EZ)} }
 ${P} .ag-doc { ${at(T.doc, 'ag-doc', IO, 'none')} }
+${P} .ag-doc text { animation: ${hide([T.doc[0] + 1.0, .2])}; }   /* (the label goes before the page moves, so it never smears into the node) */
 ${P} .ag-fl-sup { ${at(T.sup, 'ag-flash', IO, 'none')} }
 ${P} .ag-sp-sup { ${spinning(T.spsup)} }
 ${P} .ag-sp-hyp { ${spinning(T.sphyp)} }
@@ -332,7 +333,8 @@ ${P} .ag-sp-det { ${spinning(T.spdet)} }
 ${P} .ag-q { animation: ${show(T.q)}, ${hide(T.qout)}; }
 ${P} .ag-q0 { animation: ${hide(T.q0out)}; }
 ${P} .ag-q1 { animation: ${show([T.q1[0], .1])}, ${hide(T.q1out)}; }
-${['q0', 'q1'].map((q, j) => `${P} .ag-${q} .ag-qc { ${at(T[q], 'ag-wipe', 'steps(8)')} }\n${P} .ag-${q} .ag-qk { animation: ${a(T[q], 'ag-caret', 'steps(8)')}, ${hide(T['k' + j])}; }`).join('\n')}
+/* (jump-none: the last step lands before the end, since a plain steps() held forwards can stop a step short) */
+${['q0', 'q1'].map((q, j) => `${P} .ag-${q} .ag-qc { ${at(T[q], 'ag-wipe', 'steps(8, jump-none)')} }\n${P} .ag-${q} .ag-qk { animation: ${a(T[q], 'ag-caret', 'steps(8, jump-none)')}, ${hide(T['k' + j])}; }`).join('\n')}
 ${P} .ag-qsel { ${at(T.sel, 'ag-show', 'linear')} }
 ${P} .ag-qd { animation: ${show(T.qd)}; }
 ${P} .ag-qs { ${at(T.qs, 'ag-scan', 'linear', 'none')} }
