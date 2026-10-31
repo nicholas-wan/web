@@ -211,12 +211,12 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(scene(root)).toBeVisible();
  await expect(phoneScene(root)).toBeHidden();
  // Reduced motion holds the final frame: all three steps, the human and the second search's find shown; nothing
- // transient (the report on its way in, pulses, ripples, glows, spinners, the typed queries, the first search's "0 found") is left on screen; the result row stays, with its one unusual result lit.
- for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-found','.ag-qo','.ag-qw','.ag-replit','.ag-anl'])expect(await shown(scene(root).locator(s))).toBe(1);
- for(const s of ['.ag-doc','.ag-none','.ag-pk','.ag-det-dot','.ag-q0','.ag-q1','.ag-hunch','.ag-gl0','.ag-gl2','.ag-gh1'])expect(await shown(scene(root).locator(s))).toBe(0);
- for(const o of await scene(root).locator('.ag-fl, .ag-rip, .ag-spin, .ag-lc').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
+ // transient (the first query, the notes, glows, beams, the travelling result, the dotted outline) is left on screen; the second query, the logs with their one lit result and the supervisor's wire to Detection stay.
+ for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-n32','.ag-ring','.ag-qw','.ag-card','.ag-decides','.ag-wire2','.ag-q1'])expect(await shown(scene(root).locator(s))).toBe(1);
+ for(const s of ['.ag-n0','.ag-pk','.ag-q0','.ag-gl0','.ag-gl1','.ag-fly','.ag-slot','.ag-ln1'])expect(await shown(scene(root).locator(s))).toBe(0);
+ for(const o of await scene(root).locator('.ag-b-glow, .ag-halo, .ag-beam, .ag-bar, .ag-cn').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
  const words=await scene(root).textContent();
- for(const s of ['Agentic Threat Hunting','From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Report','A local model does best with one job, so','each narrow agent gets only the tools','and context that job needs.','Only a human','No results can mean a bad query, not a','safe network. So the agent rewrites it,','checks the fix and searches again.','check query','32 found','Agents flag what looks suspicious, with','analyst makes the call.','Scheduled Task','T1053.005'])expect(words).toContain(s);
+ for(const s of ['Agentic Threat Hunting','From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Reporting','Ransomware report','Event logs','A local model does best with one job, so','each narrow agent gets only the tools','and context that job needs.','Only a human','No results can mean a bad query, not a','safe network. So the agent rewrites it,','checks the fix and searches again.','query checked','32 found','1 unusual','Agents flag what looks suspicious, with','analyst makes the call.','Scheduled Task','T1053.005','Analyst decides','a known attacker trick'])expect(words).toContain(s);
  const label=await scene(root).getAttribute('aria-label');
  expect(label.startsWith('An illustrative hunt.')).toBe(true);
  // The hunter's specifics are in the label, not on the chart.
@@ -254,7 +254,7 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  // Phones draw the same full pictures, larger, so the drawing uses the width rather than squeezing beside the text.
  const pb=await phoneScene(root).boundingBox();
  expect(pb.height).toBeGreaterThan(pb.width*1.8);
- await expect(phoneScene(root).locator('.ag-tool')).toHaveCount(3);
+ await expect(phoneScene(root).locator('.ag-t')).toHaveCount(32);
  await expect(phoneScene(root).locator('.ag-logo')).toHaveCount(1);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
 });
