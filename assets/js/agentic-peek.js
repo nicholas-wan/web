@@ -35,6 +35,7 @@
       play();
       requestAnimationFrame(() => { if (docked) reveal(); });
     } else {
+      if (c.contains(document.activeElement)) b.focus();   // Escape or the button: focus returns to the chip, not an inert card
       r.grow = zoom.shut(c, false, true, late => { if (!late || !docked) { c.classList.remove('is-open', 'is-playing', 'is-still'); c.style.overflow = ''; } });
     }
   }

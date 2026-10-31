@@ -9,6 +9,7 @@
 //   2 catch a blind spot (valid negative, 0 results that can't see API-made tasks, re-plan, checked query) 3-6
 //   3 hand off to an analyst (the rare task, its evidence, the next step)               entry 7 and the Analyst
 // Every time is read from the console's own markup and CSS, for desktop and phones; apply.cjs writes the result.
+const fs = require('fs'); const path = require('path');
 const BEATS = ['Plan the hunt', 'Catch a blind spot', 'Hand off to an analyst'];
 const FIRST = [0, 3, 7];                               // the console entry each beat starts with
 const TALLY = '1 lead for analyst review · 1 valid negative · 1 set aside';
@@ -31,7 +32,7 @@ const SCENES = [
   + `<dl class="hsk-kv hsk-a" style="--t:2.4s"><div><dt>Hypothesis</dt><dd>A new task runs at logon, outside the baseline</dd></div></dl>`,
   // 2 catch a blind spot (~10 s): one clean negative, one search that couldn't have seen it, the re-plan, the check
   //   (the checked query lands with the console's result at ~7.8 s and holds two seconds before beat 3)
-  top('Zero results is a blind spot, not a negative', 'The verdict sets the next step: revise, record or raise a lead.')
+  top('Zero results can be a blind spot, not a negative', 'The verdict sets the next step: revise, record or raise a lead.')
   + `<ul class="hsk-rows"><li ${a(0.5)}><span>Run keys vs baseline</span><b class="is-ok hsk-a" style="--t:1.2s">${tick}Valid negative</b></li>`
   + `<li ${a(2.1)}><span>process = schtasks.exe</span><b class="is-warn hsk-a" style="--t:2.7s">0 results</b></li></ul>`
   + `<p class="hsk-note hsk-a" style="--t:3.6s">Tasks made through the Task Scheduler API never launch schtasks.exe.</p>`
@@ -42,29 +43,36 @@ const SCENES = [
   + `<li><span>\\Microsoft\\…\\ScheduledDefrag</span><i ${a(0.6, 'gr')}></i><b>in baseline</b></li>`
   + `<li class="is-lead"><span>\\WinTaskUpdate</span><i ${a(0.8, 'gr')}></i><b>1 host</b></li></ul>`
   + `<p ${a(1.6, 'hsk-res is-lead')}>${flag}Not in the baseline · lead for analyst review</p>`
-  + `<p ${a(2.6, 'hsk-next')}>Next: check who created the task and what it runs</p>`,
+  + `<p ${a(2.6, 'hsk-next')}>Next: what the task runs, and the hosts the audit didn't cover</p>`,
 ];
 
 // ---------------------------------------------------------------- the chip, card and strip (the chip and card as
 // approved 26 Oct 2026, before the scroll story replaced them)
 const MINI = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 24"><rect x="1.5" y="2.5" width="17" height="19" rx="2" fill="#0e2024" stroke="#3a6f73"/><path d="M4.5 7H15.5M4.5 10.5H12" stroke="#3a6f73" stroke-width="1.4" stroke-linecap="round"/><rect x="4" y="13" width="11" height="3" rx="1" fill="#28d7c5" opacity=".45"/><path d="M4.5 18.5H13" stroke="#3a6f73" stroke-width="1.4" stroke-linecap="round"/><path d="M21.5 12H26.5M24.5 10L26.5 12L24.5 14" fill="none" stroke="#6f9a96" stroke-linecap="round" stroke-linejoin="round"/><rect x="29.5" y="4.5" width="23" height="15" rx="2" fill="#071315" stroke="#24464b"/><path d="M32.5 9H44M32.5 12.5H49M32.5 16H40" stroke="#b8f2eb" stroke-width="1.3" stroke-linecap="round" opacity=".8"/><path d="M32.5 9H36.5M35.5 12.5H39" stroke="#28d7c5" stroke-width="1.3" stroke-linecap="round"/><path d="M55.5 12H60.5M58.5 10L60.5 12L58.5 14" fill="none" stroke="#6f9a96" stroke-linecap="round" stroke-linejoin="round"/><rect x="63" y="6" width="13" height="12" rx="2" fill="#ffb869"/><path d="M67 9V15M67 9.4H72L70.6 11L72 12.6H67" fill="none" stroke="#071315" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/></svg>';
 const span = (cls, txt) => `<span class="hsk-v ${cls}">${txt}</span>`;
+// (the strip's state words, beat and pill are stacked spans, so they are hidden from readers; the console's aria-label
+// tells the whole hunt and the button carries its own label)
 function strip() {
   const words = span('hsk-wr', 'Running') + span('hsk-wd', 'Done') + span('hsk-wp', 'Paused');
   const steps = BEATS.map((b, i) => span(`hsk-s${i}`, `${i + 1}/3 · ${b}`)).join('') + span('hsk-sd', TALLY);
   const segs = BEATS.map((_, i) => `<i class="hsk-seg hsk-g${i}"><b></b></i>`).join('');
-  return `<div class="hsk-bar"><p class="hsk-status"><i class="hsk-dot" aria-hidden="true"></i><span class="hsk-words">${words}</span><span class="hsk-steps">${steps}</span></p><span class="hsk-env">Local LLM · on-premises</span><button type="button" class="hsk-ctl" aria-label="Pause the hunt">Pause</button><span class="hsk-prog" aria-hidden="true">${segs}</span></div>`;
+  return `<div class="hsk-bar"><p class="hsk-status" aria-hidden="true"><i class="hsk-dot"></i><span class="hsk-words">${words}</span><span class="hsk-steps">${steps}</span></p><span class="hsk-env" aria-hidden="true">Local LLM · on-premises</span><button type="button" class="hsk-ctl" aria-label="Pause the hunt">Pause</button><span class="hsk-prog" aria-hidden="true">${segs}</span></div>`;
 }
 
 // the whole peek: hint, chip and card around the console (scene.html, one line)
-exports.html = scene => {
+exports.html = (scene, sceneCss) => {
   // a quiet ring on each agent while it works
   for (const ag of ['sup', 'hyp', 'inv', 'det']) {
     const re = new RegExp(`(<div class="c2-node c2-n--${ag}"[^>]*>)`);
     if (!re.test(scene)) throw new Error('console node not found: ' + ag);
     scene = scene.replace(re, '$1<i class="hsk-work" aria-hidden="true"></i>');
   }
-  const story = `<div class="hsk-tool" aria-hidden="true"><div class="hsk-tss">${SCENES.map((s, i) => `<div class="hsk-ts hsk-ts${i}">${s}</div>`).join('')}</div></div>`;
+  // phones: the console holds 0.4 s longer on each of its captions (timeline.json), so a part's offset is remapped
+  // through the same stretch (--tp, read by peek.css under the phone container query) and still lands with its entry
+  const T = times(scene, sceneCss), { PH, caps } = JSON.parse(fs.readFileSync(path.join(__dirname, 'timeline.json'), 'utf8'));
+  const TPh = t => { let s = 0; for (const c of caps) if (c + 0.3 < t - 1e-9) s += PH; return t + s; };
+  const scenes = SCENES.map((s, i) => s.replace(/--t:([\d.]+)s/g, (_, t) => `--t:${t}s;--tp:${r2(TPh(T.d.B[i] + +t) - T.p.B[i])}s`));
+  const story = `<div class="hsk-tool" aria-hidden="true"><div class="hsk-tss">${scenes.map((s, i) => `<div class="hsk-ts hsk-ts${i}">${s}</div>`).join('')}</div></div>`;
   const panel = `<div class="hunt-panel">${strip()}<div class="hsk-stage">${story}<div class="hsk-live">${scene}</div></div></div>`;
   return '<p class="internship-demo-hint"><strong><span class="anomaly-peek__hint-hover">Click the chart</span><span class="anomaly-peek__hint-touch">Tap the chart</span></strong> to see it in action</p>'
     + `<div class="internship-demo-peek" data-company="agentic" data-script="assets/js/agentic-peek.js"><button type="button" class="internship-demo-peek__chip" aria-expanded="false" aria-controls="agentic-demo-card"><span class="internship-demo-peek__mini" aria-hidden="true">${MINI}</span>Hunt from a report</button>`

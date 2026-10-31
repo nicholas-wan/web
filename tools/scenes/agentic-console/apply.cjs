@@ -37,7 +37,7 @@ if (from > -1 && from < stop) {
   const loader = page.slice(to).match(/^<script>\/\* Loads the Agentic AI story[\s\S]*?<\/script>/);
   if (loader) to += loader[0].length;
 }
-page = page.slice(0, from) + peek.html(scene) + page.slice(to);
+page = page.slice(0, from) + peek.html(scene, sceneCss) + page.slice(to);
 fs.writeFileSync(pageFile, page);
 
 const file = path.join(root, 'assets', 'css', 'internship-peek.css');

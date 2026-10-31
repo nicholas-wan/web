@@ -1,6 +1,7 @@
 // The agent console on Experience (prefix c2-): the live system inside the Agentic AI card's "Hunt from a
 // report" peek (README "Agentic AI console peek"); peek.cjs adds the status strip and the story panel around it.
-//   node tools/scenes/agentic-console/build.cjs   writes scene.html and scene.css here
+//   node tools/scenes/agentic-console/build.cjs   writes scene.html, scene.css and timeline.json (the caption times
+//                                                  peek.cjs remaps the story's phone offsets with) here
 //   node tools/scenes/agentic-console/apply.cjs   puts the peek into experience.html and its CSS into internship-peek.css
 // peek.cjs reads its beat times from the markup and CSS written here, so rerun both after changing the timeline.
 // Strings were revised 27 Oct 2026 ("only expected entries", "Inconclusive, so it re-plans", a vendor-neutral
@@ -310,6 +311,7 @@ const { desk, phone } = tracks();
 const css = fs.readFileSync(path.join(__dirname, 'base.css'), 'utf8') + `\n/* ---- generated (story ends at ${r3(T0.END)}s; phones ${TPh(T0.END)}s) ---- */\n` + kcss + desk + `\n@container c2p (max-width: 480px) {\n${phone}\n}\n`;
 fs.writeFileSync(path.join(OUT, 'scene.html'), html);
 fs.writeFileSync(path.join(OUT, 'scene.css'), css);
+fs.writeFileSync(path.join(OUT, 'timeline.json'), JSON.stringify({ PH, caps: cap.map(r3) }) + '\n');
 console.log('wrote scene.html', html.length, 'scene.css', css.length, 'keyframes', kn);
 CAPS.forEach((c, i) => {
   const out = i < 7 ? capOut(i) - GAP : null;
