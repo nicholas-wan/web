@@ -195,7 +195,7 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
  }
 });
 
-test('agentic AI peek: opens inline on a click, plays one ~21 s run with a status strip, pauses, ends on Done with Replay, and fits the card',async({page})=>{
+test('agentic AI peek: opens inline on a click, plays one ~22 s run with a status strip, pauses, ends on Done with Replay, and fits the card',async({page})=>{
  const panel=root=>root.locator('.hunt-panel');
  const ctl=root=>root.locator('.hsk-ctl');
  const shown=(root,sel)=>root.locator(sel).evaluate(e=>+getComputedStyle(e).opacity);

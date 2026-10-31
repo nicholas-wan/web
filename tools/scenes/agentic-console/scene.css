@@ -46,11 +46,12 @@
 .c2-co { display: inline-flex; align-items: center; gap: 3px; font-weight: 600; color: color-mix(in srgb, var(--oc) calc(var(--c2-a) * var(--c2-o) * 100%), transparent); }
 .c2-co { margin-left: 1px; padding-left: 7px; border-left: 1px solid color-mix(in srgb, color-mix(in srgb, #2b5155 calc(var(--c2-o) * 100%), #17302f) calc(var(--c2-a) * 100%), transparent); }
 .c2-co .c2-ico { width: 11px; height: 11px; stroke-width: 1.6; }
+.c2-cos { display: none; }   /* the short form of a long name or outcome, for a strip header too narrow for it (below) */
 
 /* ---------------- graph ---------------- */
 .c2-g { grid-area: graph; position: relative; z-index: 2; --gx: 0px; }
 .c2-wires { position: absolute; left: var(--gx); top: 0; overflow: visible; pointer-events: none; }
-.c2 .c2-wt, .c2 .c2-wp { visibility: hidden; }
+.c2 .c2-wt { visibility: hidden; }
 .c2-edge { fill: none; stroke-width: 1.3; stroke-opacity: .8; }
 .c2-edge--ana { stroke-dasharray: 3 3; }
 .c2-comet { fill: none; stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: .16 2; stroke-opacity: 0; }
@@ -191,12 +192,14 @@
   .c2-dot { left: 1.5px; }
   .c2-card { margin-left: 18px; }
 }
-/* phones: header, graph strip, then a long feed */
+/* a narrow strip (481–580px): the header shares its row with the 282px graph column, so the chips drop their
+   technique IDs, and up to 520px the long name and outcome read short (review, 31 Oct 2026: they clipped). */
+@container c2p (min-width: 481px) and (max-width: 580px) { .c2-cid { display: none; } }
+@container c2p (min-width: 481px) and (max-width: 520px) { .c2-col { display: none; } .c2-cos { display: inline; } }
+/* phones: header, graph strip, the log's label row, then a long feed (the strip wires, with the same 44px row) */
 @container c2p (max-width: 480px) {
-  .c2 { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "cap" "graph" "feed"; grid-template-rows: auto auto 160px 296px; }
-  .c2 .c2-wt { visibility: hidden; }
-  .c2 .c2-wp { visibility: visible; }
-  .c2-cap { flex-direction: column; align-items: flex-start; gap: 7px; padding: 6px 14px 8px; }
+  .c2 { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "graph" "cap" "feed"; grid-template-rows: auto 160px 44px 296px; }
+  .c2-cap { gap: 8px; }
   .c2-lines { width: 100%; }
   .c2-line { font-size: 14px; line-height: 19px; }
   .c2-s { --L: var(--Lp); --D: var(--Dp); }
@@ -228,25 +231,25 @@
   .c2-g { zoom: .88; }
 }
 
-/* ---- generated (story ends at 21.31s; phones 24.51s) ---- */
+/* ---- generated (story ends at 22.11s; phones 25.31s) ---- */
 @keyframes c2-k0{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}31.429%{--c2-v:1}71.429%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k1{0%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:1}}
 @keyframes c2-k2{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}31.250%{--c2-g:1}62.500%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k3{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}24.444%{--c2-v:1}77.778%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k4{0%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:1}}
 @keyframes c2-k5{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}25.000%{--c2-g:1}70.000%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
-@keyframes c2-k6{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}6.875%{--c2-v:1}93.750%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
+@keyframes c2-k6{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}8.462%{--c2-v:1}92.308%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k7{0%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:1}}
-@keyframes c2-k8{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}7.576%{--c2-g:1}90.909%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
+@keyframes c2-k8{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}9.259%{--c2-g:1}88.889%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k9{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}22.000%{--c2-v:1}80.000%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k10{0%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:1}}
 @keyframes c2-k11{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}22.727%{--c2-g:1}72.727%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k12{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}5.670%{--c2-v:1}94.845%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k13{0%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:1}}
 @keyframes c2-k14{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}6.281%{--c2-g:1}92.462%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
-@keyframes c2-k15{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}12.222%{--c2-v:1}88.889%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
+@keyframes c2-k15{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}6.875%{--c2-v:1}93.750%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k16{0%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:1}}
-@keyframes c2-k17{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}13.158%{--c2-g:1}84.211%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
+@keyframes c2-k17{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}7.576%{--c2-g:1}90.909%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k18{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}10.000%{--c2-v:1}90.909%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k19{0%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:1}}
 @keyframes c2-k20{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}10.870%{--c2-g:1}86.957%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
@@ -258,9 +261,9 @@
 @keyframes c2-k26{0%{--c2-on:0}77.778%{--c2-on:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-on:1}}
 @keyframes c2-k27{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}15.217%{--c2-g:1}78.261%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k28{0%{--c2-on:0}91.781%{--c2-on:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-on:1}}
-@keyframes c2-k29{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}9.044%{--c2-g:1}87.080%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
-@keyframes c2-k30{0%{--c2-on:0}96.011%{--c2-on:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-on:1}}
-@keyframes c2-k31{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}2.705%{--c2-g:1}96.136%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
+@keyframes c2-k29{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}10.703%{--c2-g:1}84.709%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
+@keyframes c2-k30{0%{--c2-on:0}95.665%{--c2-on:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-on:1}}
+@keyframes c2-k31{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}2.441%{--c2-g:1}96.513%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k32{0%{--c2-hush:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-hush:1}}
 @keyframes c2-k33{0%{--c2-hush:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-hush:1}}
 @keyframes c2-k34{0%{--c2-hush:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-hush:1}}
@@ -275,12 +278,12 @@
 @keyframes c2-k43{0%{--c2-a:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-a:1}}
 @keyframes c2-k44{0%{--c2-o:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-o:1}}
 @keyframes c2-k45{0.000%{--c2-r:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}12.963%{--c2-r:1}83.333%{--c2-r:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-r:0}}
-@keyframes c2-k46{0.000%{--c2-r:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}3.296%{--c2-r:1}95.763%{--c2-r:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-r:0}}
-@keyframes c2-k47{0.000%{--c2-r:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}8.197%{--c2-r:1}89.461%{--c2-r:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-r:0}}
+@keyframes c2-k46{0.000%{--c2-r:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}2.912%{--c2-r:1}96.256%{--c2-r:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-r:0}}
+@keyframes c2-k47{0.000%{--c2-r:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}9.537%{--c2-r:1}87.738%{--c2-r:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-r:0}}
 @keyframes c2-k48{0.000%{--c2-r:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}16.908%{--c2-r:1}78.261%{--c2-r:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-r:0}}
-@keyframes c2-k49{0%{stroke-opacity:.28}2.735%{stroke-opacity:.28;animation-timing-function:cubic-bezier(.45,0,.25,1)}5.221%{stroke-opacity:.8}96.519%{stroke-opacity:.8;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{stroke-opacity:.32}}
-@keyframes c2-k50{0%{stroke-opacity:.28}5.470%{stroke-opacity:.28;animation-timing-function:cubic-bezier(.45,0,.25,1)}7.956%{stroke-opacity:.8}96.519%{stroke-opacity:.8;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{stroke-opacity:.32}}
-@keyframes c2-k51{0%{stroke-opacity:.28}16.907%{stroke-opacity:.28;animation-timing-function:cubic-bezier(.45,0,.25,1)}19.393%{stroke-opacity:.8}96.519%{stroke-opacity:.8;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{stroke-opacity:.32}}
+@keyframes c2-k49{0%{stroke-opacity:.28}2.630%{stroke-opacity:.28;animation-timing-function:cubic-bezier(.45,0,.25,1)}5.022%{stroke-opacity:.8}96.652%{stroke-opacity:.8;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{stroke-opacity:.32}}
+@keyframes c2-k50{0%{stroke-opacity:.28}5.261%{stroke-opacity:.28;animation-timing-function:cubic-bezier(.45,0,.25,1)}7.652%{stroke-opacity:.8}96.652%{stroke-opacity:.8;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{stroke-opacity:.32}}
+@keyframes c2-k51{0%{stroke-opacity:.28}16.260%{stroke-opacity:.28;animation-timing-function:cubic-bezier(.45,0,.25,1)}18.651%{stroke-opacity:.8}96.652%{stroke-opacity:.8;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{stroke-opacity:.32}}
 @keyframes c2-k52{0%{stroke-opacity:.28;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{stroke-opacity:.8}}
 @keyframes c2-k53{0%{stroke-opacity:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{stroke-opacity:0.8}}
 @keyframes c2-k54{0%{stroke-dashoffset:0.18;stroke-opacity:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}20.000%{stroke-opacity:1}66.667%{stroke-dashoffset:-0.82;stroke-opacity:1;animation-timing-function:linear}100%{stroke-dashoffset:-0.82;stroke-opacity:0}}
@@ -300,16 +303,16 @@
 @keyframes c2-k68{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}20.000%{--c2-v:1}80.000%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k69{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}12.963%{--c2-g:1}83.333%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k70{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}13.793%{--c2-v:1}86.207%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
-@keyframes c2-k71{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}8.197%{--c2-g:1}89.461%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
-@keyframes c2-k72{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}8.949%{--c2-v:1}91.051%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
+@keyframes c2-k71{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}9.537%{--c2-g:1}87.738%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
+@keyframes c2-k72{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}10.336%{--c2-v:1}89.664%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k73{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}16.908%{--c2-g:1}78.261%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k74{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}17.621%{--c2-v:1}82.379%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k75{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}11.290%{--c2-g:1}85.484%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k76{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}12.121%{--c2-v:1}87.879%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k77{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}15.217%{--c2-g:1}80.435%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k78{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}16.000%{--c2-v:1}84.000%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
-@keyframes c2-k79{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}11.785%{--c2-g:1}84.848%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
-@keyframes c2-k80{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}12.618%{--c2-v:1}87.382%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
+@keyframes c2-k79{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}8.009%{--c2-g:1}89.703%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
+@keyframes c2-k80{0.000%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}8.753%{--c2-v:1}91.247%{--c2-v:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:0}}
 @keyframes c2-k81{0.000%{--c2-g:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}10.769%{--c2-g:1}81.538%{--c2-g:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-g:0}}
 @keyframes c2-k82{0%{--c2-v:0;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{--c2-v:1}}
 @keyframes c2-k83{0%{stroke-dashoffset:1;animation-timing-function:cubic-bezier(.45,0,.25,1)}100%{stroke-dashoffset:0}}
@@ -319,44 +322,44 @@
 .is-playing .hunt-panel .c2-tk0{animation:c2-k1 0.25s linear 1.3s backwards,c2-k2 0.8s linear 1.3s none}
 .is-playing .hunt-panel .c2-line1{animation:c2-k3 0.9s linear 3.4s none}
 .is-playing .hunt-panel .c2-tk1{animation:c2-k4 0.25s linear 3.4s backwards,c2-k5 1s linear 3.4s none}
-.is-playing .hunt-panel .c2-line2{animation:c2-k6 3.2s linear 4.97s none}
-.is-playing .hunt-panel .c2-tk2{animation:c2-k7 0.25s linear 4.97s backwards,c2-k8 3.3s linear 4.97s none}
-.is-playing .hunt-panel .c2-line3{animation:c2-k9 1s linear 8.84s none}
-.is-playing .hunt-panel .c2-tk3{animation:c2-k10 0.25s linear 8.84s backwards,c2-k11 1.1s linear 8.84s none}
-.is-playing .hunt-panel .c2-line4{animation:c2-k12 3.88s linear 10.56s none}
-.is-playing .hunt-panel .c2-tk4{animation:c2-k13 0.25s linear 10.56s backwards,c2-k14 3.98s linear 10.56s none}
-.is-playing .hunt-panel .c2-line5{animation:c2-k15 1.8s linear 15.21s none}
-.is-playing .hunt-panel .c2-tk5{animation:c2-k16 0.25s linear 15.21s backwards,c2-k17 1.9s linear 15.21s none}
-.is-playing .hunt-panel .c2-line6{animation:c2-k18 2.2s linear 18.21s none}
-.is-playing .hunt-panel .c2-tk6{animation:c2-k19 0.25s linear 18.21s backwards,c2-k20 2.3s linear 18.21s none}
-.is-playing .hunt-panel .c2-line7{animation:c2-k21 0.22s linear 20.41s backwards}
-.is-playing .hunt-panel .c2-tk7{animation:c2-k22 0.25s linear 20.41s backwards,c2-k23 0.25s linear 20.41s backwards}
-.is-playing .hunt-panel .c2-n--sup{animation:c2-k24 0.8s linear 0s backwards,c2-k25 0.55s linear 0.8s none,c2-k32 0.7s linear 19.41s backwards}
-.is-playing .hunt-panel .c2-n--hyp{animation:c2-k26 1.35s linear 0s backwards,c2-k27 2.3s linear 1.35s none,c2-k33 0.7s linear 19.41s backwards}
-.is-playing .hunt-panel .c2-n--inv{animation:c2-k28 3.65s linear 0s backwards,c2-k29 3.87s linear 3.65s none,c2-k34 0.7s linear 19.41s backwards}
-.is-playing .hunt-panel .c2-n--det{animation:c2-k30 7.52s linear 0s backwards,c2-k31 12.94s linear 7.52s none,c2-k35 3.2s linear 11.09s none}
-.is-playing .hunt-panel .c2-n--ana{animation:c2-k36 0.4s linear 20.41s backwards}
-.is-playing .hunt-panel .c2-pin{animation:c2-k37 0.35s linear 20.86s backwards}
-.is-playing .hunt-panel .c2-halo{animation:c2-halo 1.3s cubic-bezier(.22,1,.36,1) 20.56s none}
+.is-playing .hunt-panel .c2-line2{animation:c2-k6 2.6s linear 4.97s none}
+.is-playing .hunt-panel .c2-tk2{animation:c2-k7 0.25s linear 4.97s backwards,c2-k8 2.7s linear 4.97s none}
+.is-playing .hunt-panel .c2-line3{animation:c2-k9 1s linear 8.24s none}
+.is-playing .hunt-panel .c2-tk3{animation:c2-k10 0.25s linear 8.24s backwards,c2-k11 1.1s linear 8.24s none}
+.is-playing .hunt-panel .c2-line4{animation:c2-k12 3.88s linear 9.96s none}
+.is-playing .hunt-panel .c2-tk4{animation:c2-k13 0.25s linear 9.96s backwards,c2-k14 3.98s linear 9.96s none}
+.is-playing .hunt-panel .c2-line5{animation:c2-k15 3.2s linear 14.61s none}
+.is-playing .hunt-panel .c2-tk5{animation:c2-k16 0.25s linear 14.61s backwards,c2-k17 3.3s linear 14.61s none}
+.is-playing .hunt-panel .c2-line6{animation:c2-k18 2.2s linear 19.01s none}
+.is-playing .hunt-panel .c2-tk6{animation:c2-k19 0.25s linear 19.01s backwards,c2-k20 2.3s linear 19.01s none}
+.is-playing .hunt-panel .c2-line7{animation:c2-k21 0.22s linear 21.21s backwards}
+.is-playing .hunt-panel .c2-tk7{animation:c2-k22 0.25s linear 21.21s backwards,c2-k23 0.25s linear 21.21s backwards}
+.is-playing .hunt-panel .c2-n--sup{animation:c2-k24 0.8s linear 0s backwards,c2-k25 0.55s linear 0.8s none,c2-k32 0.7s linear 20.21s backwards}
+.is-playing .hunt-panel .c2-n--hyp{animation:c2-k26 1.35s linear 0s backwards,c2-k27 2.3s linear 1.35s none,c2-k33 0.7s linear 20.21s backwards}
+.is-playing .hunt-panel .c2-n--inv{animation:c2-k28 3.65s linear 0s backwards,c2-k29 3.27s linear 3.65s none,c2-k34 0.7s linear 20.21s backwards}
+.is-playing .hunt-panel .c2-n--det{animation:c2-k30 6.92s linear 0s backwards,c2-k31 14.34s linear 6.92s none,c2-k35 3.2s linear 10.49s none}
+.is-playing .hunt-panel .c2-n--ana{animation:c2-k36 0.4s linear 21.21s backwards}
+.is-playing .hunt-panel .c2-pin{animation:c2-k37 0.35s linear 21.66s backwards}
+.is-playing .hunt-panel .c2-halo{animation:c2-halo 1.3s cubic-bezier(.22,1,.36,1) 21.36s none}
 .is-playing .hunt-panel .c2-rep{animation:c2-k38 1.55s linear 0.05s none}
-.is-playing .hunt-panel .c2-chip0{animation:c2-k39 0.4s linear 1.15s backwards,c2-k40 0.4s linear 17.86s backwards,c2-k45 2.7s linear 1.7s none,c2-k46 10.62s linear 9.54s none}
-.is-playing .hunt-panel .c2-chip1{animation:c2-k41 0.4s linear 1.3s backwards,c2-k42 0.4s linear 4.95s backwards,c2-k47 4.27s linear 4s none}
-.is-playing .hunt-panel .c2-chip2{animation:c2-k43 0.4s linear 1.45s backwards,c2-k44 0.4s linear 8.82s backwards,c2-k48 2.07s linear 7.87s none}
-.is-playing .hunt-panel .c2-edge--in{animation:c2-k49 20.11s linear 0s backwards}
-.is-playing .hunt-panel .c2-edge--hyp{animation:c2-k50 20.11s linear 0s backwards}
-.is-playing .hunt-panel .c2-edge--inv{animation:c2-k51 20.11s linear 0s backwards}
-.is-playing .hunt-panel .c2-edge--det{animation:c2-k52 0.5s linear 7.27s backwards}
-.is-playing .hunt-panel .c2-edge--ana{animation:c2-k53 0.9s linear 19.76s backwards}
+.is-playing .hunt-panel .c2-chip0{animation:c2-k39 0.4s linear 1.15s backwards,c2-k40 0.4s linear 18.66s backwards,c2-k45 2.7s linear 1.7s none,c2-k46 12.02s linear 8.94s none}
+.is-playing .hunt-panel .c2-chip1{animation:c2-k41 0.4s linear 1.3s backwards,c2-k42 0.4s linear 4.95s backwards,c2-k47 3.67s linear 4s none}
+.is-playing .hunt-panel .c2-chip2{animation:c2-k43 0.4s linear 1.45s backwards,c2-k44 0.4s linear 8.22s backwards,c2-k48 2.07s linear 7.27s none}
+.is-playing .hunt-panel .c2-edge--in{animation:c2-k49 20.91s linear 0s backwards}
+.is-playing .hunt-panel .c2-edge--hyp{animation:c2-k50 20.91s linear 0s backwards}
+.is-playing .hunt-panel .c2-edge--inv{animation:c2-k51 20.91s linear 0s backwards}
+.is-playing .hunt-panel .c2-edge--det{animation:c2-k52 0.5s linear 6.67s backwards}
+.is-playing .hunt-panel .c2-edge--ana{animation:c2-k53 0.9s linear 20.56s backwards}
 .is-playing .hunt-panel .c2-pc0{animation:c2-k54 0.75s linear 0.3s none}
 .is-playing .hunt-panel .c2-pb0{animation:c2-k55 0.75s linear 0.3s none}
 .is-playing .hunt-panel .c2-pc1{animation:c2-k56 0.75s linear 0.85s none}
 .is-playing .hunt-panel .c2-pb1{animation:c2-k57 0.75s linear 0.85s none}
 .is-playing .hunt-panel .c2-pc2{animation:c2-k58 0.75s linear 3.15s none}
 .is-playing .hunt-panel .c2-pb2{animation:c2-k59 0.75s linear 3.15s none}
-.is-playing .hunt-panel .c2-pc3{animation:c2-k60 0.75s linear 7.02s none}
-.is-playing .hunt-panel .c2-pb3{animation:c2-k61 0.75s linear 7.02s none}
-.is-playing .hunt-panel .c2-hc{animation:c2-k62 1.15s linear 19.66s none}
-.is-playing .hunt-panel .c2-hb{animation:c2-k63 1.15s linear 19.66s none}
+.is-playing .hunt-panel .c2-pc3{animation:c2-k60 0.75s linear 6.42s none}
+.is-playing .hunt-panel .c2-pb3{animation:c2-k61 0.75s linear 6.42s none}
+.is-playing .hunt-panel .c2-hc{animation:c2-k62 1.15s linear 20.46s none}
+.is-playing .hunt-panel .c2-hb{animation:c2-k63 1.15s linear 20.46s none}
 .is-playing .hunt-panel .c2-sc-sup{animation:c2-k64 0.8s linear 0.05s none}
 .is-playing .hunt-panel .c2-sb-sup{animation:c2-k65 0.8s linear 0.05s none}
 .is-playing .hunt-panel .c2-sw-sup{animation:c2-k66 0.8s linear 0.05s none}
@@ -366,71 +369,71 @@
 .is-playing .hunt-panel .c2-sc-inv{animation:c2-k64 0.8s linear 3.75s none}
 .is-playing .hunt-panel .c2-sb-inv{animation:c2-k65 0.8s linear 3.75s none}
 .is-playing .hunt-panel .c2-sw-inv{animation:c2-k66 0.8s linear 3.75s none}
-.is-playing .hunt-panel .c2-sc-det{animation:c2-k64 0.8s linear 7.62s none,c2-k64 0.8s linear 9.29s none,c2-k64 0.8s linear 11.99s none,c2-k64 0.8s linear 13.89s none,c2-k64 0.8s linear 16.46s none}
-.is-playing .hunt-panel .c2-sb-det{animation:c2-k65 0.8s linear 7.62s none,c2-k65 0.8s linear 9.29s none,c2-k65 0.8s linear 11.99s none,c2-k65 0.8s linear 13.89s none,c2-k65 0.8s linear 16.46s none}
-.is-playing .hunt-panel .c2-sw-det{animation:c2-k66 0.8s linear 7.62s none,c2-k66 0.8s linear 9.29s none,c2-k66 0.8s linear 11.99s none,c2-k66 0.8s linear 13.89s none,c2-k66 0.8s linear 16.46s none}
+.is-playing .hunt-panel .c2-sc-det{animation:c2-k64 0.8s linear 7.02s none,c2-k64 0.8s linear 8.69s none,c2-k64 0.8s linear 11.39s none,c2-k64 0.8s linear 13.29s none,c2-k64 0.8s linear 17.26s none}
+.is-playing .hunt-panel .c2-sb-det{animation:c2-k65 0.8s linear 7.02s none,c2-k65 0.8s linear 8.69s none,c2-k65 0.8s linear 11.39s none,c2-k65 0.8s linear 13.29s none,c2-k65 0.8s linear 17.26s none}
+.is-playing .hunt-panel .c2-sw-det{animation:c2-k66 0.8s linear 7.02s none,c2-k66 0.8s linear 8.69s none,c2-k66 0.8s linear 11.39s none,c2-k66 0.8s linear 13.29s none,c2-k66 0.8s linear 17.26s none}
 .is-playing .hunt-panel .c2-s0 > .c2-card{animation:c2-k67 1.8s linear 0.35s none}
 .is-playing .hunt-panel .c2-s0 > .c2-veil{animation:c2-k68 2s linear 0.3s none}
 .is-playing .hunt-panel .c2-s1 > .c2-card{animation:c2-k69 2.7s linear 1.75s none}
 .is-playing .hunt-panel .c2-s1 > .c2-veil{animation:c2-k70 2.9s linear 1.7s none}
-.is-playing .hunt-panel .c2-s2 > .c2-card{animation:c2-k71 4.27s linear 4.05s none}
-.is-playing .hunt-panel .c2-s2 > .c2-veil{animation:c2-k72 4.47s linear 4s none}
-.is-playing .hunt-panel .c2-s3 > .c2-card{animation:c2-k73 2.07s linear 7.92s none}
-.is-playing .hunt-panel .c2-s3 > .c2-veil{animation:c2-k74 2.27s linear 7.87s none}
-.is-playing .hunt-panel .c2-s4 > .c2-card{animation:c2-k75 3.1s linear 9.59s none}
-.is-playing .hunt-panel .c2-s4 > .c2-veil{animation:c2-k76 3.3s linear 9.54s none}
-.is-playing .hunt-panel .c2-s5 > .c2-card{animation:c2-k77 2.3s linear 12.29s none}
-.is-playing .hunt-panel .c2-s5 > .c2-veil{animation:c2-k78 2.5s linear 12.24s none}
-.is-playing .hunt-panel .c2-s6 > .c2-card{animation:c2-k79 2.97s linear 14.19s none}
-.is-playing .hunt-panel .c2-s6 > .c2-veil{animation:c2-k80 3.17s linear 14.14s none}
-.is-playing .hunt-panel .c2-s7 > .c2-card{animation:c2-k81 3.25s linear 16.76s none}
-.is-playing .hunt-panel .c2-s7 > .c2-veil{animation:c2-k82 0.4s linear 16.71s backwards}
-.is-playing .hunt-panel .c2-loop{animation:c2-k83 0.9s linear 11.24s backwards}
-.is-playing .hunt-panel .c2-loopbead{animation:c2-k84 1.15s linear 11.24s none}
-.is-playing .hunt-panel .c2-loophead{animation:c2-k85 0.3s linear 11.99s backwards}
+.is-playing .hunt-panel .c2-s2 > .c2-card{animation:c2-k71 3.67s linear 4.05s none}
+.is-playing .hunt-panel .c2-s2 > .c2-veil{animation:c2-k72 3.87s linear 4s none}
+.is-playing .hunt-panel .c2-s3 > .c2-card{animation:c2-k73 2.07s linear 7.32s none}
+.is-playing .hunt-panel .c2-s3 > .c2-veil{animation:c2-k74 2.27s linear 7.27s none}
+.is-playing .hunt-panel .c2-s4 > .c2-card{animation:c2-k75 3.1s linear 8.99s none}
+.is-playing .hunt-panel .c2-s4 > .c2-veil{animation:c2-k76 3.3s linear 8.94s none}
+.is-playing .hunt-panel .c2-s5 > .c2-card{animation:c2-k77 2.3s linear 11.69s none}
+.is-playing .hunt-panel .c2-s5 > .c2-veil{animation:c2-k78 2.5s linear 11.64s none}
+.is-playing .hunt-panel .c2-s6 > .c2-card{animation:c2-k79 4.37s linear 13.59s none}
+.is-playing .hunt-panel .c2-s6 > .c2-veil{animation:c2-k80 4.57s linear 13.54s none}
+.is-playing .hunt-panel .c2-s7 > .c2-card{animation:c2-k81 3.25s linear 17.56s none}
+.is-playing .hunt-panel .c2-s7 > .c2-veil{animation:c2-k82 0.4s linear 17.51s backwards}
+.is-playing .hunt-panel .c2-loop{animation:c2-k83 0.9s linear 10.64s backwards}
+.is-playing .hunt-panel .c2-loopbead{animation:c2-k84 1.15s linear 10.64s none}
+.is-playing .hunt-panel .c2-loophead{animation:c2-k85 0.3s linear 11.39s backwards}
 @container c2p (max-width: 480px) {
 .is-playing .hunt-panel .c2-line0{animation-delay:1.3s;animation-duration:1.1s}
 .is-playing .hunt-panel .c2-tk0{animation-delay:1.3s,1.3s;animation-duration:0.25s,1.2s}
 .is-playing .hunt-panel .c2-line1{animation-delay:3.8s;animation-duration:1.3s}
 .is-playing .hunt-panel .c2-tk1{animation-delay:3.8s,3.8s;animation-duration:0.25s,1.4s}
-.is-playing .hunt-panel .c2-line2{animation-delay:5.77s;animation-duration:3.6s}
-.is-playing .hunt-panel .c2-tk2{animation-delay:5.77s,5.77s;animation-duration:0.25s,3.7s}
-.is-playing .hunt-panel .c2-line3{animation-delay:10.04s;animation-duration:1.4s}
-.is-playing .hunt-panel .c2-tk3{animation-delay:10.04s,10.04s;animation-duration:0.25s,1.5s}
-.is-playing .hunt-panel .c2-line4{animation-delay:12.16s;animation-duration:4.28s}
-.is-playing .hunt-panel .c2-tk4{animation-delay:12.16s,12.16s;animation-duration:0.25s,4.38s}
-.is-playing .hunt-panel .c2-line5{animation-delay:17.21s;animation-duration:2.2s}
-.is-playing .hunt-panel .c2-tk5{animation-delay:17.21s,17.21s;animation-duration:0.25s,2.3s}
-.is-playing .hunt-panel .c2-line6{animation-delay:20.61s;animation-duration:2.6s}
-.is-playing .hunt-panel .c2-tk6{animation-delay:20.61s,20.61s;animation-duration:0.25s,2.7s}
-.is-playing .hunt-panel .c2-line7{animation-delay:23.21s;animation-duration:0.22s}
-.is-playing .hunt-panel .c2-tk7{animation-delay:23.21s,23.21s;animation-duration:0.25s,0.25s}
-.is-playing .hunt-panel .c2-n--sup{animation-delay:0s,0.8s,22.21s;animation-duration:0.8s,0.55s,0.7s}
-.is-playing .hunt-panel .c2-n--hyp{animation-delay:0s,1.35s,22.21s;animation-duration:1.35s,2.7s,0.7s}
-.is-playing .hunt-panel .c2-n--inv{animation-delay:0s,4.05s,22.21s;animation-duration:4.05s,4.67s,0.7s}
-.is-playing .hunt-panel .c2-n--det{animation-delay:0s,8.72s,13.09s;animation-duration:8.72s,14.54s,3.2s}
-.is-playing .hunt-panel .c2-n--ana{animation-delay:23.21s;animation-duration:0.8s}
-.is-playing .hunt-panel .c2-pin{animation-delay:24.06s;animation-duration:0.35s}
-.is-playing .hunt-panel .c2-halo{animation-delay:23.36s;animation-duration:1.7s}
+.is-playing .hunt-panel .c2-line2{animation-delay:5.77s;animation-duration:3s}
+.is-playing .hunt-panel .c2-tk2{animation-delay:5.77s,5.77s;animation-duration:0.25s,3.1s}
+.is-playing .hunt-panel .c2-line3{animation-delay:9.44s;animation-duration:1.4s}
+.is-playing .hunt-panel .c2-tk3{animation-delay:9.44s,9.44s;animation-duration:0.25s,1.5s}
+.is-playing .hunt-panel .c2-line4{animation-delay:11.56s;animation-duration:4.28s}
+.is-playing .hunt-panel .c2-tk4{animation-delay:11.56s,11.56s;animation-duration:0.25s,4.38s}
+.is-playing .hunt-panel .c2-line5{animation-delay:16.61s;animation-duration:3.6s}
+.is-playing .hunt-panel .c2-tk5{animation-delay:16.61s,16.61s;animation-duration:0.25s,3.7s}
+.is-playing .hunt-panel .c2-line6{animation-delay:21.41s;animation-duration:2.6s}
+.is-playing .hunt-panel .c2-tk6{animation-delay:21.41s,21.41s;animation-duration:0.25s,2.7s}
+.is-playing .hunt-panel .c2-line7{animation-delay:24.01s;animation-duration:0.22s}
+.is-playing .hunt-panel .c2-tk7{animation-delay:24.01s,24.01s;animation-duration:0.25s,0.25s}
+.is-playing .hunt-panel .c2-n--sup{animation-delay:0s,0.8s,23.01s;animation-duration:0.8s,0.55s,0.7s}
+.is-playing .hunt-panel .c2-n--hyp{animation-delay:0s,1.35s,23.01s;animation-duration:1.35s,2.7s,0.7s}
+.is-playing .hunt-panel .c2-n--inv{animation-delay:0s,4.05s,23.01s;animation-duration:4.05s,4.07s,0.7s}
+.is-playing .hunt-panel .c2-n--det{animation-delay:0s,8.12s,12.49s;animation-duration:8.12s,15.94s,3.2s}
+.is-playing .hunt-panel .c2-n--ana{animation-delay:24.01s;animation-duration:0.8s}
+.is-playing .hunt-panel .c2-pin{animation-delay:24.86s;animation-duration:0.35s}
+.is-playing .hunt-panel .c2-halo{animation-delay:24.16s;animation-duration:1.7s}
 .is-playing .hunt-panel .c2-rep{animation-delay:0.05s;animation-duration:1.55s}
-.is-playing .hunt-panel .c2-chip0{animation-delay:1.15s,20.26s,2.1s,11.14s;animation-duration:0.4s,0.4s,3.1s,11.82s}
-.is-playing .hunt-panel .c2-chip1{animation-delay:1.3s,5.75s,4.8s;animation-duration:0.8s,0.8s,4.67s}
-.is-playing .hunt-panel .c2-chip2{animation-delay:1.45s,10.02s,9.07s;animation-duration:0.8s,0.8s,2.47s}
-.is-playing .hunt-panel .c2-edge--in{animation-delay:0s;animation-duration:22.91s}
-.is-playing .hunt-panel .c2-edge--hyp{animation-delay:0s;animation-duration:22.91s}
-.is-playing .hunt-panel .c2-edge--inv{animation-delay:0s;animation-duration:22.91s}
-.is-playing .hunt-panel .c2-edge--det{animation-delay:8.47s;animation-duration:0.5s}
-.is-playing .hunt-panel .c2-edge--ana{animation-delay:22.56s;animation-duration:0.9s}
+.is-playing .hunt-panel .c2-chip0{animation-delay:1.15s,21.06s,2.1s,10.54s;animation-duration:0.4s,0.4s,3.1s,13.22s}
+.is-playing .hunt-panel .c2-chip1{animation-delay:1.3s,5.75s,4.8s;animation-duration:0.8s,0.8s,4.07s}
+.is-playing .hunt-panel .c2-chip2{animation-delay:1.45s,9.42s,8.47s;animation-duration:0.8s,0.8s,2.47s}
+.is-playing .hunt-panel .c2-edge--in{animation-delay:0s;animation-duration:23.71s}
+.is-playing .hunt-panel .c2-edge--hyp{animation-delay:0s;animation-duration:23.71s}
+.is-playing .hunt-panel .c2-edge--inv{animation-delay:0s;animation-duration:23.71s}
+.is-playing .hunt-panel .c2-edge--det{animation-delay:7.87s;animation-duration:0.5s}
+.is-playing .hunt-panel .c2-edge--ana{animation-delay:23.36s;animation-duration:0.9s}
 .is-playing .hunt-panel .c2-pc0{animation-delay:0.3s;animation-duration:0.75s}
 .is-playing .hunt-panel .c2-pb0{animation-delay:0.3s;animation-duration:0.75s}
 .is-playing .hunt-panel .c2-pc1{animation-delay:0.85s;animation-duration:0.75s}
 .is-playing .hunt-panel .c2-pb1{animation-delay:0.85s;animation-duration:0.75s}
 .is-playing .hunt-panel .c2-pc2{animation-delay:3.55s;animation-duration:1.15s}
 .is-playing .hunt-panel .c2-pb2{animation-delay:3.55s;animation-duration:1.15s}
-.is-playing .hunt-panel .c2-pc3{animation-delay:8.22s;animation-duration:0.75s}
-.is-playing .hunt-panel .c2-pb3{animation-delay:8.22s;animation-duration:0.75s}
-.is-playing .hunt-panel .c2-hc{animation-delay:22.46s;animation-duration:1.55s}
-.is-playing .hunt-panel .c2-hb{animation-delay:22.46s;animation-duration:1.55s}
+.is-playing .hunt-panel .c2-pc3{animation-delay:7.62s;animation-duration:0.75s}
+.is-playing .hunt-panel .c2-pb3{animation-delay:7.62s;animation-duration:0.75s}
+.is-playing .hunt-panel .c2-hc{animation-delay:23.26s;animation-duration:1.55s}
+.is-playing .hunt-panel .c2-hb{animation-delay:23.26s;animation-duration:1.55s}
 .is-playing .hunt-panel .c2-sc-sup{animation-delay:0.05s;animation-duration:0.8s}
 .is-playing .hunt-panel .c2-sb-sup{animation-delay:0.05s;animation-duration:0.8s}
 .is-playing .hunt-panel .c2-sw-sup{animation-delay:0.05s;animation-duration:0.8s}
@@ -440,26 +443,26 @@
 .is-playing .hunt-panel .c2-sc-inv{animation-delay:4.55s;animation-duration:0.8s}
 .is-playing .hunt-panel .c2-sb-inv{animation-delay:4.55s;animation-duration:0.8s}
 .is-playing .hunt-panel .c2-sw-inv{animation-delay:4.55s;animation-duration:0.8s}
-.is-playing .hunt-panel .c2-sc-det{animation-delay:8.82s,10.89s,13.99s,15.89s,18.86s;animation-duration:0.8s,0.8s,0.8s,0.8s,0.8s}
-.is-playing .hunt-panel .c2-sb-det{animation-delay:8.82s,10.89s,13.99s,15.89s,18.86s;animation-duration:0.8s,0.8s,0.8s,0.8s,0.8s}
-.is-playing .hunt-panel .c2-sw-det{animation-delay:8.82s,10.89s,13.99s,15.89s,18.86s;animation-duration:0.8s,0.8s,0.8s,0.8s,0.8s}
+.is-playing .hunt-panel .c2-sc-det{animation-delay:8.22s,10.29s,13.39s,15.29s,19.66s;animation-duration:0.8s,0.8s,0.8s,0.8s,0.8s}
+.is-playing .hunt-panel .c2-sb-det{animation-delay:8.22s,10.29s,13.39s,15.29s,19.66s;animation-duration:0.8s,0.8s,0.8s,0.8s,0.8s}
+.is-playing .hunt-panel .c2-sw-det{animation-delay:8.22s,10.29s,13.39s,15.29s,19.66s;animation-duration:0.8s,0.8s,0.8s,0.8s,0.8s}
 .is-playing .hunt-panel .c2-s0 > .c2-card{animation-delay:0.35s;animation-duration:2.2s}
 .is-playing .hunt-panel .c2-s0 > .c2-veil{animation-delay:0.3s;animation-duration:2.4s}
 .is-playing .hunt-panel .c2-s1 > .c2-card{animation-delay:2.15s;animation-duration:3.1s}
 .is-playing .hunt-panel .c2-s1 > .c2-veil{animation-delay:2.1s;animation-duration:3.3s}
-.is-playing .hunt-panel .c2-s2 > .c2-card{animation-delay:4.85s;animation-duration:4.67s}
-.is-playing .hunt-panel .c2-s2 > .c2-veil{animation-delay:4.8s;animation-duration:4.87s}
-.is-playing .hunt-panel .c2-s3 > .c2-card{animation-delay:9.12s;animation-duration:2.47s}
-.is-playing .hunt-panel .c2-s3 > .c2-veil{animation-delay:9.07s;animation-duration:2.67s}
-.is-playing .hunt-panel .c2-s4 > .c2-card{animation-delay:11.19s;animation-duration:3.5s}
-.is-playing .hunt-panel .c2-s4 > .c2-veil{animation-delay:11.14s;animation-duration:3.7s}
-.is-playing .hunt-panel .c2-s5 > .c2-card{animation-delay:14.29s;animation-duration:2.3s}
-.is-playing .hunt-panel .c2-s5 > .c2-veil{animation-delay:14.24s;animation-duration:2.5s}
-.is-playing .hunt-panel .c2-s6 > .c2-card{animation-delay:16.19s;animation-duration:3.37s}
-.is-playing .hunt-panel .c2-s6 > .c2-veil{animation-delay:16.14s;animation-duration:3.57s}
-.is-playing .hunt-panel .c2-s7 > .c2-card{animation-delay:19.16s;animation-duration:3.65s}
-.is-playing .hunt-panel .c2-s7 > .c2-veil{animation-delay:19.11s;animation-duration:0.4s}
-.is-playing .hunt-panel .c2-loop{animation-delay:13.24s;animation-duration:0.9s}
-.is-playing .hunt-panel .c2-loopbead{animation-delay:13.24s;animation-duration:1.15s}
-.is-playing .hunt-panel .c2-loophead{animation-delay:13.99s;animation-duration:0.3s}
+.is-playing .hunt-panel .c2-s2 > .c2-card{animation-delay:4.85s;animation-duration:4.07s}
+.is-playing .hunt-panel .c2-s2 > .c2-veil{animation-delay:4.8s;animation-duration:4.27s}
+.is-playing .hunt-panel .c2-s3 > .c2-card{animation-delay:8.52s;animation-duration:2.47s}
+.is-playing .hunt-panel .c2-s3 > .c2-veil{animation-delay:8.47s;animation-duration:2.67s}
+.is-playing .hunt-panel .c2-s4 > .c2-card{animation-delay:10.59s;animation-duration:3.5s}
+.is-playing .hunt-panel .c2-s4 > .c2-veil{animation-delay:10.54s;animation-duration:3.7s}
+.is-playing .hunt-panel .c2-s5 > .c2-card{animation-delay:13.69s;animation-duration:2.3s}
+.is-playing .hunt-panel .c2-s5 > .c2-veil{animation-delay:13.64s;animation-duration:2.5s}
+.is-playing .hunt-panel .c2-s6 > .c2-card{animation-delay:15.59s;animation-duration:4.77s}
+.is-playing .hunt-panel .c2-s6 > .c2-veil{animation-delay:15.54s;animation-duration:4.97s}
+.is-playing .hunt-panel .c2-s7 > .c2-card{animation-delay:19.96s;animation-duration:3.65s}
+.is-playing .hunt-panel .c2-s7 > .c2-veil{animation-delay:19.91s;animation-duration:0.4s}
+.is-playing .hunt-panel .c2-loop{animation-delay:12.64s;animation-duration:0.9s}
+.is-playing .hunt-panel .c2-loopbead{animation-delay:12.64s;animation-duration:1.15s}
+.is-playing .hunt-panel .c2-loophead{animation-delay:13.39s;animation-duration:0.3s}
 }

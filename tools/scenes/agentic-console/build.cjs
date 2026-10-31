@@ -50,7 +50,8 @@ const E = [
 ];
 // --- timeline (desktop). Each caption starts just after its entry's result and fades (0.2s) as the next entry lands.
 const GAP = 0.2, TOOL = 0.55, TRAVEL = 0.55;
-const HOLD = [0.5, 0.7, 3.0, 0.8, 0, 1.6];          // hold before the next entry lands (31 Oct 2026: three beats; beat 5 and 7 set below)
+const HOLD = [0.5, 0.7, 2.4, 0.8, 0, 3.0];          // hold before the next entry lands (31 Oct 2026: three beats; beat 5 and 7 set below;
+                                                     // motion review: 0.6s off the set-aside hold, 1.4s onto the checked query, so beat 2's last line is read before beat 3)
 const T0 = {};
 const cap = [];
 E[0].L = 0.6; E[0].D = E[0].L + TOOL; cap[0] = E[0].D + 0.15;
@@ -73,11 +74,12 @@ for (const e of E) { e.L = r3(e.L); if (e.D != null) e.D = r3(e.D); }
 const CAP_IN = 0.22;                                 // caption fade-in; fade-out is GAP
 const CAP_ENTRY = [0, 1, 2, 3, 4, 6, 7];             // the entry each caption explains (the re-plan caption spans entries 4-5)
 const capOut = i => (i < 7 ? (i === 6 ? T0.ANA : E[CAP_ENTRY[i + 1]].L) : null);  // gone by the time the next beat's entry lands
-// chips: [technique, outcome, which entry resolves it, ring windows (entry-index ranges)]
+// chips: [technique, outcome, which entry resolves it, ring windows (entry-index ranges)]; `sn` and `short` are the name and
+// outcome a narrow strip header shows instead (481–520px: the long ones clipped at the console's edge)
 const CHIPS = [
   { id: 'T1053.005', name: 'Scheduled Task', out: 'Flagged', oc: 'var(--c2-amb)', ob: 'rgba(255,184,105,.7)', flag: true, at: () => E[7].D + 0.3 },
-  { id: 'T1059.001', name: 'PowerShell', out: 'covered by a recent hunt', oc: 'var(--c2-sec)', ob: '#2b5155', at: () => E[2].D + 0.1 },
-  { id: 'T1547.001', name: 'Registry Run Keys', out: 'Valid negative', oc: '#7fe6da', ob: '#2b5155', ok: true, at: () => E[3].D + 0.1 },
+  { id: 'T1059.001', name: 'PowerShell', out: 'covered by a recent hunt', short: 'hunted recently', oc: 'var(--c2-sec)', ob: '#2b5155', at: () => E[2].D + 0.1 },
+  { id: 'T1547.001', name: 'Registry Run Keys', sn: 'Run Keys', out: 'Valid negative', oc: '#7fe6da', ob: '#2b5155', ok: true, at: () => E[3].D + 0.1 },
 ];
 const RINGS = [
   [0, () => E[1].L - 0.3, () => E[2].L - 0.35], [0, () => E[4].L - 0.3, () => T0.HUSH + 0.3],
@@ -105,7 +107,7 @@ const S = {
   ana: { x: 174, y: 124, w: 90, h: 28 },
   rail: 6, bus: 112,
 };
-const DOT_TAB = 160 + 44 + 15, DOT_PHONE = 160 + 15;
+const DOT_STRIP = 160 + 44 + 15;   // the strip layouts: a 160px graph, the 44px log-label row, then the feed's first dot
 const cx = g => g.x + g.w / 2, bot = g => g.y + g.h;
 function geo(G, strip, dot) {
   const sb = bot(G.sup), sc = cx(G.sup);
@@ -192,15 +194,14 @@ function entries() {
   return inner;
 }
 
-const chipHtml = CHIPS.map((c, i) => `<span class="c2-chip c2-chip${i}" style="--oc:${c.oc};--ob:${c.ob}"><span class="c2-cid">${c.id}</span><span class="c2-cn">${c.name}</span><span class="c2-co">${c.flag ? svgI('flag') : c.ok ? svgI('tick') : ''}${c.out}</span></span>`).join('');
+const chipHtml = CHIPS.map((c, i) => `<span class="c2-chip c2-chip${i}" style="--oc:${c.oc};--ob:${c.ob}"><span class="c2-cid">${c.id}</span><span class="c2-cn">${c.sn ? `<span class="c2-col">${c.name}</span><span class="c2-cos">${c.sn}</span>` : c.name}</span><span class="c2-co">${c.flag ? svgI('flag') : c.ok ? svgI('tick') : ''}${c.short ? `<span class="c2-col">${c.out}</span><span class="c2-cos">${c.short}</span>` : c.out}</span></span>`).join('');
 const ARIA = 'An illustrative hunt. Agents turn a ransomware report into three techniques to hunt. PowerShell was covered by a recent hunt, so it is set aside. The Run keys search finds only expected entries, a valid negative. For scheduled tasks the first search is inconclusive, so the Detection agent re-plans around event 4698 and checks its query before it runs. It flags one task, \\WinTaskUpdate, on one host and not in the baseline, and hands it to an analyst with the evidence.';
 const html = `<div class="c2" role="img" aria-label="${esc(ARIA)}">
 <div class="c2-head"><span class="c2-rep">${svgI('rep')}<span>Ransomware report</span></span><svg class="c2-arrow" viewBox="0 0 14 12" aria-hidden="true"><path d="M1 6h11M8.5 2.5 12 6l-3.5 3.5"/></svg><span class="c2-chips">${chipHtml}</span></div>
 <div class="c2-cap"><span class="c2-ticks">${CAPS.map((_, i) => `<i class="c2-tk c2-tk${i}${i === CAPS.length - 1 ? ' c2-tk--now' : ''}"></i>`).join('')}</span><span class="c2-lines">${CAPS.map((t, i) => `<span class="c2-line c2-line${i}${i === CAPS.length - 1 ? ' c2-line--fin' : ''}">${esc(t)}</span>`).join('')}</span></div>
 <div class="c2-g">
   ${wires(W, false, W.dot, 'c2-ww', 276, 312)}
-  ${wires(S, true, DOT_TAB, 'c2-wt', 268, 230)}
-  ${wires(S, true, DOT_PHONE, 'c2-wp', 268, 190)}
+  ${wires(S, true, DOT_STRIP, 'c2-wt', 268, 230)}
   ${['sup', 'hyp', 'inv', 'det', 'ana'].map(node).join('\n  ')}
 </div>
 <div class="c2-f"><div class="c2-list"><i class="c2-rail"></i>${entries()}</div></div>

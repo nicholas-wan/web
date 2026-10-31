@@ -29,12 +29,13 @@ const SCENES = [
   + `<p ${a(0.2, 'hsk-doc')}>…<mark ${a(0.6, 'mk')}>create a scheduled task</mark> … <mark ${a(1.0, 'mk')}>run PowerShell</mark> … <mark ${a(1.4, 'mk')}>add a Run key</mark>…</p>`
   + `<p class="hsk-ids"><code ${a(1.2)}>Scheduled Task</code><code ${a(1.6, 'is-out')}>PowerShell<b class="hsk-a" style="--t:4.6s">hunted recently</b></code><code ${a(2)}>Run Keys</code></p>`
   + `<dl class="hsk-kv hsk-a" style="--t:2.4s"><div><dt>Hypothesis</dt><dd>A new task runs at logon, outside the baseline</dd></div></dl>`,
-  // 2 catch a blind spot (~9 s): one clean negative, one search that couldn't have seen it, the re-plan, the check
+  // 2 catch a blind spot (~10 s): one clean negative, one search that couldn't have seen it, the re-plan, the check
+  //   (the checked query lands with the console's result at ~7.8 s and holds two seconds before beat 3)
   top('Zero results is a blind spot, not a negative', 'The verdict sets the next step: revise, record or raise a lead.')
   + `<ul class="hsk-rows"><li ${a(0.5)}><span>Run keys vs baseline</span><b class="is-ok hsk-a" style="--t:1.2s">${tick}Valid negative</b></li>`
   + `<li ${a(2.1)}><span>process = schtasks.exe</span><b class="is-warn hsk-a" style="--t:2.7s">0 results</b></li></ul>`
   + `<p class="hsk-note hsk-a" style="--t:3.6s">Tasks made through the Task Scheduler API never launch schtasks.exe.</p>`
-  + `<p class="hsk-src"><span class="hsk-a" style="--t:5.2s">Re-plan: event 4698 · a task was created</span><b class="hsk-a" style="--t:7s">${tick}Query checked against this telemetry</b></p>`,
+  + `<p class="hsk-src"><span class="hsk-a" style="--t:5.2s">Re-plan: event 4698 · a task was created</span><b class="hsk-a" style="--t:7.5s">${tick}Query checked against this telemetry</b></p>`,
   // 3 hand off (~6 s and the end): the rare task stands out, with its evidence and the next step
   top('Hands it to an analyst, with the evidence', 'Analysts receive the evidence and a concrete next investigation.')
   + `<ul class="hsk-bars"><li><span>\\Microsoft\\…\\ProactiveScan</span><i ${a(0.4, 'gr')}></i><b>in baseline</b></li>`
