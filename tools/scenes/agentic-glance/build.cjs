@@ -208,8 +208,10 @@ const T = {
 };
 const OUT_EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)';
 const P = '.is-playing svg.ag-scene', PH = phone();
-const at = ([d, s], name, ez = IO, fill = 'both') => `animation: ${name} ${s}s ${ez} ${d}s ${fill};`;
-const ends = Object.values(T).flatMap(v => Array.isArray(v[0]) ? v : [v]).map(([d, s]) => d + s);
+// PACE scales the whole timeline at once, keeping its rhythm (owner, 31 Oct 2026: "make the animation faster")
+const PACE = 0.75, k = v => +(v * PACE).toFixed(3);
+const at = ([d, s], name, ez = IO, fill = 'both') => `animation: ${name} ${k(s)}s ${ez} ${k(d)}s ${fill};`;
+const ends = Object.values(T).flatMap(v => Array.isArray(v[0]) ? v : [v]).map(([d, s]) => k(d + s));
 const css = `/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
 .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 246; }

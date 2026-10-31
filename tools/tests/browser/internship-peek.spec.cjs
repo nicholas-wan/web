@@ -194,7 +194,7 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
  }
 });
 
-test('agentic AI chart: a hover previews it like the internship charts, it plays one ~17 s hunt in three narrative steps and replays, reduced motion holds the final frame, and phones get the stacked drawing',async({page})=>{
+test('agentic AI chart: a hover previews it like the internship charts, it plays one ~14 s hunt in three narrative steps and replays, reduced motion holds the final frame, and phones get the stacked drawing',async({page})=>{
  const scene=root=>card(root).locator('svg.ag-scene:not(.ag-scene--m)');
  const phoneScene=root=>card(root).locator('svg.ag-scene--m');
  const shown=loc=>loc.evaluate(e=>+getComputedStyle(e).opacity);
@@ -238,8 +238,8 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await chip(root).click();
  await expect(card(root)).toHaveClass(/is-playing/);
  const end=await card(root).evaluate(c=>Math.max(...c.getAnimations({subtree:true}).map(a=>a.effect.getComputedTiming().endTime).filter(Number.isFinite)));
- expect(end).toBeGreaterThan(15000);
- expect(end).toBeLessThan(21000);
+ expect(end).toBeGreaterThan(11000);
+ expect(end).toBeLessThan(17000);
  expect(await shown(scene(root).locator('.ag-s2'))).toBeLessThan(1);
  await expect(card(root).locator('.hsk-ctl')).toHaveCount(0);
  await page.keyboard.press('Escape');

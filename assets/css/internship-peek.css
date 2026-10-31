@@ -769,55 +769,55 @@ svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .a
 @keyframes ag-pk { 0% { opacity: 0; transform: none; } 15%, 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--dx)); } }
 @keyframes ag-pop { 0% { opacity: 0; transform: scale(.6); } 70% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
 /* step 1: the report drops into the supervisor, which hands Hypothesis its slice and takes its result back, then hands Detection the hunt */
-.is-playing svg.ag-scene .ag-s0 { animation: ag-in 0.5s cubic-bezier(.22,1,.36,1) 0.2s both; }
-.is-playing svg.ag-scene .ag-doc { animation: ag-doc 2s cubic-bezier(.45,0,.25,1) 0.2s none; }
-.is-playing svg.ag-scene .ag-fl-sup { animation: ag-flash 0.7s cubic-bezier(.45,0,.25,1) 2s none; }
-.is-playing svg.ag-scene .ag-c0 { animation: ag-comet 0.7s linear 2.3s none; }
-.is-playing svg.ag-scene .ag-fl-hyp { animation: ag-flash 1s cubic-bezier(.45,0,.25,1) 2.8s none; }
-.is-playing svg.ag-scene .ag-c0r { animation: ag-comet-r 0.6s linear 3.5s none; }
-.is-playing svg.ag-scene .ag-c1 { animation: ag-comet 0.7s linear 4s none; }
-.is-playing svg.ag-scene .ag-rip-det { animation: ag-rip 1s cubic-bezier(.22,1,.36,1) 4.6s none; }
-.is-playing svg.ag-scene .ag-det { animation: ag-det 0.45s cubic-bezier(.45,0,.25,1) 4.6s both; }
-.is-playing svg.ag-scene .ag-det-dot { animation: ag-out 0.45s cubic-bezier(.45,0,.25,1) 4.6s both; }
-.is-playing svg.ag-scene .ag-job-on text { animation: ag-job 0.45s cubic-bezier(.45,0,.25,1) 4.6s both; }
-.is-playing svg.ag-scene .ag-chev0 { animation: ag-chev 0.9s cubic-bezier(.45,0,.25,1) 5.4s none; }
+.is-playing svg.ag-scene .ag-s0 { animation: ag-in 0.375s cubic-bezier(.22,1,.36,1) 0.15s both; }
+.is-playing svg.ag-scene .ag-doc { animation: ag-doc 1.5s cubic-bezier(.45,0,.25,1) 0.15s none; }
+.is-playing svg.ag-scene .ag-fl-sup { animation: ag-flash 0.525s cubic-bezier(.45,0,.25,1) 1.5s none; }
+.is-playing svg.ag-scene .ag-c0 { animation: ag-comet 0.525s linear 1.725s none; }
+.is-playing svg.ag-scene .ag-fl-hyp { animation: ag-flash 0.75s cubic-bezier(.45,0,.25,1) 2.1s none; }
+.is-playing svg.ag-scene .ag-c0r { animation: ag-comet-r 0.45s linear 2.625s none; }
+.is-playing svg.ag-scene .ag-c1 { animation: ag-comet 0.525s linear 3s none; }
+.is-playing svg.ag-scene .ag-rip-det { animation: ag-rip 0.75s cubic-bezier(.22,1,.36,1) 3.45s none; }
+.is-playing svg.ag-scene .ag-det { animation: ag-det 0.338s cubic-bezier(.45,0,.25,1) 3.45s both; }
+.is-playing svg.ag-scene .ag-det-dot { animation: ag-out 0.338s cubic-bezier(.45,0,.25,1) 3.45s both; }
+.is-playing svg.ag-scene .ag-job-on text { animation: ag-job 0.338s cubic-bezier(.45,0,.25,1) 3.45s both; }
+.is-playing svg.ag-scene .ag-chev0 { animation: ag-chev 0.675s cubic-bezier(.45,0,.25,1) 4.05s none; }
 /* step 2: the agent and its kit; a search that finds nothing, the loop and the checked query, a search that finds one */
-.is-playing svg.ag-scene .ag-s1 { animation: ag-wake 0.5s cubic-bezier(.22,1,.36,1) 5.7s both; }
-.is-playing svg.ag-scene .ag-p1 { animation: ag-fade 0.5s cubic-bezier(.45,0,.25,1) 5.7s both; }
-.is-playing svg.ag-scene .ag-fl-arr { animation: ag-flash 0.9s cubic-bezier(.45,0,.25,1) 5.9s none; }
-.is-playing svg.ag-scene .ag-tool0 { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 6.2s both; }
-.is-playing svg.ag-scene .ag-tool1 { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 6.45s both; }
-.is-playing svg.ag-scene .ag-tool2 { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 6.7s both; }
-.is-playing svg.ag-scene .ag-g0a { animation: ag-flash 1.3s cubic-bezier(.45,0,.25,1) 7.2s none; }
-.is-playing svg.ag-scene .ag-rip0 { animation: ag-rip 1.1s cubic-bezier(.22,1,.36,1) 7.3s none; }
-.is-playing svg.ag-scene .ag-rip1 { animation: ag-rip 1.1s cubic-bezier(.22,1,.36,1) 7.6s none; }
-.is-playing svg.ag-scene .ag-none { animation: ag-hold 4.2s linear 8.2s none; }
-.is-playing svg.ag-scene .ag-loop { animation: ag-draw 1s cubic-bezier(.45,0,.25,1) 9.4s both; }
-.is-playing svg.ag-scene .ag-lh { animation: ag-fade 0.25s cubic-bezier(.45,0,.25,1) 10.3s both; }
-.is-playing svg.ag-scene .ag-g1 { animation: ag-flash 1.2s cubic-bezier(.45,0,.25,1) 9.8s none; }
-.is-playing svg.ag-scene .ag-rw { animation: ag-hold 1.3s linear 9.4s none; }
-.is-playing svg.ag-scene .ag-ck { animation: ag-gap 1.3s linear 9.4s none; }
-.is-playing svg.ag-scene .ag-tick { animation: ag-draw 0.5s cubic-bezier(.45,0,.25,1) 10.7s both; }
-.is-playing svg.ag-scene .ag-g0b { animation: ag-flash 1.3s cubic-bezier(.45,0,.25,1) 11.5s none; }
-.is-playing svg.ag-scene .ag-rip2 { animation: ag-rip 1.1s cubic-bezier(.22,1,.36,1) 11.6s none; }
-.is-playing svg.ag-scene .ag-rip3 { animation: ag-rip 1.1s cubic-bezier(.22,1,.36,1) 11.9s none; }
-.is-playing svg.ag-scene .ag-found { animation: ag-pop 0.45s cubic-bezier(.22,1,.36,1) 12.4s both; }
-.is-playing svg.ag-scene .ag-g2 { animation: ag-flash 0.9s cubic-bezier(.45,0,.25,1) 12.8s none; }
-.is-playing svg.ag-scene .ag-chev1 { animation: ag-chev 0.9s cubic-bezier(.45,0,.25,1) 13.5s none; }
+.is-playing svg.ag-scene .ag-s1 { animation: ag-wake 0.375s cubic-bezier(.22,1,.36,1) 4.275s both; }
+.is-playing svg.ag-scene .ag-p1 { animation: ag-fade 0.375s cubic-bezier(.45,0,.25,1) 4.275s both; }
+.is-playing svg.ag-scene .ag-fl-arr { animation: ag-flash 0.675s cubic-bezier(.45,0,.25,1) 4.425s none; }
+.is-playing svg.ag-scene .ag-tool0 { animation: ag-fade 0.262s cubic-bezier(.45,0,.25,1) 4.65s both; }
+.is-playing svg.ag-scene .ag-tool1 { animation: ag-fade 0.262s cubic-bezier(.45,0,.25,1) 4.838s both; }
+.is-playing svg.ag-scene .ag-tool2 { animation: ag-fade 0.262s cubic-bezier(.45,0,.25,1) 5.025s both; }
+.is-playing svg.ag-scene .ag-g0a { animation: ag-flash 0.975s cubic-bezier(.45,0,.25,1) 5.4s none; }
+.is-playing svg.ag-scene .ag-rip0 { animation: ag-rip 0.825s cubic-bezier(.22,1,.36,1) 5.475s none; }
+.is-playing svg.ag-scene .ag-rip1 { animation: ag-rip 0.825s cubic-bezier(.22,1,.36,1) 5.7s none; }
+.is-playing svg.ag-scene .ag-none { animation: ag-hold 3.15s linear 6.15s none; }
+.is-playing svg.ag-scene .ag-loop { animation: ag-draw 0.75s cubic-bezier(.45,0,.25,1) 7.05s both; }
+.is-playing svg.ag-scene .ag-lh { animation: ag-fade 0.188s cubic-bezier(.45,0,.25,1) 7.725s both; }
+.is-playing svg.ag-scene .ag-g1 { animation: ag-flash 0.9s cubic-bezier(.45,0,.25,1) 7.35s none; }
+.is-playing svg.ag-scene .ag-rw { animation: ag-hold 0.975s linear 7.05s none; }
+.is-playing svg.ag-scene .ag-ck { animation: ag-gap 0.975s linear 7.05s none; }
+.is-playing svg.ag-scene .ag-tick { animation: ag-draw 0.375s cubic-bezier(.45,0,.25,1) 8.025s both; }
+.is-playing svg.ag-scene .ag-g0b { animation: ag-flash 0.975s cubic-bezier(.45,0,.25,1) 8.625s none; }
+.is-playing svg.ag-scene .ag-rip2 { animation: ag-rip 0.825s cubic-bezier(.22,1,.36,1) 8.7s none; }
+.is-playing svg.ag-scene .ag-rip3 { animation: ag-rip 0.825s cubic-bezier(.22,1,.36,1) 8.925s none; }
+.is-playing svg.ag-scene .ag-found { animation: ag-pop 0.338s cubic-bezier(.22,1,.36,1) 9.3s both; }
+.is-playing svg.ag-scene .ag-g2 { animation: ag-flash 0.675s cubic-bezier(.45,0,.25,1) 9.6s none; }
+.is-playing svg.ag-scene .ag-chev1 { animation: ag-chev 0.675s cubic-bezier(.45,0,.25,1) 10.125s none; }
 /* step 3: the Report agent lights and the lead card writes itself; the lead travels to the human */
-.is-playing svg.ag-scene .ag-s2 { animation: ag-wake 0.5s cubic-bezier(.22,1,.36,1) 13.9s both; }
-.is-playing svg.ag-scene .ag-p2 { animation: ag-fade 0.5s cubic-bezier(.45,0,.25,1) 13.9s both; }
-.is-playing svg.ag-scene .ag-flag { animation: ag-fade 0.4s cubic-bezier(.45,0,.25,1) 15s both; }
-.is-playing svg.ag-scene .ag-cardo { animation: ag-draw 0.8s cubic-bezier(.45,0,.25,1) 15s both; }
-.is-playing svg.ag-scene .ag-lead { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 15.5s both; }
-.is-playing svg.ag-scene .ag-ln0 { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 15.7s both; }
-.is-playing svg.ag-scene .ag-ln1 { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 15.9s both; }
-.is-playing svg.ag-scene .ag-c2 { animation: ag-comet 0.6s linear 14s none; }
-.is-playing svg.ag-scene .ag-fl-rep { animation: ag-flash 0.8s cubic-bezier(.45,0,.25,1) 14.5s none; }
-.is-playing svg.ag-scene .ag-he { animation: ag-fade 0.4s cubic-bezier(.45,0,.25,1) 16.4s both; }
-.is-playing svg.ag-scene .ag-pk { animation: ag-pk 0.55s cubic-bezier(.45,0,.25,1) 16.6s none; }
-.is-playing svg.ag-scene .ag-ana { animation: ag-pop 0.5s cubic-bezier(.22,1,.36,1) 17.1s both; }
-.is-playing svg.ag-scene .ag-halo { animation: ag-halo 1.1s cubic-bezier(.22,1,.36,1) 17.5s none; }
+.is-playing svg.ag-scene .ag-s2 { animation: ag-wake 0.375s cubic-bezier(.22,1,.36,1) 10.425s both; }
+.is-playing svg.ag-scene .ag-p2 { animation: ag-fade 0.375s cubic-bezier(.45,0,.25,1) 10.425s both; }
+.is-playing svg.ag-scene .ag-flag { animation: ag-fade 0.3s cubic-bezier(.45,0,.25,1) 11.25s both; }
+.is-playing svg.ag-scene .ag-cardo { animation: ag-draw 0.6s cubic-bezier(.45,0,.25,1) 11.25s both; }
+.is-playing svg.ag-scene .ag-lead { animation: ag-fade 0.262s cubic-bezier(.45,0,.25,1) 11.625s both; }
+.is-playing svg.ag-scene .ag-ln0 { animation: ag-fade 0.262s cubic-bezier(.45,0,.25,1) 11.775s both; }
+.is-playing svg.ag-scene .ag-ln1 { animation: ag-fade 0.262s cubic-bezier(.45,0,.25,1) 11.925s both; }
+.is-playing svg.ag-scene .ag-c2 { animation: ag-comet 0.45s linear 10.5s none; }
+.is-playing svg.ag-scene .ag-fl-rep { animation: ag-flash 0.6s cubic-bezier(.45,0,.25,1) 10.875s none; }
+.is-playing svg.ag-scene .ag-he { animation: ag-fade 0.3s cubic-bezier(.45,0,.25,1) 12.3s both; }
+.is-playing svg.ag-scene .ag-pk { animation: ag-pk 0.413s cubic-bezier(.45,0,.25,1) 12.45s none; }
+.is-playing svg.ag-scene .ag-ana { animation: ag-pop 0.375s cubic-bezier(.22,1,.36,1) 12.825s both; }
+.is-playing svg.ag-scene .ag-halo { animation: ag-halo 0.825s cubic-bezier(.22,1,.36,1) 13.125s none; }
 /* agentic-glance:end */
 
 /* Phone versions of the internship scenes (25 Oct 2026; owner: "do longer
