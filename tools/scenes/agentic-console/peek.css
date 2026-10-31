@@ -1,0 +1,131 @@
+/* The Agentic AI peek around the console (peek.cjs; README "Agentic AI console peek"). apply.cjs writes this
+   after scene.css and before the generated peek timing. Every timed piece animates --c2-v (the console's
+   registered "shown" number, 0..1) or a transform; resting styles are the finished run, so reduced motion
+   (is-still) shows Done with a full bar and the hand-off picture. */
+@keyframes hsk-in { from { --c2-v: 0; } }
+@keyframes hsk-fill { from { transform: scaleX(0); } }
+
+/* ---------------- status strip: state, beat, progress, one control ---------------- */
+#agentic-ai .hsk-bar {
+  position: relative; display: flex; align-items: center; gap: 12px; min-height: 44px; padding: 8px 12px 10px 14px;
+  border-bottom: 1px solid var(--c2-rule); background: #081719;
+}
+#agentic-ai .hsk-status { flex: 1 1 auto; display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; font-size: 12.5px; color: var(--c2-sec); }
+#agentic-ai .hsk-words, #agentic-ai .hsk-steps { display: grid; min-width: 0; }
+#agentic-ai .hsk-v { grid-area: 1 / 1; --c2-v: 0; opacity: var(--c2-v); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#agentic-ai .hsk-wd, #agentic-ai .hsk-sd { --c2-v: 1; }
+#agentic-ai .hsk-words { flex: none; font-weight: 700; color: var(--c2-ink); }
+#agentic-ai .hsk-wd { color: var(--c2-teal); }
+#agentic-ai .hsk-sd { color: var(--c2-body); }
+/* the status dot: pulses while running, grey when paused, steady when done (the one ambient loop) */
+#agentic-ai .hsk-dot { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--c2-teal); }
+@keyframes hsk-ping { 0% { box-shadow: 0 0 0 0 rgba(40, 215, 197, .55); } 80%, 100% { box-shadow: 0 0 0 7px rgba(40, 215, 197, 0); } }
+#agentic-ai .is-playing:not(.is-paused):not(.is-ended) .hsk-dot { animation: hsk-ping 1.6s ease-out infinite; }
+#agentic-ai .is-paused .hsk-dot { background: var(--c2-mute); }
+/* paused: the word says so, whatever the clock was showing */
+#agentic-ai .is-paused .hsk-words .hsk-v { visibility: hidden; }
+#agentic-ai .is-paused .hsk-words .hsk-wp { visibility: visible; --c2-v: 1; }
+#agentic-ai .hsk-env { flex: none; padding: 2px 8px; border: 1px solid var(--c2-rule); border-radius: 999px; font-size: 11px; font-weight: 600; color: var(--c2-mute); white-space: nowrap; }
+#agentic-ai .hsk-bar .hsk-ctl {   /* (beats the theme's button rule: uppercase, inset shadow, dark ink !important) */
+  flex: none; height: 28px; min-width: 76px; padding: 0 12px; border: 1px solid var(--c2-rule); border-radius: 999px; background: none; box-shadow: none;
+  color: var(--c2-teal) !important; font: 600 12px/1 "Figtree", "Source Sans Pro", Helvetica, sans-serif; letter-spacing: 0; text-transform: none; cursor: pointer;
+}
+#agentic-ai .hsk-bar .hsk-ctl:hover { border-color: var(--c2-teal); }
+#agentic-ai .hsk-bar .hsk-ctl:focus-visible { outline: 2px solid var(--c2-teal); outline-offset: 2px; }
+#agentic-ai .internship-demo-card:not(.is-playing) .hsk-ctl { display: none; }
+/* progress: one segment per beat along the strip's foot; the current one fills over its beat */
+#agentic-ai .hsk-prog { position: absolute; left: 14px; right: 12px; bottom: 4px; display: flex; gap: 4px; height: 3px; }
+#agentic-ai .hsk-seg { flex: 1; position: relative; overflow: hidden; border-radius: 2px; background: #1b3437; }
+#agentic-ai .hsk-seg b { position: absolute; inset: 0; background: var(--c2-teal); transform-origin: 0 50%; }
+@container c2p (max-width: 480px) {
+  #agentic-ai .hsk-bar { flex-wrap: wrap; gap: 6px 10px; padding: 10px 12px 14px; }
+  #agentic-ai .hsk-status { flex-basis: 100%; }
+  #agentic-ai .hsk-env { margin-right: auto; }
+}
+
+/* ---------------- two columns: the story first, then the live system ----------------
+   Desktop review (31 Oct 2026): as a third column the story was the narrowest, read last and set smallest,
+   while the dimmed log took the most width. The console keeps its own layouts, sized by its own container. */
+#agentic-ai .hsk-stage { display: grid; grid-template-columns: clamp(320px, 38%, 500px) minmax(0, 1fr); }
+#agentic-ai .hsk-live { container: c2p / inline-size; min-width: 0; border-left: 1px solid var(--c2-rule); }
+@container c2p (max-width: 700px) {   /* (the panel's container) narrow: the story above the live system */
+  #agentic-ai .hsk-stage { grid-template-columns: minmax(0, 1fr); }
+  #agentic-ai .hsk-live { border-left: 0; border-top: 1px solid var(--c2-rule); }
+}
+/* a narrow live column drops the technique IDs from its chips, keeping names and outcomes readable */
+@container c2p (min-width: 481px) and (max-width: 560px) { #agentic-ai .hsk-live .c2-cid { display: none; } }
+
+/* the agent at work: a quiet ring, only inside its working windows */
+#agentic-ai .hsk-work { position: absolute; inset: -3px; z-index: 2; --c2-v: 0; opacity: var(--c2-v); border-radius: 11px; box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--a) 70%, transparent); pointer-events: none; }
+/* the feed and graph are the agents' live texture: no caption over the feed (the story panel explains), the log dimmed */
+#agentic-ai .hunt-panel .c2-ticks, #agentic-ai .hunt-panel .c2-lines { display: none; }
+#agentic-ai .hunt-panel .c2-cap { padding-left: 16px; }
+#agentic-ai .hunt-panel .c2-cap::before { content: "Agent log"; font-size: 10.5px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--c2-mute); }
+#agentic-ai .hunt-panel .c2-f { opacity: .72; }
+@container c2p (max-width: 825px) { #agentic-ai .hunt-panel .c2-cap { padding-left: 40px; } }
+@container c2p (max-width: 480px) { #agentic-ai .hunt-panel .c2-cap { padding: 6px 14px 4px; } }
+
+/* ---------------- the story panel: the beat's explanation and picture, the one place to look ---------------- */
+#agentic-ai .hsk-tool {
+  display: flex; flex-direction: column; min-width: 0; margin: 14px;
+  border: 1px solid #2b5155; border-radius: 12px; background: linear-gradient(180deg, #0c2125, #081619); overflow: hidden;
+  box-shadow: 0 10px 28px -16px rgba(0, 0, 0, .8);
+}
+#agentic-ai .hsk-tool p, #agentic-ai .hsk-tool ul, #agentic-ai .hsk-tool dl { margin: 0; padding: 0; list-style: none; text-align: left; }
+#agentic-ai .hsk-tss { flex: 1; display: grid; min-height: 0; }
+#agentic-ai .hsk-ts { grid-area: 1 / 1; --c2-v: 0; opacity: var(--c2-v); display: flex; flex-direction: column; gap: 12px; padding: 18px 20px 20px; min-width: 0; font-size: 13px; line-height: 1.45; color: var(--c2-body); }
+#agentic-ai .hsk-ts2 { --c2-v: 1; }
+#agentic-ai .hsk-tool code { font-family: var(--c2-mono); }
+/* the headline is the largest type in the console */
+#agentic-ai .hsk-h { font-size: 21px; font-weight: 700; line-height: 1.25; letter-spacing: -0.01em; color: #eef6f4; text-wrap: balance; }
+#agentic-ai .hsk-why { margin-top: -5px !important; font-size: 14.5px; line-height: 1.5; color: var(--c2-sec); text-wrap: pretty; }
+@container c2p (max-width: 480px) {
+  #agentic-ai .hsk-tool { margin: 10px 12px; }
+  #agentic-ai .hsk-ts { padding: 14px 14px 16px; gap: 10px; }
+  #agentic-ai .hsk-h { font-size: 18px; }
+  #agentic-ai .hsk-why { font-size: 13.5px; }
+}
+#agentic-ai .hsk-doc { padding: 7px 10px !important; border: 1px solid var(--c2-edge); border-radius: 7px; background: #071315; color: var(--c2-mute); font-size: 13px; line-height: 1.75; }
+#agentic-ai .hsk-doc mark { color: #dcefec; background: linear-gradient(rgba(40, 215, 197, .22), rgba(40, 215, 197, .22)) no-repeat 0 0 / 100% 100%; box-shadow: inset 0 -1.5px 0 rgba(40, 215, 197, .7); border-radius: 3px; padding: 0 2px; }
+#agentic-ai .hsk-ids { display: flex; flex-wrap: wrap; gap: 5px; }
+#agentic-ai .hsk-ids code {   /* (the theme boxes every code; these are chips) */
+  display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border: 1px solid #2b5155; border-radius: 999px;
+  background: var(--c2-node); font-family: inherit; font-size: 12.5px; font-weight: 600; color: var(--c2-ink);
+}
+#agentic-ai .hsk-ids code.is-out { color: var(--c2-mute); }
+#agentic-ai .hsk-ids code b { font-size: 11.5px; font-weight: 600; color: var(--c2-inv); }
+#agentic-ai .hsk-tool .hsk-kv { display: grid; gap: 5px; padding: 8px 10px; border: 1px solid rgba(242, 162, 122, .35); border-radius: 7px; background: var(--c2-node); }
+#agentic-ai .hsk-kv div { display: grid; gap: 2px; }
+#agentic-ai .hsk-kv dt { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--c2-hyp); }
+#agentic-ai .hsk-kv dd { margin: 0; color: var(--c2-ink); font-size: 13.5px; }
+#agentic-ai .hsk-rows { display: grid; gap: 5px; }
+#agentic-ai .hsk-rows li { display: flex; align-items: center; gap: 8px; min-width: 0; padding: 8px 11px; border: 1px solid var(--c2-edge); border-radius: 7px; background: var(--c2-node); }
+#agentic-ai .hsk-rows li span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--c2-mono); font-size: 12.5px; color: var(--c2-sec); }
+#agentic-ai .hsk-rows li b { display: inline-flex; align-items: center; gap: 4px; flex: none; font-size: 12.5px; font-weight: 700; color: var(--c2-mute); }
+#agentic-ai .hsk-rows li b.is-ok { color: var(--c2-ok); }
+#agentic-ai .hsk-rows li b.is-warn { color: #f0c47a; }
+#agentic-ai .hsk-note { padding-left: 9px !important; border-left: 2px solid #f0c47a; font-size: 13.5px; color: var(--c2-ink); }
+#agentic-ai .hsk-src { display: grid; justify-items: start; gap: 6px; }
+#agentic-ai .hsk-src span { padding: 7px 11px; font-size: 13.5px; border: 1px solid rgba(99, 214, 160, .55); border-radius: 7px; background: var(--c2-node); color: var(--c2-ink); font-weight: 600; }
+#agentic-ai .hsk-src b { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 600; color: var(--c2-ok); }
+#agentic-ai .hsk-res { display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: var(--c2-ink); }
+#agentic-ai .hsk-res.is-lead { color: var(--c2-amb); }
+#agentic-ai .hsk-next { padding: 9px 12px !important; font-size: 13.5px; border: 1px dashed rgba(255, 184, 105, .45); border-radius: 7px; color: var(--c2-ink); }
+#agentic-ai .hsk-tk { flex: none; width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+#agentic-ai .hsk-bars { display: grid; gap: 7px; }
+#agentic-ai .hsk-bars li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; font-size: 12.5px; }
+#agentic-ai .hsk-bars span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--c2-mono); color: var(--c2-sec); }
+#agentic-ai .hsk-bars b { grid-row: 1 / 3; grid-column: 2; align-self: center; font-weight: 600; color: var(--c2-mute); }
+#agentic-ai .hsk-bars i { grid-column: 1; height: 8px; border-radius: 3px; background: #2f6f6b; transform-origin: 0 50%; width: 96%; }
+#agentic-ai .hsk-bars li:nth-child(2) i { width: 88%; }
+#agentic-ai .hsk-bars .is-lead span { color: var(--c2-ink); }
+#agentic-ai .hsk-bars .is-lead i { width: 4%; min-width: 6px; background: var(--c2-amb); }
+#agentic-ai .hsk-bars .is-lead b { color: var(--c2-amb); }
+/* playing: each part arrives at its beat's start (--s) plus its own offset (--t), one at a time */
+@keyframes hsk-pop { from { opacity: 0; transform: translateY(5px); } }
+@keyframes hsk-mk { from { background-size: 0% 100%; box-shadow: inset 0 0 0 transparent; } }
+@keyframes hsk-gr { from { transform: scaleX(0); } }
+#agentic-ai .is-playing .hsk-ts .hsk-a { animation: hsk-pop .4s var(--c2-out) calc(var(--s) + var(--t)) backwards; }
+#agentic-ai .is-playing .hsk-ts .hsk-a.mk { animation-name: hsk-mk; animation-duration: .45s; }
+#agentic-ai .is-playing .hsk-ts .hsk-a.gr { animation-name: hsk-gr; animation-duration: .7s; }
+@media (prefers-reduced-motion: reduce) { #agentic-ai .hsk-ts .hsk-a { animation: none !important; } }

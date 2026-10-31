@@ -1,10 +1,11 @@
-// The agent console on Experience (prefix c2-): the engine in chapter 02 of the Agentic AI story, where
-// assets/js/hunt-story.js drives its paused animations from scroll (the story hides its caption row).
+// The agent console on Experience (prefix c2-): the live system inside the Agentic AI card's "Hunt from a
+// report" peek (README "Agentic AI console peek"); peek.cjs adds the status strip and the story panel around it.
 //   node tools/scenes/agentic-console/build.cjs   writes scene.html and scene.css here
-//   node tools/scenes/agentic-console/apply.cjs   puts them into the story in experience.html and into internship-peek.css
-// The story (tools/scenes/agentic-story/build.cjs) mirrors the beat times below and fails on drift: rerun it
-// after changing the timeline. Strings were revised 27 Oct 2026: "only expected entries", "Inconclusive, so it
-// re-plans", and the vendor-neutral pseudo-query event_id = 4698 | count by host, task_name.
+//   node tools/scenes/agentic-console/apply.cjs   puts the peek into experience.html and its CSS into internship-peek.css
+// peek.cjs reads its beat times from the markup and CSS written here, so rerun both after changing the timeline.
+// Strings were revised 27 Oct 2026 ("only expected entries", "Inconclusive, so it re-plans", a vendor-neutral
+// pseudo-query) and 31 Oct 2026 after a threat-hunter review: a root-level path alone is not suspicious (many
+// updaters live there), event 4698 needs its audit policy on, and stacking should surface the rare tail.
 // Story timing, strings and the timeline are below; base.css holds the static (final-frame) styles.
 // Base: the caption-led console (one caption, one focal point per beat). From the annotation-led one: the end
 // is split in two (7a the flag and its evidence; 7b the graph steps back, a bead travels, the Analyst lights
@@ -29,7 +30,7 @@ const AG = {
 const CAPS = [
   'Reads the report, picks what to hunt',
   'Turns it into a claim it can test',
-  'Hunted recently, so not repeated',
+  'Hunted recently, so set aside',
   'Only expected entries, still an answer',
   'Inconclusive, so it re-plans',
   'Checks the query before it runs',
@@ -43,27 +44,27 @@ const E = [
   { ag: 'inv', ty: 'tool', name: 'search_past_hunts', res: 'PowerShell · covered by a recent hunt' },
   { ag: 'det', ty: 'tool', name: 'run_search', res: 'Valid negative · only expected entries', rk: 'ok' },
   { ag: 'det', ty: 'tool', name: 'run_search', res: 'Scheduled tasks · Inconclusive', rk: 'inc', sub: 'Tasks made through the Task Scheduler API never launch schtasks.exe.' },
-  { ag: 'det', ty: 'reason', text: 'Look for the task being created instead: event 4698.', replan: true, wipe: 1.0 },
+  { ag: 'det', ty: 'reason', text: 'Look for the task being created instead: event 4698, audited on these workstations.', replan: true, wipe: 1.0 },
   { ag: 'det', ty: 'tool', name: 'check_query', res: 'Query validated', rk: 'ok', code: true },
   { ag: 'det', ty: 'tool', name: 'request_review', res: 'Lead for analyst review', flag: true },
 ];
 // --- timeline (desktop). Each caption starts just after its entry's result and fades (0.2s) as the next entry lands.
 const GAP = 0.2, TOOL = 0.55, TRAVEL = 0.55;
-const HOLD = [3.4, 3.4, 3.2, 3.5, 0, 3.3];          // caption hold before the next entry lands (beat 5 and 7 set below)
+const HOLD = [0.5, 0.7, 3.0, 0.8, 0, 1.6];          // hold before the next entry lands (31 Oct 2026: three beats; beat 5 and 7 set below)
 const T0 = {};
 const cap = [];
-E[0].L = 1.1; E[0].D = E[0].L + TOOL; cap[0] = E[0].D + 0.15;
+E[0].L = 0.6; E[0].D = E[0].L + TOOL; cap[0] = E[0].D + 0.15;
 E[1].L = cap[0] + HOLD[0] + GAP; E[1].R = E[1].L + E[1].wipe; cap[1] = E[1].R + 0.1;
 E[2].L = cap[1] + HOLD[1] + GAP; E[2].D = E[2].L + TOOL; cap[2] = E[2].D + 0.12;
 E[3].L = cap[2] + HOLD[2] + GAP; E[3].D = E[3].L + TOOL; cap[3] = E[3].D + 0.12;
 E[4].L = cap[3] + HOLD[3] + GAP; E[4].D = E[4].L + 0.6; cap[4] = E[4].D + 0.12;
 // the re-plan: "Inconclusive" holds ~1.1s, then the loop draws under Detection, then the new plan lands
-T0.LOOP = [E[4].D + 1.05, E[4].D + 1.05 + 0.9];
+T0.LOOP = [E[4].D + 0.8, E[4].D + 0.8 + 0.9];
 E[5].L = T0.LOOP[1] + 0.4; E[5].R = E[5].L + E[5].wipe;
-E[6].L = E[5].R + 1.6; E[6].D = E[6].L + 0.65; cap[5] = E[6].D + 0.12;
+E[6].L = E[5].R + 0.9; E[6].D = E[6].L + 0.65; cap[5] = E[6].D + 0.12;
 E[7].L = cap[5] + HOLD[5] + GAP; E[7].D = E[7].L + 0.55;
 cap[6] = E[7].D + 0.65;                              // after the Flagged badge and the evidence rows are in
-T0.HUSH = cap[6] + 2.5;                              // 7b: the rest of the graph steps back
+T0.HUSH = cap[6] + 1.2;                              // 7b: the rest of the graph steps back
 T0.HAND = [T0.HUSH + 0.25, 0.9];                     // amber bead: Detection -> the Analyst
 T0.ANA = T0.HAND[0] + T0.HAND[1] - 0.15;             // the Analyst arrives as the bead lands
 cap[7] = T0.ANA;                                     // ...and the hand-off line appears in that same frame
@@ -173,10 +174,10 @@ function card(e) {
     return `<div class="c2-card c2-card--reason"><span class="c2-row"><span class="c2-tag">Reason</span><b class="c2-who">${a.name}</b>${e.replan ? `<span class="c2-replan">${svgI('loop')}re-plan</span>` : ''}<span class="c2-txt"><span class="c2-wipe">${esc(e.text)}</span></span></span></div>`;
   }
   const icon = `<svg class="c2-si" viewBox="0 0 12 12" aria-hidden="true"><circle class="c2-spin" cx="6" cy="6" r="4.4" pathLength="1"/><path class="c2-tick" d="M3.2 6.3l1.9 1.9 3.7-4" pathLength="1"/></svg>`;
-  const code = e.code ? `<span class="c2-code"><span class="c2-cl c2-cl1"><b>event_id</b> = 4698</span><span class="c2-cl c2-cl2">| <b>count by</b> host, task_name</span></span>` : '';
+  const code = e.code ? `<span class="c2-code"><span class="c2-cl c2-cl1"><b>event_id</b> = 4698</span><span class="c2-cl c2-cl2">| <b>count by</b> task_name, host | <b>sort</b> count</span></span>` : '';
   const flag = e.flag ? `<span class="c2-flag">${svgI('flag')}Flagged</span>` : '';
   const sub = e.sub ? `<span class="c2-sub"><span class="c2-wipe">${esc(e.sub)}</span></span>` : '';
-  const evid = e.flag ? `<span class="c2-ev"><span class="c2-evr c2-evr1"><span class="c2-mono c2-path"><span class="c2-pdir">\\Microsoft\\Windows\\Chkdsk\\</span><span class="c2-leaf">ProactiveScan</span></span><span class="c2-evn">built-in</span></span><span class="c2-evr c2-evr2"><span class="c2-mono c2-task">\\WinTaskUpdate</span><span class="c2-evn c2-evn--amb">root-level · not in baseline</span></span></span>` : '';
+  const evid = e.flag ? `<span class="c2-ev"><span class="c2-evr c2-evr1"><span class="c2-mono c2-path"><span class="c2-pdir">\\Microsoft\\Windows\\Chkdsk\\</span><span class="c2-leaf">ProactiveScan</span></span><span class="c2-evn">built-in</span></span><span class="c2-evr c2-evr2"><span class="c2-mono c2-task">\\WinTaskUpdate</span><span class="c2-evn c2-evn--amb">1 host · not in baseline</span></span></span>` : '';
   return `<div class="c2-card c2-card--tool${e.flag ? ' c2-card--flag' : ''}"><span class="c2-row"><span class="c2-tag">Tool</span>${icon}<span class="c2-call">${e.name}</span><span class="c2-res c2-wipe${e.rk ? ' c2-res--' + e.rk : ''}">${esc(e.res)}</span>${flag}${sub}</span>${code}${evid}</div>`;
 }
 function entries() {
@@ -192,7 +193,7 @@ function entries() {
 }
 
 const chipHtml = CHIPS.map((c, i) => `<span class="c2-chip c2-chip${i}" style="--oc:${c.oc};--ob:${c.ob}"><span class="c2-cid">${c.id}</span><span class="c2-cn">${c.name}</span><span class="c2-co">${c.flag ? svgI('flag') : c.ok ? svgI('tick') : ''}${c.out}</span></span>`).join('');
-const ARIA = 'An illustrative hunt. Agents turn a ransomware report into three techniques to hunt. PowerShell was covered by a recent hunt, so it is not repeated. The Run keys search finds only expected entries, a valid negative. For scheduled tasks the first search is inconclusive, so the Detection agent re-plans around event 4698 and checks its query before it runs. It flags one task, \\WinTaskUpdate, root-level and not in the baseline, and hands it to an analyst with the evidence.';
+const ARIA = 'An illustrative hunt. Agents turn a ransomware report into three techniques to hunt. PowerShell was covered by a recent hunt, so it is set aside. The Run keys search finds only expected entries, a valid negative. For scheduled tasks the first search is inconclusive, so the Detection agent re-plans around event 4698 and checks its query before it runs. It flags one task, \\WinTaskUpdate, on one host and not in the baseline, and hands it to an analyst with the evidence.';
 const html = `<div class="c2" role="img" aria-label="${esc(ARIA)}">
 <div class="c2-head"><span class="c2-rep">${svgI('rep')}<span>Ransomware report</span></span><svg class="c2-arrow" viewBox="0 0 14 12" aria-hidden="true"><path d="M1 6h11M8.5 2.5 12 6l-3.5 3.5"/></svg><span class="c2-chips">${chipHtml}</span></div>
 <div class="c2-cap"><span class="c2-ticks">${CAPS.map((_, i) => `<i class="c2-tk c2-tk${i}${i === CAPS.length - 1 ? ' c2-tk--now' : ''}"></i>`).join('')}</span><span class="c2-lines">${CAPS.map((t, i) => `<span class="c2-line c2-line${i}${i === CAPS.length - 1 ? ' c2-line--fin' : ''}">${esc(t)}</span>`).join('')}</span></div>

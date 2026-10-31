@@ -17,6 +17,17 @@
   if (document.readyState === 'complete') warmFonts();
   else addEventListener('load', warmFonts, { once: true });
   let active = null, pinned = null, hovered = null, leaveTimer = null, pointer = { x: -1, y: -1 };
+  // The agentic console docks inline on a desktop click and runs its own controls: agentic-peek.js, loaded
+  // on its first open (outside the page's 80 KB ceiling). Phones open it like any other card.
+  const dock = r => !touch.matches && r.dataset.company === 'agentic';
+  const agentic = (r, then) => {
+    if (window.agenticPeek) return then && window.agenticPeek[then]();
+    if (r.dataset.loading) return;
+    r.dataset.loading = 1;
+    const s = document.createElement('script');
+    s.src = r.dataset.script; s.onload = () => then && window.agenticPeek[then]();
+    document.head.appendChild(s);
+  };
 
   const card = r => r.querySelector('.internship-demo-card');
   const chip = r => r.querySelector('button');
@@ -30,7 +41,7 @@
   const shown = new Set();
   // All breathing chips share one phase.
   const breathe = () => breathers.forEach(r => {
-    const b = chip(r), on = shown.has(r) && !(active && active.closest('.case-study') === r.closest('.case-study'));
+    const b = chip(r), on = shown.has(r) && !r.dataset.docked && !(active && active.closest('.case-study') === r.closest('.case-study'));
     if (on !== b.classList.contains('is-breathing')) b.style.animationDelay = on ? `${-(performance.now() % 2600)}ms` : '';
     b.classList.toggle('is-breathing', on);
   });
@@ -178,9 +189,11 @@
     breathe();
     play(r);
     loop(r);
+    if (r.dataset.company === 'agentic') agentic(r);
   }
   // A scene longer than REPLAY allows still holds its final frame for HOLD.
   function loop(r) {
+    if (r.dataset.company === 'agentic') return;   // it plays once and offers Replay
     const c = card(r), end = Math.max(0, ...c.getAnimations({ subtree: true }).map(a => a.effect.getComputedTiming().endTime).filter(Number.isFinite));
     clearInterval(r.loop);
     r.loop = setInterval(() => { if (!document.hidden && onScreen(c)) replay(r); }, Math.max(REPLAY, end + HOLD + FADE));
@@ -199,20 +212,21 @@
 
   roots.forEach(r => {
     const b = chip(r);
-    r.addEventListener('mouseenter', () => { if (zoom.lock) return; hovered = r; if (!touch.matches) open(r); });
-    r.addEventListener('mouseleave', () => { if (hovered === r) hovered = null; if (!touch.matches) scheduleLeave(); });
+    r.addEventListener('mouseenter', () => { if (zoom.lock || dock(r)) return; hovered = r; if (!touch.matches) open(r); });
+    r.addEventListener('mouseleave', () => { if (hovered === r) hovered = null; if (!touch.matches && !dock(r)) scheduleLeave(); });
     b.addEventListener('focus', () => {
-      if (touch.matches) return;
+      if (touch.matches || dock(r)) return;
       // Keyboard focus moves on for good: another chip's pin is dropped, so
       // it cannot pop back open later from a stray hover.
       if (pinned && pinned !== r) pinned = null;
       open(r);
     });
     b.addEventListener('click', () => {
+      if (dock(r)) return agentic(r, 'toggle');
       if (pinned === r) { pinned = null; close(r); }
       else { pinned = r; open(r); requestAnimationFrame(() => { if (active === r) reveal(r); }); }
     });
-    r.addEventListener('focusout', e => { if (!r.contains(e.relatedTarget) && pinned !== r) close(r); });
+    r.addEventListener('focusout', e => { if (!r.contains(e.relatedTarget) && pinned !== r && !dock(r)) close(r); });
   });
   document.addEventListener('mousemove', e => {
     pointer = { x: e.clientX, y: e.clientY };
@@ -233,7 +247,7 @@
   });
   motion.addEventListener('change', () => { if (active) { play(active); loop(active); } });
   document.addEventListener('visibilitychange', () => {
-    if (!active || !active.getAnimations) return;
+    if (!active || !active.getAnimations || active.dataset.company === 'agentic') return;
     active.getAnimations({ subtree: true }).forEach(a => {
       if (document.hidden && a.playState === 'running') a.pause();
       else if (!document.hidden && a.playState === 'paused') a.play();

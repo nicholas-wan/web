@@ -729,7 +729,7 @@ $assetVersions = @{}
 foreach ($file in @('icons.css', 'main.css', 'noscript.css', 'internship-peek.css')) {
     $assetVersions["assets/css/$file"] = Get-FileContentVersion (Join-Path $root "assets\css\$file")
 }
-foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'hunt-story.js', 'travel-shortcuts.js', 'travel-chronology.js')) {
+foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'agentic-peek.js', 'travel-shortcuts.js', 'travel-chronology.js')) {
     $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
 }
 $assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
@@ -1070,10 +1070,10 @@ foreach ($page in $pages) {
         $main = $main.Replace('<!-- PHOTO_EXPLORE_FALLBACK -->', (($exploreFallback | Select-Object -First 4) -join "`n"))
     }
     if ($slug -eq 'experience') {
-        # The Agentic AI story's script is not a <script src> either: the Work page keeps
-        # under its 80 KB JavaScript ceiling, so an inline loader after the story reads
-        # this versioned URL and injects hunt-story.js once the story is a screen away.
-        $main = $main.Replace('data-hs-script="assets/js/hunt-story.js"', "data-hs-script=`"$(Get-AssetRef 'assets/js/hunt-story.js')`"")
+        # The agentic console's script is not a <script src>: the Work page keeps under its
+        # 80 KB JavaScript ceiling, so internship-peek.js loads this versioned URL on the
+        # "Hunt from a report" chip's first open.
+        $main = $main.Replace('data-script="assets/js/agentic-peek.js"', "data-script=`"$(Get-AssetRef 'assets/js/agentic-peek.js')`"")
     }
     if ($journalBySlug.ContainsKey($slug)) {
         $title = $journalBySlug[$slug].title
@@ -1261,7 +1261,7 @@ if ($imageDimensionCacheDirty) {
 
 # Publish only runtime assets used by the generated Pages site.
 $runtimeCss = @("icons.css", "main.css", "noscript.css", "internship-peek.css")
-$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "hunt-story.js", "travel-shortcuts.js", "travel-chronology.js")
+$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "agentic-peek.js", "travel-shortcuts.js", "travel-chronology.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCss) {

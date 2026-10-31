@@ -257,7 +257,7 @@ foreach ($copiedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'asset
         'assets/js/personal-timeline.js', 'assets/js/scramble-reveal.js',
         'assets/js/travel-discovery.js', 'assets/js/photo-search.js', 'assets/js/page-transitions.js',
         'assets/js/anomaly-peek.js', 'assets/js/travel-shortcuts.js', 'assets/js/travel-chronology.js',
-        'assets/css/internship-peek.css', 'assets/js/internship-peek.js', 'assets/js/hunt-story.js')) {
+        'assets/css/internship-peek.css', 'assets/js/internship-peek.js', 'assets/js/agentic-peek.js')) {
     Assert-DistMatchesSource $copiedAsset
 }
 
@@ -382,11 +382,10 @@ Assert-FileSizeBudget 'assets\js\anomaly-peek.js' 46
 # 26 -> 30 KB (18 Oct 2026): owner-approved decode-before-swap postcards, bounded
 # loading/retry and stale-intent cancellation; search stays outside the initial-page bundle.
 Assert-FileSizeBudget 'assets\js\photo-search.js' 30
-# hunt-story.js drives the Work page's Agentic AI story (approved 27 Oct 2026). Like photo-search.js
-# it is injected on demand by an inline loader, outside the page's 80 KB <script src> ceiling, so it
-# carries its own budget: 13 KB at launch (scroll clock, frames, controls); 16 KB once each frame's move
-# was scrubbed by the scroll (27 Oct 2026: progress values, the chase, chip measuring), with headroom to 18 KB.
-Assert-FileSizeBudget 'assets\js\hunt-story.js' 18
+# agentic-peek.js runs the Work page's Agentic AI console peek (31 Oct 2026: dock, Pause/Resume/Replay, holds).
+# Like photo-search.js it loads at point of need, on the chip's first open, outside the page's 80 KB
+# <script src> ceiling: about 5 KB at launch, with headroom to 7 KB.
+Assert-FileSizeBudget 'assets\js\agentic-peek.js' 7
 if ($travel -match '<script\b[^>]*\bsrc="assets/js/photo-search\.js') { throw 'photo-search.js must stay lazily injected on the travel page, never a static <script src>.' }
 if ($travel -notmatch 'data-search-script="assets/js/photo-search\.js\?v=[0-9a-f]{8}"') { throw 'The travel page must carry the versioned photo-search.js URL in data-search-script.' }
 $photoSearchJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\photo-search.js') -Raw -Encoding UTF8
@@ -864,22 +863,22 @@ if ($homeHtml -notmatch '<canvas id="nokey"') { throw "Homepage background anima
 # The Cyber Detection Analytics card ends with three chips that each open one small chart
 # below them (never over the writeup); only the Work page loads the script.
 if ([regex]::Matches($experience, 'data-peek="(site|series|graph)"').Count -ne 3 -or [regex]::Matches($experience, 'data-peek-card="(site|series|graph)"').Count -ne 3 -or $experience -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/anomaly-peek.js'))) { throw "The Work page must carry the three anomaly-peek chips, their three chart cards and anomaly-peek.js." }
-# The Agentic AI story (approved 27 Oct 2026; README "Agentic AI story") replaced the "Hunt from a report"
-# chip peek: three pinned chapters in the #agentic-ai card, with the agent console as the engine in
-# chapter 02. Its script is injected on demand from a versioned data-hs-script, never a <script src>.
+# The Agentic AI peek (README "Agentic AI console peek"; restored 31 Oct 2026, retiring the 27 Oct scroll story):
+# "Hunt from a report" opens the agent console inline, with its status strip (state, beat, progress, one
+# Pause/Resume/Replay button) and its story panel, all written by tools/scenes/agentic-console (apply.cjs).
 $agenticCard = [regex]::Match($experience, '(?s)<article class="case-study case-study--work" id="agentic-ai">(.*?)</article>').Groups[1].Value
-$agenticStory = [regex]::Match($agenticCard, '(?s)<div class="hs-story".*').Value
-if ($experience -match 'data-company="agentic"|agentic-demo-card|Hunt from a report' -or $agenticCard -match 'internship-demo-(hint|peek)') { throw "The retired agentic chip peek is still on the Work page; the Agentic AI story replaced it." }
-if (-not $agenticStory -or [regex]::Matches($agenticStory, '<section class="hs-scene hs-scene--(product|eng|trust)').Count -ne 3 -or $agenticStory -notmatch '(?s)hs-scene--eng.*?<div class="hs-console"><div class="hunt-panel"><div class="c2" role="img" aria-label="An illustrative hunt\.') { throw "The #agentic-ai card must carry the three-chapter Agentic AI story, with the agent console (its aria-label starting 'An illustrative hunt.') in chapter 02." }
-# Copy re-aimed 28 Oct 2026 (mockup H, owner-approved), then reworked the same day after an independent review: each chapter sells one capability, in the terms AI product roles name.
-foreach ($storyLine in @('Built the way hunters plan a hunt.', 'Narrow agents, one supervisor.', 'Context engineering, evals and human review.', 'An illustrative hunt, from a threat report to a claim it can test.', 'One report. A hunt for each technique.', 'Scope each hunt to the environment.', 'Define the evidence the hunt needs.', 'Orchestrate specialist agents.', 'Re-plan when evidence is inconclusive.', 'Keep every attempt traceable.', 'Keep each model call focused.', 'Score the evidence behind each verdict.', 'Give analysts the evidence and next step.', 'Analyst review', 'Inconclusive', 'Verdict')) {
-    if (-not $agenticStory.Contains($storyLine)) { throw "The Agentic AI story is missing its approved line: $storyLine" }
+$agenticPeek = [regex]::Match($agenticCard, '(?s)<div class="internship-demo-peek" data-company="agentic"[^>]*>.*').Value
+if (-not $agenticPeek -or $agenticCard -notmatch 'class="internship-demo-hint"' -or $agenticPeek -notmatch 'id="agentic-demo-card"' -or $agenticPeek -notmatch '>Hunt from a report</button>' -or $agenticPeek -notmatch '<div class="c2" role="img" aria-label="An illustrative hunt\.' -or $agenticPeek -notmatch 'class="hsk-bar"' -or $agenticPeek -notmatch 'class="hsk-ctl"' -or [regex]::Matches($agenticPeek, 'class="hsk-ts hsk-ts\d"').Count -ne 3) { throw "The #agentic-ai card must carry the 'Hunt from a report' peek: the agent console (its aria-label starting 'An illustrative hunt.'), the status strip with its control, and the three-beat story panel." }
+if ($agenticPeek -notmatch ('data-script="' + [regex]::Escape((Get-DistAssetRef 'assets/js/agentic-peek.js')) + '"') -or $experience -match '<script\b[^>]*\bsrc="assets/js/agentic-peek\.js') { throw "agentic-peek.js must load on demand from the peek's versioned data-script, never as a static <script src>." }
+if ($experience -match 'hs-story|data-hs-script|hunt-story\.js' -or (Test-Path -LiteralPath (Join-Path $dist 'assets\js\hunt-story.js'))) { throw "The retired Agentic AI scroll story (or hunt-story.js) is still on the Work page or in dist." }
+# Three beats, each with one headline (pacing and portfolio reviews, 31 Oct 2026).
+foreach ($peekLine in @('Plan the hunt', 'Catch a blind spot', 'Hand off to an analyst', 'From a report to a hypothesis it can test', 'Zero results is a blind spot, not a negative', 'Hands it to an analyst, with the evidence', 'Analysts receive the evidence and a concrete next investigation.')) {
+    if (-not $agenticPeek.Contains($peekLine)) { throw "The agentic peek is missing its line: $peekLine" }
 }
-$huntStoryRef = Get-DistAssetRef 'assets/js/hunt-story.js'
-if ($agenticStory -notmatch ('data-hs-script="' + [regex]::Escape($huntStoryRef) + '"') -or $experience -match '<script\b[^>]*\bsrc="assets/js/hunt-story\.js' -or $agenticCard -notmatch '</div><script>/\* Loads the Agentic AI story') { throw "hunt-story.js must be injected on demand from the story's versioned data-hs-script ($huntStoryRef), never a static <script src>." }
-# Generic and unquestionable (accuracy and disclosure review, Oct 2026): no SIEM vendor syntax, no real
-# malware, no retired wording, and no days-to-hours claim inside the story (the Outcome row stays the only one).
-if ($experience -match 'index=wineventlog|SysUpdate|Splunk|only known Run keys|known activity' -or $agenticStory -match '(?i)days to hours|hours instead of days|\bdays\b|SPL crafter|Post-query|Evidence found|\d+ hits|\btokens?\b') { throw "The Work page carries a forbidden agentic string (SIEM syntax, real malware, retired wording or a days-to-hours claim in the story)." }
+# Generic and unquestionable (accuracy and disclosure reviews, Oct 2026): no SIEM vendor syntax, no real
+# malware, no retired wording (a root-level path alone is not suspicious), and no days-to-hours claim inside
+# the peek (the Outcome row stays the only one).
+if ($experience -match 'index=wineventlog|SysUpdate|Splunk|only known Run keys|known activity|root-level' -or $agenticPeek -match '(?i)days to hours|hours instead of days|\bdays\b|SPL crafter|Post-query|Evidence found|\d+ hits|\btokens?\b') { throw "The Work page carries a forbidden agentic string (SIEM syntax, real malware, retired wording or a days-to-hours claim in the peek)." }
 $anomalyPeekJs = Get-Content -LiteralPath (Join-Path $dist 'assets\js\anomaly-peek.js') -Raw -Encoding UTF8
 # Phones and touch tablets (Oct 2026): no hover, so a pinned floating card would sit
 # over Early career; the card opens inline instead and the chips are 44px tall.

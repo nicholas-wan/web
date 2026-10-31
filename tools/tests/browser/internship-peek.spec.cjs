@@ -1,6 +1,6 @@
 const {test,expect}=require('@playwright/test');
 const peek=(page,company)=>page.locator('[data-company="'+company+'"]');
-const chip=root=>root.locator('button');
+const chip=root=>root.locator('.internship-demo-peek__chip');   // (the agentic card has its own Pause button)
 const card=root=>root.locator('.internship-demo-card');
 
 test('internship peeks: hover previews, click pins, focus drops a foreign pin, Escape closes, reduced motion holds the final frame',async({page})=>{
@@ -195,11 +195,103 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
  }
 });
 
+test('agentic AI peek: opens inline on a click, plays one ~21 s run with a status strip, pauses, ends on Done with Replay, and fits the card',async({page})=>{
+ const panel=root=>root.locator('.hunt-panel');
+ const ctl=root=>root.locator('.hsk-ctl');
+ const shown=(root,sel)=>root.locator(sel).evaluate(e=>+getComputedStyle(e).opacity);
+ // Measured once the card's opening zoom has settled.
+ const fits=root=>expect(async()=>{
+  const c=await card(root).boundingBox(),p=await panel(root).boundingBox();
+  expect(p.x).toBeGreaterThanOrEqual(c.x-0.5);
+  expect(p.x+p.width).toBeLessThanOrEqual(c.x+c.width+0.5);
+  expect(p.y+p.height).toBeLessThanOrEqual(c.y+c.height+0.5);
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+ }).toPass({timeout:3000});
+ await page.setViewportSize({width:1366,height:768});
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('/experience');
+ const root=peek(page,'agentic');
+ await expect(chip(root)).toHaveText('Hunt from a report');
+ // Desktop: a hover opens nothing (a panel this size would cover the page);
+ // a click opens it inline, pushing the next card down, not covering it.
+ await root.dispatchEvent('mouseenter');
+ await expect(chip(root)).toHaveAttribute('aria-expanded','false');
+ const nextTop=()=>page.locator('#cloud-analytics').evaluate(e=>e.getBoundingClientRect().top+scrollY);
+ const before=await nextTop();
+ await chip(root).click();
+ await expect(card(root)).toHaveClass(/is-still/);
+ await expect(card(root)).toHaveCSS('position','static');
+ expect(await nextTop()).toBeGreaterThan(before+300);
+ // Reduced motion shows the finished run (README): Done with the tally, the hand-off beat, no control.
+ expect(await shown(root,'.hsk-wd')).toBe(1);
+ expect(await shown(root,'.hsk-wr')).toBe(0);
+ expect(await shown(root,'.hsk-ts2')).toBe(1);
+ expect(await shown(root,'.hsk-ts0')).toBe(0);
+ await expect(ctl(root)).toBeHidden();
+ const c2=panel(root).locator('.c2');
+ const words=await panel(root).textContent();
+ for(const s of ['Scheduled Task','Flagged','covered by a recent hunt','Valid negative','4698','\\WinTaskUpdate','1 host · not in baseline','Analyst','request_review','Hands it to an analyst, with the evidence','Local LLM · on-premises','1 lead for analyst review · 1 valid negative · 1 set aside'])expect(words).toContain(s);
+ const label=await c2.getAttribute('aria-label');
+ expect(label.startsWith('An illustrative hunt.')).toBe(true);
+ // Generic and unquestionable: no real malware, internal component names, product names,
+ // counts, a root-level path as the reason, or the card's days-to-hours claim.
+ const forbidden=/SysUpdate|Evidence found|SPL crafter|Post-query|Splunk|root-level|days to hours|\bdays\b|\d+ hits|tokens?\b/i;
+ expect(words).not.toMatch(forbidden);
+ expect(label).not.toMatch(forbidden);
+ await fits(root);
+ // A hover preview elsewhere leaves it open; Escape closes it.
+ await peek(page,'shopee').dispatchEvent('mouseenter');
+ await expect(chip(root)).toHaveAttribute('aria-expanded','true');
+ await peek(page,'shopee').dispatchEvent('mouseleave');
+ await page.waitForTimeout(300);
+ await page.keyboard.press('Escape');
+ await expect(chip(root)).toHaveAttribute('aria-expanded','false');
+ // Playing: one run of about 21 s, then it rests on Done (no replay loop).
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await chip(root).click();
+ await expect(card(root)).toHaveClass(/is-playing/);
+ const end=await card(root).evaluate(c=>Math.max(...c.getAnimations({subtree:true}).map(a=>a.effect.getComputedTiming().endTime).filter(Number.isFinite)));
+ expect(end).toBeGreaterThan(15000);
+ expect(end).toBeLessThan(26000);
+ await expect(ctl(root)).toHaveText('Pause');
+ // Pause freezes the run where it is; Resume carries on from there.
+ await page.waitForTimeout(1200);
+ await ctl(root).click();
+ await expect(card(root)).toHaveClass(/is-paused/);
+ await expect(ctl(root)).toHaveText('Resume');
+ const at=()=>root.locator('.hsk-g0 b').evaluate(e=>e.getAnimations()[0].currentTime);
+ const t1=await at();
+ await page.waitForTimeout(600);
+ expect(await at()).toBe(t1);
+ await ctl(root).click();
+ await expect(card(root)).not.toHaveClass(/is-paused/);
+ await expect(ctl(root)).toHaveText('Pause');
+ // The end: Done, and the button offers Replay, which starts the run again.
+ await card(root).evaluate(c=>c.getAnimations({subtree:true}).forEach(a=>{const e=a.effect.getComputedTiming().endTime;if(Number.isFinite(e))a.currentTime=e;}));
+ await expect(card(root)).toHaveClass(/is-ended/);
+ await expect(ctl(root)).toHaveText('Replay');
+ expect(await shown(root,'.hsk-wd')).toBe(1);
+ await ctl(root).click();
+ await expect(card(root)).not.toHaveClass(/is-ended/);
+ await expect(ctl(root)).toHaveText('Pause');
+ await page.keyboard.press('Escape');
+ await expect(chip(root)).toHaveAttribute('aria-expanded','false');
+ // Phones: a tap opens it inline, inside the card, the story above the live console, with no sideways scroll.
+ await page.setViewportSize({width:390,height:844});
+ await page.goto('/experience');
+ await chip(root).click();
+ await expect(chip(root)).toHaveAttribute('aria-expanded','true');
+ await expect(card(root)).toHaveCSS('position','static');
+ // (measured together: the page may still be easing the card into view)
+ expect(await root.evaluate(r=>r.querySelector('.hsk-tool').getBoundingClientRect().bottom<=r.querySelector('.hsk-live').getBoundingClientRect().top+1)).toBe(true);
+ await fits(root);
+});
+
 test('phone charts stay open while the page scrolls and a finger lands elsewhere; the chip closes them',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/experience');
  const touchDown=()=>page.evaluate(()=>document.querySelector('#main').dispatchEvent(new PointerEvent('pointerdown',{pointerType:'touch',bubbles:true})));
- for(const company of ['shopee','league','league-ab']){
+ for(const company of ['shopee','league','league-ab','agentic']){
   const root=peek(page,company);
   await chip(root).click();
   await expect(chip(root)).toHaveAttribute('aria-expanded','true');
@@ -226,6 +318,8 @@ test('internship rows invite a hover (or a tap on phones), and the first chip of
  const hints=page.locator('.case-study--internship .internship-demo-hint');
  await expect(hints).toHaveCount(2);
  await expect(hints.first()).toHaveText('Hover the chart to see it in action',{useInnerText:true});
+ // The agentic console opens on a click, and says so.
+ await expect(page.locator('#agentic-ai .internship-demo-hint')).toHaveText('Click the chart to see it in action',{useInnerText:true});
  const first=chip(peek(page,'shopee'));
  await first.scrollIntoViewIfNeeded();
  await expect(first).toHaveClass(/is-breathing/);
@@ -238,6 +332,7 @@ test('internship rows invite a hover (or a tap on phones), and the first chip of
  await page.setViewportSize({width:390,height:844});
  await page.reload();
  await expect(hints.nth(1)).toHaveText('Tap a chart to see it in action',{useInnerText:true});
+ await expect(page.locator('#agentic-ai .internship-demo-hint')).toHaveText('Tap the chart to see it in action',{useInnerText:true});
 });
 
 test('smart zoom: a click near the bottom eases the whole card into view, keeps the chip on screen, and hover never scrolls',async({page})=>{
