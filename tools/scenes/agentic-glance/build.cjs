@@ -40,7 +40,7 @@ const STEPS = [
   { title: 'Hand off', d: ['One unusual task on one computer.', 'A human analyst makes the call.'], m: ['One unusual task on one computer.', 'A human analyst makes the call.'],
     ev: ['\\WinTaskUpdate', '1 host · not in baseline'] },
 ];
-const ARIA = 'An illustrative hunt, in three steps. From a ransomware report, AI agents search for a scheduled-task persistence technique; the first search, for schtasks.exe, comes back empty. Empty is not the same as clear: tasks made through the Task Scheduler API never launch schtasks.exe, so the Detection agent re-plans around event 4698, a task being created. That finds one unusual task, \\WinTaskUpdate, on one host and not in the baseline, and a human analyst makes the call.';
+const ARIA = 'An illustrative hunt. From a ransomware report, AI agents search for a scheduled-task persistence technique; the first search, for schtasks.exe, comes back empty. Empty is not the same as clear: tasks made through the Task Scheduler API never launch schtasks.exe, so the Detection agent re-plans around event 4698, a task being created. That finds one unusual task, \\WinTaskUpdate, on one host and not in the baseline, and a human analyst makes the call.';
 
 // a plain agent node: a ring with a dot; the one we follow is filled teal
 const node = (cx, cy, r, on, cls = '') => on

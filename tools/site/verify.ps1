@@ -868,7 +868,7 @@ if (-not $agenticPeek -or $agenticCard -notmatch 'class="internship-demo-hint"><
 if ($experience -match 'hs-story|data-hs-script|hunt-story\.js|agentic-peek\.js' -or (Test-Path -LiteralPath (Join-Path $dist 'assets\js\hunt-story.js')) -or (Test-Path -LiteralPath (Join-Path $dist 'assets\js\agentic-peek.js'))) { throw "A retired Agentic AI script (hunt-story.js or agentic-peek.js) is still on the Work page or in dist." }
 # One moment in three plain steps, the hunter's evidence under each (owner, 31 Oct 2026: the console was too complex
 # to appreciate at a glance, and a layperson must get the agentic element).
-foreach ($peekLine in @('T1053.005', 'Scheduled Task', 'Search', 'Re-plan', 'Hand off', 'AI agents turn the report into searches.', 'The first comes back empty.', 'mean safe. The agent', 'then tries another way.', 'One unusual task on one computer.', 'A human analyst makes the call.', 'process = schtasks.exe', '0 results', 'event 4698', 'a task being created', '\WinTaskUpdate', '1 host · not in baseline')) {
+foreach ($peekLine in @('T1053.005', 'Scheduled Task', 'Search', 'Re-plan', 'Hand off', 'AI agents turn the report into searches.', 'The first comes back empty.', 'mean safe. The agent', 'then tries another way.', 'One unusual task on one computer.', 'A human analyst makes the call.', 'process = schtasks.exe', '0 results', 'event 4698', 'a task being created', '\WinTaskUpdate', ('1 host ' + [char]0xB7 + ' not in baseline'))) {   # (the middle dot by code point: PowerShell 5.1 reads this file as ANSI)
     if (-not $agenticPeek.Contains($peekLine)) { throw "The agentic chart is missing its line: $peekLine" }
 }
 # Generic and unquestionable (accuracy and disclosure reviews, Oct 2026): no SIEM vendor syntax, no real
