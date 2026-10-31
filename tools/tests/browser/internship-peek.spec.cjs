@@ -171,11 +171,10 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
   await expect(chip(shopee)).toHaveAttribute('aria-expanded','true');
   await expect(card(shopee)).toHaveCSS('position','static');
   await expect(shopee.locator('svg.sp-brand:not(.sp-brand--m) .sp-result')).toHaveCSS('opacity','1');
-  // The floating return-to-top steps aside while a card is open on phones.
+  // Phones drop the floating return-to-top on the Work page (it sat on the tags and chips), as Personal does.
   const toTop=page.locator('#return-to-top');
   await expect(toTop).toHaveClass(/is-visible/);
-  await expect(toTop).toHaveCSS('opacity','0');
-  await expect(toTop).toHaveCSS('pointer-events','none');
+  await expect(toTop).toBeHidden();
   // One tap on the other chip opens it, even though closing Shopee moves the chip.
   await chip(league).click();
   await expect(chip(league)).toHaveAttribute('aria-expanded','true');

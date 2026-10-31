@@ -53,10 +53,10 @@ const STEPS = [
   { title: 'Surface to the analyst', d: ['Agents flag what looks suspicious, with', 'the evidence attached. Only a human', 'analyst makes the call.'],
     m: ['Agents flag what looks suspicious, with the evidence', 'attached. Only a human analyst makes the call.'] },
 ];
-const JOBS = ['Hypothesis', 'Detection', 'Report'], HYP = 0, ON = 1, REP = 2;   // the product's own agents, the three that read best (prime-th th-core: hypothesis, detection_logic, report); Detection searches
+const JOBS = ['Hypothesis', 'Detection', 'Reporting'], HYP = 0, ON = 1, REP = 2;   // the product's own agents, the three that read best (prime-th th-core: hypothesis, detection_logic, report); Detection searches
 const LOOP_END = 200;   // degrees, clockwise from the right: where the loop's arc ends and its arrowhead points up
 const TOOLS = [['search', 'search'], ['check', 'check query'], ['bars', 'analyse results']];   // the Detection agent's own steps (past hunts is the Hypothesis agent's tool)
-const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each given only the tools and context its one job needs, because a local model does best with one job: forming a hypothesis, writing and running the detection logic, reporting. Agents carry tools and skills. The Detection agent\'s first search, for schtasks.exe, comes back empty, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the agent asks whether its search could have missed the threat, checks a new query and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline. The Report agent writes it up with the evidence attached, and only a human analyst makes the call.';
+const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each given only the tools and context its one job needs, because a local model does best with one job: forming a hypothesis, writing and running the detection logic, reporting. Agents carry tools and skills. The Detection agent\'s first search, for schtasks.exe, comes back empty, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the agent asks whether its search could have missed the threat, checks a new query and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline. The Reporting agent writes it up with the evidence attached, and only a human analyst makes the call.';
 
 // a plain agent node: a ring with a dot; the one we follow is solid teal
 const node = (cx, cy, r, on, cls = '') => on
@@ -81,8 +81,8 @@ function picture(i, x, cy, r) {
     p += ripple('ag-rip-det', ax[on], ay, r) + node(scx, sy, r, false) + [0, 1, 2].map(k => node(ax[k], ay, r, k === on, k === on ? 'ag-det' : '')).join('') +
       `<circle class="ag-det-dot" cx="${ax[on]}" cy="${ay}" r="${r1(r * .3)}" fill="${C.dim}"/>`;   // until it lights, Detection looks like the others
     p += flash('ag-fl-sup', scx, sy, r) + flash('ag-fl-hyp', ax[HYP], ay, r) + flash('ag-fl-rep', ax[rep], ay, r);
-    // the report itself, left of the supervisor, before it slides in
-    p += `<g class="ag-doc">${icon('rep', r1(scx - 70), r1(sy - 12), 2, C.ink)}</g>`;
+    // the threat report itself, labelled, left of the supervisor, before it slides in
+    p += `<g class="ag-doc">${icon('rep', r1(scx - 70), r1(sy - 23), 2, C.ink)}${label(scx - 58, r1(sy + 12), 9, 'Threat report')}</g>`;   // the label under the page, so it never reads on one line with Supervisor
     p += label(scx, sy - r - 5, lf, 'Supervisor');
     JOBS.forEach((j, k) => {
       const ly = ay + r + lf + 3;
@@ -115,7 +115,8 @@ function picture(i, x, cy, r) {
         p += `<g class="ag-tool ag-tool${k}"><path d="${wire}" stroke="${C.rule}"/>` +
           `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="4" fill="${C.chip}" stroke="${C.rule}"/>` +
           (k === 0 ? glow('ag-g0a') + glow('ag-g0b') : glow(`ag-g${k}`)) +
-          (k === 1 ? icon(ic, tx + 6, ty + 3, 1, C.dim).replace(' class="ag-tick"', '') : '') + `${icon(ic, tx + 6, ty + 3, 1, C.teal)}<text x="${tx + 22}" y="${ty + 12.5}" font-size="10" fill="${C.body}">${name}</text>`;
+          (k === 1 ? icon(ic, tx + 6, ty + 3, 1, C.dim).replace(' class="ag-tick"', '') : '') + `${icon(ic, tx + 6, ty + 3, 1, C.teal)}<text${k === 1 ? ' class="ag-ck"' : ''} x="${tx + 22}" y="${ty + 12.5}" font-size="10" fill="${C.body}">${name}</text>` +
+          (k === 1 ? `<text class="ag-rw" x="${tx + 22}" y="${ty + 12.5}" font-size="10" font-weight="600" fill="${C.teal}">rewrite query</text>` : '');
         // what the search found: none the first time, one the second
         if (k === 0) p += `<text class="ag-none" x="${tx + tw - 7}" y="${ty + 12.5}" text-anchor="end" font-size="9.5" font-weight="600" fill="${C.body}">0 found</text>` +
           `<text class="ag-found" x="${tx + tw - 7}" y="${ty + 12.5}" text-anchor="end" font-size="9.5" font-weight="700" fill="${C.teal}">1 found</text>`;
@@ -197,13 +198,13 @@ function phone() {
 // checked query, a second search that finds one, the analysis. Step 3: the Report agent lights, the lead card writes
 // itself, then travels to the human.
 const T = {
-  s0: [0.2, .5], doc: [0.3, 1.4], sup: [1.5, .7], c0: [1.8, .7], hyp: [2.3, 1.0], c0r: [3.0, .6], c1: [3.5, .7], det: [4.1, .45], ripdet: [4.1, 1.0], chev0: [4.9, .9],
-  s1: [5.2, .5], arr: [5.4, .9], tool: [[5.7, .35], [5.95, .35], [6.2, .35]],
-  g0a: [6.7, 1.3], rip0: [6.8, 1.1], rip1: [7.1, 1.1], none: [7.7, 3.6],
-  loop: [8.9, 1.0], g1: [9.3, 1.1], tick: [9.55, .5], lh: [9.8, .25],
-  g0b: [10.4, 1.3], rip2: [10.5, 1.1], rip3: [10.8, 1.1], found: [11.3, .45], g2: [11.7, .9], chev1: [12.4, .9],
-  s2: [12.8, .5], c2: [12.9, .6], rep: [13.4, .8], cardf: [13.9, .4], cardo: [13.9, .8], lead: [14.4, .35], ln: [[14.6, .35], [14.8, .35]],
-  he: [15.3, .4], pk: [15.5, .55], ana: [16.0, .5], halo: [16.4, 1.1],
+  s0: [0.2, .5], doc: [0.2, 2.0], sup: [2.0, .7], c0: [2.3, .7], hyp: [2.8, 1.0], c0r: [3.5, .6], c1: [4.0, .7], det: [4.6, .45], ripdet: [4.6, 1.0], chev0: [5.4, .9],
+  s1: [5.7, .5], arr: [5.9, .9], tool: [[6.2, .35], [6.45, .35], [6.7, .35]],
+  g0a: [7.2, 1.3], rip0: [7.3, 1.1], rip1: [7.6, 1.1], none: [8.2, 4.2],
+  loop: [9.4, 1.0], rw: [9.4, 1.3], g1: [9.8, 1.2], lh: [10.3, .25], tick: [10.7, .5],
+  g0b: [11.5, 1.3], rip2: [11.6, 1.1], rip3: [11.9, 1.1], found: [12.4, .45], g2: [12.8, .9], chev1: [13.5, .9],
+  s2: [13.9, .5], c2: [14.0, .6], rep: [14.5, .8], cardf: [15.0, .4], cardo: [15.0, .8], lead: [15.5, .35], ln: [[15.7, .35], [15.9, .35]],
+  he: [16.4, .4], pk: [16.6, .55], ana: [17.1, .5], halo: [17.5, 1.1],
 };
 const OUT_EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)';
 const P = '.is-playing svg.ag-scene', PH = phone();
@@ -229,7 +230,7 @@ svg.ag-scene .ag-s, svg.ag-scene .ag-chev, svg.ag-scene .ag-ana { transform-box:
 svg.ag-scene .ag-rip, svg.ag-scene .ag-found, svg.ag-scene .ag-doc { transform-box: fill-box; transform-origin: center; }
 svg.ag-scene .ag-rip { vector-effect: non-scaling-stroke; }
 /* transient marks: hidden in the final frame, shown only while they play */
-svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .ag-none, svg.ag-scene .ag-pk, svg.ag-scene .ag-det-dot { opacity: 0; }
+svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .ag-none, svg.ag-scene .ag-rw, svg.ag-scene .ag-pk, svg.ag-scene .ag-det-dot { opacity: 0; }
 @keyframes ag-in { from { opacity: 0; transform: translateY(-4px); } }
 @keyframes ag-out { from { opacity: 1; } }
 @keyframes ag-wake { from { opacity: .2; } }
@@ -241,9 +242,10 @@ svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .a
 @keyframes ag-comet-r { 0% { stroke-dashoffset: -.82; stroke-opacity: 0; } 20% { stroke-opacity: 1; } 80% { stroke-dashoffset: .18; stroke-opacity: 1; } 100% { stroke-dashoffset: .18; stroke-opacity: 0; } }
 @keyframes ag-flash { 0%, 100% { opacity: 0; } 25%, 65% { opacity: 1; } }
 @keyframes ag-hold { 0%, 100% { opacity: 0; } 8%, 90% { opacity: 1; } }
+@keyframes ag-gap { 0%, 100% { opacity: 1; } 8%, 90% { opacity: 0; } }
 @keyframes ag-rip { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }
 @keyframes ag-halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.6); } }
-@keyframes ag-doc { 0% { opacity: 0; transform: translate(0, -6px); } 25%, 55% { opacity: 1; transform: translate(0, 0); } 100% { opacity: 0; transform: translate(58px, 0) scale(.4); } }
+@keyframes ag-doc { 0% { opacity: 0; transform: translate(0, -6px); } 12%, 60% { opacity: 1; transform: translate(0, 0); } 100% { opacity: 0; transform: translate(58px, 5px) scale(.4); } }
 @keyframes ag-chev { 0%, 100% { stroke: ${C.mute}; transform: none; } 45% { stroke: ${C.teal}; transform: translateX(3px); } }
 @keyframes ag-pk { 0% { opacity: 0; transform: none; } 15%, 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--dx)); } }
 @keyframes ag-pop { 0% { opacity: 0; transform: scale(.6); } 70% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
@@ -272,6 +274,8 @@ ${P} .ag-none { ${at(T.none, 'ag-hold', 'linear', 'none')} }
 ${P} .ag-loop { ${at(T.loop, 'ag-draw')} }
 ${P} .ag-lh { ${at(T.lh, 'ag-fade')} }
 ${P} .ag-g1 { ${at(T.g1, 'ag-flash', IO, 'none')} }
+${P} .ag-rw { ${at(T.rw, 'ag-hold', 'linear', 'none')} }
+${P} .ag-ck { ${at(T.rw, 'ag-gap', 'linear', 'none')} }
 ${P} .ag-tick { ${at(T.tick, 'ag-draw')} }
 ${P} .ag-g0b { ${at(T.g0b, 'ag-flash', IO, 'none')} }
 ${P} .ag-rip2 { ${at(T.rip2, 'ag-rip', OUT_EZ, 'none')} }
