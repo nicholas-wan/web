@@ -1,0 +1,36 @@
+/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
+   are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
+.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 250; }
+.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 392; }
+@media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
+svg.ag-scene text { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
+svg.ag-scene .ag-m { font-family: Consolas, "SF Mono", Menlo, "DejaVu Sans Mono", "Liberation Mono", monospace; }
+svg.ag-scene .ag-i { fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+svg.ag-scene .ag-flag .ag-i { stroke-width: inherit; }
+svg.ag-scene path { fill: none; }
+svg.ag-scene .ag-c { stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: .16 2; stroke-opacity: 0; }
+svg.ag-scene .ag-loop { stroke-dasharray: 1 1; stroke-dashoffset: 0; stroke-linecap: round; }
+svg.ag-scene .ag-lh { stroke-linecap: round; stroke-linejoin: round; }
+svg.ag-scene .ag-s { transform-box: fill-box; }
+/* playing: each step arrives once, in order; the followed agent lights as the pulse reaches it */
+@keyframes ag-in { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes ag-fade { from { opacity: 0; } }
+@keyframes ag-draw { from { stroke-dashoffset: 1; } }
+@keyframes ag-det { from { fill: #0b1b1e; stroke: #4f6f6e; } }
+@keyframes ag-detd { from { fill: #4f6f6e; } }
+@keyframes ag-comet { 0% { stroke-dashoffset: .18; stroke-opacity: 0; } 20% { stroke-opacity: 1; } 80% { stroke-dashoffset: -.82; stroke-opacity: 1; } 100% { stroke-dashoffset: -.82; stroke-opacity: 0; } }
+.is-playing svg.ag-scene .ag-s0 { animation: ag-in .45s cubic-bezier(.22,1,.36,1) 0.2s both; }
+.is-playing svg.ag-scene .ag-c1 { animation: ag-comet .7s linear 0.5s none; }
+.is-playing svg.ag-scene .ag-det .ag-nd { animation: ag-det .4s cubic-bezier(.45,0,.25,1) 1s both; }
+.is-playing svg.ag-scene .ag-det .ag-ndd { animation: ag-detd .4s cubic-bezier(.45,0,.25,1) 1s both; }
+.is-playing svg.ag-scene .ag-ev0 { animation: ag-fade .35s cubic-bezier(.45,0,.25,1) 1.1s both; }
+.is-playing svg.ag-scene .ag-evr0 { animation: ag-fade .35s cubic-bezier(.45,0,.25,1) 1.9s both; }
+.is-playing svg.ag-scene .ag-s1 { animation: ag-in .45s cubic-bezier(.22,1,.36,1) 2.6s both; }
+.is-playing svg.ag-scene .ag-loop { animation: ag-draw .7s cubic-bezier(.45,0,.25,1) 2.7s both; }
+.is-playing svg.ag-scene .ag-lh { animation: ag-fade .25s cubic-bezier(.45,0,.25,1) 3.3s both; }
+.is-playing svg.ag-scene .ag-ev1, .is-playing svg.ag-scene .ag-evr1 { animation: ag-fade .35s cubic-bezier(.45,0,.25,1) 3.5s both; }
+.is-playing svg.ag-scene .ag-s2 { animation: ag-in .45s cubic-bezier(.22,1,.36,1) 4.7s both; }
+.is-playing svg.ag-scene .ag-flag { animation: ag-fade .3s cubic-bezier(.45,0,.25,1) 4.8s both; }
+.is-playing svg.ag-scene .ag-he { animation: ag-fade .3s cubic-bezier(.45,0,.25,1) 5.1s both; }
+.is-playing svg.ag-scene .ag-ana { animation: ag-fade .4s cubic-bezier(.22,1,.36,1) 5.3s both; }
+.is-playing svg.ag-scene .ag-ev2, .is-playing svg.ag-scene .ag-evr2 { animation: ag-fade .35s cubic-bezier(.45,0,.25,1) 5.5s both; }
