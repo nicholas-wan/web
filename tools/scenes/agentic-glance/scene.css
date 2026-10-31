@@ -1,29 +1,29 @@
 /* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
-.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 246; }
-.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 780.3; }
+.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 260; }
+.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 810.3; }
 @media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
 svg.ag-scene text { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
 svg.ag-scene .ag-i { fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 svg.ag-scene .ag-flag .ag-i { stroke-width: inherit; }
-svg.ag-scene .ag-ana .ag-i { stroke-width: .85; }
+svg.ag-scene :is(.ag-ana, .ag-anw) .ag-i { stroke-width: .85; }
 svg.ag-scene .ag-logo path { fill: #d8e6e4; }   /* (scaled R/7, so about the other icons' 1.3-1.8) */
 svg.ag-scene .ag-doc .ag-i { stroke-width: .6; }
 svg.ag-scene path, svg.ag-scene .ag-rip, svg.ag-scene .ag-cardo { fill: none; }
 svg.ag-scene .ag-doc path:first-child { fill: #0a191c; }
-svg.ag-scene .ag-c { stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: .16 2; stroke-opacity: 0; }
-svg.ag-scene .ag-loop, svg.ag-scene .ag-tick, svg.ag-scene .ag-cardo { stroke-dasharray: 1 2; stroke-dashoffset: 0; stroke-linecap: round; }   /* (undrawn, the dash sits wholly before the start, so no round cap shows as a dot) */
+svg.ag-scene .ag-c { stroke-width: 3; stroke-linecap: round; stroke-dasharray: .2 2; stroke-opacity: 0; }
+svg.ag-scene .ag-loop, svg.ag-scene .ag-tick, svg.ag-scene .ag-wd { stroke-dasharray: 1 2; stroke-dashoffset: 0; stroke-linecap: round; }   /* (undrawn, the dash sits wholly before the start, so no round cap shows as a dot) */
 svg.ag-scene .ag-lh { stroke-linecap: round; stroke-linejoin: round; }
-svg.ag-scene .ag-s, svg.ag-scene .ag-chev, svg.ag-scene .ag-ana { transform-box: fill-box; transform-origin: center; }
-svg.ag-scene .ag-rip, svg.ag-scene .ag-found, svg.ag-scene .ag-doc { transform-box: fill-box; transform-origin: center; }
+svg.ag-scene :is(.ag-s, .ag-chev, .ag-ana, .ag-rip, .ag-found, .ag-doc, .ag-supn, .ag-none, .ag-qo, .ag-hc, .ag-spin) { transform-box: fill-box; transform-origin: center; }
 svg.ag-scene .ag-rip { vector-effect: non-scaling-stroke; }
-/* transient marks: hidden in the final frame, shown only while they play */
-svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .ag-none, svg.ag-scene .ag-rw, svg.ag-scene .ag-pk, svg.ag-scene .ag-det-dot { opacity: 0; }
-svg.ag-scene .ag-spin, svg.ag-scene .ag-q, svg.ag-scene .ag-qsel, svg.ag-scene .ag-qc, svg.ag-scene .ag-qs { opacity: 0; }
-svg.ag-scene .ag-spin { stroke-dasharray: .25 .75; stroke-linecap: round; transform-box: fill-box; transform-origin: center; }
-svg.ag-scene text.ag-qt { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+svg.ag-scene .ag-flag { transform-box: fill-box; transform-origin: 14% 25%; }   /* (the flag, where the dot lands) */
 svg.ag-scene .ag-qc { transform-box: fill-box; transform-origin: 100% 50%; }
-svg.ag-scene .ag-qo { transform-box: fill-box; transform-origin: center; }
+svg.ag-scene .ag-spin { stroke-dasharray: .25 .75; stroke-linecap: round; }
+svg.ag-scene :is(.ag-none, .ag-cnt, .ag-found) { font-variant-numeric: tabular-nums; }
+svg.ag-scene text.ag-qt { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+/* transient marks: hidden in the final frame, shown only while they play */
+svg.ag-scene :is(.ag-fl, .ag-rip, .ag-doc, .ag-none, .ag-cnt, .ag-pk, .ag-det-dot, .ag-spin, .ag-q0, .ag-q1, .ag-qc, .ag-qs, .ag-hc, .ag-anw, .ag-replit, .ag-st text) { opacity: 0; }
+svg.ag-scene .ag-qg { opacity: .42; }   /* (the final frame keeps the result row, quiet, with the one unusual result lit: the second review's payoff) */
 @keyframes ag-in { from { opacity: 0; transform: translateY(-4px); } }
 @keyframes ag-out { from { opacity: 1; } }
 @keyframes ag-wake { from { opacity: .2; } }
@@ -31,88 +31,142 @@ svg.ag-scene .ag-qo { transform-box: fill-box; transform-origin: center; }
 @keyframes ag-draw { from { stroke-dashoffset: 1.05; } }
 @keyframes ag-det { from { fill: #0b1b1e; stroke: #4f6f6e; } }
 @keyframes ag-job { from { fill: #8ba7a6; } }
-@keyframes ag-comet { 0% { stroke-dashoffset: .18; stroke-opacity: 0; } 20% { stroke-opacity: 1; } 80% { stroke-dashoffset: -.82; stroke-opacity: 1; } 100% { stroke-dashoffset: -.82; stroke-opacity: 0; } }
-@keyframes ag-comet-r { 0% { stroke-dashoffset: -.82; stroke-opacity: 0; } 20% { stroke-opacity: 1; } 80% { stroke-dashoffset: .18; stroke-opacity: 1; } 100% { stroke-dashoffset: .18; stroke-opacity: 0; } }
+@keyframes ag-comet { 0% { stroke-dashoffset: .2; stroke-opacity: 0; } 20% { stroke-opacity: 1; } 80% { stroke-dashoffset: -.8; stroke-opacity: 1; } 100% { stroke-dashoffset: -.8; stroke-opacity: 0; } }
+@keyframes ag-comet-r { 0% { stroke-dashoffset: -.8; stroke-opacity: 0; } 20% { stroke-opacity: 1; } 80% { stroke-dashoffset: .2; stroke-opacity: 1; } 100% { stroke-dashoffset: .2; stroke-opacity: 0; } }
 @keyframes ag-flash { 0%, 100% { opacity: 0; } 25%, 65% { opacity: 1; } }
 @keyframes ag-rip { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }
-@keyframes ag-halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.6); } }
-@keyframes ag-doc { 0% { opacity: 0; transform: translate(0, -6px); } 12%, 60% { opacity: 1; transform: translate(0, 0); } 100% { opacity: 0; transform: translate(58px, 5px) scale(.4); } }
-@keyframes ag-chev { 0%, 100% { stroke: #8ba7a6; transform: none; } 45% { stroke: #28d7c5; transform: translateX(3px); } }
-@keyframes ag-pk { 0% { opacity: 0; transform: none; } 15%, 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--dx)); } }
+@keyframes ag-halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.7); } }
+@keyframes ag-doc { 0% { opacity: 0; transform: translate(0, -20px); } 18%, 50% { opacity: 1; transform: translate(0, 0); } 62% { opacity: 1; transform: translate(-3px, -3px); } 100% { opacity: 0; transform: translate(58px, 5px) scale(.4); } }
+@keyframes ag-bump { 50% { transform: scale(1.1); } }
+@keyframes ag-pk { 0% { opacity: 0; transform: none; } 12%, 88% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--dx)); } }
+@keyframes ag-march { to { stroke-dashoffset: -14; } }
 @keyframes ag-pop { 0% { opacity: 0; transform: scale(.6); } 70% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
+@keyframes ag-land { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
+@keyframes ag-shake { 0% { opacity: 0; transform: scale(1.3); } 35% { opacity: 1; transform: scale(1); } 50% { transform: translateX(-2px); } 65% { transform: translateX(2px); } 80% { transform: translateX(-1px); } 100% { opacity: 1; transform: none; } }
 @keyframes ag-show { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ag-hide { from { opacity: 1; } to { opacity: 0; } }
+@keyframes ag-say { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 @keyframes ag-turn { to { transform: rotate(360deg); } }
 @keyframes ag-wipe { from { opacity: 1; transform: scaleX(1); } to { opacity: 1; transform: scaleX(0); } }
+@keyframes ag-unwipe { from { opacity: 1; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
 @keyframes ag-caret { to { transform: translateX(var(--w)); } }
+@keyframes ag-caret-back { from { transform: translateX(var(--w)); } to { transform: none; } }
 @keyframes ag-scan { 0% { opacity: 0; transform: none; } 15%, 85% { opacity: .7; } 100% { opacity: 0; transform: translateX(var(--w)); } }
-/* step 1: the report drops into the supervisor, which hands Hypothesis its slice and takes its result back, then hands Detection the hunt */
+@keyframes ag-dimin { from { opacity: 1; } to { opacity: .42; } }
+@keyframes ag-dimout { from { opacity: .42; } to { opacity: 1; } }
+@keyframes ag-hx { to { transform: translateX(var(--dx)); } }
+@keyframes ag-hy { to { transform: translateY(var(--dy)); } }
+@keyframes ag-hy1 { 45% { transform: translateY(var(--dip)); } 100% { transform: translateY(var(--dy)); } }
+@keyframes ag-spring { from { transform: scale(.8); } to { transform: none; } }
+@keyframes ag-h1m { 0% { opacity: 0; transform: scale(.35); } 10% { opacity: 1; } 22%, 72% { opacity: .2; } 88% { opacity: 1; transform: scale(.45); } 96% { transform: scale(1.12); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes ag-h2m { 0% { opacity: 0; transform: scale(.75); } 6% { opacity: 1; } 20% { opacity: 1; transform: scale(1.5); } 32%, 72% { opacity: .2; } 85% { opacity: 1; transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes ag-h1 { 0% { opacity: 0; transform: scale(.35); } 18% { opacity: 0; } 28% { opacity: 1; } 88% { opacity: 1; transform: scale(.45); } 96% { transform: scale(1.12); } 100% { opacity: 1; transform: scale(1); } }   /* (it appears once clear of the labels and stays small in flight, so it never covers words; full size as it lands) */
+@keyframes ag-h2 { 0% { opacity: 0; transform: scale(.75); } 6% { opacity: 1; } 20%, 85% { transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes ag-grow { from { opacity: 0; transform: scale(.12); } 45% { opacity: 1; } to { opacity: 1; transform: none; } }
+@keyframes ag-antic { 45% { transform: translateX(-5px); } }
+/* the status line: the spinner turns throughout, each phrase rises in and leaves */
+/* (each phrase is gone before the next rises in, so two never overlap) */
+.is-playing svg.ag-scene .ag-sp-st0 { animation: ag-show 0.134s linear 0.734s both, ag-hide 0.168s linear 4.286s forwards, ag-turn .9s linear 0.734s 5; }
+.is-playing svg.ag-scene .ag-sp-st1 { animation: ag-show 0.134s linear 4.52s both, ag-hide 0.168s linear 10.885s forwards, ag-turn .9s linear 4.52s 8; }
+.is-playing svg.ag-scene .ag-sp-st2 { animation: ag-show 0.134s linear 11.086s both, ag-hide 0.168s linear 13.732s forwards, ag-turn .9s linear 11.086s 4; }
+.is-playing svg.ag-scene .ag-st0 { animation: ag-say 0.201s cubic-bezier(.22,1,.36,1) 0.734s forwards, ag-hide 0.08s linear 1.74s forwards; }
+.is-playing svg.ag-scene .ag-st1 { animation: ag-say 0.201s cubic-bezier(.22,1,.36,1) 1.873s forwards, ag-hide 0.08s linear 3.147s forwards; }
+.is-playing svg.ag-scene .ag-st2 { animation: ag-say 0.201s cubic-bezier(.22,1,.36,1) 3.281s forwards, ag-hide 0.08s linear 4.353s forwards; }
+.is-playing svg.ag-scene .ag-st3 { animation: ag-say 0.201s cubic-bezier(.22,1,.36,1) 4.52s forwards, ag-hide 0.08s linear 5.659s forwards; }
+.is-playing svg.ag-scene .ag-st4 { animation: ag-say 0.201s cubic-bezier(.22,1,.36,1) 5.793s forwards, ag-hide 0.08s linear 6.731s forwards; }
+.is-playing svg.ag-scene .ag-st5 { animation: ag-say 0.201s cubic-bezier(.22,1,.36,1) 6.865s forwards, ag-hide 0.08s linear 8.205s forwards; }
+.is-playing svg.ag-scene .ag-st6 { animation: ag-say 0.201s cubic-bezier(.22,1,.36,1) 8.339s forwards, ag-hide 0.08s linear 9.646s forwards; }
+.is-playing svg.ag-scene .ag-st7 { animation: ag-say 0.201s cubic-bezier(.22,1,.36,1) 9.78s forwards, ag-hide 0.08s linear 10.952s forwards; }
+.is-playing svg.ag-scene .ag-st8 { animation: ag-say 0.201s cubic-bezier(.22,1,.36,1) 11.086s forwards, ag-hide 0.08s linear 12.259s forwards; }
+.is-playing svg.ag-scene .ag-st9 { animation: ag-say 0.201s cubic-bezier(.22,1,.36,1) 12.393s forwards, ag-hide 0.08s linear 13.8s forwards; }
+/* step 1: the wires draw, the report drops into the supervisor, which reads it, sends a pulse to Hypothesis and back, then hands Detection the hunt */
 .is-playing svg.ag-scene .ag-s0 { animation: ag-in 0.335s cubic-bezier(.22,1,.36,1) 0.634s both; }
-.is-playing svg.ag-scene .ag-doc { animation: ag-doc 1.34s cubic-bezier(.45,0,.25,1) 0.634s none; }
-.is-playing svg.ag-scene .ag-doc text { animation: ag-hide 0.134s linear 1.304s forwards; }   /* (the label goes before the page moves, so it never smears into the node) */
-.is-playing svg.ag-scene .ag-fl-sup { animation: ag-flash 0.469s cubic-bezier(.45,0,.25,1) 1.84s none; }
-.is-playing svg.ag-scene .ag-sp-sup { animation: ag-show 0.134s linear 1.773s both, ag-hide 0.168s linear 2.276s forwards, ag-turn .9s linear 1.773s 1; }
-.is-playing svg.ag-scene .ag-sp-hyp { animation: ag-show 0.134s linear 2.376s both, ag-hide 0.168s linear 2.878s forwards, ag-turn .9s linear 2.376s 1; }
-.is-playing svg.ag-scene .ag-c0 { animation: ag-comet 0.469s linear 2.041s none; }
-.is-playing svg.ag-scene .ag-fl-hyp { animation: ag-flash 0.67s cubic-bezier(.45,0,.25,1) 2.376s none; }
-.is-playing svg.ag-scene .ag-c0r { animation: ag-comet-r 0.402s linear 2.845s none; }
-.is-playing svg.ag-scene .ag-c1 { animation: ag-comet 0.469s linear 3.18s none; }
-.is-playing svg.ag-scene .ag-rip-det { animation: ag-rip 0.67s cubic-bezier(.22,1,.36,1) 3.582s none; }
-.is-playing svg.ag-scene .ag-det { animation: ag-det 0.302s cubic-bezier(.45,0,.25,1) 3.582s both; }
-.is-playing svg.ag-scene .ag-det-dot { animation: ag-out 0.302s cubic-bezier(.45,0,.25,1) 3.582s both; }
-.is-playing svg.ag-scene .ag-job-on text { animation: ag-job 0.302s cubic-bezier(.45,0,.25,1) 3.582s both; }
-.is-playing svg.ag-scene .ag-chev0 { animation: ag-chev 0.603s cubic-bezier(.45,0,.25,1) 3.85s none; }
-/* step 2: the agent and its kit; a search that finds nothing, the loop and the checked query, a search that finds one */
-.is-playing svg.ag-scene .ag-s1 { animation: ag-wake 0.335s cubic-bezier(.22,1,.36,1) 4.051s both; }
-.is-playing svg.ag-scene .ag-p1 { animation: ag-fade 0.335s cubic-bezier(.45,0,.25,1) 4.051s both; }
-.is-playing svg.ag-scene .ag-fl-arr { animation: ag-flash 0.603s cubic-bezier(.45,0,.25,1) 4.185s none; }
-.is-playing svg.ag-scene .ag-tool0 { animation: ag-fade 0.234s cubic-bezier(.45,0,.25,1) 4.386s both; }
-.is-playing svg.ag-scene .ag-tool1 { animation: ag-fade 0.234s cubic-bezier(.45,0,.25,1) 4.554s both; }
-.is-playing svg.ag-scene .ag-tool2 { animation: ag-fade 0.234s cubic-bezier(.45,0,.25,1) 4.721s both; }
-/* the agent thinks and writes its query, a few characters at a time behind a caret; later selects and rewrites it */
-.is-playing svg.ag-scene .ag-sp-det { animation: ag-show 0.134s linear 4.788s both, ag-hide 0.168s linear 7.033s forwards, ag-turn .9s linear 4.788s 3; }
-.is-playing svg.ag-scene .ag-q { animation: ag-show 0.201s linear 4.855s both, ag-hide 0.268s linear 12.158s forwards; }
-.is-playing svg.ag-scene .ag-q0 { animation: ag-hide 0.101s linear 7.736s forwards; }
-.is-playing svg.ag-scene .ag-q1 { animation: ag-show 0.067s linear 7.803s both, ag-hide 0.101s linear 9.746s forwards; }
+.is-playing svg.ag-scene .ag-wd { animation: ag-draw 0.402s cubic-bezier(.45,0,.25,1) 0.701s both; }
+.is-playing svg.ag-scene .ag-doc { animation: ag-doc 1.206s cubic-bezier(.45,0,.25,1) 0.634s none; }
+.is-playing svg.ag-scene .ag-doc text { animation: ag-hide 0.134s linear 1.237s forwards; }   /* (the label goes before the page moves, so it never smears into the node) */
+.is-playing svg.ag-scene .ag-supn { animation: ag-bump 0.268s cubic-bezier(.34,1.56,.64,1) 1.806s none; }
+.is-playing svg.ag-scene .ag-sp-sup { animation: ag-show 0.134s linear 1.84s both, ag-hide 0.168s linear 2.276s forwards, ag-turn .9s linear 1.84s 1; }
+.is-playing svg.ag-scene .ag-sp-hyp { animation: ag-show 0.134s linear 2.443s both, ag-hide 0.168s linear 2.946s forwards, ag-turn .9s linear 2.443s 1; }
+.is-playing svg.ag-scene .ag-c0 { animation: ag-comet 0.402s linear 2.108s none; }
+.is-playing svg.ag-scene .ag-fl-hyp { animation: ag-flash 0.67s cubic-bezier(.45,0,.25,1) 2.443s none; }
+.is-playing svg.ag-scene .ag-c0r { animation: ag-comet-r 0.402s linear 3.046s none; }
+.is-playing svg.ag-scene .ag-c1 { animation: ag-comet 0.402s linear 3.314s none; }
+.is-playing svg.ag-scene .ag-rip-det { animation: ag-rip 0.67s cubic-bezier(.22,1,.36,1) 3.683s none; }
+.is-playing svg.ag-scene .ag-det { animation: ag-det 0.302s cubic-bezier(.45,0,.25,1) 3.683s both; }
+.is-playing svg.ag-scene .ag-det-dot { animation: ag-out 0.302s cubic-bezier(.45,0,.25,1) 3.683s both; }
+.is-playing svg.ag-scene .ag-job-on text { animation: ag-job 0.302s cubic-bezier(.45,0,.25,1) 3.683s both; }
+.is-playing svg.ag-scene .ag-chev { animation: ag-fade 0.335s cubic-bezier(.45,0,.25,1) 0.634s both; }
+.is-playing svg.ag-scene .ag-team { animation: ag-dimin 0.302s ease 4.252s forwards, ag-dimout 0.302s ease 13.632s forwards; }
+/* the followed dot: Detection to step 2's agent, then the unusual result to the lead card */
+.is-playing svg.ag-scene .ag-h1 { animation: ag-hx 0.536s cubic-bezier(.45,0,.25,1) 3.984s both; }
+.is-playing svg.ag-scene .ag-h1 .ag-hy { animation: ag-hy1 0.536s ease-in-out 3.984s both; }   /* (down under the labels, then up into step 2) */
+.is-playing svg.ag-scene .ag-h1 .ag-hc { animation: ag-h1 0.536s linear 3.984s both, ag-hide 0.02s linear 4.527s forwards; }   /* (the agent below shows the instant it lands, then the dot goes) */
+.is-playing svg.ag-scene .ag-h2 { animation: ag-hx 0.536s cubic-bezier(.45,0,.25,1) 11.086s both; }
+.is-playing svg.ag-scene .ag-h2 .ag-hy { animation: ag-hy 0.536s cubic-bezier(.55,.05,.85,.45) 11.086s both; }
+.is-playing svg.ag-scene .ag-h2 .ag-hc { animation: ag-h2 0.67s cubic-bezier(.45,0,.25,1) 10.952s both, ag-hide 0.101s linear 11.609s forwards; }
+.is-playing svg.ag-scene .ag-h2.ag-tr1 { animation: ag-hx 0.536s cubic-bezier(.45,0,.25,1) 11.126s both; }
+.is-playing svg.ag-scene .ag-h2.ag-tr1 .ag-hy { animation: ag-hy 0.536s cubic-bezier(.55,.05,.85,.45) 11.126s both; }
+.is-playing svg.ag-scene .ag-h2.ag-tr1 .ag-hc { animation: ag-h2 0.67s cubic-bezier(.45,0,.25,1) 10.992s both, ag-hide 0.067s linear 11.582s forwards; }
+.is-playing svg.ag-scene .ag-h2.ag-tr2 { animation: ag-hx 0.536s cubic-bezier(.45,0,.25,1) 11.166s both; }
+.is-playing svg.ag-scene .ag-h2.ag-tr2 .ag-hy { animation: ag-hy 0.536s cubic-bezier(.55,.05,.85,.45) 11.166s both; }
+.is-playing svg.ag-scene .ag-h2.ag-tr2 .ag-hc { animation: ag-h2 0.67s cubic-bezier(.45,0,.25,1) 11.032s both, ag-hide 0.067s linear 11.622s forwards; }   /* (two fading ghosts a beat behind, so the eye keeps it) */
+/* phones: the dots fall straight down the stacked steps, so they fade back while they cross the words, and travel without ghosts */
+.is-playing svg.ag-scene--m .ag-h1 .ag-hc { animation-name: ag-h1m, ag-hide; }
+.is-playing svg.ag-scene--m .ag-h2 .ag-hc { animation-name: ag-h2m, ag-hide; }
+svg.ag-scene--m :is(.ag-tr1, .ag-tr2) { display: none; }
+/* step 2: the agent lands, writes a search, sends it and finds nothing; loops, rewrites and checks; finds 32, one unusual */
+.is-playing svg.ag-scene .ag-s1 { animation: ag-wake 0.335s cubic-bezier(.22,1,.36,1) 3.984s both; }
+.is-playing svg.ag-scene .ag-p1 { animation: ag-fade 0.268s cubic-bezier(.45,0,.25,1) 3.984s both, ag-dimin 0.302s ease 11.354s forwards, ag-dimout 0.302s ease 13.732s forwards; }
+.is-playing svg.ag-scene .ag-n1 { animation: ag-show 0.007s linear 4.513s both; }
+.is-playing svg.ag-scene .ag-tool0 { animation: ag-in 0.201s cubic-bezier(.22,1,.36,1) 4.52s both; }
+.is-playing svg.ag-scene .ag-tool1 { animation: ag-in 0.201s cubic-bezier(.22,1,.36,1) 4.654s both; }
+.is-playing svg.ag-scene .ag-tool2 { animation: ag-in 0.201s cubic-bezier(.22,1,.36,1) 4.788s both; }
+.is-playing svg.ag-scene .ag-sp-det { animation: ag-show 0.134s linear 4.587s both, ag-hide 0.168s linear 5.894s forwards, ag-turn .9s linear 4.587s 2; }
+.is-playing svg.ag-scene .ag-q { animation: ag-show 0.201s linear 4.654s both; }
 /* (jump-none: the last step lands before the end, since a plain steps() held forwards can stop a step short) */
-.is-playing svg.ag-scene .ag-q0 .ag-qc { animation: ag-wipe 0.536s steps(8, jump-none) 4.989s both; }
-.is-playing svg.ag-scene .ag-q0 .ag-qk { animation: ag-caret 0.536s steps(8, jump-none) 4.989s both, ag-hide 0.101s linear 5.592s forwards; }
-.is-playing svg.ag-scene .ag-q1 .ag-qc { animation: ag-wipe 0.536s steps(8, jump-none) 7.803s both; }
-.is-playing svg.ag-scene .ag-q1 .ag-qk { animation: ag-caret 0.536s steps(8, jump-none) 7.803s both, ag-hide 0.101s linear 8.473s forwards; }
-.is-playing svg.ag-scene .ag-qsel { animation: ag-show 0.101s linear 7.334s both; }
-.is-playing svg.ag-scene .ag-qd { animation: ag-show 0.134s linear 9.88s both; }
-.is-playing svg.ag-scene .ag-qs { animation: ag-scan 0.536s linear 9.947s none; }
-.is-playing svg.ag-scene .ag-qo { animation: ag-pop 0.302s cubic-bezier(.22,1,.36,1) 10.316s both; }
-.is-playing svg.ag-scene .ag-qw { animation: ag-fade 0.201s cubic-bezier(.45,0,.25,1) 10.45s both; }
-.is-playing svg.ag-scene .ag-qr { animation: ag-rip 0.67s cubic-bezier(.22,1,.36,1) 10.316s none; }
-.is-playing svg.ag-scene .ag-g0a { animation: ag-flash 0.871s cubic-bezier(.45,0,.25,1) 5.592s none; }
-.is-playing svg.ag-scene .ag-rip0 { animation: ag-rip 0.737s cubic-bezier(.22,1,.36,1) 5.659s none; }
-.is-playing svg.ag-scene .ag-rip1 { animation: ag-rip 0.737s cubic-bezier(.22,1,.36,1) 5.86s none; }
-.is-playing svg.ag-scene .ag-none { animation: ag-show 0.08s linear 6.195s forwards, ag-hide 0.101s linear 7.099s forwards; }
-.is-playing svg.ag-scene .ag-loop { animation: ag-draw 0.67s cubic-bezier(.45,0,.25,1) 7.2s both; }
-.is-playing svg.ag-scene .ag-lh { animation: ag-fade 0.168s cubic-bezier(.45,0,.25,1) 7.803s both; }
-.is-playing svg.ag-scene .ag-g1 { animation: ag-flash 0.67s cubic-bezier(.45,0,.25,1) 8.205s none; }
-.is-playing svg.ag-scene .ag-rw { animation: ag-show 0.08s linear 7.267s forwards, ag-hide 0.101s linear 8.171s forwards; }
-.is-playing svg.ag-scene .ag-ck { animation: ag-hide 0.08s linear 7.187s forwards, ag-show 0.101s linear 8.306s forwards; }   /* (in sequence, never crossfaded) */
-.is-playing svg.ag-scene .ag-tick { animation: ag-draw 0.335s cubic-bezier(.45,0,.25,1) 8.339s both; }
-.is-playing svg.ag-scene .ag-g0b { animation: ag-flash 0.871s cubic-bezier(.45,0,.25,1) 8.808s none; }
-.is-playing svg.ag-scene .ag-rip2 { animation: ag-rip 0.737s cubic-bezier(.22,1,.36,1) 8.875s none; }
-.is-playing svg.ag-scene .ag-rip3 { animation: ag-rip 0.737s cubic-bezier(.22,1,.36,1) 9.076s none; }
-.is-playing svg.ag-scene .ag-found { animation: ag-pop 0.302s cubic-bezier(.22,1,.36,1) 9.411s both; }
-.is-playing svg.ag-scene .ag-g2 { animation: ag-flash 0.603s cubic-bezier(.45,0,.25,1) 9.746s none; }
-.is-playing svg.ag-scene .ag-chev1 { animation: ag-chev 0.603s cubic-bezier(.45,0,.25,1) 10.55s none; }
-/* step 3: the Report agent lights and the lead card writes itself; the lead travels to the human */
-.is-playing svg.ag-scene .ag-s2 { animation: ag-wake 0.335s cubic-bezier(.22,1,.36,1) 10.885s both; }
-.is-playing svg.ag-scene .ag-p2 { animation: ag-fade 0.335s cubic-bezier(.45,0,.25,1) 10.885s both; }
-.is-playing svg.ag-scene .ag-flag { animation: ag-fade 0.268s cubic-bezier(.45,0,.25,1) 11.622s both; }
-.is-playing svg.ag-scene .ag-cardo { animation: ag-draw 0.536s cubic-bezier(.45,0,.25,1) 11.622s both; }
-.is-playing svg.ag-scene .ag-lead { animation: ag-fade 0.234s cubic-bezier(.45,0,.25,1) 11.957s both; }
-.is-playing svg.ag-scene .ag-ln0 { animation: ag-in 0.201s cubic-bezier(.22,1,.36,1) 12.091s both; }
-.is-playing svg.ag-scene .ag-ln1 { animation: ag-in 0.201s cubic-bezier(.22,1,.36,1) 12.225s both; }
-.is-playing svg.ag-scene .ag-sp-rep { animation: ag-show 0.134s linear 11.22s both, ag-hide 0.168s linear 11.79s forwards, ag-turn .9s linear 11.22s 1; }
-.is-playing svg.ag-scene .ag-c2 { animation: ag-comet 0.402s linear 10.952s none; }
-.is-playing svg.ag-scene .ag-fl-rep { animation: ag-flash 0.536s cubic-bezier(.45,0,.25,1) 11.287s none; }
-.is-playing svg.ag-scene .ag-he { animation: ag-fade 0.268s cubic-bezier(.45,0,.25,1) 12.493s both; }
-.is-playing svg.ag-scene .ag-pk { animation: ag-pk 0.369s cubic-bezier(.45,0,.25,1) 12.627s none; }
-.is-playing svg.ag-scene .ag-ana { animation: ag-pop 0.335s cubic-bezier(.22,1,.36,1) 12.962s both; }
-.is-playing svg.ag-scene .ag-halo { animation: ag-halo 0.737s cubic-bezier(.22,1,.36,1) 13.23s none; }
+.is-playing svg.ag-scene .ag-q0 .ag-qc { animation: ag-wipe 0.536s steps(8, jump-none) 4.822s both, ag-unwipe 0.335s steps(8, jump-none) 6.865s forwards; }
+.is-playing svg.ag-scene .ag-q0 .ag-qk { animation: ag-caret 0.536s steps(8, jump-none) 4.822s both, ag-hide 0.101s linear 5.391s forwards, ag-show 0.034s linear 6.865s forwards, ag-caret-back 0.335s steps(8, jump-none) 6.865s forwards; }
+.is-playing svg.ag-scene .ag-q0 { animation: ag-show 0.007s linear 4.654s both, ag-hide 0.067s linear 7.234s forwards; }
+.is-playing svg.ag-scene .ag-q1 { animation: ag-show 0.067s linear 7.301s both, ag-hide 0.101s linear 8.674s forwards; }
+.is-playing svg.ag-scene .ag-q1 .ag-qc { animation: ag-wipe 0.536s steps(8, jump-none) 7.301s both; }
+.is-playing svg.ag-scene .ag-q1 .ag-qk { animation: ag-caret 0.536s steps(8, jump-none) 7.301s both, ag-hide 0.101s linear 8.272s forwards; }
+.is-playing svg.ag-scene .ag-g0a { animation: ag-flash 0.67s cubic-bezier(.45,0,.25,1) 5.425s none; }
+.is-playing svg.ag-scene .ag-sw0 { animation: ag-comet 0.302s linear 5.425s none; }
+.is-playing svg.ag-scene .ag-none { animation: ag-shake 0.302s cubic-bezier(.22,1,.36,1) 5.793s both, ag-hide 0.101s linear 7.133s forwards; }
+.is-playing svg.ag-scene .ag-loop { animation: ag-draw 0.67s cubic-bezier(.45,0,.25,1) 6.798s both; }
+.is-playing svg.ag-scene .ag-lh { animation: ag-fade 0.168s cubic-bezier(.45,0,.25,1) 7.401s both; }
+.is-playing svg.ag-scene .ag-g1 { animation: ag-flash 0.536s cubic-bezier(.45,0,.25,1) 7.87s none; }
+.is-playing svg.ag-scene .ag-tick { animation: ag-draw 0.335s cubic-bezier(.45,0,.25,1) 8.004s both; }
+.is-playing svg.ag-scene .ag-g0b { animation: ag-flash 0.603s cubic-bezier(.45,0,.25,1) 8.373s none; }
+.is-playing svg.ag-scene .ag-sw1 { animation: ag-comet 0.302s linear 8.373s none; }
+.is-playing svg.ag-scene .ag-cnt0 { animation: ag-show 0.007s linear 8.741s forwards, ag-hide 0.007s linear 8.801s forwards; }
+.is-playing svg.ag-scene .ag-cnt1 { animation: ag-show 0.007s linear 8.801s forwards, ag-hide 0.007s linear 8.862s forwards; }
+.is-playing svg.ag-scene .ag-cnt2 { animation: ag-show 0.007s linear 8.862s forwards, ag-hide 0.007s linear 8.922s forwards; }
+.is-playing svg.ag-scene .ag-cnt3 { animation: ag-show 0.007s linear 8.922s forwards, ag-hide 0.007s linear 8.982s forwards; }
+.is-playing svg.ag-scene .ag-cnt4 { animation: ag-show 0.007s linear 8.982s forwards, ag-hide 0.007s linear 9.043s forwards; }
+.is-playing svg.ag-scene .ag-found { animation: ag-land 0.201s cubic-bezier(.22,1,.36,1) 9.043s both; }
+.is-playing svg.ag-scene .ag-qd { animation: ag-show 0.101s linear 8.708s both; }
+.is-playing svg.ag-scene .ag-qg circle { animation: ag-show 0.101s linear calc(8.741s + var(--i) * 0.013s) both; }
+.is-playing svg.ag-scene .ag-qg { animation: ag-dimin 0.268s ease 9.88s both; }
+.is-playing svg.ag-scene .ag-g2 { animation: ag-flash 0.603s cubic-bezier(.45,0,.25,1) 9.344s none; }
+.is-playing svg.ag-scene .ag-qs { animation: ag-scan 0.536s linear 9.411s none; }
+.is-playing svg.ag-scene .ag-qo { animation: ag-pop 0.302s cubic-bezier(.22,1,.36,1) 9.78s both; }
+.is-playing svg.ag-scene .ag-qr { animation: ag-rip 0.67s cubic-bezier(.22,1,.36,1) 9.78s none; }
+.is-playing svg.ag-scene .ag-qw { animation: ag-fade 0.201s cubic-bezier(.45,0,.25,1) 9.914s both, ag-hide 0.08s linear 10.851s forwards, ag-show 0.201s linear 11.555s forwards; }   /* (out of the dots' way as they launch) */
+.is-playing svg.ag-scene .ag-replit { animation: ag-show 0.134s linear 11.22s forwards, ag-hide 0.302s linear 13.632s forwards; }
+/* step 3: Reporting writes it up as the dot flies in; the card grows from it; the hand-off, and the human lights */
+.is-playing svg.ag-scene .ag-s2 { animation: ag-wake 0.335s cubic-bezier(.22,1,.36,1) 10.818s both; }
+.is-playing svg.ag-scene .ag-p2 { animation: ag-fade 0.268s cubic-bezier(.45,0,.25,1) 10.818s both; }
+.is-playing svg.ag-scene .ag-c2 { animation: ag-comet 0.402s linear 10.483s none; }
+.is-playing svg.ag-scene .ag-sp-rep { animation: ag-show 0.134s linear 11.153s both, ag-hide 0.168s linear 11.79s forwards, ag-turn .9s linear 11.153s 1; }
+.is-playing svg.ag-scene .ag-fl-rep { animation: ag-flash 0.603s cubic-bezier(.45,0,.25,1) 11.22s none; }
+.is-playing svg.ag-scene .ag-flag { animation: ag-grow 0.335s cubic-bezier(.22,1,.36,1) 11.589s both, ag-antic 0.234s cubic-bezier(.45,0,.25,1) 12.292s none; }
+.is-playing svg.ag-scene .ag-lead { animation: ag-fade 0.201s cubic-bezier(.45,0,.25,1) 11.589s both; }
+.is-playing svg.ag-scene .ag-ln0 { animation: ag-in 0.201s cubic-bezier(.22,1,.36,1) 11.723s both; }
+.is-playing svg.ag-scene .ag-ln1 { animation: ag-in 0.201s cubic-bezier(.22,1,.36,1) 11.823s both; }
+.is-playing svg.ag-scene .ag-he { animation: ag-fade 0.201s cubic-bezier(.45,0,.25,1) 11.957s both, ag-march 0.402s linear 12.426s none; }
+.is-playing svg.ag-scene .ag-anw { animation: ag-show 0.201s linear 11.622s forwards, ag-hide 0.034s linear 12.862s forwards; }   /* (the amber one is already on top, so the person never blinks) */
+.is-playing svg.ag-scene .ag-pk { animation: ag-pk 0.402s cubic-bezier(.45,0,.25,1) 12.426s none; }
+.is-playing svg.ag-scene .ag-ana { animation: ag-show 0.007s linear 12.795s both, ag-spring 0.369s cubic-bezier(.34,1.56,.64,1) 12.795s both; }
+.is-playing svg.ag-scene .ag-halo { animation: ag-halo 0.737s cubic-bezier(.22,1,.36,1) 12.861s none; }
+.is-playing svg.ag-scene .ag-halo2 { animation: ag-halo 0.737s cubic-bezier(.22,1,.36,1) 12.995s none; }
