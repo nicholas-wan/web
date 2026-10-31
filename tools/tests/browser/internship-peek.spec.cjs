@@ -217,14 +217,14 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  for(const s of ['.ag-doc','.ag-none','.ag-pk','.ag-det-dot'])expect(await shown(scene(root).locator(s))).toBe(0);
  for(const o of await scene(root).locator('.ag-fl, .ag-rip').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
  const words=await scene(root).textContent();
- for(const s of ['From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Report','A supervisor splits the hunt among','each given only the tools','and context its one job needs.','Only a human analyst','The first search comes back empty, but',"empty doesn't mean safe. The agent asks",'searches another way.','check query','1 found','Agents surface what looks suspicious,','makes the call.'])expect(words).toContain(s);
+ for(const s of ['Agentic Threat Hunting','From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Report','A supervisor splits the hunt among','each given only the tools','and context its one job needs.','Only a human analyst','The first search comes back empty, but',"empty doesn't mean safe. The agent asks",'searches another way.','check query','1 found','Agents surface what looks suspicious,','makes the call.'])expect(words).toContain(s);
  const label=await scene(root).getAttribute('aria-label');
  expect(label.startsWith('An illustrative hunt.')).toBe(true);
  // The hunter's specifics are in the label, not on the chart.
  for(const s of ['schtasks.exe','event 4698','\\WinTaskUpdate','human analyst'])expect(label).toContain(s);
  // Generic and unquestionable: no real malware, internal component names, product names, counts of hits,
  // a root-level path as the reason, or the card's days-to-hours claim.
- const forbidden=/SysUpdate|Evidence found|SPL crafter|Post-query|Splunk|root-level|days to hours|\bdays\b|\d+ hits|tokens?\b/i;
+ const forbidden=/prime[- ]?th|SysUpdate|Evidence found|SPL crafter|Post-query|Splunk|root-level|days to hours|\bdays\b|\d+ hits|tokens?\b/i;
  expect(words).not.toMatch(forbidden);
  expect(label).not.toMatch(forbidden);
  // The card is wider than the other charts (46rem: three steps side by side) and the drawing fills it.
@@ -252,6 +252,11 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(card(root)).toHaveCSS('position','static');
  await expect(phoneScene(root)).toBeVisible();
  await expect(scene(root)).toBeHidden();
+ // Phones draw the same full pictures, larger, so the drawing uses the width rather than squeezing beside the text.
+ const pb=await phoneScene(root).boundingBox();
+ expect(pb.height).toBeGreaterThan(pb.width*1.8);
+ await expect(phoneScene(root).locator('.ag-tool')).toHaveCount(3);
+ await expect(phoneScene(root).locator('.ag-logo')).toHaveCount(1);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
 });
 test('phone charts stay open while the page scrolls and a finger lands elsewhere; the chip closes them',async({page})=>{

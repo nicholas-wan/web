@@ -727,12 +727,13 @@
 /* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
 .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 246; }
-.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 344; }
+.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 748.1; }
 @media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
 svg.ag-scene text { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
 svg.ag-scene .ag-i { fill: none; stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
 svg.ag-scene .ag-flag .ag-i { stroke-width: inherit; }
-svg.ag-scene .ag-ana .ag-i { stroke-width: .85; }   /* (scaled R/7, so about the other icons' 1.3-1.8) */
+svg.ag-scene .ag-ana .ag-i { stroke-width: .85; }
+svg.ag-scene .ag-logo path { fill: #d8e6e4; }   /* (scaled R/7, so about the other icons' 1.3-1.8) */
 svg.ag-scene .ag-doc .ag-i { stroke-width: .6; }
 svg.ag-scene path, svg.ag-scene .ag-rip, svg.ag-scene .ag-cardo { fill: none; }
 svg.ag-scene .ag-doc path:first-child { fill: #0a191c; }
@@ -798,6 +799,8 @@ svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .a
 /* step 3: the Report agent lights and the lead card writes itself; the lead travels to the human */
 .is-playing svg.ag-scene .ag-s2 { animation: ag-wake 0.5s cubic-bezier(.22,1,.36,1) 12.8s both; }
 .is-playing svg.ag-scene .ag-p2 { animation: ag-fade 0.5s cubic-bezier(.45,0,.25,1) 12.8s both; }
+/* phones: the waiting pictures show faintly with their words, so a tall empty block never looks unloaded */
+.is-playing svg.ag-scene.ag-scene--m .ag-p1, .is-playing svg.ag-scene.ag-scene--m .ag-p2 { animation-name: ag-wake; }
 .is-playing svg.ag-scene .ag-flag { animation: ag-fade 0.4s cubic-bezier(.45,0,.25,1) 13.9s both; }
 .is-playing svg.ag-scene .ag-cardo { animation: ag-draw 0.8s cubic-bezier(.45,0,.25,1) 13.9s both; }
 .is-playing svg.ag-scene .ag-lead { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 14.4s both; }
@@ -810,12 +813,6 @@ svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .a
 .is-playing svg.ag-scene .ag-pk { animation: ag-pk 0.55s cubic-bezier(.45,0,.25,1) 15.5s none; }
 .is-playing svg.ag-scene .ag-ana { animation: ag-pop 0.5s cubic-bezier(.22,1,.36,1) 16s both; }
 .is-playing svg.ag-scene .ag-halo { animation: ag-halo 1.1s cubic-bezier(.22,1,.36,1) 16.4s none; }
-/* phones draw no report glyph and no card lines: the supervisor lights sooner and the hand-off follows the flag */
-.is-playing svg.ag-scene--m .ag-fl-sup { animation: ag-flash 0.7s cubic-bezier(.45,0,.25,1) 0.6s none; }
-.is-playing svg.ag-scene--m .ag-he { animation: ag-fade 0.4s cubic-bezier(.45,0,.25,1) 14.6s both; }
-.is-playing svg.ag-scene--m .ag-pk { animation: ag-pk 0.55s cubic-bezier(.45,0,.25,1) 14.8s none; }
-.is-playing svg.ag-scene--m .ag-ana { animation: ag-pop 0.5s cubic-bezier(.22,1,.36,1) 15.3s both; }
-.is-playing svg.ag-scene--m .ag-halo { animation: ag-halo 1.1s cubic-bezier(.22,1,.36,1) 15.7s none; }
 /* agentic-glance:end */
 
 /* Phone versions of the internship scenes (25 Oct 2026; owner: "do longer
