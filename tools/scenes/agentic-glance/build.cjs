@@ -8,7 +8,7 @@
 //   node tools/scenes/agentic-glance/build.cjs   writes scene-d.svg, scene-m.svg and scene.css here
 //   node tools/scenes/agentic-glance/apply.cjs   puts the peek into experience.html and the CSS into internship-peek.css
 // Step 1, purpose-built agents: a supervisor splits the hunt among narrow agents, each built for one job (the team,
-// each specialist's job labelled, Extractor, Hypothesis and Detection as in the product; the pulse reaches Detection); the first search comes back empty.
+// each specialist's job labelled, Hypothesis, Detection and Report as in the product; the pulse reaches Detection); the first search comes back empty.
 // Step 2, tools to adapt on evidence: the acting agent with its kit; empty doesn't mean safe, so it asks whether
 // its search could have missed it and searches another way (the loop). Step 3, surface to the analyst: agents
 // surface what looks suspicious with the evidence attached (a lead card passed along a line to the human), and a
@@ -49,9 +49,9 @@ const STEPS = [
   { title: 'Surface to the analyst', d: ['Agents surface what looks suspicious,', 'evidence attached. A human analyst', 'makes the call.'],
     m: ['Agents surface what looks suspicious,', 'evidence attached. A human analyst', 'makes the call.'], ev: ['\\WinTaskUpdate', '1 host · not in baseline'] },
 ];
-const JOBS = ['Extractor', 'Hypothesis', 'Detection'];   // the product's own sub-agents (prime-th th-core graph: extractor, hypothesis, detection_logic)
+const JOBS = ['Hypothesis', 'Detection', 'Report'], ON = 1;   // the product's own agents, the three that read best (prime-th th-core: hypothesis, detection_logic, report); Detection searches
 const TOOLS = [['search', 'search'], ['check', 'check query'], ['clock', 'analyse results']];   // the Detection agent's own steps (past hunts is the Hypothesis agent's tool)
-const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each built for one job: extracting the techniques from the report, forming a hypothesis, writing and running the detection logic. The first search, for schtasks.exe, comes back empty. Agents carry tools and skills, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the Detection agent asks whether its search could have missed the threat and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline, with the evidence attached, and a human analyst makes the call.';
+const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each built for one job: forming a hypothesis, writing and running the detection logic, reporting. The first search, for schtasks.exe, comes back empty. Agents carry tools and skills, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the Detection agent asks whether its search could have missed the threat and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline, with the evidence attached, and a human analyst makes the call.';
 
 // a plain agent node: a ring with a dot; the one we follow is solid teal
 const node = (cx, cy, r, on, cls = '') => on
@@ -65,11 +65,12 @@ function picture(i, x, cy, r, rich) {
     const gap = rich ? 52 : r1(r * 2.4), lf = 8.5, drop = r1(r * 3.4);
     const ay = rich ? r1(cy + 16) : r1(cy + r * 1.7), sy = r1(ay - drop), ax = [x + (rich ? 22 : r)]; ax[1] = ax[0] + gap; ax[2] = ax[0] + 2 * gap; const scx = ax[1];
     let p = ax.map(cx => `<path d="M${scx} ${sy + r} C${scx} ${sy + r + 8} ${cx} ${ay - r - 8} ${cx} ${ay - r}" stroke="${C.dim}"/>`).join('');
-    p += `<path class="ag-c ag-c1" d="M${scx} ${sy + r} C${scx} ${sy + r + 8} ${ax[2]} ${ay - r - 8} ${ax[2]} ${ay - r}" pathLength="1" stroke="${C.teal}"/>`;
-    p += node(scx, sy, r, false) + node(ax[0], ay, r, false) + node(ax[1], ay, r, false) + node(ax[2], ay, r, true, 'ag-det');
+    const on = rich ? ON : 2;
+    p += `<path class="ag-c ag-c1" d="M${scx} ${sy + r} C${scx} ${sy + r + 8} ${ax[on]} ${ay - r - 8} ${ax[on]} ${ay - r}" pathLength="1" stroke="${C.teal}"/>`;
+    p += node(scx, sy, r, false) + [0, 1, 2].map(k => node(ax[k], ay, r, k === on, k === on ? 'ag-det' : '')).join('');
     if (rich) {
       p += label(scx, sy - r - 5, lf, 'Supervisor');
-      JOBS.forEach((j, k) => p += `<g class="${k === 2 ? 'ag-job-on' : ''}">${label(ax[k], ay + r + lf + 3, lf, j, 'middle', k === 2 ? C.teal : C.mute)}</g>`);
+      JOBS.forEach((j, k) => p += `<g class="${k === ON ? 'ag-job-on' : ''}">${label(ax[k], ay + r + lf + 3, lf, j, 'middle', k === ON ? C.teal : C.mute)}</g>`);
     }
     return p;
   }
