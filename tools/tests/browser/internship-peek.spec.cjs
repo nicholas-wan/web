@@ -195,7 +195,7 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
  }
 });
 
-test('agentic AI chart: a hover previews it like the internship charts, it plays one ~6 s moment in three plain steps and replays, reduced motion holds the final frame, and phones get the stacked drawing',async({page})=>{
+test('agentic AI chart: a hover previews it like the internship charts, it plays one ~6 s moment in three narrative steps and replays, reduced motion holds the final frame, and phones get the stacked drawing',async({page})=>{
  const scene=root=>card(root).locator('svg.ag-scene:not(.ag-scene--m)');
  const phoneScene=root=>card(root).locator('svg.ag-scene--m');
  const shown=loc=>loc.evaluate(e=>+getComputedStyle(e).opacity);
@@ -212,9 +212,9 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(scene(root)).toBeVisible();
  await expect(phoneScene(root)).toBeHidden();
  // Reduced motion holds the final frame: all three steps, the human and the evidence shown.
- for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-ev2'])expect(await shown(scene(root).locator(s))).toBe(1);
+ for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-evr2'])expect(await shown(scene(root).locator(s))).toBe(1);
  const words=await scene(root).textContent();
- for(const s of ['Scheduled Task','Search','Re-plan','Hand off','AI agents turn the report into searches.','The first comes back empty.',"Empty doesn't mean safe.",'then tries another way.','One unusual task on one computer.','A human analyst makes the call.','process = schtasks.exe','0 results','event 4698','a task being created','\\WinTaskUpdate','1 host · not in baseline'])expect(words).toContain(s);
+ for(const s of ['How one hunt ran','Purpose-built agents','Tools to adapt on evidence','Surface to the analyst','Supervisor','Hypothesis','Past hunts','Search','A supervisor splits the hunt among','The first search comes back empty.',"Empty doesn't mean safe, so the agent",'searches another way.','Agents surface what looks suspicious,','makes the call.','EVIDENCE','process = schtasks.exe','0 results','event 4698','a task being created','\WinTaskUpdate','1 host · not in baseline'])expect(words).toContain(s);
  const label=await scene(root).getAttribute('aria-label');
  expect(label.startsWith('An illustrative hunt.')).toBe(true);
  // Generic and unquestionable: no real malware, internal component names, product names, counts of hits,
