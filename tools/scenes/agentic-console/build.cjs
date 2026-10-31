@@ -5,7 +5,8 @@
 // peek.cjs reads its beat times from the markup and CSS written here, so rerun both after changing the timeline.
 // Strings were revised 27 Oct 2026 ("only expected entries", "Inconclusive, so it re-plans", a vendor-neutral
 // pseudo-query) and 31 Oct 2026 after a threat-hunter review: a root-level path alone is not suspicious (many
-// updaters live there), event 4698 needs its audit policy on, and stacking should surface the rare tail.
+// updaters live there), event 4698 needs its audit policy on, and stacking should surface the rare tail. A content
+// review the same day made the checked query count hosts per task, which is what its evidence rows show.
 // Story timing, strings and the timeline are below; base.css holds the static (final-frame) styles.
 // Base: the caption-led console (one caption, one focal point per beat). From the annotation-led one: the end
 // is split in two (7a the flag and its evidence; 7b the graph steps back, a bead travels, the Analyst lights
@@ -176,7 +177,7 @@ function card(e) {
     return `<div class="c2-card c2-card--reason"><span class="c2-row"><span class="c2-tag">Reason</span><b class="c2-who">${a.name}</b>${e.replan ? `<span class="c2-replan">${svgI('loop')}re-plan</span>` : ''}<span class="c2-txt"><span class="c2-wipe">${esc(e.text)}</span></span></span></div>`;
   }
   const icon = `<svg class="c2-si" viewBox="0 0 12 12" aria-hidden="true"><circle class="c2-spin" cx="6" cy="6" r="4.4" pathLength="1"/><path class="c2-tick" d="M3.2 6.3l1.9 1.9 3.7-4" pathLength="1"/></svg>`;
-  const code = e.code ? `<span class="c2-code"><span class="c2-cl c2-cl1"><b>event_id</b> = 4698</span><span class="c2-cl c2-cl2">| <b>count by</b> task_name, host | <b>sort</b> count</span></span>` : '';
+  const code = e.code ? `<span class="c2-code"><span class="c2-cl c2-cl1"><b>event_id</b> = 4698</span><span class="c2-cl c2-cl2">| <b>count distinct</b> host <b>by</b> task_name | <b>sort</b> count</span></span>` : '';
   const flag = e.flag ? `<span class="c2-flag">${svgI('flag')}Flagged</span>` : '';
   const sub = e.sub ? `<span class="c2-sub"><span class="c2-wipe">${esc(e.sub)}</span></span>` : '';
   const evid = e.flag ? `<span class="c2-ev"><span class="c2-evr c2-evr1"><span class="c2-mono c2-path"><span class="c2-pdir">\\Microsoft\\Windows\\Chkdsk\\</span><span class="c2-leaf">ProactiveScan</span></span><span class="c2-evn">built-in</span></span><span class="c2-evr c2-evr2"><span class="c2-mono c2-task">\\WinTaskUpdate</span><span class="c2-evn c2-evn--amb">1 host · not in baseline</span></span></span>` : '';

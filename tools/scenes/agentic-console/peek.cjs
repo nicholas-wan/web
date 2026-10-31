@@ -37,7 +37,7 @@ const SCENES = [
   + `<p class="hsk-note hsk-a" style="--t:3.6s">Tasks made through the Task Scheduler API never launch schtasks.exe.</p>`
   + `<p class="hsk-src"><span class="hsk-a" style="--t:5.2s">Re-plan: event 4698 · a task was created</span><b class="hsk-a" style="--t:7.5s">${tick}Query checked against this telemetry</b></p>`,
   // 3 hand off (~6 s and the end): the rare task stands out, with its evidence and the next step
-  top('Hands it to an analyst, with the evidence', 'Analysts receive the evidence and a concrete next investigation.')
+  top('Hands it to an analyst, with the evidence', 'Agents raise leads, not verdicts; an analyst decides what it is.')
   + `<ul class="hsk-bars"><li><span>\\Microsoft\\…\\ProactiveScan</span><i ${a(0.4, 'gr')}></i><b>in baseline</b></li>`
   + `<li><span>\\Microsoft\\…\\ScheduledDefrag</span><i ${a(0.6, 'gr')}></i><b>in baseline</b></li>`
   + `<li class="is-lead"><span>\\WinTaskUpdate</span><i ${a(0.8, 'gr')}></i><b>1 host</b></li></ul>`

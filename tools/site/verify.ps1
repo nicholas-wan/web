@@ -872,7 +872,7 @@ if (-not $agenticPeek -or $agenticCard -notmatch 'class="internship-demo-hint"' 
 if ($agenticPeek -notmatch ('data-script="' + [regex]::Escape((Get-DistAssetRef 'assets/js/agentic-peek.js')) + '"') -or $experience -match '<script\b[^>]*\bsrc="assets/js/agentic-peek\.js') { throw "agentic-peek.js must load on demand from the peek's versioned data-script, never as a static <script src>." }
 if ($experience -match 'hs-story|data-hs-script|hunt-story\.js' -or (Test-Path -LiteralPath (Join-Path $dist 'assets\js\hunt-story.js'))) { throw "The retired Agentic AI scroll story (or hunt-story.js) is still on the Work page or in dist." }
 # Three beats, each with one headline (pacing and portfolio reviews, 31 Oct 2026).
-foreach ($peekLine in @('Plan the hunt', 'Catch a blind spot', 'Hand off to an analyst', 'From a report to a hypothesis it can test', 'Zero results is a blind spot, not a negative', 'Hands it to an analyst, with the evidence', 'Analysts receive the evidence and a concrete next investigation.')) {
+foreach ($peekLine in @('Plan the hunt', 'Catch a blind spot', 'Hand off to an analyst', 'From a report to a hypothesis it can test', 'Zero results is a blind spot, not a negative', 'Hands it to an analyst, with the evidence', 'Agents raise leads, not verdicts; an analyst decides what it is.')) {
     if (-not $agenticPeek.Contains($peekLine)) { throw "The agentic peek is missing its line: $peekLine" }
 }
 # Generic and unquestionable (accuracy and disclosure reviews, Oct 2026): no SIEM vendor syntax, no real
