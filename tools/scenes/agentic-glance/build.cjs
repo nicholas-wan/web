@@ -14,7 +14,7 @@
 // surface what looks suspicious with the evidence attached (a lead card passed along a line to the human), and a
 // human analyst makes the call. The hunter's evidence sits under each step in small type (schtasks.exe and
 // 0 results; event 4698, a task being created; \WinTaskUpdate on 1 host, not in the baseline).
-// Two SVGs sharing one stylesheet: desktop 640x274, the steps as columns in a 46rem card, the three pictures on one
+// Two SVGs sharing one stylesheet: desktop 640x296, the steps as columns in a 46rem card, the three pictures on one
 // optical centreline; phones 360x470, the steps stacked with smaller pictures. Base styles are the final frame,
 // motion runs only under .is-playing, .is-still holds the final frame. About 6 s, then internship-peek.js replays
 // it every 10 s like the others. The finish comes from rounds of independent design reviews and blind reads (a
@@ -62,8 +62,8 @@ const label = (x, y, f, t, anchor = 'middle', col = C.mute) => `<text x="${x}" y
 function picture(i, x, cy, r, rich) {
   if (i === 0) {
     // the team: a supervisor over three narrow agents, each labelled with its job; the one that searches lights
-    const gap = rich ? 52 : r1(r * 2.4), lf = 8.5, drop = r1(r * 3.4);
-    const ay = rich ? r1(cy + 16) : r1(cy + r * 1.7), sy = r1(ay - drop), ax = [x + (rich ? 22 : r)]; ax[1] = ax[0] + gap; ax[2] = ax[0] + 2 * gap; const scx = ax[1];
+    const gap = rich ? 60 : r1(r * 2.4), lf = rich ? 9.5 : 8.5, drop = r1(r * 3.4);
+    const ay = rich ? r1(cy + 22) : r1(cy + r * 1.7), sy = r1(ay - drop), ax = [x + (rich ? 26 : r)]; ax[1] = ax[0] + gap; ax[2] = ax[0] + 2 * gap; const scx = ax[1];
     let p = ax.map(cx => `<path d="M${scx} ${sy + r} C${scx} ${sy + r + 8} ${cx} ${ay - r - 8} ${cx} ${ay - r}" stroke="${C.dim}"/>`).join('');
     const on = rich ? ON : 2;
     p += `<path class="ag-c ag-c1" d="M${scx} ${sy + r} C${scx} ${sy + r + 8} ${ax[on]} ${ay - r - 8} ${ax[on]} ${ay - r}" pathLength="1" stroke="${C.teal}"/>`;
@@ -81,12 +81,12 @@ function picture(i, x, cy, r, rich) {
       `<path class="ag-loop" d="M${r1(cx + lr * .5)} ${r1(cy - lr * .87)} A${lr} ${lr} 0 1 1 ${r1(cx - lr * .95)} ${r1(cy - lr * .3)}" pathLength="1" stroke="${C.teal}" stroke-width="1.6"/>` +
       `<path class="ag-lh" d="M${r1(cx - lr * .95 - 5)} ${r1(cy - lr * .3 - 6)} L${r1(cx - lr * .95 + 1)} ${r1(cy - lr * .3 + 1)} L${r1(cx - lr * .95 + 6.5)} ${r1(cy - lr * .3 - 3.5)} Z" fill="${C.teal}" stroke="${C.teal}" stroke-width="1"/>`;
     if (rich) {
-      const tx = cx + lr + 12, th = 15, tw = 70, ty0 = cy - th * 1.5 - 5;
+      const tx = cx + lr + 12, th = 18, tw = 84, ty0 = cy - th * 1.5 - 6;
       TOOLS.forEach(([ic, name], k) => {
-        const ty = r1(ty0 + k * (th + 5));
+        const ty = r1(ty0 + k * (th + 6));
         p += `<g class="ag-tool ag-tool${k}"><path d="M${cx + r} ${cy} C${cx + r + 9} ${cy} ${tx - 9} ${ty + th / 2} ${tx} ${ty + th / 2}" stroke="${C.line}"/>` +
-          `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="4" fill="${C.chip}" stroke="${C.line}"/>${icon(ic, tx + 5, ty + 1.5, 1, C.teal)}` +
-          `<text x="${tx + 20}" y="${ty + 10.5}" font-size="8.5" fill="${C.body}">${name}</text></g>`;
+          `<rect x="${tx}" y="${ty}" width="${tw}" height="${th}" rx="4" fill="${C.chip}" stroke="${C.line}"/>${icon(ic, tx + 6, ty + 3, 1, C.teal)}` +
+          `<text x="${tx + 22}" y="${ty + 12.5}" font-size="10" fill="${C.body}">${name}</text></g>`;
       });
     }
     return p;
@@ -98,10 +98,10 @@ function picture(i, x, cy, r, rich) {
     return `<g class="ag-flag" stroke-width="${r1(1.3 / fs)}">${icon('flag', fx, r1(cy - 6.2 * fs), fs, C.teal)}</g><path class="ag-he" d="M${lx0} ${cy} H${lx1}" stroke="${C.teal}" stroke-width="1.3" stroke-dasharray="4 3" stroke-linecap="round"/>` +
       `<g class="ag-ana"><circle cx="${cx}" cy="${cy}" r="${R}" fill="${C.node}" stroke="${C.amb}" stroke-width="1.3"/>${icon('ana', r1(cx - 6 * R / 7), r1(cy - 6 * R / 7), r1(R / 7), C.amb)}</g>`;
   }
-  const cw = 78, ch = 46, cx0 = x + 2, cy0 = cy - ch / 2, lx0 = cx0 + cw + 6, lx1 = lx0 + 30, cx = lx1 + 5 + R;
+  const cw = 96, ch = 56, cx0 = x + 2, cy0 = cy - ch / 2, lx0 = cx0 + cw + 6, lx1 = lx0 + 30, cx = lx1 + 5 + R;
   return `<g class="ag-flag"><rect x="${cx0}" y="${cy0}" width="${cw}" height="${ch}" rx="5" fill="${C.chip}" stroke="${C.teal}" stroke-opacity=".7"/>` +
-    `${icon('flag', cx0 + 6, cy0 + 5, 1.2, C.teal)}<text x="${cx0 + 23}" y="${cy0 + 15.5}" font-size="8.5" font-weight="700" fill="${C.ink}">1 lead</text>` +
-    `<path d="M${cx0 + 7} ${cy0 + 26} H${cx0 + 60}M${cx0 + 7} ${cy0 + 32} H${cx0 + 46}M${cx0 + 7} ${cy0 + 38} H${cx0 + 54}" stroke="${C.dim}" stroke-width="1.8" stroke-linecap="round"/></g>` +
+    `${icon('flag', cx0 + 8, cy0 + 7, 1.4, C.teal)}<text x="${cx0 + 28}" y="${cy0 + 19}" font-size="10" font-weight="700" fill="${C.ink}">1 lead</text>` +
+    `<path d="M${cx0 + 9} ${cy0 + 32} H${cx0 + 74}M${cx0 + 9} ${cy0 + 39} H${cx0 + 56}M${cx0 + 9} ${cy0 + 46} H${cx0 + 66}" stroke="${C.dim}" stroke-width="2" stroke-linecap="round"/></g>` +
     `<path class="ag-he" d="M${lx0} ${cy} H${lx1}" stroke="${C.teal}" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round"/>` +
     `<g class="ag-ana"><circle cx="${cx}" cy="${cy}" r="${R}" fill="${C.node}" stroke="${C.amb}" stroke-width="1.3"/>${icon('ana', r1(cx - 6 * R / 7), r1(cy - 6 * R / 7), r1(R / 7), C.amb)}</g>`;
 }
@@ -120,11 +120,11 @@ const open = (cls, w, h) => `<svg class="${cls}" xmlns="http://www.w3.org/2000/s
 
 // desktop: three columns, read left to right; pictures left-aligned with their headings, on one centreline
 function desktop() {
-  const W = 640, H = 274, col = 200, x0 = 16, gap = 8, pcy = 88, titleY = 156, bodyY = 175, lh = 15.5, f = { head: 11.5, hid: 9.5, title: 12.5, body: 10.3, ev: 9 };
+  const W = 640, H = 296, col = 200, x0 = 16, gap = 8, pcy = 100, titleY = 178, bodyY = 197, lh = 15.5, f = { head: 11.5, hid: 9.5, title: 12.5, body: 10.3, ev: 9 };
   const s = [open('ag-scene', W, H), header(W, 23, f.head, f.hid)];
   STEPS.forEach((st, i) => {
     const x = x0 + i * (col + gap);
-    s.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}">${picture(i, x + 2, pcy, 10, true)}</g>${title(i, x, titleY, f.title)}${body(st.d, x, bodyY, lh, f.body)}${evidence(i, x, r1(bodyY + 3 * lh + 5), f.ev)}</g>`);
+    s.push(`<g class="ag-s ag-s${i}"><g class="ag-p ag-p${i}">${picture(i, x + 2, pcy, 13, true)}</g>${title(i, x, titleY, f.title)}${body(st.d, x, bodyY, lh, f.body)}${evidence(i, x, r1(bodyY + 3 * lh + 5), f.ev)}</g>`);
     if (i < 2) s.push(`<path class="ag-chev" d="M${x + col - 9} ${pcy - 5} l4 5 -4 5" stroke="${C.mute}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>`);
   });
   return s.join('') + '</svg>';
@@ -148,7 +148,7 @@ const OUT_EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)';
 const P = '.is-playing svg.ag-scene';
 const css = `/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
-.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 274; }
+.internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 296; }
 .internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 470; }
 @media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
 svg.ag-scene text { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
