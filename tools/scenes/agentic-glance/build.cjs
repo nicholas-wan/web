@@ -248,17 +248,19 @@ const T = {
 const OUT_EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)';
 const P = '.is-playing svg.ag-scene', PH = phone();
 // PACE scales the whole timeline at once, keeping its rhythm (owner, 31 Oct 2026: "make the animation faster", then,
-// once the queries were written out, "maybe animation can speed up more even slightly": about 12.7 s)
-const PACE = 0.63, k = v => +(v * PACE).toFixed(3);
-const a = ([d, s], name, ez = IO, fill = 'both') => `${name} ${k(s)}s ${ez} ${k(d)}s ${fill}`;
+// once the queries were written out, "maybe animation can speed up more even slightly", then "i think its too fast now":
+// about 13.5 s). LEAD holds the opened card still for a beat before anything moves ("slightly longer delay before it
+// starts"), on every replay too; it is in played seconds, outside PACE.
+const PACE = 0.67, LEAD = 0.5, k = v => +(v * PACE).toFixed(3), kd = v => +(LEAD + v * PACE).toFixed(3);
+const a = ([d, s], name, ez = IO, fill = 'both') => `${name} ${k(s)}s ${ez} ${kd(d)}s ${fill}`;
 const at = (t, name, ez, fill) => `animation: ${a(t, name, ez, fill)};`;
 // a window on a transient mark: shown from one moment, hidden at another (several animations, one element)
 const show = t => a(t, 'ag-show', 'linear'), hide = t => a(t, 'ag-hide', 'linear', 'forwards');
 // shown at once for a span, then gone: a label swapped in, a count held
 const held = ([d, s]) => `${a([d, .12], 'ag-show', 'linear', 'forwards')}, ${hide([d + s - .15, .15])}`;
 // a spinner: in, turning at one rate (0.9 s a turn, whatever PACE), out
-const spinning = ([d, s]) => `animation: ${show([d, .2])}, ${hide([d + s - .25, .25])}, ag-turn .9s linear ${k(d)}s ${Math.ceil(k(s) / .9)};`;
-const ends = Object.values(T).flatMap(v => Array.isArray(v[0]) ? v : [v]).map(([d, s]) => k(d + s));
+const spinning = ([d, s]) => `animation: ${show([d, .2])}, ${hide([d + s - .25, .25])}, ag-turn .9s linear ${kd(d)}s ${Math.ceil(k(s) / .9)};`;
+const ends = Object.values(T).flatMap(v => Array.isArray(v[0]) ? v : [v]).map(([d, s]) => kd(d + s));
 const css = `/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
 .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 246; }
