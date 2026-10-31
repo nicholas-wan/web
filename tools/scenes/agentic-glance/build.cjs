@@ -16,7 +16,10 @@
 // review points): the Report agent back in step 1 lights, the lead card writes itself, and the lead travels
 // along the line to the amber human, who makes the call. Report agent last, as in the product (prime-th th-core).
 // The hunter's specifics (schtasks.exe and nothing found; event 4698; \WinTaskUpdate on 1 host, not in the baseline)
-// live in the aria-label only (owner: an evidence tier under each step "doesnt add value").
+// live in the aria-label, not in the final frame (owner: an evidence tier under each step "doesnt add value"). While
+// it plays, the motion shows what an agent and a query look like (owner, 31 Oct 2026: "more detailed / slick - how
+// does an agent, query, look like"): each agent spins while it works, and the Detection agent writes its two queries
+// out under its kit, generic rather than any SIEM's syntax, then folds them into the analysis; none of it stays.
 // Two SVGs sharing one stylesheet: desktop 640x246, the steps as columns in a 46rem card, the three pictures on one
 // optical centreline; phones 360 wide, the steps stacked, each with the same picture drawn 1.4x above its words.
 // Base styles are the final frame, motion runs only under .is-playing, .is-still holds the final frame; anything
@@ -56,6 +59,9 @@ const STEPS = [
 const JOBS = ['Hypothesis', 'Detection', 'Reporting'], HYP = 0, ON = 1, REP = 2;   // the product's own agents, the three that read best (prime-th th-core: hypothesis, detection_logic, report); Detection searches
 const LOOP_END = 200;   // degrees, clockwise from the right: where the loop's arc ends and its arrowhead points up
 const TOOLS = [['search', 'search'], ['check', 'check query'], ['bars', 'analyse results']];   // the Detection agent's own steps (past hunts is the Hypothesis agent's tool)
+// the two searches the agent writes, in no SIEM's syntax (the verifier's rule): the tool the obvious hunt looks for,
+// then the event a task's creation logs whichever tool made it; MONO is a character's width at 9px, fixed by textLength
+const QUERIES = [['process', 'schtasks.exe'], ['event', 'task created']], MONO = 5.4;
 const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each given only the tools and context its one job needs, because a local model does best with one job: forming a hypothesis, writing and running the detection logic, reporting. Agents carry tools and skills. The Detection agent\'s first search, for schtasks.exe, comes back empty, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the agent asks whether its search could have missed the threat, checks a new query and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline. The Reporting agent writes it up with the evidence attached, and only a human analyst makes the call.';
 
 // a plain agent node: a ring with a dot; the one we follow is solid teal
@@ -63,8 +69,11 @@ const node = (cx, cy, r, on, cls = '') => on
   ? `<circle class="${cls} ag-nd" cx="${cx}" cy="${cy}" r="${r}" fill="${C.teal}" stroke="${C.teal}"/>`
   : `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${C.node}" stroke="${C.dim}"/><circle cx="${cx}" cy="${cy}" r="${r1(r * .3)}" fill="${C.dim}"/>`;
 // transient marks, invisible in the final frame: a node lighting up for a moment, a search rippling out
-const flash = (cls, cx, cy, r) => `<circle class="ag-fl ${cls}" cx="${cx}" cy="${cy}" r="${r}" fill="${C.teal}" fill-opacity=".22" stroke="${C.teal}" stroke-width="1.6"/>`;
+const flash = (cls, cx, cy, r) => `<circle class="ag-fl ${cls}" cx="${cx}" cy="${cy}" r="${r}" fill="${C.teal}" fill-opacity=".22" stroke="${C.teal}" stroke-width="1.2"/>`;
 const ripple = (cls, cx, cy, r, col = C.teal) => `<circle class="ag-rip ${cls}" cx="${cx}" cy="${cy}" r="${r}" stroke="${col}" stroke-width="1.4"/>`;
+// an agent at work: a short arc turning round it, the spinner agent products show while a model thinks (Prophet's
+// "analyzing", a chat's tool call in flight)
+const spin = (cls, cx, cy, r) => `<circle class="ag-spin ${cls}" cx="${cx}" cy="${cy}" r="${r}" pathLength="1" fill="none" stroke="${C.teal}" stroke-width="1.6"/>`;
 const label = (x, y, f, t, anchor = 'middle', col = C.mute, cls = '') => `<text${cls ? ` class="${cls}"` : ''} x="${x}" y="${y}" text-anchor="${anchor}" font-size="${f}" fill="${col}">${esc(t)}</text>`;
 // the pictures, left-aligned at x and centred on cy, drawn at a size r (phones draw the same ones, scaled up)
 function picture(i, x, cy, r) {
@@ -80,7 +89,8 @@ function picture(i, x, cy, r) {
       `<path class="ag-c ag-c2" d="${wire(ax[rep])}" pathLength="1" stroke="${C.teal}"/>`;
     p += ripple('ag-rip-det', ax[on], ay, r) + node(scx, sy, r, false) + [0, 1, 2].map(k => node(ax[k], ay, r, k === on, k === on ? 'ag-det' : '')).join('') +
       `<circle class="ag-det-dot" cx="${ax[on]}" cy="${ay}" r="${r1(r * .3)}" fill="${C.dim}"/>`;   // until it lights, Detection looks like the others
-    p += flash('ag-fl-sup', scx, sy, r) + flash('ag-fl-hyp', ax[HYP], ay, r) + flash('ag-fl-rep', ax[rep], ay, r);
+    p += flash('ag-fl-sup', scx, sy, r) + flash('ag-fl-hyp', ax[HYP], ay, r) + flash('ag-fl-rep', ax[rep], ay, r) +
+      spin('ag-sp-sup', scx, sy, r + 4) + spin('ag-sp-hyp', ax[HYP], ay, r + 4) + spin('ag-sp-rep', ax[rep], ay, r + 4);
     // the threat report itself, labelled, left of the supervisor, before it slides in
     p += `<g class="ag-doc">${icon('rep', r1(scx - 70), r1(sy - 23), 2, C.ink)}${label(scx - 58, r1(sy + 12), 9, 'Threat report')}</g>`;   // the label under the page, so it never reads on one line with Supervisor
     p += label(scx, sy - r - 5, lf, 'Supervisor');
@@ -104,7 +114,7 @@ function picture(i, x, cy, r) {
     const wing = sgn => `${r1(tip[0] + 6 * Math.cos(back + sgn * .7))} ${r1(tip[1] + 6 * Math.sin(back + sgn * .7))}`;
     const head = `M${wing(1)} L${r1(tip[0])} ${r1(tip[1])} L${wing(-1)}`;
     let p = ripple('ag-rip0', cx, cy, r) + ripple('ag-rip1', cx, cy, r) + ripple('ag-rip2', cx, cy, r) + ripple('ag-rip3', cx, cy, r) +
-      flash('ag-fl-arr', cx, cy, r + 4) + node(cx, cy, r, true) +
+      flash('ag-fl-arr', cx, cy, r + 4) + node(cx, cy, r, true) + spin('ag-sp-det', cx, cy, r + 5) +
       `<path class="ag-loop" d="M${pt(-60)} A${lr} ${lr} 0 1 1 ${pt(LOOP_END)}" pathLength="1" stroke="${C.teal}" stroke-width="1.5"/>` +
       `<path class="ag-lh" d="${head}" stroke="${C.teal}" stroke-width="1.5"/>`;
     {
@@ -122,6 +132,30 @@ function picture(i, x, cy, r) {
           `<text class="ag-found" x="${tx + tw - 7}" y="${ty + 12.5}" text-anchor="end" font-size="9.5" font-weight="700" fill="${C.teal}">1 found</text>`;
         p += '</g>';
       });
+    }
+    // the query itself, under the kit while the agent works, the way agent products open the tool call in flight and
+    // fold it away once it's done: a line of code streams in a few characters at a time behind a caret; after the
+    // empty search it is selected and rewritten; then it gives way to the analysis, every result a grey dot and the
+    // one that fits no baseline teal. All of it is transient, so the final frame keeps its plain glance
+    {
+      const sx = x + 3, qy = r1(cy + 39), qw = 162, qh = 14, tx0 = sx + 15, base = r1(qy + 9.9);   // sx: the loop's left edge
+      p += `<g class="ag-q"><rect x="${sx}" y="${qy}" width="${qw}" height="${qh}" rx="4" fill="${C.chip}" stroke="${C.rule}"/>`;
+      QUERIES.forEach(([f, v], k) => {
+        const len = r1((f.length + v.length + 5) * MONO);
+        p += `<g class="ag-q${k}">` + (k === 0 ? `<rect class="ag-qsel" x="${tx0 - 1.5}" y="${qy + 2.5}" width="${r1(len + 3)}" height="${qh - 5}" rx="2" fill="${C.teal}" fill-opacity=".28"/>` : '') +
+          `<text x="${sx + 6}" y="${base}" font-size="10" font-weight="700" fill="${C.teal}">&#8250;</text>` +
+          `<text class="ag-qt" x="${tx0}" y="${base}" font-size="9" textLength="${len}" lengthAdjust="spacing"><tspan fill="${C.body}">${f}</tspan><tspan fill="${C.dim}"> = </tspan><tspan fill="${C.teal}">"${esc(v)}"</tspan></text>` +
+          `<rect class="ag-qc" x="${tx0 - .5}" y="${qy + 1.5}" width="${r1(len + 2)}" height="${qh - 3}" fill="${C.chip}"/>` +
+          `<rect class="ag-qk" x="${tx0}" y="${qy + 3}" width="1.2" height="${qh - 6}" fill="${C.teal}" style="--w:${len}px"/></g>`;
+      });
+      // the analysis: the results as an even grid of grey dots, a scan passing over them, and the one result that
+      // fits no baseline set apart in teal with its word
+      let d = ''; const gx = sx + 8, gs = 6.4, gw = 15 * gs, OUT = 26;   // OUT: the unusual one, 11th along the second row
+      for (let j = 0; j < 32; j++) if (j !== OUT) d += `<circle cx="${r1(gx + (j % 16) * gs)}" cy="${r1(qy + 4.5 + (j >> 4) * 5)}" r="1.6" fill="${C.dim}"/>`;
+      const ox = r1(gx + (OUT % 16) * gs), oy = r1(qy + 9.5);
+      p += `<g class="ag-qd">${d}<rect class="ag-qs" x="${gx - 3}" y="${qy + 2}" width="2" height="${qh - 4}" rx="1" fill="${C.teal}" style="--w:${gw + 6}px"/>` +
+        `<circle cx="${ox}" cy="${oy}" r="1.6" fill="${C.dim}"/>${ripple('ag-qr', ox, oy, 3)}<circle class="ag-qo" cx="${ox}" cy="${oy}" r="2.4" fill="${C.teal}"/>` +
+        `<text class="ag-qw" x="${r1(gx + gw + 9)}" y="${base}" font-size="9" font-weight="600" fill="${C.teal}">1 unusual</text></g></g>`;
     }
     return p;
   }
@@ -176,7 +210,7 @@ function desktop() {
 // words, so nothing is squeezed (owner, 31 Oct 2026: "on mobile, you can take up more space for the animations. dont
 // need to squeeze"), each centred on the card ("not centered on mobile"); EXT and EXTX are each picture's reach
 // above and below its centreline and left and right of its origin, in the picture's own units
-const PS = 1.4, EXT = [[48, 50], [34, 34], [29, 29]], EXTX = [[-5, 159], [-1, 163.5], [-2, 187.3]];
+const PS = 1.4, EXT = [[48, 50], [34, 57], [29, 29]], EXTX = [[-5, 159], [-1, 163.5], [-2, 187.3]];
 function phone() {
   const W = 360, x = 14, lh = 18.5, f = { head: 13, hid: 11, title: 14.5, body: 13.4 };
   const parts = []; let y = 64;
@@ -197,20 +231,33 @@ function phone() {
 // lands with a ripple. Step 2: the kit, a search that finds none (held, the hinge of the story), the loop and the
 // checked query, a second search that finds one, the analysis. Step 3: the Report agent lights, the lead card writes
 // itself, then travels to the human.
+// Each agent spins while it works (the supervisor reading the report, Hypothesis, Detection writing its query,
+// Reporting), and the query is written out under the kit before each search runs (q0, q1), selected and replaced in
+// between (sel, q0out), and folds into the analysis dots (qd) once the second search finds one.
 const T = {
-  s0: [0.2, .5], doc: [0.2, 2.0], sup: [2.0, .7], c0: [2.3, .7], hyp: [2.8, 1.0], c0r: [3.5, .6], c1: [4.0, .7], det: [4.6, .45], ripdet: [4.6, 1.0], chev0: [5.4, .9],
+  s0: [0.2, .5], doc: [0.2, 2.0], sup: [2.0, .7], spsup: [1.9, 1.0], c0: [2.3, .7], hyp: [2.8, 1.0], sphyp: [2.8, 1.0], c0r: [3.5, .6], c1: [4.0, .7], det: [4.6, .45], ripdet: [4.6, 1.0], chev0: [5.4, .9],
   s1: [5.7, .5], arr: [5.9, .9], tool: [[6.2, .35], [6.45, .35], [6.7, .35]],
-  g0a: [7.2, 1.3], rip0: [7.3, 1.1], rip1: [7.6, 1.1], none: [8.2, 4.2],
-  loop: [9.4, 1.0], rw: [9.4, 1.3], g1: [9.8, 1.2], lh: [10.3, .25], tick: [10.7, .5],
-  g0b: [11.5, 1.3], rip2: [11.6, 1.1], rip3: [11.9, 1.1], found: [12.4, .45], g2: [12.8, .9], chev1: [13.5, .9],
-  s2: [13.9, .5], c2: [14.0, .6], rep: [14.5, .8], cardf: [15.0, .4], cardo: [15.0, .8], lead: [15.5, .35], ln: [[15.7, .35], [15.9, .35]],
-  he: [16.4, .4], pk: [16.6, .55], ana: [17.1, .5], halo: [17.5, 1.1],
+  spdet: [6.8, 3.2], q: [6.9, .3], q0: [7.1, .8], k0: [8.0, .15],
+  g0a: [8.0, 1.3], rip0: [8.1, 1.1], rip1: [8.4, 1.1], none: [8.9, 1.1],
+  loop: [10.0, 1.0], lh: [10.9, .25], rw: [10.1, 1.5], sel: [10.2, .15], q0out: [10.8, .15], q1: [10.9, .8], k1: [11.9, .15], g1: [11.5, 1.0], tick: [11.7, .5],
+  g0b: [12.4, 1.3], rip2: [12.5, 1.1], rip3: [12.8, 1.1], found: [13.3, .45],
+  q1out: [13.8, .15], g2: [13.8, .9], qd: [14.0, .2], qs: [14.1, .8], qo: [14.65, .45], qr: [14.65, 1.0], qw: [14.85, .3], chev1: [14.7, .9], qout: [16.4, .4],
+  s2: [15.1, .5], c2: [15.2, .6], rep: [15.7, .8], sprep: [15.6, 1.1], cardf: [16.2, .4], cardo: [16.2, .8], lead: [16.7, .35], ln: [[16.9, .3], [17.1, .3]],
+  he: [17.9, .4], pk: [18.1, .55], ana: [18.6, .5], halo: [19.0, 1.1],
 };
 const OUT_EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)';
 const P = '.is-playing svg.ag-scene', PH = phone();
-// PACE scales the whole timeline at once, keeping its rhythm (owner, 31 Oct 2026: "make the animation faster")
-const PACE = 0.75, k = v => +(v * PACE).toFixed(3);
-const at = ([d, s], name, ez = IO, fill = 'both') => `animation: ${name} ${k(s)}s ${ez} ${k(d)}s ${fill};`;
+// PACE scales the whole timeline at once, keeping its rhythm (owner, 31 Oct 2026: "make the animation faster"; 0.7
+// since the queries were written out, so it still plays in about 14 s)
+const PACE = 0.7, k = v => +(v * PACE).toFixed(3);
+const a = ([d, s], name, ez = IO, fill = 'both') => `${name} ${k(s)}s ${ez} ${k(d)}s ${fill}`;
+const at = (t, name, ez, fill) => `animation: ${a(t, name, ez, fill)};`;
+// a window on a transient mark: shown from one moment, hidden at another (several animations, one element)
+const show = t => a(t, 'ag-show', 'linear'), hide = t => a(t, 'ag-hide', 'linear', 'forwards');
+// shown at once for a span, then gone: a label swapped in, a count held
+const held = ([d, s]) => `${a([d, .12], 'ag-show', 'linear', 'forwards')}, ${hide([d + s - .15, .15])}`;
+// a spinner: in, turning at one rate (0.9 s a turn, whatever PACE), out
+const spinning = ([d, s]) => `animation: ${show([d, .2])}, ${hide([d + s - .25, .25])}, ag-turn .9s linear ${k(d)}s ${Math.ceil(k(s) / .9)};`;
 const ends = Object.values(T).flatMap(v => Array.isArray(v[0]) ? v : [v]).map(([d, s]) => k(d + s));
 const css = `/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
@@ -233,6 +280,11 @@ svg.ag-scene .ag-rip, svg.ag-scene .ag-found, svg.ag-scene .ag-doc { transform-b
 svg.ag-scene .ag-rip { vector-effect: non-scaling-stroke; }
 /* transient marks: hidden in the final frame, shown only while they play */
 svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .ag-none, svg.ag-scene .ag-rw, svg.ag-scene .ag-pk, svg.ag-scene .ag-det-dot { opacity: 0; }
+svg.ag-scene .ag-spin, svg.ag-scene .ag-q, svg.ag-scene .ag-qsel, svg.ag-scene .ag-qc, svg.ag-scene .ag-qs { opacity: 0; }
+svg.ag-scene .ag-spin { stroke-dasharray: .25 .75; stroke-linecap: round; transform-box: fill-box; transform-origin: center; }
+svg.ag-scene text.ag-qt { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
+svg.ag-scene .ag-qc { transform-box: fill-box; transform-origin: 100% 50%; }
+svg.ag-scene .ag-qo { transform-box: fill-box; transform-origin: center; }
 @keyframes ag-in { from { opacity: 0; transform: translateY(-4px); } }
 @keyframes ag-out { from { opacity: 1; } }
 @keyframes ag-wake { from { opacity: .2; } }
@@ -243,18 +295,24 @@ svg.ag-scene .ag-fl, svg.ag-scene .ag-rip, svg.ag-scene .ag-doc, svg.ag-scene .a
 @keyframes ag-comet { 0% { stroke-dashoffset: .18; stroke-opacity: 0; } 20% { stroke-opacity: 1; } 80% { stroke-dashoffset: -.82; stroke-opacity: 1; } 100% { stroke-dashoffset: -.82; stroke-opacity: 0; } }
 @keyframes ag-comet-r { 0% { stroke-dashoffset: -.82; stroke-opacity: 0; } 20% { stroke-opacity: 1; } 80% { stroke-dashoffset: .18; stroke-opacity: 1; } 100% { stroke-dashoffset: .18; stroke-opacity: 0; } }
 @keyframes ag-flash { 0%, 100% { opacity: 0; } 25%, 65% { opacity: 1; } }
-@keyframes ag-hold { 0%, 100% { opacity: 0; } 8%, 90% { opacity: 1; } }
-@keyframes ag-gap { 0%, 100% { opacity: 1; } 8%, 90% { opacity: 0; } }
 @keyframes ag-rip { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }
 @keyframes ag-halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.6); } }
 @keyframes ag-doc { 0% { opacity: 0; transform: translate(0, -6px); } 12%, 60% { opacity: 1; transform: translate(0, 0); } 100% { opacity: 0; transform: translate(58px, 5px) scale(.4); } }
 @keyframes ag-chev { 0%, 100% { stroke: ${C.mute}; transform: none; } 45% { stroke: ${C.teal}; transform: translateX(3px); } }
 @keyframes ag-pk { 0% { opacity: 0; transform: none; } 15%, 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--dx)); } }
 @keyframes ag-pop { 0% { opacity: 0; transform: scale(.6); } 70% { opacity: 1; transform: scale(1.1); } 100% { transform: scale(1); } }
+@keyframes ag-show { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ag-hide { from { opacity: 1; } to { opacity: 0; } }
+@keyframes ag-turn { to { transform: rotate(360deg); } }
+@keyframes ag-wipe { from { opacity: 1; transform: scaleX(1); } to { opacity: 1; transform: scaleX(0); } }
+@keyframes ag-caret { to { transform: translateX(var(--w)); } }
+@keyframes ag-scan { 0% { opacity: 0; transform: none; } 15%, 85% { opacity: .7; } 100% { opacity: 0; transform: translateX(var(--w)); } }
 /* step 1: the report drops into the supervisor, which hands Hypothesis its slice and takes its result back, then hands Detection the hunt */
 ${P} .ag-s0 { ${at(T.s0, 'ag-in', OUT_EZ)} }
 ${P} .ag-doc { ${at(T.doc, 'ag-doc', IO, 'none')} }
 ${P} .ag-fl-sup { ${at(T.sup, 'ag-flash', IO, 'none')} }
+${P} .ag-sp-sup { ${spinning(T.spsup)} }
+${P} .ag-sp-hyp { ${spinning(T.sphyp)} }
 ${P} .ag-c0 { ${at(T.c0, 'ag-comet', 'linear', 'none')} }
 ${P} .ag-fl-hyp { ${at(T.hyp, 'ag-flash', IO, 'none')} }
 ${P} .ag-c0r { ${at(T.c0r, 'ag-comet-r', 'linear', 'none')} }
@@ -269,15 +327,27 @@ ${P} .ag-s1 { ${at(T.s1, 'ag-wake', OUT_EZ)} }
 ${P} .ag-p1 { ${at(T.s1, 'ag-fade')} }
 ${P} .ag-fl-arr { ${at(T.arr, 'ag-flash', IO, 'none')} }
 ${T.tool.map((t, k) => `${P} .ag-tool${k} { ${at(t, 'ag-fade')} }`).join('\n')}
+/* the agent thinks and writes its query, a few characters at a time behind a caret; later selects and rewrites it */
+${P} .ag-sp-det { ${spinning(T.spdet)} }
+${P} .ag-q { animation: ${show(T.q)}, ${hide(T.qout)}; }
+${P} .ag-q0 { animation: ${hide(T.q0out)}; }
+${P} .ag-q1 { animation: ${show([T.q1[0], .1])}, ${hide(T.q1out)}; }
+${['q0', 'q1'].map((q, j) => `${P} .ag-${q} .ag-qc { ${at(T[q], 'ag-wipe', 'steps(8)')} }\n${P} .ag-${q} .ag-qk { animation: ${a(T[q], 'ag-caret', 'steps(8)')}, ${hide(T['k' + j])}; }`).join('\n')}
+${P} .ag-qsel { ${at(T.sel, 'ag-show', 'linear')} }
+${P} .ag-qd { animation: ${show(T.qd)}; }
+${P} .ag-qs { ${at(T.qs, 'ag-scan', 'linear', 'none')} }
+${P} .ag-qo { ${at(T.qo, 'ag-pop', OUT_EZ)} }
+${P} .ag-qw { ${at(T.qw, 'ag-fade')} }
+${P} .ag-qr { ${at(T.qr, 'ag-rip', OUT_EZ, 'none')} }
 ${P} .ag-g0a { ${at(T.g0a, 'ag-flash', IO, 'none')} }
 ${P} .ag-rip0 { ${at(T.rip0, 'ag-rip', OUT_EZ, 'none')} }
 ${P} .ag-rip1 { ${at(T.rip1, 'ag-rip', OUT_EZ, 'none')} }
-${P} .ag-none { ${at(T.none, 'ag-hold', 'linear', 'none')} }
+${P} .ag-none { ${'animation: ' + held(T.none)}; }
 ${P} .ag-loop { ${at(T.loop, 'ag-draw')} }
 ${P} .ag-lh { ${at(T.lh, 'ag-fade')} }
 ${P} .ag-g1 { ${at(T.g1, 'ag-flash', IO, 'none')} }
-${P} .ag-rw { ${at(T.rw, 'ag-hold', 'linear', 'none')} }
-${P} .ag-ck { ${at(T.rw, 'ag-gap', 'linear', 'none')} }
+${P} .ag-rw { ${'animation: ' + held(T.rw)}; }
+${P} .ag-ck { animation: ${hide([T.rw[0] - .12, .12])}, ${a([T.rw[0] + T.rw[1] + .05, .15], 'ag-show', 'linear', 'forwards')}; }   /* (in sequence, never crossfaded) */
 ${P} .ag-tick { ${at(T.tick, 'ag-draw')} }
 ${P} .ag-g0b { ${at(T.g0b, 'ag-flash', IO, 'none')} }
 ${P} .ag-rip2 { ${at(T.rip2, 'ag-rip', OUT_EZ, 'none')} }
@@ -291,8 +361,9 @@ ${P} .ag-p2 { ${at(T.s2, 'ag-fade')} }
 ${P} .ag-flag { ${at(T.cardf, 'ag-fade')} }
 ${P} .ag-cardo { ${at(T.cardo, 'ag-draw')} }
 ${P} .ag-lead { ${at(T.lead, 'ag-fade')} }
-${P} .ag-ln0 { ${at(T.ln[0], 'ag-fade')} }
-${P} .ag-ln1 { ${at(T.ln[1], 'ag-fade')} }
+${P} .ag-ln0 { ${at(T.ln[0], 'ag-in', OUT_EZ)} }
+${P} .ag-ln1 { ${at(T.ln[1], 'ag-in', OUT_EZ)} }
+${P} .ag-sp-rep { ${spinning(T.sprep)} }
 ${P} .ag-c2 { ${at(T.c2, 'ag-comet', 'linear', 'none')} }
 ${P} .ag-fl-rep { ${at(T.rep, 'ag-flash', IO, 'none')} }
 ${P} .ag-he { ${at(T.he, 'ag-fade')} }
