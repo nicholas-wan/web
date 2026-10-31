@@ -8,7 +8,7 @@
 //   node tools/scenes/agentic-glance/build.cjs   writes scene-d.svg, scene-m.svg and scene.css here
 //   node tools/scenes/agentic-glance/apply.cjs   puts the peek into experience.html and the CSS into internship-peek.css
 // Step 1, purpose-built agents: a supervisor splits the hunt among narrow agents, each built for one job (the team,
-// each specialist's job labelled; the pulse reaches the one that searches); the first search comes back empty.
+// each specialist's job labelled, Extractor, Hypothesis and Detection as in the product; the pulse reaches Detection); the first search comes back empty.
 // Step 2, tools to adapt on evidence: the acting agent with its kit; empty doesn't mean safe, so it asks whether
 // its search could have missed it and searches another way (the loop). Step 3, surface to the analyst: agents
 // surface what looks suspicious with the evidence attached (a lead card passed along a line to the human), and a
@@ -49,9 +49,9 @@ const STEPS = [
   { title: 'Surface to the analyst', d: ['Agents surface what looks suspicious,', 'evidence attached. A human analyst', 'makes the call.'],
     m: ['Agents surface what looks suspicious,', 'evidence attached. A human analyst', 'makes the call.'], ev: ['\\WinTaskUpdate', '1 host · not in baseline'] },
 ];
-const JOBS = ['Hypothesis', 'Past hunts', 'Search'];
-const TOOLS = [['search', 'search'], ['check', 'check query'], ['clock', 'past hunts']];
-const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each built for one job: a hypothesis, past hunts, search. The first search, for schtasks.exe, comes back empty. Agents carry tools and skills, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the searching agent asks whether its search could have missed the threat and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline, with the evidence attached, and a human analyst makes the call.';
+const JOBS = ['Extractor', 'Hypothesis', 'Detection'];   // the product's own sub-agents (prime-th th-core graph: extractor, hypothesis, detection_logic)
+const TOOLS = [['search', 'search'], ['check', 'check query'], ['clock', 'analyse results']];   // the Detection agent's own steps (past hunts is the Hypothesis agent's tool)
+const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent splits the hunt among narrow agents, each built for one job: extracting the techniques from the report, forming a hypothesis, writing and running the detection logic. The first search, for schtasks.exe, comes back empty. Agents carry tools and skills, and empty does not mean safe: tasks made through the Task Scheduler API never launch schtasks.exe, so the Detection agent asks whether its search could have missed the threat and searches another way, around event 4698, a task being created. That surfaces one unusual task, \\WinTaskUpdate, on one host and not in the baseline, with the evidence attached, and a human analyst makes the call.';
 
 // a plain agent node: a ring with a dot; the one we follow is solid teal
 const node = (cx, cy, r, on, cls = '') => on
