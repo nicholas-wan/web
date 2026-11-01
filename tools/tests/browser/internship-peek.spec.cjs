@@ -262,7 +262,8 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(phoneScene(root).locator('.ag-t')).toHaveCount(32);
  await expect(phoneScene(root).locator('.ag-logo')).toHaveCount(1);
  // Phones join the steps on a spine (owner, 1 Nov 2026: "the connectivity between panels is not good on mobile"): three
- // numbers on it, two dots that carry the hand-offs and the two lines they leave lit; a dot shows only while it runs.
+ // numbers on it, the two travellers that carry the hand-offs (Detection, then the result) and the two lines they leave lit;
+ // a traveller shows only while it runs.
  await expect(phoneScene(root).locator('.ag-nd')).toHaveCount(3);
  await expect(phoneScene(root).locator('.ag-tk')).toHaveCount(2);
  await expect(phoneScene(root).locator('.ag-tv')).toHaveCount(2);
