@@ -1,7 +1,7 @@
 /* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
 .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 254; }
-.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 621.4; }
+.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 652.4; }
 @media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
 svg.ag-scene text { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
 svg.ag-scene text.ag-qt { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
@@ -13,6 +13,10 @@ svg.ag-scene .ag-card { transform-origin: 15% 25%; }
 svg.ag-scene .ag-qc { transform-box: fill-box; transform-origin: 100% 50%; }
 svg.ag-scene :is(.ag-wire, .ag-wire2, .ag-ln, .ag-rep-link, .ag-qx) { stroke-dasharray: 1 2; }   /* (drawn: the dash covers the path; undrawn, it sits before the start) */
 svg.ag-scene .ag-hpath { stroke-dasharray: .12 2; stroke-opacity: 0; }
+svg.ag-scene { --ag-sh1: 0s; --ag-sh2: 0s; }
+svg.ag-scene--m { --ag-sh1: 0.73s; --ag-sh2: 0.6s; }   /* (a phone's two longer runs: everything after each arrival waits for it) */
+svg.ag-scene .ag-tk { stroke-dasharray: 1 2; stroke-opacity: .5; stroke-width: 1.5; }
+svg.ag-scene .ag-tv { stroke-dasharray: .001 2; stroke-linecap: round; opacity: 0; }   /* (a dash of no length with round caps: a dot) */
 svg.ag-scene .ag-det { transform: translateX(var(--dx)); }
 svg.ag-scene .ag-odo { transform: translateY(var(--roll)); }
 svg.ag-scene .ag-cnv { font-variant-numeric: tabular-nums; }
@@ -25,7 +29,10 @@ svg.ag-scene .ag-logs .ag-tl-out { fill-opacity: 1; opacity: 1; }
 /* the final frame: the supervisor's wire to where Detection works, no dotted outline (a phone keeps it, with Detection
    faint in it, since its two places are on separate steps) */
 svg.ag-scene:not(.ag-scene--m) :is(.ag-slot, .ag-wire-det, .ag-ln1) { opacity: 0; }
-svg.ag-scene--m .ag-det1 { opacity: .3; }
+svg.ag-scene--m .ag-det1 { opacity: .28; }
+svg.ag-scene--m > rect:first-child { stroke-opacity: 0; }   /* (the card's frame bounds it; with the rail, a second outline read as a double border) */
+svg.ag-scene--m .ag-card { transform-origin: 0% 50%; }   /* (it arrives from where the dot lands, its left edge) */
+svg.ag-scene--m .ag-nd { transform-box: fill-box; transform-origin: center; }
 /* transient marks: hidden in the final frame */
 svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo, .ag-fly, .ag-q0, .ag-pk) { opacity: 0; }
 /* the replay: the drawing fades and starts over while the card, its header and its words stay */
@@ -48,10 +55,9 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
 @keyframes ag-fwd { from { opacity: .4; } to { opacity: 1; } }
 @keyframes ag-show { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ag-keep { from, to { opacity: 1; } }
-@keyframes ag-off { from, to { opacity: 0; } }
 @keyframes ag-roll { from { transform: none; } }
 @keyframes ag-hide { from { opacity: 1; } to { opacity: 0; } }
-@keyframes ag-ghost { from { opacity: 1; } to { opacity: .3; } }
+@keyframes ag-ghost { from { opacity: 1; } to { opacity: .28; } }
 @keyframes ag-wipe { from { opacity: 1; transform: scaleX(1); } to { opacity: 1; transform: scaleX(0); } }
 @keyframes ag-unwipe { from { opacity: 1; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
 @keyframes ag-caret { to { transform: translateX(var(--w)); } }
@@ -72,11 +78,16 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
 @keyframes ag-flyy { to { transform: translateY(var(--dy)); } }
 /* (the result appears exactly over the lit tile first, then lifts; fading in while lifting made it start above the tile) */
 @keyframes ag-flyt { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { transform: translateY(-6px) scale(1.7); } 100% { opacity: 1; transform: none; } }
-@keyframes ag-flytm { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { opacity: 1; transform: translateY(-6px) scale(1.7); } 42% { opacity: 0; transform: translateY(-6px) scale(1.7); } 100% { opacity: 0; transform: none; } }   /* (phones: it lifts and goes before the words; the card grows where it lands) */
 @keyframes ag-unfold { from { opacity: 0; transform: scale(.1); } 40% { opacity: 1; } to { opacity: 1; transform: none; } }
 @keyframes ag-spring { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
 @keyframes ag-halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }
 @keyframes ag-march { to { stroke-dashoffset: -14; } }
+@keyframes ag-run { 0% { opacity: 1; stroke-dashoffset: 0; } 100% { opacity: 1; stroke-dashoffset: -1; } }   /* (held at its end until what it carries has arrived over it) */
+@keyframes ag-trace { from { stroke-dashoffset: 1; } }   /* (a line drawn exactly behind its dot) */
+@keyframes ag-arrive { from { opacity: 0; transform: scale(.92); } }
+@keyframes ag-cardgrow { 0% { opacity: 0; transform: scale(.3); } 1% { opacity: .6; transform: scale(.3); } }   /* (hidden until the dot lands) */
+@keyframes ag-relay { 50% { transform: scale(1.12); } }
+@keyframes ag-nd { 50% { transform: scale(1.35); stroke-opacity: 1; } }
 @keyframes ag-pk { 0% { opacity: 0; transform: none; } 12%, 88% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--dx)); } }
 /* step 1: the report reaches the supervisor, the badges fan out, the hunch is carried to Detection, which moves on */
 .is-playing svg.ag-scene .ag-rep { animation: ag-slidein 0.5s cubic-bezier(.22,1,.36,1) 0.8s both; }
@@ -97,60 +108,75 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
 .is-playing svg.ag-scene :is(.ag-bd, .ag-det1 .ag-b) text { animation: ag-lit-t 0.3s ease 3.35s both; }
 .is-playing svg.ag-scene .ag-bd .ag-b-glow { animation: ag-glow 4.95s linear 3.3s none; }
 /* (on desktop these three are gone from the final frame, so they are held on while it plays, then go together) */
-.is-playing svg.ag-scene .ag-slot { animation: ag-keep 13s linear 0.5s both, ag-pop 0.3s cubic-bezier(.22,1,.36,1) 3.65s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.5s forwards; }
-.is-playing svg.ag-scene .ag-wire-det { animation: ag-keep 13s linear 0.5s both, ag-draw 0.3s cubic-bezier(.45,0,.25,1) 1.44s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.5s forwards; }
-.is-playing svg.ag-scene .ag-ln1 { animation: ag-keep 13s linear 0.5s both, ag-draw 0.55s cubic-bezier(.45,0,.25,1) 3.45s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.5s forwards; }
-.is-playing svg.ag-scene .ag-wire2 { animation: ag-draw 0.5s cubic-bezier(.22,1,.36,1) 13.1s both; }
+.is-playing svg.ag-scene .ag-slot { animation: ag-keep 13s linear 0.5s both, ag-pop 0.3s cubic-bezier(.22,1,.36,1) 3.65s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) calc(13.5s + var(--ag-sh1) + var(--ag-sh2)) forwards; }
+.is-playing svg.ag-scene .ag-wire-det { animation: ag-keep 13s linear 0.5s both, ag-draw 0.3s cubic-bezier(.45,0,.25,1) 1.44s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) calc(13.5s + var(--ag-sh1) + var(--ag-sh2)) forwards; }
+.is-playing svg.ag-scene .ag-ln1 { animation: ag-keep 13s linear 0.5s both, ag-draw 0.55s cubic-bezier(.45,0,.25,1) 3.45s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) calc(13.5s + var(--ag-sh1) + var(--ag-sh2)) forwards; }
+.is-playing svg.ag-scene .ag-wire2 { animation: ag-draw 0.5s cubic-bezier(.22,1,.36,1) calc(13.1s + var(--ag-sh1) + var(--ag-sh2)) both; }
 .is-playing svg.ag-scene .ag-s1 { animation: ag-wake 0.5s cubic-bezier(.22,1,.36,1) 3.5s both; }
 /* the team steps back while Detection works, Reporting comes forward to write the lead, all forward at the end */
-.is-playing svg.ag-scene .ag-team { animation: ag-back 0.3s ease 3.65s forwards, ag-fwd 0.5s ease 13.25s forwards; }
-.is-playing svg.ag-scene .ag-repb { animation: ag-back 0.3s ease 3.65s forwards, ag-fwd 0.4s ease 10.95s forwards; }
-.is-playing svg.ag-scene .ag-br .ag-b-glow { animation: ag-glow 1.3s linear 10.95s none; }
+.is-playing svg.ag-scene .ag-team { animation: ag-back 0.3s ease 3.65s forwards, ag-fwd 0.5s ease calc(13.25s + var(--ag-sh1) + var(--ag-sh2)) forwards; }
+.is-playing svg.ag-scene .ag-repb { animation: ag-back 0.3s ease 3.65s forwards, ag-fwd 0.4s ease calc(10.95s + var(--ag-sh1) + var(--ag-sh2)) forwards; }
+.is-playing svg.ag-scene .ag-br .ag-b-glow { animation: ag-glow 1.3s linear calc(10.95s + var(--ag-sh1) + var(--ag-sh2)) none; }
 /* step 2: the logs; a query, a sweep that finds nothing; struck, backspaced, retyped, checked; a sweep that finds 32, one unusual */
-.is-playing svg.ag-scene .ag-lg { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 3.95s both; }
-.is-playing svg.ag-scene .ag-q { animation: ag-fade 0.25s cubic-bezier(.45,0,.25,1) 4.05s both; }
-.is-playing svg.ag-scene .ag-q0 { animation: ag-show 0.01s linear 4.05s both, ag-hide 0.1s linear 7.4s forwards; }
+.is-playing svg.ag-scene .ag-lg { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) calc(3.95s + var(--ag-sh1)) both; }
+.is-playing svg.ag-scene .ag-q { animation: ag-fade 0.25s cubic-bezier(.45,0,.25,1) calc(4.05s + var(--ag-sh1)) both; }
+.is-playing svg.ag-scene .ag-q0 { animation: ag-show 0.01s linear calc(4.05s + var(--ag-sh1)) both, ag-hide 0.1s linear calc(7.4s + var(--ag-sh1)) forwards; }
 /* (jump-none: the last step lands before the end, since a plain steps() held forwards can stop a step short) */
-.is-playing svg.ag-scene .ag-q0 .ag-qc { animation: ag-wipe 0.6s steps(24, jump-none) 4.2s both, ag-unwipe 0.35s steps(24, jump-none) 7.05s forwards; }
-.is-playing svg.ag-scene .ag-q0 .ag-qk { animation: ag-caret 0.6s steps(24, jump-none) 4.2s both, ag-hide 0.1s linear 4.85s forwards, ag-show 0.02s linear 7.05s forwards, ag-caretback 0.35s steps(24, jump-none) 7.05s forwards; }
-.is-playing svg.ag-scene .ag-qx { animation: ag-draw 0.2s cubic-bezier(.22,1,.36,1) 6.8s both; }
-.is-playing svg.ag-scene .ag-q1 { animation: ag-show 0.05s linear 7.45s both; }
-.is-playing svg.ag-scene .ag-q1 .ag-qc { animation: ag-wipe 0.6s steps(22, jump-none) 7.45s both; }
-.is-playing svg.ag-scene .ag-q1 .ag-qk { animation: ag-caret 0.6s steps(22, jump-none) 7.45s both, ag-hide 0.1s linear 8.1s forwards; }
-.is-playing svg.ag-scene .ag-qok { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) 8.1s both; }
-.is-playing svg.ag-scene .ag-beam0 { animation: ag-beam 0.8s linear 4.9s none; }
-.is-playing svg.ag-scene .ag-bar0 { animation: ag-bar 0.7s linear 4.95s none; }
-.is-playing svg.ag-scene .ag-t { animation: ag-fade .3s cubic-bezier(.22,1,.36,1) calc(4s + var(--c) * .03s) both; }   /* (the logs cascade in by column) */
-.is-playing svg.ag-scene .ag-tm { animation: ag-miss .5s ease calc(5s + var(--c) * .08s) none; }   /* (the first sweep: each flickers grey and settles) */
-.is-playing svg.ag-scene .ag-tl:not(.ag-tl-out) { animation: ag-tile calc(1.25s - var(--c) * .07s) ease calc(8.9s + var(--c) * .07s) both; }   /* (the second: each lights, then steps back) */
-.is-playing svg.ag-scene .ag-tl-out { animation: ag-light .3s ease calc(8.9s + var(--c) * .07s) both; }
-.is-playing svg.ag-scene .ag-n0 { animation: ag-shake 0.4s cubic-bezier(.22,1,.36,1) 5.85s both, ag-hide 0.15s linear 7.05s forwards; }
-.is-playing svg.ag-scene .ag-gl0 { animation: ag-hold 1.95s linear 5.9s none; }
-.is-playing svg.ag-scene .ag-gl1 { animation: ag-hold 1.3s linear 8.15s none; }
-.is-playing svg.ag-scene .ag-beam1 { animation: ag-beam 0.6s linear 8.8s none; }
-.is-playing svg.ag-scene .ag-bar1 { animation: ag-bar 0.55s linear 8.85s none; }
-.is-playing svg.ag-scene .ag-odo { animation: ag-off 8.5s linear 0.5s backwards, ag-roll 0.5s cubic-bezier(.45,0,.25,1) 9s both; }   /* (hidden until the second sweep, then rolls 4, 9, 15, 22, 28, 32 with the columns lighting and settles) */
-.is-playing svg.ag-scene .ag-ring { animation: ag-ring 0.4s cubic-bezier(.34,1.56,.64,1) 9.85s both; }
-.is-playing svg.ag-scene .ag-qw { animation: ag-say 0.3s cubic-bezier(.22,1,.36,1) 10s both; }
+.is-playing svg.ag-scene .ag-q0 .ag-qc { animation: ag-wipe 0.6s steps(24, jump-none) calc(4.2s + var(--ag-sh1)) both, ag-unwipe 0.35s steps(24, jump-none) calc(7.05s + var(--ag-sh1)) forwards; }
+.is-playing svg.ag-scene .ag-q0 .ag-qk { animation: ag-caret 0.6s steps(24, jump-none) calc(4.2s + var(--ag-sh1)) both, ag-hide 0.1s linear calc(4.85s + var(--ag-sh1)) forwards, ag-show 0.02s linear calc(7.05s + var(--ag-sh1)) forwards, ag-caretback 0.35s steps(24, jump-none) calc(7.05s + var(--ag-sh1)) forwards; }
+.is-playing svg.ag-scene .ag-qx { animation: ag-draw 0.2s cubic-bezier(.22,1,.36,1) calc(6.8s + var(--ag-sh1)) both; }
+.is-playing svg.ag-scene .ag-q1 { animation: ag-show 0.05s linear calc(7.45s + var(--ag-sh1)) both; }
+.is-playing svg.ag-scene .ag-q1 .ag-qc { animation: ag-wipe 0.6s steps(22, jump-none) calc(7.45s + var(--ag-sh1)) both; }
+.is-playing svg.ag-scene .ag-q1 .ag-qk { animation: ag-caret 0.6s steps(22, jump-none) calc(7.45s + var(--ag-sh1)) both, ag-hide 0.1s linear calc(8.1s + var(--ag-sh1)) forwards; }
+.is-playing svg.ag-scene .ag-qok { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) calc(8.1s + var(--ag-sh1)) both; }
+.is-playing svg.ag-scene .ag-beam0 { animation: ag-beam 0.8s linear calc(4.9s + var(--ag-sh1)) none; }
+.is-playing svg.ag-scene .ag-bar0 { animation: ag-bar 0.7s linear calc(4.95s + var(--ag-sh1)) none; }
+.is-playing svg.ag-scene .ag-t { animation: ag-fade .3s cubic-bezier(.22,1,.36,1) calc(4s + var(--c) * .03s + var(--ag-sh1)) both; }   /* (the logs cascade in by column) */
+.is-playing svg.ag-scene .ag-tm { animation: ag-miss .5s ease calc(5s + var(--c) * .08s + var(--ag-sh1)) none; }   /* (the first sweep: each flickers grey and settles) */
+.is-playing svg.ag-scene .ag-tl:not(.ag-tl-out) { animation: ag-tile calc(1.25s - var(--c) * .07s) ease calc(8.9s + var(--c) * .07s + var(--ag-sh1)) both; }   /* (the second: each lights, then steps back) */
+.is-playing svg.ag-scene .ag-tl-out { animation: ag-light .3s ease calc(8.9s + var(--c) * .07s + var(--ag-sh1)) both; }
+.is-playing svg.ag-scene .ag-n0 { animation: ag-shake 0.4s cubic-bezier(.22,1,.36,1) calc(5.85s + var(--ag-sh1)) both, ag-hide 0.15s linear calc(7.05s + var(--ag-sh1)) forwards; }
+.is-playing svg.ag-scene .ag-gl0 { animation: ag-hold 1.95s linear calc(5.9s + var(--ag-sh1)) none; }
+.is-playing svg.ag-scene .ag-gl1 { animation: ag-hold 1.3s linear calc(8.15s + var(--ag-sh1)) none; }
+.is-playing svg.ag-scene .ag-beam1 { animation: ag-beam 0.6s linear calc(8.8s + var(--ag-sh1)) none; }
+.is-playing svg.ag-scene .ag-bar1 { animation: ag-bar 0.55s linear calc(8.85s + var(--ag-sh1)) none; }
+.is-playing svg.ag-scene .ag-odo { animation: ag-show 0.01s linear calc(9s + var(--ag-sh1)) both, ag-roll 0.5s cubic-bezier(.45,0,.25,1) calc(9s + var(--ag-sh1)) both; }   /* (hidden until the second sweep, then rolls 4, 9, 15, 22, 28, 32 with the columns lighting and settles) */
+.is-playing svg.ag-scene .ag-ring { animation: ag-ring 0.4s cubic-bezier(.34,1.56,.64,1) calc(9.85s + var(--ag-sh1)) both; }
+.is-playing svg.ag-scene .ag-qw { animation: ag-say 0.3s cubic-bezier(.22,1,.36,1) calc(10s + var(--ag-sh1)) both; }
 /* step 3: the result travels along the line and unfolds into the lead; Reporting's pen marks it; the hand-off */
-.is-playing svg.ag-scene .ag-ln2 { animation: ag-draw 0.3s cubic-bezier(.45,0,.25,1) 10.85s both; }
-.is-playing svg.ag-scene .ag-fly { animation: ag-flyx 0.5s cubic-bezier(.45,0,.25,1) 10.95s both; opacity: 1; }
-.is-playing svg.ag-scene .ag-fly-y { animation: ag-flyy 0.5s cubic-bezier(.55,.05,.85,.45) 10.95s both; }
-.is-playing svg.ag-scene .ag-fly-t { animation: ag-flyt 0.7s cubic-bezier(.45,0,.25,1) 10.75s both, ag-hide 0.1s linear 11.5s forwards; }
-.is-playing svg.ag-scene .ag-s2 { animation: ag-wake 0.45s cubic-bezier(.22,1,.36,1) 10.85s both; }
-.is-playing svg.ag-scene .ag-card { animation: ag-unfold 0.5s cubic-bezier(.22,1,.36,1) 11.45s both; }
-.is-playing svg.ag-scene .ag-cpen { animation: ag-pop 0.35s cubic-bezier(.22,1,.36,1) 11.75s both; }
-.is-playing svg.ag-scene .ag-trick { animation: ag-say 0.3s cubic-bezier(.22,1,.36,1) 11.85s both; }
-.is-playing svg.ag-scene .ag-he { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) 12s both, ag-march 0.55s linear 12.15s none; }
-.is-playing svg.ag-scene .ag-pk { animation: ag-pk 0.55s cubic-bezier(.45,0,.25,1) 12.15s none; }
-.is-playing svg.ag-scene .ag-ana { animation: ag-spring 0.5s cubic-bezier(.34,1.56,.64,1) 12.7s both; }
-.is-playing svg.ag-scene .ag-halo { animation: ag-halo 1.1s cubic-bezier(.22,1,.36,1) 12.8s none; }
-.is-playing svg.ag-scene .ag-decides { animation: ag-say 0.3s cubic-bezier(.22,1,.36,1) 13.85s both; }   /* (once the halo has run, so it never crosses it) */
-/* phones: Detection's two places are on separate steps, so it fades from one and arrives at the other, and the
-   result's flight fades back while it crosses the words */
-.is-playing svg.ag-scene--m .ag-det { animation: ag-pop 0.4s cubic-bezier(.22,1,.36,1) 3.75s both; }
+.is-playing svg.ag-scene .ag-ln2 { animation: ag-draw 0.3s cubic-bezier(.45,0,.25,1) calc(10.85s + var(--ag-sh1) + var(--ag-sh2)) both; }
+.is-playing svg.ag-scene .ag-fly { animation: ag-flyx 0.5s cubic-bezier(.45,0,.25,1) calc(10.95s + var(--ag-sh1) + var(--ag-sh2)) both; opacity: 1; }
+.is-playing svg.ag-scene .ag-fly-y { animation: ag-flyy 0.5s cubic-bezier(.55,.05,.85,.45) calc(10.95s + var(--ag-sh1) + var(--ag-sh2)) both; }
+.is-playing svg.ag-scene .ag-fly-t { animation: ag-flyt 0.7s cubic-bezier(.45,0,.25,1) calc(10.75s + var(--ag-sh1)) both, ag-hide 0.1s linear calc(11.5s + var(--ag-sh1) + var(--ag-sh2)) forwards; }
+.is-playing svg.ag-scene .ag-s2 { animation: ag-wake 0.45s cubic-bezier(.22,1,.36,1) calc(10.85s + var(--ag-sh1) + var(--ag-sh2)) both; }
+.is-playing svg.ag-scene .ag-card { animation: ag-unfold 0.5s cubic-bezier(.22,1,.36,1) calc(11.45s + var(--ag-sh1) + var(--ag-sh2)) both; }
+.is-playing svg.ag-scene .ag-cpen { animation: ag-pop 0.35s cubic-bezier(.22,1,.36,1) calc(11.75s + var(--ag-sh1) + var(--ag-sh2)) both; }
+.is-playing svg.ag-scene .ag-trick { animation: ag-say 0.3s cubic-bezier(.22,1,.36,1) calc(11.85s + var(--ag-sh1) + var(--ag-sh2)) both; }
+.is-playing svg.ag-scene .ag-he { animation: ag-fade 0.35s cubic-bezier(.45,0,.25,1) calc(12s + var(--ag-sh1) + var(--ag-sh2)) both, ag-march 0.55s linear calc(12.15s + var(--ag-sh1) + var(--ag-sh2)) none; }
+.is-playing svg.ag-scene .ag-pk { animation: ag-pk 0.55s cubic-bezier(.45,0,.25,1) calc(12.15s + var(--ag-sh1) + var(--ag-sh2)) none; }
+.is-playing svg.ag-scene .ag-ana { animation: ag-spring 0.5s cubic-bezier(.34,1.56,.64,1) calc(12.7s + var(--ag-sh1) + var(--ag-sh2)) both; }
+.is-playing svg.ag-scene .ag-halo { animation: ag-halo 1.1s cubic-bezier(.22,1,.36,1) calc(12.8s + var(--ag-sh1) + var(--ag-sh2)) none; }
+.is-playing svg.ag-scene .ag-decides { animation: ag-say 0.3s cubic-bezier(.22,1,.36,1) calc(13.85s + var(--ag-sh1) + var(--ag-sh2)) both; }   /* (once the halo has run, so it never crosses it) */
+/* phones: Detection's two places are on separate steps, so a dot leaves its place in step 1, passes step 2's number,
+   which lights the step, and Detection arrives where it lands; the result's dot relays through Detection, passes step
+   3's number and the lead card arrives where it lands. Linear, so each line is drawn exactly behind its dot. */
+.is-playing svg.ag-scene--m .ag-tk1 { animation: ag-trace 1.1353754727174499s linear 3.495s both; }
+.is-playing svg.ag-scene--m .ag-tv1 { animation: ag-run 1.18s linear 3.45s forwards, ag-hide 0.12s linear 4.63s forwards; }
+.is-playing svg.ag-scene--m .ag-s1 { animation: ag-wake 0.45s cubic-bezier(.22,1,.36,1) 3.974s both; }
+.is-playing svg.ag-scene--m .ag-s1 .ag-nd { animation: ag-nd 0.35s cubic-bezier(.45,0,.25,1) 3.924s none; }
+.is-playing svg.ag-scene--m .ag-det { animation: ag-arrive 0.45s cubic-bezier(.22,1,.36,1) 4.43s both; }
+.is-playing svg.ag-scene--m .ag-tk2 { animation: ag-trace 0.7419859187724287s linear calc(11.458s + var(--ag-sh1)) both; }
+.is-playing svg.ag-scene--m .ag-tv2 { animation: ag-run 1.35s linear calc(10.85s + var(--ag-sh1)) forwards, ag-hide 0.12s linear calc(12.2s + var(--ag-sh1)) forwards; }
+.is-playing svg.ag-scene--m .ag-det .ag-bd { animation: ag-relay 0.3s cubic-bezier(.45,0,.25,1) calc(11.064s + var(--ag-sh1)) none; }
+.is-playing svg.ag-scene--m .ag-s2 { animation: ag-wake 0.45s cubic-bezier(.22,1,.36,1) calc(11.722s + var(--ag-sh1)) both; }
+.is-playing svg.ag-scene--m .ag-s2 .ag-nd { animation: ag-nd 0.35s cubic-bezier(.45,0,.25,1) calc(11.672s + var(--ag-sh1)) none; }
+.is-playing svg.ag-scene--m .ag-card { animation-name: ag-cardgrow; animation-duration: .45s; }   /* (out of the dot, from the card's left edge) */
+/* Reporting is a screen away from the lead on a phone, so it steps forward with the team at the end rather than
+   flashing while the eye follows the dot down (blind reads, twice); the pen on the card is its mark */
+.is-playing svg.ag-scene--m .ag-repb { animation: ag-back 0.3s ease 3.65s forwards, ag-fwd 0.5s ease calc(14.35s + var(--ag-sh1) + var(--ag-sh2)) forwards; }
+.is-playing svg.ag-scene--m .ag-team { animation: ag-back 0.3s ease 3.65s forwards, ag-fwd 0.5s ease calc(14.35s + var(--ag-sh1) + var(--ag-sh2)) forwards; }
+.is-playing svg.ag-scene--m .ag-br .ag-b-glow { animation: none; }
 .is-playing svg.ag-scene--m .ag-det1 { animation: ag-ghost 0.55s ease 3.45s both; }
 .is-playing svg.ag-scene--m .ag-det1 .ag-b { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) 1.66s both; }   /* (it pops in with the other two badges; it had no entrance and sat there from the first frame) */
-.is-playing svg.ag-scene--m .ag-fly-t { animation-name: ag-flytm, ag-hide; }
 .is-playing svg.ag-scene--m .ag-slot { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) 3.65s both; }
 .is-playing svg.ag-scene--m .ag-wire-det { animation: ag-draw 0.3s cubic-bezier(.45,0,.25,1) 1.44s both; }

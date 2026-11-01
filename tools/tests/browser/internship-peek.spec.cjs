@@ -261,6 +261,12 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  expect(pb.height).toBeLessThan(600);
  await expect(phoneScene(root).locator('.ag-t')).toHaveCount(32);
  await expect(phoneScene(root).locator('.ag-logo')).toHaveCount(1);
+ // Phones join the steps on a spine (owner, 1 Nov 2026: "the connectivity between panels is not good on mobile"): three
+ // numbers on it, two dots that carry the hand-offs and the two lines they leave lit; a dot shows only while it runs.
+ await expect(phoneScene(root).locator('.ag-nd')).toHaveCount(3);
+ await expect(phoneScene(root).locator('.ag-tk')).toHaveCount(2);
+ await expect(phoneScene(root).locator('.ag-tv')).toHaveCount(2);
+ for(const o of await phoneScene(root).locator('.ag-tv').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
 });
 test('phone charts stay open while the page scrolls and a finger lands elsewhere; the chip closes them',async({page})=>{
