@@ -803,7 +803,7 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
 @keyframes ag-flyy { to { transform: translateY(var(--dy)); } }
 /* (the result appears exactly over the lit tile first, then lifts; fading in while lifting made it start above the tile) */
 @keyframes ag-flyt { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { transform: translateY(-6px) scale(1.7); } 100% { opacity: 1; transform: none; } }
-@keyframes ag-flytm { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { opacity: 1; transform: translateY(-6px) scale(1.7); } 45%, 75% { opacity: .25; } 100% { opacity: 1; transform: none; } }
+@keyframes ag-flytm { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { opacity: 1; transform: translateY(-6px) scale(1.7); } 42% { opacity: 0; transform: translateY(-6px) scale(1.7); } 100% { opacity: 0; transform: none; } }   /* (phones: it lifts and goes before the words; the card grows where it lands) */
 @keyframes ag-unfold { from { opacity: 0; transform: scale(.1); } 40% { opacity: 1; } to { opacity: 1; transform: none; } }
 @keyframes ag-spring { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
 @keyframes ag-halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }
@@ -813,7 +813,8 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
 .is-playing svg.ag-scene .ag-rep { animation: ag-slidein 0.5s cubic-bezier(.22,1,.36,1) 0.8s both; }
 .is-playing svg.ag-scene .ag-rep-link { animation: ag-draw 0.25s cubic-bezier(.45,0,.25,1) 1.25s both; }
 .is-playing svg.ag-scene .ag-hub { animation: ag-bump 0.3s cubic-bezier(.34,1.56,.64,1) 1.35s none; }
-.is-playing svg.ag-scene .ag-wire { animation: ag-draw 0.35s cubic-bezier(.45,0,.25,1) 1.4s both; }
+.is-playing svg.ag-scene .ag-arm0 { animation: ag-draw 0.3s cubic-bezier(.45,0,.25,1) 1.28s both; }
+.is-playing svg.ag-scene .ag-arm1 { animation: ag-draw 0.3s cubic-bezier(.45,0,.25,1) 1.36s both; }   /* (each branch draws into its badge as that badge pops) */
 .is-playing svg.ag-scene .ag-bh { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) 1.5s both; }
 .is-playing svg.ag-scene .ag-br { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) 1.58s both; }
 .is-playing svg.ag-scene .ag-bd { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) 1.66s both; }
@@ -828,7 +829,7 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
 .is-playing svg.ag-scene .ag-bd .ag-b-glow { animation: ag-glow 4.95s linear 3.3s none; }
 /* (on desktop these three are gone from the final frame, so they are held on while it plays, then go together) */
 .is-playing svg.ag-scene .ag-slot { animation: ag-keep 13s linear 0.5s both, ag-pop 0.3s cubic-bezier(.22,1,.36,1) 3.65s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.5s forwards; }
-.is-playing svg.ag-scene .ag-wire-det { animation: ag-keep 13s linear 0.5s both, ag-draw 0.35s cubic-bezier(.45,0,.25,1) 1.4s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.5s forwards; }
+.is-playing svg.ag-scene .ag-wire-det { animation: ag-keep 13s linear 0.5s both, ag-draw 0.3s cubic-bezier(.45,0,.25,1) 1.44s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.5s forwards; }
 .is-playing svg.ag-scene .ag-ln1 { animation: ag-keep 13s linear 0.5s both, ag-draw 0.55s cubic-bezier(.45,0,.25,1) 3.45s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.5s forwards; }
 .is-playing svg.ag-scene .ag-wire2 { animation: ag-draw 0.5s cubic-bezier(.22,1,.36,1) 13.1s both; }
 .is-playing svg.ag-scene .ag-s1 { animation: ag-wake 0.5s cubic-bezier(.22,1,.36,1) 3.5s both; }
@@ -883,7 +884,7 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
 .is-playing svg.ag-scene--m .ag-det1 .ag-b { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) 1.66s both; }   /* (it pops in with the other two badges; it had no entrance and sat there from the first frame) */
 .is-playing svg.ag-scene--m .ag-fly-t { animation-name: ag-flytm, ag-hide; }
 .is-playing svg.ag-scene--m .ag-slot { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) 3.65s both; }
-.is-playing svg.ag-scene--m .ag-wire-det { animation: ag-draw 0.35s cubic-bezier(.45,0,.25,1) 1.4s both; }
+.is-playing svg.ag-scene--m .ag-wire-det { animation: ag-draw 0.3s cubic-bezier(.45,0,.25,1) 1.44s both; }
 /* agentic-glance:end */
 
 /* Phone versions of the internship scenes (25 Oct 2026; owner: "do longer

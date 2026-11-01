@@ -79,7 +79,7 @@ const wire = x => `M${HUB[0]} ${HUB[1] + 8} C${HUB[0]} ${HUB[1] + 20} ${x} ${L -
 // the pictures, in the desktop's units; phone: Detection's move becomes a fade between the stacked steps
 function picture(i, phone) {
   if (i === 0) {
-    let p = `<g class="ag-team">${BX.map((x, k) => `<path class="ag-wire${k === 2 ? ' ag-wire-det' : ''}" d="${wire(x)}" pathLength="1" stroke="${C.dim}" fill="none"/>`).join('')}` +
+    let p = `<g class="ag-team">${BX.map((x, k) => `<path class="ag-wire ag-arm${k}${k === 2 ? ' ag-wire-det' : ''}" d="${wire(x)}" pathLength="1" stroke="${C.dim}" fill="none"/>`).join('')}` +
       `<g class="ag-hub"><circle cx="${HUB[0]}" cy="${HUB[1]}" r="8" fill="${C.node}" stroke="${C.dim}" stroke-width="1.3"/><circle cx="${HUB[0]}" cy="${HUB[1]}" r="2.6" fill="${C.dim}"/></g>${T(HUB[0] + 13, HUB[1] + 3.3, 'Supervisor')}` +
       badge('ag-bh', BX[0], L, 'bulb', 'Hypothesis') +
       // Detection's place in step 1: a dotted outline once it has moved on (owner)
@@ -187,7 +187,7 @@ function phone() {
 // starts"), on every replay too. Each reading moment holds about 2 s (owner: "barely on screen for 0.5s").
 const LEAD = 0.5;
 const t = {
-  rep: [0.3, .5], replink: [.75, .25], hub: [.85, .3], wires: [.9, .35], bh: [1.0, .3], br: [1.08, .3], bd: [1.16, .3],
+  rep: [0.3, .5], replink: [.75, .25], hub: [.85, .3], bh: [1.0, .3], br: [1.08, .3], bd: [1.16, .3], wire0: [.78, .3], wire1: [.86, .3], wire2d: [.94, .3],
   hyp: [1.2, 1.1], hunch: [1.3, .4], hpath: [2.1, .8], hunchgo: [2.75, .3], detglow: [2.8, 4.95], det: [2.95, .55], ln1: [2.95, .55], w1: [3.0, .5], back: [3.15, .3],
   lg: [3.45, .35], logs: [3.5, .4], q: [3.55, .25], q0: [3.7, .6], k0: [4.35, .1], s0: [4.4, .8], n0: [5.35, .4], gl0: [5.4, 1.95], qx: [6.3, .2], erase: [6.55, .35],
   q1: [6.95, .6], k1: [7.6, .1], ok: [7.6, .3], gl1: [7.65, 1.3], s1: [8.3, .6], cnt: [8.5, .07], dim: [9.1, .45], ring: [9.35, .4], qw: [9.5, .3],
@@ -274,7 +274,7 @@ ${S} :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo, .ag-fl
 @keyframes ag-flyy { to { transform: translateY(var(--dy)); } }
 /* (the result appears exactly over the lit tile first, then lifts; fading in while lifting made it start above the tile) */
 @keyframes ag-flyt { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { transform: translateY(-6px) scale(1.7); } 100% { opacity: 1; transform: none; } }
-@keyframes ag-flytm { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { opacity: 1; transform: translateY(-6px) scale(1.7); } 45%, 75% { opacity: .25; } 100% { opacity: 1; transform: none; } }
+@keyframes ag-flytm { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { opacity: 1; transform: translateY(-6px) scale(1.7); } 42% { opacity: 0; transform: translateY(-6px) scale(1.7); } 100% { opacity: 0; transform: none; } }   /* (phones: it lifts and goes before the words; the card grows where it lands) */
 @keyframes ag-unfold { from { opacity: 0; transform: scale(.1); } 40% { opacity: 1; } to { opacity: 1; transform: none; } }
 @keyframes ag-spring { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
 @keyframes ag-halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }
@@ -284,7 +284,8 @@ ${S} :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo, .ag-fl
 ${P} .ag-rep { animation: ${an(t.rep, 'ag-slidein', EZ)}; }
 ${P} .ag-rep-link { animation: ${an(t.replink, 'ag-draw')}; }
 ${P} .ag-hub { animation: ${an(t.hub, 'ag-bump', SPRING, 'none')}; }
-${P} .ag-wire { animation: ${an(t.wires, 'ag-draw')}; }
+${P} .ag-arm0 { animation: ${an(t.wire0, 'ag-draw')}; }
+${P} .ag-arm1 { animation: ${an(t.wire1, 'ag-draw')}; }   /* (each branch draws into its badge as that badge pops) */
 ${P} .ag-bh { animation: ${an(t.bh, 'ag-pop', EZ)}; }
 ${P} .ag-br { animation: ${an(t.br, 'ag-pop', EZ)}; }
 ${P} .ag-bd { animation: ${an(t.bd, 'ag-pop', EZ)}; }
@@ -299,7 +300,7 @@ ${P} :is(.ag-bd, .ag-det1 .ag-b) text { animation: ${an(t.lit, 'ag-lit-t', 'ease
 ${P} .ag-bd .ag-b-glow { animation: ${an(t.detglow, 'ag-glow', 'linear', 'none')}; }
 /* (on desktop these three are gone from the final frame, so they are held on while it plays, then go together) */
 ${P} .ag-slot { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an([t.det[0] + .2, .3], 'ag-pop', EZ)}, ${an(t.slotout, 'ag-hide', OUTEZ, 'forwards')}; }
-${P} .ag-wire-det { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an(t.wires, 'ag-draw')}, ${an(t.slotout, 'ag-hide', OUTEZ, 'forwards')}; }
+${P} .ag-wire-det { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an(t.wire2d, 'ag-draw')}, ${an(t.slotout, 'ag-hide', OUTEZ, 'forwards')}; }
 ${P} .ag-ln1 { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an(t.ln1, 'ag-draw')}, ${an(t.slotout, 'ag-hide', OUTEZ, 'forwards')}; }
 ${P} .ag-wire2 { animation: ${an(t.wire2, 'ag-draw', EZ)}; }
 ${P} .ag-s1 { animation: ${an(t.w1, 'ag-wake', EZ)}; }
@@ -354,7 +355,7 @@ ${PM} .ag-det1 { animation: ${an(t.det, 'ag-ghost', 'ease')}; }
 ${PM} .ag-det1 .ag-b { animation: ${an(t.bd, 'ag-pop', EZ)}; }   /* (it pops in with the other two badges; it had no entrance and sat there from the first frame) */
 ${PM} .ag-fly-t { animation-name: ag-flytm, ag-hide; }
 ${PM} .ag-slot { animation: ${an([t.det[0] + .2, .3], 'ag-pop', EZ)}; }
-${PM} .ag-wire-det { animation: ${an(t.wires, 'ag-draw')}; }
+${PM} .ag-wire-det { animation: ${an(t.wire2d, 'ag-draw')}; }
 `;
 fs.writeFileSync(path.join(OUT, 'scene-d.svg'), desktop());
 fs.writeFileSync(path.join(OUT, 'scene-m.svg'), PH.svg);
