@@ -212,9 +212,12 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(phoneScene(root)).toBeHidden();
  // Reduced motion holds the final frame: all three steps, the human and the second search's find shown; nothing
  // transient (the first query, the notes, glows, beams, the travelling result, the dotted outline) is left on screen; the second query, the logs with their one lit result and the supervisor's wire to Detection stay.
- for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-n32','.ag-ring','.ag-qw','.ag-card','.ag-decides','.ag-wire2','.ag-q1'])expect(await shown(scene(root).locator(s))).toBe(1);
+ for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-odo','.ag-tl-out','.ag-ring','.ag-qw','.ag-card','.ag-decides','.ag-wire2','.ag-q1'])expect(await shown(scene(root).locator(s))).toBe(1);
  for(const s of ['.ag-n0','.ag-pk','.ag-q0','.ag-gl0','.ag-gl1','.ag-fly','.ag-slot','.ag-ln1'])expect(await shown(scene(root).locator(s))).toBe(0);
- for(const o of await scene(root).locator('.ag-b-glow, .ag-halo, .ag-beam, .ag-bar, .ag-cn').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
+ for(const o of await scene(root).locator('.ag-b-glow, .ag-halo, .ag-beam, .ag-bar, .ag-tm, .ag-tl:not(.ag-tl-out)').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
+ // The count is one rolled strip (an odometer, 1 Nov 2026) resting on "32 found"; the logs are three opacity-only rects a tile, 32 tiles.
+ await expect(scene(root).locator('.ag-odo .ag-cnv')).toHaveCount(6);
+ await expect(scene(root).locator('.ag-logs .ag-t')).toHaveCount(32);
  const words=await scene(root).textContent();
  for(const s of ['Agentic Threat Hunting','From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Reporting','Ransomware report','Event logs','A local model does best with one job, so','each narrow agent gets only the tools','and context that job needs.','Only a human','No results can mean a bad query, not a','safe network. So the agent rewrites it,','checks the fix and searches again.','query checked','32 found','1 unusual','Agents flag what looks suspicious, with','analyst makes the call.','Scheduled Task','T1053.005','Analyst decides','a known attacker trick'])expect(words).toContain(s);
  const label=await scene(root).getAttribute('aria-label');

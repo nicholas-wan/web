@@ -23,6 +23,14 @@
 // appears; no SIEM's syntax; the aria-label starts "An illustrative hunt." (the verifier and the spec pin it).
 // Desktop 640x254, the steps as columns; phones 360 wide, each step's picture drawn 1.4x above its words, where
 // Detection's move and the result's flight fade between the stacked steps.
+// A polish pass (1 Nov 2026, owner: "suggest optimizations or polish. refer to professional websites and animations",
+// then "Yes, ship all six"; proposed on lab/hunt-polish, reviewed by an independent visual review and a blind motion
+// read): entrances ease out and the overshoot spring is kept for the two payoffs (the ring, the analyst); entrances
+// start near their final size (.88, not .6); exits are shorter than entrances (.25 to .3 s on a standard ease: a first
+// cut on Material's accelerate curve read as a hard cut); the queries type one character a step; the count rolls
+// like an odometer through a one-row window whose edges fade (.ag-odo, masked); and each log tile is three rects
+// (grey, the flicker, the light) so only opacity ever animates, the tiles cascading in by column. No fill keyframes
+// remain. The story, its timing, words, colours and final frame are unchanged.
 const fs = require('fs'); const path = require('path');
 const OUT = __dirname;
 
@@ -87,15 +95,21 @@ function picture(i, phone) {
   }
   if (i === 1) {
     let p = T(G.x, 73, 'Event logs', 10.5, C.mute, 'class="ag-lg"');
-    p += `<g class="ag-logs">${Array.from({ length: 32 }, (_, k) => { const c = k % 8, r = (k / 8) | 0;
-      return `<rect class="ag-t${r === OUTT[0] && c === OUTT[1] ? ' ag-t-out' : ''}" x="${G.x + c * (G.ts + G.tg)}" y="${G.y + r * (G.ts + G.tg)}" width="${G.ts}" height="${G.ts}" rx="2" style="--c:${c}"/>`; }).join('')}</g>`;
+    p += `<g class="ag-logs">${Array.from({ length: 32 }, (_, k) => { const c = k % 8, r = (k / 8) | 0, out = r === OUTT[0] && c === OUTT[1];
+      // (three rects a tile, grey, the flicker and the light, so only opacity ever animates; their size and colours are in the stylesheet)
+      return `<g class="ag-t" style="--c:${c}" transform="translate(${G.x + c * (G.ts + G.tg)} ${G.y + r * (G.ts + G.tg)})"><rect/><rect class="ag-tm"/><rect class="ag-tl${out ? ' ag-tl-out' : ''}"/></g>`; }).join('')}</g>`;
     p += `<circle class="ag-ring" cx="${OUTC[0]}" cy="${OUTC[1]}" r="9" fill="none" stroke="${C.teal}" stroke-width="1.4"/>`;
     const cone = `M${DX + 12} ${L - 3} L${G.x - 3} ${G.y - 4} H${G.x + G.w + 3} V${G.y + G.h + 4} H${G.x - 3} Z`;
     p += [0, 1].map(k => `<path class="ag-beam ag-beam${k}" d="${cone}" fill="${k ? C.teal : C.mute}" fill-opacity="${k ? .12 : .1}"/>` +
       `<rect class="ag-bar ag-bar${k}" x="${G.x - 3}" y="${G.y - 4}" width="3" height="${G.h + 8}" rx="1.5" fill="${k ? C.teal : C.mute}" style="--w:${G.w + 3}px"/>`).join('');
     const cy = 137;
-    p += T(G.x, cy, '0 found', 10.5, C.body, 'class="ag-n0" font-weight="700"') + CNT.map((v, j) => T(G.x, cy, v + ' found', 10.5, C.teal, `class="ag-cn ag-cn${j}" font-weight="700"`)).join('') +
-      T(G.x, cy, '32 found', 10.5, C.teal, 'class="ag-n32" font-weight="700"') + T(G.x + 50, cy, '&#183; 1 unusual', 10.5, C.teal, 'class="ag-qw" font-weight="700"');
+    const ROLL = 15, cid = 'ag-cc-' + (phone ? 'm' : 'd');   // (the count rolls up through a window one row tall whose edges fade, so a passing row never shows a hard cut)
+    p += T(G.x, cy, '0 found', 10.5, C.body, 'class="ag-n0" font-weight="700"') +
+      `<linearGradient id="${cid}g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".2" stop-color="#fff"/><stop offset=".8" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>` +
+      `<mask id="${cid}" maskUnits="userSpaceOnUse" x="${G.x - 2}" y="${cy - 11}" width="52" height="${ROLL}"><rect x="${G.x - 2}" y="${cy - 11}" width="52" height="${ROLL}" fill="url(#${cid}g)"/></mask>` +
+      `<g mask="url(#${cid})"><g class="ag-odo" style="--roll:${-ROLL * CNT.length}px">` +
+      [...CNT, 32].map((v, j) => T(G.x, cy + j * ROLL, v + ' found', 10.5, C.teal, 'class="ag-cnv" font-weight="700"')).join('') + '</g></g>' +
+      T(G.x + 50, cy, '&#183; 1 unusual', 10.5, C.teal, 'class="ag-qw" font-weight="700"');
     const tx0 = Q.x + 15, base = Q.y + 11.3;
     p += `<g class="ag-q"><rect x="${Q.x}" y="${Q.y}" width="${Q.w}" height="${Q.h}" rx="4" fill="${C.chip}" stroke="${C.rule}"/>`;
     QUERIES.forEach(([f, v], k) => { const len = r1((f.length + v.length + 5) * MONO);
@@ -174,13 +188,14 @@ function phone() {
 const LEAD = 0.5;
 const t = {
   rep: [0.3, .5], replink: [.75, .25], hub: [.85, .3], wires: [.9, .35], bh: [1.0, .3], br: [1.08, .3], bd: [1.16, .3],
-  hyp: [1.2, 1.1], hunch: [1.3, .4], hpath: [2.1, .8], hunchgo: [2.75, .4], detglow: [2.8, 4.95], det: [2.95, .55], ln1: [2.95, .55], w1: [3.0, .5], back: [3.15, .45],
+  hyp: [1.2, 1.1], hunch: [1.3, .4], hpath: [2.1, .8], hunchgo: [2.75, .3], detglow: [2.8, 4.95], det: [2.95, .55], ln1: [2.95, .55], w1: [3.0, .5], back: [3.15, .3],
   lg: [3.45, .35], logs: [3.5, .4], q: [3.55, .25], q0: [3.7, .6], k0: [4.35, .1], s0: [4.4, .8], n0: [5.35, .4], gl0: [5.4, 1.95], qx: [6.3, .2], erase: [6.55, .35],
   q1: [6.95, .6], k1: [7.6, .1], ok: [7.6, .3], gl1: [7.65, 1.3], s1: [8.3, .6], cnt: [8.5, .07], dim: [9.1, .45], ring: [9.35, .4], qw: [9.5, .3],
   ln2: [10.1, .35], fly: [10.25, .7], w2: [10.35, .45], fwd: [10.45, .4], card: [10.95, .5], cpen: [11.25, .35], trick: [11.35, .3],
-  he: [11.5, .35], pk: [11.65, .55], ana: [12.2, .5], halo: [12.3, 1.1], decides: [13.35, .3], all: [12.75, .5], wire2: [12.85, .6], slotout: [12.85, .5],
+  he: [11.5, .35], pk: [11.65, .55], ana: [12.2, .5], halo: [12.3, 1.1], decides: [13.35, .3], all: [12.75, .5], wire2: [12.85, .6], slotout: [12.85, .25],
 };
-const EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)', SPRING = 'cubic-bezier(.34,1.56,.64,1)', STEPS8 = 'steps(8, jump-none)';
+const OUTEZ = 'cubic-bezier(.4,0,.2,1)', EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)', SPRING = 'cubic-bezier(.34,1.56,.64,1)', STEPS8 = 'steps(8, jump-none)';
+const STEPSQ = QUERIES.map(([f, v]) => `steps(${f.length + v.length + 5}, jump-none)`);   // (one step per character)
 const d = v => +(LEAD + v).toFixed(3);
 const an = ([s, l], name, ez = IO, fill = 'both') => `${name} ${l}s ${ez} ${d(s)}s ${fill}`;
 const P = '.is-playing svg.ag-scene', PM = '.is-playing svg.ag-scene--m', S = 'svg.ag-scene', PH = phone();
@@ -201,10 +216,14 @@ ${S} .ag-qc { transform-box: fill-box; transform-origin: 100% 50%; }
 ${S} :is(.ag-wire, .ag-wire2, .ag-ln, .ag-rep-link, .ag-qx) { stroke-dasharray: 1 2; }   /* (drawn: the dash covers the path; undrawn, it sits before the start) */
 ${S} .ag-hpath { stroke-dasharray: .12 2; stroke-opacity: 0; }
 ${S} .ag-det { transform: translateX(var(--dx)); }
+${S} .ag-odo { transform: translateY(var(--roll)); }
+${S} .ag-cnv { font-variant-numeric: tabular-nums; }
 ${S} .ag-rep { opacity: .85; }
 ${S} .ag-hunch { opacity: .75; }
-${S} .ag-t { fill: ${C.dim}; fill-opacity: .55; }
-${S} .ag-t-out { fill: ${C.teal}; fill-opacity: 1; }
+${S} .ag-logs rect { width: ${G.ts}px; height: ${G.ts}px; rx: 2px; fill: ${C.dim}; fill-opacity: .55; }
+${S} .ag-logs .ag-tm { fill: ${C.mute}; fill-opacity: .9; opacity: 0; }
+${S} .ag-logs .ag-tl { fill: ${C.teal}; fill-opacity: .9; opacity: 0; }
+${S} .ag-logs .ag-tl-out { fill-opacity: 1; opacity: 1; }
 /* the final frame: the supervisor's wire to where Detection works, no dotted outline (a phone keeps it, with Detection
    faint in it, since its two places are on separate steps) */
 ${S}:not(.ag-scene--m) :is(.ag-slot, .ag-wire-det, .ag-ln1) { opacity: 0; }
@@ -217,13 +236,13 @@ ${S} :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo, .ag-fl
 .internship-demo-card.is-fading ${S} :is(.ag-sw1, .ag-sw2) { opacity: .22; transition: opacity 240ms ease; }
 @keyframes ag-in { from { opacity: 0; transform: translateY(-4px); } }
 @keyframes ag-fade { from { opacity: 0; } }
-@keyframes ag-pop { from { opacity: 0; transform: scale(.6); } }
+@keyframes ag-pop { from { opacity: 0; transform: scale(.88); } }
 @keyframes ag-draw { from { stroke-dashoffset: 1.05; } }
 @keyframes ag-wake { from { opacity: .22; } }
 @keyframes ag-slidein { from { opacity: 0; transform: translateX(-10px); } to { opacity: .85; transform: none; } }
 @keyframes ag-bump { 50% { transform: scale(1.25); } }
 @keyframes ag-glow { 0%, 100% { opacity: 0; } 12%, 88% { opacity: 1; } }
-@keyframes ag-hunch { from { opacity: 0; transform: translateY(-14px) scale(.7); } }
+@keyframes ag-hunch { from { opacity: 0; transform: translateY(-8px) scale(.9); } }
 @keyframes ag-hunchgo { from { opacity: 1; } to { opacity: .75; } }
 @keyframes ag-pulse { 0% { stroke-dashoffset: .12; stroke-opacity: 0; } 12% { stroke-opacity: 1; } 88% { stroke-dashoffset: -.88; stroke-opacity: 1; } 100% { stroke-dashoffset: -.88; stroke-opacity: 0; } }
 @keyframes ag-slide { from { transform: none; } to { transform: translateX(var(--dx)); } }
@@ -231,27 +250,29 @@ ${S} :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo, .ag-fl
 @keyframes ag-fwd { from { opacity: .4; } to { opacity: 1; } }
 @keyframes ag-show { from { opacity: 0; } to { opacity: 1; } }
 @keyframes ag-keep { from, to { opacity: 1; } }
+@keyframes ag-off { from, to { opacity: 0; } }
+@keyframes ag-roll { from { transform: none; } }
 @keyframes ag-hide { from { opacity: 1; } to { opacity: 0; } }
 @keyframes ag-ghost { from { opacity: 1; } to { opacity: .3; } }
 @keyframes ag-wipe { from { opacity: 1; transform: scaleX(1); } to { opacity: 1; transform: scaleX(0); } }
 @keyframes ag-unwipe { from { opacity: 1; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
 @keyframes ag-caret { to { transform: translateX(var(--w)); } }
 @keyframes ag-caretback { from { transform: translateX(var(--w)); } to { transform: none; } }
-@keyframes ag-shake { 0% { opacity: 0; transform: scale(1.3); } 35% { opacity: 1; transform: none; } 50% { transform: translateX(-2px); } 65% { transform: translateX(2px); } 80% { transform: translateX(-1px); } 100% { opacity: 1; transform: none; } }
+@keyframes ag-shake { 0% { opacity: 0; transform: scale(1.15); } 35% { opacity: 1; transform: none; } 50% { transform: translateX(-2px); } 65% { transform: translateX(2px); } 80% { transform: translateX(-1px); } 100% { opacity: 1; transform: none; } }
 @keyframes ag-hold { 0% { opacity: 0; transform: translateY(4px); } 10%, 90% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 @keyframes ag-say { from { opacity: 0; transform: translateY(4px); } }
 @keyframes ag-beam { 0% { opacity: 0; } 15%, 75% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes ag-bar { 0% { opacity: 0; transform: none; } 10%, 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--w)); } }
-@keyframes ag-miss { 0%, 100% { fill: ${C.dim}; fill-opacity: .55; } 30% { fill: ${C.mute}; fill-opacity: .9; } }
-@keyframes ag-tile { 0% { fill: ${C.dim}; fill-opacity: .55; } 22%, 62% { fill: ${C.teal}; fill-opacity: .9; } 100% { fill: ${C.dim}; fill-opacity: .55; } }
-@keyframes ag-light { from { fill: ${C.dim}; fill-opacity: .55; } }
+@keyframes ag-miss { 0%, 100% { opacity: 0; } 30% { opacity: 1; } }
+@keyframes ag-tile { 0% { opacity: 0; } 22%, 62% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes ag-light { from { opacity: 0; } }
 @keyframes ag-ring { 0% { opacity: 0; transform: scale(.4); } 60% { opacity: 1; transform: scale(1.15); } 100% { opacity: 1; transform: none; } }
 @keyframes ag-flyx { to { transform: translateX(var(--dx)); } }
 @keyframes ag-flyy { to { transform: translateY(var(--dy)); } }
 @keyframes ag-flyt { 0% { opacity: 0; transform: none; } 10% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { transform: translateY(-6px) scale(1.7); } 100% { opacity: 1; transform: none; } }
 @keyframes ag-flytm { 0% { opacity: 0; transform: none; } 10% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { opacity: 1; transform: translateY(-6px) scale(1.7); } 45%, 75% { opacity: .25; } 100% { opacity: 1; transform: none; } }
 @keyframes ag-unfold { from { opacity: 0; transform: scale(.1); } 40% { opacity: 1; } to { opacity: 1; transform: none; } }
-@keyframes ag-spring { from { opacity: 0; transform: scale(.75); } to { opacity: 1; transform: none; } }
+@keyframes ag-spring { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
 @keyframes ag-halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }
 @keyframes ag-march { to { stroke-dashoffset: -14; } }
 @keyframes ag-pk { 0% { opacity: 0; transform: none; } 12%, 88% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--dx)); } }
@@ -260,18 +281,18 @@ ${P} .ag-rep { animation: ${an(t.rep, 'ag-slidein', EZ)}; }
 ${P} .ag-rep-link { animation: ${an(t.replink, 'ag-draw')}; }
 ${P} .ag-hub { animation: ${an(t.hub, 'ag-bump', SPRING, 'none')}; }
 ${P} .ag-wire { animation: ${an(t.wires, 'ag-draw')}; }
-${P} .ag-bh { animation: ${an(t.bh, 'ag-pop', SPRING)}; }
-${P} .ag-br { animation: ${an(t.br, 'ag-pop', SPRING)}; }
-${P} .ag-bd { animation: ${an(t.bd, 'ag-pop', SPRING)}; }
+${P} .ag-bh { animation: ${an(t.bh, 'ag-pop', EZ)}; }
+${P} .ag-br { animation: ${an(t.br, 'ag-pop', EZ)}; }
+${P} .ag-bd { animation: ${an(t.bd, 'ag-pop', EZ)}; }
 ${P} .ag-bh .ag-b-glow { animation: ${an(t.hyp, 'ag-glow', 'linear', 'none')}; }
 ${P} .ag-hunch { animation: ${an(t.hunch, 'ag-hunch', EZ)}, ${an(t.hunchgo, 'ag-hunchgo', 'ease', 'forwards')}; }
 ${P} .ag-hpath { animation: ${an(t.hpath, 'ag-pulse', 'linear', 'none')}; }   /* (the hunch carried along the wires: up to the supervisor, down to Detection) */
 ${P} .ag-det { animation: ${an(t.det, 'ag-slide', IO)}; }   /* (straight along the line, as in the redesign) */
 ${P} .ag-bd .ag-b-glow { animation: ${an(t.detglow, 'ag-glow', 'linear', 'none')}; }
 /* (on desktop these three are gone from the final frame, so they are held on while it plays, then go together) */
-${P} .ag-slot { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an([t.det[0] + .2, .3], 'ag-pop', SPRING)}, ${an(t.slotout, 'ag-hide', 'ease', 'forwards')}; }
-${P} .ag-wire-det { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an(t.wires, 'ag-draw')}, ${an(t.slotout, 'ag-hide', 'ease', 'forwards')}; }
-${P} .ag-ln1 { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an(t.ln1, 'ag-draw')}, ${an(t.slotout, 'ag-hide', 'ease', 'forwards')}; }
+${P} .ag-slot { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an([t.det[0] + .2, .3], 'ag-pop', EZ)}, ${an(t.slotout, 'ag-hide', OUTEZ, 'forwards')}; }
+${P} .ag-wire-det { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an(t.wires, 'ag-draw')}, ${an(t.slotout, 'ag-hide', OUTEZ, 'forwards')}; }
+${P} .ag-ln1 { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an(t.ln1, 'ag-draw')}, ${an(t.slotout, 'ag-hide', OUTEZ, 'forwards')}; }
 ${P} .ag-wire2 { animation: ${an(t.wire2, 'ag-draw', EZ)}; }
 ${P} .ag-s1 { animation: ${an(t.w1, 'ag-wake', EZ)}; }
 /* the team steps back while Detection works, Reporting comes forward to write the lead, all forward at the end */
@@ -280,28 +301,28 @@ ${P} .ag-repb { animation: ${an(t.back, 'ag-back', 'ease', 'forwards')}, ${an(t.
 ${P} .ag-br .ag-b-glow { animation: ${an([t.fwd[0], 1.3], 'ag-glow', 'linear', 'none')}; }
 /* step 2: the logs; a query, a sweep that finds nothing; struck, backspaced, retyped, checked; a sweep that finds 32, one unusual */
 ${P} .ag-lg { animation: ${an(t.lg, 'ag-fade')}; }
-${P} .ag-logs { animation: ${an(t.logs, 'ag-fade')}; }
 ${P} .ag-q { animation: ${an(t.q, 'ag-fade')}; }
 ${P} .ag-q0 { animation: ${an([t.q[0], .01], 'ag-show', 'linear')}, ${an([t.q1[0] - .05, .1], 'ag-hide', 'linear', 'forwards')}; }
 /* (jump-none: the last step lands before the end, since a plain steps() held forwards can stop a step short) */
-${P} .ag-q0 .ag-qc { animation: ${an(t.q0, 'ag-wipe', STEPS8)}, ${an(t.erase, 'ag-unwipe', STEPS8, 'forwards')}; }
-${P} .ag-q0 .ag-qk { animation: ${an(t.q0, 'ag-caret', STEPS8)}, ${an(t.k0, 'ag-hide', 'linear', 'forwards')}, ${an([t.erase[0], .02], 'ag-show', 'linear', 'forwards')}, ${an(t.erase, 'ag-caretback', STEPS8, 'forwards')}; }
+${P} .ag-q0 .ag-qc { animation: ${an(t.q0, 'ag-wipe', STEPSQ[0])}, ${an(t.erase, 'ag-unwipe', STEPSQ[0], 'forwards')}; }
+${P} .ag-q0 .ag-qk { animation: ${an(t.q0, 'ag-caret', STEPSQ[0])}, ${an(t.k0, 'ag-hide', 'linear', 'forwards')}, ${an([t.erase[0], .02], 'ag-show', 'linear', 'forwards')}, ${an(t.erase, 'ag-caretback', STEPSQ[0], 'forwards')}; }
 ${P} .ag-qx { animation: ${an(t.qx, 'ag-draw', EZ)}; }
 ${P} .ag-q1 { animation: ${an([t.q1[0], .05], 'ag-show', 'linear')}; }
-${P} .ag-q1 .ag-qc { animation: ${an(t.q1, 'ag-wipe', STEPS8)}; }
-${P} .ag-q1 .ag-qk { animation: ${an(t.q1, 'ag-caret', STEPS8)}, ${an(t.k1, 'ag-hide', 'linear', 'forwards')}; }
-${P} .ag-qok { animation: ${an(t.ok, 'ag-pop', SPRING)}; }
+${P} .ag-q1 .ag-qc { animation: ${an(t.q1, 'ag-wipe', STEPSQ[1])}; }
+${P} .ag-q1 .ag-qk { animation: ${an(t.q1, 'ag-caret', STEPSQ[1])}, ${an(t.k1, 'ag-hide', 'linear', 'forwards')}; }
+${P} .ag-qok { animation: ${an(t.ok, 'ag-pop', EZ)}; }
 ${P} .ag-beam0 { animation: ${an(t.s0, 'ag-beam', 'linear', 'none')}; }
 ${P} .ag-bar0 { animation: ${an([t.s0[0] + .05, .7], 'ag-bar', 'linear', 'none')}; }
-${P} .ag-t:not(.ag-t-out) { animation: ag-tile calc(${(t.dim[0] + t.dim[1] - t.s1[0]).toFixed(2)}s - var(--c) * .07s) ease calc(${d(t.s1[0] + .1)}s + var(--c) * .07s) both, ag-miss .5s ease calc(${d(t.s0[0] + .1)}s + var(--c) * .08s) none; }   /* (the first sweep: each flickers grey and settles; the second: each lights, then steps back; the flicker listed last, so it wins while it plays) */
-${P} .ag-t-out { animation: ag-light .3s ease calc(${d(t.s1[0] + .1)}s + var(--c) * .07s) both, ag-miss .5s ease calc(${d(t.s0[0] + .1)}s + var(--c) * .08s) none; }
+${P} .ag-t { animation: ag-fade .3s ${EZ} calc(${d(t.logs[0])}s + var(--c) * .03s) both; }   /* (the logs cascade in by column) */
+${P} .ag-tm { animation: ag-miss .5s ease calc(${d(t.s0[0] + .1)}s + var(--c) * .08s) none; }   /* (the first sweep: each flickers grey and settles) */
+${P} .ag-tl:not(.ag-tl-out) { animation: ag-tile calc(${(t.dim[0] + t.dim[1] - t.s1[0]).toFixed(2)}s - var(--c) * .07s) ease calc(${d(t.s1[0] + .1)}s + var(--c) * .07s) both; }   /* (the second: each lights, then steps back) */
+${P} .ag-tl-out { animation: ag-light .3s ease calc(${d(t.s1[0] + .1)}s + var(--c) * .07s) both; }
 ${P} .ag-n0 { animation: ${an(t.n0, 'ag-shake', EZ)}, ${an([t.erase[0], .15], 'ag-hide', 'linear', 'forwards')}; }
 ${P} .ag-gl0 { animation: ${an(t.gl0, 'ag-hold', 'linear', 'none')}; }
 ${P} .ag-gl1 { animation: ${an(t.gl1, 'ag-hold', 'linear', 'none')}; }
 ${P} .ag-beam1 { animation: ${an(t.s1, 'ag-beam', 'linear', 'none')}; }
 ${P} .ag-bar1 { animation: ${an([t.s1[0] + .05, .55], 'ag-bar', 'linear', 'none')}; }
-${CNT.map((v, j) => `${P} .ag-cn${j} { animation: ${an([+(t.cnt[0] + j * t.cnt[1]).toFixed(3), .01], 'ag-show', 'linear', 'forwards')}, ${an([+(t.cnt[0] + (j + 1) * t.cnt[1]).toFixed(3), .01], 'ag-hide', 'linear', 'forwards')}; }`).join('\n')}
-${P} .ag-n32 { animation: ${an([+(t.cnt[0] + CNT.length * t.cnt[1]).toFixed(3), .01], 'ag-show', 'linear')}; }
+${P} .ag-odo { animation: ${an([0, t.cnt[0]], 'ag-off', 'linear', 'backwards')}, ${an([t.cnt[0], .5], 'ag-roll', IO)}; }   /* (hidden until the second sweep, then rolls 4, 9, 15, 22, 28, 32 with the columns lighting and settles) */
 ${P} .ag-ring { animation: ${an(t.ring, 'ag-ring', SPRING)}; }
 ${P} .ag-qw { animation: ${an(t.qw, 'ag-say', EZ)}; }
 /* step 3: the result travels along the line and unfolds into the lead; Reporting's pen marks it; the hand-off */
@@ -311,7 +332,7 @@ ${P} .ag-fly-y { animation: ${an([t.fly[0] + .2, t.fly[1]], 'ag-flyy', 'cubic-be
 ${P} .ag-fly-t { animation: ${an([t.fly[0], t.fly[1] + .2], 'ag-flyt', IO)}, ${an([t.card[0] + .05, .1], 'ag-hide', 'linear', 'forwards')}; }
 ${P} .ag-s2 { animation: ${an(t.w2, 'ag-wake', EZ)}; }
 ${P} .ag-card { animation: ${an(t.card, 'ag-unfold', EZ)}; }
-${P} .ag-cpen { animation: ${an(t.cpen, 'ag-pop', SPRING)}; }
+${P} .ag-cpen { animation: ${an(t.cpen, 'ag-pop', EZ)}; }
 ${P} .ag-trick { animation: ${an(t.trick, 'ag-say', EZ)}; }
 ${P} .ag-he { animation: ${an(t.he, 'ag-fade')}, ${an(t.pk, 'ag-march', 'linear', 'none')}; }
 ${P} .ag-pk { animation: ${an(t.pk, 'ag-pk', IO, 'none')}; }
@@ -320,10 +341,10 @@ ${P} .ag-halo { animation: ${an(t.halo, 'ag-halo', EZ, 'none')}; }
 ${P} .ag-decides { animation: ${an(t.decides, 'ag-say', EZ)}; }   /* (once the halo has run, so it never crosses it) */
 /* phones: Detection's two places are on separate steps, so it fades from one and arrives at the other, and the
    result's flight fades back while it crosses the words */
-${PM} .ag-det { animation: ${an([t.det[0] + .3, .4], 'ag-pop', SPRING)}; }
+${PM} .ag-det { animation: ${an([t.det[0] + .3, .4], 'ag-pop', EZ)}; }
 ${PM} .ag-det1 { animation: ${an(t.det, 'ag-ghost', 'ease')}; }
 ${PM} .ag-fly-t { animation-name: ag-flytm, ag-hide; }
-${PM} .ag-slot { animation: ${an([t.det[0] + .2, .3], 'ag-pop', SPRING)}; }
+${PM} .ag-slot { animation: ${an([t.det[0] + .2, .3], 'ag-pop', EZ)}; }
 ${PM} .ag-wire-det { animation: ${an(t.wires, 'ag-draw')}; }
 `;
 fs.writeFileSync(path.join(OUT, 'scene-d.svg'), desktop());
