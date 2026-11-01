@@ -52,9 +52,9 @@ const T = (x, y, t, f = 9.5, col = C.mute, extra = '') => `<text x="${x}" y="${y
 
 const STEPS = [
   { title: 'Purpose-built agents', d: ['A local model does best with one job, so', 'each narrow agent gets only the tools', 'and context that job needs.'],
-    m: ['A local model does best with one job, so each', 'narrow agent gets only the tools and context', 'that job needs.'] },
+    m: ['A local model does best with one job, so each narrow', 'agent gets only the tools and context that job needs.'] },
   { title: 'Equipped to adapt', d: ['No results can mean a bad query, not a', 'safe network. So the agent rewrites it,', 'checks the fix and searches again.'],
-    m: ['No results can mean a bad query, not a safe network.', 'So the agent rewrites it, checks the fix and', 'searches again.'] },
+    m: ['No results can mean a bad query, not a safe network. So', 'the agent rewrites it, checks the fix and searches again.'] },
   { title: 'Surface to the analyst', d: ['Agents flag what looks suspicious, with', 'the evidence attached. Only a human', 'analyst makes the call.'],
     m: ['Agents flag what looks suspicious, with the evidence', 'attached. Only a human analyst makes the call.'] },
 ];
@@ -165,21 +165,23 @@ function desktop() {
     `<g class="ag-det" style="--dx:${DX - BX[2]}px">${badge('ag-bd', BX[2], L, 'lens', 'Detection', true)}</g>` + fly((i, p) => p);
   return s.join('') + `<g class="ag-stage">${stage}</g></svg>`;
 }
-// phones: each step's picture drawn 1.4x and centred above its words, with room between them
-const PS = 1.4;
+// phones: each step's picture drawn a little over desktop size and centred above its words, the whole drawing
+// fitting one phone screen (owner, 1 Nov 2026, on an iPhone 16: "the whole animation is too long and cannot find the
+// screen entirely"; it was 1.4x with roomy gaps, 360x868, taller than Safari's viewport)
+const PS = 1.08;
 function phone() {
-  const W = 360, words = [], pics = [], at = []; let y = 64;
+  const W = 360, words = [], pics = [], at = []; let y = 60;
   STEPS.forEach((st, i) => {
-    const [x0, x1, y0, y1] = REACH[i], px = r1((W - PS * (x1 - x0)) / 2 - PS * x0), py = r1(y + 18 - PS * y0);
+    const [x0, x1, y0, y1] = REACH[i], px = r1((W - PS * (x1 - x0)) / 2 - PS * x0), py = r1(y + 6 - PS * y0);
     at[i] = [px, py];
     pics.push(`<g class="ag-p ag-p${i}"><g transform="translate(${px} ${py}) scale(${PS})">${picture(i, true)}</g></g>`);
-    const ty = r1(y + 18 + PS * (y1 - y0) + 26), by = r1(ty + 22);
-    words.push(`<g class="ag-sw ag-sw${i}"><g class="ag-s ag-s${i}">${title(i, 16, ty, 14.5)}${body(st.m, 16, by, 18.5, 13.4)}</g></g>`);
-    y = r1(by + (st.m.length - 1) * 18.5 + 22);
+    const ty = r1(y + 6 + PS * (y1 - y0) + 20), by = r1(ty + 17);
+    words.push(`<g class="ag-sw ag-sw${i}"><g class="ag-s ag-s${i}">${title(i, 16, ty, 13.5)}${body(st.m, 16, by, 16, 12.5)}</g></g>`);
+    y = r1(by + (st.m.length - 1) * 16 + 13);
     if (i < 2) words.push(`<path d="M14 ${y} H${W - 14}" stroke="${C.line}"/>`);
   });
   const H = r1(y + 2), map = (i, [u, v]) => [at[i][0] + PS * u, at[i][1] + PS * v];
-  return { svg: open('ag-scene ag-scene--m', W, H) + header(W, 25, 13, true) + words.join('') + `<g class="ag-stage">${pics.join('')}${fly(map)}</g></svg>`, H };
+  return { svg: open('ag-scene ag-scene--m', W, H) + header(W, 23, 12.5, true) + words.join('') + `<g class="ag-stage">${pics.join('')}${fly(map)}</g></svg>`, H };
 }
 
 // ---------------------------------------------------------------- motion (one stylesheet for both drawings)

@@ -254,9 +254,11 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(card(root)).toHaveCSS('position','static');
  await expect(phoneScene(root)).toBeVisible();
  await expect(scene(root)).toBeHidden();
- // Phones draw the same full pictures, larger, so the drawing uses the width rather than squeezing beside the text.
+ // Phones draw the same full pictures above the words, stacked, and the whole drawing fits one phone screen
+ // (owner, 1 Nov 2026, on an iPhone 16: "the whole animation is too long and cannot find the screen entirely").
  const pb=await phoneScene(root).boundingBox();
- expect(pb.height).toBeGreaterThan(pb.width*1.8);
+ expect(pb.height).toBeGreaterThan(pb.width*1.5);
+ expect(pb.height).toBeLessThan(600);
  await expect(phoneScene(root).locator('.ag-t')).toHaveCount(32);
  await expect(phoneScene(root).locator('.ag-logo')).toHaveCount(1);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
