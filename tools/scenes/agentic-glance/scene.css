@@ -64,11 +64,15 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
 @keyframes ag-miss { 0%, 100% { opacity: 0; } 30% { opacity: 1; } }
 @keyframes ag-tile { 0% { opacity: 0; } 22%, 62% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes ag-light { from { opacity: 0; } }
+@keyframes ag-lit-s { from { stroke: #4f6f6e; } }
+@keyframes ag-lit-i { from { stroke: #8ba7a6; } }
+@keyframes ag-lit-t { from { fill: #8ba7a6; } }
 @keyframes ag-ring { 0% { opacity: 0; transform: scale(.4); } 60% { opacity: 1; transform: scale(1.15); } 100% { opacity: 1; transform: none; } }
 @keyframes ag-flyx { to { transform: translateX(var(--dx)); } }
 @keyframes ag-flyy { to { transform: translateY(var(--dy)); } }
-@keyframes ag-flyt { 0% { opacity: 0; transform: none; } 10% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { transform: translateY(-6px) scale(1.7); } 100% { opacity: 1; transform: none; } }
-@keyframes ag-flytm { 0% { opacity: 0; transform: none; } 10% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { opacity: 1; transform: translateY(-6px) scale(1.7); } 45%, 75% { opacity: .25; } 100% { opacity: 1; transform: none; } }
+/* (the result appears exactly over the lit tile first, then lifts; fading in while lifting made it start above the tile) */
+@keyframes ag-flyt { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { transform: translateY(-6px) scale(1.7); } 100% { opacity: 1; transform: none; } }
+@keyframes ag-flytm { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { opacity: 1; transform: translateY(-6px) scale(1.7); } 45%, 75% { opacity: .25; } 100% { opacity: 1; transform: none; } }
 @keyframes ag-unfold { from { opacity: 0; transform: scale(.1); } 40% { opacity: 1; } to { opacity: 1; transform: none; } }
 @keyframes ag-spring { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
 @keyframes ag-halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }
@@ -86,12 +90,16 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
 .is-playing svg.ag-scene .ag-hunch { animation: ag-hunch 0.4s cubic-bezier(.22,1,.36,1) 1.8s both, ag-hunchgo 0.3s ease 3.25s forwards; }
 .is-playing svg.ag-scene .ag-hpath { animation: ag-pulse 0.8s linear 2.6s none; }   /* (the hunch carried along the wires: up to the supervisor, down to Detection) */
 .is-playing svg.ag-scene .ag-det { animation: ag-slide 0.55s cubic-bezier(.45,0,.25,1) 3.45s both; }   /* (straight along the line, as in the redesign) */
+/* Detection is neutral until the hunch lands on it, then lights (cause before effect; a blind continuity review) */
+.is-playing svg.ag-scene :is(.ag-bd, .ag-det1 .ag-b) > rect:not(.ag-b-glow) { animation: ag-lit-s 0.3s ease 3.35s both; }
+.is-playing svg.ag-scene :is(.ag-bd, .ag-det1 .ag-b) .ag-i { animation: ag-lit-i 0.3s ease 3.35s both; }
+.is-playing svg.ag-scene :is(.ag-bd, .ag-det1 .ag-b) text { animation: ag-lit-t 0.3s ease 3.35s both; }
 .is-playing svg.ag-scene .ag-bd .ag-b-glow { animation: ag-glow 4.95s linear 3.3s none; }
 /* (on desktop these three are gone from the final frame, so they are held on while it plays, then go together) */
-.is-playing svg.ag-scene .ag-slot { animation: ag-keep 12.85s linear 0.5s both, ag-pop 0.3s cubic-bezier(.22,1,.36,1) 3.65s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.35s forwards; }
-.is-playing svg.ag-scene .ag-wire-det { animation: ag-keep 12.85s linear 0.5s both, ag-draw 0.35s cubic-bezier(.45,0,.25,1) 1.4s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.35s forwards; }
-.is-playing svg.ag-scene .ag-ln1 { animation: ag-keep 12.85s linear 0.5s both, ag-draw 0.55s cubic-bezier(.45,0,.25,1) 3.45s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.35s forwards; }
-.is-playing svg.ag-scene .ag-wire2 { animation: ag-draw 0.6s cubic-bezier(.22,1,.36,1) 13.35s both; }
+.is-playing svg.ag-scene .ag-slot { animation: ag-keep 13s linear 0.5s both, ag-pop 0.3s cubic-bezier(.22,1,.36,1) 3.65s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.5s forwards; }
+.is-playing svg.ag-scene .ag-wire-det { animation: ag-keep 13s linear 0.5s both, ag-draw 0.35s cubic-bezier(.45,0,.25,1) 1.4s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.5s forwards; }
+.is-playing svg.ag-scene .ag-ln1 { animation: ag-keep 13s linear 0.5s both, ag-draw 0.55s cubic-bezier(.45,0,.25,1) 3.45s both, ag-hide 0.25s cubic-bezier(.4,0,.2,1) 13.5s forwards; }
+.is-playing svg.ag-scene .ag-wire2 { animation: ag-draw 0.5s cubic-bezier(.22,1,.36,1) 13.1s both; }
 .is-playing svg.ag-scene .ag-s1 { animation: ag-wake 0.5s cubic-bezier(.22,1,.36,1) 3.5s both; }
 /* the team steps back while Detection works, Reporting comes forward to write the lead, all forward at the end */
 .is-playing svg.ag-scene .ag-team { animation: ag-back 0.3s ease 3.65s forwards, ag-fwd 0.5s ease 13.25s forwards; }
@@ -124,10 +132,10 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
 .is-playing svg.ag-scene .ag-ring { animation: ag-ring 0.4s cubic-bezier(.34,1.56,.64,1) 9.85s both; }
 .is-playing svg.ag-scene .ag-qw { animation: ag-say 0.3s cubic-bezier(.22,1,.36,1) 10s both; }
 /* step 3: the result travels along the line and unfolds into the lead; Reporting's pen marks it; the hand-off */
-.is-playing svg.ag-scene .ag-ln2 { animation: ag-draw 0.35s cubic-bezier(.45,0,.25,1) 10.6s both; }
-.is-playing svg.ag-scene .ag-fly { animation: ag-flyx 0.7s cubic-bezier(.45,0,.25,1) 10.95s both; opacity: 1; }
-.is-playing svg.ag-scene .ag-fly-y { animation: ag-flyy 0.7s cubic-bezier(.55,.05,.85,.45) 10.95s both; }
-.is-playing svg.ag-scene .ag-fly-t { animation: ag-flyt 0.8999999999999999s cubic-bezier(.45,0,.25,1) 10.75s both, ag-hide 0.1s linear 11.5s forwards; }
+.is-playing svg.ag-scene .ag-ln2 { animation: ag-draw 0.3s cubic-bezier(.45,0,.25,1) 10.85s both; }
+.is-playing svg.ag-scene .ag-fly { animation: ag-flyx 0.5s cubic-bezier(.45,0,.25,1) 10.95s both; opacity: 1; }
+.is-playing svg.ag-scene .ag-fly-y { animation: ag-flyy 0.5s cubic-bezier(.55,.05,.85,.45) 10.95s both; }
+.is-playing svg.ag-scene .ag-fly-t { animation: ag-flyt 0.7s cubic-bezier(.45,0,.25,1) 10.75s both, ag-hide 0.1s linear 11.5s forwards; }
 .is-playing svg.ag-scene .ag-s2 { animation: ag-wake 0.45s cubic-bezier(.22,1,.36,1) 10.85s both; }
 .is-playing svg.ag-scene .ag-card { animation: ag-unfold 0.5s cubic-bezier(.22,1,.36,1) 11.45s both; }
 .is-playing svg.ag-scene .ag-cpen { animation: ag-pop 0.35s cubic-bezier(.22,1,.36,1) 11.75s both; }
@@ -141,6 +149,7 @@ svg.ag-scene :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo
    result's flight fades back while it crosses the words */
 .is-playing svg.ag-scene--m .ag-det { animation: ag-pop 0.4s cubic-bezier(.22,1,.36,1) 3.75s both; }
 .is-playing svg.ag-scene--m .ag-det1 { animation: ag-ghost 0.55s ease 3.45s both; }
+.is-playing svg.ag-scene--m .ag-det1 .ag-b { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) 1.66s both; }   /* (it pops in with the other two badges; it had no entrance and sat there from the first frame) */
 .is-playing svg.ag-scene--m .ag-fly-t { animation-name: ag-flytm, ag-hide; }
 .is-playing svg.ag-scene--m .ag-slot { animation: ag-pop 0.3s cubic-bezier(.22,1,.36,1) 3.65s both; }
 .is-playing svg.ag-scene--m .ag-wire-det { animation: ag-draw 0.35s cubic-bezier(.45,0,.25,1) 1.4s both; }

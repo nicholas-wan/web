@@ -99,9 +99,9 @@ function picture(i, phone) {
       // (three rects a tile, grey, the flicker and the light, so only opacity ever animates; their size and colours are in the stylesheet)
       return `<g class="ag-t" style="--c:${c}" transform="translate(${G.x + c * (G.ts + G.tg)} ${G.y + r * (G.ts + G.tg)})"><rect/><rect class="ag-tm"/><rect class="ag-tl${out ? ' ag-tl-out' : ''}"/></g>`; }).join('')}</g>`;
     p += `<circle class="ag-ring" cx="${OUTC[0]}" cy="${OUTC[1]}" r="9" fill="none" stroke="${C.teal}" stroke-width="1.4"/>`;
-    const cone = `M${DX + 12} ${L - 3} L${G.x - 3} ${G.y - 4} H${G.x + G.w + 3} V${G.y + G.h + 4} H${G.x - 3} Z`;
+    const cone = `M${DX + 12} ${L - 3} L${G.x - 3} ${G.y - 4} H${G.x + G.w + 3} V${G.y + G.h + 2.5} H${G.x - 3} Z`;
     p += [0, 1].map(k => `<path class="ag-beam ag-beam${k}" d="${cone}" fill="${k ? C.teal : C.mute}" fill-opacity="${k ? .12 : .1}"/>` +
-      `<rect class="ag-bar ag-bar${k}" x="${G.x - 3}" y="${G.y - 4}" width="3" height="${G.h + 8}" rx="1.5" fill="${k ? C.teal : C.mute}" style="--w:${G.w + 3}px"/>`).join('');
+      `<rect class="ag-bar ag-bar${k}" x="${G.x - 3}" y="${G.y - 3}" width="3" height="${G.h + 5.5}" rx="1.5" fill="${k ? C.teal : C.mute}" style="--w:${G.w + 3}px"/>`).join('');
     const cy = 137;
     const ROLL = 15, cid = 'ag-cc-' + (phone ? 'm' : 'd');   // (the count rolls up through a window one row tall whose edges fade, so a passing row never shows a hard cut)
     p += T(G.x, cy, '0 found', 10.5, C.body, 'class="ag-n0" font-weight="700"') +
@@ -131,7 +131,7 @@ function picture(i, phone) {
     `<path class="ag-he" d="M${x + w + 6} ${L} H${AX - R - 6}" stroke="${C.teal}" stroke-width="1.5" stroke-dasharray="4 3" stroke-linecap="round" fill="none"/>` +
     `<rect class="ag-pk" x="${x + w + 2}" y="${L - 3.5}" width="9" height="7" rx="1.5" fill="${C.teal}" style="--dx:${AX - R - 6 - (x + w + 6)}px"/>` +
     `<g class="ag-ana"><circle cx="${AX}" cy="${L}" r="${R}" fill="${C.node}" stroke="${C.amb}" stroke-width="1.5"/>${icon('ana', r1(AX - 13.7), r1(L - 13.7), 2.28, C.amb)}</g>` +
-    `<circle class="ag-halo" cx="${AX}" cy="${L}" r="${R}" fill="none" stroke="${C.amb}" stroke-width="1.4"/>${T(AX, L + R + 18, 'Analyst decides', 9.8, C.amb, 'class="ag-decides" text-anchor="middle" font-weight="600"')}`;
+    `<circle class="ag-halo" cx="${AX}" cy="${L}" r="${R}" fill="none" stroke="${C.amb}" stroke-width="1.4"/>${T(AX, CARD.y + CARD.h + 16, 'Analyst decides', 9.8, C.amb, 'class="ag-decides" text-anchor="middle" font-weight="600"')}`;
 }
 // the result's flight, from the unusual tile to the card's flag (map: desktop units to the drawing's)
 const fly = map => { const [a, b] = [map(1, OUTC), map(2, [CARD.x + 14, CARD.y + 15])], s1 = map(1, [1, 0])[0] - map(1, [0, 0])[0];
@@ -160,7 +160,7 @@ function desktop() {
     s.push(`<g class="ag-sw ag-sw${i}"><g class="ag-s ag-s${i}">${title(i, x, 194, 12.5)}${body(st.d, x, 213, 15.5, 10.3)}</g></g>`); });
   const stage = [0, 1, 2].map(i => `<g class="ag-p ag-p${i}">${picture(i, false)}</g>`).join('') +
     // the line: Detection's place to where it works, and on to step 3; at the end the supervisor's wire is redrawn to it
-    `<path class="ag-ln ag-ln1" d="M${BX[2] + 15} ${L} H${DX - 15}" pathLength="1" stroke="${C.rule}" fill="none"/><path class="ag-ln ag-ln2" d="M${G.x + G.w + 8} ${L} H${CARD.x - 6}" pathLength="1" stroke="${C.rule}" fill="none"/>` +
+    `<path class="ag-ln ag-ln1" d="M${BX[2] + 15} ${L} H${DX - 15}" pathLength="1" stroke="${C.rule}" fill="none"/><path class="ag-ln ag-ln2" d="M${G.x + G.w + 8} ${L} H${CARD.x - 1.5}" pathLength="1" stroke="${C.rule}" fill="none"/>` +
     `<path class="ag-wire2" d="M${HUB[0]} ${HUB[1] + 8} C${HUB[0]} ${HUB[1] + 30} ${DX} ${L - 40} ${DX} ${L - 14}" pathLength="1" stroke="${C.dim}" fill="none"/>` +
     `<g class="ag-det" style="--dx:${DX - BX[2]}px">${badge('ag-bd', BX[2], L, 'lens', 'Detection', true)}</g>` + fly((i, p) => p);
   return s.join('') + `<g class="ag-stage">${stage}</g></svg>`;
@@ -191,8 +191,8 @@ const t = {
   hyp: [1.2, 1.1], hunch: [1.3, .4], hpath: [2.1, .8], hunchgo: [2.75, .3], detglow: [2.8, 4.95], det: [2.95, .55], ln1: [2.95, .55], w1: [3.0, .5], back: [3.15, .3],
   lg: [3.45, .35], logs: [3.5, .4], q: [3.55, .25], q0: [3.7, .6], k0: [4.35, .1], s0: [4.4, .8], n0: [5.35, .4], gl0: [5.4, 1.95], qx: [6.3, .2], erase: [6.55, .35],
   q1: [6.95, .6], k1: [7.6, .1], ok: [7.6, .3], gl1: [7.65, 1.3], s1: [8.3, .6], cnt: [8.5, .07], dim: [9.1, .45], ring: [9.35, .4], qw: [9.5, .3],
-  ln2: [10.1, .35], fly: [10.25, .7], w2: [10.35, .45], fwd: [10.45, .4], card: [10.95, .5], cpen: [11.25, .35], trick: [11.35, .3],
-  he: [11.5, .35], pk: [11.65, .55], ana: [12.2, .5], halo: [12.3, 1.1], decides: [13.35, .3], all: [12.75, .5], wire2: [12.85, .6], slotout: [12.85, .25],
+  ln2: [10.35, .3], fly: [10.25, .5], lit: [2.85, .3], w2: [10.35, .45], fwd: [10.45, .4], card: [10.95, .5], cpen: [11.25, .35], trick: [11.35, .3],
+  he: [11.5, .35], pk: [11.65, .55], ana: [12.2, .5], halo: [12.3, 1.1], decides: [13.35, .3], all: [12.75, .5], wire2: [12.6, .5], slotout: [13.0, .25],
 };
 const OUTEZ = 'cubic-bezier(.4,0,.2,1)', EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)', SPRING = 'cubic-bezier(.34,1.56,.64,1)', STEPS8 = 'steps(8, jump-none)';
 const STEPSQ = QUERIES.map(([f, v]) => `steps(${f.length + v.length + 5}, jump-none)`);   // (one step per character)
@@ -266,11 +266,15 @@ ${S} :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo, .ag-fl
 @keyframes ag-miss { 0%, 100% { opacity: 0; } 30% { opacity: 1; } }
 @keyframes ag-tile { 0% { opacity: 0; } 22%, 62% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes ag-light { from { opacity: 0; } }
+@keyframes ag-lit-s { from { stroke: ${C.dim}; } }
+@keyframes ag-lit-i { from { stroke: ${C.mute}; } }
+@keyframes ag-lit-t { from { fill: ${C.mute}; } }
 @keyframes ag-ring { 0% { opacity: 0; transform: scale(.4); } 60% { opacity: 1; transform: scale(1.15); } 100% { opacity: 1; transform: none; } }
 @keyframes ag-flyx { to { transform: translateX(var(--dx)); } }
 @keyframes ag-flyy { to { transform: translateY(var(--dy)); } }
-@keyframes ag-flyt { 0% { opacity: 0; transform: none; } 10% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { transform: translateY(-6px) scale(1.7); } 100% { opacity: 1; transform: none; } }
-@keyframes ag-flytm { 0% { opacity: 0; transform: none; } 10% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { opacity: 1; transform: translateY(-6px) scale(1.7); } 45%, 75% { opacity: .25; } 100% { opacity: 1; transform: none; } }
+/* (the result appears exactly over the lit tile first, then lifts; fading in while lifting made it start above the tile) */
+@keyframes ag-flyt { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { transform: translateY(-6px) scale(1.7); } 100% { opacity: 1; transform: none; } }
+@keyframes ag-flytm { 0% { opacity: 0; transform: none; } 1% { opacity: 1; transform: none; } 12% { opacity: 1; transform: translateY(-6px) scale(1.7); } 30% { opacity: 1; transform: translateY(-6px) scale(1.7); } 45%, 75% { opacity: .25; } 100% { opacity: 1; transform: none; } }
 @keyframes ag-unfold { from { opacity: 0; transform: scale(.1); } 40% { opacity: 1; } to { opacity: 1; transform: none; } }
 @keyframes ag-spring { from { opacity: 0; transform: scale(.85); } to { opacity: 1; transform: none; } }
 @keyframes ag-halo { 0% { opacity: .9; transform: scale(1); } 100% { opacity: 0; transform: scale(1.8); } }
@@ -288,6 +292,10 @@ ${P} .ag-bh .ag-b-glow { animation: ${an(t.hyp, 'ag-glow', 'linear', 'none')}; }
 ${P} .ag-hunch { animation: ${an(t.hunch, 'ag-hunch', EZ)}, ${an(t.hunchgo, 'ag-hunchgo', 'ease', 'forwards')}; }
 ${P} .ag-hpath { animation: ${an(t.hpath, 'ag-pulse', 'linear', 'none')}; }   /* (the hunch carried along the wires: up to the supervisor, down to Detection) */
 ${P} .ag-det { animation: ${an(t.det, 'ag-slide', IO)}; }   /* (straight along the line, as in the redesign) */
+/* Detection is neutral until the hunch lands on it, then lights (cause before effect; a blind continuity review) */
+${P} :is(.ag-bd, .ag-det1 .ag-b) > rect:not(.ag-b-glow) { animation: ${an(t.lit, 'ag-lit-s', 'ease')}; }
+${P} :is(.ag-bd, .ag-det1 .ag-b) .ag-i { animation: ${an(t.lit, 'ag-lit-i', 'ease')}; }
+${P} :is(.ag-bd, .ag-det1 .ag-b) text { animation: ${an(t.lit, 'ag-lit-t', 'ease')}; }
 ${P} .ag-bd .ag-b-glow { animation: ${an(t.detglow, 'ag-glow', 'linear', 'none')}; }
 /* (on desktop these three are gone from the final frame, so they are held on while it plays, then go together) */
 ${P} .ag-slot { animation: ${an([0, t.slotout[0]], 'ag-keep', 'linear')}, ${an([t.det[0] + .2, .3], 'ag-pop', EZ)}, ${an(t.slotout, 'ag-hide', OUTEZ, 'forwards')}; }
@@ -343,6 +351,7 @@ ${P} .ag-decides { animation: ${an(t.decides, 'ag-say', EZ)}; }   /* (once the h
    result's flight fades back while it crosses the words */
 ${PM} .ag-det { animation: ${an([t.det[0] + .3, .4], 'ag-pop', EZ)}; }
 ${PM} .ag-det1 { animation: ${an(t.det, 'ag-ghost', 'ease')}; }
+${PM} .ag-det1 .ag-b { animation: ${an(t.bd, 'ag-pop', EZ)}; }   /* (it pops in with the other two badges; it had no entrance and sat there from the first frame) */
 ${PM} .ag-fly-t { animation-name: ag-flytm, ag-hide; }
 ${PM} .ag-slot { animation: ${an([t.det[0] + .2, .3], 'ag-pop', EZ)}; }
 ${PM} .ag-wire-det { animation: ${an(t.wires, 'ag-draw')}; }
