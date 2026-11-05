@@ -1711,13 +1711,39 @@ html:has(> body.is-map-fullscreen) {
   color: #ffb869;
 }
 
+/* Popover thumbnails stay unrendered until the pointer or keyboard focus is
+   on the map. A visibility-hidden lazy image still downloads once it nears the
+   viewport, so all twelve fetched with the page (~940 KB of -800 files on a
+   desktop, Nov 2026); display: none defers them in Chromium and WebKit. Hovering
+   anywhere on the map warms all twelve before a pin is reached, travel.html
+   gives them their real 62-91px slot (so -480), and the explicit row and column
+   keep the popover's size the same while the image is unrendered. The delayed
+   discrete display transition keeps a thumbnail through the 0.18s fade-out when
+   the pointer leaves the map from an open popover. */
 .travel-map__marker-label img {
-  display: block;
+  display: none;
   width: 4.25rem;
   height: 3.2rem;
   margin: 0;
   border-radius: 0.3rem;
   object-fit: cover;
+  transition: display 0s linear 0.18s allow-discrete;
+}
+
+@media screen and (min-width: 521px) {
+  .travel-map__journal-link {
+    grid-template-rows: minmax(3.2rem, auto);
+  }
+
+  .travel-map__marker-copy {
+    grid-column: 2;
+  }
+
+  .travel-map:hover .travel-map__marker-label img,
+  .travel-map:focus-within .travel-map__marker-label img {
+    display: block;
+    transition-delay: 0s;
+  }
 }
 
 .travel-map__marker-label strong,
@@ -9633,6 +9659,11 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 .travel-timeline .chronology-year{position:absolute;top:calc(var(--timeline-line) + .5px);transform:translate(9px,-50%);padding:0 4px;background:#f3f7f3;font:700 12px/14px var(--font-display);color:#286957;pointer-events:none}
 .travel-timeline .chronology-label{max-width:100%}
 .travel-timeline .chronology-date{max-width:100%}
+/* travel.html moves the atlas below the journals with an inline script right after them. Until it runs, the
+   timeline layout leaves the map out of the opening card, so even a frame painted mid-parse never shows it there
+   (the runtime move it replaced shifted the archive heading: desktop CLS 0.046). No JavaScript, no class: the
+   map stays in the opening card. */
+.travel-timeline .travel-atlas:not(.travel-atlas--map)>.photo-explore__map-heading,.travel-timeline .travel-atlas:not(.travel-atlas--map)>.travel-atlas__layout{display:none}
 .travel-timeline .travel-atlas--map{padding-top:2rem!important}
 .travel-timeline .travel-atlas--map .photo-explore__map-heading{margin-top:0}
 .travel-timeline .da-paris-light{stroke:#ba842c;stroke-width:1.35}
