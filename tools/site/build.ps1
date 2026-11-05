@@ -674,24 +674,44 @@ function Get-FileContentVersion([string]$Path) {
 # exact bytes that get written later. The write-out below reuses these values.
 $customCssSource = Get-Content -LiteralPath (Join-Path $root 'assets\css\custom.css') -Raw -Encoding UTF8
 $cssSegments = @(
-    [pscustomobject]@{ Bundle = 'travel-navigation.css'; Start = '/* Route bundle: travel-navigation:start */'; End = '/* Route bundle: travel-navigation:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'travel-map-page.css'; Start = '/* Travel destination atlas */'; End = '/* Guangzhou journal */'; IncludeEnd = $false },
-    [pscustomobject]@{ Bundle = 'travel-journal.css'; Start = '/* Guangzhou journal */'; End = '/* Portfolio positioning and case-study system. */'; IncludeEnd = $false },
-    [pscustomobject]@{ Bundle = 'experience-page.css'; Start = '/* Route bundle: experience-base:start */'; End = '/* Route bundle: experience-base:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'travel-journal.css'; Start = '/* Travel journal navigation.'; End = '/* Route bundle: journal-nav:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'personal-page.css'; Start = '/* Route bundle: personal-base:start */'; End = '/* Route bundle: personal-base:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'travel-journal.css'; Start = '/* Japan editorial title and lower banner crop. */'; End = '/* Route bundle: journal-japan:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'personal-page.css'; Start = '/* Route bundle: personal-responsive:start */'; End = '/* Route bundle: personal-responsive:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'skills-page.css'; Start = '/* Quiet Skills-card treatment:'; End = '/* Route bundle: skills-polish:end */'; IncludeEnd = $true },
-    [pscustomobject]@{ Bundle = 'travel-search.css'; Start = '/* Route bundle: travel-search:start */'; End = '/* Route bundle: travel-search:end */'; IncludeEnd = $true }
+    [pscustomobject]@{ Bundle = 'travel-navigation.css'; Name = 'travel-navigation' },
+    [pscustomobject]@{ Bundle = 'travel-map-page.css'; Name = 'travel-map' },
+    [pscustomobject]@{ Bundle = 'travel-journal.css'; Name = 'journal-guangzhou' },
+    [pscustomobject]@{ Bundle = 'experience-page.css'; Name = 'experience-base' },
+    [pscustomobject]@{ Bundle = 'experience-page.css'; Name = 'experience-layout' },
+    [pscustomobject]@{ Bundle = 'experience-page.css'; Name = 'experience-responsive' },
+    [pscustomobject]@{ Bundle = 'experience-page.css'; Name = 'experience-internships' },
+    [pscustomobject]@{ Bundle = 'travel-journal.css'; Name = 'journal-nav' },
+    [pscustomobject]@{ Bundle = 'personal-page.css'; Name = 'personal-base' },
+    [pscustomobject]@{ Bundle = 'travel-journal.css'; Name = 'journal-japan' },
+    [pscustomobject]@{ Bundle = 'personal-page.css'; Name = 'personal-responsive' },
+    [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-education' },
+    [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-cards' },
+    [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-responsive' },
+    [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-polish' },
+    [pscustomobject]@{ Bundle = 'travel-search.css'; Name = 'travel-search' },
+    # Masonry tiles, the lightbox and the event pages' context bar: only the
+    # pages that load gallery.js (house, prewed and the journals) need them.
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'journal-progress' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'gallery-masonry' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'gallery-tiles' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'prewed-layout' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'event-context-bar' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'gallery-bricks' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'gallery-lightbox' }
 )
+# Each block is bounded by explicit /* Route bundle: <name>:start */ and
+# /* Route bundle: <name>:end */ comments, never by ordinary headings, so
+# rewording a heading cannot move rules between bundles.
 $resolvedCssSegments = foreach ($segment in $cssSegments) {
-    $start = $customCssSource.IndexOf($segment.Start)
-    $endMarkerStart = $customCssSource.IndexOf($segment.End, $start + $segment.Start.Length)
+    $startMarker = "/* Route bundle: $($segment.Name):start */"
+    $endMarker = "/* Route bundle: $($segment.Name):end */"
+    $start = $customCssSource.IndexOf($startMarker)
+    $endMarkerStart = $customCssSource.IndexOf($endMarker, [Math]::Max($start, 0) + $startMarker.Length)
     if ($start -lt 0 -or $endMarkerStart -le $start) {
-        throw "Could not locate CSS bundle boundaries for $($segment.Bundle): $($segment.Start)"
+        throw "Could not locate CSS bundle boundaries for $($segment.Bundle): $startMarker"
     }
-    $end = if ($segment.IncludeEnd) { $endMarkerStart + $segment.End.Length } else { $endMarkerStart }
+    $end = $endMarkerStart + $endMarker.Length
     [pscustomobject]@{ Bundle = $segment.Bundle; Start = $start; End = $end }
 }
 $resolvedCssSegments = @($resolvedCssSegments | Sort-Object Start)
@@ -1170,6 +1190,8 @@ foreach ($page in $pages) {
     $routeStylesheets = @()
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-map-page.css')`" />" }
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-search.css')`" />"; $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-navigation.css')`" />" }
+    # gallery.css first: its rules came before every journal rule in custom.css.
+    if ($galleryPages -contains $slug) { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/gallery.css')`" />" }
     if ($tripOrder -contains $slug) { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-journal.css')`" />" }
     if ($slug -eq 'experience') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/experience-page.css')`" /><link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/internship-peek.css')`" />" }
     if ($slug -eq 'personal') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/personal-page.css')`" />" }

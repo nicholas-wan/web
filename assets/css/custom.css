@@ -35,6 +35,7 @@
   --ease-emphasized: cubic-bezier(0.22, 0.8, 0.32, 1);
 }
 
+/* Route bundle: skills-education:start */
 .education-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -131,12 +132,14 @@
 .education-highlights strong {
   color: var(--color-ink-800);
 }
+/* Route bundle: skills-education:end */
 @media only screen and (max-width: 600px) {
   .aboutblock {
     text-align: left !important;
   }
 }
 
+/* Route bundle: skills-cards:start */
 .education-heading h2,
 .skills-heading h2 {
   font-size: 2.8rem !important;
@@ -430,6 +433,7 @@
     min-height: 0;
   }
 }
+/* Route bundle: skills-cards:end */
 
 /* iPhone-style swipe intro: JS drives --p from 0 (photo centered, text
    offstage right) to 1 (side-by-side). Default 1 keeps the settled layout
@@ -501,7 +505,7 @@
 
 .intro-swipe__text h3 {
   margin-bottom: 0.75rem;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-family: var(--font-display);
   font-size: 2.1rem;
   font-weight: 900;
   line-height: 1.15;
@@ -667,7 +671,7 @@
   width: 1.6rem;
   height: 1.6rem;
   background-color: currentColor;
-  color: #11807d;
+  color: var(--color-brand-600);
   content: "";
   -webkit-mask: var(--homepage-card-icon) center / contain no-repeat;
   mask: var(--homepage-card-icon) center / contain no-repeat;
@@ -695,7 +699,7 @@
   width: 2.75rem;
   height: 2.75rem;
   place-items: center;
-  color: #11807d;
+  color: var(--color-brand-600);
   opacity: var(--ip, 1);
   pointer-events: none;
   transform-origin: center;
@@ -788,7 +792,7 @@
 }
 
 .homepage-link[data-scrub]::after {
-  background: linear-gradient(90deg, #11807d, #2fd7cf) top left / calc(var(--ip, 0) * 100%) 2px no-repeat;
+  background: linear-gradient(90deg, var(--color-brand-600), #2fd7cf) top left / calc(var(--ip, 0) * 100%) 2px no-repeat;
   opacity: calc(var(--pulse, 0) * 0.82);
 }
 
@@ -829,7 +833,7 @@
   text-align: center;
   box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.5), 0 0 1.4rem rgba(0, 224, 224, 0.3);
   opacity: 0;
-  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity 0.35s ease, transform 0.35s var(--ease-standard);
 }
 
 .game-toast.is-visible {
@@ -846,6 +850,7 @@
   }
 }
 
+/* Route bundle: journal-progress:start */
 /* Journal reading progress */
 .read-progress {
   position: fixed;
@@ -862,10 +867,12 @@
   display: block;
   height: 100%;
   width: 100%;
-  background: linear-gradient(90deg, #11807d, #2fd7cf);
+  background: linear-gradient(90deg, var(--color-brand-600), #2fd7cf);
   transform: scaleX(0);
   transform-origin: left;
 }
+
+/* Route bundle: journal-progress:end */
 
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] {
@@ -982,6 +989,7 @@ html:has(> body.is-map-fullscreen) {
   object-fit: contain;
 }
 
+/* Route bundle: gallery-masonry:start */
 /* Masonry item */
 .masonry .brick {
   display: inline-block; /* Fix the misalignment of items */
@@ -1032,6 +1040,8 @@ html:has(> body.is-map-fullscreen) {
   }
 }
 
+/* Route bundle: gallery-masonry:end */
+
 /* Raleway is self-hosted via main.css font-face rules */
 
 *,
@@ -1044,6 +1054,7 @@ html:has(> body.is-map-fullscreen) {
   box-sizing: border-box;
 }
 
+/* Route bundle: gallery-tiles:start */
 @media screen and (max-width: 640px) {
   .container {
     display: block;
@@ -1135,6 +1146,16 @@ html:has(> body.is-map-fullscreen) {
   left: 20%;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .masonry .brick img,
+  .content .content-overlay,
+  .content-details {
+    transition: none;
+  }
+}
+
+/* Route bundle: gallery-tiles:end */
+
 #return-to-top {
     position: fixed;
     bottom: 20px;
@@ -1181,14 +1202,12 @@ html:has(> body.is-map-fullscreen) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .masonry .brick img,
-  .content .content-overlay,
-  .content-details,
   #return-to-top,
   #return-to-top i {
     transition: none;
   }
 }
+/* Route bundle: prewed-layout:start */
 /* .desktoponly / .mobileonly swap at exactly 800px. These used to switch at
    different widths (600px / 800px), so 601-799px viewports rendered BOTH
    prewed hero wordmarks stacked on top of each other. */
@@ -1209,6 +1228,9 @@ html:has(> body.is-map-fullscreen) {
   }
 }
 
+/* Route bundle: prewed-layout:end */
+
+/* Route bundle: travel-map:start */
 /* Travel destination atlas */
 .travel-atlas {
   position: relative;
@@ -1466,7 +1488,7 @@ html:has(> body.is-map-fullscreen) {
   display: flex;
   align-items: center;
   justify-content: center;
-  font: 700 0.6rem/1 var(--font-display, sans-serif);
+  font: 700 0.6rem/1 var(--font-display);
   color: #071315;
   opacity: 0;
   pointer-events: none;
@@ -1496,7 +1518,7 @@ html:has(> body.is-map-fullscreen) {
   pointer-events: none;
   transform: rotate(var(--leader-angle, 0rad));
   transform-origin: 0 50%;
-  transition: background 0.15s ease, opacity 0.15s ease;
+  transition: background var(--motion-fast) ease, opacity var(--motion-fast) ease;
 }
 
 .travel-map__marker .travel-map__detail-leader,
@@ -1523,7 +1545,7 @@ html:has(> body.is-map-fullscreen) {
   letter-spacing: 0.025em;
   line-height: 1.15;
   text-transform: none;
-  transition: opacity 0.15s ease, visibility 0.15s ease,
+  transition: opacity var(--motion-fast) ease, visibility var(--motion-fast) ease,
     border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
   white-space: nowrap;
 }
@@ -1657,7 +1679,7 @@ html:has(> body.is-map-fullscreen) {
   letter-spacing: 0.045em;
   line-height: 1;
   text-transform: uppercase;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--motion-fast) ease;
   white-space: nowrap;
 }
 
@@ -2081,7 +2103,7 @@ html:has(> body.is-map-fullscreen) {
   line-height: 1;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  transition: background var(--motion-fast) ease, border-color var(--motion-fast) ease, color var(--motion-fast) ease, opacity var(--motion-fast) ease;
 }
 
 .travel-map__detail-step span {
@@ -2300,7 +2322,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   letter-spacing: 0.05em;
   line-height: 1;
   text-transform: uppercase;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: background var(--motion-fast) ease, border-color var(--motion-fast) ease, color var(--motion-fast) ease;
   white-space: nowrap;
 }
 
@@ -2361,7 +2383,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   font-size: 1.05rem;
   font-weight: 700;
   line-height: 1;
-  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+  transition: background var(--motion-fast) ease, color var(--motion-fast) ease, opacity var(--motion-fast) ease;
 }
 
 .travel-map__zoom-btn:hover,
@@ -3100,6 +3122,9 @@ body.is-map-fullscreen .travel-atlas__layout {
   .travel-grid { grid-template-columns: 1fr; }
 }
 
+/* Route bundle: travel-map:end */
+
+/* Route bundle: journal-guangzhou:start */
 /* Guangzhou journal */
 .page-travel-journal header.major > .date {
   display: flex;
@@ -3855,6 +3880,8 @@ body.is-map-fullscreen .travel-atlas__layout {
   }
 }
 
+/* Route bundle: journal-guangzhou:end */
+
 /* Portfolio positioning and case-study system. */
 .sr-only {
   position: absolute !important;
@@ -3875,10 +3902,8 @@ body.is-map-fullscreen .travel-atlas__layout {
 }
 
 #intro .portfolio-hero__summary {
-  margin: 0;
   color: rgba(255, 255, 255, 0.86);
   font-size: 1.15rem;
-  font-style: normal;
   line-height: 1.65;
 }
 
@@ -3907,7 +3932,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3),
     0 0.35rem 1.1rem rgba(0, 0, 0, 0.1);
   color: rgba(255, 255, 255, 0.9) !important;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-family: var(--font-display);
   font-size: 0.69rem;
   font-weight: 700;
   letter-spacing: 0.075em;
@@ -4078,10 +4103,6 @@ body.is-map-fullscreen .travel-atlas__layout {
   padding: 2rem !important;
 }
 
-.credentials {
-  padding: 4rem !important;
-}
-
 #selected-work {
   scroll-margin-top: 1.5rem;
 }
@@ -4101,8 +4122,8 @@ body.is-map-fullscreen .travel-atlas__layout {
 
 .internship-group__label {
   margin: 0 0 0.65rem;
-  color: #20343d;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  color: var(--color-ink-900);
+  font-family: var(--font-display);
   font-size: 0.9rem;
   font-weight: 900;
   letter-spacing: 0.05em;
@@ -4351,7 +4372,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   border-radius: 999px;
   background: #edf6f5;
   color: #285a59;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-family: var(--font-display);
   font-size: max(var(--text-floor), 0.76rem);
   font-weight: 700;
   line-height: 1.3;
@@ -4386,8 +4407,8 @@ body.is-map-fullscreen .travel-atlas__layout {
 }
 
 .earlier-work summary strong {
-  color: #20343d;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  color: var(--color-ink-900);
+  font-family: var(--font-display);
   font-size: 1rem;
 }
 
@@ -4413,7 +4434,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   border: 1px solid #e1e7e9;
   border-radius: 0.45rem;
   background: #fff;
-  box-shadow: 0 0.45rem 1.35rem rgba(3, 14, 30, 0.07);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
   transition: border-color var(--motion-standard) ease,
     box-shadow var(--motion-standard) ease,
@@ -4423,7 +4444,7 @@ body.is-map-fullscreen .travel-atlas__layout {
 .earlier-work__grid article:hover,
 .earlier-work__grid article:focus-within {
   border-color: rgba(18, 138, 134, 0.38);
-  box-shadow: 0 0.9rem 2rem rgba(3, 14, 30, 0.12);
+  box-shadow: var(--shadow-card-hover);
   transform: translateY(-3px);
 }
 
@@ -4457,7 +4478,7 @@ body.is-map-fullscreen .travel-atlas__layout {
 }
 
 .earlier-project-card__body > span {
-  color: #11807d;
+  color: var(--color-brand-600);
   font-size: max(var(--text-floor), 0.72rem);
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -4466,7 +4487,7 @@ body.is-map-fullscreen .travel-atlas__layout {
 
 .earlier-work__grid h3 {
   margin: 0.35rem 0;
-  color: #20343d !important;
+  color: var(--color-ink-900) !important;
   font-size: 1rem;
 }
 
@@ -4484,7 +4505,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   min-height: 2.75rem;
   align-items: center;
   color: #0f7470;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-family: var(--font-display);
   font-size: max(var(--text-floor), 0.78rem);
   font-weight: 700;
 }
@@ -4517,12 +4538,12 @@ body.is-map-fullscreen .travel-atlas__layout {
   flex-basis: 100%;
   margin: 0.25rem 0 0;
   color: #68727e;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
-  font-size: max(var(--text-floor, 0px), 0.8rem);
+  font-family: var(--font-display);
+  font-size: max(var(--text-floor), 0.8rem);
   line-height: 1.35;
   text-align: left;
 }
-.page-experience #cloud-analytics .anomaly-peek__hint strong { color: #0c6663; font-weight: 700; }
+.page-experience #cloud-analytics .anomaly-peek__hint strong { color: var(--color-brand-700); font-weight: 700; }
 .anomaly-peek__hint-touch { display: none; }
 @media (hover: none) {
   .anomaly-peek__hint-hover { display: none; }
@@ -4539,25 +4560,25 @@ body.is-map-fullscreen .travel-atlas__layout {
   border-radius: 999px;
   background: #ffffff;
   box-shadow: inset 0 0 0 1px #cfdcda, 0 1px 2px rgba(7, 19, 21, 0.06);
-  color: #20343d !important;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
-  font-size: max(var(--text-floor, 0px), 0.78rem);
+  color: var(--color-ink-900) !important;
+  font-family: var(--font-display);
+  font-size: max(var(--text-floor), 0.78rem);
   font-weight: 700;
   letter-spacing: normal;
   line-height: 1.3;
   text-transform: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: box-shadow var(--motion-fast, 150ms) ease, transform var(--motion-fast, 150ms) ease;
+  transition: box-shadow var(--motion-fast) ease, transform var(--motion-fast) ease;
 }
 .page-experience #cloud-analytics .anomaly-peek__chip[aria-expanded="true"] {
-  box-shadow: inset 0 0 0 1px #11807d, 0 4px 12px rgba(12, 102, 99, 0.14);
-  color: #0c6663 !important;
+  box-shadow: inset 0 0 0 1px var(--color-brand-600), 0 4px 12px rgba(12, 102, 99, 0.14);
+  color: var(--color-brand-700) !important;
 }
 @media (hover: hover) {
   .page-experience #cloud-analytics .anomaly-peek__chip:hover {
-    box-shadow: inset 0 0 0 1px #11807d, 0 4px 12px rgba(12, 102, 99, 0.14);
-    color: #0c6663 !important;
+    box-shadow: inset 0 0 0 1px var(--color-brand-600), 0 4px 12px rgba(12, 102, 99, 0.14);
+    color: var(--color-brand-700) !important;
     transform: translateY(-1px);
   }
 }
@@ -4584,7 +4605,7 @@ body.is-map-fullscreen .travel-atlas__layout {
     border-right: 1.6px solid currentColor;
     opacity: 0.5;
     transform: rotate(45deg);
-    transition: transform var(--motion-fast, 150ms) ease, opacity var(--motion-fast, 150ms) ease;
+    transition: transform var(--motion-fast) ease, opacity var(--motion-fast) ease;
   }
   .page-experience #cloud-analytics .anomaly-peek__chip:hover::after,
   .page-experience #cloud-analytics .anomaly-peek__chip[aria-expanded="true"]::after {
@@ -4599,13 +4620,13 @@ body.is-map-fullscreen .travel-atlas__layout {
 /* The nudge: once the previews come to rest, each chip glows once, a beat
    apart, to invite a hover or tap. Never repeats while you watch. */
 .page-experience #cloud-analytics .anomaly-peek__chip.is-nudging {
-  animation: peek-nudge 900ms var(--ease-standard, ease-out) 1;
+  animation: peek-nudge 900ms var(--ease-standard) 1;
 }
 .page-experience #cloud-analytics .anomaly-peek__chip.is-nudging + .anomaly-peek__chip.is-nudging { animation-delay: 160ms; }
 /* Only the peak is keyed, so the glow starts and ends on whatever shadow
    the chip has (resting, hover or open). */
 @keyframes peek-nudge {
-  40% { box-shadow: inset 0 0 0 1px #11807d, 0 0 0 5px rgba(17, 128, 125, 0.16); }
+  40% { box-shadow: inset 0 0 0 1px var(--color-brand-600), 0 0 0 5px rgba(17, 128, 125, 0.16); }
 }
 @media (prefers-reduced-motion: reduce) {
   .page-experience #cloud-analytics .anomaly-peek__chip.is-nudging { animation: none; }
@@ -4616,12 +4637,12 @@ body.is-map-fullscreen .travel-atlas__layout {
   animation: peek-breathe 2.6s ease-in-out infinite;
 }
 @keyframes peek-breathe {
-  50% { box-shadow: inset 0 0 0 1.5px #11807d, 0 0 0 5px rgba(17, 128, 125, 0.14); }
+  50% { box-shadow: inset 0 0 0 1.5px var(--color-brand-600), 0 0 0 5px rgba(17, 128, 125, 0.14); }
 }
 @media (prefers-reduced-motion: reduce) {
   .page-experience #cloud-analytics .anomaly-peek__chip.is-breathing {
     animation: none;
-    box-shadow: inset 0 0 0 1.5px #11807d;
+    box-shadow: inset 0 0 0 1.5px var(--color-brand-600);
   }
 }
 /* Touch: a 44px tap area without a taller chip. */
@@ -4646,14 +4667,14 @@ body.is-map-fullscreen .travel-atlas__layout {
   overflow: visible;
 }
 .mini-band { fill: rgba(17, 128, 125, 0.14); }
-.mini-line { fill: none; stroke: #11807d; stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; }
+.mini-line { fill: none; stroke: var(--color-brand-600); stroke-width: 1.4; stroke-linejoin: round; stroke-linecap: round; }
 .mini-flag { fill: #c46d1c; stroke: #ffffff; stroke-width: 1; }
 .mini-edge { stroke: rgba(17, 128, 125, 0.4); stroke-width: 1; }
 .mini-odd { fill: none; stroke: #c46d1c; stroke-width: 1.2; stroke-dasharray: 2 1.5; }
-.mini-node { fill: #11807d; stroke: #ffffff; stroke-width: 1; }
+.mini-node { fill: var(--color-brand-600); stroke: #ffffff; stroke-width: 1; }
 .mini-ring { fill: none; stroke: #c46d1c; stroke-width: 1; }
 .mini-node.is-odd { fill: #c46d1c; }
-.mini-packet { fill: #11807d; opacity: 0.7; }
+.mini-packet { fill: var(--color-brand-600); opacity: 0.7; }
 
 /* The chart cards: absolutely placed below the chip row by the script, so
    opening one never moves the page or covers the writeup above. 28rem, the
@@ -4675,7 +4696,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   transform: translateY(-6px) scale(0.92);
   transform-origin: var(--grow-x, 50%) 0;
   pointer-events: none;
-  transition: opacity 200ms ease, transform 220ms var(--ease-standard, ease), visibility 0s linear 220ms;
+  transition: opacity 200ms ease, transform 220ms var(--ease-standard), visibility 0s linear 220ms;
 }
 .page-experience #cloud-analytics .anomaly-card.is-open {
   visibility: visible;
@@ -4687,10 +4708,10 @@ body.is-map-fullscreen .travel-atlas__layout {
 .page-experience #cloud-analytics .anomaly-card__title {
   margin: 0 0 0.3rem;
   color: #68727e;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
-  font-size: max(var(--text-floor, 0px), 0.7rem);
+  font-family: var(--font-display);
+  font-size: max(var(--text-floor), 0.7rem);
   font-weight: 700;
-  letter-spacing: var(--eyebrow-tracking, 0.12em);
+  letter-spacing: var(--eyebrow-tracking);
   line-height: 1.3;
   text-transform: uppercase;
 }
@@ -4700,7 +4721,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   margin: 0.35rem 0 0;
   text-align: left;
   color: #596273;
-  font-size: max(var(--text-floor, 0px), 0.78rem);
+  font-size: max(var(--text-floor), 0.78rem);
   line-height: 1.45;
 }
 
@@ -4708,15 +4729,15 @@ body.is-map-fullscreen .travel-atlas__layout {
 .peek-band { fill: rgba(17, 128, 125, 0.12); }
 .peek-mid { fill: none; stroke: rgba(17, 128, 125, 0.3); stroke-width: 1; }
 .peek-axis { stroke: #d7e4e2; stroke-width: 1; }
-.peek-line { fill: none; stroke: #11807d; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.peek-line { fill: none; stroke: var(--color-brand-600); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .peek-flag { fill: #c46d1c; stroke: #ffffff; stroke-width: 2; }
 .peek-label {
-  fill: #20343d;
+  fill: var(--color-ink-900);
   stroke: #ffffff;
   stroke-width: 3px;
   stroke-linejoin: round;
   paint-order: stroke;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-family: var(--font-display);
   font-size: 12px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
@@ -4728,7 +4749,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   opacity: 0;
   transform-box: fill-box;
   transform-origin: center;
-  animation: peek-pulse 1600ms var(--ease-standard, ease-out) infinite;
+  animation: peek-pulse 1600ms var(--ease-standard) infinite;
 }
 svg.is-paused .peek-pulse { animation-play-state: paused; }
 svg.is-drawing .peek-flag,
@@ -4739,26 +4760,26 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
   to { opacity: 0; transform: scale(3.2); }
 }
 .peek-edge { stroke: rgba(17, 128, 125, 0.28); stroke-width: 1; }
-.peek-node { fill: #11807d; stroke: #ffffff; stroke-width: 2; transition: fill var(--motion-standard, 220ms) ease; }
+.peek-node { fill: var(--color-brand-600); stroke: #ffffff; stroke-width: 2; transition: fill var(--motion-standard) ease; }
 .peek-node.is-odd { fill: #c46d1c; }
-.peek-packet { fill: #11807d; opacity: 0.75; }
+.peek-packet { fill: var(--color-brand-600); opacity: 0.75; }
 .peek-odd { stroke: #c46d1c; stroke-width: 1.5; stroke-dasharray: 4 3; stroke-linecap: round; }
 .peek-odd-packet { fill: #c46d1c; }
 .peek-ring { fill: none; stroke: #c46d1c; stroke-width: 1.5; }
 /* Phishing domains: the address-bar text and the "Phishing" tag. */
 .peek-url,
 .peek-tag {
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-family: var(--font-display);
   font-size: 12px;
   font-weight: 700;
 }
-.peek-url { fill: #20343d; }
+.peek-url { fill: var(--color-ink-900); }
 .peek-tag { fill: #ffffff; letter-spacing: 0.03em; }
 /* The one-line key under the copy ("Domain squatting", "Altered logo"):
    outside the pages, quieter than the address, its swatches carry the amber. */
 .peek-key {
   fill: #4a5961;
-  font-family: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
+  font-family: var(--font-display);
   font-size: 12px;
   font-weight: 700;
 }
@@ -5016,7 +5037,6 @@ body:not(.page-home) #wrapper.fade-in::before {
   #intro .portfolio-hero__cta:focus-visible {
     width: 14.2rem;
     max-width: 100%;
-    height: 2.75rem;
     box-sizing: border-box;
     justify-content: center;
     border-radius: 0;
@@ -5248,6 +5268,7 @@ body:not(.page-home) #wrapper.fade-in::before {
   }
 }
 
+/* Route bundle: event-context-bar:start */
 .mobile-context-bar {
   display: none;
 }
@@ -5300,6 +5321,8 @@ body:not(.page-home) #wrapper.fade-in::before {
     font-size: 1rem;
   }
 }
+
+/* Route bundle: event-context-bar:end */
 
 @media (prefers-reduced-motion: reduce) and (max-width: 980px) {
   body::before,
@@ -5364,10 +5387,6 @@ body:not(.page-home) #wrapper.fade-in::before {
     padding: 1rem !important;
   }
 
-  .credentials {
-    padding: 2.25rem 1rem !important;
-  }
-
   .case-study-grid {
     grid-template-columns: 1fr;
   }
@@ -5430,6 +5449,7 @@ body:not(.page-home) #wrapper.fade-in::before {
   }
 }
 
+/* Route bundle: journal-nav:start */
 /* Travel journal navigation. travel-nav.js publishes the toolbar's measured
    height as --travel-nav-offset so native anchor jumps clear the single-row
    rail precisely; the rem values are no-JS fallbacks. */
@@ -6094,6 +6114,7 @@ ul.icons li a.icon:hover::before,
   letter-spacing: var(--eyebrow-tracking);
 }
 
+/* Route bundle: gallery-bricks:start */
 .masonry .brick .content {
   background: var(--color-surface-subtle);
 }
@@ -6147,6 +6168,8 @@ ul.icons li a.icon:hover::before,
   touch-action: manipulation;
 }
 
+/* Route bundle: gallery-bricks:end */
+
 /* Touch-first layouts keep primary controls at a comfortable 44px-or-larger
    target without enlarging their desktop mouse treatment. */
 @media screen and (max-width: 980px) {
@@ -6176,6 +6199,7 @@ ul.icons li a.icon:hover::before,
   }
 }
 
+/* Route bundle: gallery-lightbox:start */
 html.lightbox-open,
 body.lightbox-open {
   overflow: hidden;
@@ -6449,6 +6473,8 @@ body.lightbox-open {
   }
 }
 
+/* Route bundle: gallery-lightbox:end */
+
 @media screen and (max-width: 600px) {
   #intro {
     min-height: 72vh;
@@ -6513,6 +6539,7 @@ body.lightbox-open {
   }
 }
 
+/* Route bundle: experience-layout:start */
 /* --------------------------------------------------------------------------
    Retained Work and Skills layouts from the earlier design exploration.
    Visual styling elsewhere remains on the established site design.
@@ -6749,7 +6776,7 @@ body.lightbox-open {
   width: 0.7rem;
   height: 0.7rem;
   border-radius: 50%;
-  background: #11807d;
+  background: var(--color-brand-600);
   box-shadow: 0 0 0 0.25rem #ffffff;
   transition: background-color 300ms ease-out;
 }
@@ -6825,12 +6852,14 @@ body.lightbox-open {
 .page-experience .case-study--internship h2 {
   min-height: 0;
 }
+/* Route bundle: experience-layout:end */
 
 .page-skills .education-details,
 .page-skills .education-details p {
   text-align: left !important;
 }
 
+/* Route bundle: experience-responsive:start */
 @media screen and (max-width: 980px) {
   .page-experience #agentic-ai,
   .page-experience #cloud-analytics {
@@ -6981,7 +7010,11 @@ body.lightbox-open {
 
   /* Thumbnails stay on top at full width: the BrainHack and showcase
      artwork carries lettering that a narrow side crop makes illegible. */
+}
+/* Route bundle: experience-responsive:end */
 
+/* Route bundle: skills-responsive:start */
+@media screen and (max-width: 736px) {
   .page-skills #main > .post {
     padding: 1.5rem 1.15rem 2rem;
   }
@@ -7055,6 +7088,7 @@ body.lightbox-open {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+/* Route bundle: skills-responsive:end */
 
 /* Route bundle: personal-base:start */
 /* --------------------------------------------------------------------------
@@ -7110,7 +7144,7 @@ body.lightbox-open {
   display: block;
   width: 100%;
   height: 100%;
-  background: linear-gradient(180deg, #31aaa4 0%, #11807d 72%, #0d6663 100%);
+  background: linear-gradient(180deg, #31aaa4 0%, var(--color-brand-600) 72%, #0d6663 100%);
   transform: scaleY(var(--timeline-progress, 0));
   transform-origin: center top;
   transition: transform 0.08s linear;
@@ -7174,7 +7208,7 @@ body.lightbox-open {
 }
 
 .personal-timeline-event {
-  --timeline-accent: #11807d;
+  --timeline-accent: var(--color-brand-600);
   position: relative;
   display: grid;
   min-height: 6.5rem;
@@ -7852,6 +7886,7 @@ body.page-home #intro {
   background: linear-gradient(135deg, #dce7e6, #edf2f1);
 }
 
+/* Route bundle: journal-japan:start */
 /* Japan editorial title and lower banner crop. */
 .japan-journal .japan-journal__intro {
   margin-bottom: 1.75rem;
@@ -8216,6 +8251,7 @@ body.page-home #nav {
   }
 }
 
+/* Route bundle: skills-polish:start */
 /* Quiet Skills-card treatment: compact, static capability cards modelled on
    the reference's low-contrast surface, icon-title row, and short summary. */
 .page-skills .skills-heading::before {
@@ -9204,6 +9240,7 @@ html .page-opening-eyebrow { display:block; margin:0 0 .5rem; color:var(--color-
 html .page-skills .skills-heading p,
 html .personal-timeline__intro p,
 html .travel-atlas__header > div > p { margin:.65rem 0 0; max-width:55rem; color:var(--color-ink-500); font:300 max(var(--text-floor), .9rem)/1.65 var(--font-body); text-align:left; }
+/* Route bundle: experience-internships:start */
 /* Internship entries, owner-approved 18 Oct 2026. Keep descriptions and tags
    together so company metadata cannot stretch the gap between them. */
 html .page-experience .internship-group { margin-top: .6rem; }
@@ -9304,7 +9341,6 @@ html .page-experience .case-study--internship .case-study__tags li {
   html .page-experience .case-study--internship .case-study__company {
     grid-column: 1;
     grid-row: 1;
-    grid-template-columns: 4rem minmax(0, 1fr);
     gap: .85rem;
   }
   html .page-experience .case-study--internship .company-logo { width: 4rem; }
@@ -9326,6 +9362,7 @@ html .page-experience .case-study--internship .case-study__tags li {
   html .page-experience .case-study--internship .case-study__company-meta br { display: none; }
   html .page-experience .case-study--internship .case-study__company-place::before { content: " · "; }
 }
+/* Route bundle: experience-internships:end */
 
 @media(max-width:736px) {
  body { --opening-gutter:1.15rem; }
@@ -9450,7 +9487,6 @@ html .page-skills #main > .post { border-top:0; }
 .travel-timeline .authored-scene[data-scene="2"] svg{filter:contrast(1.12)}
 .travel-timeline .authored-scene[data-scene="8"] svg{filter:contrast(1.1)}
 /* Other scenes retain their silhouettes; secondary motion follows the main action. */
-@media(prefers-reduced-motion:reduce){.travel-timeline .authored-scene *{animation:none!important}}
 
 /* A small gull glides across a shallow arc. Reset occurs entirely outside the
    clipped SVG; it re-enters from the left instead of making a forced U-turn. */
@@ -9510,7 +9546,7 @@ html .page-skills #main > .post { border-top:0; }
 .da-cologne-rain.mm-back .mm-drop{stroke:#aab7c4;stroke-width:.18;opacity:.4}
 /* Look closer: a frosted loupe on the scene a reader is on; it opens the scene large. */
 .mobile-journal-row{position:relative}
-.scene-loupe{position:absolute;z-index:7;width:22px;height:22px;margin:0;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.3);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);box-shadow:none;cursor:zoom-in;opacity:0;transform:scale(.8);transition:opacity .18s ease,transform .18s ease;pointer-events:none}
+.scene-loupe{position:absolute;z-index:7;width:22px;margin:0;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.3);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);box-shadow:none;cursor:zoom-in;opacity:0;transform:scale(.8);transition:opacity .18s ease,transform .18s ease;pointer-events:none}
 .scene-loupe.is-shown,.scene-loupe:focus-visible{opacity:.7;transform:none;pointer-events:auto}
 .scene-loupe:hover,.scene-loupe:focus-visible{opacity:1;background:rgba(255,255,255,.7)}
 .scene-loupe:focus-visible{outline:2px solid #347d6c;outline-offset:2px}
@@ -9661,7 +9697,6 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
  .travel-timeline .chronology-line{top:var(--timeline-line)}
  .travel-timeline .chronology-trip{top:calc(var(--timeline-line) - 8px)}
  .travel-timeline .chronology-name{top:calc(-1 * var(--timeline-icon-height) - 53px)}
- .travel-timeline .chronology-trip.lane-1 .chronology-name{top:20px}
  .travel-timeline .chronology-pulse{top:calc(var(--timeline-line) - 3px)}
  .travel-timeline #main>.journal-preview-controls{margin:0 40px 24px;padding:8px 24px 12px!important;justify-content:flex-end;background:#f3f7f3;border:1px solid #dce7de;border-top:0;border-radius:0 0 10px 10px}
  .travel-timeline .journal-preview-controls label{display:none}
@@ -9669,9 +9704,9 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
  /* All previews contribute to one shared row height; only the selected card is visible.
     This also reserves room for longer text at narrower desktop widths. */
  .travel-timeline #main>.compact-journals:not(.journals-expanded){display:grid!important;grid-template-columns:minmax(0,1fr);gap:0;width:auto!important;margin:0 40px;padding:16px 24px 0!important;background:#f3f7f3;border:1px solid #dce7de;border-top:0;border-bottom:0;border-radius:0;overflow-anchor:none}
- .travel-timeline .compact-journals:not(.journals-expanded)>.travel-card{display:grid!important;grid-area:1/1;grid-template-columns:240px minmax(0,1fr);grid-template-rows:auto auto;min-height:160px;width:100%!important;max-width:900px;margin:0 auto!important;transform:none;overflow-anchor:none}
- .travel-timeline .compact-journals:not(.journals-expanded)>.travel-card:not(.preview-selected){visibility:hidden;pointer-events:none}
- .travel-timeline .compact-journals:not(.journals-expanded)>.travel-card.preview-selected{visibility:visible;margin:0 auto!important}
+ .travel-timeline .compact-journals:not(.journals-expanded)>.travel-card{display:grid!important;grid-area:1/1;grid-template-rows:auto auto;min-height:160px;width:100%!important;max-width:900px;margin:0 auto!important;transform:none;overflow-anchor:none}
+ .travel-timeline .compact-journals:not(.journals-expanded)>.travel-card:not(.preview-selected){pointer-events:none}
+ .travel-timeline .compact-journals:not(.journals-expanded)>.travel-card.preview-selected{margin:0 auto!important}
  .travel-timeline .chronology-preview-cue{display:none}
  .travel-timeline .journal-is-selected .chronology-name{background:rgba(255,255,255,.72);border-radius:7px;box-shadow:0 0 0 1px #d5e2d9}
  .travel-timeline .journal-is-selected .chronology-preview-cue{color:#174d3b}
@@ -9682,7 +9717,7 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 @media(min-width:1100px){
  .travel-timeline #main>.compact-journals:not(.journals-expanded){grid-template-columns:150px minmax(0,1fr) 150px;column-gap:22px;align-items:center}
  .travel-timeline .compact-journals:not(.journals-expanded)>.travel-card{grid-area:1/2;grid-template-columns:minmax(170px,38%) minmax(0,1fr)}
- .travel-timeline .compact-journals:not(.journals-expanded)>.journal-neighbour{display:flex;flex-direction:column;align-items:stretch;align-self:center;grid-area:1/1;width:150px;height:auto;padding:0;background:transparent;border:0;border-radius:5px;box-shadow:none;text-align:left;text-transform:none;letter-spacing:0;white-space:normal;line-height:1.3;color:#35594b;cursor:pointer}
+ .travel-timeline .compact-journals:not(.journals-expanded)>.journal-neighbour{display:flex;flex-direction:column;align-items:stretch;align-self:center;grid-area:1/1;height:auto;background:transparent;border:0;border-radius:5px;box-shadow:none;text-align:left;text-transform:none;letter-spacing:0;white-space:normal;line-height:1.3;color:#35594b;cursor:pointer}
  .travel-timeline .compact-journals:not(.journals-expanded)>.journal-later{grid-area:1/3}
  .travel-timeline .journal-neighbour img{display:block;width:150px;height:82px;object-fit:cover;border-radius:4px;opacity:.65;filter:saturate(.65);transition:opacity .18s}
  .travel-timeline .journal-neighbour:hover img,.travel-timeline .journal-neighbour:focus-visible img{opacity:1;filter:none}
@@ -9708,17 +9743,11 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 }
 /* Keep discovery useful, but let the journal timeline lead the page. */
 .travel-timeline .travel-atlas__header{row-gap:16px!important;margin-bottom:18px!important}
-.travel-timeline .travel-portals{max-width:390px;gap:10px}
+.travel-timeline .travel-portals{gap:10px}
 .travel-timeline .travel-portals .travel-portal{padding:6px 12px 10px}
 .travel-timeline .portal-label{font-size:13px}
 .travel-timeline .portal-label small{font-size:max(var(--text-floor),11px);margin-top:3px}
-.travel-timeline .portal-art{height:66px;flex-basis:66px;width:120px}
-.travel-timeline .portal-stack img{left:29px;top:8px}
-.travel-timeline .photo-explore{margin-top:14px!important;margin-bottom:16px!important}
-.travel-timeline .photo-explore__heading{margin-bottom:6px!important}
-.travel-timeline .photo-explore__hint{margin:0 0 10px;font-size:12px}
-.travel-timeline .photo-explore__card img{height:105px;aspect-ratio:auto}
-.travel-timeline .photo-explore__caption{padding:8px 12px;gap:3px}
+.travel-timeline .photo-explore__hint{font-size:12px}
 .travel-timeline .photo-explore__caption strong{font-size:15px;line-height:1.3}
 .travel-timeline .photo-explore__caption>span{font-size:max(var(--text-floor),11px);line-height:1.4}
 .travel-timeline #main>.travel-atlas:first-child{padding-bottom:18px!important}
@@ -9731,13 +9760,10 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 }
 @media(max-width:736px){
  .travel-timeline .travel-portals{max-width:none}
- .travel-timeline .portal-art{height:58px;flex-basis:58px}
  .travel-timeline .photo-explore__cards{gap:8px}
  .travel-timeline .photo-explore__card{flex-direction:row;align-items:stretch}
- .travel-timeline .photo-explore__card img{width:60px;height:76px;flex:0 0 60px}
- .travel-timeline .photo-explore__caption{padding:7px;justify-content:center;gap:4px}
- .travel-timeline .photo-explore__caption strong{font-size:13px}
- .travel-timeline .photo-explore__caption>span{font-size:max(var(--text-floor),10px);margin-top:0}
+ .travel-timeline .photo-explore__caption{justify-content:center}
+ .travel-timeline .photo-explore__caption>span{margin-top:0}
 }
 .travel-timeline #main>.travel-archive-heading{margin-top:8px!important;min-height:0}
 .travel-timeline #main>.travel-archive-heading h2{margin:0!important}
@@ -9747,8 +9773,7 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 .travel-timeline .portal-art{width:148px;height:88px;flex-basis:88px}
 .travel-timeline .portal-stack img{left:42px;top:15px}
 .travel-timeline .photo-explore__card{display:flex;flex-direction:column;align-items:stretch}
-.travel-timeline .photo-explore__card img{width:100%;height:145px;flex:0 0 145px;object-fit:cover}
-.travel-timeline .photo-explore__caption{position:static!important;inset:auto!important;transform:none!important;background:#faf8f2;flex:1;padding:8px 12px}
+.travel-timeline .photo-explore__caption{position:static!important;inset:auto!important;transform:none!important;background:#faf8f2;flex:1}
 @media(max-width:736px){
  .travel-timeline .portal-art{width:120px;height:72px;flex-basis:72px}
  .travel-timeline .portal-stack img{left:29px;top:9px}
@@ -9817,34 +9842,34 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
    the matching real journal card stays readable and clickable at right. */
 @media (max-width:736px){
   .travel-timeline.travel-phone-rail .journal-chronology{display:none!important}
-  .travel-timeline.travel-phone-rail .mobile-journal-list{display:grid;gap:0;margin:22px 0 34px;padding:0;min-width:0}
-  .travel-timeline.travel-phone-rail .mobile-journal-row{position:relative;display:grid;grid-template-columns:112px minmax(0,1fr);column-gap:18px;align-items:start;min-width:0;padding:0 0 28px;margin:0;border:0}
-  .travel-timeline.travel-phone-rail .mobile-journal-row::before{content:"";position:absolute;top:10px;bottom:0;left:55px;width:1px;background:#d6e1db;pointer-events:none}
-  .travel-timeline.travel-phone-rail .mobile-journal-row:last-child::before{bottom:auto;height:125px}
-  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{position:relative!important;inset:auto!important;top:auto!important;left:auto!important;display:block!important;width:112px!important;height:auto!important;min-height:145px;margin:0!important;padding:0 0 12px!important;pointer-events:auto!important;text-align:center;border:0!important;border-radius:0;background:#fff!important;color:#285f54;z-index:1;transform:none!important;text-decoration:none;box-shadow:none}
+  .travel-timeline.travel-phone-rail .mobile-journal-list{display:grid;gap:0;padding:0;min-width:0}
+  .travel-timeline.travel-phone-rail .mobile-journal-row{position:relative;display:grid;align-items:start;min-width:0;padding:0 0 28px;margin:0;border:0}
+  .travel-timeline.travel-phone-rail .mobile-journal-row::before{content:"";position:absolute;top:10px;bottom:0;width:1px;background:#d6e1db;pointer-events:none}
+  .travel-timeline.travel-phone-rail .mobile-journal-row:last-child::before{bottom:auto}
+  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{position:relative!important;inset:auto!important;top:auto!important;left:auto!important;display:block!important;height:auto!important;margin:0!important;pointer-events:auto!important;text-align:center;border:0!important;border-radius:0;background:#fff!important;color:#285f54;z-index:1;transform:none!important;text-decoration:none;box-shadow:none}
   .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip::before{display:none!important}
   .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-dot{display:none!important}
   .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-name{position:static!important;inset:auto!important;display:flex!important;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;min-height:0!important;padding:0!important;margin:0;background:#fff;pointer-events:auto!important;transform:none!important}
-  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{display:block;width:112px!important;height:75px!important;min-width:112px;flex:none;margin:0 0 5px!important;transform:none!important;overflow:visible}
-  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene>svg{display:block;width:112px!important;height:75px!important;max-width:none}
-  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{display:block;max-width:112px;min-height:0;margin:0;padding:0 4px;font-family:inherit;font-size:12px!important;font-weight:700;line-height:1.35;letter-spacing:0;text-transform:none;color:#285247;overflow-wrap:anywhere}
-  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{display:block;max-width:108px;margin:0;font-size:12px!important;font-weight:400;line-height:1.4;letter-spacing:0;text-transform:none;color:#5e6f65}
+  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{display:block;flex:none;margin:0 0 5px!important;transform:none!important}
+  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene>svg{display:block}
+  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{display:block;min-height:0;margin:0;padding:0 4px;font-family:inherit;font-size:12px!important;font-weight:700;line-height:1.35;letter-spacing:0;text-transform:none;color:#285247;overflow-wrap:anywhere}
+  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{display:block;margin:0;font-size:12px!important;font-weight:400;line-height:1.4;letter-spacing:0;text-transform:none;color:#5e6f65}
   .travel-timeline.travel-phone-rail .mobile-journal-row .mobile-journal-card{display:block!important;position:relative;min-width:0;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform:none!important;opacity:1!important;text-align:left}
   .travel-timeline.travel-phone-rail .mobile-journal-card>a.image,
   .travel-timeline.travel-phone-rail .mobile-journal-card>.travel-card__image,
   .travel-timeline.travel-phone-rail .mobile-journal-card>a:has(>img){display:block;position:relative;width:100%;margin:0 0 11px!important;padding:0;border:0!important;border-radius:4px;overflow:hidden;aspect-ratio:1.48}
-  .travel-timeline.travel-phone-rail .mobile-journal-card img{display:block;width:100%!important;height:100%!important;aspect-ratio:1.48;object-fit:cover;object-position:center;margin:0!important;border-radius:4px}
-  .travel-timeline.travel-phone-rail .mobile-journal-card header{display:block!important;margin:0 0 8px!important;padding:0!important;border:0;background:transparent;text-align:left}
+  .travel-timeline.travel-phone-rail .mobile-journal-card img{display:block;width:100%!important;object-fit:cover;margin:0!important;border-radius:4px}
+  .travel-timeline.travel-phone-rail .mobile-journal-card header{margin:0 0 8px!important;padding:0!important;border:0;background:transparent;text-align:left}
   .travel-timeline.travel-phone-rail .mobile-journal-card header .date{display:block;margin:0 0 5px!important;font-size:12px!important;line-height:1.35;letter-spacing:0;text-transform:none;color:#5e6f65}
   .travel-timeline.travel-phone-rail .mobile-journal-card h2{margin:0!important;padding:0;font-family:var(--font-body);font-size:19px!important;font-weight:400!important;line-height:1.2!important;letter-spacing:-.2px!important;text-transform:none!important;color:#243e36;overflow-wrap:anywhere}
   .travel-timeline.travel-phone-rail .mobile-journal-card h2 a{display:block;padding:0 0 5px;border:0!important;color:inherit;text-decoration:none}
-  .travel-timeline.travel-phone-rail .mobile-journal-card>p{display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden;margin:0!important;font-size:12px!important;line-height:1.55!important;text-align:left;color:#69776e}
+  .travel-timeline.travel-phone-rail .mobile-journal-card>p{display:-webkit-box!important;-webkit-box-orient:vertical;overflow:hidden;margin:0!important;font-size:12px!important;text-align:left;color:#69776e}
   .travel-timeline.travel-phone-rail .mobile-journal-card .actions{display:none!important}
   .travel-timeline.travel-phone-rail .mobile-journal-row a:focus-visible{outline:2px solid #347d6c!important;outline-offset:4px;border-radius:3px}
   .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip:focus-visible .chronology-name{outline:none!important}
 }
 @media (max-width:360px){
-  .travel-timeline.travel-phone-rail .mobile-journal-row{column-gap:10px;padding-bottom:24px}
+  .travel-timeline.travel-phone-rail .mobile-journal-row{padding-bottom:24px}
   .travel-timeline.travel-phone-rail .mobile-journal-card h2{font-size:17px!important}
   .travel-timeline.travel-phone-rail .mobile-journal-card>p{-webkit-line-clamp:2}
 }
@@ -9855,7 +9880,7 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 /* Refined A: paired images, one set of labels, and a two-line excerpt. */
 @media(max-width:736px){
  .travel-timeline.travel-phone-rail .mobile-journal-list{margin:8px 0 20px}
- .travel-timeline.travel-phone-rail .mobile-journal-row{padding-bottom:28px;column-gap:14px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row{padding-bottom:28px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{min-height:0;padding:22px 0 8px!important}
  .travel-timeline.travel-phone-rail .mobile-journal-card header{display:none!important}
  .travel-timeline.travel-phone-rail .mobile-journal-card>a.image,.travel-timeline.travel-phone-rail .mobile-journal-card>.travel-card__image{height:150px;aspect-ratio:auto;margin:0 0 10px!important}
@@ -9967,7 +9992,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{width:128px!important}
  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{max-width:128px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{max-width:124px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{--tile:128px;width:var(--tile)!important;height:calc(var(--tile)*.75)!important;min-width:0;overflow:hidden;border-radius:12px;background:#f1f6f2}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{--tile:128px;width:var(--tile)!important;height:calc(var(--tile)*.75)!important;min-width:0;overflow:hidden;border-radius:12px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene>svg{width:calc(var(--tile)*var(--vw,120)/var(--cw))!important;height:calc(var(--tile)*var(--vh,80)/var(--cw))!important;max-width:none;margin:calc(var(--tile)*(var(--vy,0) - var(--cy))/var(--cw)) 0 0 calc(var(--tile)*(var(--vx,0) - var(--cx))/var(--cw))}
  .mobile-journal-row .mm-dusk-tile{display:inline}
  /* Soft resting skies; the scene that is playing comes up to full colour with a sage ring. */

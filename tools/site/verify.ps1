@@ -109,6 +109,7 @@ $routeCssOwners = @{
     'experience-page.css' = @('experience.html')
     'personal-page.css' = @('personal.html')
     'skills-page.css' = @('skills.html')
+    'gallery.css' = @($eventPageNames + $journalPageNames)
 }
 $navSignatures = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
 
@@ -270,8 +271,9 @@ $travelJournalCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\travel
 $experiencePageCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\experience-page.css') -Raw -Encoding UTF8
 $personalPageCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\personal-page.css') -Raw -Encoding UTF8
 $skillsPageCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\skills-page.css') -Raw -Encoding UTF8
+$galleryCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\gallery.css') -Raw -Encoding UTF8
 $iconsCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\icons.css') -Raw -Encoding UTF8
-$customCss = @($sharedCustomCss, $travelMapPageCss, $travelJournalCss, $experiencePageCss, $personalPageCss, $skillsPageCss) -join "`n"
+$customCss = @($sharedCustomCss, $galleryCss, $travelMapPageCss, $travelJournalCss, $experiencePageCss, $personalPageCss, $skillsPageCss) -join "`n"
 # Page changes (Oct 2026): content pages skip the theme's black load overlay, pages
 # opt in to cross-document view transitions on the 220ms token, and reduced motion
 # opts out. See "Page changes" in README.md.
@@ -329,9 +331,15 @@ Assert-FileSizeBudget 'assets\css\travel-search.css' 19
 # 12 -> 22: the Cloud Anomaly card's anomaly peek (two chips with mini previews and
 # two small chart cards, Oct 2026) adds about 9 KB of route-only CSS.
 # 22 -> 24: the third chart chip, equal-width chips with an open arrow and phone/tablet tiles (Oct 2026).
-Assert-FileSizeBudget 'assets\css\experience-page.css' 24
+# 24 -> 48 (5 Nov 2026): the Work layouts and internship entries moved here
+# from shared custom.css, which every page loads (about 17 KB).
+Assert-FileSizeBudget 'assets\css\experience-page.css' 48
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32
-Assert-FileSizeBudget 'assets\css\skills-page.css' 10
+# 10 -> 19 (5 Nov 2026): the education, toolkit-card and tech-stack rules moved
+# here from shared custom.css, which every page loads.
+Assert-FileSizeBudget 'assets\css\skills-page.css' 19
+# Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
+Assert-FileSizeBudget 'assets\css\gallery.css' 15
 Assert-FileSizeBudget 'assets\css\icons.css' 4
 if ($iconsCss -match '@font-face|fontawesome-webfont' -or [regex]::Matches($iconsCss, '\.\bfa-[a-z0-9-]+::before').Count -ne 22) { throw 'The minimal icon stylesheet must map exactly the selected self-hosted page icons without a webfont.' }
 $publishedIconSvgs = @(Get-ChildItem -LiteralPath (Join-Path $dist 'assets\icons\fontawesome') -Filter '*.svg' -File -Recurse)
@@ -895,7 +903,7 @@ if ($experience -notmatch 'id="agentic-ai"') { throw "Lead agentic AI case study
 if ($experience -notmatch 'class="case-study__writeup"' -or $experience -match 'case-study__writeup-label|case-study__writeup-note|Specifics are limited' -or $experience -notmatch 'Spearheaded the design and implementation of a LangGraph-based agentic threat-hunting solution' -or $experience -notmatch 'defined tool access, guardrails, and analyst review points' -or $experience -notmatch 'context engineering and evaluation' -or $experience -notmatch 'on-premises environment' -or $experience -notmatch 'Validated the solution through red-team evaluation\.' -or $experience -notmatch 'Present &middot; Agentic&nbsp;AI&nbsp;lead&nbsp;since&nbsp;2025' -or $experience -match 'case-study__expand|case-study__pipeline') { throw "Agentic AI case-study writeup (owner copy with guardrails, evaluation, and operational constraints; no eyebrow label, defence note, or retired expand markup) is missing or stale." }
 if ($experience -match 'raw operational context' -or ($experience -match 'id="agentic-ai"[\s\S]*?case-study__lede[\s\S]*?id="cloud-analytics"')) { throw "The agentic AI card folds its lede into the single writeup block (owner decision, Jul 2026); only Cloud Analytics keeps a lede." }
 if ($experience -match 'hours instead of days' -or $experience -match 'Cybersecurity AI Senior Engineer') { throw "The scrambled Outcome row is the only days-to-hours claim on the card, and the DSTA header carries no job title (owner decisions, Jul 2026)." }
-if ($experience -match 'case-study__eyebrow' -or $experience -notmatch '<h2>Cyber Detection Analytics</h2>' -or $experience -notmatch 'and phishing domains impersonating MINDEF websites\.' -or $experience -notmatch 'Worked with stakeholders on use cases and methods, then rolled out what(&nbsp;| )worked\.' -or $experience -notmatch 'Identifying deviations in high-volume cloud activity, and sites impersonating MINDEF' -or $experience -notmatch 'New detection capabilities in daily operational use' -or $experience -notmatch '<li>Behavioural baselining</li>' -or $customCss -notmatch '(?s)\.page-experience #cloud-analytics \.case-study__highlights li::before\s*\{[^}]*background:\s*#11807d') { throw "Cyber Detection Analytics must carry its title, the owner lede, the operational-use outcome, method-level tags, and the light dot-timeline with no eyebrow line (owner decisions, Jul 2026)." }
+if ($experience -match 'case-study__eyebrow' -or $experience -notmatch '<h2>Cyber Detection Analytics</h2>' -or $experience -notmatch 'and phishing domains impersonating MINDEF websites\.' -or $experience -notmatch 'Worked with stakeholders on use cases and methods, then rolled out what(&nbsp;| )worked\.' -or $experience -notmatch 'Identifying deviations in high-volume cloud activity, and sites impersonating MINDEF' -or $experience -notmatch 'New detection capabilities in daily operational use' -or $experience -notmatch '<li>Behavioural baselining</li>' -or $customCss -notmatch '(?s)\.page-experience #cloud-analytics \.case-study__highlights li::before\s*\{[^}]*background:\s*var\(--color-brand-600\)') { throw "Cyber Detection Analytics must carry its title, the owner lede, the operational-use outcome, method-level tags, and the light dot-timeline with no eyebrow line (owner decisions, Jul 2026)." }
 if ($customCss -notmatch '(?s)\.page-experience #agentic-ai \.case-study__highlights li::before\s*\{[^}]*background:\s*#28d7c5' -or $customCss -notmatch '(?s)\.page-experience #agentic-ai \.case-study__highlights\.is-complete li:last-child::before\s*\{[^}]*background:\s*#ffb869' -or $customCss -notmatch '(?s)\.page-experience #agentic-ai \.case-study__highlights\.is-complete \[data-scramble-row\]\s*\{[^}]*color:\s*#ffb869' -or $customCss -notmatch '(?s)\.page-experience #cloud-analytics \.case-study__highlights\.is-complete li:last-child::before\s*\{[^}]*background:\s*#e8963f' -or $customCss -notmatch '(?s)\.page-experience #cloud-analytics \.case-study__highlights\.is-complete \[data-scramble-row\]\s*\{[^}]*color:\s*#a05e12' -or $customCss -notmatch '(?s)@media screen and \(max-width: 980px\).*?\.page-experience #agentic-ai \.case-study__highlights li\s*\{[^}]*min-height:\s*0') { throw "Each experience Outcome must begin teal, resolve into its card's amber, and keep compact single-column timeline rows." }
 if ($customCss -notmatch '(?s)\.page-experience #agentic-ai \.case-study__highlights\s*\{[^}]*padding:\s*5\.2rem 0 0 2\.25rem' -or $customCss -notmatch '(?s)\.page-experience #agentic-ai \.case-study__tags\s*\{[^}]*grid-column:\s*1 / -1' -or $customCss -notmatch '(?s)@media screen and \(max-width: 980px\).*?\.page-experience #agentic-ai \.case-study__writeup\s*\{[^}]*margin-top:\s*0\.75rem') { throw "Agentic card layout: timeline starts level with the title band, tags span the card as a base strip, and the single-column writeup keeps its breathing room." }
 if ($mainJs -notmatch "is-scrolled-away" -or $mainJs -notmatch 'navPanelToggle\.parentElement !== wrapper' -or $customCss -notmatch '(?s)#wrapper > #navPanelToggle\.is-scrolled-away\s*\{[^}]*opacity:\s*0[^}]*pointer-events:\s*none' -or $customCss -notmatch '(?s)@media screen and \(max-width: 980px\) and \(prefers-reduced-motion: reduce\)\s*\{\s*#wrapper > #navPanelToggle\s*\{[^}]*transition:\s*none') { throw "The floating menu pill must scroll away on downward scroll (wrapper-level only, reduced-motion instant), so it cannot sit over card text at reading position." }
@@ -903,7 +911,7 @@ foreach ($distPage in Get-ChildItem -LiteralPath $dist -Filter '*.html') {
     if ((Get-Content -LiteralPath $distPage.FullName -Raw -Encoding UTF8) -match 'target="_blank"(?![^>]*rel=)') { throw "$($distPage.Name) opens a tab without rel=noopener noreferrer." }
 }
 if ($experience -notmatch '<body class="is-preload page-experience">') { throw "Work layout scope is missing." }
-if ($experience -notmatch '<h1 id="portfolio-title">Selected work</h1>' -or [regex]::Matches($experience, 'Agentic AI Product Lead, Cyber Defence').Count -ne 1 -or $sharedCustomCss -notmatch '\.internship-entry__body' -or $sharedCustomCss -notmatch 'page-opening-eyebrow' -or $sharedCustomCss -notmatch 'font:700 1\.8rem/1\.3 var\(--font-body\)') { throw "Tab pages must retain shared openings and readable internship entries; the job title belongs in its DSTA card." }
+if ($experience -notmatch '<h1 id="portfolio-title">Selected work</h1>' -or [regex]::Matches($experience, 'Agentic AI Product Lead, Cyber Defence').Count -ne 1 -or $experiencePageCss -notmatch '\.internship-entry__body' -or $sharedCustomCss -notmatch 'page-opening-eyebrow' -or $sharedCustomCss -notmatch 'font:700 1\.8rem/1\.3 var\(--font-body\)') { throw "Tab pages must retain shared openings and readable internship entries; the job title belongs in its DSTA card." }
 if ([regex]::Matches($experience, 'class="case-study case-study--work"').Count -ne 2) { throw "The two DSTA cards must use the same work-card format." }
 if ($experience -match 'case-study--compact' -or $experience -match 'case-study--lead' -or $experience -match 'case-study--wide') { throw "Retired work-card variants are still present." }
 if ([regex]::Matches($experience, 'class="case-study case-study--internship"').Count -ne 3 -or [regex]::Matches($experience, 'class="internship-entry__body"').Count -ne 3) { throw "Internships must retain three entries with grouped descriptions and tags." }
@@ -1053,7 +1061,7 @@ if ($prewed -match '<style>' -or $house -match '<style>' -or $sharedCustomCss -n
 Assert-FileSizeBudget 'assets\fonts\josephsophia-wordmark.woff2' 16
 if ($personalPageCss -notmatch '(?s)@media \(hover: none\).*?\.personal-timeline-event:not\(\.is-gallery-active\):not\(\[data-gallery-warm="true"\]\) \.personal-event-card__image--slideshow img:not\(:first-child\)\s*\{\s*display:\s*none') { throw "Touch galleries must keep later frames out of layout until their card activates." }
 if ($canvasJs -notmatch 'new IntersectionObserver' -or $canvasJs -notmatch 'canvasOnScreen && !canvasRunning') { throw "The homepage canvas must stop drawing once it leaves the viewport." }
-if ($journalProgressJs -notmatch "fill\.style\.transform = 'scaleX\('" -or $sharedCustomCss -notmatch '(?s)\.read-progress__fill\s*\{[^}]*transform-origin:\s*left') { throw "Journal progress must animate a transform, not width." }
+if ($journalProgressJs -notmatch "fill\.style\.transform = 'scaleX\('" -or $galleryCss -notmatch '(?s)\.read-progress__fill\s*\{[^}]*transform-origin:\s*left') { throw "Journal progress must animate a transform, not width." }
 if ($galleryJs -match "window\.addEventListener\('resize', refreshCue\)" -or $personalTimelineJs -match "window\.addEventListener\('resize', remeasureAndUpdate\)") { throw "Phone URL-bar resizes must not re-run width-only layout work." }
 
 # Oct 2026: explicit phone gallery navigation replaces the animated swipe hint.

@@ -74,13 +74,13 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 
 ### CSS and JavaScript
 
-- `assets/css/custom.css` is the authored source. The build splits marker-bounded route blocks into `travel-map-page.css`, `travel-journal.css`, `experience-page.css`, `personal-page.css` and `skills-page.css`; shared rules stay in generated `custom.css`.
+- `assets/css/custom.css` is the authored source. The build splits route blocks, each between `/* Route bundle: <name>:start */` and `/* Route bundle: <name>:end */` comments (never ordinary headings), into `travel-map-page.css`, `travel-journal.css`, `travel-search.css`, `travel-navigation.css`, `experience-page.css`, `personal-page.css`, `skills-page.css` and `gallery.css` (masonry, lightbox and event bar; house, prewed and journals, before `travel-journal.css`); shared rules stay in generated `custom.css`. Route bundles load after `custom.css`, so a rule moved into one now follows every shared rule: check equal-specificity shared rules for the same element before moving it.
 - `assets/js/main.js` is the authored, dependency-free theme shell. Its marked canvas block becomes homepage-only `canvas-background.js`.
 - Route scripts: `game.js` (homepage), `anomaly-peek.js` and `internship-peek.js` (Work; the latter also drives the Agentic AI console peek), `listing-effects.js` (Skills, Travel), `journal-progress.js` (journals). Verification enforces route ownership, rejects the retired jQuery/theme-helper runtime and caps per-page JavaScript.
 
 ### Theme stylesheet
 
-- `assets/css/main.css` is Massively with rules pruned whose selectors match nothing in the HTML, scripts or rendered DOM.
+- `assets/css/main.css` is Massively with rules pruned whose selectors match nothing in the HTML, scripts or rendered DOM. `-moz-`/`-ms-` duplicates of unprefixed declarations and declarations that an identical selector in `custom.css` always overrides were removed too (5 Nov 2026); `-webkit-` ones and `vh`/`svh` fallback pairs stay.
 - Base styles for `h4`–`h6`, `em`, `b`, `ol`, `blockquote`, `code`, `pre`, `hr`, `sub`, `sup`, `mark`, tables, `dl` and `iframe` are kept on purpose. Form controls and the grid, box, feature and pagination components are gone; restore their rules from `vendor/massively/` before using them.
 - `tools/css/computed-style-check.py` (needs `pip install playwright` and Edge) baselines styles for `prune-main-css.py`.
 
