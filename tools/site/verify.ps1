@@ -1,5 +1,6 @@
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+. (Join-Path $PSScriptRoot 'common.ps1')
 $dist = Join-Path $root "dist"
 $journalManifestPath = Join-Path $root 'journals\manifest.json'
 $journalPartialPath = Join-Path $root 'partials\travel-journal.html'
@@ -12,25 +13,13 @@ $journalStarterPath = Join-Path $root 'journals\_template.html'
 function Get-DistAssetRef([string]$RelativePath) {
     $path = Join-Path $dist ($RelativePath -replace '/', '\')
     if (-not (Test-Path -LiteralPath $path)) { throw "Versioned asset is missing from dist: $RelativePath" }
-    # EOL-normalized to match build.ps1's Get-ContentVersion exactly — an
-    # autocrlf difference between checkouts must not change a hash.
-    $content = (Get-Content -LiteralPath $path -Raw -Encoding UTF8).Replace("`r`n", "`n")
-    $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($content)
-    $sha = [System.Security.Cryptography.SHA256]::Create()
-    try { $hash = $sha.ComputeHash($bytes) } finally { $sha.Dispose() }
-    return "$RelativePath`?v=$(-join ($hash[0..3] | ForEach-Object { $_.ToString('x2') }))"
+    return "$RelativePath`?v=$(Get-ContentVersion (Get-Content -LiteralPath $path -Raw -Encoding UTF8))"
 }
 
 # Recomputing hashes from dist made the standalone verify task self-consistent
 # with a STALE dist: markup and asset drift together, so a forgotten rebuild
 # passed. For the byte-copied runtime assets, source is the truth verify can
 # check against — dist differing from source means dist predates the change.
-# Same as build.ps1: published CSS drops every comment except /*! ... */.
-function Remove-CssComments([string]$Css) {
-    $stripped = [regex]::Replace($Css, '("(?:\\.|[^"\\])*"|''(?:\\.|[^''\\])*'')|/\*(?!!)[\s\S]*?\*/', { param($m) $m.Groups[1].Value })
-    $stripped = [regex]::Replace($stripped, '(?m)^[ \t]+$', '')
-    return ([regex]::Replace($stripped, '(\r?\n){3,}', "`n`n")).Trim() + "`n"
-}
 function Assert-DistMatchesSource([string]$RelativePath) {
     $distPath = Join-Path $dist ($RelativePath -replace '/', '\')
     $sourcePath = Join-Path $root ($RelativePath -replace '/', '\')
@@ -627,7 +616,7 @@ if ($seoul -notmatch '<p class="travel-journal__title guangzhou-journal__locatio
 if ([regex]::Matches($guangzhou, '<video class="content-image journal-animation" data-autoplay loop muted playsinline preload="none"').Count -ne 2 -or $guangzhou -notmatch 'width="236" height="420" data-poster="images/travel/2026_guangzhou/day5/driving-simulator-poster\.webp"' -or $guangzhou -notmatch '<source src="images/travel/2026_guangzhou/day5/driving-simulator\.mp4" type="video/mp4">' -or $guangzhou -match 'driving-simulator\.(?:gif|webp)') { throw "The portrait Guangzhou driving simulator animation must use an MP4 tile and lightbox with a static WebP poster." }
 Assert-FileSizeBudget 'images\travel\2026_guangzhou\day5\driving-simulator.mp4' 512
 if ([regex]::Matches($guangzhou, 'class="guangzhou-day[^\"]*guangzhou-day--compact').Count -ne 6) { throw "Every Guangzhou day must use the compact gallery treatment." }
-if ([regex]::Matches($guangzhou, 'class="brick lazyload container(?: travel-gallery__item--tall)?(?: guangzhou-gallery__brick--tall)?"').Count -ne 55) { throw "Guangzhou journal must retain the curated 55-item gallery after the requested removals." }
+if ([regex]::Matches($guangzhou, 'class="brick container(?: travel-gallery__item--tall)?(?: guangzhou-gallery__brick--tall)?"').Count -ne 55) { throw "Guangzhou journal must retain the curated 55-item gallery after the requested removals." }
 foreach ($restoredPhoto in @('day2/yongqingfang-calligraphy.webp', 'day2/guangzhou-ice-cream.webp', 'day2/opera-museum-courtyard.webp', 'day3/yuexiu-cat.webp', 'day3/chimelong-entrance.webp', 'day3/chimelong-monkey.webp', 'day3/circus-stage.webp', 'day4/massage-stop.webp', 'day5/tianhe-steak.webp', 'day5/chagee-tea.webp', 'day5/pearl-river-view.webp')) {
     if ($guangzhou -notmatch [regex]::Escape("2026_guangzhou/$restoredPhoto")) { throw "Guangzhou journal is missing restored photo: $restoredPhoto" }
 }
@@ -768,7 +757,11 @@ if ($japan -notmatch 'sizes="\(max-width: 736px\) 100vw, \(max-width: 1024px\) c
 # 800w files to 313px phone cards and full originals to 2x desktops.
 $tileSizes = '(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 90vw, (max-width: 767px) 76vw, (max-width: 1023px) 40vw, (max-width: 1279px) 27vw, 20vw'
 $personalCardSizes = '(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 85vw, (max-width: 1680px) 275px, 366px'
-if ($japan -notmatch 'sizes="\(max-width: 736px\) 160px, 20vw"' -or $japan -match 'sizes="\(max-width: 736px\) (?:100vw|250px), (?:800px|20vw)"' -or $usaCanada -match 'sizes="\(max-width: 736px\) 250px, (?:800px|20vw)"') { throw "Journal gallery images must use the measured 20vw desktop slot with 480w phone previews." }
+# Nov 2026: four-up tiles are 224px to 1365px, 244px to 1680px and 325px above;
+# the slot claims 240px in the middle band so 2x laptops take -480 (2.0x), not -800.
+# Two-up sparse days (328px tiles) keep 20vw.
+$journalTileSizes = '(max-width: 736px) 160px, (max-width: 1179px) 20vw, (max-width: 1365px) 224px, (max-width: 1680px) 240px, 325px'
+if ($japan -notmatch ('sizes="' + [regex]::Escape($journalTileSizes) + '"') -or $perth -notmatch '(?s)masonry mason2">(?:(?!<div class="[^"]*\bmasonry\b).)*?sizes="\(max-width: 736px\) 160px, 20vw"' -or $japan -match 'sizes="\(max-width: 736px\) (?:100vw|250px), (?:800px|20vw)"' -or $usaCanada -match 'sizes="\(max-width: 736px\) 250px, (?:800px|20vw)"') { throw "Journal gallery images must use the measured desktop tile slots with 480w phone previews." }
 if ([regex]::Matches($prewed, '<img class="content-image"[^>]*\bsizes="' + [regex]::Escape($tileSizes) + '"[^>]*\bsrcset="[^"]*-480\.jpg 480w').Count -ne 25 -or [regex]::Matches($house, '<img class="content-image"[^>]*\bsizes="' + [regex]::Escape($tileSizes) + '"[^>]*\bsrcset="[^"]*-480\.webp 480w').Count -ne 11 -or $prewed -match 'sizes="\(max-width: 736px\) 250px, 800px"' -or $house -match 'sizes="\(max-width: 736px\) 250px, 800px"') { throw "Pre-wedding and house tiles must publish -480 variants and the measured masonry sizes slot." }
 if ([regex]::Matches($personal, '<img src="images/(?:personal|brawlstars)/[^"]+"[^>]*\bsizes="' + [regex]::Escape($personalCardSizes) + '"[^>]*\bsrcset="[^"]*-480\.(?:jpg|webp) 480w').Count -ne 20 -or $personal -match 'sizes="\(max-width: 736px\) 250px, 800px"') { throw "Personal timeline cards must publish -480 variants and the measured card image slot." }
 if ([regex]::Matches($usaCanada, '-480\.jpg 480w').Count -lt 150 -or [regex]::Matches($perth, '-480\.jpg 480w').Count -lt 80 -or [regex]::Matches($europe, '-480\.jpg 480w').Count -lt 50) { throw "Journal galleries must publish -480 variants so the 20vw slot has a 1x source (run tools/images/make-responsive-variants.py)." }
@@ -945,7 +938,7 @@ if ($customCss -notmatch '(?s)\.company-logo--shopee\s*\{[^}]*background:\s*tran
 foreach ($companyLogo in @('images\company\dsta.svg', 'images\company\the-league.png', 'images\company\shopee.svg', 'images\company\nuhs.png')) {
     if (-not (Test-Path -LiteralPath (Join-Path $dist $companyLogo))) { throw "Generated site is missing company logo: $companyLogo" }
 }
-if ($personal -notmatch '(?s)personal-event-card__image--slides-3.*?ndu2\.jpg.*?ndu1-800\.jpg.*?ndu3-800\.jpg.*?<span class="personal-event-card__meta">2016 &ndash; 2017 &middot; Service</span>.*?<strong>Naval Diving Unit</strong>.*?<span>I completed National Service with the Naval Diving Unit\.</span>') { throw "Naval Diving Unit must be a self-contained three-photo timeline gallery in its approved frame order." }
+if ($personal -notmatch '(?s)personal-event-card__image--slides-3.*?ndu2\.jpg.*?ndu1\.jpg.*?ndu3\.jpg.*?<span class="personal-event-card__meta">2016 &ndash; 2017 &middot; Service</span>.*?<strong>Naval Diving Unit</strong>.*?<span>I completed National Service with the Naval Diving Unit\.</span>') { throw "Naval Diving Unit must be a self-contained three-photo timeline gallery in its approved frame order." }
 if ($personal -match 'section-intro--personal|Projects, communities, and memories from 2016|Scroll through the years|personal-timeline__guide' -or $personal -notmatch '<body class="is-preload page-personal">' -or $personal -notmatch '<h1 id="personal-timeline-title">Life outside work</h1>' -or $personal -notmatch 'A few projects, communities, and milestones that have shaped my life outside work\.') { throw "Personal page must begin with concise, first-person timeline copy and no redundant scrolling instruction." }
 if ($personal -notmatch 'data-personal-timeline' -or $personal -notmatch 'data-timeline-progress' -or $personal -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/personal-timeline.js')) -or $personalTimelineJs -notmatch 'warmGallery' -or -not (Test-Path -LiteralPath (Join-Path $dist 'assets\js\personal-timeline.js'))) { throw "Personal page scroll timeline, nearby slideshow warmup, or its interaction script is missing." }
 if ($personalTimelineJs -notmatch 'is-focus' -or $personalTimelineJs -notmatch 'is-condensed' -or $personalTimelineJs -notmatch 'measureCards' -or $personalTimelineJs -notmatch 'readingFocusFactor = singleRail\.matches' -or $personalTimelineJs -notmatch 'scrollDirection < 0 \? 0\.44 : 0\.5' -or $personalTimelineJs -notmatch 'scrollDirection < 0 \? 0\.54 : 0\.62' -or $personalTimelineJs -notmatch 'focusMargin = scrollDirection < 0 \? 16 : 48' -or $personalTimelineJs -notmatch 'foldAbove = viewport \* 0\.48' -or $customCss -notmatch '(?s)\.is-focus \.personal-event-card\s*\{[^}]*--card-scale-x:\s*1\.01;[^}]*--card-scale-y:\s*1\.01;' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?\.is-focus \.personal-event-card\s*\{[^}]*--card-scale-x:\s*1\.01;[^}]*--card-scale-y:\s*1\.01;' -or $customCss -notmatch '(?s)@media screen and \(min-width: 737px\).*?\.is-focus \.personal-event-card\s*\{[^}]*--image-col:\s*17rem;[^}]*\}.*?\.is-focus \.personal-event-card__image\s*\{[^}]*min-height:\s*12rem;' -or $customCss -notmatch '(?s)\.is-condensed \.personal-event-card\s*\{[^}]*--card-scale:\s*0\.995;') { throw "The timeline must promote a distortion-free main event through vertical reveal with minimal zoom, hand focus back early on reverse scroll, and compact prior cards." }

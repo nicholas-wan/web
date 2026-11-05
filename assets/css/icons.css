@@ -18,6 +18,15 @@
   vertical-align: -0.125em;
 }
 
+/* An empty <i> is italic by default, which alone makes Chrome fetch the
+   46 KB Merriweather italic face on every page (Nov 2026). */
+i.icon,
+i.fa,
+i.fas,
+i.fab {
+  font-style: normal;
+}
+
 .fa-home::before { --fa-icon: url("../icons/fontawesome/solid/house.svg"); }
 .fa-user::before { --fa-icon: url("../icons/fontawesome/solid/user.svg"); }
 .fa-plus::before { --fa-icon: url("../icons/fontawesome/solid/plus.svg"); }

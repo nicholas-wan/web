@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet('build', 'verify', 'check')]
+    [ValidateSet('build', 'verify', 'check', 'test')]
     [string]$Task = 'check',
     [switch]$Clean,
     [string]$Output = 'dist'
@@ -27,5 +27,19 @@ switch ($Task) {
         if ($Output -ne 'dist') { throw 'The CI-equivalent check targets the canonical dist output.' }
         Invoke-SiteBuild -UseClean $true
         & $verifyScript
+    }
+    'test' {
+        # Everything CI runs before it deploys: check, unit tests, browser tests.
+        if ($Output -ne 'dist') { throw 'The browser tests serve the canonical dist output.' }
+        Invoke-SiteBuild -UseClean $true
+        & $verifyScript
+        Push-Location (Join-Path $PSScriptRoot 'tests\browser')
+        try {
+            npm run test:unit
+            if ($LASTEXITCODE -ne 0) { throw 'Unit tests failed.' }
+            npm test
+            if ($LASTEXITCODE -ne 0) { throw 'Browser tests failed.' }
+        }
+        finally { Pop-Location }
     }
 }

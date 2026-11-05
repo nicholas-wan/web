@@ -5,6 +5,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+. (Join-Path $PSScriptRoot 'common.ps1')
 $out = [IO.Path]::GetFullPath((Join-Path $root $Output)).TrimEnd('\', '/')
 # -Clean empties this directory, so accept only a dist* folder directly inside
 # the repository. An allow-list: the old block-list let '.\' (the root plus a
@@ -140,6 +141,18 @@ function Get-CachedImageDimensions([string]$Path, [hashtable]$SourceIndex) {
     }
 }
 
+$journalTileSizes = '(max-width: 736px) 160px, (max-width: 1179px) 20vw, (max-width: 1365px) 224px, (max-width: 1680px) 240px, 325px'
+$wideJournalTileSizes = '(max-width: 736px) 160px, 20vw'
+# Gives images in two-up (mason2) journal galleries their wider slot before
+# Add-ImagePerformanceAttributes, which keeps any sizes already present.
+function Set-WideJournalTileSizes([string]$Markup) {
+    $parts = [regex]::Split($Markup, '(?=<div class="[^"]*\bmasonry\b)|(?=<section\b)')
+    return -join @(foreach ($part in $parts) {
+        if ($part -match '^<div class="[^"]*\bmason2\b') {
+            [regex]::Replace($part, '<img\b(?![^>]*\bsizes=)[^>]*?(?=\s*/?>)',{ param($m) $m.Value + ' sizes="' + $script:wideJournalTileSizes + '"' })
+        } else { $part }
+    })
+}
 function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [hashtable]$SourceIndex, [bool]$JournalGallery = $false) {
     $state = @{ Counter = 0 }
     return [regex]::Replace($Markup, '<img\b[^>]*>', {
@@ -225,12 +238,19 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                         # and 2x desktops the full ~1536px original for a
                         # ~220px tile. A 20vw slot selects -480 on 1x and -800
                         # on 2x screens up to 1920px wide (Sep 2026).
+                        # Nov 2026: four-up tiles step with the column, 224px to
+                        # 1365px, 244px to 1680px, 325px above. 20vw overstated
+                        # them by up to a fifth, so 2x laptops took -800 (3.3x).
+                        # The slot says 240px, not 244px: a 1.6% upscale nobody
+                        # sees, and Chrome then takes -480 at 2x up to 1680px.
+                        # Two-up sparse days have 328px tiles and keep 20vw
+                        # (Set-WideJournalTileSizes).
                         # Oct 2026 phone-scroll profiling: 800w WebP tiles reached
                         # 100-200 KB and competed on slow mobile links. Use existing
                         # 480w previews for the ~264 CSS px horizontal tiles, via a
                         # 160px density-capped slot at DPR <= 3. The lightbox selects
                         # its own fitted source; zoom still uses the original.
-                        $sizes = if ($isJournalBanner) { '(max-width: 736px) 100vw, (max-width: 1024px) calc(100vw - 176px), (max-width: 1680px) 1024px, 1366px' } elseif ($JournalGallery) { '(max-width: 736px) 160px, 20vw' } else { '(max-width: 736px) 250px, 800px' }
+                        $sizes = if ($isJournalBanner) { '(max-width: 736px) 100vw, (max-width: 1024px) calc(100vw - 176px), (max-width: 1680px) 1024px, 1366px' } elseif ($JournalGallery) { $journalTileSizes } else { '(max-width: 736px) 250px, 800px' }
                         $tag = Add-AttributeToImgTag $tag ('sizes="{0}"' -f $sizes)
                     }
                 }
@@ -372,7 +392,6 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
 
     $headings = [regex]::Matches($Markup, '(?is)<h2\b[^>]*>(.*?)</h2>')
     $sections = @()
-    $headingIndex = 0
     foreach ($heading in $headings) {
         $label = [regex]::Replace($heading.Groups[1].Value, '<[^>]+>', '')
         $label = [System.Net.WebUtility]::HtmlDecode(($label -replace '\s+', ' ').Trim())
@@ -382,36 +401,12 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
         $shortLabel = if ($shortMatch.Success) { [System.Net.WebUtility]::HtmlDecode($shortMatch.Groups[1].Value) } else { '' }
         $label = $label -replace '(?i)^Day\s+\d+\s*[^\w\s]\s*', ''
         $label = $label -replace '^#\d+\s*-\s*', ''
-        if ($label -eq 'Hutt Lagoon & Kalbarri National Park') { $label = 'Hutt Lagoon & Kalbarri' }
-    if ($label -match '^Melbourne\s*-\s*(.+)$') { $label = 'Melbourne &middot; ' + $Matches[1] }
-    if ($label -match '^Sydney\s*-\s*(.+)$') { $label = 'Sydney &middot; ' + $Matches[1] }
-        if ($label -eq 'Melbourne City') { $label = 'Melbourne' }
-        if ($label -eq 'Sydney City') { $label = 'Sydney' }
-        if ($label -eq 'Osaka & Nara') { $label = '&#x1F3C3; Osaka &amp; Nara &#x1F98C;' }
-        if ($label -eq 'Tokyo') { $label = '&#x1F5FB; Tokyo &#x1F5FC;' }
-        if ($label -eq 'France') { $label = '&#x1F5FC; France' }
-        if ($label -eq 'Belgium') { $label = '&#x1F9C7; Belgium' }
-        if ($label -eq 'Netherlands') { $label = '&#x1F337; Netherlands' }
-        if ($label -eq 'Germany') { $label = '&#x1F968; Germany' }
-        if ($label -eq 'Switzerland') { $label = '&#x1F3D4; Switzerland' }
+        # Pill labels come from data-nav-label; only the Australia journal's
+        # Melbourne and Sydney days still take an emoji here.
         if ($label -eq 'Melbourne') { $label = '&#x1F998; Melbourne' }
         if ($label -eq 'Sydney') { $label = '&#x1F998; Sydney' }
-        if ($label -eq 'Departure') { $label = '&#x2708;&#xFE0F; Departure' }
-        if ($label -match 'France$' -and $label -notmatch '&#x1F1EB;') { $label = $label -replace 'France$', '&#x1F1EB;&#x1F1F7; France' }
-        if ($label -match 'Belgium$' -and $label -notmatch '&#x1F1E7;') { $label = $label -replace 'Belgium$', '&#x1F1E7;&#x1F1EA; Belgium' }
-        if ($label -match 'Netherlands$' -and $label -notmatch '&#x1F1F3;') { $label = $label -replace 'Netherlands$', '&#x1F1F3;&#x1F1F1; Netherlands' }
-        if ($label -match 'Germany$' -and $label -notmatch '&#x1F1E9;') { $label = $label -replace 'Germany$', '&#x1F1E9;&#x1F1EA; Germany' }
-        if ($label -match 'Switzerland$' -and $label -notmatch '&#x1F1E8;') { $label = $label -replace 'Switzerland$', '&#x1F1E8;&#x1F1ED; Switzerland' }
-        $label = [regex]::Replace($label, '&#x1F1[0-9A-F]{2};', '')
         $label = ($label -replace '\s+', ' ').Trim()
-        if ($label -match '^\s*Germany.*Switzerland$') { $label = '&#x1F968; Germany &middot; &#x1F3D4; Switzerland' }
-        if ($label -match '^\s*France.*Switzerland$') { $label = '&#x1F5FC; France &middot; &#x1F3D4; Switzerland' }
-        if ($headingIndex -eq 0 -and $label -match '(?i)(trip$|silicon valley$)') {
-            $headingIndex++
-            continue
-        }
         $sections += @{ Id = "trip-section-$($sections.Count + 1)"; Label = $label; Day = $day; Short = $shortLabel; Full = $fullLabel }
-        $headingIndex++
     }
 
     # Numbered days are individually reachable, including departures. Legacy
@@ -426,16 +421,9 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
     }
     $sections = $dedupedSections
 
-    $sectionState = @{ Count = 0; First = $true }
+    $sectionState = @{ Count = 0 }
     $updated = [regex]::Replace($Markup, '(?is)<h2\b([^>]*)>(.*?)</h2>', {
         param($match)
-        $label = [regex]::Replace($match.Groups[2].Value, '<[^>]+>', '')
-        $label = [System.Net.WebUtility]::HtmlDecode(($label -replace '\s+', ' ').Trim())
-        if ($sectionState.First -and $label -match '(?i)(trip$|silicon valley$)') {
-            $sectionState.First = $false
-            return $match.Value
-        }
-        $sectionState.First = $false
         $id = "trip-section-$($sectionState.Count + 1)"
         $sectionState.Count++
         return ('<h2 id="' + $id + '"' + $match.Groups[1].Value + '>' + $match.Groups[2].Value + '</h2>')
@@ -462,17 +450,6 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
         $firstItem = $groupItems[0]
         $firstPlainLabel = [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($firstItem.Label, '&#x[0-9A-Fa-f]+;', '') -replace '\s+', ' ').Trim())
         $headingLabel = if ($firstPlainLabel -eq $group) { $firstItem.Label } else { $group }
-        $headingEmoji = @{
-            'Europe' = '&#x1F30D; '
-            'Perth' = '&#x1F334; '
-            'USA & Canada' = '&#x1F5FA; '
-            'Australia' = '&#x1F998; '
-            'Germany' = '&#x1F968; '
-            'Japan' = '&#x1F5FC; '
-            'Guangzhou' = '&#x1F307; '
-            'Silicon Valley' = '&#x1F4BB; '
-        }
-        if ($firstPlainLabel -ne $group -and $headingEmoji.ContainsKey($group)) { $headingLabel = $headingEmoji[$group] + $group }
         $headingLabel = [regex]::Replace($headingLabel, '(&#x1F[0-9A-Fa-f]+;|&#x2708;)(&#xFE0F;)?', '<span class="travel-emoji">$1$2</span>')
         $groupHeading = ""
         if ($groups.Keys.Count -gt 1) {
@@ -488,7 +465,9 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
             if ($plainLabel.Contains('&middot;') -or $plainLabel.Contains([char]0xB7)) { return }
             if ($plainLabel -match '^(Melbourne|Sydney)\s*[\u00B7]\s*(.+)$') { $displayLabel = $Matches[2] }
             elseif ($plainLabel -eq $group) { $displayLabel = 'Overview' }
-            $displayLabel = ([regex]::Replace($displayLabel, '&#x[0-9A-Fa-f]+;', '') -replace '^\s+|\s+$', '')
+            # Labels are decoded text plus emoji entities: drop the emoji, then
+            # escape the text (an "Osaka & Nara" heading needs its &amp;).
+            $displayLabel = ([regex]::Replace($displayLabel, '&#x[0-9A-Fa-f]+;', '') -replace '^\s+|\s+$', '').Replace('&', '&amp;').Replace('<', '&lt;').Replace('>', '&gt;')
             if ($_.Short) { $displayLabel = [System.Net.WebUtility]::HtmlEncode($_.Short) }
             if ($_.Day -ne '') { $displayLabel = 'D' + $_.Day + ' &middot; ' + $displayLabel }
             '<a href="#' + $_.Id + '" aria-label="' + [System.Net.WebUtility]::HtmlEncode($_.Full) + '">' + $displayLabel + '</a>'
@@ -656,27 +635,9 @@ if (Test-Path -LiteralPath $webpSource) {
 # visitors ran new behaviour against stale styling, and a pure-CSS timeline fix
 # shipped under an unchanged key, reaching nobody. verify.ps1 could not catch
 # either, because it asserted the same stale number the build emitted.
-function Get-ContentVersion([string]$Content) {
-    # Line endings are normalized before hashing: git's autocrlf gives the same
-    # commit CRLF on one checkout and LF on another, and without this the same
-    # source produced a different ?v= locally than in CI. The hash answers "did
-    # the code change", and an EOL flip is not a code change.
-    $bytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($Content.Replace("`r`n", "`n"))
-    $sha = [System.Security.Cryptography.SHA256]::Create()
-    try { $hash = $sha.ComputeHash($bytes) } finally { $sha.Dispose() }
-    return -join ($hash[0..3] | ForEach-Object { $_.ToString('x2') })
-}
+# Get-ContentVersion and Remove-CssComments live in common.ps1.
 function Get-FileContentVersion([string]$Path) {
     return Get-ContentVersion (Get-Content -LiteralPath $Path -Raw -Encoding UTF8)
-}
-# Published CSS ships without comments (about a third of its gzip size, Nov 2026).
-# The sources keep them; /*! ... */ comments (the icon licence) are kept. Quoted
-# strings are matched first so a "/*" inside one is never treated as a comment.
-# verify.ps1 has the same function; change both together.
-function Remove-CssComments([string]$Css) {
-    $stripped = [regex]::Replace($Css, '("(?:\\.|[^"\\])*"|''(?:\\.|[^''\\])*'')|/\*(?!!)[\s\S]*?\*/', { param($m) $m.Groups[1].Value })
-    $stripped = [regex]::Replace($stripped, '(?m)^[ \t]+$', '')
-    return ([regex]::Replace($stripped, '(\r?\n){3,}', "`n`n")).Trim() + "`n"
 }
 
 # Computed here, ahead of page generation, because the pages must reference the
@@ -1132,6 +1093,7 @@ foreach ($page in $pages) {
         $main = $main.Replace($mapping.Key, $mapping.Value)
         $intro = $intro.Replace($mapping.Key, $mapping.Value)
     }
+    if ($tripOrder -contains $slug) { $main = Set-WideJournalTileSizes $main }
     $main = Add-ImagePerformanceAttributes $main (Join-Path $root "images") $sourceImageIndex ($tripOrder -contains $slug)
     $main = Add-GalleryAltText $main $slug
     $main = Add-RouteSummaries $main $slug

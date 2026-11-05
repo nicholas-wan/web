@@ -1062,10 +1062,6 @@ html:has(> body.is-map-fullscreen) {
   }
 }
 
-.container .title {
-  color: #1a1a1a;
-  text-align: center;
-}
 
 .content {
   position: relative;
@@ -1294,25 +1290,8 @@ html:has(> body.is-map-fullscreen) {
   text-align: left;
 }
 
-.travel-atlas__summary {
-  flex: 0 0 auto;
-  padding-bottom: 0.25rem;
-  font-family: var(--font-display);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
 
-.travel-atlas__summary strong {
-  color: var(--color-brand-700);
-  font-size: 1.1rem;
-  font-weight: 900;
-}
 
-.travel-atlas__summary span {
-  margin: 0 0.35rem;
-  color: var(--color-border);
-}
 
 .travel-atlas__layout {
   position: relative;
@@ -2428,9 +2407,6 @@ body.is-map-fullscreen .travel-atlas__layout {
     font-size: 1.55rem;
   }
 
-  .travel-atlas__summary {
-    margin-top: 0.8rem !important;
-  }
 
   .travel-atlas__layout {
     max-width: none;
@@ -8708,10 +8684,6 @@ body.page-home #nav {
   color: var(--color-brand-700) !important;
 }
 
-.photo-search .photo-search__hint {
-  flex: 1 1 14rem;
-  font-size: max(var(--text-floor), 0.8rem);
-}
 
 .photo-search .photo-search__status {
   flex: 1 0 100%;
@@ -8722,7 +8694,6 @@ body.page-home #nav {
   letter-spacing: 0.02em;
 }
 
-.photo-search.is-active .photo-search__hint,
 .photo-search__status:empty {
   display: none;
 }
@@ -9473,12 +9444,10 @@ html .page-skills #main > .post { border-top:0; }
 .chronology-pulse { position: absolute; left: -4px; top: 144px; width: 8px; height: 8px; border-radius: 50%; background: #347d6c; box-shadow: 0 0 0 5px #347d6c24; pointer-events: none; }
 .chronology-pulse[hidden] { display: none; }
 
-    @media(prefers-reduced-motion:reduce){.authored-scene[data-scene="1"] *,.authored-scene[data-scene="7"] *{animation:none!important}}
 
-    @media(prefers-reduced-motion:reduce){.authored-scene[data-scene="9"] *,.authored-scene[data-scene="3"] *,.authored-scene[data-scene="6"] *{animation:none!important}}
 
-    @media(prefers-reduced-motion:reduce){.authored-scene[data-scene="0"] *,.authored-scene[data-scene="5"] *,.authored-scene[data-scene="8"] *{animation:none!important}}
 
+/* The one reduced-motion stop for every destination scene and its parts. */
 @media (prefers-reduced-motion: reduce) { .authored-scene, .authored-scene * { animation: none !important; transition: none !important; } }
 
 /* Approved travel journals: artwork, motion, responsive rail and previews. */
@@ -9498,7 +9467,6 @@ html .page-skills #main > .post { border-top:0; }
 
 .cr-liberty-glint,.cr-liberty-ripple{opacity:0}.authored-scene.is-active .cr-liberty-glint{animation:cr-glint var(--polish-duration) ease both}.authored-scene.is-active .cr-liberty-ferry{animation:cr-ferry var(--polish-duration) linear both}.authored-scene.is-active .cr-ripple-a{animation:cr-ripple-a var(--polish-duration) ease both}.authored-scene.is-active .cr-ripple-b{animation:cr-ripple-b var(--polish-duration) ease both}@keyframes cr-ferry{0%,5%{transform:translateX(0)}95%,100%{transform:translateX(153px)}}@keyframes cr-ripple-a{0%,30%,100%{opacity:0}45%{opacity:.8}70%{opacity:0}}@keyframes cr-ripple-b{0%,58%,100%{opacity:0}73%{opacity:.8}94%{opacity:0}}@media(prefers-reduced-motion:reduce){.authored-scene .cr-liberty-ferry{transform:translateX(47px)}.authored-scene .cr-liberty-glint,.authored-scene .cr-liberty-ferry,.authored-scene .cr-liberty-ripple{animation:none!important}}
 
-@media(prefers-reduced-motion:reduce){.authored-scene[data-corrected="architecture"] *{animation:none!important}}
 
 .cl-gull{transform:translate(17px,9px)}.cl-wing{transform-origin:0 0}
 .authored-scene.is-active .cl-gull{animation:cl-gull var(--polish-duration) linear both}
@@ -9508,7 +9476,6 @@ html .page-skills #main > .post { border-top:0; }
 .cl-tower-light{opacity:0}
 .authored-scene.is-active .cl-tower-light{animation:cl-tower-light var(--polish-duration) ease both}
 @keyframes cl-tower-light{0%,12%{opacity:0;transform:translateY(0)}25%{opacity:.22}75%{opacity:.22;transform:translateY(-65px)}90%,100%{opacity:0;transform:translateY(0)}}
-@media(prefers-reduced-motion:reduce){.authored-scene [class^="cl-"]{animation:none!important}}
 
 
 
@@ -9522,14 +9489,12 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes cn-cloud-b{0%,100%{transform:translateX(0);opacity:1}51%{transform:translateX(11px);opacity:.6}80%{transform:translateX(3px);opacity:.9}}
 @keyframes cn-light{0%,30%,100%{opacity:0}62%,72%{opacity:.5}88%{opacity:.15}}
 
-@media(prefers-reduced-motion:reduce){.corrected-nature *{animation:none!important}}
 
 .depth-nature .dn-deck{animation:none!important}
 /* No translucent foundation: the photographs do not resolve submerged structure. */
 
 .depth-nature-fuji.is-active .cn-fuji-maple{animation:dn-foliage var(--scene-duration,6200ms) ease-in-out both;transform-origin:14px 72px}
 @keyframes dn-foliage{0%,100%{transform:rotate(0)}26%{transform:rotate(1.4deg)}52%{transform:rotate(-1deg)}78%{transform:rotate(.6deg)}}
-@media(prefers-reduced-motion:reduce){.depth-nature-panda *,.depth-nature-fuji *{animation:none!important}}
 
 
 
@@ -9577,7 +9542,6 @@ html .page-skills #main > .post { border-top:0; }
 .authored-scene.is-active .pw-ripples{animation:pw-ripples var(--scene-duration,6200ms) ease-in-out both}
 @keyframes pw-bands{0%,100%{transform:translateX(0)}50%{transform:translateX(-4px)}}
 @keyframes pw-ripples{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(1.6px);opacity:.75}}
-@media(prefers-reduced-motion:reduce){.pw-bands,.pw-ripples{animation:none!important}}
 
 
 .depth-nature-fuji.is-active .cn-fuji-cloud-a{animation:dn-cloud-clear var(--polish-duration) linear both}
@@ -9593,7 +9557,6 @@ html .page-skills #main > .post { border-top:0; }
 
 
 @keyframes da-paris-light{0%,100%{opacity:0}10%{opacity:1}82%{opacity:1;animation-timing-function:ease-in-out}}
-@media(prefers-reduced-motion:reduce){.authored-scene[data-depth="architecture"] *{animation:none!important}}
 
 /* Golden Gate from Battery Spencer (3D, 20 Oct 2026). Car lights follow the
    projected deck, so they slow and shrink with distance; keyframes come from

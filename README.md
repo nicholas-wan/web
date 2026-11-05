@@ -5,7 +5,8 @@ Static personal site. `tools/site/build.ps1` builds `dist/` from the root pages 
 ## Commands
 
 ```powershell
-powershell.exe -NoProfile -File tools/site.ps1 check  # CI-equivalent clean build + verify (Windows PowerShell 5.1)
+powershell.exe -NoProfile -File tools/site.ps1 check  # clean build + verify (Windows PowerShell 5.1)
+powershell.exe -NoProfile -File tools/site.ps1 test   # check + unit + browser tests: everything CI runs
 .\tools\site.ps1 build          # build only (-Clean to start fresh)
 .\tools\site.ps1 verify         # verify an existing dist/
 node tools/preview-server.mjs   # preview dist/ at http://localhost:4321 (plain static servers 404 the extensionless URLs)
@@ -15,7 +16,7 @@ CI then runs these; run them before pushing, after a build, from `tools/tests/br
 
 ```powershell
 npm run test:unit   # search and lightbox logic
-npm test            # Playwright layout checks
+npm test            # Playwright layout checks (PW_PORT=4398 if 4321 is taken: an existing server there is reused)
 ```
 
 ## Layout
@@ -67,7 +68,7 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 
 - Banner `sizes`: `100vw` on phones, `calc(100vw - 176px)` to 1024px, `1024px` to 1680px, `1366px` above.
 - Banners get a `-1200` tier (`make-responsive-variants.py --banners-only`, q82 JPEG / q80 WebP, kept only if it saves a fifth) for DPR-3 phones. Seoul and Guangzhou are excluded (2:1 art).
-- Journal tiles use a density-capped `160px` phone slot and a `20vw` desktop slot; non-journal galleries keep `800px`. No images are recompressed.
+- Journal tiles use a density-capped `160px` phone slot. Desktop four-up tiles use their measured widths (`20vw` to 1179px, `224px` to 1365px, `240px` to 1680px, `325px` above; the real middle band is 244px, rounded down so 2x laptops take `-480` at 2.0x instead of `-800`, Nov 2026). Two-up sparse days keep `20vw`. Non-journal galleries keep `800px`. No images are recompressed.
 - The same `160px` phone cap (24 Oct 2026) applies to Browse photos postcards (`travel-seeds.js`, `travel-discovery.js`), search tiles (`photo-search.js`) and the phone journal list photos (`travel-chronology.js`). The list photos are 224px wide, so DPR-3 phones get about 2.1x density; the owner accepted that softening for roughly 460 KB less per full scroll.
 - The three Read journals shortcut photos have dedicated 200px WebP copies (`*-200.webp`, made from the originals with Pillow at q80, 24 Oct 2026, owner-approved), about 22 KB instead of 133 KB.
 - Journal animations use `data-poster`, not `poster`, which loads eagerly. `gallery.js` attaches it near the viewport; `travel-map.js` reads either.
@@ -299,7 +300,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Hiding a focused Info control first moves focus to close (orientation changes too).
 - Test: `node --test tools/tests/lightbox-cache.test.cjs`.
 - MP4 animations: the build renames `poster` to `data-poster`; `gallery.js` attaches it near the viewport and before the lightbox (literal `poster` loads despite `preload="none"`).
-- Tiles: 480w on phones (160px slot, density-capped to DPR 3); `20vw` desktop. See [Build and deployment](#build-and-deployment).
+- Tiles: 480w on phones (160px slot, density-capped to DPR 3); measured desktop slots, so 1x and most 2x laptops get 480w. See [Build and deployment](#build-and-deployment).
 - Section links use the sticky-toolbar correction in `assets/js/travel-nav.js` (date above heading, if any). One horizontally scrollable row.
 - Desktop strip arrows get `hidden` without overflow (not dimmed); phones keep the right-edge fade; ResizeObserver refreshes them. Scrollspy centres only the strip.
 
@@ -328,7 +329,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Personal card, pre-wedding and house images need authored `sizes` and `-480`/`-800` siblings:
   - Personal: `(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 85vw, (max-width: 1680px) 275px, 366px`
   - Galleries: `(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 90vw, (max-width: 767px) 76vw, (max-width: 1023px) 40vw, (max-width: 1279px) 27vw, 20vw`
-- DPR-3 clause caps phones at `-800`. House siblings sit beside the WebP overlay in `images-webp/personal/house/`, because the build looks for siblings next to the resolved file. `verify.ps1` checks slots and siblings. Pre-wedding phones stay on `-800` deliberately. `images/brawlstars/`, `images/experience/NDU/` lack `-480`.
+- DPR-3 clause caps phones at `-800`. House siblings sit beside the WebP overlay in `images-webp/personal/house/`, because the build looks for siblings next to the resolved file. `verify.ps1` checks slots and siblings. Pre-wedding phones stay on `-800` deliberately. `images/brawlstars/` lacks `-480`; the NDU card got its `-480` siblings and the Personal card `sizes` in Nov 2026.
 - Mobile: endpoints inside the viewport, larger card type, return-to-top hidden.
 - The five timeline galleries have no photo controls (owner decision, 17 Oct 2026).
 - Desktop crossfades on hover/keyboard focus, 1s per photo. Touch plays only the card nearest reading focus, 4s per photo. Reduced motion holds first photos.
