@@ -33,13 +33,10 @@
 }
 /* The first internship chip breathes while it is on screen until any
    internship chart is opened, as the anomaly peek's first chip does
-   (peek-breathe lives in custom.css); reduced motion holds a teal outline. */
-.page-experience .case-study--internship .internship-demo-peek__chip.is-breathing {
-  animation: peek-breathe 2.6s ease-in-out infinite;
-}
+   (its .peek-glow span and peek-breathe live in custom.css); reduced motion
+   holds a teal outline. */
 @media (prefers-reduced-motion: reduce) {
   .page-experience .case-study--internship .internship-demo-peek__chip.is-breathing {
-    animation: none;
     box-shadow: inset 0 0 0 1.5px var(--color-brand-600);
   }
 }
@@ -689,12 +686,9 @@
   .page-experience #agentic-ai .internship-demo-hint .anomaly-peek__hint-hover { display: none; }
   .page-experience #agentic-ai .internship-demo-hint .anomaly-peek__hint-touch { display: inline; }
 }
-.page-experience #agentic-ai .internship-demo-peek__chip.is-breathing { animation: peek-breathe-dark 2.6s ease-in-out infinite; }
-@keyframes peek-breathe-dark {
-  50% { box-shadow: inset 0 0 0 1.5px #28d7c5, 0 0 0 5px rgba(40, 215, 197, 0.16); }
-}
+.page-experience #agentic-ai .peek-glow { --glow-ring: #28d7c5; --glow-halo: rgba(40, 215, 197, 0.16); }
 @media (prefers-reduced-motion: reduce) {
-  .page-experience #agentic-ai .internship-demo-peek__chip.is-breathing { animation: none; box-shadow: inset 0 0 0 1.5px #28d7c5; }
+  .page-experience #agentic-ai .internship-demo-peek__chip.is-breathing { box-shadow: inset 0 0 0 1.5px #28d7c5; }
 }
 .page-experience #agentic-ai .internship-demo-peek__chip {
   background: #0e2024;
