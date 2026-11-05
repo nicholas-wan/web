@@ -211,9 +211,9 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(scene(root)).toBeVisible();
  await expect(phoneScene(root)).toBeHidden();
  // Reduced motion holds the final frame: all three steps, the human and the second search's find shown; nothing
- // transient (the first query, the notes, glows, beams, the travelling result, the dotted outline) is left on screen; the second query, the logs with their one lit result and the supervisor's wire to Detection stay.
- for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-odo','.ag-tl-out','.ag-ring','.ag-qw','.ag-card','.ag-decides','.ag-wire2','.ag-q1'])expect(await shown(scene(root).locator(s))).toBe(1);
- for(const s of ['.ag-n0','.ag-pk','.ag-q0','.ag-gl0','.ag-gl1','.ag-fly','.ag-slot','.ag-ln1'])expect(await shown(scene(root).locator(s))).toBe(0);
+ // transient (the first query, the notes, glows, beams, the travelling result, Detection's old wire) is left on screen; the second query, the logs with their one lit result, the supervisor's wire to Detection and the dotted outline where Detection was (owner, 5 Nov 2026) stay.
+ for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-odo','.ag-tl-out','.ag-ring','.ag-qw','.ag-card','.ag-decides','.ag-wire2','.ag-q1','.ag-slot','.ag-ln1'])expect(await shown(scene(root).locator(s))).toBe(1);
+ for(const s of ['.ag-n0','.ag-pk','.ag-q0','.ag-gl0','.ag-gl1','.ag-fly','.ag-wire-det','.ag-pv'])expect(await shown(scene(root).locator(s))).toBe(0);
  for(const o of await scene(root).locator('.ag-b-glow, .ag-halo, .ag-beam, .ag-bar, .ag-tm, .ag-hk').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
  // The final frame shows the second query typed out: its cover wiped away and its caret gone (it showed an empty strip until 5 Nov 2026).
  expect(await scene(root).locator('.ag-q1 .ag-qc').evaluate(e=>e.getBoundingClientRect().width)).toBeLessThan(1);
