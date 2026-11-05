@@ -139,7 +139,14 @@
     if (r.grow) { r.grow.cancel(); r.grow = null; }
     r.grow = zoom.shut(c, swap, touch.matches, late => {
       if (late && active === r) return;
-      c.classList.remove('is-open', 'is-playing', 'is-still', 'is-fading');
+      // A floating card fades out over ~220ms: keep its scene frozen where it
+      // was until it has gone, so a close mid-run never flashes the final frame.
+      if (!swap && !late && !motion.matches) {
+        c.classList.remove('is-open');
+        c.getAnimations({ subtree: true }).forEach(a => { if (a.animationName) a.pause(); });
+        clearTimeout(r.settle);
+        r.settle = setTimeout(() => { if (!c.classList.contains('is-open')) c.classList.remove('is-playing', 'is-still', 'is-fading'); }, 240);
+      } else c.classList.remove('is-open', 'is-playing', 'is-still', 'is-fading');
       c.style.overflow = c.style.animation = '';
     });
     c.inert = true;
