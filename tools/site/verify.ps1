@@ -25,12 +25,19 @@ function Get-DistAssetRef([string]$RelativePath) {
 # with a STALE dist: markup and asset drift together, so a forgotten rebuild
 # passed. For the byte-copied runtime assets, source is the truth verify can
 # check against — dist differing from source means dist predates the change.
+# Same as build.ps1: published CSS drops every comment except /*! ... */.
+function Remove-CssComments([string]$Css) {
+    $stripped = [regex]::Replace($Css, '("(?:\\.|[^"\\])*"|''(?:\\.|[^''\\])*'')|/\*(?!!)[\s\S]*?\*/', { param($m) $m.Groups[1].Value })
+    $stripped = [regex]::Replace($stripped, '(?m)^[ \t]+$', '')
+    return ([regex]::Replace($stripped, '(\r?\n){3,}', "`n`n")).Trim() + "`n"
+}
 function Assert-DistMatchesSource([string]$RelativePath) {
     $distPath = Join-Path $dist ($RelativePath -replace '/', '\')
     $sourcePath = Join-Path $root ($RelativePath -replace '/', '\')
     if (-not (Test-Path -LiteralPath $distPath)) { throw "Runtime asset missing from dist: $RelativePath" }
     $distContent = (Get-Content -LiteralPath $distPath -Raw -Encoding UTF8).Replace("`r`n", "`n")
     $sourceContent = (Get-Content -LiteralPath $sourcePath -Raw -Encoding UTF8).Replace("`r`n", "`n")
+    if ($RelativePath -like '*.css') { $sourceContent = Remove-CssComments $sourceContent }
     if ($distContent -ne $sourceContent) { throw "dist is stale: $RelativePath differs from its source. Rebuild with tools/site.ps1 build." }
 }
 
@@ -365,10 +372,16 @@ foreach ($leagueCut in @('playfair-900-italic-league', 'librebaskerville-400-lea
 }
 $mainCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\main.css') -Raw -Encoding UTF8
 if ($sharedCustomCss -notmatch '--font-display:\s*"Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;' -or $mainCss -notmatch '(?s)@font-face\s*\{[^}]*font-family:\s*"Source Sans Fallback";[^}]*font-weight:\s*600 900;[^}]*src:\s*local\("Arial Bold"\)[^}]*size-adjust:\s*8[0-9]%') { throw 'The display stack must name the size-adjusted "Source Sans Fallback" face (Oct 2026 cold-load reflow fix).' }
-if ($sharedCustomCss -match 'Route bundle:|Travel destination atlas|Guangzhou journal|Travel journal navigation\.|Japan editorial title|Quiet Skills-card treatment') { throw 'Generated shared custom.css still contains a route-owned block.' }
-if ($travelMapPageCss -notmatch 'Travel destination atlas' -or $travelMapPageCss -notmatch 'Compact travel journal archive') { throw 'Travel index CSS bundle is missing its atlas or archive block.' }
-if ($travelJournalCss -notmatch 'Guangzhou journal' -or $travelJournalCss -notmatch 'Travel journal navigation\.' -or $travelJournalCss -notmatch 'Japan editorial title') { throw 'Travel journal CSS bundle is missing a journal-owned block.' }
-if ($experiencePageCss -notmatch 'Route bundle: experience-base:start' -or $personalPageCss -notmatch 'Route bundle: personal-responsive:start' -or $skillsPageCss -notmatch 'Quiet Skills-card treatment') { throw 'A page-specific CSS bundle is missing its ownership marker.' }
+# Published CSS carries no comments, so bundle ownership is checked by a
+# selector from each route-owned block instead of its heading.
+foreach ($cssFile in Get-ChildItem -LiteralPath (Join-Path $dist 'assets\css') -Filter '*.css') {
+    if ((Get-Content -LiteralPath $cssFile.FullName -Raw -Encoding UTF8) -match '/\*(?!!)') { throw "Published CSS still contains comments: $($cssFile.Name). Rebuild with tools/site.ps1 build." }
+}
+if ($iconsCss -notmatch '^/\*!(?:(?!\*/)[\s\S])*Font Awesome Free is licensed under CC BY 4\.0') { throw 'icons.css must keep the Font Awesome licence notice.' }
+if ($sharedCustomCss -match '#main > \.travel-archive-heading \{|\.page-travel-journal header\.major > \.date \{|\.page-travel-journal #header \{|\.japan-journal \.japan-journal__intro \{|\.page-skills \.skills-heading::before \{') { throw 'Generated shared custom.css still contains a route-owned block.' }
+if ($travelMapPageCss -notmatch '\.travel-atlas \{' -or $travelMapPageCss -notmatch '#main > \.travel-archive-heading \{') { throw 'Travel index CSS bundle is missing its atlas or archive block.' }
+if ($travelJournalCss -notmatch '\.page-travel-journal header\.major > \.date \{' -or $travelJournalCss -notmatch '\.page-travel-journal #header \{' -or $travelJournalCss -notmatch '\.japan-journal \.japan-journal__intro \{') { throw 'Travel journal CSS bundle is missing a journal-owned block.' }
+if ($experiencePageCss -notmatch '#main > \.portfolio-headline \{' -or $personalPageCss -notmatch '\.personal-timeline-page > \.personal-timeline \{' -or $skillsPageCss -notmatch '\.page-skills \.skills-heading::before \{') { throw 'A page-specific CSS bundle is missing its route-owned rules.' }
 Assert-FileSizeBudget 'assets\js\main.js' 18
 Assert-FileSizeBudget 'assets\js\canvas-background.js' 14
 # 22 -> 24: phone hero glide (initHeroSnap, Jul 2026).
@@ -1019,7 +1032,7 @@ if ($skillsHtml -notmatch 'Designing multi-agent workflows with defined tool acc
 if ($skillsHtml -notmatch 'Building AI systems and tools for cybersecurity\.' -or $skillsHtml -match 'I keep delivery focused|I test behaviour against realistic tasks|I balance performance with maintainability|I design workflows that analysts can investigate' -or $skillsHtml -notmatch 'Turning analyst problems into clear product priorities, roadmaps, and delivery decisions\.' -or $skillsHtml -notmatch 'build scalable, maintainable cybersecurity systems and analyst tools\.' -or $skillsHtml -notmatch 'Specialising in threat hunting, cloud anomaly detection, and practical security operations\.') { throw "Skills must retain its compact supporting line and concise summaries that fit the three-line desktop treatment." }
 if ($skillsHtml -notmatch '(?s)<header class="major skills-heading">.*?<section class="tech-stack".*?<header class="major education-heading">') { throw "Skills and its Tech stack must precede Education in document order." }
 if ($customCss -notmatch '(?s)\.tech-stack__grid\s*\{[^}]*grid-template-columns:\s*repeat\(9' -or $customCss -notmatch '(?s)\.page-skills \.tech-stack\s*\{[^}]*grid-column:\s*1 / -1') { throw "Technology stack must retain its responsive full-width tile layout." }
-if ($customCss -match 'Signal Console redesign|\.page-index #intro' -or $customCss -notmatch 'Quiet Skills-card treatment' -or $customCss -notmatch '(?s)\.page-experience #agentic-ai\s*\{[^}]*grid-template-columns[^}]*#071315' -or $customCss -notmatch '(?s)\.page-skills #main > \.post\s*\{[^}]*grid-template-columns:\s*1fr' -or $customCss -notmatch '(?s)\.page-skills \.toolkit-card:hover,[^{]*\.page-skills \.toolkit-card:focus-within\s*\{[^}]*box-shadow:\s*none[^}]*transform:\s*none') { throw "The original Work layout and calm Skills-card treatment are not correctly scoped." }
+if ($customCss -match 'Signal Console redesign|\.page-index #intro' -or $customCss -notmatch '\.page-skills \.skills-heading::before \{' -or $customCss -notmatch '(?s)\.page-experience #agentic-ai\s*\{[^}]*grid-template-columns[^}]*#071315' -or $customCss -notmatch '(?s)\.page-skills #main > \.post\s*\{[^}]*grid-template-columns:\s*1fr' -or $customCss -notmatch '(?s)\.page-skills \.toolkit-card:hover,[^{]*\.page-skills \.toolkit-card:focus-within\s*\{[^}]*box-shadow:\s*none[^}]*transform:\s*none') { throw "The original Work layout and calm Skills-card treatment are not correctly scoped." }
 # Oct 2026: Work page small text keeps the 12px phone floor like its neighbours.
 foreach ($workFloorRule in @('\.case-study__company-label\s*\{[^}]*font-size:\s*max\(var\(--text-floor\), 0\.8rem\)', '\.case-study__company-role\s*\{[^}]*font-size:\s*max\(var\(--text-floor\), 0\.84rem\)', '\.case-study__company-meta\s*\{[^}]*font-size:\s*max\(var\(--text-floor\), 0\.78rem\)', '\.case-study__tags li\s*\{[^}]*font-size:\s*max\(var\(--text-floor\), 0\.76rem\)', '\.earlier-work__grid a\s*\{[^}]*font-size:\s*max\(var\(--text-floor\), 0\.78rem\)')) {
     if ($experiencePageCss -notmatch "(?s)$workFloorRule") { throw "Work page company, tag and project-link text must keep the 12px phone floor: $workFloorRule" }

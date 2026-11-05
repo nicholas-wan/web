@@ -669,6 +669,15 @@ function Get-ContentVersion([string]$Content) {
 function Get-FileContentVersion([string]$Path) {
     return Get-ContentVersion (Get-Content -LiteralPath $Path -Raw -Encoding UTF8)
 }
+# Published CSS ships without comments (about a third of its gzip size, Nov 2026).
+# The sources keep them; /*! ... */ comments (the icon licence) are kept. Quoted
+# strings are matched first so a "/*" inside one is never treated as a comment.
+# verify.ps1 has the same function; change both together.
+function Remove-CssComments([string]$Css) {
+    $stripped = [regex]::Replace($Css, '("(?:\\.|[^"\\])*"|''(?:\\.|[^''\\])*'')|/\*(?!!)[\s\S]*?\*/', { param($m) $m.Groups[1].Value })
+    $stripped = [regex]::Replace($stripped, '(?m)^[ \t]+$', '')
+    return ([regex]::Replace($stripped, '(\r?\n){3,}', "`n`n")).Trim() + "`n"
+}
 
 # Computed here, ahead of page generation, because the pages must reference the
 # exact bytes that get written later. The write-out below reuses these values.
@@ -732,10 +741,14 @@ foreach ($segment in $resolvedCssSegments) {
 if ($cssCursor -lt $customCssSource.Length) {
     $sharedCssParts.Add($customCssSource.Substring($cssCursor))
 }
-$sharedCustomCss = (($sharedCssParts -join '') -replace '(\r?\n){3,}', "`n`n").Trim() + "`n"
+$sharedCustomCss = Remove-CssComments ($sharedCssParts -join '')
 $routeCssBundles = @{}
 foreach ($bundle in $routeCssParts.Keys) {
-    $routeCssBundles[$bundle] = (($routeCssParts[$bundle] -join "`n`n").Trim() + "`n")
+    $routeCssBundles[$bundle] = Remove-CssComments ($routeCssParts[$bundle] -join "`n`n")
+}
+$runtimeCssText = @{}
+foreach ($file in @('icons.css', 'main.css', 'noscript.css', 'internship-peek.css')) {
+    $runtimeCssText[$file] = Remove-CssComments (Get-Content -LiteralPath (Join-Path $root "assets\css\$file") -Raw -Encoding UTF8)
 }
 
 $mainJsSource = Get-Content -LiteralPath (Join-Path $root 'assets\js\main.js') -Raw -Encoding UTF8
@@ -748,8 +761,8 @@ $canvasJs = $mainJsSource.Substring($canvasStart, $canvasEnd - $canvasStart).Tri
 $sharedMainJs = ($mainJsSource.Substring(0, $canvasStart).TrimEnd() + "`n`n" + $mainJsSource.Substring($canvasEnd + $canvasEndMarker.Length).TrimStart())
 
 $assetVersions = @{}
-foreach ($file in @('icons.css', 'main.css', 'noscript.css', 'internship-peek.css')) {
-    $assetVersions["assets/css/$file"] = Get-FileContentVersion (Join-Path $root "assets\css\$file")
+foreach ($file in $runtimeCssText.Keys) {
+    $assetVersions["assets/css/$file"] = Get-ContentVersion $runtimeCssText[$file]
 }
 foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'travel-shortcuts.js', 'travel-chronology.js')) {
     $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
@@ -1282,12 +1295,11 @@ if ($imageDimensionCacheDirty) {
 }
 
 # Publish only runtime assets used by the generated Pages site.
-$runtimeCss = @("icons.css", "main.css", "noscript.css", "internship-peek.css")
 $runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "travel-shortcuts.js", "travel-chronology.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
-foreach ($file in $runtimeCss) {
-    Copy-Item -LiteralPath (Join-Path $root "assets\css\$file") -Destination (Join-Path $out "assets\css\$file") -Force
+foreach ($file in $runtimeCssText.Keys) {
+    Write-Utf8 (Join-Path $out "assets\css\$file") $runtimeCssText[$file]
 }
 # Bundle contents were computed before page generation so the pages could
 # reference their content hashes; write those exact strings out here.

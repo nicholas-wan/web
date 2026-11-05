@@ -498,9 +498,12 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
   - Pre-squash history (all refs): `C:/Users/nicho/Projects/web-before-squash.bundle`; restore with `git clone` on it, else deletable.
   - Do not track `dist/` or GIFs again; see [Build and deployment](#build-and-deployment).
 - **`.gitattributes` pins text to LF; do not remove it (Jul 2026).** CI's `core.autocrlf=true` CRLF pushed JS/CSS past `verify.ps1` budgets on CI only, silently stalling deploys. Budgets assume LF.
-- **`travel-map-page.css` sits under 1 KB below its 49 KB (50,176 LF bytes) `verify.ps1` budget (Oct 2026).**
+- **Published CSS has no comments (Nov 2026).** The build strips every CSS comment except `/*! ... */` (the Font Awesome licence in `icons.css`) and hashes the stripped text, which cut gzipped CSS by about a third. Sources keep their comments, so write them freely and never delete them to save bytes.
+  - `verify.ps1` budgets measure the stripped output.
+  - Verify checks bundle ownership by selector. Never pin comment text; it is not in `dist`.
+- **`travel-map-page.css` sits about 6 KB below its 49 KB (50,176 LF bytes) `verify.ps1` budget once stripped (Nov 2026).**
   - No large CSS on the travel/atlas route.
-  - If needed, bump the budget with a dated rationale comment (like the 40 → 42 note); never strip `custom.css` comments to save bytes.
+  - If needed, bump the budget with a dated rationale comment (like the 40 → 42 note).
 - **Keep travel JavaScript deferred (Oct 2026).** Initial travel bundle loads `travel-discovery.js`, not the atlas; 80 KB initial ceiling; `travel-discovery.js` 7 KB (submit interception and IME state must precede the module); atlas 64 KB, near viewport; search 30 KB, on interaction. Do not restore eager atlas or search scripts.
 - **`.travel-gallery__item--tall` looks unused, isn't.** It pairs with the `guangzhou-gallery__brick--tall` compat class (the only one in markup); SKILL.md mandates the pair; removing it unstyles future journals.
 
