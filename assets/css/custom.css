@@ -35,6 +35,7 @@
   --ease-emphasized: cubic-bezier(0.22, 0.8, 0.32, 1);
 }
 
+/* Route bundle: skills-education:start */
 .education-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -131,12 +132,14 @@
 .education-highlights strong {
   color: var(--color-ink-800);
 }
+/* Route bundle: skills-education:end */
 @media only screen and (max-width: 600px) {
   .aboutblock {
     text-align: left !important;
   }
 }
 
+/* Route bundle: skills-cards:start */
 .education-heading h2,
 .skills-heading h2 {
   font-size: 2.8rem !important;
@@ -430,6 +433,7 @@
     min-height: 0;
   }
 }
+/* Route bundle: skills-cards:end */
 
 /* iPhone-style swipe intro: JS drives --p from 0 (photo centered, text
    offstage right) to 1 (side-by-side). Default 1 keeps the settled layout
@@ -7003,7 +7007,10 @@ body.lightbox-open {
 
   /* Thumbnails stay on top at full width: the BrainHack and showcase
      artwork carries lettering that a narrow side crop makes illegible. */
+}
 
+/* Route bundle: skills-responsive:start */
+@media screen and (max-width: 736px) {
   .page-skills #main > .post {
     padding: 1.5rem 1.15rem 2rem;
   }
@@ -7077,6 +7084,7 @@ body.lightbox-open {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+/* Route bundle: skills-responsive:end */
 
 /* Route bundle: personal-base:start */
 /* --------------------------------------------------------------------------

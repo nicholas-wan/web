@@ -330,7 +330,9 @@ Assert-FileSizeBudget 'assets\css\travel-search.css' 19
 # 22 -> 24: the third chart chip, equal-width chips with an open arrow and phone/tablet tiles (Oct 2026).
 Assert-FileSizeBudget 'assets\css\experience-page.css' 24
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32
-Assert-FileSizeBudget 'assets\css\skills-page.css' 10
+# 10 -> 19 (5 Nov 2026): the education, toolkit-card and tech-stack rules moved
+# here from shared custom.css, which every page loads.
+Assert-FileSizeBudget 'assets\css\skills-page.css' 19
 # Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
 Assert-FileSizeBudget 'assets\css\gallery.css' 15
 Assert-FileSizeBudget 'assets\css\icons.css' 4

@@ -682,6 +682,9 @@ $cssSegments = @(
     [pscustomobject]@{ Bundle = 'personal-page.css'; Name = 'personal-base' },
     [pscustomobject]@{ Bundle = 'travel-journal.css'; Name = 'journal-japan' },
     [pscustomobject]@{ Bundle = 'personal-page.css'; Name = 'personal-responsive' },
+    [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-education' },
+    [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-cards' },
+    [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-responsive' },
     [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-polish' },
     [pscustomobject]@{ Bundle = 'travel-search.css'; Name = 'travel-search' },
     # Masonry tiles, the lightbox and the event pages' context bar: only the
