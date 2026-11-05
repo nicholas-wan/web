@@ -14,14 +14,14 @@
 // of Hypothesis and a pulse carries it along the wires to Detection, which slides straight along the line into step
 // 2, leaving a dotted outline (owner); the rest of the team steps back. Step 2: the event logs; Detection types its
 // first query, its beam sweeps the logs and nothing lights ("0 found", "empty doesn't mean safe"); the query is struck
-// through, backspaced and retyped, then checked ("query checked"); the beam sweeps again, 32 light, all but one step
-// back ("32 found · 1 unusual"). Step 3: that one lifts off the logs, travels along the line and unfolds into the
+// through, backspaced and retyped, then checked ("query checked"); the beam sweeps again, 32 light, all but one dim
+// again ("32 found · 1 unusual"). Step 3: that one lifts off the logs, travels along the line and unfolds into the
 // lead card, Reporting comes forward and its pen marks the card, a small card runs the dashed line and the analyst
 // lights amber ("Analyst decides"). At the end the supervisor's wire is redrawn to where Detection works and the
 // dotted outline goes. Base styles are the final frame (reduced motion holds it); motion only under .is-playing;
 // the replay fades the drawing only. Teal for the machine, amber for the human alone; the product's name never
 // appears; no SIEM's syntax; the aria-label starts "An illustrative hunt." (the verifier and the spec pin it).
-// Desktop 640x254, the steps as columns; phones 360 wide, the steps stacked on a spine of numbers down the left, each
+// Desktop 640x260, the steps as columns; phones 360 wide, the steps stacked on a spine of numbers down the left, each
 // step's words above its picture (drawn 1.08x), the hand-offs a teal dot running the spine from one picture to the next.
 // A polish pass (1 Nov 2026, owner: "suggest optimizations or polish. refer to professional websites and animations",
 // then "Yes, ship all six"; proposed on lab/hunt-polish, reviewed by an independent visual review and a blind motion
@@ -67,9 +67,11 @@ const ARIA = 'An illustrative hunt. From a ransomware report, a supervisor agent
 const L = 104, HUB = [138, 58], BX = [56, 116, 176], DX = 252, G = { x: 292, y: 81, ts: 9, tg: 3 }, OUTT = [2, 5];
 G.w = 8 * (G.ts + G.tg) - G.tg; G.h = 4 * (G.ts + G.tg) - G.tg;
 const OUTC = [G.x + OUTT[1] * (G.ts + G.tg) + G.ts / 2, G.y + OUTT[0] * (G.ts + G.tg) + G.ts / 2];
-const Q = { x: 238, y: 143, w: 162, h: 16 }, CARD = { x: 436, y: 76, w: 92, h: 56 }, AX = 588, R = 16;
-// each step's picture: its reach in the desktop's units [left, right, top, bottom] (phones scale and stack them)
+const Q = { x: 238, y: 143, w: 162, h: 16 }, CARD = { x: 436, y: 76, w: 92, h: 56 }, AX = 588, R = 16, QS = 1.2;
+// each step's picture: its reach in the desktop's units [left, right, top, bottom] (phones scale and stack them; on a
+// phone step 2 reaches further right and lower, for its larger query strip)
 const REACH = [[16, 216, 47, 166], [234, 404, 64, 179], [434, 622, 74, 158]];
+const REACH_M = [REACH[0], [234, r1(Q.x + Q.w * QS + 1), 64, r1(179 + Q.h * (QS - 1))], REACH[2]];
 
 const badge = (cls, cx, cy, ic, name, on) => `<g class="ag-b ${cls}"><rect class="ag-b-glow" x="${cx - 18}" y="${cy - 18}" width="36" height="36" rx="10" fill="none" stroke="${C.teal}" stroke-width="5" stroke-opacity=".22"/>` +
   `<rect x="${cx - 14}" y="${cy - 14}" width="28" height="28" rx="7" fill="${C.node}" stroke="${on ? C.teal : C.dim}" stroke-width="1.4"/>` +
@@ -91,7 +93,10 @@ function picture(i, phone) {
       `<path class="ag-rep-link" d="M120 ${HUB[1]} H${HUB[0] - 9}" stroke="${C.dim}" pathLength="1" fill="none"/>`;
     p += `<g class="ag-repb">${badge('ag-br', rx, L, 'pen', 'Reporting')}</g>`;
     p += `<g class="ag-hunch"><rect x="16" y="146" width="200" height="17" rx="8.5" fill="${C.chip}" stroke="${C.teal}" stroke-opacity=".55"/>` +
-      `<text x="25" y="158" font-size="10" fill="${C.body}"><tspan font-weight="700" fill="${C.teal}">Hunch:</tspan> attackers hide in scheduled tasks</text></g>` +
+      `<text x="25" y="158" font-size="10" fill="${C.body}"><tspan font-weight="700" fill="${C.teal}">Hunch:</tspan> attackers hide in scheduled tasks</text>` +
+      // (the same line again, only "scheduled tasks" painted, in teal: it shows while Detection types "schtasks", so the
+      // query reads as the hunch put to work; opacity only, laid exactly over the words)
+      `<text class="ag-hk" x="25" y="158" font-size="10" fill="${C.teal}" fill-opacity="0"><tspan font-weight="700">Hunch:</tspan> attackers hide in <tspan fill-opacity="1">scheduled tasks</tspan></text></g>` +
       `<path class="ag-hpath" d="M${hx} ${L - 14} C${hx} ${L - 30} ${HUB[0]} ${HUB[1] + 20} ${HUB[0]} ${HUB[1] + 8} C${HUB[0]} ${HUB[1] + 20} ${dx} ${L - 30} ${dx} ${L - 14}" pathLength="1" stroke="${C.teal}" stroke-width="3" stroke-linecap="round" fill="none"/>`;
     return p;
   }
@@ -102,8 +107,13 @@ function picture(i, phone) {
       return `<g class="ag-t" style="--c:${c}" transform="translate(${G.x + c * (G.ts + G.tg)} ${G.y + r * (G.ts + G.tg)})"><rect/><rect class="ag-tm"/><rect class="ag-tl${out ? ' ag-tl-out' : ''}"/></g>`; }).join('')}</g>`;
     p += `<circle class="ag-ring" cx="${OUTC[0]}" cy="${OUTC[1]}" r="9" fill="none" stroke="${C.teal}" stroke-width="1.4"/>`;
     const cone = `M${DX + 12} ${L - 3} L${G.x - 3} ${G.y - 4} H${G.x + G.w + 3} V${G.y + G.h + 2.5} H${G.x - 3} Z`;
-    p += [0, 1].map(k => `<path class="ag-beam ag-beam${k}" d="${cone}" fill="${k ? C.teal : C.mute}" fill-opacity="${k ? .12 : .1}"/>` +
-      `<rect class="ag-bar ag-bar${k}" x="${G.x - 3}" y="${G.y - 3}" width="3" height="${G.h + 5.5}" rx="1.5" fill="${k ? C.teal : C.mute}" style="--w:${G.w + 3}px"/>`).join('');
+    // (the beam is light, not a slab: clear at Detection, brightest where it reaches the logs, fading past them)
+    const bx0 = DX + 12, bx1 = G.x + G.w + 3, at = r1((G.x - 3 - bx0) / (bx1 - bx0));
+    p += [0, 1].map(k => { const id = `ag-bm-${phone ? 'm' : 'd'}${k}`, col = k ? C.teal : C.mute, peak = k ? .16 : .13;
+      return `<linearGradient id="${id}" gradientUnits="userSpaceOnUse" x1="${bx0}" y1="0" x2="${bx1}" y2="0"><stop offset="0" stop-color="${col}" stop-opacity="0"/>` +
+        `<stop offset="${at}" stop-color="${col}" stop-opacity="${peak}"/><stop offset="1" stop-color="${col}" stop-opacity="${+(peak * .3).toFixed(3)}"/></linearGradient>` +
+        `<path class="ag-beam ag-beam${k}" d="${cone}" fill="url(#${id})"/>` +
+        `<rect class="ag-bar ag-bar${k}" x="${G.x - 3}" y="${G.y - 3}" width="3" height="${G.h + 5.5}" rx="1.5" fill="${col}" style="--w:${G.w + 3}px"/>`; }).join('');
     const cy = 137;
     const ROLL = 15, cid = 'ag-cc-' + (phone ? 'm' : 'd');   // (the count rolls up through a window one row tall whose edges fade, so a passing row never shows a hard cut)
     p += T(G.x, cy, '0 found', 10.5, C.body, 'class="ag-n0" font-weight="700"') +
@@ -113,14 +123,16 @@ function picture(i, phone) {
       [...CNT, 32].map((v, j) => T(G.x, cy + j * ROLL, v + ' found', 10.5, C.teal, 'class="ag-cnv" font-weight="700"')).join('') + '</g></g>' +
       T(G.x + 50, cy, '&#183; 1 unusual', 10.5, C.teal, 'class="ag-qw" font-weight="700"');
     const tx0 = Q.x + 15, base = Q.y + 11.3;
-    p += `<g class="ag-q"><rect x="${Q.x}" y="${Q.y}" width="${Q.w}" height="${Q.h}" rx="4" fill="${C.chip}" stroke="${C.rule}"/>`;
+    // (a phone draws the query strip QS larger, from its top left corner, so the query reads at about 10px on an iPhone)
+    p += (phone ? `<g transform="translate(${Q.x} ${Q.y}) scale(${QS}) translate(${-Q.x} ${-Q.y})">` : '<g>') + `<g class="ag-q"><rect x="${Q.x}" y="${Q.y}" width="${Q.w}" height="${Q.h}" rx="4" fill="${C.chip}" stroke="${C.rule}"/>`;
     QUERIES.forEach(([f, v], k) => { const len = r1((f.length + v.length + 5) * MONO);
       p += `<g class="ag-q${k}"><text x="${Q.x + 6}" y="${base}" font-size="10" font-weight="700" fill="${C.teal}">&#8250;</text>` +
         `<text class="ag-qt" x="${tx0}" y="${base}" font-size="9" textLength="${len}" lengthAdjust="spacing"><tspan fill="${C.body}">${f}</tspan><tspan fill="${C.dim}"> = </tspan><tspan fill="${C.teal}">"${esc(v)}"</tspan></text>` +
         (k === 0 ? `<path class="ag-qx" d="M${tx0 - 1} ${Q.y + Q.h / 2 + .5} H${r1(tx0 + len + 1)}" pathLength="1" stroke="${C.mute}" stroke-width="1.2"/>` : `<g class="ag-qok">${icon('tick', Q.x + Q.w - 17, Q.y + 2, 1, C.teal)}</g>`) +
         `<rect class="ag-qc" x="${tx0 - .5}" y="${Q.y + 1.5}" width="${r1(len + 2)}" height="${Q.h - 3}" fill="${C.chip}"/>` +
         `<rect class="ag-qk" x="${tx0}" y="${Q.y + 3}" width="1.2" height="${Q.h - 6}" fill="${C.teal}" style="--w:${len}px"/></g>`; });
-    p += '</g>' + T(Q.x, 175, 'empty doesn&#39;t mean safe', 11, C.ink, 'class="ag-gl ag-gl0" font-weight="600"') + T(Q.x, 175, 'query checked', 11, C.teal, 'class="ag-gl ag-gl1" font-weight="600"');
+    const ny = r1(175 + (phone ? Q.h * (QS - 1) : 0));
+    p += '</g></g>' + T(Q.x, ny, 'empty doesn&#39;t mean safe', 11, C.ink, 'class="ag-gl ag-gl0" font-weight="600"') + T(Q.x, ny, 'query checked', 11, C.teal, 'class="ag-gl ag-gl1" font-weight="600"');
     if (phone) p += `<g class="ag-det" style="--dx:0px">${badge('ag-bd', DX, L, 'lens', 'Detection', true)}</g>`;
     return p;
   }
@@ -154,12 +166,13 @@ function header(w, y, fh, phone) {
 }
 const open = (cls, w, h) => `<svg class="${cls}" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="${esc(ARIA)}"><rect x=".5" y=".5" width="${w - 1}" height="${h - 1}" rx="12" fill="${C.bg}" stroke="${C.rule}"/>`;
 
-// desktop: three columns, the line running through them
-const DH = 254;
+// desktop: three columns, the line running through them; the words sit 6 lower than they did (5 Nov 2026), so step 2's
+// notes ("empty doesn't mean safe", "query checked") clear its heading by 16 and no longer read as part of it
+const DH = 260;
 function desktop() {
   const W = 640, s = [open('ag-scene', W, DH), header(W, 23, 11.5)];
   STEPS.forEach((st, i) => { const x = 16 + i * 208;
-    s.push(`<g class="ag-sw ag-sw${i}"><g class="ag-s ag-s${i}">${title(i, x, 194, 12.5)}${body(st.d, x, 213, 15.5, 10.3)}</g></g>`); });
+    s.push(`<g class="ag-sw ag-sw${i}"><g class="ag-s ag-s${i}">${title(i, x, 200, 12.5)}${body(st.d, x, 219, 15.5, 10.3)}</g></g>`); });
   const stage = [0, 1, 2].map(i => `<g class="ag-p ag-p${i}">${picture(i, false)}</g>`).join('') +
     // the line: Detection's place to where it works, and on to step 3; at the end the supervisor's wire is redrawn to it
     `<path class="ag-ln ag-ln1" d="M${BX[2] + 15} ${L} H${DX - 15}" pathLength="1" stroke="${C.rule}" fill="none"/><path class="ag-ln ag-ln2" d="M${G.x + G.w + 8} ${L} H${CARD.x - 1.5}" pathLength="1" stroke="${C.rule}" fill="none"/>` +
@@ -205,7 +218,7 @@ const node = (i, y) => `<circle class="ag-nd" cx="${SP}" cy="${y}" r="7.5" fill=
 function phone() {
   const W = 360, words = [], pics = [], at = [], nodes = []; let y = 60, H = 0;
   STEPS.forEach((st, i) => {
-    const [x0, x1, y0, y1] = REACH[i], ty = r1(y + 18), by = r1(ty + 17), top = by + (st.m.length - 1) * 16 + 14;
+    const [x0, x1, y0, y1] = REACH_M[i], ty = r1(y + 18), by = r1(ty + 17), top = by + (st.m.length - 1) * 16 + 14;
     const px = r1(CX - PS * (x0 + x1) / 2), py = r1(top - PS * y0), bottom = top + PS * (y1 - y0);
     at[i] = [px, py]; nodes[i] = r1(ty - 4.6);
     words.push(`<circle cx="${SP}" cy="${nodes[i]}" r="7.5" fill="${C.bg}"/><g class="ag-sw ag-sw${i}"><g class="ag-s ag-s${i}">${node(i, nodes[i])}<text x="${TX}" y="${ty}" font-size="13.5" font-weight="700" fill="${C.ink}">${STEPS[i].title}</text>${body(st.m, TX, by, 16, 12.5)}</g></g>`);
@@ -234,8 +247,10 @@ function phone() {
     `${icon('lens', r1(d1[0] - 8.4 * PS), r1(L1 - 8.4 * PS), r1(1.4 * PS), C.teal)}</g>`;
   const cell = `<rect class="ag-tv ag-tv2" x="${r1(out[0] - ts / 2)}" y="${r1(out[1] - ts / 2)}" width="${r1(ts)}" height="${r1(ts)}" rx="${r1(2 * PS)}" fill="${C.teal}"/>`;
   // (Detection shrinks to .65 where it stands, travels so, is hidden while it passes behind step 2's number and grows back
-  // over its last 24 units; the result swells to 1.35 where it stands, the lift before it goes)
-  const kf = keys('ag-tv1', v1, .65, (dd, l) => l - dd < 24 ? .65 + .35 * (1 - (l - dd) / 24) : .65, dd => Math.abs(dd - pass2) < 12 ? 0 : 1) + '\n' +
+  // over its last 44 units, eased, so it lands rather than pops; the result swells to 1.35 where it stands, the lift
+  // before it goes)
+  const GROW = 44;
+  const kf = keys('ag-tv1', v1, .65, (dd, l) => { const u = Math.max(0, 1 - (l - dd) / GROW); return .65 + .35 * u * u * (3 - 2 * u); }, dd => Math.abs(dd - pass2) < 12 ? 0 : 1) + '\n' +
     keys('ag-tv2', v2, 1.35, () => 1.35);
   return { svg: open('ag-scene ag-scene--m', W, H) + header(W, 23, 12.5, true) + stem + `<g class="ag-stage">${lit}</g><g class="ag-stage">${pics.join('')}${cell}${chip}</g>` + words.join('') + '</svg>', H, kf,
     // (each run's length, and as fractions of it: where its line starts, the number it passes, Detection's relay)
@@ -246,20 +261,28 @@ function phone() {
 // [start, duration] in seconds; LEAD holds the opened card still for a beat first ("slightly longer delay before it
 // starts"), on every replay too. Each reading moment holds about 2 s (owner: "barely on screen for 0.5s").
 const LEAD = 0.5;
+// A review (5 Nov 2026, owner: "review web - th animation for enhancements", then "edit and push"; real-time recordings
+// read by a blind motion designer and a blind first-time viewer) moved four beats: the struck query holds half a second
+// before it is erased, and "query checked" holds about 2 s (everything from the erase on is .45 s later); Reporting
+// comes forward as the lead card arrives and glows as its pen marks it, not half a second before there is a card; and
+// on both layouts the team relights (and on desktop the supervisor's wire is redrawn and the dotted outline goes) a
+// second after "Analyst decides", so nothing competes with the analyst. The report now stands by the supervisor from
+// the first frame, faint, and brightens as the lead-in ends, so a replay never opens on an empty card.
 const t = {
-  rep: [0.3, .5], replink: [.75, .25], hub: [.85, .3], bh: [1.0, .3], br: [1.08, .3], bd: [1.16, .3], wire0: [.78, .3], wire1: [.86, .3], wire2d: [.94, .3],
+  rep: [0, .45], replink: [.75, .25], hub: [.85, .3], bh: [1.0, .3], br: [1.08, .3], bd: [1.16, .3], wire0: [.78, .3], wire1: [.86, .3], wire2d: [.94, .3],
   hyp: [1.2, 1.1], hunch: [1.3, .4], hpath: [2.1, .8], hunchgo: [2.75, .3], detglow: [2.8, 4.95], det: [2.95, .55], ln1: [2.95, .55], w1: [3.0, .5], back: [3.15, .3],
-  lg: [3.45, .35], logs: [3.5, .4], q: [3.55, .25], q0: [3.7, .6], k0: [4.35, .1], s0: [4.4, .8], n0: [5.35, .4], gl0: [5.4, 1.95], qx: [6.3, .2], erase: [6.55, .35],
-  q1: [6.95, .6], k1: [7.6, .1], ok: [7.6, .3], gl1: [7.65, 1.3], s1: [8.3, .6], cnt: [8.5, .07], dim: [9.1, .45], ring: [9.35, .4], qw: [9.5, .3],
-  ln2: [10.35, .3], fly: [10.25, .5], lit: [2.85, .3], w2: [10.35, .45], fwd: [10.45, .4], card: [10.95, .5], cpen: [11.25, .35], trick: [11.35, .3],
-  he: [11.5, .35], pk: [11.65, .55], ana: [12.2, .5], halo: [12.3, 1.1], decides: [13.35, .3], all: [12.75, .5], wire2: [12.6, .5], slotout: [13.0, .25],
+  lg: [3.45, .35], logs: [3.5, .4], q: [3.55, .25], q0: [3.7, .6], hk: [3.9, 2.0], k0: [4.35, .1], s0: [4.4, .8], n0: [5.35, .4], gl0: [5.4, 2.4], qx: [6.3, .2], erase: [7.0, .35],
+  q1: [7.4, .6], k1: [8.05, .1], ok: [8.05, .3], gl1: [8.1, 2.2], s1: [8.75, .6], cnt: [8.95, .07], dim: [9.55, .45], ring: [9.8, .4], qw: [9.95, .3],
+  ln2: [10.8, .3], fly: [10.7, .5], lit: [2.85, .3], w2: [10.8, .45], fwd: [11.4, .4], card: [11.4, .5], cpen: [11.7, .35], trick: [11.8, .3],
+  he: [11.95, .35], pk: [12.1, .55], ana: [12.65, .5], halo: [12.75, 1.1], decides: [13.8, .3], all: [14.8, .5], wire2: [14.8, .5], slotout: [15.05, .25],
 };
+const LATE = 10.75;   // (where step 3 starts: on a phone, everything from here waits for the second run as well)
 // phones: the two dots' runs (about 370 and 450 units, too far for the desktop's half-second moves), at one steady
 // speed; everything after the first arrival waits SH1 longer on a phone, everything after the second SH2 (they add up)
 const PH = phone(), dur = len => +(Math.min(1.2, Math.max(1, len / 380)) / (1 - HOLD)).toFixed(2), tAt = (tv, f) => +(tv[0] + (HOLD + (1 - HOLD) * f) * tv[1]).toFixed(3);
 const TV1 = [t.det[0], dur(PH.run[0])], TV2 = [t.fly[0] + .1, dur(PH.run[1])];
 const SH1 = +(TV1[0] + TV1[1] + .1 - (t.det[0] + t.det[1])).toFixed(2), SH2 = +(TV2[0] + TV2[1] - .02 - t.card[0]).toFixed(2);
-const tier = s => s >= 10.3 ? 2 : s >= 3.4 ? 1 : 0;
+const tier = s => s >= LATE ? 2 : s >= 3.4 ? 1 : 0;
 const RUN = 'cubic-bezier(.37,0,.63,1)', OUTEZ = 'cubic-bezier(.4,0,.2,1)', EZ = 'cubic-bezier(.22,1,.36,1)', IO = 'cubic-bezier(.45,0,.25,1)', SPRING = 'cubic-bezier(.34,1.56,.64,1)', STEPS8 = 'steps(8, jump-none)';
 const STEPSQ = QUERIES.map(([f, v]) => `steps(${f.length + v.length + 5}, jump-none)`);   // (one step per character)
 const d = v => +(LEAD + v).toFixed(3);
@@ -294,7 +317,7 @@ ${S} .ag-rep { opacity: .85; }
 ${S} .ag-hunch { opacity: .75; }
 ${S} .ag-logs rect { width: ${G.ts}px; height: ${G.ts}px; rx: 2px; fill: ${C.dim}; fill-opacity: .55; }
 ${S} .ag-logs .ag-tm { fill: ${C.mute}; fill-opacity: .9; opacity: 0; }
-${S} .ag-logs .ag-tl { fill: ${C.teal}; fill-opacity: .9; opacity: 0; }
+${S} .ag-logs .ag-tl { fill: ${C.teal}; fill-opacity: .9; opacity: .35; }   /* (the 32 found stay faintly lit, so the one unusual reads as one of 32) */
 ${S} .ag-logs .ag-tl-out { fill-opacity: 1; opacity: 1; }
 /* the final frame: the supervisor's wire to where Detection works, no dotted outline (a phone keeps it, with Detection
    faint in it, since its two places are on separate steps) */
@@ -304,7 +327,7 @@ svg.ag-scene--m > rect:first-child { stroke-opacity: 0; }   /* (the card's frame
 svg.ag-scene--m .ag-card { transform-origin: 0% 50%; }   /* (it arrives from where the dot lands, its left edge) */
 svg.ag-scene--m .ag-nd { transform-box: fill-box; transform-origin: center; }
 /* transient marks: hidden in the final frame */
-${S} :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo, .ag-fly, .ag-q0, .ag-pk) { opacity: 0; }
+${S} :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo, .ag-fly, .ag-q0, .ag-pk, .ag-hk) { opacity: 0; }
 /* the replay: the drawing fades and starts over while the card, its header and its words stay */
 .internship-demo-card.is-fading .internship-demo-card__plot > svg.ag-scene { opacity: 1; }
 .internship-demo-card.is-fading ${S} .ag-stage { opacity: 0; transition: opacity 240ms ease; }
@@ -314,7 +337,7 @@ ${S} :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo, .ag-fl
 @keyframes ag-pop { from { opacity: 0; transform: scale(.88); } }
 @keyframes ag-draw { from { stroke-dashoffset: 1.05; } }
 @keyframes ag-wake { from { opacity: .22; } }
-@keyframes ag-slidein { from { opacity: 0; transform: translateX(-10px); } to { opacity: .85; transform: none; } }
+@keyframes ag-ready { from { opacity: .4; transform: translateX(-4px); } to { opacity: .85; transform: none; } }
 @keyframes ag-bump { 50% { transform: scale(1.25); } }
 @keyframes ag-glow { 0%, 100% { opacity: 0; } 12%, 88% { opacity: 1; } }
 @keyframes ag-hunch { from { opacity: 0; transform: translateY(-8px) scale(.9); } }
@@ -333,12 +356,13 @@ ${S} :is(.ag-b-glow, .ag-n0, .ag-cn, .ag-gl, .ag-beam, .ag-bar, .ag-halo, .ag-fl
 @keyframes ag-caret { to { transform: translateX(var(--w)); } }
 @keyframes ag-caretback { from { transform: translateX(var(--w)); } to { transform: none; } }
 @keyframes ag-shake { 0% { opacity: 0; transform: scale(1.15); } 35% { opacity: 1; transform: none; } 50% { transform: translateX(-2px); } 65% { transform: translateX(2px); } 80% { transform: translateX(-1px); } 100% { opacity: 1; transform: none; } }
+@keyframes ag-glint { 0%, 100% { opacity: 0; } 15%, 75% { opacity: 1; } }
 @keyframes ag-hold { 0% { opacity: 0; transform: translateY(4px); } 10%, 90% { opacity: 1; transform: none; } 100% { opacity: 0; } }
 @keyframes ag-say { from { opacity: 0; transform: translateY(4px); } }
 @keyframes ag-beam { 0% { opacity: 0; } 15%, 75% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes ag-bar { 0% { opacity: 0; transform: none; } 10%, 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--w)); } }
 @keyframes ag-miss { 0%, 100% { opacity: 0; } 30% { opacity: 1; } }
-@keyframes ag-tile { 0% { opacity: 0; } 22%, 62% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes ag-tile { 0% { opacity: 0; } 22%, 62% { opacity: 1; } 100% { opacity: .35; } }
 @keyframes ag-light { from { opacity: 0; } }
 @keyframes ag-lit-s { from { stroke: ${C.dim}; } }
 @keyframes ag-lit-i { from { stroke: ${C.mute}; } }
@@ -360,7 +384,7 @@ ${PH.kf}   /* (each held at its end until what it becomes has arrived over it) *
 @keyframes ag-nd { 50% { transform: scale(1.35); stroke-opacity: 1; } }
 @keyframes ag-pk { 0% { opacity: 0; transform: none; } 12%, 88% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--dx)); } }
 /* step 1: the report reaches the supervisor, the badges fan out, the hunch is carried to Detection, which moves on */
-${P} .ag-rep { animation: ${an(t.rep, 'ag-slidein', EZ)}; }
+${P} .ag-rep { animation: ${an(t.rep, 'ag-ready', EZ)}; }   /* (faint by the supervisor from the first frame, then sent) */
 ${P} .ag-rep-link { animation: ${an(t.replink, 'ag-draw')}; }
 ${P} .ag-hub { animation: ${an(t.hub, 'ag-bump', SPRING, 'none')}; }
 ${P} .ag-arm0 { animation: ${an(t.wire0, 'ag-draw')}; }
@@ -370,6 +394,7 @@ ${P} .ag-br { animation: ${an(t.br, 'ag-pop', EZ)}; }
 ${P} .ag-bd { animation: ${an(t.bd, 'ag-pop', EZ)}; }
 ${P} .ag-bh .ag-b-glow { animation: ${an(t.hyp, 'ag-glow', 'linear', 'none')}; }
 ${P} .ag-hunch { animation: ${an(t.hunch, 'ag-hunch', EZ)}, ${an(t.hunchgo, 'ag-hunchgo', 'ease', 'forwards')}; }
+${P} .ag-hk { animation: ${an(t.hk, 'ag-glint', 'ease', 'none')}; }   /* ("scheduled tasks" lights in the hunch while "schtasks" is typed) */
 ${P} .ag-hpath { animation: ${an(t.hpath, 'ag-pulse', 'linear', 'none')}; }   /* (the hunch carried along the wires: up to the supervisor, down to Detection) */
 ${P} .ag-det { animation: ${an(t.det, 'ag-slide', IO)}; }   /* (straight along the line, as in the redesign) */
 /* Detection is neutral until the hunch lands on it, then lights (cause before effect; a blind continuity review) */
@@ -386,7 +411,7 @@ ${P} .ag-s1 { animation: ${an(t.w1, 'ag-wake', EZ)}; }
 /* the team steps back while Detection works, Reporting comes forward to write the lead, all forward at the end */
 ${P} .ag-team { animation: ${an(t.back, 'ag-back', 'ease', 'forwards')}, ${an(t.all, 'ag-fwd', 'ease', 'forwards')}; }
 ${P} .ag-repb { animation: ${an(t.back, 'ag-back', 'ease', 'forwards')}, ${an(t.fwd, 'ag-fwd', 'ease', 'forwards')}; }
-${P} .ag-br .ag-b-glow { animation: ${an([t.fwd[0], 1.3], 'ag-glow', 'linear', 'none')}; }
+${P} .ag-br .ag-b-glow { animation: ${an([t.cpen[0] - .1, 1.1], 'ag-glow', 'linear', 'none')}; }   /* (as its pen marks the card) */
 /* step 2: the logs; a query, a sweep that finds nothing; struck, backspaced, retyped, checked; a sweep that finds 32, one unusual */
 ${P} .ag-lg { animation: ${an(t.lg, 'ag-fade')}; }
 ${P} .ag-q { animation: ${an(t.q, 'ag-fade')}; }
@@ -443,8 +468,8 @@ ${PM} .ag-s2 .ag-nd { animation: ${an([tAt(TV2, PH.pass[1]) - .1, .35], 'ag-nd',
 ${PM} .ag-card { animation-name: ag-cardgrow; animation-duration: .35s; }   /* (out of the dot, from the card's left edge) */
 /* Reporting is a screen away from the lead on a phone, so it steps forward with the team at the end rather than
    flashing while the eye follows the dot down (blind reads, twice); the pen on the card is its mark */
-${PM} .ag-repb { animation: ${an(t.back, 'ag-back', 'ease', 'forwards')}, ${an([t.decides[0] + .5, t.all[1]], 'ag-fwd', 'ease', 'forwards')}; }
-${PM} .ag-team { animation: ${an(t.back, 'ag-back', 'ease', 'forwards')}, ${an([t.decides[0] + .5, t.all[1]], 'ag-fwd', 'ease', 'forwards')}; }
+${PM} .ag-repb { animation: ${an(t.back, 'ag-back', 'ease', 'forwards')}, ${an(t.all, 'ag-fwd', 'ease', 'forwards')}; }
+${PM} .ag-team { animation: ${an(t.back, 'ag-back', 'ease', 'forwards')}, ${an(t.all, 'ag-fwd', 'ease', 'forwards')}; }
 ${PM} .ag-br .ag-b-glow { animation: none; }
 ${PM} .ag-det1 { animation: ${an([t.det[0], .15], 'ag-ghost', 'ease')}; }
 ${PM} .ag-det1 .ag-b { animation: ${an(t.bd, 'ag-pop', EZ)}; }   /* (it pops in with the other two badges; it had no entrance and sat there from the first frame) */
