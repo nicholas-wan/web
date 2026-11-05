@@ -48,35 +48,45 @@
 		navPanelToggle.classList.add('alt');
 	}
 
-	var toggleToneFrame = null;
-	function renderToggleTone() {
-		toggleToneFrame = null;
-		if (!header) {
-			navPanelToggle.classList.add('alt');
-			return;
-		}
-		navPanelToggle.classList.toggle('alt', header.getBoundingClientRect().bottom <= window.innerHeight * 0.05);
-	}
-	function queueToggleTone() {
-		if (toggleToneFrame === null) toggleToneFrame = window.requestAnimationFrame(renderToggleTone);
-	}
-	window.addEventListener('scroll', queueToggleTone, { passive: true });
-	window.addEventListener('resize', queueToggleTone, { passive: true });
-	queueToggleTone();
-
+	// The scroll-driven chrome (the menu pill's tone, its step away, and
+	// return-to-top) shares one frame that reads everything before it writes
+	// anything, so no write forces the next read to restyle the page.
+	var returnToTop = document.getElementById('return-to-top');
+	var chromeFrame = null;
+	var chromeScrolled = false;
 	// The wrapper-level pill steps away on downward reading progress and returns
 	// on upward intent. Context and sticky navigation parents opt out.
 	var toggleScrollY = window.scrollY;
-	window.addEventListener('scroll', function() {
+	function stepAway(y) {
 		if (navPanelToggle.parentElement !== wrapper) return;
-		var y = window.scrollY;
 		if (Math.abs(y - toggleScrollY) < 8) return;
 		if (y > toggleScrollY && y > 160 && !body.classList.contains('is-navPanel-visible'))
 			navPanelToggle.classList.add('is-scrolled-away');
 		else
 			navPanelToggle.classList.remove('is-scrolled-away');
 		toggleScrollY = y;
+	}
+	function renderChrome() {
+		chromeFrame = null;
+		var scrolled = chromeScrolled;
+		chromeScrolled = false;
+		var y = window.scrollY;
+		// Headerless pages keep the solid pill.
+		var alt = !header || header.getBoundingClientRect().bottom <= window.innerHeight * 0.05;
+
+		navPanelToggle.classList.toggle('alt', alt);
+		if (scrolled) stepAway(y);
+		if (returnToTop) returnToTop.classList.toggle('is-visible', y >= 50);
+	}
+	function queueChrome() {
+		if (chromeFrame === null) chromeFrame = window.requestAnimationFrame(renderChrome);
+	}
+	window.addEventListener('scroll', function() {
+		chromeScrolled = true;
+		queueChrome();
 	}, { passive: true });
+	window.addEventListener('resize', queueChrome, { passive: true });
+	queueChrome();
 
 	var navPanel = document.createElement('div');
 	navPanel.id = 'navPanel';
@@ -236,23 +246,12 @@
 	mobileNav.addEventListener('change', syncNavMode);
 	syncNavMode();
 
-	// Return-to-top visibility and scrolling no longer require a second script.
-	var returnToTop = document.getElementById('return-to-top');
+	// Return-to-top scrolls here; renderChrome shows it past 50px.
 	if (returnToTop) {
-		var topFrame = null;
-		function syncReturnToTop() {
-			topFrame = null;
-			returnToTop.classList.toggle('is-visible', window.scrollY >= 50);
-		}
-		function queueReturnToTop() {
-			if (topFrame === null) topFrame = window.requestAnimationFrame(syncReturnToTop);
-		}
-		window.addEventListener('scroll', queueReturnToTop, { passive: true });
 		returnToTop.addEventListener('click', function(event) {
 			event.preventDefault();
 			window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'auto' : 'smooth' });
 		});
-		queueReturnToTop();
 	}
 })();
 
