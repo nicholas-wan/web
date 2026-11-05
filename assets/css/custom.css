@@ -846,6 +846,7 @@
   }
 }
 
+/* Route bundle: journal-progress:start */
 /* Journal reading progress */
 .read-progress {
   position: fixed;
@@ -866,6 +867,8 @@
   transform: scaleX(0);
   transform-origin: left;
 }
+
+/* Route bundle: journal-progress:end */
 
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] {
@@ -982,6 +985,7 @@ html:has(> body.is-map-fullscreen) {
   object-fit: contain;
 }
 
+/* Route bundle: gallery-masonry:start */
 /* Masonry item */
 .masonry .brick {
   display: inline-block; /* Fix the misalignment of items */
@@ -1032,6 +1036,8 @@ html:has(> body.is-map-fullscreen) {
   }
 }
 
+/* Route bundle: gallery-masonry:end */
+
 /* Raleway is self-hosted via main.css font-face rules */
 
 *,
@@ -1044,6 +1050,7 @@ html:has(> body.is-map-fullscreen) {
   box-sizing: border-box;
 }
 
+/* Route bundle: gallery-tiles:start */
 @media screen and (max-width: 640px) {
   .container {
     display: block;
@@ -1135,6 +1142,16 @@ html:has(> body.is-map-fullscreen) {
   left: 20%;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .masonry .brick img,
+  .content .content-overlay,
+  .content-details {
+    transition: none;
+  }
+}
+
+/* Route bundle: gallery-tiles:end */
+
 #return-to-top {
     position: fixed;
     bottom: 20px;
@@ -1181,14 +1198,12 @@ html:has(> body.is-map-fullscreen) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .masonry .brick img,
-  .content .content-overlay,
-  .content-details,
   #return-to-top,
   #return-to-top i {
     transition: none;
   }
 }
+/* Route bundle: prewed-layout:start */
 /* .desktoponly / .mobileonly swap at exactly 800px. These used to switch at
    different widths (600px / 800px), so 601-799px viewports rendered BOTH
    prewed hero wordmarks stacked on top of each other. */
@@ -1208,6 +1223,8 @@ html:has(> body.is-map-fullscreen) {
     column-count:4;
   }
 }
+
+/* Route bundle: prewed-layout:end */
 
 /* Route bundle: travel-map:start */
 /* Travel destination atlas */
@@ -5247,6 +5264,7 @@ body:not(.page-home) #wrapper.fade-in::before {
   }
 }
 
+/* Route bundle: event-context-bar:start */
 .mobile-context-bar {
   display: none;
 }
@@ -5299,6 +5317,8 @@ body:not(.page-home) #wrapper.fade-in::before {
     font-size: 1rem;
   }
 }
+
+/* Route bundle: event-context-bar:end */
 
 @media (prefers-reduced-motion: reduce) and (max-width: 980px) {
   body::before,
@@ -6090,6 +6110,7 @@ ul.icons li a.icon:hover::before,
   letter-spacing: var(--eyebrow-tracking);
 }
 
+/* Route bundle: gallery-bricks:start */
 .masonry .brick .content {
   background: var(--color-surface-subtle);
 }
@@ -6143,6 +6164,8 @@ ul.icons li a.icon:hover::before,
   touch-action: manipulation;
 }
 
+/* Route bundle: gallery-bricks:end */
+
 /* Touch-first layouts keep primary controls at a comfortable 44px-or-larger
    target without enlarging their desktop mouse treatment. */
 @media screen and (max-width: 980px) {
@@ -6172,6 +6195,7 @@ ul.icons li a.icon:hover::before,
   }
 }
 
+/* Route bundle: gallery-lightbox:start */
 html.lightbox-open,
 body.lightbox-open {
   overflow: hidden;
@@ -6444,6 +6468,8 @@ body.lightbox-open {
     transform: none;
   }
 }
+
+/* Route bundle: gallery-lightbox:end */
 
 @media screen and (max-width: 600px) {
   #intro {

@@ -109,6 +109,7 @@ $routeCssOwners = @{
     'experience-page.css' = @('experience.html')
     'personal-page.css' = @('personal.html')
     'skills-page.css' = @('skills.html')
+    'gallery.css' = @($eventPageNames + $journalPageNames)
 }
 $navSignatures = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
 
@@ -267,8 +268,9 @@ $travelJournalCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\travel
 $experiencePageCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\experience-page.css') -Raw -Encoding UTF8
 $personalPageCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\personal-page.css') -Raw -Encoding UTF8
 $skillsPageCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\skills-page.css') -Raw -Encoding UTF8
+$galleryCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\gallery.css') -Raw -Encoding UTF8
 $iconsCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\icons.css') -Raw -Encoding UTF8
-$customCss = @($sharedCustomCss, $travelMapPageCss, $travelJournalCss, $experiencePageCss, $personalPageCss, $skillsPageCss) -join "`n"
+$customCss = @($sharedCustomCss, $galleryCss, $travelMapPageCss, $travelJournalCss, $experiencePageCss, $personalPageCss, $skillsPageCss) -join "`n"
 # Page changes (Oct 2026): content pages skip the theme's black load overlay, pages
 # opt in to cross-document view transitions on the 220ms token, and reduced motion
 # opts out. See "Page changes" in README.md.
@@ -329,6 +331,8 @@ Assert-FileSizeBudget 'assets\css\travel-search.css' 19
 Assert-FileSizeBudget 'assets\css\experience-page.css' 24
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 Assert-FileSizeBudget 'assets\css\skills-page.css' 10
+# Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
+Assert-FileSizeBudget 'assets\css\gallery.css' 15
 Assert-FileSizeBudget 'assets\css\icons.css' 4
 if ($iconsCss -match '@font-face|fontawesome-webfont' -or [regex]::Matches($iconsCss, '\.\bfa-[a-z0-9-]+::before').Count -ne 22) { throw 'The minimal icon stylesheet must map exactly the selected self-hosted page icons without a webfont.' }
 $publishedIconSvgs = @(Get-ChildItem -LiteralPath (Join-Path $dist 'assets\icons\fontawesome') -Filter '*.svg' -File -Recurse)
@@ -1050,7 +1054,7 @@ if ($prewed -match '<style>' -or $house -match '<style>' -or $sharedCustomCss -n
 Assert-FileSizeBudget 'assets\fonts\josephsophia-wordmark.woff2' 16
 if ($personalPageCss -notmatch '(?s)@media \(hover: none\).*?\.personal-timeline-event:not\(\.is-gallery-active\):not\(\[data-gallery-warm="true"\]\) \.personal-event-card__image--slideshow img:not\(:first-child\)\s*\{\s*display:\s*none') { throw "Touch galleries must keep later frames out of layout until their card activates." }
 if ($canvasJs -notmatch 'new IntersectionObserver' -or $canvasJs -notmatch 'canvasOnScreen && !canvasRunning') { throw "The homepage canvas must stop drawing once it leaves the viewport." }
-if ($journalProgressJs -notmatch "fill\.style\.transform = 'scaleX\('" -or $sharedCustomCss -notmatch '(?s)\.read-progress__fill\s*\{[^}]*transform-origin:\s*left') { throw "Journal progress must animate a transform, not width." }
+if ($journalProgressJs -notmatch "fill\.style\.transform = 'scaleX\('" -or $galleryCss -notmatch '(?s)\.read-progress__fill\s*\{[^}]*transform-origin:\s*left') { throw "Journal progress must animate a transform, not width." }
 if ($galleryJs -match "window\.addEventListener\('resize', refreshCue\)" -or $personalTimelineJs -match "window\.addEventListener\('resize', remeasureAndUpdate\)") { throw "Phone URL-bar resizes must not re-run width-only layout work." }
 
 # Oct 2026: explicit phone gallery navigation replaces the animated swipe hint.

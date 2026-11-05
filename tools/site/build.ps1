@@ -683,7 +683,16 @@ $cssSegments = @(
     [pscustomobject]@{ Bundle = 'travel-journal.css'; Name = 'journal-japan' },
     [pscustomobject]@{ Bundle = 'personal-page.css'; Name = 'personal-responsive' },
     [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-polish' },
-    [pscustomobject]@{ Bundle = 'travel-search.css'; Name = 'travel-search' }
+    [pscustomobject]@{ Bundle = 'travel-search.css'; Name = 'travel-search' },
+    # Masonry tiles, the lightbox and the event pages' context bar: only the
+    # pages that load gallery.js (house, prewed and the journals) need them.
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'journal-progress' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'gallery-masonry' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'gallery-tiles' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'prewed-layout' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'event-context-bar' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'gallery-bricks' },
+    [pscustomobject]@{ Bundle = 'gallery.css'; Name = 'gallery-lightbox' }
 )
 # Each block is bounded by explicit /* Route bundle: <name>:start */ and
 # /* Route bundle: <name>:end */ comments, never by ordinary headings, so
@@ -1175,6 +1184,8 @@ foreach ($page in $pages) {
     $routeStylesheets = @()
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-map-page.css')`" />" }
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-search.css')`" />"; $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-navigation.css')`" />" }
+    # gallery.css first: its rules came before every journal rule in custom.css.
+    if ($galleryPages -contains $slug) { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/gallery.css')`" />" }
     if ($tripOrder -contains $slug) { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-journal.css')`" />" }
     if ($slug -eq 'experience') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/experience-page.css')`" /><link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/internship-peek.css')`" />" }
     if ($slug -eq 'personal') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/personal-page.css')`" />" }
