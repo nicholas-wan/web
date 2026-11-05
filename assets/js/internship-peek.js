@@ -28,6 +28,15 @@
   const breathers = [...new Set(roots.map(r => r.closest('.case-study')))]
     .map(row => roots.find(r => r.closest('.case-study') === row));
   const shown = new Set();
+  // They breathe on a .peek-glow span whose layers only fade (custom.css),
+  // so the chip never repaints; they take its animation delay.
+  breathers.forEach(r => {
+    const glow = document.createElement('span');
+    glow.className = 'peek-glow';
+    glow.setAttribute('aria-hidden', 'true');
+    glow.innerHTML = '<i></i>'.repeat(6);
+    chip(r).appendChild(glow);
+  });
   // All breathing chips share one phase.
   const breathe = () => breathers.forEach(r => {
     const b = chip(r), on = shown.has(r) && !(active && active.closest('.case-study') === r.closest('.case-study'));

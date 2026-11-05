@@ -628,6 +628,13 @@
   // One card at a time: what is hovered or focused wins, else the last pin.
   var stamp = 0;
   // The first chip breathes on screen while no chart is open (owner, Oct 2026).
+  // It breathes on a .peek-glow span whose layers only fade (custom.css), so
+  // the chip never repaints; they take its animation delay.
+  var glow = document.createElement('span');
+  glow.className = 'peek-glow';
+  glow.setAttribute('aria-hidden', 'true');
+  glow.innerHTML = '<i></i><i></i><i></i><i></i><i></i><i></i>';
+  charts[keys[0]].chip.appendChild(glow);
   function breathe() {
     var b = charts[keys[0]].chip, on = onScreen && !keys.some(function (k) { return charts[k].state.open; });
     // In phase with the internship chips' breathing.

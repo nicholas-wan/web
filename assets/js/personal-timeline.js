@@ -5,6 +5,9 @@
   if (!timeline) return;
 
   var years = timeline.querySelector('[data-timeline-years]');
+  /* Only the rail fill reads --timeline-progress; setting it on the years
+     container invalidated every card's style on each scroll frame. */
+  var progressFill = timeline.querySelector('[data-timeline-progress]');
   var events = Array.prototype.slice.call(timeline.querySelectorAll('[data-timeline-event]'));
   var galleryEvents = events.filter(function (event) {
     return event.querySelector('.personal-event-card__image--slideshow');
@@ -167,7 +170,7 @@
     var readingLine = viewport * 0.94;
     var progress = (readingLine - bounds.top) / Math.max(bounds.height, 1);
     progress = Math.max(0, Math.min(1, progress));
-    years.style.setProperty('--timeline-progress', progress.toFixed(4));
+    if (progressFill) progressFill.style.setProperty('--timeline-progress', progress.toFixed(4));
 
     /* A lower reading line promotes the next card early while moving down. On
        reverse scroll, shift the line upward so the previous card takes focus

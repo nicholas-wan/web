@@ -8,6 +8,33 @@
 
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* One frame for the homepage's scroll effects: each effect measures, then
+     each writes, so no effect's write forces the next one's read to restyle
+     the page. A job reads when called and returns its write, if any;
+     `scrolled` says whether a scroll asked for this frame. */
+  var frameJobs = [];
+  var framePending = false;
+  var frameScrolled = false;
+  function runFrame() {
+    framePending = false;
+    var scrolled = frameScrolled;
+    frameScrolled = false;
+    var writes = frameJobs.map(function (job) { return job(scrolled); });
+    writes.forEach(function (write) { if (write) { write(); } });
+  }
+  function queueFrame() {
+    if (framePending) { return; }
+    framePending = true;
+    requestAnimationFrame(runFrame);
+  }
+  function addFrameJob(job) {
+    if (!frameJobs.length) {
+      window.addEventListener('scroll', function () { frameScrolled = true; queueFrame(); }, { passive: true });
+      window.addEventListener('resize', queueFrame, { passive: true });
+    }
+    frameJobs.push(job);
+  }
+
   function ready(fn) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', fn);
@@ -32,19 +59,13 @@
     var main = document.getElementById('main');
     if (!intro || !main) return;
     var compact = window.matchMedia('(max-width: 480px)');
-    var frame = null;
-    function sync() {
-      frame = null;
+    addFrameJob(function () {
       var threshold = window.innerHeight * (compact.matches ? 0.65 : 0.75);
-      intro.classList.toggle('hidden', main.getBoundingClientRect().top <= threshold);
-    }
-    function queue() {
-      if (frame === null) frame = window.requestAnimationFrame(sync);
-    }
-    compact.addEventListener('change', queue);
-    window.addEventListener('scroll', queue, { passive: true });
-    window.addEventListener('resize', queue, { passive: true });
-    queue();
+      var hidden = main.getBoundingClientRect().top <= threshold;
+      return function () { intro.classList.toggle('hidden', hidden); };
+    });
+    compact.addEventListener('change', queueFrame);
+    queueFrame();
   }
 
   /* The desktop scene pins while it scrubs; phones use the portrait's entry
@@ -78,7 +99,7 @@
       else { section.style.removeProperty('--photo-p'); }
     }
 
-    function update() {
+    function read() {
       var phone = window.innerWidth <= 736;
       var scrollable = section.offsetHeight - window.innerHeight;
       var sectionTop = section.getBoundingClientRect().top;
@@ -99,30 +120,25 @@
            leaving a portrait-only pause in the middle of the mobile handoff. */
         textProgress = Math.max(p, Math.min(1, Math.max(0, (photoProgress - 0.06) / 0.82)));
       }
-      section.style.setProperty('--p', textProgress.toFixed(4));
-      section.style.setProperty('--photo-p', photoProgress.toFixed(4));
+      return function () {
+        section.style.setProperty('--p', textProgress.toFixed(4));
+        section.style.setProperty('--photo-p', photoProgress.toFixed(4));
+      };
     }
+    function update() { read()(); }
 
-    var ticking = false;
-    window.addEventListener('scroll', function () {
-      if (ticking) { return; }
-      ticking = true;
-      requestAnimationFrame(function () { ticking = false; update(); });
-    }, { passive: true });
+    addFrameJob(read);
     /* A phone URL-bar resize changes only the height, and the phone photo's
        42vh cap tracks the large viewport, which the URL bar never moves, so
        those resizes skip measure()'s forced layouts. Desktop sizes the photo
-       by 62vh of a real window, so every desktop resize re-measures. update()
-       reads the viewport height and always runs, batched into the next frame. */
+       by 62vh of a real window, so every desktop resize re-measures. read()
+       takes the viewport height and always runs, in the shared next frame. */
     var measuredWidth = window.innerWidth;
     window.addEventListener('resize', function () {
       if (window.innerWidth !== measuredWidth || window.innerWidth > 736) {
         measuredWidth = window.innerWidth;
         measure();
       }
-      if (ticking) { return; }
-      ticking = true;
-      requestAnimationFrame(function () { ticking = false; update(); });
     });
     if (document.readyState === 'complete') {
       measure();
@@ -213,12 +229,13 @@
       glide(direction > 0 ? edge : 0);
     }
 
-    window.addEventListener('scroll', function () {
-      if (glideFrame !== null) { return; }
+    // Read in the shared frame, so the scroll position never forces a restyle.
+    addFrameJob(function (scrolled) {
+      if (!scrolled || glideFrame !== null) { return; }
       var y = window.scrollY;
       if (y !== lastY) { direction = y > lastY ? 1 : -1; lastY = y; }
       armSettle();
-    }, { passive: true });
+    });
 
     // Also cancel on wheel for narrow pointer-driven viewports.
     window.addEventListener('wheel', cancelGlide, { passive: true });
@@ -251,10 +268,13 @@
       last.push(0);
     }
 
-    function update() {
+    function read() {
       var vh = window.innerHeight || document.documentElement.clientHeight;
       // Read every card before writing any, so a write cannot force a layout.
       var rects = Array.prototype.map.call(cards, function (card) { return card.getBoundingClientRect(); });
+      return function () { write(vh, rects); };
+    }
+    function write(vh, rects) {
       for (var i = 0; i < cards.length; i++) {
         var r = rects[i];
         // Rects include the scrub translate; undo it so progress reads the
@@ -273,15 +293,8 @@
       }
     }
 
-    var ticking = false;
-    function schedule() {
-      if (ticking) { return; }
-      ticking = true;
-      requestAnimationFrame(function () { ticking = false; update(); });
-    }
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    update();
+    addFrameJob(read);
+    read()();
   }
 
   /* ------------------------------------------------------------------ */
