@@ -1732,13 +1732,39 @@ html:has(> body.is-map-fullscreen) {
   color: #ffb869;
 }
 
+/* Popover thumbnails stay unrendered until the pointer or keyboard focus is
+   on the map. A visibility-hidden lazy image still downloads once it nears the
+   viewport, so all twelve fetched with the page (~940 KB of -800 files on a
+   desktop, Nov 2026); display: none defers them in Chromium and WebKit. Hovering
+   anywhere on the map warms all twelve before a pin is reached, travel.html
+   gives them their real 62-91px slot (so -480), and the explicit row and column
+   keep the popover's size the same while the image is unrendered. The delayed
+   discrete display transition keeps a thumbnail through the 0.18s fade-out when
+   the pointer leaves the map from an open popover. */
 .travel-map__marker-label img {
-  display: block;
+  display: none;
   width: 4.25rem;
   height: 3.2rem;
   margin: 0;
   border-radius: 0.3rem;
   object-fit: cover;
+  transition: display 0s linear 0.18s allow-discrete;
+}
+
+@media screen and (min-width: 521px) {
+  .travel-map__journal-link {
+    grid-template-rows: minmax(3.2rem, auto);
+  }
+
+  .travel-map__marker-copy {
+    grid-column: 2;
+  }
+
+  .travel-map:hover .travel-map__marker-label img,
+  .travel-map:focus-within .travel-map__marker-label img {
+    display: block;
+    transition-delay: 0s;
+  }
 }
 
 .travel-map__marker-label strong,
