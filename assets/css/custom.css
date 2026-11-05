@@ -4078,10 +4078,6 @@ body.is-map-fullscreen .travel-atlas__layout {
   padding: 2rem !important;
 }
 
-.credentials {
-  padding: 4rem !important;
-}
-
 #selected-work {
   scroll-margin-top: 1.5rem;
 }
@@ -5362,10 +5358,6 @@ body:not(.page-home) #wrapper.fade-in::before {
 
   .portfolio-overview {
     padding: 1rem !important;
-  }
-
-  .credentials {
-    padding: 2.25rem 1rem !important;
   }
 
   .case-study-grid {
