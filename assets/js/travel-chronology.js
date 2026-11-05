@@ -237,8 +237,8 @@
   links.forEach((link,i)=>{const fraction=i/(links.length-1),left='calc('+fraction*100+'% + '+(inset-2*inset*fraction)+'px)';link.style.left=left;if(years[i])years[i].style.left=left;});
  }
  new ResizeObserver(fit).observe(scroller);fit();
- const grid=document.querySelector('.travel-grid'),map=document.querySelector('.travel-atlas__layout'),heading=document.querySelector('.photo-explore__map-heading');
- if(grid&&map&&heading){const section=document.createElement('section');section.className='travel-atlas travel-atlas--map';section.setAttribute('aria-label','Explore by destination');grid.after(section);section.append(heading,map);}
+ // The atlas already sits below the journals: travel.html moves it inline as the page parses.
+ const grid=document.querySelector('.travel-grid');
  if(grid){
   const cards=[...grid.querySelectorAll('.travel-card')];
   grid.classList.add('compact-journals');grid.id='journal-preview';

@@ -348,6 +348,10 @@
 							</article>
 
 						</section>
+						<script>/* The atlas sits below the journals once the timeline layout applies. Moving it here, while the page
+						   parses and before anything below the journals exists, means no laid-out content moves (desktop
+						   CLS was 0.046 when the chronology runtime moved it at ~1s). Without JavaScript it stays in the opening card. */
+						(function(){var g=document.querySelector('.travel-grid'),h=document.querySelector('.photo-explore__map-heading'),m=document.querySelector('.travel-atlas__layout');if(!g||!h||!m)return;var s=document.createElement('section');s.className='travel-atlas travel-atlas--map';s.setAttribute('aria-label','Explore by destination');g.after(s);s.append(h,m);})();</script>
 
 								</div>
 								<footer id="footer">
