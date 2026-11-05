@@ -6539,6 +6539,7 @@ body.lightbox-open {
   }
 }
 
+/* Route bundle: experience-layout:start */
 /* --------------------------------------------------------------------------
    Retained Work and Skills layouts from the earlier design exploration.
    Visual styling elsewhere remains on the established site design.
@@ -6851,12 +6852,14 @@ body.lightbox-open {
 .page-experience .case-study--internship h2 {
   min-height: 0;
 }
+/* Route bundle: experience-layout:end */
 
 .page-skills .education-details,
 .page-skills .education-details p {
   text-align: left !important;
 }
 
+/* Route bundle: experience-responsive:start */
 @media screen and (max-width: 980px) {
   .page-experience #agentic-ai,
   .page-experience #cloud-analytics {
@@ -7008,6 +7011,7 @@ body.lightbox-open {
   /* Thumbnails stay on top at full width: the BrainHack and showcase
      artwork carries lettering that a narrow side crop makes illegible. */
 }
+/* Route bundle: experience-responsive:end */
 
 /* Route bundle: skills-responsive:start */
 @media screen and (max-width: 736px) {
@@ -9236,6 +9240,7 @@ html .page-opening-eyebrow { display:block; margin:0 0 .5rem; color:var(--color-
 html .page-skills .skills-heading p,
 html .personal-timeline__intro p,
 html .travel-atlas__header > div > p { margin:.65rem 0 0; max-width:55rem; color:var(--color-ink-500); font:300 max(var(--text-floor), .9rem)/1.65 var(--font-body); text-align:left; }
+/* Route bundle: experience-internships:start */
 /* Internship entries, owner-approved 18 Oct 2026. Keep descriptions and tags
    together so company metadata cannot stretch the gap between them. */
 html .page-experience .internship-group { margin-top: .6rem; }
@@ -9357,6 +9362,7 @@ html .page-experience .case-study--internship .case-study__tags li {
   html .page-experience .case-study--internship .case-study__company-meta br { display: none; }
   html .page-experience .case-study--internship .case-study__company-place::before { content: " · "; }
 }
+/* Route bundle: experience-internships:end */
 
 @media(max-width:736px) {
  body { --opening-gutter:1.15rem; }

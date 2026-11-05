@@ -328,7 +328,9 @@ Assert-FileSizeBudget 'assets\css\travel-search.css' 19
 # 12 -> 22: the Cloud Anomaly card's anomaly peek (two chips with mini previews and
 # two small chart cards, Oct 2026) adds about 9 KB of route-only CSS.
 # 22 -> 24: the third chart chip, equal-width chips with an open arrow and phone/tablet tiles (Oct 2026).
-Assert-FileSizeBudget 'assets\css\experience-page.css' 24
+# 24 -> 48 (5 Nov 2026): the Work layouts and internship entries moved here
+# from shared custom.css, which every page loads (about 17 KB).
+Assert-FileSizeBudget 'assets\css\experience-page.css' 48
 Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 # 10 -> 19 (5 Nov 2026): the education, toolkit-card and tech-stack rules moved
 # here from shared custom.css, which every page loads.
@@ -906,7 +908,7 @@ foreach ($distPage in Get-ChildItem -LiteralPath $dist -Filter '*.html') {
     if ((Get-Content -LiteralPath $distPage.FullName -Raw -Encoding UTF8) -match 'target="_blank"(?![^>]*rel=)') { throw "$($distPage.Name) opens a tab without rel=noopener noreferrer." }
 }
 if ($experience -notmatch '<body class="is-preload page-experience">') { throw "Work layout scope is missing." }
-if ($experience -notmatch '<h1 id="portfolio-title">Selected work</h1>' -or [regex]::Matches($experience, 'Agentic AI Product Lead, Cyber Defence').Count -ne 1 -or $sharedCustomCss -notmatch '\.internship-entry__body' -or $sharedCustomCss -notmatch 'page-opening-eyebrow' -or $sharedCustomCss -notmatch 'font:700 1\.8rem/1\.3 var\(--font-body\)') { throw "Tab pages must retain shared openings and readable internship entries; the job title belongs in its DSTA card." }
+if ($experience -notmatch '<h1 id="portfolio-title">Selected work</h1>' -or [regex]::Matches($experience, 'Agentic AI Product Lead, Cyber Defence').Count -ne 1 -or $experiencePageCss -notmatch '\.internship-entry__body' -or $sharedCustomCss -notmatch 'page-opening-eyebrow' -or $sharedCustomCss -notmatch 'font:700 1\.8rem/1\.3 var\(--font-body\)') { throw "Tab pages must retain shared openings and readable internship entries; the job title belongs in its DSTA card." }
 if ([regex]::Matches($experience, 'class="case-study case-study--work"').Count -ne 2) { throw "The two DSTA cards must use the same work-card format." }
 if ($experience -match 'case-study--compact' -or $experience -match 'case-study--lead' -or $experience -match 'case-study--wide') { throw "Retired work-card variants are still present." }
 if ([regex]::Matches($experience, 'class="case-study case-study--internship"').Count -ne 3 -or [regex]::Matches($experience, 'class="internship-entry__body"').Count -ne 3) { throw "Internships must retain three entries with grouped descriptions and tags." }
