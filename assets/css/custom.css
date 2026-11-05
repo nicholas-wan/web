@@ -1209,6 +1209,7 @@ html:has(> body.is-map-fullscreen) {
   }
 }
 
+/* Route bundle: travel-map:start */
 /* Travel destination atlas */
 .travel-atlas {
   position: relative;
@@ -3100,6 +3101,9 @@ body.is-map-fullscreen .travel-atlas__layout {
   .travel-grid { grid-template-columns: 1fr; }
 }
 
+/* Route bundle: travel-map:end */
+
+/* Route bundle: journal-guangzhou:start */
 /* Guangzhou journal */
 .page-travel-journal header.major > .date {
   display: flex;
@@ -3854,6 +3858,8 @@ body.is-map-fullscreen .travel-atlas__layout {
     font-size: max(var(--text-floor), 0.67rem);
   }
 }
+
+/* Route bundle: journal-guangzhou:end */
 
 /* Portfolio positioning and case-study system. */
 .sr-only {
@@ -5419,6 +5425,7 @@ body:not(.page-home) #wrapper.fade-in::before {
   }
 }
 
+/* Route bundle: journal-nav:start */
 /* Travel journal navigation. travel-nav.js publishes the toolbar's measured
    height as --travel-nav-offset so native anchor jumps clear the single-row
    rail precisely; the rem values are no-JS fallbacks. */
@@ -7841,6 +7848,7 @@ body.page-home #intro {
   background: linear-gradient(135deg, #dce7e6, #edf2f1);
 }
 
+/* Route bundle: journal-japan:start */
 /* Japan editorial title and lower banner crop. */
 .japan-journal .japan-journal__intro {
   margin-bottom: 1.75rem;
@@ -8205,6 +8213,7 @@ body.page-home #nav {
   }
 }
 
+/* Route bundle: skills-polish:start */
 /* Quiet Skills-card treatment: compact, static capability cards modelled on
    the reference's low-contrast surface, icon-title row, and short summary. */
 .page-skills .skills-heading::before {

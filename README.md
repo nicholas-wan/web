@@ -74,7 +74,7 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 
 ### CSS and JavaScript
 
-- `assets/css/custom.css` is the authored source. The build splits marker-bounded route blocks into `travel-map-page.css`, `travel-journal.css`, `experience-page.css`, `personal-page.css` and `skills-page.css`; shared rules stay in generated `custom.css`.
+- `assets/css/custom.css` is the authored source. The build splits route blocks, each between `/* Route bundle: <name>:start */` and `/* Route bundle: <name>:end */` comments (never ordinary headings), into `travel-map-page.css`, `travel-journal.css`, `travel-search.css`, `travel-navigation.css`, `experience-page.css`, `personal-page.css` and `skills-page.css`; shared rules stay in generated `custom.css`.
 - `assets/js/main.js` is the authored, dependency-free theme shell. Its marked canvas block becomes homepage-only `canvas-background.js`.
 - Route scripts: `game.js` (homepage), `anomaly-peek.js` and `internship-peek.js` (Work; the latter also drives the Agentic AI console peek), `listing-effects.js` (Skills, Travel), `journal-progress.js` (journals). Verification enforces route ownership, rejects the retired jQuery/theme-helper runtime and caps per-page JavaScript.
 
