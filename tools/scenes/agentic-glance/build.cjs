@@ -321,7 +321,7 @@ const css = `/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.c
 .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / ${DH}; }
 .internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / ${PH.H}; }
 @media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
-${S} text { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
+${S} text { font-family: "Figtree", var(--font-display); }
 ${S} text.ag-qt { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
 ${S} .ag-i { fill: none; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
 ${S} .ag-logo path { fill: ${C.ink}; }

@@ -3,7 +3,7 @@
 .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 260; }
 .internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 653.5; }
 @media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
-svg.ag-scene text { font-family: "Figtree", "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif; }
+svg.ag-scene text { font-family: "Figtree", var(--font-display); }
 svg.ag-scene text.ag-qt { font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace; }
 svg.ag-scene .ag-i { fill: none; stroke-width: 1.2; stroke-linecap: round; stroke-linejoin: round; }
 svg.ag-scene .ag-logo path { fill: #d8e6e4; }
