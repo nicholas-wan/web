@@ -1,8 +1,8 @@
 (function () {
   'use strict';
 
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var phone = window.matchMedia && window.matchMedia('(max-width: 736px)').matches;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var phone = window.matchMedia('(max-width: 736px)').matches;
   var watchers = [];
   var scheduled = false;
   var REVEAL_DURATION = 480;

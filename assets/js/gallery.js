@@ -7,13 +7,16 @@
      Playback starts here instead, and only once the animation is near the
      viewport; leaving again pauses it so long journals do not keep dozens of
      offscreen loops decoding. */
+  var playQuietly = function (video) {
+    var playback = video.play();
+    if (playback) playback.catch(function () {});
+  };
   var syncAnimation = function (video) {
     if (reducedMotion.matches) {
       video.pause();
       video.currentTime = 0;
     } else if (video.__nearViewport && !document.hidden && !document.body.classList.contains('lightbox-open')) {
-      var playback = video.play();
-      if (playback && playback.catch) playback.catch(function () {});
+      playQuietly(video);
     } else {
       video.pause();
     }
@@ -47,8 +50,7 @@
       journalAnimations.forEach(function (video) { video.__nearViewport = true; revealPoster(video); });
       syncAnimationPreference();
     }
-    if (reducedMotion.addEventListener) reducedMotion.addEventListener('change', syncAnimationPreference);
-    else if (reducedMotion.addListener) reducedMotion.addListener(syncAnimationPreference);
+    reducedMotion.addEventListener('change', syncAnimationPreference);
     document.addEventListener('visibilitychange', syncAnimationPreference);
   }
 
@@ -431,8 +433,7 @@
   };
   var toggleVideo = function () {
     if (viewerVideo.paused) {
-      var resume = viewerVideo.play();
-      if (resume && resume.catch) resume.catch(function () {});
+      playQuietly(viewerVideo);
     } else {
       viewerVideo.pause();
     }
@@ -508,8 +509,7 @@
       viewerVideo.poster = source.poster;
       if (reducedMotion.matches) viewerVideo.pause();
       else {
-        var lightboxPlayback = viewerVideo.play();
-        if (lightboxPlayback && lightboxPlayback.catch) lightboxPlayback.catch(function () {});
+        playQuietly(viewerVideo);
       }
       syncVideoLabel();
     } else {

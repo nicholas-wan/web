@@ -333,12 +333,13 @@
   };
 
   var ticking = false;
-  window.addEventListener('scroll', function () {
+  var queueUpdate = function () {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(function () { ticking = false; update(); });
-  }, { passive: true });
-  window.addEventListener('resize', update);
+  };
+  window.addEventListener('scroll', queueUpdate, { passive: true });
+  window.addEventListener('resize', queueUpdate);
   update();
 }());
 

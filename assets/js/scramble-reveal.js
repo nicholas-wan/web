@@ -253,11 +253,7 @@
     });
   }
 
-  if (reducedMotion.addEventListener) {
-    reducedMotion.addEventListener("change", handleMotionChange);
-  } else if (reducedMotion.addListener) {
-    reducedMotion.addListener(handleMotionChange);
-  }
+  reducedMotion.addEventListener("change", handleMotionChange);
 
   document.addEventListener("visibilitychange", function () {
     if (!document.hidden) return;

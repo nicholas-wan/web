@@ -16,7 +16,7 @@
   var root = document.querySelector('.anomaly-peek');
   if (!root) { return; }
   var NS = 'http://www.w3.org/2000/svg';
-  var motionQuery = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
+  var motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
   var reduce = !!(motionQuery && motionQuery.matches);
 
   function el(name, attrs, parent) {
@@ -771,7 +771,6 @@
     resume();
   }
   if (motionQuery) {
-    if (motionQuery.addEventListener) { motionQuery.addEventListener('change', onMotionChange); }
-    else if (motionQuery.addListener) { motionQuery.addListener(onMotionChange); }
+    motionQuery.addEventListener('change', onMotionChange);
   }
 })();

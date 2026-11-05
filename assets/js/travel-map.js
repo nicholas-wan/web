@@ -241,6 +241,7 @@
   var detailCardHideTimer = 0;
   var detailImageRequest = 0;
   var sectionImageCache = {};
+  var journalImageCache = {};
 
   var baseCanvasWidth = function () {
     return viewport.clientWidth;
@@ -408,18 +409,22 @@
     });
     var visible = [];
     var failed = false;
-    links.forEach(function (link) {
+    var mapTop = map.getBoundingClientRect().top;
+    // Measure all labels before writing any, to avoid a layout per label.
+    links.map(function (link) {
       var label = link.querySelector(labelSelector);
+      return [link, label, link.getBoundingClientRect(), label.getBoundingClientRect()];
+    }).forEach(function (m) {
+      var link = m[0], label = m[1], size = m[3];
       var leader = link.querySelector('.travel-map__detail-leader');
       // CSS positions labels from the link centre, not the larger selected dot.
-      var rect = link.getBoundingClientRect();
+      var rect = m[2];
       var x = rect.left + rect.width / 2, y = rect.top + rect.height / 2;
       if (x < bounds.left || x > bounds.right || y < bounds.top || y > bounds.bottom) {
         link.classList.add('is-label-offscreen');
         return;
       }
       visible.push(link);
-      var size = label.getBoundingClientRect();
       var width = Math.ceil(size.width), height = Math.ceil(size.height);
       var clear = function (box) {
         return box.left >= bounds.left + 6 && box.right <= bounds.right - 6 &&
@@ -457,7 +462,7 @@
       if (box.top - start - 6 > best.height) best = { top: start, height: box.top - start - 6 };
       start = Math.max(start, box.bottom + 6);
     });
-    labelList.style.top = (best.top - map.getBoundingClientRect().top) + 'px';
+    labelList.style.top = (best.top - mapTop) + 'px';
     labelList.style.maxHeight = Math.max(24, best.height) + 'px';
     visible.forEach(function (link) {
       var item = document.createElement('a');
@@ -793,39 +798,42 @@
     }
   };
 
-  var loadSectionImage = function (point) {
-    var targetParts = point[2].split('#');
-    var pageHref = targetParts[0];
-    var sectionId = targetParts[1];
-    var cacheKey = pageHref + '#' + sectionId;
-    if (sectionImageCache[cacheKey]) return sectionImageCache[cacheKey];
-
-    sectionImageCache[cacheKey] = window.fetch(pageHref, { credentials: 'same-origin' })
+  /* Parse each journal once, keeping only each section's photo, so later stops
+     from the same trip open without another parse mid-flight. */
+  var loadJournalImages = function (pageHref) {
+    return journalImageCache[pageHref] || (journalImageCache[pageHref] = window.fetch(pageHref, { credentials: 'same-origin' })
       .then(function (response) {
         if (!response.ok) throw new Error('Unable to load journal section');
         return response.text().then(function (markup) {
-          return { markup: markup, pageUrl: response.url };
+          var images = {};
+          var mediaSelector = 'img.content-image, video[poster], video[data-poster], img';
+          new window.DOMParser().parseFromString(markup, 'text/html').querySelectorAll('h2[id^="trip-section-"]').forEach(function (heading) {
+            var section = heading.closest('.travel-journal__day, .guangzhou-day');
+            var media = section && section.querySelector(mediaSelector);
+            var sibling = heading.nextElementSibling;
+            while (!media && sibling && !sibling.matches('h2[id^="trip-section-"]')) {
+              media = sibling.matches(mediaSelector) ? sibling : sibling.querySelector(mediaSelector);
+              sibling = sibling.nextElementSibling;
+            }
+            if (media) images[heading.id] = {
+              src: new URL(media.getAttribute('src') || media.getAttribute('poster') || media.getAttribute('data-poster'), response.url).href,
+              alt: media.getAttribute('alt') || media.getAttribute('aria-label')
+            };
+          });
+          return images;
         });
-      })
-      .then(function (result) {
-        var journal = new window.DOMParser().parseFromString(result.markup, 'text/html');
-        var heading = journal.getElementById(sectionId);
-        var section = heading && heading.closest('.travel-journal__day, .guangzhou-day');
-        var mediaSelector = 'img.content-image, video[poster], video[data-poster], img';
-        var media = section && section.querySelector(mediaSelector);
-        var sibling = heading && heading.nextElementSibling;
-        while (!media && sibling && !sibling.matches('h2[id^="trip-section-"]')) {
-          media = sibling.matches(mediaSelector)
-            ? sibling
-            : sibling.querySelector(mediaSelector);
-          sibling = sibling.nextElementSibling;
-        }
-        if (!media) throw new Error('Journal section has no photograph');
-        var source = media.getAttribute('src') || media.getAttribute('poster') || media.getAttribute('data-poster');
-        return {
-          src: new URL(source, result.pageUrl).href,
-          alt: media.getAttribute('alt') || media.getAttribute('aria-label') || point[1] + ' travel photograph'
-        };
+      }));
+  };
+
+  var loadSectionImage = function (point) {
+    var targetParts = point[2].split('#');
+    var cacheKey = point[2];
+    if (sectionImageCache[cacheKey]) return sectionImageCache[cacheKey];
+    sectionImageCache[cacheKey] = loadJournalImages(targetParts[0])
+      .then(function (images) {
+        var image = images[targetParts[1]];
+        if (!image) throw new Error('Journal section has no photograph');
+        return { src: image.src, alt: image.alt || point[1] + ' travel photograph' };
       })
       .catch(function () {
         return {
@@ -1187,7 +1195,7 @@
 
   /* The overlay is a modal dialog: Escape closes it and Tab stays inside. */
   document.addEventListener('keydown', function (event) {
-    var isEscape = event.key === 'Escape' || event.key === 'Esc';
+    var isEscape = event.key === 'Escape';
     if (isEscape && selectedDetail) {
       event.preventDefault();
       dismissDetailCard();
@@ -1232,7 +1240,7 @@
   var handleMobileChange = function (event) {
     if (!event.matches) closeFullscreen(true);
   };
-  if (mobileMapQuery.addEventListener) mobileMapQuery.addEventListener('change', handleMobileChange);
+  mobileMapQuery.addEventListener('change', handleMobileChange);
 
   /* Wheel and trackpad scrolling zoom around the pointer. Once the map reaches
      either limit, that same-direction gesture returns to normal page scroll. */
@@ -1382,18 +1390,25 @@
     scheduleApply();
   });
 
+  /* The boxed inline map ignores height-only (URL-bar) resizes; orientation
+     changes move the overlay's fit-to-height floor. */
+  var resizeFrame = 0, resizeWidth = window.innerWidth;
   window.addEventListener('resize', function () {
-    /* Orientation changes move the overlay's fit-to-height floor. */
-    if (isFullscreen) {
-      minScale = fitHeightScale();
-      if (scale < minScale) scale = minScale;
-    }
-    apply();
+    if (resizeFrame || (!isFullscreen && window.innerWidth === resizeWidth)) return;
+    resizeFrame = window.requestAnimationFrame(function () {
+      resizeFrame = 0;
+      resizeWidth = window.innerWidth;
+      if (isFullscreen) {
+        minScale = fitHeightScale();
+        if (scale < minScale) scale = minScale;
+      }
+      apply();
+    });
   });
   /* Crossing the desktop breakpoint changes the opening crop, and with it the
      zoom-out floor — re-establish the matching baseline view. */
   var desktopCrop = window.matchMedia('(min-width: 981px)');
-  if (desktopCrop.addEventListener) desktopCrop.addEventListener('change', resetView);
+  desktopCrop.addEventListener('change', resetView);
   positionRegionMarkers();
   createRouteLayer();
   createDetailPoints();

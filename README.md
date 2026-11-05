@@ -14,8 +14,8 @@ node tools/preview-server.mjs   # preview dist/ at http://localhost:4321 (plain 
 CI then runs these; run them before pushing, after a build, from `tools/tests/browser` (first `npm ci` and `npx playwright install chromium webkit`):
 
 ```powershell
-node --test ../photo-search.test.cjs ../lightbox-cache.test.cjs
-npm test   # Playwright layout checks
+npm run test:unit   # search and lightbox logic
+npm test            # Playwright layout checks
 ```
 
 ## Layout
@@ -24,6 +24,7 @@ npm test   # Playwright layout checks
 - `journals/` journal fragments, manifest, photo tags, template · `partials/` shared fragments
 - `tools/` build, verify, image, map and font tooling · `docs/photo-edits.csv` photo-edit log
 - `dist/` generated; never edit or commit it
+- `lab/` local-only prototypes and review pages (git-ignored); lab paths named below exist only on the machine that made them
 
 ## Editing photos
 
@@ -99,7 +100,7 @@ python .\tools\images\convert-curated-webp.py
 - `make-touch-icons.py` regenerates the home-screen icons from the owner-approved "NW" monogram.
 - Animations ship as an H.264 MP4 plus a static `-poster.webp`. Do not add animated WebP or GIF tiles.
 - `tools/maps/generate-world-map.ps1` rebuilds `images/travel/world-map.svg` at `-Tolerance 0.25`, keeping every feature, sub-pixel islets included.
-- Never run the destructive `tools/legacy/` scripts in builds. Do not re-run `cap-original-images.py` or re-encode originals.
+- Do not re-encode originals. (The one-off `tools/legacy/` capping and GIF-conversion scripts were removed on 5 Nov 2026; they are in git history.)
 
 **Editing a photo:**
 

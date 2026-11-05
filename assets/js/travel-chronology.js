@@ -216,21 +216,10 @@
   reduced.addEventListener('change', () => { stopAll(); schedule(2000); });
   document.addEventListener('visibilitychange', () => { stopAll(); if (!document.hidden) schedule(2000); });
   window.addEventListener('pagehide', stopAll);
-  window.polishTimelineReplay = index => {
-    const entry = entries[Math.max(0, Math.min(entries.length - 1, Number(index) || 0))];
-    stopGuide();
-    if (entry) stop(entry);
-    if (entry && play(entry)) schedule(2000);
-  };
-  window.polishTimelineTour = () => {
-    stopAll();
-    nextIndex = 0;
-    schedule(0);
-  };
 })();
 
 (()=>{
- const root=document.documentElement;root.classList.add('travel-timeline');
+ const root=document.documentElement;
  const timeline=document.querySelector('.journal-chronology');
  const track=timeline.querySelector('.chronology-track');
  const links=[...track.querySelectorAll('.chronology-trip')];
@@ -279,8 +268,7 @@
 })();
 
 (()=>{
- const root=document.documentElement,source=document.querySelector('.journal-chronology'),grid=document.querySelector('.travel-grid');if(!source||!grid)return;
- root.classList.add('travel-phone-rail');
+ const source=document.querySelector('.journal-chronology'),grid=document.querySelector('.travel-grid');if(!source||!grid)return;
  const list=document.createElement('section');list.className='mobile-journal-list';list.setAttribute('aria-label','Travel journals timeline');
  const entries=[...source.querySelectorAll('.chronology-trip')].map((trip,i)=>{
   const original=[...grid.querySelectorAll('.travel-card')].find(c=>c.querySelector('a').getAttribute('href')===trip.getAttribute('href'));if(!original)return null;
@@ -340,7 +328,7 @@
  loupe.addEventListener('pointerenter',()=>clearTimeout(hide));loupe.addEventListener('pointerleave',away);loupe.addEventListener('blur',away);
  // Phones have no hover: the loupe rides on whichever scene is playing.
  new MutationObserver(list=>list.forEach(m=>{if(phone.matches&&m.target.classList.contains('is-active')&&m.target.closest('.mobile-journal-row'))place(m.target);}))
-  .observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
+  .observe(document.querySelector('.mobile-journal-list')||document.body,{subtree:true,attributes:true,attributeFilter:['class']});
  loupe.addEventListener('click',()=>{if(!scene)return;const trip=scene.closest('.chronology-trip'),art=scene.cloneNode(true);
   art.style.background=getComputedStyle(scene,'::before').backgroundImage;
   // The original may sit in a hidden presentation, so paint-server IDs must be the clone's own.
@@ -357,7 +345,8 @@
 /* Keep photos outside the reading area inert, including the hidden presentation. */
 (() => {
  const images=new Set(document.querySelectorAll('img[data-journal-src]'));
- function warm(){images.forEach(img=>{if(!img.isConnected||!img.dataset.journalSrc){observer.unobserve(img);images.delete(img);return;}const r=img.getBoundingClientRect();if(!r.width||r.top>innerHeight+200||r.bottom< -200||getComputedStyle(img).visibility==='hidden')return;
+ // Measure every pending photo before loading any, so the writes cannot force a layout per photo.
+ function warm(){[...images].filter(img=>{if(!img.isConnected||!img.dataset.journalSrc){observer.unobserve(img);images.delete(img);return false;}const r=img.getBoundingClientRect();return r.width&&r.top<=innerHeight+200&&r.bottom>=-200&&getComputedStyle(img).visibility!=='hidden';}).forEach(img=>{
   img.classList.add('journal-photo-pending');const done=()=>{img.classList.remove('journal-photo-pending');if(!img.naturalWidth)img.classList.add('journal-photo-failed');};img.addEventListener('load',done,{once:true});img.addEventListener('error',done,{once:true});
   if(img.dataset.journalSrcset)img.srcset=img.dataset.journalSrcset;
   img.src=img.dataset.journalSrc;delete img.dataset.journalSrc;delete img.dataset.journalSrcset;observer.unobserve(img);images.delete(img);
@@ -365,7 +354,7 @@
  const observer=new IntersectionObserver(warm,{rootMargin:'200px'});images.forEach(img=>observer.observe(img));
  const grid=document.querySelector('.travel-grid');
  new MutationObserver(()=>{grid.querySelectorAll('img[data-journal-src]').forEach(img=>{if(!images.has(img)){images.add(img);observer.observe(img);}});warm();}).observe(grid,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
- window.addEventListener('resize',warm);warm();
+ let frame=0;window.addEventListener('resize',()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;warm();});});warm();
 })();
 
 /* CSS backgrounds ignore loading=lazy: attach the full vector map on approach. */

@@ -114,9 +114,15 @@ function Get-CachedImageDimensions([string]$Path, [hashtable]$SourceIndex) {
         if ($Path -match '\.webp$') {
             $dimensions = Get-WebpDimensions $Path
         } else {
-            $loadedImage = [System.Drawing.Image]::FromFile($Path)
-            try { $dimensions = @{ Width = $loadedImage.Width; Height = $loadedImage.Height } }
-            finally { $loadedImage.Dispose() }
+            # Read the header only; FromFile decodes every pixel, which made a
+            # cold (CI) build spend most of its image time here.
+            $stream = [IO.File]::OpenRead($Path)
+            try {
+                $loadedImage = [System.Drawing.Image]::FromStream($stream, $false, $false)
+                try { $dimensions = @{ Width = $loadedImage.Width; Height = $loadedImage.Height } }
+                finally { $loadedImage.Dispose() }
+            }
+            finally { $stream.Dispose() }
         }
         if ($dimensions) {
             $script:imageDimensionCache[$key] = [pscustomobject]@{
@@ -319,7 +325,6 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
         }
 
         $destination = Join-Path $OutputRoot ($reference -replace '/', '\\')
-        New-Item -ItemType Directory -Path (Split-Path $destination -Parent) -Force | Out-Null
         $destinationInfo = $publishedImageIndex[[IO.Path]::GetFullPath($destination).ToLowerInvariant()]
         $copyRequired = -not $destinationInfo
         if (-not $copyRequired) {
@@ -328,7 +333,10 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
                 $sourceInfo.LastWriteTimeUtc -gt $destinationInfo.LastWriteTimeUtc
         }
         if ($copyRequired) {
-            Copy-Item -LiteralPath $source -Destination $destination -Force
+            # .NET calls instead of New-Item/Copy-Item per file; File.Copy keeps
+            # LastWriteTime, which the incremental check above relies on.
+            [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($destination))
+            [IO.File]::Copy($source, $destination, $true)
             $copied++
         }
     }
@@ -389,8 +397,6 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
         if ($label -eq 'Melbourne') { $label = '&#x1F998; Melbourne' }
         if ($label -eq 'Sydney') { $label = '&#x1F998; Sydney' }
         if ($label -eq 'Departure') { $label = '&#x2708;&#xFE0F; Departure' }
-        if ($label -eq 'Germany Switzerland') { $label = '&#x1F1E9;&#x1F1EA; Germany · &#x1F1E8;&#x1F1ED; Switzerland' }
-        if ($label -eq 'France Switzerland') { $label = '&#x1F1EB;&#x1F1F7; France · &#x1F1E8;&#x1F1ED; Switzerland' }
         if ($label -match 'France$' -and $label -notmatch '&#x1F1EB;') { $label = $label -replace 'France$', '&#x1F1EB;&#x1F1F7; France' }
         if ($label -match 'Belgium$' -and $label -notmatch '&#x1F1E7;') { $label = $label -replace 'Belgium$', '&#x1F1E7;&#x1F1EA; Belgium' }
         if ($label -match 'Netherlands$' -and $label -notmatch '&#x1F1F3;') { $label = $label -replace 'Netherlands$', '&#x1F1F3;&#x1F1F1; Netherlands' }
@@ -633,18 +639,14 @@ function Get-BannerPreloadLink([string]$Markup, [string]$Slug) {
 
 $webpMap = @{}
 $webpSource = Join-Path $root "images-webp"
-$optimizedAnimatedImages = @()
 if (Test-Path -LiteralPath $webpSource) {
     Get-ChildItem -LiteralPath $webpSource -Recurse -File -Filter *.webp | ForEach-Object {
         $relativeWebp = $_.FullName.Substring($webpSource.Length + 1).Replace('\', '/')
-        $animatedRelative = [IO.Path]::ChangeExtension($relativeWebp, '.gif').Replace('/', '\')
-        if ($optimizedAnimatedImages -notcontains $animatedRelative) {
-            $base = [IO.Path]::ChangeExtension($relativeWebp, '.jpg')
-            $jpegBase = [IO.Path]::ChangeExtension($relativeWebp, '.jpeg')
-            # Keep both legacy extensions mapped so converted originals can be removed.
-            $webpMap["images/$base"] = "images/$relativeWebp"
-            $webpMap["images/$jpegBase"] = "images/$relativeWebp"
-        }
+        $base = [IO.Path]::ChangeExtension($relativeWebp, '.jpg')
+        $jpegBase = [IO.Path]::ChangeExtension($relativeWebp, '.jpeg')
+        # Keep both legacy extensions mapped so converted originals can be removed.
+        $webpMap["images/$base"] = "images/$relativeWebp"
+        $webpMap["images/$jpegBase"] = "images/$relativeWebp"
     }
 }
 
@@ -718,12 +720,12 @@ foreach ($bundle in $routeCssParts.Keys) {
 
 $mainJsSource = Get-Content -LiteralPath (Join-Path $root 'assets\js\main.js') -Raw -Encoding UTF8
 $canvasStartMarker = '/*Canvas*/'
-$canvasEndMarker = '// Shared progressive enhancement'
+$canvasEndMarker = '/*Canvas end*/'
 $canvasStart = $mainJsSource.IndexOf($canvasStartMarker)
 $canvasEnd = $mainJsSource.IndexOf($canvasEndMarker)
 if ($canvasStart -lt 0 -or $canvasEnd -le $canvasStart) { throw 'Could not locate the homepage canvas JavaScript boundaries.' }
 $canvasJs = $mainJsSource.Substring($canvasStart, $canvasEnd - $canvasStart).Trim() + "`n"
-$sharedMainJs = ($mainJsSource.Substring(0, $canvasStart).TrimEnd() + "`n`n" + $mainJsSource.Substring($canvasEnd).TrimStart())
+$sharedMainJs = ($mainJsSource.Substring(0, $canvasStart).TrimEnd() + "`n`n" + $mainJsSource.Substring($canvasEnd + $canvasEndMarker.Length).TrimStart())
 
 $assetVersions = @{}
 foreach ($file in @('icons.css', 'main.css', 'noscript.css', 'internship-peek.css')) {
@@ -925,8 +927,12 @@ foreach ($entry in $photoEntries) {
 $exploreReviews = Get-Content -LiteralPath (Join-Path $root 'journals\explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $exploreCoverPhotos = [System.Collections.Generic.List[object]]::new()
 $exploreIds = @{}
+# Index photo ids once (case-sensitive, like the old -ceq scan) rather than
+# scanning every photo for each reviewed cover.
+$photoPositions = New-Object System.Collections.Hashtable ([System.StringComparer]::Ordinal)
+for ($i = 0; $i -lt $photoEntries.Count; $i++) { if (-not $photoPositions.ContainsKey($photoEntries[$i].Id)) { $photoPositions[$photoEntries[$i].Id] = $i } }
 foreach ($review in $exploreReviews) {
-    $photo = $photoEntries | Where-Object { $_.Id -ceq $review.id } | Select-Object -First 1
+    $photo = if ($photoPositions.ContainsKey([string]$review.id)) { $photoEntries[$photoPositions[[string]$review.id]] } else { $null }
     if (-not $photo -or $photo.Video -or $exploreIds[$review.id]) { throw "Invalid or duplicate reviewed postcard: $($review.id)" }
     $exploreIds[$review.id] = $true
     $source = Resolve-SourceImagePath $photo.Thumb
@@ -948,8 +954,6 @@ foreach ($review in $exploreReviews) {
 # Compact tuples: [photo index, positions in that photo's tags, optional fx, fy].
 # All references are generated together; the source review retains stable ids,
 # thumbnail hashes and explicit crops. Missing coordinates mean 50% / 50%.
-$photoPositions = @{}
-for ($i = 0; $i -lt $photoEntries.Count; $i++) { $photoPositions[$photoEntries[$i].Id] = $i }
 $photoIndexCovers = foreach ($cover in $exploreCoverPhotos) {
     $position = $photoPositions[$cover.Id]
     $photo = $photoEntries[$position]

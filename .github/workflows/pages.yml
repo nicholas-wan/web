@@ -28,6 +28,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+          cache-dependency-path: tools/tests/browser/package-lock.json
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~\AppData\Local\ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('tools/tests/browser/package-lock.json') }}
 
       - name: Install rendered layout checks
         working-directory: tools/tests/browser
@@ -37,7 +45,7 @@ jobs:
 
       - name: Check search and lightbox logic
         working-directory: tools/tests/browser
-        run: node --test ../photo-search.test.cjs ../lightbox-cache.test.cjs
+        run: npm run test:unit
 
       - name: Check travel search and layouts before publishing
         working-directory: tools/tests/browser

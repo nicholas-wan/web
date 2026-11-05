@@ -11,12 +11,6 @@
 
 	var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 	var mobileNav = window.matchMedia('(max-width: 980px)');
-	var compactIntro = window.matchMedia('(max-width: 480px)');
-
-	function watchMedia(query, callback) {
-		if (query.addEventListener) query.addEventListener('change', callback);
-		else query.addListener(callback);
-	}
 
 	// Reveal content as soon as its DOM and interaction handlers are ready.
 	// The homepage keeps its load-synchronised intro/scramble choreography;
@@ -33,23 +27,6 @@
 	else {
 		revealPage();
 	}
-
-	// Retain the theme's smooth in-page links without the old scrolly plugin.
-	Array.prototype.forEach.call(document.querySelectorAll('a.scrolly'), function(link) {
-		link.addEventListener('click', function(event) {
-			var href = link.getAttribute('href');
-			if (!href || href.charAt(0) !== '#' || href.length < 2) return;
-			var target;
-			try { target = document.querySelector(href); }
-			catch (error) { return; }
-			if (!target) return;
-			event.preventDefault();
-			window.scrollTo({
-				top: Math.max(0, target.getBoundingClientRect().top + window.scrollY),
-				behavior: reducedMotion.matches ? 'auto' : 'smooth'
-			});
-		});
-	});
 
 	// Build the mobile navigation sheet.
 	var navPanelToggle = document.createElement('a');
@@ -256,27 +233,8 @@
 			icon.classList.toggle('alt', mobile);
 		});
 	}
-	watchMedia(mobileNav, syncNavMode);
+	mobileNav.addEventListener('change', syncNavMode);
 	syncNavMode();
-
-	// The intro fades once the main content crosses the same desktop/mobile
-	// handoff zones formerly managed by Scrollex, and returns when scrolling up.
-	var intro = document.getElementById('intro');
-	if (intro) {
-		var introFrame = null;
-		function syncIntro() {
-			introFrame = null;
-			var threshold = window.innerHeight * (compactIntro.matches ? 0.65 : 0.75);
-			intro.classList.toggle('hidden', main.getBoundingClientRect().top <= threshold);
-		}
-		function queueIntro() {
-			if (introFrame === null) introFrame = window.requestAnimationFrame(syncIntro);
-		}
-		watchMedia(compactIntro, queueIntro);
-		window.addEventListener('scroll', queueIntro, { passive: true });
-		window.addEventListener('resize', queueIntro, { passive: true });
-		queueIntro();
-	}
 
 	// Return-to-top visibility and scrolling no longer require a second script.
 	var returnToTop = document.getElementById('return-to-top');
@@ -312,11 +270,11 @@
 
   var canvas = document.getElementById('nokey');
   if (!canvas) { return; }
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) { canvas.hidden = true; return; }
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { canvas.hidden = true; return; }
 
   var ctx = canvas.getContext('2d');
-  var compactCanvas = window.matchMedia && window.matchMedia('(max-width: 736px)').matches;
-  var finePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+  var compactCanvas = window.matchMedia('(max-width: 736px)').matches;
+  var finePointer = window.matchMedia('(pointer: fine)').matches;
   var W = 0, H = 0;
   var R = 2, LINK = compactCanvas ? 145 : 210, ball_limit = compactCanvas ? 9 : 14;
   var balls = [];
@@ -497,21 +455,4 @@
   }
 })();
 
-// Shared progressive enhancement: keep gallery pages fast and external links safe.
-(function() {
-	var images = document.querySelectorAll('img');
-	Array.prototype.forEach.call(images, function(image, index) {
-		image.decoding = 'async';
-		// Leave alt="" alone: an intentional empty alt marks a decorative image
-		// and must stay empty, not be filled with filename noise.
-		if (index > 1 && !image.hasAttribute('loading')) {
-			image.loading = 'lazy';
-		}
-	});
-
-	var links = document.querySelectorAll('a[target="_blank"], a[target="__blank"]');
-	Array.prototype.forEach.call(links, function(link) {
-		link.target = '_blank';
-		link.rel = 'noopener noreferrer';
-	});
-})();
+/*Canvas end*/

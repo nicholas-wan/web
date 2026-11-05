@@ -374,7 +374,7 @@
     }
     requestProgressUpdate();
   });
-  if (singleRail.addEventListener) singleRail.addEventListener('change', remeasureAndUpdate);
+  singleRail.addEventListener('change', remeasureAndUpdate);
   window.addEventListener('load', remeasureAndUpdate);
 
   updateTimelineProgress();

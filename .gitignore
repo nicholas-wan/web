@@ -20,9 +20,16 @@ tools/photos/work/
 # Worktrees the Claude desktop app creates for parallel agents.
 .claude/worktrees/
 
-# Rendered UI regression dependencies and failure artifacts.
+# Rendered UI regression dependencies and failure artifacts, including
+# renamed copies kept from one-off reruns.
 tools/tests/browser/node_modules/
-tools/tests/browser/test-results/
+tools/tests/browser/test-results*/
+
+# Local prototypes and review pages; never published or tracked.
+lab/
+
+# Scene generators' scratch output.
+tools/scenes/**/_work/
 
 # Impeccable critique snapshots (local design-review archive).
 .impeccable/

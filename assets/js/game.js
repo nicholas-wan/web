@@ -6,7 +6,7 @@
 (function () {
   'use strict';
 
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function ready(fn) {
     if (document.readyState === 'loading') {
@@ -17,12 +17,35 @@
   }
 
   ready(function () {
+    initIntroFade();
     initIntroSwipe();
     initHeroSnap();
     initCardScrub();
     initHeroBurst();
     initKonami();
   });
+
+  /* The intro fades once the main content crosses the old Scrollex handoff
+     zones, and returns when scrolling up. Runs under reduced motion too. */
+  function initIntroFade() {
+    var intro = document.getElementById('intro');
+    var main = document.getElementById('main');
+    if (!intro || !main) return;
+    var compact = window.matchMedia('(max-width: 480px)');
+    var frame = null;
+    function sync() {
+      frame = null;
+      var threshold = window.innerHeight * (compact.matches ? 0.65 : 0.75);
+      intro.classList.toggle('hidden', main.getBoundingClientRect().top <= threshold);
+    }
+    function queue() {
+      if (frame === null) frame = window.requestAnimationFrame(sync);
+    }
+    compact.addEventListener('change', queue);
+    window.addEventListener('scroll', queue, { passive: true });
+    window.addEventListener('resize', queue, { passive: true });
+    queue();
+  }
 
   /* The desktop scene pins while it scrubs; phones use the portrait's entry
      through one viewport so no completed scene retains a dead scroll tail. */
@@ -230,8 +253,10 @@
 
     function update() {
       var vh = window.innerHeight || document.documentElement.clientHeight;
+      // Read every card before writing any, so a write cannot force a layout.
+      var rects = Array.prototype.map.call(cards, function (card) { return card.getBoundingClientRect(); });
       for (var i = 0; i < cards.length; i++) {
-        var r = cards[i].getBoundingClientRect();
+        var r = rects[i];
         // Rects include the scrub translate; undo it so progress reads the
         // layout position and the loop stays stable.
         var top = r.top - (1 - last[i]) * LIFT;

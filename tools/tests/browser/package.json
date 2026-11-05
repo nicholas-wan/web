@@ -1,5 +1,8 @@
 {
   "private": true,
-  "scripts": { "test": "playwright test" },
+  "scripts": {
+    "test": "playwright test",
+    "test:unit": "node --test ../photo-search.test.cjs ../lightbox-cache.test.cjs"
+  },
   "devDependencies": { "@playwright/test": "1.64.0" }
 }
