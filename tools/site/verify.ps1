@@ -131,7 +131,10 @@ foreach ($page in $pages) {
     foreach ($sharedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'assets/css/custom.css', 'assets/css/noscript.css', 'assets/js/main.js')) {
         if ($scan -notmatch [regex]::Escape((Get-DistAssetRef $sharedAsset))) { throw "$($page.Name) does not reference the current content hash for $sharedAsset." }
     }
-    if ($scan -notmatch '<link rel="preload" href="assets/fonts/merriweather-300-latin\.woff2" as="font" type="font/woff2" crossorigin />') { throw "$($page.Name) is missing the body-font preload." }
+    # The homepage skips it: nothing on its first screen uses Merriweather (Nov 2026).
+    $bodyFontPreload = $scan -match '<link rel="preload" href="assets/fonts/merriweather-300-latin\.woff2" as="font" type="font/woff2" crossorigin />'
+    if ($page.Name -eq 'index.html' -and $bodyFontPreload) { throw "index.html must not preload the body font." }
+    if ($page.Name -ne 'index.html' -and -not $bodyFontPreload) { throw "$($page.Name) is missing the body-font preload." }
     # Oct 2026: the display font swaps in on every page's nav and headings and
     # Raleway on journal titles; discovering them from the stylesheet cost up to
     # 0.043 CLS on cold phone loads, so the head preloads them.

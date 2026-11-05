@@ -1181,7 +1181,9 @@ foreach ($page in $pages) {
     $introLine = if ($intro) { "    $intro" } else { "" }
     $canvasMarkup = if ($slug -eq 'index') { '    <canvas id="nokey" width="800" height="800" aria-hidden="true"></canvas>' } else { '' }
     $preloadMarkup = '    <link rel="preload" href="assets/fonts/source-sans-pro-900-latin.woff2" as="font" type="font/woff2" crossorigin />'
-    $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />'
+    # Nov 2026: the homepage's first screen sets no Merriweather (its About text
+    # starts ~1400px down), and the 44 KB preload delayed first paint ~160ms on slow phones.
+    if ($slug -ne 'index') { $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />' }
     if ($tripOrder -contains $slug) { $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/raleway-400-latin.woff2" as="font" type="font/woff2" crossorigin />' }
     if ($bannerPreload) { $preloadMarkup += "`n" + $bannerPreload }
     # Apply approved Travel geometry before first paint, not after its runtime downloads.
