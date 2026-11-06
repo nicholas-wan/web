@@ -21,6 +21,9 @@ that no tracked source names (og images and unreviewed explore-covers.json
 thumbnails keep theirs); rerun it after updating those to prune the rest. Pass
 --report <csv> to record the per-tier qualities, sizes and SSIMs. Needs
 scikit-image.
+
+--phone-banners writes only the phone-only banner crops recorded in
+phone-banner-crops.json.
 """
 import argparse
 import csv
@@ -63,6 +66,8 @@ parser.add_argument("--coverage-gaps-only", action="store_true")
 parser.add_argument("--banners-only", action="store_true")
 parser.add_argument("--webp-tiers", action="store_true")
 parser.add_argument("--report", type=Path)
+parser.add_argument("--phone-banners", action="store_true",
+                    help="write the phone-only banner crops in phone-banner-crops.json")
 args = parser.parse_args()
 
 
@@ -364,6 +369,51 @@ def generate_webp_tiers() -> None:
 
 if args.webp_tiers:
     generate_webp_tiers()
+    raise SystemExit
+
+PHONE_BANNER_CROPS = Path(__file__).with_name("phone-banner-crops.json")
+
+
+def generate_phone_banner_crops() -> None:
+    """Phone-only WebP crops of journal banners (5 Nov 2026, owner-approved).
+    Phones show a cover-fit strip of the banner, so each srcset tier gets a
+    sibling cut to the rows phones can see. The boxes, qualities and how they
+    were chosen live in phone-banner-crops.json; this checks each box still
+    frames every phone width exactly, then writes missing files. Originals
+    are never re-encoded."""
+    config = json.loads(PHONE_BANNER_CROPS.read_text(encoding="utf-8"))
+    for banner in config["banners"]:
+        source = ROOT / banner["source"]
+        focus = banner["objectPositionY"]
+        with Image.open(source) as image:
+            source_size = image.size
+        for variant in banner["variants"]:
+            width, height = variant["width"], variant["height"]
+            left, top, right, bottom = variant["crop"]
+            crop_height = bottom - top
+            expected_height = source_size[1] if width == source_size[0] else round(source_size[1] * width / source_size[0])
+            band = width / banner["narrowestPhoneAspect"] * banner["margin"]
+            if (height != expected_height or (left, right) != (0, width) or crop_height < band
+                    or (height - crop_height) * focus != top * 100):
+                raise SystemExit(f"{source.name} {width}w: crop {variant['crop']} no longer frames the phone band")
+            target = source.with_name(f"{source.stem}-phone-{width}.webp")
+            if target.exists():
+                continue
+            with Image.open(source) as image:
+                icc = image.info.get("icc_profile")
+                frame = image.convert("RGB")
+                if width != source_size[0]:
+                    frame = frame.resize((width, height), Image.LANCZOS)
+                frame = frame.crop((left, top, right, bottom))
+                options = {"quality": variant["quality"], "method": 6}
+                if icc:
+                    options["icc_profile"] = icc
+                frame.save(target, "WEBP", **options)
+            print(f"{source.name} -> {target.name} ({target.stat().st_size // 1024} KB)")
+
+
+if args.phone_banners:
+    generate_phone_banner_crops()
     raise SystemExit
 
 if args.banners_only:

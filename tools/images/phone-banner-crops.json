@@ -1,0 +1,26 @@
+{
+  "about": [
+    "Phone-only WebP crops of journal banners (5 Nov 2026, owner-approved). Originals are untouched.",
+    "Each variant is the source resized exactly as its existing srcset tier was (Lanczos, same width and height), then cut to the rows phones can see.",
+    "Rows phones see: the banner is object-fit: cover in a box from 320px to 736px wide; the narrowest box aspect (narrowestPhoneAspect, measured in Chromium) shows the tallest band, width / aspect rows. The crop keeps margin times that band.",
+    "The crop top is (height - cropHeight) * objectPositionY, an exact integer, so the same object-position frames every phone width exactly as the full tier does.",
+    "Quality: the lowest WebP quality from 80 (the banners' WebP standard) whose SSIM against the same region of a lossless Lanczos resize of the original is at least the existing tier's (baselineSsim; for the full-width tier, the -1200 tier's).",
+    "make-responsive-variants.py --phone-banners checks these boxes and writes any missing <stem>-phone-<width>.webp; the build emits a (max-width: 736px) <source> only when every srcset tier has one."
+  ],
+  "banners": [
+    {
+      "journal": "travel_2025_japan",
+      "source": "images/travel/2025_japan/japan_banner_japan.jpg",
+      "objectPositionY": 52,
+      "narrowestPhoneAspect": 2.061,
+      "narrowestPhoneBox": "601px viewport: 483.7 x 234.7 CSS px (320px: 290.7 x 133.3, aspect 2.181)",
+      "margin": 1.02,
+      "variants": [
+        { "width": 480, "height": 340, "crop": [0, 52, 480, 292], "quality": 80, "ssim": 0.9610, "baselineSsim": 0.9535 },
+        { "width": 800, "height": 566, "crop": [0, 78, 800, 494], "quality": 80, "ssim": 0.9676, "baselineSsim": 0.9601 },
+        { "width": 1200, "height": 850, "crop": [0, 130, 1200, 730], "quality": 82, "ssim": 0.9736, "baselineSsim": 0.9732 },
+        { "width": 1600, "height": 1133, "crop": [0, 169, 1600, 977], "quality": 80, "ssim": 0.9744, "baselineSsim": 0.9732 }
+      ]
+    }
+  ]
+}
