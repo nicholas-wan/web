@@ -166,6 +166,27 @@ foreach ($page in $pages) {
         if ($bannerPreload.Value -notmatch [regex]::Escape('href="' + $bannerSrc + '"')) { throw "$($page.Name) banner preload must target the banner image." }
         $headEnd = $scan.IndexOf('</head>')
         if ($headEnd -lt 0 -or $scan.IndexOf($bannerPreload.Value) -gt $headEnd) { throw "$($page.Name) banner preload must live in the document head." }
+        # Phone banner crops (5 Nov 2026): a (max-width: 736px) <source> lists a
+        # -phone- crop for every <img> srcset width at 100vw, and the head preload
+        # splits by the same media query, each half mirroring its own element.
+        $imagePreloads = [regex]::Matches($scan.Substring(0, $headEnd), '<link\b[^>]*\brel="preload"[^>]*\bas="image"[^>]*>')
+        $phonePicture = [regex]::Match($scan, '<picture><source media="\(max-width: 736px\)" type="image/webp" srcset="([^"]+)" sizes="100vw" width="(\d+)" height="(\d+)" />' + [regex]::Escape($bannerImg.Value) + '</picture>')
+        $bannerSrcset = [regex]::Match($bannerImg.Value, '\ssrcset="([^"]+)"').Groups[1].Value
+        $bannerSizes = [regex]::Match($bannerImg.Value, '\ssizes="([^"]+)"').Groups[1].Value
+        if ($phonePicture.Success) {
+            $bannerBase = $bannerSrc -replace '\.(jpg|jpeg|webp)$', ''
+            $expectedPhone = @(foreach ($candidate in ($bannerSrcset -split ',\s*')) { $width = ($candidate -split '\s+')[1] -replace 'w$', ''; '{0}-phone-{1}.webp {1}w' -f $bannerBase, $width }) -join ', '
+            if ($phonePicture.Groups[1].Value -ne $expectedPhone) { throw "$($page.Name) phone banner source must list a -phone- crop for every banner srcset width." }
+            foreach ($candidate in ($expectedPhone -split ',\s*')) {
+                if (-not (Test-Path -LiteralPath (Join-Path $dist (($candidate -split '\s+')[0] -replace '/', '\')))) { throw "$($page.Name) phone banner crop $candidate is not published." }
+            }
+            $desktopPreload = '<link rel="preload" as="image" href="{0}" imagesrcset="{1}" imagesizes="{2}" media="(min-width: 737px)" fetchpriority="high" />' -f $bannerSrc, $bannerSrcset, $bannerSizes
+            $phonePreload = '<link rel="preload" as="image" href="{0}" imagesrcset="{1}" imagesizes="100vw" type="image/webp" media="(max-width: 736px)" fetchpriority="high" />' -f (($expectedPhone -split ',\s*')[-1] -replace '\s+\d+w$', ''), $expectedPhone
+            if ($imagePreloads.Count -ne 2 -or $imagePreloads[0].Value -ne $desktopPreload -or $imagePreloads[1].Value -ne $phonePreload) { throw "$($page.Name) must preload the banner <img> above 736px and its phone crop source at 736px and below." }
+        } else {
+            if ($scan -match '-phone-\d+\.webp') { throw "$($page.Name) references a phone banner crop outside the banner <picture>." }
+            if ($imagePreloads.Count -ne 1 -or $imagePreloads[0].Value -match '\smedia=') { throw "$($page.Name) must keep one unconditional banner preload." }
+        }
     } elseif ($scan -match 'assets/js/journal-progress\.js') { throw "$($page.Name) must not load the journal progress bundle." }
     if ($journalPageNames -notcontains $page.Name -and [regex]::IsMatch($scan, '<link\b[^>]*\brel="preload"[^>]*\bas="image"')) { throw "$($page.Name) must not preload a banner image it does not render." }
     foreach ($routeCss in $routeCssOwners.Keys) {
@@ -1067,6 +1088,9 @@ foreach ($bannerJournal in @('travel_2024_germany', 'travel_2025_japan', 'travel
     $bannerHtml = Get-Content -LiteralPath (Join-Path $dist "$bannerJournal.html") -Raw -Encoding UTF8
     if ($bannerHtml -notmatch '<link rel="preload" as="image"[^>]*imagesrcset="[^"]*-1200\.jpg 1200w' -or $bannerHtml -notmatch 'class="journal-banner"[^>]*srcset="[^"]*-1200\.jpg 1200w') { throw "$bannerJournal banner must offer its -1200 tier so DPR-3 phones skip the full original." }
 }
+# Japan's 10rem phone strip shows about two-thirds of its banner, so phones take
+# the cropped WebP tiers (5 Nov 2026, tools/images/phone-banner-crops.json).
+if ($japan -notmatch '<picture><source media="\(max-width: 736px\)" type="image/webp" srcset="images/travel/2025_japan/japan_banner_japan-phone-480\.webp 480w, [^"]*japan_banner_japan-phone-1600\.webp 1600w" sizes="100vw" width="1600" height="808" /><img class="journal-banner"') { throw "Japan's banner must keep its phone crop source." }
 if ($prewed -match '<style>' -or $house -match '<style>' -or $sharedCustomCss -notmatch '(?s)@font-face\s*\{\s*font-family:\s*Wedding;\s*src:\s*url\("\.\./fonts/josephsophia-wordmark\.woff2"\)' -or (Test-Path -LiteralPath (Join-Path $dist 'assets\fonts\josephsophia.otf'))) { throw "The pre-wedding wordmark must use the subset WOFF2 from shared CSS, not the 82 KB OTF or an inline style block." }
 Assert-FileSizeBudget 'assets\fonts\josephsophia-wordmark.woff2' 16
 if ($personalPageCss -notmatch '(?s)@media \(hover: none\).*?\.personal-timeline-event:not\(\.is-gallery-active\):not\(\[data-gallery-warm="true"\]\) \.personal-event-card__image--slideshow img:not\(:first-child\)\s*\{\s*display:\s*none') { throw "Touch galleries must keep later frames out of layout until their card activates." }

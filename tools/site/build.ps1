@@ -262,8 +262,38 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
             else { $tag = Add-AttributeToImgTag $tag 'loading="lazy"' }
         }
         $state.Counter++
+        if ($isJournalBanner -and $dimensions) { $tag = Add-PhoneBannerSource $tag $path $srcMatch.Groups[1].Value $SourceIndex }
         return $tag
     })
+}
+
+# Phone banner crops (5 Nov 2026, owner-approved): phones show a cover-fit
+# strip of the banner, so tools/images/phone-banner-crops.json cuts each srcset
+# tier to the rows phones can see (<stem>-phone-<width>.webp). They ship only
+# through a (max-width: 736px) <source> listing the same widths, so a phone
+# picks the same tier and density as before and sees the same framing; the
+# <img>, and so desktop, is untouched. All or nothing: a missing tier keeps
+# the plain <img>. Get-BannerPreloadLink mirrors this source.
+function Add-PhoneBannerSource([string]$Tag, [string]$Path, [string]$Src, [hashtable]$SourceIndex) {
+    $srcsetMatch = [regex]::Match($Tag, '\ssrcset="([^"]+)"')
+    if (-not $srcsetMatch.Success) { return $Tag }
+    $directory = [IO.Path]::GetDirectoryName($Path)
+    $stem = [IO.Path]::GetFileNameWithoutExtension($Path)
+    $srcBase = $Src -replace '\.(jpg|jpeg|webp)$', ''
+    $candidates = @()
+    $largestWidth = 0
+    $largestFile = $null
+    foreach ($candidate in ($srcsetMatch.Groups[1].Value -split ',\s*')) {
+        $width = [int](($candidate.Trim() -split '\s+')[1] -replace 'w$', '')
+        $file = Join-Path $directory ($stem + '-phone-' + $width + '.webp')
+        if (-not (Get-SourceImageInfo $file $SourceIndex)) { return $Tag }
+        $candidates += ('{0}-phone-{1}.webp {1}w' -f $srcBase, $width)
+        if ($width -gt $largestWidth) { $largestWidth = $width; $largestFile = $file }
+    }
+    $phoneDimensions = Get-CachedImageDimensions $largestFile $SourceIndex
+    if (-not $phoneDimensions -or $phoneDimensions.Width -ne $largestWidth) { throw "Phone banner crop $largestFile must be $largestWidth px wide." }
+    $source = '<source media="(max-width: 736px)" type="image/webp" srcset="{0}" sizes="100vw" width="{1}" height="{2}" />' -f ($candidates -join ', '), $phoneDimensions.Width, $phoneDimensions.Height
+    return '<picture>' + $source + $Tag + '</picture>'
 }
 
 function Normalize-MissingJpegReferences([string]$Markup, [string]$ImageRoot) {
@@ -612,8 +642,18 @@ function Get-BannerPreloadLink([string]$Markup, [string]$Slug) {
     if ($srcsetMatch.Success) { $attributes += ('imagesrcset="{0}"' -f $srcsetMatch.Groups[1].Value) }
     $sizesMatch = [regex]::Match($tag, '\ssizes="([^"]+)"')
     if ($sizesMatch.Success) { $attributes += ('imagesizes="{0}"' -f $sizesMatch.Groups[1].Value) }
-    $attributes += 'fetchpriority="high"'
-    return '    <link ' + ($attributes -join ' ') + ' />'
+    # A phone crop <source> (Add-PhoneBannerSource) splits the preload by the
+    # same media query: phones preload the crop, wider screens the <img> as before.
+    $phoneSource = [regex]::Match($Markup, '<picture><source media="\(max-width: 736px\)" type="image/webp" srcset="([^"]+)" sizes="([^"]+)"[^>]*>' + [regex]::Escape($tag))
+    if (-not $phoneSource.Success) {
+        $attributes += 'fetchpriority="high"'
+        return '    <link ' + ($attributes -join ' ') + ' />'
+    }
+    $attributes += @('media="(min-width: 737px)"', 'fetchpriority="high"')
+    $phoneSrcset = $phoneSource.Groups[1].Value
+    $phoneHref = ($phoneSrcset -split ',\s*')[-1] -replace '\s+\d+w$', ''
+    $phoneAttributes = @('rel="preload"', 'as="image"', ('href="{0}"' -f $phoneHref), ('imagesrcset="{0}"' -f $phoneSrcset), ('imagesizes="{0}"' -f $phoneSource.Groups[2].Value), 'type="image/webp"', 'media="(max-width: 736px)"', 'fetchpriority="high"')
+    return '    <link ' + ($attributes -join ' ') + ' />' + "`n" + '    <link ' + ($phoneAttributes -join ' ') + ' />'
 }
 
 $webpMap = @{}

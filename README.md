@@ -68,6 +68,7 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 
 - Banner `sizes`: `100vw` on phones, `calc(100vw - 176px)` to 1024px, `1024px` to 1680px, `1366px` above.
 - Banners get a `-1200` tier (`make-responsive-variants.py --banners-only`, q82 JPEG / q80 WebP, kept only if it saves a fifth) for DPR-3 phones. Seoul and Guangzhou are excluded (2:1 art).
+- Phone banner crops (5 Nov 2026, owner-approved; originals untouched): `--phone-banners` writes `<stem>-phone-<width>.webp` for every srcset tier from the boxes in `tools/images/phone-banner-crops.json` (each tier resized as before, then cut to the rows a 320-736px cover-fit box can show, plus 2%; WebP from q80, SSIM at least the old tier's). The build wraps the banner in `<picture>` with a `(max-width: 736px)` source of the same widths at `100vw`, so phones keep their tier and framing, and splits the head preload by the same media query; the `<img>` and desktop are unchanged. Only Japan has them (its 10rem strip shows about two-thirds of the photo: 175 KB to 97 KB at 390px DPR 3, 415 KB to 145 KB at 430px). The rest gain no crop: Perth, USA & Canada, Australia and Germany are contain-fit up to 600px, and the phone boxes of Seoul, Silicon Valley, Chengdu and Guangzhou run from 1.41:1 to 2.64:1 across their photo's own ratio, so together they see the whole frame; Europe's band is 98% of it and WebP alone saves under a fifth.
 - Journal tiles use a density-capped `160px` phone slot. Desktop four-up tiles use their measured widths (`20vw` to 1179px, `224px` to 1365px, `240px` to 1680px, `325px` above; the real middle band is 244px, rounded down so 2x laptops take `-480` at 2.0x instead of `-800`, Nov 2026). Two-up sparse days keep `20vw`. Non-journal galleries keep `800px`. No images are recompressed.
 - The same `160px` phone cap (24 Oct 2026) applies to Browse photos postcards (`travel-seeds.js`, `travel-discovery.js`), search tiles (`photo-search.js`) and the phone journal list photos (`travel-chronology.js`). The list photos are 224px wide, so DPR-3 phones get about 2.1x density; the owner accepted that softening for roughly 460 KB less per full scroll.
 - The three Read journals shortcut photos have dedicated 200px WebP copies (`*-200.webp`, made from the originals with Pillow at q80, 24 Oct 2026, owner-approved), about 22 KB instead of 133 KB.
@@ -105,7 +106,7 @@ python .\tools\images\convert-curated-webp.py
 
 **Editing a photo:**
 
-1. Delete its `-480`/`-800`/`-1200` siblings; the tool skips existing variants. `--banners-only` restores `-1200`.
+1. Delete its `-480`/`-800`/`-1200` siblings; the tool skips existing variants. `--banners-only` restores `-1200`. A banner with `-phone-*` crops: delete those too, re-check its boxes in `phone-banner-crops.json`, then run `--phone-banners`.
 2. The tool re-encodes every `-800`: `git checkout --` each changed sibling you did not edit.
 3. Tiles are fixed `object-fit: cover` boxes, so a crop moves the framing, not the grid. Check desktop and phone; prefer `--focus-x`/`--focus-y` for framing.
 4. Re-grab video posters from the tile's own MP4 at their existing size.

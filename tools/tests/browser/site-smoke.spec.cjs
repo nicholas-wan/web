@@ -103,3 +103,21 @@ test('phone deep links land with the day date visible below the toolbar', async 
   }
   await context.close();
 });
+
+// Phone banner crops (5 Nov 2026): phones fetch only the cropped WebP tier their
+// width and density pick, wider screens only the <img> tier, never both.
+for (const [width, scale, expected] of [[390, 3, 'japan_banner_japan-phone-1200.webp'], [390, 2, 'japan_banner_japan-phone-800.webp'], [1366, 1, 'japan_banner_japan-1200.jpg']]) {
+  test(`Japan banner fetches only ${expected} at ${width}px DPR ${scale}`, async ({ browser }) => {
+    const context = await browser.newContext({ viewport: { width, height: 844 }, deviceScaleFactor: scale });
+    const page = await context.newPage();
+    const banners = [];
+    page.on('request', request => { if (/japan_banner_japan/.test(request.url())) banners.push(request.url().split('/').pop()); });
+    await page.goto('/travel_2025_japan');
+    const banner = page.locator('img.journal-banner');
+    await expect.poll(() => banner.evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
+    await page.waitForTimeout(500);
+    expect(await banner.evaluate(image => image.currentSrc.split('/').pop())).toBe(expected);
+    expect([...new Set(banners)]).toEqual([expected]);
+    await context.close();
+  });
+}
