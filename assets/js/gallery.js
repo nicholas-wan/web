@@ -2,9 +2,8 @@
   var journalAnimations = Array.prototype.slice.call(document.querySelectorAll('video.journal-animation'));
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var isJournal = document.body.classList.contains('page-travel-journal');
-  /* Phones flick through several screens a second, and a photo that has not
-     arrived reads as an empty card, so phones start photos, posters and row
-     tiles about two screens ahead; desktop keeps its margins (Nov 2026). */
+  /* Phones flick through several screens a second, so they start photos and
+     posters about two screens ahead; desktop keeps its margins (Nov 2026). */
   var onPhone = window.matchMedia('(max-width: 736px)').matches;
   var imageAhead = onPhone ? '1800px' : '900px';
   var posterAhead = onPhone ? '1800px' : '600px';
@@ -120,23 +119,41 @@
     return heading;
   });
 
-  /* Native lazy loading is deliberately conservative, which can leave a
-     blank tile after a quick journal scroll or horizontal swipe. Warm only
-     the low-priority images approaching the viewport; the rest keep their
-     native lazy behaviour and do not compete with the page's first image. */
+  /* Lazy loading can leave a blank tile after a quick scroll: warm photos
+     ahead of the reader at low priority (behind, half a screen: both ways,
+     a day jump loaded ~31 at once, the landing photo last; Nov 2026). */
   var warmImage = function (image) {
     if (image.loading !== 'lazy') return;
     image.fetchPriority = 'low';
     image.loading = 'eager';
   };
   if ('IntersectionObserver' in window) {
+    var lastY = scrollY, down = true, deferred = new Set(), recheck = null;
+    var wanted = function (rect) {
+      return down ? rect.bottom > -innerHeight / 2 : rect.top < innerHeight * 1.5;
+    };
+    var warm = function (image) {
+      deferred.delete(image);
+      warmImage(image);
+      imageWarmup.unobserve(image);
+    };
     var imageWarmup = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        warmImage(entry.target);
-        imageWarmup.unobserve(entry.target);
+        if (!entry.isIntersecting) deferred.delete(entry.target);
+        else if (wanted(entry.boundingClientRect)) warm(entry.target);
+        else deferred.add(entry.target);
       });
     }, { rootMargin: imageAhead });
+    window.addEventListener('scroll', function () {
+      var y = scrollY;
+      if (y !== lastY) down = y > lastY;
+      lastY = y;
+      if (recheck || !deferred.size) return;
+      recheck = setTimeout(function () {
+        recheck = null;
+        deferred.forEach(function (image) { if (wanted(image.getBoundingClientRect())) warm(image); });
+      }, 150);
+    }, { passive: true });
     images.forEach(function (image) {
       if (image.loading === 'lazy') imageWarmup.observe(image);
     });
@@ -871,7 +888,7 @@
   var galleryWarmers = new Map();
   var galleryWarmup = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) { galleryWarmers.get(entry.target)(entry.isIntersecting); });
-  }, { rootMargin: imageAhead + ' 0px' }) : null;
+  }, { rootMargin: (onPhone ? '50%' : imageAhead) + ' 0px' }) : null;
   Array.prototype.forEach.call(document.querySelectorAll('.travel-gallery--compact, .guangzhou-day--compact .masonry'), function (gallery, galleryIndex) {
     var shell = document.createElement('div');
     var controls = document.createElement('div');
