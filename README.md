@@ -196,7 +196,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - "Browse photos": 1.1rem/900. Lightbox captions: 1.5 leading, context line ≥12px.
 - Source Sans Pro ships 700 (latin, via `tools/fonts/subset-source-sans.py` from Source Sans 3) and 900; labels use 700, titles 900. The Shopee peek alone also ships Figtree 400/500/700 (ASCII only); see Fonts.
 - `.travel-map__place` stays explicit 900 (atlas collision layout).
-- Preload Source Sans 900 everywhere, Raleway on journals. `--font-display` uses size-adjusted `"Source Sans Fallback"` (Arial 86%/97%) against cold-load reflow.
+- Preload Source Sans 900 everywhere, Raleway on journals, Merriweather only on the text-first pages (Experience, Skills, 404; Nov 2026: on photo-led pages it slowed the banner by 0.2-0.4 s on slow phones). `--font-display` uses size-adjusted `"Source Sans Fallback"` (Arial 86%/97%) against cold-load reflow.
 - Phone floor: `font-size: max(var(--text-floor), <rem>)`; `--text-floor` is 12px at ≤736px, else 0.
 - Never bare `max(12px, …)` (the 11pt root at ≤1280px would grow laptop text), except the atlas text listed under Travel atlas contracts. Atlas canvas labels are exempt from the floor.
 - Phone/tablet: CTAs, map controls, archive actions keep 3rem targets; dense atlas pins may use transparent halos and region controls instead.

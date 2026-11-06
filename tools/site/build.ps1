@@ -1234,10 +1234,14 @@ foreach ($page in $pages) {
     $shareImageMeta = if ($slug -in @('experience', 'skills')) { '' } else { "    <meta property=`"og:image`" content=`"__OGIMAGE__`" />`n    <meta name=`"twitter:card`" content=`"summary_large_image`" />" }
     $introLine = if ($intro) { "    $intro" } else { "" }
     $canvasMarkup = if ($slug -eq 'index') { '    <canvas id="nokey" width="800" height="800" aria-hidden="true"></canvas>' } else { '' }
+    $bodyFontPreloadPages = @('experience', 'skills', '404')
     $preloadMarkup = '    <link rel="preload" href="assets/fonts/source-sans-pro-900-latin.woff2" as="font" type="font/woff2" crossorigin />'
-    # Nov 2026: the homepage's first screen sets no Merriweather (its About text
-    # starts ~1400px down), and the 44 KB preload delayed first paint ~160ms on slow phones.
-    if ($slug -ne 'index') { $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />' }
+    # Nov 2026: only pages whose first screen is body text preload Merriweather.
+    # On the homepage it starts ~1400px down; on the photo-led pages (journals,
+    # Travel, Personal, House, Prewed) the 44 KB font shared the slow link with
+    # the CSS and banner, and dropping it cut phone LCP by 0.2-0.4 s on slow 4G
+    # with no layout shift (fonts use swap).
+    if ($bodyFontPreloadPages -contains $slug) { $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />' }
     if ($tripOrder -contains $slug) { $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/raleway-400-latin.woff2" as="font" type="font/woff2" crossorigin />' }
     if ($bannerPreload) { $preloadMarkup += "`n" + $bannerPreload }
     # Apply approved Travel geometry before first paint, not after its runtime downloads.

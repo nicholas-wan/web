@@ -15,6 +15,7 @@
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var singleRail = window.matchMedia('(max-width: 736px)');
   var scrollFrame = null;
+  var pageLoaded = document.readyState === 'complete';
   var needsMeasure = false;
   var focusedEvent = null;
   var scrollDirection = 1;
@@ -289,8 +290,11 @@
            activation in the reading band and its first crossfade two seconds
            later. Measured on slow 4G at reading pace, every gallery had all its
            frames by activation; a two-viewport lead restored ~400 KB of the
-           first-load saving for no visible gain. */
-        if (cardBounds.top < viewport && cardBounds.bottom > 0) warmGallery(event);
+           first-load saving for no visible gain. Until the page has loaded
+           only the active gallery warms (below): warming every on-screen card
+           at once pulled ~255 KB of hidden frames in with the visible photos
+           and held the first screen back ~1.2 s on slow 4G (Nov 2026). */
+        if (pageLoaded && cardBounds.top < viewport && cardBounds.bottom > 0) warmGallery(event);
         var distance = event === focusEvent
           ? -1
           : Math.abs((cardBounds.top + cardBounds.bottom) / 2 - readingFocus);
@@ -378,7 +382,10 @@
     requestProgressUpdate();
   });
   singleRail.addEventListener('change', remeasureAndUpdate);
-  window.addEventListener('load', remeasureAndUpdate);
+  window.addEventListener('load', function () {
+    pageLoaded = true;
+    remeasureAndUpdate();
+  });
 
   updateTimelineProgress();
 }());
