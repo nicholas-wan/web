@@ -201,7 +201,6 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                 # Follow the RESOLVED file, not the reference: a .jpg ref that fell
                 # back to a webp replacement must look for -480.webp, not -480.jpg.
                 # .jpeg sources keep the historical -480.jpg naming.
-                $variantSuffix = if ($path -match '\.webp$') { '.webp' } else { '.jpg' }
                 $tileSuffix = Get-TileVariantSuffix $path $SourceIndex
                 $originalSource = "$($srcMatch.Groups[1].Value) $($dimensions.Width)w"
                 $sources = @()
@@ -212,7 +211,8 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                 # Journal banners carry a -1200 tier: their truthful 100vw phone
                 # slot needs ~1170 device px on a DPR-3 phone, which skipped -800
                 # and fetched the full 1470-1920 px original (make-responsive-variants.py).
-                $variant1200 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-1200' + $variantSuffix))
+                # --webp-tiers switches a banner's -1200 with its other tiers (6 Nov 2026).
+                $variant1200 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-1200' + $tileSuffix))
                 $has1200 = $has800 -and $dimensions.Width -gt 1200 -and [bool](Get-SourceImageInfo $variant1200 $SourceIndex)
                 if ($has480) {
                     $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-480' + $tileSuffix)) 480w"
@@ -222,7 +222,7 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                     $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-800' + $tileSuffix)) 800w"
                 }
                 if ($has1200) {
-                    $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-1200' + $variantSuffix)) 1200w"
+                    $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-1200' + $tileSuffix)) 1200w"
                 }
                 if ($has480) { $sources += $originalSource }
                 if ($sources.Count -gt 1) {

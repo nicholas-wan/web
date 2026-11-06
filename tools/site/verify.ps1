@@ -186,6 +186,8 @@ foreach ($page in $pages) {
         } else {
             if ($scan -match '-phone-\d+\.webp') { throw "$($page.Name) references a phone banner crop outside the banner <picture>." }
             if ($imagePreloads.Count -ne 1 -or $imagePreloads[0].Value -match '\smedia=') { throw "$($page.Name) must keep one unconditional banner preload." }
+            $bannerPreloadMirror = '<link rel="preload" as="image" href="{0}" imagesrcset="{1}" imagesizes="{2}" fetchpriority="high" />' -f $bannerSrc, $bannerSrcset, $bannerSizes
+            if ($imagePreloads[0].Value -ne $bannerPreloadMirror) { throw "$($page.Name) banner preload must mirror the banner's src, srcset and sizes exactly." }
         }
     } elseif ($scan -match 'assets/js/journal-progress\.js') { throw "$($page.Name) must not load the journal progress bundle." }
     if ($journalPageNames -notcontains $page.Name -and [regex]::IsMatch($scan, '<link\b[^>]*\brel="preload"[^>]*\bas="image"')) { throw "$($page.Name) must not preload a banner image it does not render." }
@@ -232,11 +234,12 @@ foreach ($page in $pages) {
             $candidatePath = ($candidate.Trim() -split '\s+')[0]
             if ($candidatePath) { $references.Add($candidatePath) }
         }
-        # JPEG photos' -480/-800 tiers are WebP where make-responsive-variants.py
-        # --webp-tiers made them (5 Nov 2026): never mixed, never a .jpg beside its .webp.
-        $tierExtensions = @([regex]::Matches($match.Groups[1].Value, '-(?:480|800)\.(jpg|webp) (?:480|800)w') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
-        if ($tierExtensions.Count -gt 1) { throw "$($page.Name) mixes JPEG and WebP -480/-800 tiers in one srcset: $($match.Groups[1].Value)" }
-        foreach ($jpegTier in [regex]::Matches($match.Groups[1].Value, '(images/[^\s,]+-(?:480|800))\.jpg (?:480|800)w')) {
+        # JPEG photos' -480/-800 tiers (and banners' -1200, 6 Nov 2026) are WebP where
+        # make-responsive-variants.py --webp-tiers made them (5 Nov 2026): never
+        # mixed, never a .jpg beside its .webp.
+        $tierExtensions = @([regex]::Matches($match.Groups[1].Value, '-(?:480|800|1200)\.(jpg|webp) (?:480|800|1200)w') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+        if ($tierExtensions.Count -gt 1) { throw "$($page.Name) mixes JPEG and WebP -480/-800/-1200 tiers in one srcset: $($match.Groups[1].Value)" }
+        foreach ($jpegTier in [regex]::Matches($match.Groups[1].Value, '(images/[^\s,]+-(?:480|800|1200))\.jpg (?:480|800|1200)w')) {
             if (Test-Path -LiteralPath (Join-Path $root (($jpegTier.Groups[1].Value + '.webp') -replace '/', '\'))) { throw "$($page.Name) serves $($jpegTier.Groups[1].Value).jpg although its WebP tier exists." }
         }
     }
@@ -620,11 +623,11 @@ $siliconValley = Get-Content -LiteralPath (Join-Path $dist 'travel_2019_siliconv
 $germany = Get-Content -LiteralPath (Join-Path $dist 'travel_2024_germany.html') -Raw -Encoding UTF8
 $seoul = Get-Content -LiteralPath (Join-Path $dist 'travel_2017_seoul.html') -Raw -Encoding UTF8
 $responsiveJournalMarkup = @($europe, $perth, $siliconValley, $germany, $guangzhou) -join "`n"
-# JPEG originals' tiers are WebP since 5 Nov 2026; perth_bg is a banner and
-# dusseldorf3's WebP saved under a tenth, so both keep JPEG tiers.
+# JPEG originals' tiers are WebP since 5 Nov 2026 (banners since 6 Nov);
+# dusseldorf3's WebP saved under a tenth, so it keeps JPEG tiers.
 $expectedMobileTiers = [ordered]@{
     'ALCATRAZ' = 'webp'; 'MARIN_cliff' = 'webp'; 'MARIN_cliff_jump' = 'webp'; 'MONTEREY_stars' = 'webp'
-    'departure3' = 'webp'; 'switzerland5' = 'webp'; 'perth_bg' = 'jpg'; 'dusseldorf1' = 'webp'
+    'departure3' = 'webp'; 'switzerland5' = 'webp'; 'perth_bg' = 'webp'; 'dusseldorf1' = 'webp'
     'dusseldorf3' = 'jpg'; 'dusseldorf5' = 'webp'; 'kalkarfood1' = 'webp'; 'canton-tower-frame' = 'webp'
 }
 foreach ($responsiveBase in $expectedMobileTiers.Keys) {
@@ -1098,9 +1101,21 @@ foreach ($fullBannerJournal in @('travel_2017_seoul', 'travel_2026_guangzhou')) 
     $fullBannerHtml = Get-Content -LiteralPath (Join-Path $dist "$fullBannerJournal.html") -Raw -Encoding UTF8
     if ($fullBannerHtml -match '-1200\.webp 1200w') { throw "$fullBannerJournal banner must not offer a -1200 tier; its phone crop needs more pixels." }
 }
-foreach ($bannerJournal in @('travel_2024_germany', 'travel_2025_japan', 'travel_2023_perth')) {
+# Banner tiers are WebP where --webp-tiers saved a tenth on every tier at equal
+# SSIM (6 Nov 2026); Australia's -800 saved 8%, so its banner keeps JPEG tiers.
+# The original stays the largest candidate. Europe (1280px) has no -1200.
+$expectedBannerTiers = [ordered]@{
+    'travel_2019_siliconvalley' = 'webp'; 'travel_2022_europe' = 'webp'; 'travel_2023_perth' = 'webp'; 'travel_2023_usacanada' = 'webp'
+    'travel_2024_australia' = 'jpg'; 'travel_2024_germany' = 'webp'; 'travel_2025_japan' = 'webp'
+}
+foreach ($bannerJournal in $expectedBannerTiers.Keys) {
     $bannerHtml = Get-Content -LiteralPath (Join-Path $dist "$bannerJournal.html") -Raw -Encoding UTF8
-    if ($bannerHtml -notmatch '<link rel="preload" as="image"[^>]*imagesrcset="[^"]*-1200\.jpg 1200w' -or $bannerHtml -notmatch 'class="journal-banner"[^>]*srcset="[^"]*-1200\.jpg 1200w') { throw "$bannerJournal banner must offer its -1200 tier so DPR-3 phones skip the full original." }
+    $bannerTag = [regex]::Match($bannerHtml, '<img\b[^>]*\bclass="[^"]*\bjournal-banner\b[^"]*"[^>]*>').Value
+    $bannerOriginal = [regex]::Match($bannerTag, '\ssrc="([^"]+\.jpg)"').Groups[1].Value
+    $tierWidths = if ($bannerJournal -eq 'travel_2022_europe') { @(480, 800) } else { @(480, 800, 1200) }
+    $bannerBase = $bannerOriginal -replace '\.jpg$', ''
+    $expectedSrcset = (@($tierWidths | ForEach-Object { '{0}-{1}.{2} {1}w' -f $bannerBase, $_, $expectedBannerTiers[$bannerJournal] }) + [regex]::Match($bannerTag, '\ssrcset="[^"]*?(\S+\.jpg \d+w)"').Groups[1].Value) -join ', '
+    if (-not $bannerOriginal -or $bannerTag -notmatch ('\ssrcset="' + [regex]::Escape($expectedSrcset) + '"') -or $expectedSrcset -notmatch ([regex]::Escape($bannerOriginal) + ' \d+w$')) { throw "$bannerJournal banner must list its $($expectedBannerTiers[$bannerJournal]) tiers ($($tierWidths -join ', ')) and then its JPEG original: $bannerTag" }
 }
 # Japan's 10rem phone strip shows about two-thirds of its banner, so phones take
 # the cropped WebP tiers (5 Nov 2026, tools/images/phone-banner-crops.json).

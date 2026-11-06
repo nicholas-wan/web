@@ -107,7 +107,7 @@ test('phone deep links land with the day date visible below the toolbar', async 
 
 // Phone banner crops (5 Nov 2026): phones fetch only the cropped WebP tier their
 // width and density pick, wider screens only the <img> tier, never both.
-for (const [width, scale, expected] of [[390, 3, 'japan_banner_japan-phone-1200.webp'], [390, 2, 'japan_banner_japan-phone-800.webp'], [1366, 1, 'japan_banner_japan-1200.jpg']]) {
+for (const [width, scale, expected] of [[390, 3, 'japan_banner_japan-phone-1200.webp'], [390, 2, 'japan_banner_japan-phone-800.webp'], [1366, 1, 'japan_banner_japan-1200.webp']]) {
   test(`Japan banner fetches only ${expected} at ${width}px DPR ${scale}`, async ({ browser }) => {
     const context = await browser.newContext({ viewport: { width, height: 844 }, deviceScaleFactor: scale });
     const page = await context.newPage();

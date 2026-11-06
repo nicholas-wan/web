@@ -15,8 +15,10 @@ JPEG's own dimensions and ICC profile) and encoded at the lowest WebP quality
 whose luma SSIM against the uncompressed resize is at least the JPEG tier's
 own. An original switches only when every one of its tiers comes out at most
 WEBP_TIER_MAX_RATIO of the JPEG's bytes, so a photo never mixes .webp and .jpg
-tiers. Journal banners, WebP-overlaid and animated originals are skipped, and
-originals are never re-encoded. The run then deletes each replaced JPEG tier
+tiers. Journal banners (6 Nov 2026, owner-approved) also switch their -1200
+tier, under the same rule, so a banner's srcset never mixes formats either.
+WebP-overlaid and animated originals are skipped, and originals are never
+re-encoded. The run then deletes each replaced JPEG tier
 that no tracked source names (og images and unreviewed explore-covers.json
 thumbnails keep theirs); rerun it after updating those to prune the rest. Pass
 --report <csv> to record the per-tier qualities, sizes and SSIMs. Needs
@@ -201,7 +203,7 @@ def generate_banner_1200_variants() -> None:
             continue
         webp = source.suffix.lower() == ".webp"
         target = source.with_name(source.stem + ("-1200.webp" if webp else "-1200.jpg"))
-        if target.exists():
+        if target.exists() or target.with_suffix(".webp").exists():  # --webp-tiers may have switched it
             continue
         with Image.open(source) as image:
             if image.size[0] <= 1400:
@@ -216,6 +218,9 @@ def generate_banner_1200_variants() -> None:
 
 
 WEBP_TIER_WIDTHS = (480, 800)
+BANNER_TIER_WIDTHS = (480, 800, 1200)
+# A tenth for banners too: swapping a tier's format adds no file or srcset entry,
+# unlike the -1200 tier's "a fifth", which weighs an extra file against the original.
 WEBP_TIER_MAX_RATIO = 0.9
 WEBP_TIER_QUALITY_RANGE = (50, 95)
 # Tracked text that can name an image tier directly (og images, covers, partials).
@@ -243,14 +248,14 @@ def ssim(reference, image: Image.Image) -> float:
     return structural_similarity(reference, luma(image), data_range=255)
 
 
-def plan_webp_tiers(source: Path) -> dict:
+def plan_webp_tiers(source: Path, widths: tuple[int, ...] = WEBP_TIER_WIDTHS) -> dict:
     """Encode every JPEG tier of one original as WebP in memory; never writes."""
     tiers = []
     with Image.open(source) as image:
         if getattr(image, "n_frames", 1) > 1:
             return {"source": source, "tiers": [], "keep": False, "why": "animated"}
         rgb = image.convert("RGB")
-    for width in WEBP_TIER_WIDTHS:
+    for width in widths:
         jpeg_path = source.with_name(source.stem + f"-{width}.jpg")
         if not jpeg_path.exists():
             continue
@@ -306,7 +311,7 @@ def named_tier_references() -> set[str]:
     names = set()
     for relative in tracked:
         text = (ROOT / relative).read_text(encoding="utf-8")
-        names.update(re.findall(r"images/[^\"'\s,)]+-(?:480|800)\.jpg", text))
+        names.update(re.findall(r"images/[^\"'\s,)]+-(?:480|800|1200)\.jpg", text))
     return names
 
 
@@ -314,7 +319,7 @@ def prune_replaced_jpeg_tiers() -> None:
     named = named_tier_references()
     kept = removed = 0
     for jpeg in sorted((ROOT / "images").rglob("*.jpg")):
-        if not re.fullmatch(r".+-(?:480|800)\.jpg", jpeg.name) or not jpeg.with_suffix(".webp").exists():
+        if not re.fullmatch(r".+-(?:480|800|1200)\.jpg", jpeg.name) or not jpeg.with_suffix(".webp").exists():
             continue
         if jpeg.relative_to(ROOT).as_posix() in named:
             kept += 1
@@ -333,15 +338,16 @@ def generate_webp_tiers() -> None:
             continue
         original = next((jpeg.with_name(match.group(1) + suffix) for suffix in (".jpg", ".jpeg")
                          if jpeg.with_name(match.group(1) + suffix).exists()), None)
-        if original is None or original.resolve() in banners:
+        if original is None:
             continue
         overlay = ROOT / "images-webp" / original.relative_to(ROOT / "images").with_suffix(".webp")
         if overlay.exists() or any(original.with_name(original.stem + f"-{width}.webp").exists()
-                                   for width in WEBP_TIER_WIDTHS):
+                                   for width in BANNER_TIER_WIDTHS):
             continue
         sources.add(original)
     with ThreadPoolExecutor() as pool:
-        plans = list(pool.map(plan_webp_tiers, sorted(sources)))
+        plans = list(pool.map(lambda source: plan_webp_tiers(
+            source, BANNER_TIER_WIDTHS if source.resolve() in banners else WEBP_TIER_WIDTHS), sorted(sources)))
     rows = []
     for plan in plans:
         for tier in plan["tiers"]:
