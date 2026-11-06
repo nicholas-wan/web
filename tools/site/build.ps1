@@ -1178,6 +1178,10 @@ foreach ($page in $pages) {
     # Move it to data-poster; gallery.js attaches the poster as each animation
     # nears the viewport, and travel-map.js reads either attribute.
     $main = [regex]::Replace($main, '<video\b[^>]*>', { param($m) if ($m.Value -match '\bdata-autoplay\b') { $m.Value -replace '\sposter="', ' data-poster="' } else { $m.Value } })
+    # A <source src> still costs: WebKit froze the main thread 2-3 s after
+    # load on USA/Canada's 37 animations, even under preload="none". Write it
+    # as data-src; gallery.js attaches it with the poster (Nov 2026).
+    $main = [regex]::Replace($main, '(?s)(<video\b[^>]*\bdata-autoplay\b[^>]*>)(.*?</video>)', { param($m) $m.Groups[1].Value + ($m.Groups[2].Value -replace '<source src="', '<source data-src="') })
 
     $bannerPreload = Get-BannerPreloadLink $main $slug
 

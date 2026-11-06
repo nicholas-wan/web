@@ -74,7 +74,7 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 - Phone banner crops (5 Nov 2026, owner-approved; originals untouched): `--phone-banners` writes `<stem>-phone-<width>.webp` for every srcset tier from the boxes in `tools/images/phone-banner-crops.json` (each tier resized as before, then cut to the rows a 320-736px cover-fit box can show, plus 2%; WebP from q80, SSIM at least the old tier's). The build wraps the banner in `<picture>` with a `(max-width: 736px)` source of the same widths at `100vw`, so phones keep their tier and framing, and splits the head preload by the same media query; the `<img>` and desktop are unchanged. Only Japan has them (its 10rem strip shows about two-thirds of the photo: 175 KB to 97 KB at 390px DPR 3, 415 KB to 145 KB at 430px). The rest gain no crop: Perth, USA & Canada, Australia and Germany are contain-fit up to 600px, and the phone boxes of Seoul, Silicon Valley, Chengdu and Guangzhou run from 1.41:1 to 2.64:1 across their photo's own ratio, so together they see the whole frame; Europe's band is 98% of it and WebP alone saves under a fifth.
 - The same `160px` phone cap (24 Oct 2026) applies to Browse photos postcards (`travel-seeds.js`, `travel-discovery.js`), search tiles (`photo-search.js`) and the phone journal list photos (`travel-chronology.js`). The list photos are 224px wide, so DPR-3 phones get about 2.1x density; the owner accepted that softening for roughly 460 KB less per full scroll.
 - The three Read journals shortcut photos have dedicated 200px WebP copies (`*-200.webp`, made from the originals with Pillow at q80, 24 Oct 2026, owner-approved), about 22 KB instead of 133 KB.
-- Journal animations use `data-poster`, not `poster`, which loads eagerly. `gallery.js` attaches it near the viewport; `travel-map.js` reads either.
+- Journal animations use `data-poster`, not `poster`, which loads eagerly. `gallery.js` attaches it near the viewport; `travel-map.js` reads either. Their `<source>` ships as `data-src` too (6 Nov 2026): with `src` in the markup, WebKit froze the main thread about 3 s after load on USA & Canada (37 videos); deferred, 0.35 s.
 
 ### CSS and JavaScript
 
@@ -301,11 +301,11 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Zoom loads the original, holding the decoded preview until it decodes; leaving, closing, fit or orientation-mode switch cancels it.
 - Pan release after a real drag (even with a stationary hold) refreshes click suppression; controls stay usable.
 - Near-viewport phone rows warm current, two ahead, one behind; scroll measured once per frame.
-- Posters warm near the viewport; playback needs visibility (pauses under the lightbox or a hidden tab).
+- Posters warm near the viewport; playback needs visibility (pauses under the lightbox or a hidden tab). Narrowed 6 Nov 2026: playback starts once a clip is at least half on screen for 300ms, and leaving with its download unfinished drops the source until it plays again. Starting at the first visible pixel let a Europe swipe pull 0.8 MB of MP4 while 31% of the photo time was blank (slow 4G); with the dwell, 10 KB and 0%.
 - Caption (polite, atomic): place name, then section/day and position within that section, split by a visually hidden middle dot (`…京都勝牛 Hiroshima · 1 of 16`).
 - Hiding a focused Info control first moves focus to close (orientation changes too).
 - Test: `node --test tools/tests/lightbox-cache.test.cjs`.
-- MP4 animations: the build renames `poster` to `data-poster`; `gallery.js` attaches it near the viewport and before the lightbox (literal `poster` loads despite `preload="none"`).
+- MP4 animations: the build renames `poster` to `data-poster` and `<source src>` to `<source data-src>`; `gallery.js` attaches both near the viewport and before the lightbox (literal `poster` loads despite `preload="none"`). The source attaches as a fresh `<source>` element: `load()` makes Chromium ignore `preload="none"` and fetch the whole clip.
 - Tiles: 480w on phones (160px slot, density-capped to DPR 3); measured desktop slots, so 1x and most 2x laptops get 480w. See [Build and deployment](#build-and-deployment).
 - Section links use the sticky-toolbar correction in `assets/js/travel-nav.js` (date above heading, if any). One horizontally scrollable row.
 - Desktop strip arrows get `hidden` without overflow (not dimmed); phones keep the right-edge fade; ResizeObserver refreshes them. Scrollspy centres only the strip.

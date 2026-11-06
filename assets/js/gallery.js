@@ -38,22 +38,58 @@
   var revealPoster = function (video) {
     if (!video.poster && video.dataset.poster) video.poster = video.dataset.poster;
   };
+  /* The build writes each <source> as data-src: WebKit froze 2-3 s after
+     load with 37 sources (USA & Canada). A fresh <source> resumes selection
+     under preload="none"; load() makes Chromium fetch the whole clip. */
+  var attachSource = function (video, playing) {
+    var source = video.querySelector('source[data-src]');
+    if (!source || source.getAttribute('src') || (video.__detached && !playing)) return;
+    var fresh = source.cloneNode();
+    fresh.setAttribute('src', source.getAttribute('data-src'));
+    video.replaceChild(fresh, source);
+    video.__detached = false;
+  };
+  /* Leaving drops a running download; only playback reattaches it. */
+  var detachSource = function (video) {
+    var source = video.querySelector('source[src]');
+    if (!source || video.networkState !== 2 || video.readyState > 3) return;
+    video.__detached = true;
+    source.removeAttribute('src');
+    video.load();
+  };
+  var warmAnimation = function (video, playing) {
+    revealPoster(video);
+    attachSource(video, playing);
+  };
   if (journalAnimations.length) {
     if ('IntersectionObserver' in window) {
       var animationWarmup = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
-          if (entry.isIntersecting) revealPoster(entry.target);
+          if (entry.isIntersecting) warmAnimation(entry.target);
         });
       }, { rootMargin: posterAhead });
+      /* Play (and download) after 300ms at half visible: one pixel let a
+         swipe start every clip it passed (Europe: 0.8 MB, Nov 2026). */
       var animationPlayback = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
-          entry.target.__nearViewport = entry.isIntersecting;
-          syncAnimation(entry.target);
+          var video = entry.target;
+          clearTimeout(video.__dwell);
+          if (entry.intersectionRatio >= 0.5) {
+            video.__dwell = setTimeout(function () {
+              warmAnimation(video, true);
+              video.__nearViewport = true;
+              syncAnimation(video);
+            }, 300);
+          } else if (!entry.isIntersecting) {
+            video.__nearViewport = false;
+            syncAnimation(video);
+            detachSource(video);
+          }
         });
-      });
+      }, { threshold: [0, 0.5] });
       journalAnimations.forEach(function (video) { animationWarmup.observe(video); animationPlayback.observe(video); });
     } else {
-      journalAnimations.forEach(function (video) { video.__nearViewport = true; revealPoster(video); });
+      journalAnimations.forEach(function (video) { video.__nearViewport = true; warmAnimation(video); });
       syncAnimationPreference();
     }
     reducedMotion.addEventListener('change', syncAnimationPreference);
@@ -510,8 +546,8 @@
       handOffFocusBeforeHiding(viewerImage);
       viewerImage.hidden = true;
       viewerVideo.hidden = false;
-      viewerVideo.src = source.currentSrc || source.querySelector('source').src;
-      revealPoster(source);
+      warmAnimation(source);
+      viewerVideo.src = source.currentSrc || source.querySelector('source').getAttribute('data-src');
       viewerVideo.poster = source.poster;
       if (reducedMotion.matches) viewerVideo.pause();
       else {
@@ -909,7 +945,7 @@
         var tile = tiles[state.nearest + offset];
         var media = tile && tile.querySelector('img, video');
         if (!media) return;
-        if (media.tagName === 'VIDEO') revealPoster(media);
+        if (media.tagName === 'VIDEO') warmAnimation(media);
         else {
           warmImage(media);
           if (!offset) media.fetchPriority = 'auto';
@@ -1023,7 +1059,7 @@
       return galleryMedia.filter(function (media) {
         if ((media.tagName === 'VIDEO') !== isVideo) return false;
         var source = media.querySelector('source');
-        return tail.test([media.getAttribute('src'), media.getAttribute('srcset'), source && source.getAttribute('src'), media.getAttribute('data-poster')].join(' '));
+        return tail.test([media.getAttribute('src'), media.getAttribute('srcset'), source && source.getAttribute('data-src'), media.getAttribute('data-poster')].join(' '));
       })[0] || null;
     },
     open: function (media, onClose) {
