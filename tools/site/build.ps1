@@ -1243,8 +1243,10 @@ foreach ($page in $pages) {
     # Nov 2026: only pages whose first screen is body text preload Merriweather.
     # On the homepage it starts ~1400px down; on the photo-led pages (journals,
     # Travel, Personal, House, Prewed) the 44 KB font shared the slow link with
-    # the CSS and banner, and dropping it cut phone LCP by 0.2-0.4 s on slow 4G
-    # with no layout shift (fonts use swap).
+    # the CSS and banner, and dropping it cut phone LCP by 0.2-0.4 s on slow 4G.
+    # Swapping in later rewrapped the Silicon Valley lede and pushed its banner
+    # 25px down (CLS 0.056); the size-adjusted "Merriweather Fallback" in
+    # main.css keeps the pre-swap lines in step.
     if ($bodyFontPreloadPages -contains $slug) { $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/merriweather-300-latin.woff2" as="font" type="font/woff2" crossorigin />' }
     if ($tripOrder -contains $slug) { $preloadMarkup += "`n" + '    <link rel="preload" href="assets/fonts/raleway-400-latin.woff2" as="font" type="font/woff2" crossorigin />' }
     if ($bannerPreload) { $preloadMarkup += "`n" + $bannerPreload }

@@ -959,7 +959,7 @@ svg.ag-scene .ag-q1 .ag-qk { opacity: 0; }
 .sp-brand--m .sp-m-chip { opacity: 0; }
 /* One plain note per step, in the anomaly cards' note style; each
    fades in just after its step arrives and holds in the final frame. */
-.sp-brand--m .sp-m-note { font-family: "Merriweather", Georgia, serif; font-size: 13px; font-weight: 300; fill: #596273; }
+.sp-brand--m .sp-m-note { font-family: "Merriweather", "Merriweather Fallback", Georgia, serif; font-size: 13px; font-weight: 300; fill: #596273; }
 .is-playing .sp-brand--m .sp-m-note-1 { animation: sp-m-reveal 0.5s 1.95s both; }
 .is-playing .sp-brand--m .sp-m-note-2 { animation: sp-m-reveal 0.5s 4.35s both; }
 .is-playing .sp-brand--m .sp-m-note-3 { animation: sp-m-reveal 0.5s 5.75s both; }
@@ -1115,7 +1115,7 @@ svg.ag-scene .ag-q1 .ag-qk { opacity: 0; }
 .lgab-scene--m .lgab-m-t { font-size: 13.5px; }
 .lgab-scene--m .lgab-m-s { font-size: 12.5px; }
 .lgab-scene--m .lgab-m-arm { font-size: 14px; }
-.lgab-scene--m .lgab-m-note { font-family: "Merriweather", Georgia, serif; font-size: 13px; font-weight: 300; fill: #596273; }
+.lgab-scene--m .lgab-m-note { font-family: "Merriweather", "Merriweather Fallback", Georgia, serif; font-size: 13px; font-weight: 300; fill: #596273; }
 .lgab-scene--m .lgab-m-tx-a { transform: translateX(121.357px); }
 .lgab-scene--m .lgab-m-tx-b { transform: translateX(146.714px); }
 .is-playing .lgab-scene--m .lgab-m-tx-a { animation: lgab-m-tx-a 3.868s cubic-bezier(0.25,0.25,0.7,1) 1.232s both, lgab-show .6s ease 1.832s both; }
@@ -1137,7 +1137,7 @@ svg.ag-scene .ag-q1 .ag-qk { opacity: 0; }
    viewBox is 360x144. Base styles are the final frame; each note fades in
    just after its step arrives, on the phone's timings. */
 .internship-demo-card__plot > svg.sp-brand:not(.sp-brand--m) { aspect-ratio: 360 / 144; }
-svg.sp-brand:not(.sp-brand--m) .sp-d-note { font-family: "Merriweather", Georgia, serif; font-size: 11.14px; font-weight: 300; fill: #596273; }
+svg.sp-brand:not(.sp-brand--m) .sp-d-note { font-family: "Merriweather", "Merriweather Fallback", Georgia, serif; font-size: 11.14px; font-weight: 300; fill: #596273; }
 .is-playing svg.sp-brand:not(.sp-brand--m) .sp-d-note-1 { animation: sp-d-note-in 0.5s 1.95s both; }
 .is-playing svg.sp-brand:not(.sp-brand--m) .sp-d-note-2 { animation: sp-d-note-in 0.5s 4.35s both; }
 .is-playing svg.sp-brand:not(.sp-brand--m) .sp-d-note-3 { animation: sp-d-note-in 0.5s 5.75s both; }
@@ -1169,7 +1169,7 @@ svg.league-brand-scene:not(.league-brand-scene--m) .lg-d-note { font-family: Mer
    rocking and Measure's with B's win, both taken from league-ab-motion.py. */
 .internship-demo-card__plot > svg.lgab-scene:not(.lgab-scene--m) { aspect-ratio: 360 / 160; }
 svg.lgab-scene:not(.lgab-scene--m) .lgab-cap text { font-size: 11px; }
-svg.lgab-scene:not(.lgab-scene--m) .lgab-d-note { font-family: "Merriweather", Georgia, serif; font-size: 9.8px; font-weight: 300; fill: #596273; }
+svg.lgab-scene:not(.lgab-scene--m) .lgab-d-note { font-family: "Merriweather", "Merriweather Fallback", Georgia, serif; font-size: 9.8px; font-weight: 300; fill: #596273; }
 .is-playing svg.lgab-scene:not(.lgab-scene--m) .lgab-d-note-1 { animation: lgab-d-show .5s ease 0.65s both; }
 .is-playing svg.lgab-scene:not(.lgab-scene--m) .lgab-d-note-2 { animation: lgab-d-show .6s ease 5.2s both; }
 @keyframes lgab-d-show { from { opacity: 0; } to { opacity: 1; } }

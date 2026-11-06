@@ -95,16 +95,19 @@
   }
 
   /* The first frame is the one on screen, so it loads at high priority and
-     the hidden frames at low. Chrome raises any laid-out image in the viewport
-     to high, even hidden or at opacity 0, so a hidden frame downloads through
-     a detached image and gets its sources back once that arrives (Nov 2026). */
+     the frames after the next at low. Chrome raises any laid-out image in the
+     viewport to high, even hidden or at opacity 0, so those download through
+     a detached image and get their sources back once that arrives (Nov 2026).
+     The next frame loads in place: it is due two seconds after activation, and
+     handed back that way Chrome logged its fade-in as a new, larger LCP (the
+     opened Cats card, 2.1 s to 5.6 s on slow 4G; frames 3-5 were not). */
   function warmGallery(event) {
     if (!event || event.dataset.galleryWarm === 'true') return;
     event.dataset.galleryWarm = 'true';
     Array.prototype.forEach.call(event.querySelectorAll('.personal-event-card__image--slideshow img'), function (image, index) {
       var src = image.getAttribute('src');
       var srcset = image.getAttribute('srcset');
-      if (!index || image.complete || !src) {
+      if (index < 2 || image.complete || !src) {
         if (!index) image.fetchPriority = 'high';
         image.loading = 'eager';
         return;
@@ -125,6 +128,27 @@
       probe.src = src;
     });
   }
+
+  /* A low-priority frame can still be on its way when its crossfade starts:
+     on slow 4G the Cats card faded its first photo out to an empty frame for
+     ~0.75 s and the second popped in unfaded (Nov 2026). Each frame's fade-in
+     fires animationstart at opacity 0, so hold the whole slideshow there until
+     that photo arrives (or fails), then let the crossfade carry on. */
+  document.addEventListener('animationstart', function (startEvent) {
+    var image = startEvent.target;
+    if (image.tagName !== 'IMG' || !image.previousElementSibling) return;
+    var slideshow = image.closest('.personal-event-card__image--slideshow');
+    if (!slideshow || (image.getAttribute('src') && image.complete)) return;
+    slideshow.classList.add('is-awaiting-frame');
+    var resume = function () {
+      if (!image.getAttribute('src') || !image.complete) return;
+      image.removeEventListener('load', resume);
+      image.removeEventListener('error', resume);
+      slideshow.classList.remove('is-awaiting-frame');
+    };
+    image.addEventListener('load', resume);
+    image.addEventListener('error', resume);
+  });
 
   var details = Array.prototype.slice.call(
     timeline.querySelectorAll('.personal-event-card__body > span:not(.personal-event-card__meta)')

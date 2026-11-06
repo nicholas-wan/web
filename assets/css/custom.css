@@ -15,7 +15,7 @@
   --color-border: #e1e7e9;
   --color-border-soft: #e5eaeb;
   --font-display: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
-  --font-body: "Merriweather", Georgia, serif;
+  --font-body: "Merriweather", "Merriweather Fallback", Georgia, serif;
   --font-typewriter: "Courier New", Courier, monospace;
   --radius-card: 0.75rem;
   --radius-compact: 0.5rem;
@@ -7444,6 +7444,11 @@ body.lightbox-open {
 .personal-event-card__image--slideshow img:first-child {
   position: relative;
   opacity: 1;
+}
+
+/* personal-timeline.js holds the crossfade while the incoming frame loads. */
+.personal-event-card__image--slideshow.is-awaiting-frame img {
+  animation-play-state: paused;
 }
 
 @media (hover: hover) and (pointer: fine) {

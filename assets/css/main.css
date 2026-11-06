@@ -143,6 +143,47 @@
   descent-override: 27.3%;
   line-gap-override: 0%;
 }
+/* Size-adjusted Georgia for the body stack. Only text-first pages preload
+   Merriweather, so on photo-led pages slow phones paint the first screen in
+   the fallback and swap ~1.4 s later; plain Georgia set the Silicon Valley
+   lede 5% narrower, so it rewrapped from two lines to three and pushed the
+   banner down 25px (CLS 0.056, Nov 2026). Widths are the site's own
+   Merriweather text measured against Georgia in Chromium (300: 105.1%, 700:
+   95.6%, 300 italic: 97.3%); 300 is set to 105.8%, the middle of the
+   105.5-106% band where the fewest first-screen blocks rewrap across 15 pages
+   at 360-430px (2, against 10 at 105.1% and 16 for plain Georgia). Ascent and
+   descent are Merriweather's (1968/546 of 2000). Android has no Georgia and
+   keeps the plain stack. */
+@font-face {
+  font-family: "Merriweather Fallback";
+  font-style: normal;
+  font-weight: 100 500;
+  src: local("Georgia");
+  size-adjust: 105.8%;
+  ascent-override: 98.4%;
+  descent-override: 27.3%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Fallback";
+  font-style: normal;
+  font-weight: 600 900;
+  src: local("Georgia Bold"), local("Georgia-Bold");
+  size-adjust: 95.6%;
+  ascent-override: 98.4%;
+  descent-override: 27.3%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: "Merriweather Fallback";
+  font-style: italic;
+  font-weight: 100 500;
+  src: local("Georgia Italic"), local("Georgia-Italic");
+  size-adjust: 97.3%;
+  ascent-override: 98.4%;
+  descent-override: 27.3%;
+  line-gap-override: 0%;
+}
 /* Raleway 400 normal latin-ext */
 @font-face {
   font-family: "Raleway";
@@ -266,7 +307,7 @@ body {
 }
 
 body, select {
-	font-family: "Merriweather", Georgia, serif;
+	font-family: "Merriweather", "Merriweather Fallback", Georgia, serif;
 	font-weight: 300;
 	font-size: 1rem;
 	line-height: 2.375;
