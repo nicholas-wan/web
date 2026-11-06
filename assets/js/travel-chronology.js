@@ -342,19 +342,21 @@
  viewer.addEventListener('close',()=>{clearInterval(loop);box.replaceChildren();});
 })();
 
-/* Keep photos outside the reading area inert, including the hidden presentation. */
+/* Keep photos outside the reading area inert, including the hidden presentation.
+   After load they start one screen ahead (at 200px, iPhone list photos were blank 3-5% of their time on
+   slow 4G); before load, 200px, as a screen ahead added ~80 KB alongside the opening photos (Nov 2026). */
 (() => {
- const images=new Set(document.querySelectorAll('img[data-journal-src]'));
+ const images=new Set(document.querySelectorAll('img[data-journal-src]')),ahead=()=>document.readyState==='complete'?innerHeight:200;
  // Measure every pending photo before loading any, so the writes cannot force a layout per photo.
- function warm(){[...images].filter(img=>{if(!img.isConnected||!img.dataset.journalSrc){observer.unobserve(img);images.delete(img);return false;}const r=img.getBoundingClientRect();return r.width&&r.top<=innerHeight+200&&r.bottom>=-200&&getComputedStyle(img).visibility!=='hidden';}).forEach(img=>{
+ function warm(){[...images].filter(img=>{if(!img.isConnected||!img.dataset.journalSrc){observer.unobserve(img);images.delete(img);return false;}const r=img.getBoundingClientRect();return r.width&&r.top<=innerHeight+ahead()&&r.bottom>=-ahead()&&getComputedStyle(img).visibility!=='hidden';}).forEach(img=>{
   img.classList.add('journal-photo-pending');const done=()=>{img.classList.remove('journal-photo-pending');if(!img.naturalWidth)img.classList.add('journal-photo-failed');};img.addEventListener('load',done,{once:true});img.addEventListener('error',done,{once:true});
   if(img.dataset.journalSrcset)img.srcset=img.dataset.journalSrcset;
   img.src=img.dataset.journalSrc;delete img.dataset.journalSrc;delete img.dataset.journalSrcset;observer.unobserve(img);images.delete(img);
  });}
- const observer=new IntersectionObserver(warm,{rootMargin:'200px'});images.forEach(img=>observer.observe(img));
+ const observer=new IntersectionObserver(warm,{rootMargin:'100%'});images.forEach(img=>observer.observe(img));
  const grid=document.querySelector('.travel-grid');
  new MutationObserver(()=>{grid.querySelectorAll('img[data-journal-src]').forEach(img=>{if(!images.has(img)){images.add(img);observer.observe(img);}});warm();}).observe(grid,{subtree:true,childList:true,attributes:true,attributeFilter:['class']});
- let frame=0;window.addEventListener('resize',()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;warm();});});warm();
+ let frame=0;window.addEventListener('resize',()=>{if(!frame)frame=requestAnimationFrame(()=>{frame=0;warm();});});addEventListener('load',warm);warm();
 })();
 
 /* CSS backgrounds ignore loading=lazy: attach the full vector map on approach. */
