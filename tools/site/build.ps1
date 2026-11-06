@@ -99,6 +99,17 @@ function Get-SourceImageInfo([string]$Path, [hashtable]$Index) {
     return $Index[[IO.Path]::GetFullPath($Path).ToLowerInvariant()]
 }
 
+# The -480/-800 tiers of a JPEG original are WebP when make-responsive-variants.py
+# --webp-tiers found them a tenth smaller at the JPEG tiers' SSIM (5 Nov 2026,
+# owner-approved; the original stays JPEG). It switches a photo's tiers together,
+# so one suffix covers both, and photo-search.js can swap -480. for -800.
+function Get-TileVariantSuffix([string]$Path, [hashtable]$Index) {
+    if ($Path -match '\.webp$') { return '.webp' }
+    $stem = [IO.Path]::Combine([IO.Path]::GetDirectoryName($Path), [IO.Path]::GetFileNameWithoutExtension($Path))
+    if ((Get-SourceImageInfo ($stem + '-480.webp') $Index) -or (Get-SourceImageInfo ($stem + '-800.webp') $Index)) { return '.webp' }
+    return '.jpg'
+}
+
 function Get-CachedImageDimensions([string]$Path, [hashtable]$SourceIndex) {
     $info = Get-SourceImageInfo $Path $SourceIndex
     if (-not $info) { return $null }
@@ -191,10 +202,11 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                 # back to a webp replacement must look for -480.webp, not -480.jpg.
                 # .jpeg sources keep the historical -480.jpg naming.
                 $variantSuffix = if ($path -match '\.webp$') { '.webp' } else { '.jpg' }
+                $tileSuffix = Get-TileVariantSuffix $path $SourceIndex
                 $originalSource = "$($srcMatch.Groups[1].Value) $($dimensions.Width)w"
                 $sources = @()
-                $variant480 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-480' + $variantSuffix))
-                $variant800 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-800' + $variantSuffix))
+                $variant480 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-480' + $tileSuffix))
+                $variant800 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-800' + $tileSuffix))
                 $has480 = $dimensions.Width -gt 480 -and [bool](Get-SourceImageInfo $variant480 $SourceIndex)
                 $has800 = $dimensions.Width -gt 800 -and [bool](Get-SourceImageInfo $variant800 $SourceIndex)
                 # Journal banners carry a -1200 tier: their truthful 100vw phone
@@ -203,11 +215,11 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                 $variant1200 = [IO.Path]::Combine([IO.Path]::GetDirectoryName($path), ([IO.Path]::GetFileNameWithoutExtension($path) + '-1200' + $variantSuffix))
                 $has1200 = $has800 -and $dimensions.Width -gt 1200 -and [bool](Get-SourceImageInfo $variant1200 $SourceIndex)
                 if ($has480) {
-                    $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-480' + $variantSuffix)) 480w"
+                    $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-480' + $tileSuffix)) 480w"
                 }
                 if (-not $has480) { $sources += $originalSource }
                 if ($has800) {
-                    $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-800' + $variantSuffix)) 800w"
+                    $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-800' + $tileSuffix)) 800w"
                 }
                 if ($has1200) {
                     $sources += "$($srcMatch.Groups[1].Value -replace '\.(jpg|jpeg|webp)$', ('-1200' + $variantSuffix)) 1200w"
@@ -842,9 +854,12 @@ function Get-JournalPhotoEntries([string]$Markup, $Journal, [hashtable]$PhotoTag
             $dimensionSource = $poster
         } else {
             $thumb = $src
-            $variantSuffix = if ($src -match '\.webp$') { '.webp' } else { '.jpg' }
-            $variant480 = ($src -replace '\.[A-Za-z0-9]+$', '') + '-480' + $variantSuffix
-            if (Resolve-SourceImagePath $variant480) { $thumb = $variant480 }
+            # A JPEG's -480 tier is WebP where --webp-tiers replaced it (Get-TileVariantSuffix).
+            $variantSuffixes = if ($src -match '\.webp$') { @('.webp') } else { @('.webp', '.jpg') }
+            foreach ($variantSuffix in $variantSuffixes) {
+                $variant480 = ($src -replace '\.[A-Za-z0-9]+$', '') + '-480' + $variantSuffix
+                if (Resolve-SourceImagePath $variant480) { $thumb = $variant480; break }
+            }
             $dimensionSource = $src
         }
         $dimensionPath = Resolve-SourceImagePath $dimensionSource
@@ -898,7 +913,9 @@ foreach ($entry in $photoEntries) {
     # Custom search crops and video posters never switch to a different image.
     $variants = 0
     $srcset = ''
-    if (-not $entry.Video -and $entry.Width -gt 480 -and $entry.Thumb -ceq ($entry.Src -replace '(\.[^.]+)$', '-480$1')) {
+    # .jpeg photos (tiers named -480.jpg) never matched the old same-extension test
+    # and keep their single thumb; a JPEG's -480 may be WebP (Get-TileVariantSuffix).
+    if (-not $entry.Video -and $entry.Width -gt 480 -and $entry.Src -cmatch '\.(?:jpg|webp)$' -and $entry.Thumb -cmatch '-480\.(?:jpg|webp)$' -and ($entry.Thumb -creplace '\.[^.]+$', '') -ceq (($entry.Src -creplace '\.[^.]+$', '') + '-480')) {
         $thumbDimensions = Get-CachedImageDimensions (Resolve-SourceImagePath $entry.Thumb) $script:sourceImageIndex
         if ($thumbDimensions.Width -eq 480) {
             $variants = 1

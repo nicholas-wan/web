@@ -211,6 +211,13 @@ foreach ($page in $pages) {
             $candidatePath = ($candidate.Trim() -split '\s+')[0]
             if ($candidatePath) { $references.Add($candidatePath) }
         }
+        # JPEG photos' -480/-800 tiers are WebP where make-responsive-variants.py
+        # --webp-tiers made them (5 Nov 2026): never mixed, never a .jpg beside its .webp.
+        $tierExtensions = @([regex]::Matches($match.Groups[1].Value, '-(?:480|800)\.(jpg|webp) (?:480|800)w') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+        if ($tierExtensions.Count -gt 1) { throw "$($page.Name) mixes JPEG and WebP -480/-800 tiers in one srcset: $($match.Groups[1].Value)" }
+        foreach ($jpegTier in [regex]::Matches($match.Groups[1].Value, '(images/[^\s,]+-(?:480|800))\.jpg (?:480|800)w')) {
+            if (Test-Path -LiteralPath (Join-Path $root (($jpegTier.Groups[1].Value + '.webp') -replace '/', '\'))) { throw "$($page.Name) serves $($jpegTier.Groups[1].Value).jpg although its WebP tier exists." }
+        }
     }
     foreach ($reference in $references) {
         if ($reference -match '^(https?:|//|mailto:|javascript:)') { continue }
@@ -436,7 +443,9 @@ for ($i = 0; $i -lt $photoIndex.photos.Count; $i++) {
     $photo = $photoIndex.photos[$i]
     $flag = $photoIndex.variants.Substring($i, 1)
     if ($flag -eq '0') { continue }
-    if ($photo.video -or $photo.w -le 480 -or $photo.thumb -cne ($photo.src -replace '(\.[^.]+)$', '-480$1')) { throw "Unsafe responsive photo: $($photo.id)" }
+    # A JPEG photo's -480 thumb may be its WebP tier (5 Nov 2026); the base must still match.
+    if ($photo.video -or $photo.w -le 480 -or $photo.src -cnotmatch '\.(?:jpg|webp)$' -or $photo.thumb -cnotmatch '-480\.(?:jpg|webp)$' -or ($photo.thumb -creplace '\.[^.]+$', '') -cne (($photo.src -creplace '\.[^.]+$', '') + '-480')) { throw "Unsafe responsive photo: $($photo.id)" }
+    if ($photo.src -cmatch '\.webp$' -and $photo.thumb -cnotmatch '\.webp$') { throw "A WebP photo must keep a WebP -480 thumb: $($photo.id)" }
     if ($flag -eq '2' -and -not (Test-Path -LiteralPath (Join-Path $dist ($photo.thumb -replace '-480\.', '-800.')))) { throw "Missing responsive sibling: $($photo.id)" }
 }
 $coverReviews = Get-Content -LiteralPath (Join-Path $root 'journals/explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -590,15 +599,18 @@ $siliconValley = Get-Content -LiteralPath (Join-Path $dist 'travel_2019_siliconv
 $germany = Get-Content -LiteralPath (Join-Path $dist 'travel_2024_germany.html') -Raw -Encoding UTF8
 $seoul = Get-Content -LiteralPath (Join-Path $dist 'travel_2017_seoul.html') -Raw -Encoding UTF8
 $responsiveJournalMarkup = @($europe, $perth, $siliconValley, $germany, $guangzhou) -join "`n"
-$expectedMobileJpegs = @(
-    'ALCATRAZ', 'MARIN_cliff', 'MARIN_cliff_jump', 'MONTEREY_stars',
-    'departure3', 'switzerland5', 'perth_bg', 'dusseldorf1',
-    'dusseldorf3', 'dusseldorf5', 'kalkarfood1', 'canton-tower-frame'
-)
-foreach ($responsiveBase in $expectedMobileJpegs) {
-    if ($responsiveJournalMarkup -notmatch ([regex]::Escape("$responsiveBase-480.jpg") + ' 480w')) { throw "Journal responsive coverage is missing $responsiveBase-480.jpg." }
+# JPEG originals' tiers are WebP since 5 Nov 2026; perth_bg is a banner and
+# dusseldorf3's WebP saved under a tenth, so both keep JPEG tiers.
+$expectedMobileTiers = [ordered]@{
+    'ALCATRAZ' = 'webp'; 'MARIN_cliff' = 'webp'; 'MARIN_cliff_jump' = 'webp'; 'MONTEREY_stars' = 'webp'
+    'departure3' = 'webp'; 'switzerland5' = 'webp'; 'perth_bg' = 'jpg'; 'dusseldorf1' = 'webp'
+    'dusseldorf3' = 'jpg'; 'dusseldorf5' = 'webp'; 'kalkarfood1' = 'webp'; 'canton-tower-frame' = 'webp'
 }
-if ([regex]::Matches($japan, '<img\b[^>]*\bsrcset="[^"]*-480\.webp 480w').Count -ne 10 -or [regex]::Matches($germany, '<img\b[^>]*\bsrcset="[^"]*-480\.webp 480w').Count -ne 1) { throw "Japan and Germany must retain responsive variants for their static curated WebPs." }
+foreach ($responsiveBase in $expectedMobileTiers.Keys) {
+    $responsiveTier = "$responsiveBase-480.$($expectedMobileTiers[$responsiveBase])"
+    if ($responsiveJournalMarkup -notmatch ([regex]::Escape($responsiveTier) + ' 480w')) { throw "Journal responsive coverage is missing $responsiveTier." }
+}
+if ([regex]::Matches($japan, '<img\b(?=[^>]*\ssrc="[^"]+\.webp")[^>]*\bsrcset="[^"]*-480\.webp 480w').Count -ne 10 -or [regex]::Matches($germany, '<img\b(?=[^>]*\ssrc="[^"]+\.webp")[^>]*\bsrcset="[^"]*-480\.webp 480w').Count -ne 1) { throw "Japan and Germany must retain responsive variants for their static curated WebPs." }
 $journalDates = [ordered]@{
     'travel_2017_seoul.html' = '18 December 2017 &ndash; 26 December 2017'
     'travel_2019_siliconvalley.html' = 'August 2019 &ndash; April 2020'
@@ -766,9 +778,11 @@ $personalCardSizes = '(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (m
 # Two-up sparse days (328px tiles) keep 20vw.
 $journalTileSizes = '(max-width: 736px) 160px, (max-width: 1179px) 20vw, (max-width: 1365px) 224px, (max-width: 1680px) 240px, 325px'
 if ($japan -notmatch ('sizes="' + [regex]::Escape($journalTileSizes) + '"') -or $perth -notmatch '(?s)masonry mason2">(?:(?!<div class="[^"]*\bmasonry\b).)*?sizes="\(max-width: 736px\) 160px, 20vw"' -or $japan -match 'sizes="\(max-width: 736px\) (?:100vw|250px), (?:800px|20vw)"' -or $usaCanada -match 'sizes="\(max-width: 736px\) 250px, (?:800px|20vw)"') { throw "Journal gallery images must use the measured desktop tile slots with 480w phone previews." }
-if ([regex]::Matches($prewed, '<img class="content-image"[^>]*\bsizes="' + [regex]::Escape($tileSizes) + '"[^>]*\bsrcset="[^"]*-480\.jpg 480w').Count -ne 25 -or [regex]::Matches($house, '<img class="content-image"[^>]*\bsizes="' + [regex]::Escape($tileSizes) + '"[^>]*\bsrcset="[^"]*-480\.webp 480w').Count -ne 11 -or $prewed -match 'sizes="\(max-width: 736px\) 250px, 800px"' -or $house -match 'sizes="\(max-width: 736px\) 250px, 800px"') { throw "Pre-wedding and house tiles must publish -480 variants and the measured masonry sizes slot." }
+if ([regex]::Matches($prewed, '<img class="content-image"[^>]*\bsizes="' + [regex]::Escape($tileSizes) + '"[^>]*\bsrcset="[^"]*-480\.(?:jpg|webp) 480w').Count -ne 25 -or [regex]::Matches($house, '<img class="content-image"[^>]*\bsizes="' + [regex]::Escape($tileSizes) + '"[^>]*\bsrcset="[^"]*-480\.webp 480w').Count -ne 11 -or $prewed -match 'sizes="\(max-width: 736px\) 250px, 800px"' -or $house -match 'sizes="\(max-width: 736px\) 250px, 800px"') { throw "Pre-wedding and house tiles must publish -480 variants and the measured masonry sizes slot." }
 if ([regex]::Matches($personal, '<img src="images/(?:personal|brawlstars)/[^"]+"[^>]*\bsizes="' + [regex]::Escape($personalCardSizes) + '"[^>]*\bsrcset="[^"]*-480\.(?:jpg|webp) 480w').Count -ne 20 -or $personal -match 'sizes="\(max-width: 736px\) 250px, 800px"') { throw "Personal timeline cards must publish -480 variants and the measured card image slot." }
-if ([regex]::Matches($usaCanada, '-480\.jpg 480w').Count -lt 150 -or [regex]::Matches($perth, '-480\.jpg 480w').Count -lt 80 -or [regex]::Matches($europe, '-480\.jpg 480w').Count -lt 50) { throw "Journal galleries must publish -480 variants so the 20vw slot has a 1x source (run tools/images/make-responsive-variants.py)." }
+if ([regex]::Matches($usaCanada, '-480\.(?:jpg|webp) 480w').Count -lt 150 -or [regex]::Matches($perth, '-480\.(?:jpg|webp) 480w').Count -lt 80 -or [regex]::Matches($europe, '-480\.(?:jpg|webp) 480w').Count -lt 50) { throw "Journal galleries must publish -480 variants so the 20vw slot has a 1x source (run tools/images/make-responsive-variants.py)." }
+# 5 Nov 2026: most tiers are WebP (194, 101 and 65 at the switch); falling below means they were lost.
+if ([regex]::Matches($usaCanada, '-480\.webp 480w').Count -lt 180 -or [regex]::Matches($perth, '-480\.webp 480w').Count -lt 90 -or [regex]::Matches($europe, '-480\.webp 480w').Count -lt 60) { throw "Journal galleries lost their WebP -480 tiers (run tools/images/make-responsive-variants.py --webp-tiers)." }
 # Poster attributes are fetched at page load even under preload="none" (37 stills,
 # ~1.5 MB on USA/Canada). The build moves them to data-poster and gallery.js attaches
 # each poster as the animation nears the viewport; travel-map.js reads either form.
@@ -950,7 +964,7 @@ if ($personalTimelineJs -notmatch '(?s)if \(singleRail\.matches\)\s*\{[^}]*folde
 if ($customCss -notmatch '(?s)\.personal-timeline-event \.personal-event-card\s*\{\s*transform: translate\(var\(--card-enter-x') { throw "Card entrance, hover lift, and reading-focus scale must share one composed transform." }
 if ($customCss -notmatch '(?s)max-height:\s*var\(--detail-height, none\)' -or $personalTimelineJs -notmatch 'scrollHeight' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?\.personal-event-card__body,\s*\.personal-timeline\.is-enhanced \.personal-event-card__body > span:not\(\.personal-event-card__meta\),\s*\.personal-event-card__body > strong\s*\{[^}]*transition:\s*none;' -or $customCss -notmatch '(?s)@media screen and \(max-width: 520px\).*?\.personal-event-card__image\s*\{[^}]*aspect-ratio:\s*16\s*/\s*9;[^}]*transition:\s*none;' -or $personalTimelineJs -notmatch 'MAX_FOCUS_ANIMATION_VELOCITY = 0\.85' -or $personalTimelineJs -notmatch 'Math\.abs\(previousIndex - nextIndex\) !== 1' -or $personalTimelineJs -notmatch "classList\.add\('is-focus-revealing'\)" -or $customCss -notmatch '(?s)\.personal-timeline-event\.is-focus-flipping\s*\{[^}]*transform:\s*translate3d\(0, var\(--focus-flip-y[^}]*transition:\s*none;' -or $customCss -notmatch '(?s)\.personal-timeline-event\.is-focus-revealing \.personal-event-card\s*\{[^}]*clip-path:\s*inset\(0 0 var\(--focus-reveal-bottom' -or $customCss -notmatch '(?s)\.personal-timeline-event\.is-focus-flipping\.is-focus-flipping-active\s*\{[^}]*transition:\s*transform 0\.18s') { throw "Phone focus handoffs must keep layout atomic, limit animation to slow adjacent swaps, and reveal the incoming card without stretching its text." }
 if ($personalTimelineJs -match 'data-story|scheduleAutoplay|activeSlides|personal-story' -or $personal -match 'data-story|personal-story-dialog|orientation-memory|data-slide-duration' -or $customCss -match 'personal-story|orientation-memory') { throw "Retired personal-memory modal code was reintroduced." }
-if ($personal -notmatch '(?s)personal-event-card__image--slides-2.*?nova-800\.jpg.*?gamora-800\.jpg.*?<span class="personal-event-card__meta">23 &ndash; 31 July 2018 &middot; Community</span>.*?<strong>Orientation Group Leader</strong>') { throw "Orientation must be a self-contained two-photo timeline gallery." }
+if ($personal -notmatch '(?s)personal-event-card__image--slides-2.*?nova-800\.webp.*?gamora-800\.webp.*?<span class="personal-event-card__meta">23 &ndash; 31 July 2018 &middot; Community</span>.*?<strong>Orientation Group Leader</strong>') { throw "Orientation must be a self-contained two-photo timeline gallery." }
 if ($personal -notmatch '(?s)<a class="personal-event-card personal-event-card--cats[^"]*" href="https://www\.instagram\.com/twoshotsofcuteness/" target="_blank" rel="noopener noreferrer">.*?class="icon fa fa-instagram".*?>View Instagram <span aria-hidden="true">&#8599;</span>' -or $personal -match 'data-cats-preview-toggle|cats-instagram-preview|cats-instagram-phone-screen|class="instagram-media"|instagram\.com/embed\.js|data-story-open="cats"|data-story="cats"|href="cats"') { throw "The cats timeline event must be a direct, icon-labelled external Instagram link without hover previews or embeds." }
 if ($personal -notmatch 'images/personal/cats-banner\.webp' -or (Test-Path -LiteralPath (Join-Path $dist 'images\personal\cats-instagram-profile.webp'))) { throw "The cats event must keep its optimized banner and publish no Instagram screenshot." }
 foreach ($catsAsset in @('cats-banner.webp', 'cats-2.webp', 'cats-3.webp', 'cats-4.webp', 'cats-5.webp')) {
