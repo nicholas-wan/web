@@ -7,11 +7,29 @@ banners. It also closes complete journal responsive-coverage gaps when a
 smaller variant reduces transferred bytes, and adds the -1200 journal-banner
 tier (--banners-only runs just that step). Animated WebPs are intentionally
 left unchanged.
+
+--webp-tiers (5 Nov 2026, owner-approved) replaces the -480.jpg/-800.jpg tiers
+of JPEG originals with -480.webp/-800.webp, which build.ps1 then prefers. Each
+tier is resized from the original exactly like its JPEG (RGB, LANCZOS, the
+JPEG's own dimensions and ICC profile) and encoded at the lowest WebP quality
+whose luma SSIM against the uncompressed resize is at least the JPEG tier's
+own. An original switches only when every one of its tiers comes out at most
+WEBP_TIER_MAX_RATIO of the JPEG's bytes, so a photo never mixes .webp and .jpg
+tiers. Journal banners, WebP-overlaid and animated originals are skipped, and
+originals are never re-encoded. The run then deletes each replaced JPEG tier
+that no tracked source names (og images and unreviewed explore-covers.json
+thumbnails keep theirs); rerun it after updating those to prune the rest. Pass
+--report <csv> to record the per-tier qualities, sizes and SSIMs. Needs
+scikit-image.
 """
 import argparse
+import csv
+import io
 import json
 import re
 import os
+import subprocess
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from PIL import Image
@@ -43,7 +61,15 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--mobile-cards-only", action="store_true")
 parser.add_argument("--coverage-gaps-only", action="store_true")
 parser.add_argument("--banners-only", action="store_true")
+parser.add_argument("--webp-tiers", action="store_true")
+parser.add_argument("--report", type=Path)
 args = parser.parse_args()
+
+
+def has_tier(source: Path, width: int) -> bool:
+    """A JPEG original's tier may be a .jpg or, after --webp-tiers, a .webp."""
+    suffixes = (".webp",) if source.suffix.lower() == ".webp" else (".jpg", ".webp")
+    return any(source.with_name(source.stem + f"-{width}{suffix}").exists() for suffix in suffixes)
 
 
 def make_variant(path: Path, target_width: int, keep_only_if_smaller: bool = False,
@@ -52,6 +78,8 @@ def make_variant(path: Path, target_width: int, keep_only_if_smaller: bool = Fal
         if image.size[0] <= target_width:
             return
         target = path.with_name(path.stem + f"-{target_width}.jpg")
+        if path.with_name(path.stem + f"-{target_width}.webp").exists():
+            return
         ratio = target_width / image.size[0]
         resized = image.convert("RGB").resize(
             (target_width, round(image.size[1] * ratio)), Image.LANCZOS
@@ -111,11 +139,7 @@ def referenced_journal_sources(pages: list[Path] = JOURNAL_PAGES) -> list[tuple[
 
 def generate_missing_responsive_sets() -> None:
     for reference, source in referenced_journal_sources():
-        variant_suffix = ".webp" if source.suffix.lower() == ".webp" else ".jpg"
-        if any(
-            source.with_name(source.stem + f"-{width}{variant_suffix}").exists()
-            for width in WEBP_TARGET_WIDTHS
-        ):
+        if any(has_tier(source, width) for width in WEBP_TARGET_WIDTHS):
             continue
         with Image.open(source) as image:
             if getattr(image, "n_frames", 1) > 1:
@@ -137,10 +161,7 @@ def generate_gallery_480_variants() -> None:
     source that already has an -800 sibling a -480 one as well, kept only when
     it is genuinely smaller. Animated sources are left alone."""
     for reference, source in referenced_journal_sources(ALL_JOURNAL_PAGES):
-        variant_suffix = ".webp" if source.suffix.lower() == ".webp" else ".jpg"
-        has_800 = source.with_name(source.stem + f"-800{variant_suffix}").exists()
-        target = source.with_name(source.stem + f"-480{variant_suffix}")
-        if not has_800 or target.exists():
+        if not has_tier(source, 800) or has_tier(source, 480):
             continue
         with Image.open(source) as image:
             if getattr(image, "n_frames", 1) > 1 or image.size[0] <= 480:
@@ -188,6 +209,162 @@ def generate_banner_1200_variants() -> None:
             target.unlink()
             print(f"Skipping low-value banner variant: {target.name}")
 
+
+WEBP_TIER_WIDTHS = (480, 800)
+WEBP_TIER_MAX_RATIO = 0.9
+WEBP_TIER_QUALITY_RANGE = (50, 95)
+# Tracked text that can name an image tier directly (og images, covers, partials).
+TIER_REFERENCE_GLOBS = ("*.html", "journals/*.html", "journals/*.json", "partials/*.html",
+                        "assets/js/*.js", "assets/css/*.css", "tools/site/*.ps1")
+
+
+def journal_banner_sources() -> set[Path]:
+    banners = set()
+    for page in ALL_JOURNAL_PAGES:
+        html = page.read_text(encoding="utf-8")
+        for tag in re.findall(r'<img\b[^>]*class="[^"]*\bjournal-banner\b[^"]*"[^>]*>', html):
+            reference = re.search(r'src="(images/[^"]+)"', tag).group(1)
+            banners.add((ROOT / reference).resolve())
+    return banners
+
+
+def luma(image: Image.Image):
+    import numpy
+    return numpy.asarray(image.convert("L"), dtype=numpy.float64)
+
+
+def ssim(reference, image: Image.Image) -> float:
+    from skimage.metrics import structural_similarity
+    return structural_similarity(reference, luma(image), data_range=255)
+
+
+def plan_webp_tiers(source: Path) -> dict:
+    """Encode every JPEG tier of one original as WebP in memory; never writes."""
+    tiers = []
+    with Image.open(source) as image:
+        if getattr(image, "n_frames", 1) > 1:
+            return {"source": source, "tiers": [], "keep": False, "why": "animated"}
+        rgb = image.convert("RGB")
+    for width in WEBP_TIER_WIDTHS:
+        jpeg_path = source.with_name(source.stem + f"-{width}.jpg")
+        if not jpeg_path.exists():
+            continue
+        with Image.open(jpeg_path) as jpeg:
+            jpeg.load()
+            # A tier left over from before the original was re-cropped has another
+            # shape; matching its SSIM means nothing, so leave the photo for a person.
+            if jpeg.size[0] != width or abs(jpeg.size[1] - rgb.size[1] * width / rgb.size[0]) > 1:
+                return {"source": source, "tiers": [], "keep": False,
+                        "why": f"stale {jpeg_path.name} is {jpeg.size[0]}x{jpeg.size[1]}"}
+            icc = jpeg.info.get("icc_profile")
+            resized = rgb.resize(jpeg.size, Image.LANCZOS)
+            reference = luma(resized)
+            target = ssim(reference, jpeg)
+        options = {"method": 6}
+        if icc:
+            options["icc_profile"] = icc
+        encoded = {}
+
+        def encode(quality: int):
+            if quality not in encoded:
+                buffer = io.BytesIO()
+                resized.save(buffer, "WEBP", quality=quality, **options)
+                data = buffer.getvalue()
+                with Image.open(io.BytesIO(data)) as decoded:
+                    encoded[quality] = (data, ssim(reference, decoded))
+            return encoded[quality]
+
+        low, high = WEBP_TIER_QUALITY_RANGE
+        tier = {"width": width, "jpeg": jpeg_path, "target": target,
+                "jpeg_bytes": jpeg_path.stat().st_size, "quality": None}
+        if encode(high)[1] >= target:
+            while low < high:  # lowest quality that still matches the JPEG's SSIM
+                middle = (low + high) // 2
+                if encode(middle)[1] >= target:
+                    high = middle
+                else:
+                    low = middle + 1
+            tier["quality"] = high
+            tier["data"], tier["ssim"] = encode(high)
+        tiers.append(tier)
+    keep = bool(tiers) and all(
+        tier["quality"] is not None and len(tier["data"]) <= tier["jpeg_bytes"] * WEBP_TIER_MAX_RATIO
+        for tier in tiers
+    )
+    why = "" if keep else ("no JPEG tiers" if not tiers else "WebP not a tenth smaller at equal SSIM")
+    return {"source": source, "tiers": tiers, "keep": keep, "why": why}
+
+
+def named_tier_references() -> set[str]:
+    tracked = subprocess.run(["git", "ls-files", *TIER_REFERENCE_GLOBS], cwd=ROOT,
+                             capture_output=True, text=True, check=True).stdout.split()
+    names = set()
+    for relative in tracked:
+        text = (ROOT / relative).read_text(encoding="utf-8")
+        names.update(re.findall(r"images/[^\"'\s,)]+-(?:480|800)\.jpg", text))
+    return names
+
+
+def prune_replaced_jpeg_tiers() -> None:
+    named = named_tier_references()
+    kept = removed = 0
+    for jpeg in sorted((ROOT / "images").rglob("*.jpg")):
+        if not re.fullmatch(r".+-(?:480|800)\.jpg", jpeg.name) or not jpeg.with_suffix(".webp").exists():
+            continue
+        if jpeg.relative_to(ROOT).as_posix() in named:
+            kept += 1
+            continue
+        jpeg.unlink()
+        removed += 1
+    print(f"Removed {removed} replaced JPEG tiers; kept {kept} that a source still names.")
+
+
+def generate_webp_tiers() -> None:
+    banners = journal_banner_sources()
+    sources = set()
+    for jpeg in (ROOT / "images").rglob("*.jpg"):
+        match = re.fullmatch(r"(.+)-(?:480|800)\.jpg", jpeg.name)
+        if not match:
+            continue
+        original = next((jpeg.with_name(match.group(1) + suffix) for suffix in (".jpg", ".jpeg")
+                         if jpeg.with_name(match.group(1) + suffix).exists()), None)
+        if original is None or original.resolve() in banners:
+            continue
+        overlay = ROOT / "images-webp" / original.relative_to(ROOT / "images").with_suffix(".webp")
+        if overlay.exists() or any(original.with_name(original.stem + f"-{width}.webp").exists()
+                                   for width in WEBP_TIER_WIDTHS):
+            continue
+        sources.add(original)
+    with ThreadPoolExecutor() as pool:
+        plans = list(pool.map(plan_webp_tiers, sorted(sources)))
+    rows = []
+    for plan in plans:
+        for tier in plan["tiers"]:
+            rows.append([plan["source"].relative_to(ROOT).as_posix(), tier["width"], tier["quality"],
+                         tier["jpeg_bytes"], len(tier["data"]) if "data" in tier else "",
+                         f'{tier["target"]:.5f}', f'{tier["ssim"]:.5f}' if "ssim" in tier else "",
+                         plan["keep"]])
+            if plan["keep"]:
+                tier["jpeg"].with_suffix(".webp").write_bytes(tier["data"])
+        if not plan["keep"]:
+            print(f"Keeping JPEG tiers: {plan['source'].relative_to(ROOT)} ({plan['why']})")
+    switched = [plan for plan in plans if plan["keep"]]
+    before = sum(tier["jpeg_bytes"] for plan in switched for tier in plan["tiers"])
+    after = sum(len(tier["data"]) for plan in switched for tier in plan["tiers"])
+    print(f"WebP tiers for {len(switched)} of {len(plans)} originals: "
+          f"{before // 1024} KB of JPEG tiers -> {after // 1024} KB")
+    if args.report:
+        with open(args.report, "w", newline="", encoding="utf-8") as handle:
+            writer = csv.writer(handle)
+            writer.writerow(["source", "width", "webp_quality", "jpeg_bytes", "webp_bytes",
+                             "jpeg_ssim", "webp_ssim", "switched"])
+            writer.writerows(rows)
+    prune_replaced_jpeg_tiers()
+
+
+if args.webp_tiers:
+    generate_webp_tiers()
+    raise SystemExit
 
 if args.banners_only:
     generate_banner_1200_variants()
