@@ -29,7 +29,7 @@ npm test            # Playwright layout checks (PW_PORT=4398 if 4321 is taken: a
 
 ## Editing photos
 
-Edit under `images/` (or `images-webp/`), delete its `-480`/`-800`/`-1200` siblings, run `python .\tools\images\make-responsive-variants.py`, then `git checkout --` any sibling it re-encoded for a photo you didn't touch. Prefer a tile's `--focus-x`/`--focus-y` to cropping pixels. Log grades, crops and removals in `docs/photo-edits.csv` with their commit; removals never touch people.
+Edit under `images/` (or `images-webp/`), delete its `-480`/`-800`/`-1200` siblings (`.jpg` or `.webp`), run `python .\tools\images\make-responsive-variants.py` and then the same with `--webp-tiers`, then `git checkout --` any sibling it re-encoded for a photo you didn't touch. Prefer a tile's `--focus-x`/`--focus-y` to cropping pixels. Log grades, crops and removals in `docs/photo-edits.csv` with their commit; removals never touch people.
 
 ## Owner preferences
 
@@ -68,7 +68,8 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 
 - Banner `sizes`: `100vw` on phones, `calc(100vw - 176px)` to 1024px, `1024px` to 1680px, `1366px` above.
 - Banners get a `-1200` tier (`make-responsive-variants.py --banners-only`, q82 JPEG / q80 WebP, kept only if it saves a fifth) for DPR-3 phones. Seoul and Guangzhou are excluded (2:1 art).
-- Journal tiles use a density-capped `160px` phone slot. Desktop four-up tiles use their measured widths (`20vw` to 1179px, `224px` to 1365px, `240px` to 1680px, `325px` above; the real middle band is 244px, rounded down so 2x laptops take `-480` at 2.0x instead of `-800`, Nov 2026). Two-up sparse days keep `20vw`. Non-journal galleries keep `800px`. No images are recompressed.
+- Journal tiles use a density-capped `160px` phone slot. Desktop four-up tiles use their measured widths (`20vw` to 1179px, `224px` to 1365px, `240px` to 1680px, `325px` above; the real middle band is 244px, rounded down so 2x laptops take `-480` at 2.0x instead of `-800`, Nov 2026). Two-up sparse days keep `20vw`. Non-journal galleries keep `800px`.
+- JPEG originals' `-480`/`-800` tiers are WebP since 5 Nov 2026 (owner-approved; originals untouched). `make-responsive-variants.py --webp-tiers` encodes each at the lowest quality whose luma SSIM matches its q78 JPEG tier (median q78-80) and switches a photo only when both tiers save a tenth: 651 of 725 photos, tiers about 24% smaller (108 to 82 MB), full journal scrolls 13-23% lighter. The build prefers a `.webp` tier beside a JPEG (`Get-TileVariantSuffix`); `verify.ps1` rejects mixed or JPEG-beside-WebP srcsets. Banners and their tiers stay JPEG, as do og images (`kyoto4-800.jpg` and the banners'), the 73 photos where WebP saved too little, and `blackforest4.jpeg`, whose `-480.jpg` predates its re-crop (480x360 against a 1360x1200 original; needs a fresh tier and cover review). WebP needs Safari 14+, which the overlay already assumed.
 - The same `160px` phone cap (24 Oct 2026) applies to Browse photos postcards (`travel-seeds.js`, `travel-discovery.js`), search tiles (`photo-search.js`) and the phone journal list photos (`travel-chronology.js`). The list photos are 224px wide, so DPR-3 phones get about 2.1x density; the owner accepted that softening for roughly 460 KB less per full scroll.
 - The three Read journals shortcut photos have dedicated 200px WebP copies (`*-200.webp`, made from the originals with Pillow at q80, 24 Oct 2026, owner-approved), about 22 KB instead of 133 KB.
 - Journal animations use `data-poster`, not `poster`, which loads eagerly. `gallery.js` attaches it near the viewport; `travel-map.js` reads either.
@@ -95,6 +96,7 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 
 ```powershell
 python .\tools\images\make-responsive-variants.py
+python .\tools\images\make-responsive-variants.py --webp-tiers   # needs scikit-image
 python .\tools\images\convert-curated-webp.py
 ```
 
@@ -105,10 +107,11 @@ python .\tools\images\convert-curated-webp.py
 
 **Editing a photo:**
 
-1. Delete its `-480`/`-800`/`-1200` siblings; the tool skips existing variants. `--banners-only` restores `-1200`.
-2. The tool re-encodes every `-800`: `git checkout --` each changed sibling you did not edit.
-3. Tiles are fixed `object-fit: cover` boxes, so a crop moves the framing, not the grid. Check desktop and phone; prefer `--focus-x`/`--focus-y` for framing.
-4. Re-grab video posters from the tile's own MP4 at their existing size.
+1. Delete its `-480`/`-800`/`-1200` siblings, `.jpg` and `.webp`; the tool skips existing variants. `--banners-only` restores `-1200`.
+2. The tool re-encodes every `-800.jpg` that has no `-800.webp`: `git checkout --` each changed sibling you did not edit.
+3. Run it again with `--webp-tiers`. It turns the new JPEG tiers into WebP where that saves a tenth at equal SSIM and deletes the JPEG tiers no source names. If a Discovery cover's thumbnail changed, re-inspect its crop (see Discovery covers), update `explore-covers.json`, and rerun to prune its old `-480.jpg`.
+4. Tiles are fixed `object-fit: cover` boxes, so a crop moves the framing, not the grid. Check desktop and phone; prefer `--focus-x`/`--focus-y` for framing.
+5. Re-grab video posters from the tile's own MP4 at their existing size.
 
 ### Photo search
 
@@ -134,7 +137,7 @@ python -I .\tools\photos\seed_photo_tags.py
 ### Discovery covers
 
 - Topics: `journals/explore-themes.json`. Covers come only from the reviewed pool in `journals/explore-covers.json`, so a new search tag cannot become a cover.
-- Review each topic against the actual 8:5 card crop. Record photo id, thumbnail path, SHA-256, focal point (0–100%) and visible topics. Re-inspect a changed image's crop before updating its digest.
+- Review each topic against the actual 8:5 card crop. Record photo id, thumbnail path, SHA-256, focal point (0–100%) and visible topics. Re-inspect a changed image's crop before updating its digest. (The 601 thumbnails that became WebP on 5 Nov 2026 were checked by rendering old and new 8:5 crops at each focal point: same framing, SSIM 0.89-0.99, a sample viewed side by side.)
 - The build rejects missing photos, animations, duplicate ids, unknown topics and changed thumbnails. All covers must fit the index budget.
 - Use specific topic labels such as **bubble tea**. Keep four cards per batch and the lazy-loading budgets. Postcards show place · year, no "Photo:" prefix.
 
@@ -493,7 +496,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - **Internship peek runtime: measured, fine (25 Oct 2026, do not retry blindly).** At 4x CPU on a 1366 laptop all three scenes hold 60fps with no long frames; about 1.5-2.5s of main-thread style, layout and paint per 7.5s story. Removing either SVG filter (`spLift`, the chips' shadow; `lgMono`, the League photo's greyscale) changed nothing measurable, and with no card open the page renders no frames at all (the anomaly charts' hidden pulses do not tick).
 - **Build size: measured, no easy win (do not retry).**
   - JPEGs are q40–42; recompressing is break-even or worse (1600px cap enlarges them).
-  - JPEG→WebP refuted (net growth); only the 9 banners (q82) have headroom.
+  - JPEG→WebP refuted (net growth) for the q40–42 originals; only the 9 banners (q82) have headroom. The q78 `-480`/`-800` tiers did have headroom and became WebP on 5 Nov 2026 (see Responsive images).
   - Sep 2026 wins were selection: `20vw` slot with `-480` tiles, deferred animation posters, simplified world map, circus globe WebP → MP4.
 - **History was squashed to one commit on 22 Sep 2026.** Partial `git filter-repo` rewrites missed the ~350 MB floor; only a squash reached it.
   - Pre-squash history (all refs): `C:/Users/nicho/Projects/web-before-squash.bundle`; restore with `git clone` on it, else deletable.
