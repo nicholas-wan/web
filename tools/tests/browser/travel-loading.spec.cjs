@@ -1,4 +1,5 @@
 const {test,expect}=require('@playwright/test');
+const BASE = 'http://127.0.0.1:' + (process.env.PW_PORT || '4321'); // matches playwright.config.cjs
 test('opening layout and four postcards exist before external scripts arrive',async({page})=>{
  await page.route('**/*.js*',route=>route.abort());
  await page.goto('/travel');
@@ -42,5 +43,5 @@ test.describe('mobile reading animation',()=>{
 });
 
 test('no JavaScript retains ten visible journal covers',async({browser})=>{
- const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const page=await context.newPage();await page.goto('http://127.0.0.1:4321/travel');await expect(page.locator('.travel-card img:visible')).toHaveCount(10);await context.close();
+ const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const page=await context.newPage();await page.goto(BASE + '/travel');await expect(page.locator('.travel-card img:visible')).toHaveCount(10);await context.close();
 });

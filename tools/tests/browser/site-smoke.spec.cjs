@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const BASE = 'http://127.0.0.1:' + (process.env.PW_PORT || '4321'); // matches playwright.config.cjs
 
 test('nested missing URLs retain working assets and recovery links', async ({ page }) => {
   const failures = [];
@@ -65,7 +66,7 @@ test('DPR-3 phones use small journal tiles while the lightbox and zoom retain de
   const page = await context.newPage();
   try {
     for (const trip of ['2026_guangzhou', '2025_japan']) {
-      await page.goto('http://127.0.0.1:4321/travel_' + trip);
+      await page.goto(BASE + '/travel_' + trip);
       const tile = page.locator('#main .content').filter({ has: page.locator('img[srcset*="-480"]') }).first();
       const image = tile.locator('img');
       await tile.scrollIntoViewIfNeeded();

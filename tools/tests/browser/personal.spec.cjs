@@ -1,9 +1,10 @@
 const { test, expect } = require('@playwright/test');
+const BASE = 'http://127.0.0.1:' + (process.env.PW_PORT || '4321'); // matches playwright.config.cjs
 
 test('personal galleries carry no photo controls and still play on touch', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
   const page = await context.newPage();
-  await page.goto('http://127.0.0.1:4321/personal');
+  await page.goto(BASE + '/personal');
   // Owner decision (17 Oct 2026): no previous/next/pause row under the cards.
   await expect(page.locator('.personal-gallery-controls')).toHaveCount(0);
   const event = page.locator('[data-timeline-event]', { hasText: 'Latte & Mocha' });
@@ -17,7 +18,7 @@ test('keyboard focus plays the standalone galleries on desktop', async ({ browse
   // The suite defaults to reduced motion, which correctly holds the first photo.
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'no-preference' });
   const page = await context.newPage();
-  await page.goto('http://127.0.0.1:4321/personal');
+  await page.goto(BASE + '/personal');
   for (const name of ['Orientation Group Leader photos', 'Naval Diving Unit photos']) {
     const card = page.getByRole('group', { name, exact: true });
     // Tab to the card like a keyboard user: script focus does not set
