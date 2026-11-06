@@ -341,7 +341,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Desktop crossfades on hover/keyboard focus, 1s per photo. Touch plays only the card nearest reading focus, 4s per photo. Reduced motion holds first photos.
 - Cats, house, pre-wedding rotate five photos; crossfades overlap.
 - Use animation longhands (shorthand resets `animation-delay`).
-- On touch, later frames stay `display: none` until `warmGallery` marks the card warm, once it is on screen, ahead of activation and the first crossfade.
+- On touch, later frames stay `display: none` until `warmGallery` marks the card warm, once it is on screen, ahead of activation and the first crossfade. Since 6 Nov 2026 `warmGallery` loads the first frame at high priority and each later frame at low through a detached image, handing its sources back (and showing it) once that arrives: laid out, even hidden or at opacity 0, Chrome raised every hidden frame to high priority alongside the visible photos.
 - Per-image `--focus-x`/`--focus-y`; no per-class `object-position`. Brawl Stars is full-bleed, 16/9 focused on mobile.
 - Frames target 3:2: desktop `--image-col` widens as a card opens; mobile 2/1 folded, 3/2 open. Latte & Mocha and Code in the Community use `personal-event-card--upright` to keep a squarer frame (widening crops them harder).
 - Measure before retuning ratios; the timeline column caps cards at ~451px, not `max-width`.

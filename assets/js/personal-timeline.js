@@ -94,12 +94,35 @@
     });
   }
 
+  /* The first frame is the one on screen, so it loads at high priority and
+     the hidden frames at low. Chrome raises any laid-out image in the viewport
+     to high, even hidden or at opacity 0, so a hidden frame downloads through
+     a detached image and gets its sources back once that arrives (Nov 2026). */
   function warmGallery(event) {
     if (!event || event.dataset.galleryWarm === 'true') return;
     event.dataset.galleryWarm = 'true';
-    Array.prototype.forEach.call(event.querySelectorAll('.personal-event-card__image--slideshow img'), function (image) {
-      image.fetchPriority = 'low';
-      image.loading = 'eager';
+    Array.prototype.forEach.call(event.querySelectorAll('.personal-event-card__image--slideshow img'), function (image, index) {
+      var src = image.getAttribute('src');
+      var srcset = image.getAttribute('srcset');
+      if (!index || image.complete || !src) {
+        if (!index) image.fetchPriority = 'high';
+        image.loading = 'eager';
+        return;
+      }
+      var probe = new Image();
+      image.style.visibility = 'hidden';
+      image.removeAttribute('srcset');
+      image.removeAttribute('src');
+      probe.onload = probe.onerror = function () {
+        if (srcset) image.setAttribute('srcset', srcset);
+        image.setAttribute('src', src);
+        image.loading = 'eager';
+        image.style.visibility = '';
+      };
+      probe.fetchPriority = 'low';
+      probe.sizes = image.sizes;
+      if (srcset) probe.srcset = srcset;
+      probe.src = src;
     });
   }
 
