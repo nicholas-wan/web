@@ -2,6 +2,12 @@
   var journalAnimations = Array.prototype.slice.call(document.querySelectorAll('video.journal-animation'));
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   var isJournal = document.body.classList.contains('page-travel-journal');
+  /* Phones flick through several screens a second, and a photo that has not
+     arrived reads as an empty card, so phones start photos, posters and row
+     tiles about two screens ahead; desktop keeps its margins (Nov 2026). */
+  var onPhone = window.matchMedia('(max-width: 736px)').matches;
+  var imageAhead = onPhone ? '1800px' : '900px';
+  var posterAhead = onPhone ? '1800px' : '600px';
   /* The build renames each animation's autoplay attribute to data-autoplay,
      because the attribute makes the browser download every video at page load.
      Playback starts here instead, and only once the animation is near the
@@ -38,7 +44,7 @@
         entries.forEach(function (entry) {
           if (entry.isIntersecting) revealPoster(entry.target);
         });
-      }, { rootMargin: '600px' });
+      }, { rootMargin: posterAhead });
       var animationPlayback = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           entry.target.__nearViewport = entry.isIntersecting;
@@ -94,7 +100,7 @@
         warmImage(entry.target);
         imageWarmup.unobserve(entry.target);
       });
-    }, { rootMargin: '900px' });
+    }, { rootMargin: imageAhead });
     images.forEach(function (image) {
       if (image.loading === 'lazy') imageWarmup.observe(image);
     });
@@ -829,7 +835,7 @@
   var galleryWarmers = new Map();
   var galleryWarmup = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) { galleryWarmers.get(entry.target)(entry.isIntersecting); });
-  }, { rootMargin: '900px 0px' }) : null;
+  }, { rootMargin: imageAhead + ' 0px' }) : null;
   Array.prototype.forEach.call(document.querySelectorAll('.travel-gallery--compact, .guangzhou-day--compact .masonry'), function (gallery, galleryIndex) {
     var shell = document.createElement('div');
     var controls = document.createElement('div');

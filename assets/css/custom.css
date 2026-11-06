@@ -3844,6 +3844,14 @@ body.is-map-fullscreen .travel-atlas__layout {
     background: #0a1b1f;
   }
 
+  /* The dark card is for the caption band. A photo or animation that has not
+     arrived shows the banners' pale placeholder, never a black hole on a slow
+     phone connection (Nov 2026). */
+  .travel-gallery--compact .content-image,
+  .guangzhou-day--compact .masonry .content-image {
+    background: linear-gradient(135deg, #dce7e6, #edf2f1);
+  }
+
   .guangzhou-journal .content-overlay {
     display: none;
   }
