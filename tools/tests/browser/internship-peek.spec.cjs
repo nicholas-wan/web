@@ -220,11 +220,15 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  expect(await shown(scene(root).locator('.ag-q1 .ag-qk'))).toBe(0);
  // The other 31 found stay faintly lit (5 Nov 2026), so the unusual one reads as one of the 32.
  for(const o of await scene(root).locator('.ag-tl:not(.ag-tl-out)').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBeCloseTo(.35,2);
- // The count is one rolled strip (an odometer, 1 Nov 2026) resting on "32 found"; the logs are three opacity-only rects a tile, 32 tiles.
- await expect(scene(root).locator('.ag-odo .ag-cnv')).toHaveCount(6);
+ // The count steps 4 a column with the beam (7 Nov 2026), each number right-aligned beside one "found" drawn once, so
+ // nothing moves as it counts; it rests on 32. The logs are three opacity-only rects a tile, 32 tiles.
+ await expect(scene(root).locator('.ag-odo .ag-cnv')).toHaveCount(8);
+ await expect(scene(root).locator('.ag-odo .ag-cnv').last()).toHaveText('32');
+ await expect(scene(root).locator('.ag-odo .ag-fd')).toHaveText('found');
+ expect(await scene(root).locator('.ag-odo .ag-cnv').evaluateAll(es=>es.every(e=>e.getAttribute('text-anchor')==='end'))).toBe(true);
  await expect(scene(root).locator('.ag-logs .ag-t')).toHaveCount(32);
  const words=await scene(root).textContent();
- for(const s of ['Agentic Threat Hunting','From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Reporting','Ransomware report','Event logs','A local model does best with one job, so','each narrow agent gets only the tools','and context that job needs.','Only a human','No results can mean a bad query, not a','safe network. So the agent rewrites it,','checks the fix and searches again.','query checked','32 found','1 unusual','Agents flag what looks suspicious, with','analyst makes the call.','Scheduled Task','T1053.005','Analyst decides','a known attacker trick'])expect(words).toContain(s);
+ for(const s of ['Agentic Threat Hunting','From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Reporting','Ransomware report','Event logs','A local model does best with one job, so','each narrow agent gets only the tools','and context that job needs.','Only a human','No results can mean a bad query, not a','safe network. So the agent rewrites it,','checks the fix and searches again.','fields and syntax checked','1 unusual','Agents flag what looks suspicious, with','analyst makes the call.','Scheduled Task','ATT&CK T1053.005','Analyst decides','A known attacker trick'])expect(words).toContain(s);
  const label=await scene(root).getAttribute('aria-label');
  expect(label.startsWith('An illustrative hunt.')).toBe(true);
  // The hunter's specifics are in the label, not on the chart.
@@ -250,6 +254,10 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  expect(end).toBeLessThan(17000);
  expect(await shown(scene(root).locator('.ag-s2'))).toBeLessThan(1);
  await expect(card(root).locator('.hsk-ctl')).toHaveCount(0);
+ // The replay fades only what the run made: the report, the supervisor and the agents stay on screen through the seam (7 Nov 2026).
+ await card(root).evaluate(c=>c.classList.add('is-fading'));
+ await expect.poll(()=>scene(root).locator('.ag-run').first().evaluate(e=>+getComputedStyle(e).opacity)).toBe(0);
+ for(const s of ['.ag-rep','.ag-hub','.ag-bh','.ag-br'])expect(await shown(scene(root).locator(s))).toBeGreaterThan(.5);
  await page.keyboard.press('Escape');
  await expect(chip(root)).toHaveAttribute('aria-expanded','false');
  // Phones: a tap opens it inline with the stacked drawing, and nothing scrolls sideways.
