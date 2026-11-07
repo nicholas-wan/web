@@ -211,7 +211,7 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(scene(root)).toBeVisible();
  await expect(phoneScene(root)).toBeHidden();
  // Reduced motion holds the final frame: all three steps, the human and the second search's find shown; nothing
- // transient (the first query, the notes, glows, beams, Detection's old wire) is left on screen; the second query, the logs with their one lit result and the supervisor's wire to Detection stay. The dotted outline Detection leaves (owner) goes, with the line from it, 1.5 s after Detection lands (7 Nov 2026, round 2: a lasting empty box read as a missing agent).
+ // transient (the first query, the notes, glows, beams, Detection's old wire) is left on screen; the second query, the logs with their one lit result and the supervisor's wire to Detection stay. The dotted outline Detection leaves (owner) goes, with the line from it, as the new wire finishes half a second after Detection lands (7 Nov 2026, rounds 2 and 3: a lasting empty box read as a missing agent).
  for(const s of ['.ag-s0','.ag-s1','.ag-s2','.ag-ana','.ag-odo','.ag-tl-out','.ag-ring','.ag-qw','.ag-card','.ag-decides','.ag-wire2','.ag-q1'])expect(await shown(scene(root).locator(s))).toBe(1);
  for(const s of ['.ag-n0','.ag-pk','.ag-q0','.ag-gl0','.ag-gl1','.ag-wire-det','.ag-slot','.ag-ln1','.ag-cft'])expect(await shown(scene(root).locator(s))).toBe(0);
  for(const o of await scene(root).locator('.ag-b-glow, .ag-halo, .ag-beam, .ag-bar, .ag-tm, .ag-hk').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
@@ -228,7 +228,7 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  expect(await scene(root).locator('.ag-odo .ag-cnv').evaluateAll(es=>es.every(e=>e.getAttribute('text-anchor')==='end'))).toBe(true);
  await expect(scene(root).locator('.ag-logs .ag-t')).toHaveCount(32);
  const words=await scene(root).textContent();
- for(const s of ['Agentic Threat Hunting','From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Reporting','Ransomware report','Event logs','A local model does best with one job, so','each narrow agent gets only the tools','and context that job needs.','Only a human','No results can mean a bad query, not a','safe network. So the agent rewrites it,','checks the fix and searches again.','fields and syntax checked','1 unusual','Agents flag what looks suspicious, with','analyst makes the call.','Scheduled Task','ATT&CK T1053.005','Analyst decides','A known attacker trick'])expect(words).toContain(s);
+ for(const s of ['Agentic Threat Hunting','From a ransomware report to one lead','Purpose-built agents','Equipped to adapt','Surface to the analyst','Supervisor','Hypothesis','Detection','Reporting','Ransomware report','Event logs','A local model does best with one job, so','each narrow agent gets only the tools','and context that job needs.','Only a human','No results can mean a bad query, not a','safe network. So the agent rewrites it,','checks the fix and searches again.','Fields and syntax checked','1 unusual','Agents flag what looks suspicious, with','analyst makes the call.','Scheduled Task','ATT&CK T1053.005','Analyst decides','A known attacker trick'])expect(words).toContain(s);
  const label=await scene(root).getAttribute('aria-label');
  expect(label.startsWith('An illustrative hunt.')).toBe(true);
  // The hunter's specifics are in the label, not on the chart.
