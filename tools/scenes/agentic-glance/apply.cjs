@@ -8,11 +8,12 @@ const root = path.join(__dirname, '..', '..', '..');
 const read = f => fs.readFileSync(path.join(__dirname, f), 'utf8').replace(/\r\n/g, '\n').trim();
 const sceneD = read('scene-d.svg'), sceneM = read('scene-m.svg'), css = read('scene.css');
 
+// (data-fade: the replay is a 760 ms rewind, not the shared 240 ms fade; build.cjs's is-fading rules)
 // the chip's thumbnail (the 26 Oct 2026 peek's: a report, its findings, a flag)
 const MINI = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 78 24"><rect x="1.5" y="2.5" width="17" height="19" rx="2" fill="#0e2024" stroke="#3a6f73"/><path d="M4.5 7H15.5M4.5 10.5H12" stroke="#3a6f73" stroke-width="1.4" stroke-linecap="round"/><rect x="4" y="13" width="11" height="3" rx="1" fill="#28d7c5" opacity=".45"/><path d="M4.5 18.5H13" stroke="#3a6f73" stroke-width="1.4" stroke-linecap="round"/><path d="M21.5 12H26.5M24.5 10L26.5 12L24.5 14" fill="none" stroke="#6f9a96" stroke-linecap="round" stroke-linejoin="round"/><rect x="29.5" y="4.5" width="23" height="15" rx="2" fill="#071315" stroke="#24464b"/><path d="M32.5 9H44M32.5 12.5H49M32.5 16H40" stroke="#b8f2eb" stroke-width="1.3" stroke-linecap="round" opacity=".8"/><path d="M32.5 9H36.5M35.5 12.5H39" stroke="#28d7c5" stroke-width="1.3" stroke-linecap="round"/><path d="M55.5 12H60.5M58.5 10L60.5 12L58.5 14" fill="none" stroke="#6f9a96" stroke-linecap="round" stroke-linejoin="round"/><rect x="63" y="6" width="13" height="12" rx="2" fill="#ffb869"/><path d="M67 9V15M67 9.4H72L70.6 11L72 12.6H67" fill="none" stroke="#071315" stroke-width="1.1" stroke-linejoin="round" stroke-linecap="round"/></svg>';
 const peek = '<p class="internship-demo-hint"><strong><span class="anomaly-peek__hint-hover">Hover the chart</span><span class="anomaly-peek__hint-touch">Tap the chart</span></strong> to see it in action</p>'
   + `<div class="internship-demo-peek" data-company="agentic"><button type="button" class="internship-demo-peek__chip" aria-expanded="false" aria-controls="agentic-demo-card"><span class="internship-demo-peek__mini" aria-hidden="true">${MINI}</span>Hunt from a report</button>`
-  + `<div class="internship-demo-card" id="agentic-demo-card" inert=""><div class="internship-demo-card__plot">${sceneD}${sceneM}</div></div></div>`;
+  + `<div class="internship-demo-card" id="agentic-demo-card" data-fade="760" inert=""><div class="internship-demo-card__plot">${sceneD}${sceneM}</div></div></div>`;
 
 // the element that starts at index i, through its matching close tag
 function end(html, i) {

@@ -4,12 +4,14 @@
    chips or the card. On phones and touch a tap opens the card in place, open
    while the page scrolls until a chip or Escape closes it. Scenes replay
    every 10s on screen (longer if needed to hold the final frame for 3s),
-   fading before each restart; reduced motion holds the final frame. */
+   fading before each restart (a card's data-fade sets how long, in ms, for a
+   scene that rewinds rather than fades); reduced motion holds the final frame. */
 (() => {
   const roots = [...document.querySelectorAll('.internship-demo-peek')];
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const touch = matchMedia('(max-width: 736px), (hover: none)');
   const REPLAY = 10000, HOLD = 3000, FADE = 240, GRACE = 130;
+  const fadeOf = c => +c.dataset.fade || FADE;
   // Phones keep the cards display:none until a tap, which would leave the
   // scenes' faces unrequested until a scene had already started. Warm them
   // once the page has loaded, so they never compete with the text's fonts.
@@ -58,7 +60,7 @@
     if (motion.matches) return;
     card(r).classList.add('is-fading');
     clearTimeout(r.fade);
-    r.fade = setTimeout(() => { if (active === r) play(r); }, FADE);
+    r.fade = setTimeout(() => { if (active === r) play(r); }, fadeOf(card(r)));
   }
   // Smart zoom (owner, 25 Oct 2026), shared with anomaly-peek.js as
   // window.peekZoom. grow(): a card grows out of its chip (CSS, --grow-x); an
@@ -199,7 +201,7 @@
   function loop(r) {
     const c = card(r), end = Math.max(0, ...c.getAnimations({ subtree: true }).map(a => a.effect.getComputedTiming().endTime).filter(Number.isFinite));
     clearInterval(r.loop);
-    r.loop = setInterval(() => { if (!document.hidden && onScreen(c)) replay(r); }, Math.max(REPLAY, end + HOLD + FADE));
+    r.loop = setInterval(() => { if (!document.hidden && onScreen(c)) replay(r); }, Math.max(REPLAY, end + HOLD + fadeOf(c)));
   }
   // The pointer has left the chip row and the card: after a short grace a
   // pinned card returns, otherwise the preview closes.
