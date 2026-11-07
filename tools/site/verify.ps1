@@ -993,7 +993,7 @@ if ($customCss -notmatch '(?s)\.company-logo--shopee\s*\{[^}]*background:\s*tran
 foreach ($companyLogo in @('images\company\dsta.svg', 'images\company\the-league.png', 'images\company\shopee.svg', 'images\company\nuhs.png')) {
     if (-not (Test-Path -LiteralPath (Join-Path $dist $companyLogo))) { throw "Generated site is missing company logo: $companyLogo" }
 }
-if ($personal -notmatch '(?s)personal-event-card__image--slides-3.*?ndu2\.jpg.*?ndu1\.jpg.*?ndu3\.jpg.*?<span class="personal-event-card__meta">2016 &ndash; 2017 &middot; Service</span>.*?<strong>Naval Diving Unit</strong>.*?<span>I completed National Service with the Naval Diving Unit\.</span>') { throw "Naval Diving Unit must be a self-contained three-photo timeline gallery in its approved frame order." }
+if ($personal -notmatch '(?s)personal-event-card__image--slides-3.*?ndu2\.(?:jpg|webp).*?ndu1\.jpg.*?ndu3\.jpg.*?<span class="personal-event-card__meta">2016 &ndash; 2017 &middot; Service</span>.*?<strong>Naval Diving Unit</strong>.*?<span>I completed National Service with the Naval Diving Unit\.</span>') { throw "Naval Diving Unit must be a self-contained three-photo timeline gallery in its approved frame order." }
 if ($personal -match 'section-intro--personal|Projects, communities, and memories from 2016|Scroll through the years|personal-timeline__guide' -or $personal -notmatch '<body class="is-preload page-personal">' -or $personal -notmatch '<h1 id="personal-timeline-title">Life outside work</h1>' -or $personal -notmatch 'A few projects, communities, and milestones that have shaped my life outside work\.') { throw "Personal page must begin with concise, first-person timeline copy and no redundant scrolling instruction." }
 if ($personal -notmatch 'data-personal-timeline' -or $personal -notmatch 'data-timeline-progress' -or $personal -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/personal-timeline.js')) -or $personalTimelineJs -notmatch 'warmGallery' -or -not (Test-Path -LiteralPath (Join-Path $dist 'assets\js\personal-timeline.js'))) { throw "Personal page scroll timeline, nearby slideshow warmup, or its interaction script is missing." }
 if ($personalTimelineJs -notmatch 'is-focus' -or $personalTimelineJs -notmatch 'is-condensed' -or $personalTimelineJs -notmatch 'measureCards' -or $personalTimelineJs -notmatch 'readingFocusFactor = singleRail\.matches' -or $personalTimelineJs -notmatch 'scrollDirection < 0 \? 0\.44 : 0\.5' -or $personalTimelineJs -notmatch 'scrollDirection < 0 \? 0\.54 : 0\.62' -or $personalTimelineJs -notmatch 'focusMargin = scrollDirection < 0 \? 16 : 48' -or $personalTimelineJs -notmatch 'foldAbove = viewport \* 0\.48' -or $customCss -notmatch '(?s)\.is-focus \.personal-event-card\s*\{[^}]*--card-scale-x:\s*1\.01;[^}]*--card-scale-y:\s*1\.01;' -or $customCss -notmatch '(?s)@media screen and \(max-width: 736px\).*?\.is-focus \.personal-event-card\s*\{[^}]*--card-scale-x:\s*1\.01;[^}]*--card-scale-y:\s*1\.01;' -or $customCss -notmatch '(?s)@media screen and \(min-width: 737px\).*?\.is-focus \.personal-event-card\s*\{[^}]*--image-col:\s*17rem;[^}]*\}.*?\.is-focus \.personal-event-card__image\s*\{[^}]*min-height:\s*12rem;' -or $customCss -notmatch '(?s)\.is-condensed \.personal-event-card\s*\{[^}]*--card-scale:\s*0\.995;') { throw "The timeline must promote a distortion-free main event through vertical reveal with minimal zoom, hand focus back early on reverse scroll, and compact prior cards." }
@@ -1128,7 +1128,8 @@ foreach ($fullBannerJournal in @('travel_2017_seoul', 'travel_2026_guangzhou')) 
 }
 # Banner tiers are WebP where --webp-tiers saved a tenth on every tier at equal
 # SSIM (6 Nov 2026); Australia's -800 saved 8%, so its banner keeps JPEG tiers.
-# The original stays the largest candidate. Europe (1280px) has no -1200.
+# The original stays the largest candidate. Europe's 1280px original got a
+# hand-made -1200 WebP in Nov 2026 (27% smaller, so DPR-3 phones skip the original).
 $expectedBannerTiers = [ordered]@{
     'travel_2019_siliconvalley' = 'webp'; 'travel_2022_europe' = 'webp'; 'travel_2023_perth' = 'webp'; 'travel_2023_usacanada' = 'webp'
     'travel_2024_australia' = 'jpg'; 'travel_2024_germany' = 'webp'; 'travel_2025_japan' = 'webp'
@@ -1137,7 +1138,7 @@ foreach ($bannerJournal in $expectedBannerTiers.Keys) {
     $bannerHtml = Get-Content -LiteralPath (Join-Path $dist "$bannerJournal.html") -Raw -Encoding UTF8
     $bannerTag = [regex]::Match($bannerHtml, '<img\b[^>]*\bclass="[^"]*\bjournal-banner\b[^"]*"[^>]*>').Value
     $bannerOriginal = [regex]::Match($bannerTag, '\ssrc="([^"]+\.jpg)"').Groups[1].Value
-    $tierWidths = if ($bannerJournal -eq 'travel_2022_europe') { @(480, 800) } else { @(480, 800, 1200) }
+    $tierWidths = @(480, 800, 1200)
     $bannerBase = $bannerOriginal -replace '\.jpg$', ''
     $expectedSrcset = (@($tierWidths | ForEach-Object { '{0}-{1}.{2} {1}w' -f $bannerBase, $_, $expectedBannerTiers[$bannerJournal] }) + [regex]::Match($bannerTag, '\ssrcset="[^"]*?(\S+\.jpg \d+w)"').Groups[1].Value) -join ', '
     if (-not $bannerOriginal -or $bannerTag -notmatch ('\ssrcset="' + [regex]::Escape($expectedSrcset) + '"') -or $expectedSrcset -notmatch ([regex]::Escape($bannerOriginal) + ' \d+w$')) { throw "$bannerJournal banner must list its $($expectedBannerTiers[$bannerJournal]) tiers ($($tierWidths -join ', ')) and then its JPEG original: $bannerTag" }
