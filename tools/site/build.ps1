@@ -552,7 +552,8 @@ function Add-PageNavigation([string]$Markup, [string]$Slug) {
             $links += '<a class="site-pager__link site-pager__link--next" href="' + $next + '"><span>Next section</span><strong>' + $sectionLabels[$next] + ' &#8594;</strong></a>'
         }
     } elseif ($Slug -in @('house', 'prewed')) {
-        $links += '<a class="site-pager__link site-pager__link--next" href="personal"><span>Back to</span><strong>Personal timeline &#8594;</strong></a>'
+        # Points back, so it takes the previous slot and arrow (7 Nov 2026).
+        $links += '<a class="site-pager__link site-pager__link--previous" href="personal"><span>Back to</span><strong>&#8592; Personal timeline</strong></a>'
     }
     if ($links.Count -eq 0) { return $Markup }
     $modifier = if ($links.Count -eq 1) { ' site-pager--single' } else { '' }
@@ -706,6 +707,7 @@ $cssSegments = @(
     [pscustomobject]@{ Bundle = 'travel-journal.css'; Name = 'journal-nav' },
     [pscustomobject]@{ Bundle = 'personal-page.css'; Name = 'personal-base' },
     [pscustomobject]@{ Bundle = 'travel-journal.css'; Name = 'journal-japan' },
+    [pscustomobject]@{ Bundle = 'travel-journal.css'; Name = 'journal-polish' },
     [pscustomobject]@{ Bundle = 'personal-page.css'; Name = 'personal-responsive' },
     [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-education' },
     [pscustomobject]@{ Bundle = 'skills-page.css'; Name = 'skills-cards' },

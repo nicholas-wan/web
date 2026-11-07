@@ -458,15 +458,32 @@
   overflow: hidden;
 }
 
+/* About opens like the other tab pages (7 Nov 2026): teal "About me" eyebrow, then the serif
+   title. Desktop shows the opening in the text column beside the photo; phones stack the photo
+   first, so the same opening sits in the head above it and the text column keeps the copy.
+   Only one copy is displayed at a time, so assistive tech reads one heading. */
 .intro-swipe__head {
+  display: none;
   flex: 0 0 auto;
-  padding-bottom: 2.25rem;
+  padding-bottom: 1.25rem;
 }
 
-/* Out-rank main.css's "#main > .post header.major h2" (2rem bottom margin)
-   so the scene's heading→photo rhythm is exact. */
-#main > .post header.major.intro-swipe__head h2 {
-  margin-bottom: 0;
+/* Out-ranks the theme's centred "#main > .post header.major". */
+#main > .post header.major.intro-swipe__head {
+  text-align: left;
+}
+
+.intro-swipe__text h3,
+.intro-swipe__head .intro-swipe__title {
+  margin: 0 0 0.9rem;
+  /* custom.css sets every h3 to `color: grey !important`. */
+  color: #20343d !important;
+  font-family: var(--font-body);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+  text-transform: none;
 }
 
 .intro-swipe__row {
@@ -492,7 +509,8 @@
   max-height: 62vh;
   object-fit: contain;
   border-radius: 0.6rem;
-  box-shadow: 0 1rem 3rem rgba(3, 14, 30, 0.18);
+  /* The site's card shadow: the old 48px one was clipped by the swipe stage. */
+  box-shadow: 0 0.45rem 1.35rem rgba(3, 14, 30, 0.1);
 }
 
 .intro-swipe__text {
@@ -501,15 +519,6 @@
   transform: translateX(calc((1 - var(--p, 1)) * var(--swipe-text, 55vw)));
   opacity: var(--p, 1);
   will-change: transform, opacity;
-}
-
-.intro-swipe__text h3 {
-  margin-bottom: 0.75rem;
-  font-family: var(--font-display);
-  font-size: 2.1rem;
-  font-weight: 900;
-  line-height: 1.15;
-  color: #030e1e !important;
 }
 
 /* Out-rank the later .homepage .aboutblock margin so the scene's rhythm
@@ -556,7 +565,23 @@
   }
 
   .intro-swipe__head {
-    padding-bottom: 1rem;
+    display: block;
+    padding: 0 1rem 1.25rem;
+  }
+
+  .intro-swipe__head .intro-swipe__title {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .intro-swipe__text .page-opening-eyebrow,
+  .intro-swipe__text h3 {
+    display: none;
+  }
+
+  /* The photo starts on the same left edge as the opening and the copy. */
+  .intro-swipe__photo {
+    align-self: flex-start;
   }
 
   .intro-swipe__row {
@@ -583,9 +608,6 @@
     transform: translateX(calc((1 - var(--p, 1)) * var(--swipe-text, 110vw)));
   }
 
-  .intro-swipe__text h3 {
-    font-size: 1.6rem;
-  }
 
   .intro-swipe__text .aboutblock {
     text-align: left;
@@ -754,10 +776,59 @@
   line-height: 1.5;
 }
 
-/* 404 page */
+/* 404 page. Opens like the tab pages (7 Nov 2026): "404 · Page not found" is the eyebrow, the
+   title is the serif sentence-case title, the lede is upright at body leading (it was italic at
+   237%, taller than the gap to the cards), and the cards match the homepage cards (no glow).
+   The id keeps these above main.css's "#main > .post header.major h1/h2". */
+#main > .notfound header.major {
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+#main > .notfound header.major > h1 {
+  margin: 0 0 0.5rem;
+  color: var(--color-brand-700);
+  font-family: var(--font-display);
+  font-size: var(--eyebrow-size);
+  font-weight: 700;
+  letter-spacing: var(--eyebrow-tracking);
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+#main > .notfound header.major h2 {
+  margin: 0 0 0.75rem;
+  color: #20343d;
+  font-family: var(--font-body);
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.3;
+  text-transform: none;
+}
+
+#main > .notfound header.major p {
+  color: #66757b;
+  font-style: normal;
+  line-height: 1.65;
+  text-align: left !important;
+}
+
 .notfound .homepage-link {
   justify-content: center;
   min-height: 7rem;
+  background-image: none;
+  box-shadow: none;
+}
+
+@media screen and (max-width: 736px) {
+  #main > .notfound header.major h2 { font-size: 1.5rem; }
+}
+
+/* The phone cards were pulled up 1.5rem to sit under the old giant heading; with the lede
+   now ending the header, they keep the header's own gap. */
+@media screen and (max-width: 600px) {
+  .notfound .homepage-links { margin-top: 0; }
 }
 
 .notfound .homepage-link:nth-child(1)::before { --homepage-card-icon: url("../icons/fontawesome/solid/house.svg"); }
@@ -7905,6 +7976,31 @@ body.page-event #nav {
   margin-top: 0 !important;
 }
 
+/* House opens like the journals beside it (7 Nov 2026): date between rules, Raleway title-case
+   title, upright muted credit, instead of 64px uppercase Source Sans and an italic credit 90px
+   lower. `:has(h2)` keeps Pre-wedding's wordmark, which leans on the date's 64px gap. */
+.page-event #main > article > header.major:has(h2) .date {
+  margin-bottom: 1.5rem;
+}
+
+.page-event #main > article > header.major h2 {
+  margin: 0 0 0.6rem;
+  color: var(--color-ink-900, #20343d);
+  font-family: "Raleway", sans-serif;
+  font-size: clamp(2.25rem, 6vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-transform: none;
+}
+
+.page-event #main > article > header.major h2 + p {
+  margin-bottom: 2rem;
+  color: #66757b;
+  font-style: normal;
+  line-height: 1.65;
+}
+
 /* 100lvh, not svh: with the iPhone URL bar retracted the visual viewport
    exceeds svh and a white band of #main entered the opening screen. The
    large-viewport height keeps the first screen fully black in both bar
@@ -10111,6 +10207,99 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 /* The hover/selected card hugs the tile: no white band above it, matching corners. */
 .travel-timeline .journal-chronology .chronology-name{padding-top:0;margin-top:3px;border-radius:10px}
 @media(prefers-reduced-motion:reduce){.travel-timeline .journal-chronology .authored-scene::before,.travel-timeline .journal-chronology .mm-dusk-tile{transition:none}}
-.travel-timeline .travel-archive-heading .journal-show-all{border:0;box-shadow:none;padding:0 8px;min-height:44px;line-height:44px;text-transform:none;letter-spacing:0;font-size:12px;color:var(--color-brand-700)}
+.travel-timeline .travel-archive-heading .journal-show-all{border:0;box-shadow:none;padding:0 8px;min-height:44px;line-height:44px;text-transform:none;letter-spacing:0;font-size:12px;font-weight:700;color:var(--color-brand-700)!important}
 @media(max-width:736px){.travel-timeline .journal-show-all{display:none}}
+/* Travel polish (7 Nov 2026). Section headings on the page share one style: "Travel journals"
+   was 1.4x "Browse photos" and "Explore by destination", its "Show all" was black 900 beside the
+   teal 700 "Another mix" (the theme's `button { color: ... !important }` beat its teal; fixed on
+   its rule above), and the shortcut counts were 4.2:1. */
+#main > .travel-archive-heading #travel-archive-title{font-size:1.1rem;letter-spacing:.075em}
+.travel-portal small{color:var(--color-ink-600)}
+/* Phones: the archive heading sat under ~59px of air; bring it to the ~30px its sibling headings
+   get. .travel-timeline sits on <html>, so the class is doubled for weight rather than nested. */
+@media screen and (max-width:600px){.travel-timeline.travel-timeline #main > .travel-archive-heading{margin-top:0!important;padding-top:.25rem!important}}
 /* Route bundle: travel-navigation:end */
+
+/* Route bundle: journal-polish:start */
+/* Journal polish (7 Nov 2026). Last in travel-journal.css so it follows the journal rules it
+   adjusts. */
+
+/* One phone gutter. Seoul, Silicon Valley, Europe, Perth, USA & Canada, Germany and Chengdu set
+   their days in the theme's 2rem (29px) while the hero above uses 1.1rem (16px); Japan, Guangzhou
+   and Australia already use 16px with inset 1px dividers, which every journal now shares. */
+@media screen and (max-width: 600px) {
+  .page-travel-journal #main > .guangzhou-day {
+    padding-left: 1.1rem;
+    padding-right: 1.1rem;
+    border-top: 0;
+    background: linear-gradient(#e5eaeb, #e5eaeb) center top / calc(100% - 2.2rem) 1px no-repeat;
+  }
+}
+
+@media screen and (min-width: 601px) {
+  .page-travel-journal #main > .guangzhou-day {
+    border-top: 0;
+    background: linear-gradient(#e5eaeb, #e5eaeb) center top / calc(100% - 8rem) 1px no-repeat;
+  }
+}
+
+/* "View all N stops" uses the day-strip chip it sits under (1px teal border, sentence case,
+   700) instead of the theme's black 2px uppercase capsule. */
+.page-travel-journal .travel-route__more {
+  height: auto;
+  position: relative;
+  min-height: 2.4rem;
+  padding: 0.45rem 1.05rem;
+  border: 1px solid rgba(17, 128, 125, 0.6);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: none;
+  /* The theme's `button { color: ... !important }` would keep it ink. */
+  color: var(--color-brand-700) !important;
+  font-family: var(--font-display);
+  font-size: max(var(--text-floor, 0px), 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.2;
+  text-transform: none;
+}
+
+.page-travel-journal .travel-route__more:hover {
+  border-color: var(--color-brand-600);
+  background: #f1f7f6;
+  box-shadow: none;
+  color: var(--color-brand-700);
+}
+
+/* Phones keep the 3rem touch target without a 3rem pill: the hit area extends past the chip. */
+@media screen and (max-width: 736px) {
+  .page-travel-journal .travel-route__more { margin-block: 0.3rem; }
+  .page-travel-journal .travel-route__more::after {
+    position: absolute;
+    inset: -0.3rem 0;
+    content: "";
+  }
+}
+
+/* Korean place names no longer break mid-word in the route summary. */
+.page-travel-journal .travel-route-summary {
+  word-break: keep-all;
+}
+
+/* Day strip: "Trip sections" was the site's only tracked serif label; it takes the eyebrow
+   token. Desktop chips cut mid-word at the strip edge get the right-edge fade phones have. */
+.travel-section-nav > strong {
+  color: var(--color-brand-700);
+  font-family: var(--font-display);
+  font-size: var(--eyebrow-size);
+  font-weight: 700;
+  letter-spacing: var(--eyebrow-tracking);
+}
+
+@media screen and (min-width: 737px) {
+  .travel-jump-groups {
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
+  }
+}
+/* Route bundle: journal-polish:end */

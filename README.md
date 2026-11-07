@@ -166,6 +166,11 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 ### Site-wide behavior
 
 - Tab-page openings (approved 18 Oct 2026): matching left-aligned serif title scale, teal eyebrows, top spacing and gutters on Work, Skills, Personal and Travel. Work stays visible on phones; Personal is left-aligned; Travel opens on plain white. Desktop titles retain their glide.
+- Site polish (owner-approved 7 Nov 2026; Skills' description font change was rejected because "Technical systems" wrapped to a fourth line on desktop):
+  - About opens the same way: teal "About me" eyebrow, then "Hi, I'm Nicholas." in Merriweather 700 (1.8rem, 1.5rem on phones). Desktop puts it in the text column beside the photo. Phones put it in the head above the left-aligned photo and hide the text-column copy, so only one heading is displayed. The portrait uses the card shadow (the 48px one was clipped by the swipe stage).
+  - 404: "404 · Page not found" is the eyebrow (the page's one `h1`), the title is serif sentence case, the lede is upright at 1.65, and the cards have no glow.
+  - House opens like the journals: Raleway title-case title, 1.5rem below the date, upright muted credit. `:has(h2)` keeps Pre-wedding's wordmark gap.
+  - House and Pre-wedding end with "← Personal timeline" in the pager's previous slot, because the link points back.
 
 - 404 uses root-relative assets and nav links so nested paths work; fragment links stay local.
 - New-tab links need `rel="noopener noreferrer"`.
@@ -192,8 +197,9 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - `<button>` and `[role="button"]` share the `a:focus-visible` teal ring; archive card ring is teal.
 - Small uppercase labels: `--eyebrow-size` (`max(var(--text-floor), 0.7rem)`), `--eyebrow-tracking` (0.12em), brand-700 (atlas/Japan/archive eyebrows, search label, internship labels, day dates, pager spans, footer "Contact").
 - `--radius-control` (0.3rem) for controls; `--color-ink-800`, not `#333`.
-- Day-strip pills: Source Sans 700, brand-600 active.
-- "Browse photos": 1.1rem/900. Lightbox captions: 1.5 leading, context line ≥12px.
+- Day-strip pills: Source Sans 700, brand-600 active. The "Trip sections" label uses the eyebrow token; desktop strips fade at the right edge like phones.
+- Journal days (7 Nov 2026): one 1.1rem (16px) phone gutter, the same as the hero, and an inset 1px `#e5eaeb` divider on every journal (`journal-polish` block, last in `travel-journal.css`).
+- Travel section headings ("Travel journals", "Browse photos", "Explore by destination"): 1.1rem/900. "Show all" is teal 700 like "Another mix"; shortcut counts use `--color-ink-600`. Lightbox captions: 1.5 leading, context line ≥12px.
 - Source Sans Pro ships 700 (latin, via `tools/fonts/subset-source-sans.py` from Source Sans 3) and 900; labels use 700, titles 900. The Shopee peek alone also ships Figtree 400/500/700 (ASCII only); see Fonts.
 - `.travel-map__place` stays explicit 900 (atlas collision layout).
 - Preload Source Sans 900 everywhere, Raleway on journals, Merriweather only on the text-first pages (Experience, Skills, 404; Nov 2026: on photo-led pages it slowed the banner by 0.2-0.4 s on slow phones). `--font-display` uses size-adjusted `"Source Sans Fallback"` (Arial 86%/97%) against cold-load reflow; the body stack likewise names `"Merriweather Fallback"` (Georgia 105.8% / bold 95.6% / italic 97.3%, Merriweather's ascent and descent), added 7 Nov 2026 when the late swap rewrapped Silicon Valley's lede and moved its banner 25px (CLS 0.004 to 0.056 on slow phones; now 0.004). 105.8% is the middle of the band where the fewest first-screen blocks rewrap (2 across 15 pages at 360-430px, against 16 for plain Georgia). Android has no Georgia and keeps the plain fallback.
@@ -291,6 +297,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Day headings keep full titles; optional `data-nav-label` sets the pill; build prefixes D0, D1…. One pill group in section order; only Australia splits (Melbourne, Sydney); no country grouping in `build.ps1`. Chapter/place journals keep their meaning. Every day (departures, repeats) stays reachable.
 - Deep links (`#trip-section-N`) land with the day's date just below the toolbar and the heading under it, in Chromium and WebKit (24 Oct 2026). `scroll-margin-top` on a heading that follows a date adds the 34px date gap (62px below 360px, where long dates wrap), because the browser's own post-load anchor jump reads as visitor scrolling and cancels `travel-nav.js`'s correction. Australia's headings have no date and keep the plain offset.
 - Route subtitles use `--color-ink-600`. Every route box is labelled `Route` and gets the shared enhancement.
+- "View all N stops" is the teal 1px day-strip chip in sentence case, not the theme's capsule; on phones `::after` extends its hit area to 3rem. Route summaries use `word-break: keep-all` so Korean names stay whole.
 - Phone routes: first and last stop plus "View all N stops"; summary joins name and `<small>` subtitle with a middle dot (`樟宜机场 · Zhāngyí Jīchǎng → …`), name alone if none. Expanded: full bilingual numbered timeline; collapsed stops hidden from assistive tech. Desktop keeps wrapped expansion.
 - Routes arrive folded (24 Oct 2026): `Add-RouteSummaries` in `build.ps1` emits the summary, route id and `View all N stops` button, and `custom.css` hides the list on phones until it is expanded, so it never paints in full and then collapses (Perth CLS 0.061) and phones skip Merriweather 700. `noscript.css` shows the full list without JavaScript; `travel-nav.js` only builds a summary for markup that lacks one.
 - Phone route summary and Australia's intro are left-aligned. Australia keeps its lede-less header, 2.5rem bottom margin, day-note intro.
