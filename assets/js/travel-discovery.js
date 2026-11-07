@@ -37,6 +37,9 @@
     document.body.appendChild(script);
   }
   retry.addEventListener('click', function () {
+    // A click while a retry is pending, or once it has succeeded, must not
+    // start another download (script clicks reach hidden buttons too).
+    if (retry.hidden || retry.getAttribute('aria-disabled') === 'true') return;
     // Safari pointer activation does not focus buttons automatically.
     retry.focus({ preventScroll: true });
     if (ready) form.dispatchEvent(new Event('retry-search'));
