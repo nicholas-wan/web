@@ -99,11 +99,12 @@ const badge = (cls, cx, cy, ic, name, on) => `<g class="ag-b ${cls}"><rect class
   `<rect x="${cx - 14}" y="${cy - 14}" width="28" height="28" rx="7" fill="${C.node}" stroke="${on ? C.teal : C.dim}" stroke-width="${SE}"/>` +
   `<g class="ag-bi">${icon(ic, r1(cx - 8.4), r1(cy - 8.4), 1.4, on ? C.teal : C.mute)}</g>${T(cx, cy + 28, name, 10, on ? C.teal : C.mute, 'text-anchor="middle"')}</g>`;   // (.ag-bi: the icon's own group, so it can move without losing its place)
 const wire = x => `M${HUB[0]} ${HUB[1] + 8} C${HUB[0]} ${HUB[1] + 20} ${x} ${L - 30} ${x} ${L - 14}`;
-// (round 3: Reporting's hand-off to the lead on desktop, a pulse in the same grammar as the hunch's: up its own wire,
-// through the supervisor, along the clear lane under the header and down onto the card's pen as the card forms; blind
-// viewers saw Reporting glow but nothing tie it to the card)
-const LANE = 42, PENX = CARD.x + CARD.w - 16;
-const RPATH = `M${BX[1]} ${L - 14} C${BX[1]} ${L - 30} ${HUB[0]} ${HUB[1] + 20} ${HUB[0]} ${HUB[1] + 8} V${HUB[1] - 8} C${HUB[0]} ${LANE + 3} ${HUB[0] + 3} ${LANE} ${HUB[0] + 8} ${LANE} H${PENX - 8} C${PENX - 3} ${LANE} ${PENX} ${LANE + 3} ${PENX} ${LANE + 8} V${CARD.y}`;
+// (round 4: round 3's pulse from Reporting along the lane under the header to the card's pen is gone; two blind reviewers
+// read it as a stray comet over the title, running with no track while the result grew into the card. Reporting's part
+// is now a second beat in place: it readies before the result lifts, and presses and writes as the card's pen does.)
+// the unusual result's ring, drawn over the lead card's frame (round 4: the frame, growing out of the tile, passed over
+// the ring for a frame and read as the ring blinking off)
+const ringSvg = () => `<g class="ag-ring"><circle cx="${OUTC[0]}" cy="${OUTC[1]}" r="9" fill="none" stroke="${C.bg}" stroke-width="3.8"/><circle cx="${OUTC[0]}" cy="${OUTC[1]}" r="9" fill="none" stroke="${C.teal}" stroke-width="${SE}"/></g>`;
 
 // the pictures, in the desktop's units. Detection stands on the side it leaves from: last on desktop, where it slides
 // right into step 2, and first on a phone, where it leaves left for the spine.
@@ -116,8 +117,6 @@ function picture(i, phone) {
     let p = `<g class="ag-team">${[hx, rx, dx].map((x, k) => `<path class="ag-wire ag-arm${k}${k === 2 ? ' ag-wire-det' : ''}" d="${wire(x)}" pathLength="1" stroke="${C.dim}" fill="none"/>`).join('')}` +
       // (the supervisor hands each agent its part: a pulse down each wire, the same teal token as every other hand-off)
       [hx, rx, dx].map((x, k) => `<path class="ag-fan ag-fan${k}" d="${wire(x)}" pathLength="1" stroke="${C.teal}" stroke-width="2.6" stroke-linecap="round" fill="none"/>`).join('') +
-      // (desktop: Reporting's pulse to the lead, under the supervisor so it passes through it)
-      (phone ? '' : ['ag-rglow" stroke-width="7', 'ag-rcore" stroke-width="3'].map(k => `<path class="ag-rpath ${k}" d="${RPATH}" pathLength="1" stroke="${C.teal}" stroke-linecap="round" fill="none"/>`).join('')) +
       `<g class="ag-hub"><circle cx="${HUB[0]}" cy="${HUB[1]}" r="8" fill="${C.node}" stroke="${C.dim}" stroke-width="${SE}"/><circle cx="${HUB[0]}" cy="${HUB[1]}" r="2.6" fill="${C.dim}"/></g>${T(HUB[0] + 13, HUB[1] + 3.3, 'Supervisor')}` +
       badge('ag-bh', hx, L, 'bulb', 'Hypothesis') +
       // Detection's place in step 1: a dotted outline once it has moved on (owner); always drawn, under Detection while it is there
@@ -144,7 +143,6 @@ function picture(i, phone) {
       // (three rects a tile, grey, the flicker and the light, so only opacity ever animates; their size and colours are in the stylesheet)
       const dd = Math.max(Math.abs(r - OUTT[0]), Math.abs(c - OUTT[1]));   // (its distance from the unusual one: the dim closes in on it)
       return `<g class="ag-t" style="--c:${c};--d:${dd}" transform="translate(${G.x + c * (G.ts + G.tg)} ${G.y + r * (G.ts + G.tg)})"><rect ${TILE}/><rect class="ag-tm" ${TILE}/><rect class="ag-tl${out ? ' ag-tl-out' : ''}" ${TILE}/></g>`; }).join('')}</g>`;
-    p += `<g class="ag-ring"><circle cx="${OUTC[0]}" cy="${OUTC[1]}" r="9" fill="none" stroke="${C.bg}" stroke-width="3.8"/><circle cx="${OUTC[0]}" cy="${OUTC[1]}" r="9" fill="none" stroke="${C.teal}" stroke-width="${SE}"/></g>`;
     // (the beam and its bar reach 2.75 past the logs above and below, round 3; the beam had reached 4 above and 2.5 below)
     const cone = `M${DX + 12} ${L - 3} L${G.x - 3} ${G.y - 2.75} H${G.x + G.w + 3} V${G.y + G.h + 2.75} H${G.x - 3} Z`;
     // (the beam is light, not a slab: clear at Detection, brightest where it reaches the logs, fading past them)
@@ -196,8 +194,10 @@ function picture(i, phone) {
     `<g class="ag-cpen">${icon('pen', x + w - 24.5, oy + PENY, 1.35, C.teal)}</g>` +
     `<g class="ag-cc ag-cc1">${T(x + 10.5, oy + 35.5, 'Scheduled Task', 10, C.body)}</g><g class="ag-cc ag-cc2">${T(x + 10.5, oy + 47.5, 'ATT&amp;CK T1053.005', 9, C.mute)}</g></g>` +
     `<g class="ag-trick">${T(x, cap, 'A known attacker trick', 10, C.body)}</g>` +
-    // (the dashed line to the analyst extends behind the packet as it runs: a mask over it widens in step with it)
-    `<mask id="ag-hem-${phone ? 'm' : 'd'}" maskUnits="userSpaceOnUse"><rect class="ag-hem" x="${x + w + 4}" y="${L - 4}" width="${AX - R - 6 - (x + w + 6) + 8}" height="8" fill="#fff"/></mask>` +
+    // (the dashed line to the analyst extends behind the packet as it runs: a mask over it widens in step with it. Round
+    // 4: the mask's region is its own, since the default, -10% to 120% of the viewport, ended at x 396 on a phone's 360-wide
+    // drawing and so cut the line, at x 536 in step 3's units, from a phone's final frame)
+    `<mask id="ag-hem-${phone ? 'm' : 'd'}" maskUnits="userSpaceOnUse" x="${x + w + 2}" y="${L - 6}" width="${AX - R - 6 - (x + w + 6) + 12}" height="12"><rect class="ag-hem" x="${x + w + 4}" y="${L - 4}" width="${AX - R - 6 - (x + w + 6) + 8}" height="8" fill="#fff"/></mask>` +
     `<path class="ag-he" d="M${x + w + 6} ${L} H${AX - R - 6}" stroke="${C.teal}" stroke-width="${SE}" stroke-dasharray="4 3" stroke-linecap="round" fill="none" mask="url(#ag-hem-${phone ? 'm' : 'd'})"/>` +
     `<rect class="ag-pk" x="${x + w + 1}" y="${L - 4}" width="11" height="8" rx="2" fill="${C.teal}" style="--dx:${AX - R - 6 - (x + w + 6)}px"/>` +
     `<g class="ag-ana"><circle cx="${AX}" cy="${L}" r="${R}" fill="${C.node}" stroke="${C.amb}" stroke-width="${SE}"/>${icon('ana', r1(AX - 13.7), r1(L - 13.7), 2.28, C.amb)}</g>` +
@@ -241,6 +241,7 @@ function desktop() {
     `<path class="ag-wire2" d="M${HUB[0]} ${HUB[1] + 8} C${HUB[0]} ${HUB[1] + 30} ${DX} ${L - 40} ${DX} ${L - 14}" pathLength="1" stroke="${C.dim}" fill="none"/></g>` +
     `<g class="ag-run ag-r2"><g class="ag-p ag-p1">${picture(1, false)}</g></g>` +
     `<g class="ag-run ag-r3"><path class="ag-ln ag-ln2" d="M${G.x + G.w + 1} ${L} H${CARD.x - .75}" pathLength="1" stroke="${C.dim}" fill="none" shape-rendering="crispEdges"/><g class="ag-p ag-p2">${picture(2, false)}</g></g>` +
+    `<g class="ag-run ag-r2">${ringSvg()}</g>` +   // (over the card's frame, which grows out from under it)
     `<g class="ag-det" style="--dx:${DX - BX[2]}px">${badge('ag-bd', BX[2], L, 'lens', 'Detection', true)}</g>`;
   return s.join('') + `<g class="ag-stage">${stage}</g></svg>`;
 }
@@ -275,6 +276,9 @@ const GAP = [-1.1, 2.1, 1.1], CUT = [0, 2.1, 0];
 // the morph's sizes: the unusual tile's outer size and corners, the swell it lifts with (a phone's is smaller, since it
 // travels at that size), and the card's frame (stroke-centred, as a rect's geometry is)
 const TILE0 = { o: G.ts, r: 2 }, SWELLS = { d: 1.35, m: 1.25 };
+// a phone's hand-offs between stacked steps (round 4): what leaves drifts this far down as it fades, what arrives drops
+// the same distance into place
+const DRIFT = 8;
 function phone() {
   const W = 360, words = [], pics = [], at = [], nodes = [], boxes = []; let y = 60, H = 0;
   STEPS.forEach((st, i) => {
@@ -291,41 +295,29 @@ function phone() {
   const stem = `<path class="ag-rail" d="M${SP} ${r1(nodes[0] + 7.5)} V${r1(nodes[2] - 7.5)}" stroke="${C.teal}" stroke-opacity=".15" shape-rendering="crispEdges"/>`;   // (the rail, through the numbers)
   // (the spine's progress: from each number to the next, filled as that step's move travels)
   const tk = k => `<path class="ag-tk ag-tk${k + 1}" d="M${SP} ${r1(nodes[k] + 7.5)} V${r1(nodes[k + 1] - 7.5)}" pathLength="1" stroke="${C.teal}" fill="none" shape-rendering="crispEdges"/>`;
-  // Detection, travelling: its exact badge (its stroke and its lens's as drawn in the steps, round 3), from its place
-  // in step 1 to its place in step 2
+  // Detection, leaving: its exact badge (its stroke and its lens's as drawn in the steps, round 3), over its place in
+  // step 1, which greys under it
   const b = 14 * PS;
   const chip = `<g class="ag-tv ag-tv1"><rect x="${r1(d1[0] - b)}" y="${r1(d1[1] - b)}" width="${r1(2 * b)}" height="${r1(2 * b)}" rx="${r1(7 * PS)}" fill="${C.node}" stroke="${C.teal}" stroke-width="${r1(SE * PS)}"/>` +
     `<g class="ag-i" transform="translate(${r1(d1[0] - 8.4 * PS)} ${r1(d1[1] - 8.4 * PS)}) scale(${+(1.4 * PS).toFixed(3)})" stroke="${C.teal}" style="stroke-width:${(1.55 / 1.4).toFixed(3)}">${ICON.lens}</g></g>`;
-  // its move (round 3): blind viewers saw it cross the lit hunch and step 2's words into a step not yet lit. Now step
-  // 2's words light first and Detection takes the left gutter: it curves out of step 1 to the spine, shrinking to .42
-  // so it fits between the frame and the words, passes behind step 2's number (which pulses as it does) and grows back
-  // as it comes in under step 2's words to its place. One curve, eased on the standard curve, sampled by translation
-  // and scale (no rotation). The replay runs it backwards (its own keyframes: WebKit held a reversed animation at its
-  // start), so Detection goes home the way it came.
-  const [x0, y0] = d1, [x3, y3] = d2, dy = y3 - y0, MIN = .42;
-  const curve = cx => { const c1 = [cx, y0 + .3 * dy], c2 = [cx, y3 - .18 * dy];
-    return s => [0, 1].map(k => (1 - s) ** 3 * d1[k] + 3 * (1 - s) ** 2 * s * c1[k] + 3 * (1 - s) * s * s * c2[k] + s ** 3 * d2[k]); };
-  const atY = (f, yy) => { let lo = 0, hi = 1; for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2; if (f(m)[1] < yy) lo = m; else hi = m; } return lo; };
-  let lo = -200, hi = x3;   // (the control points' x, so the curve meets step 2's number on the spine)
-  for (let i = 0; i < 40; i++) { const m = (lo + hi) / 2, f = curve(m); if (f(atY(f, nodes[1]))[0] < SP) lo = m; else hi = m; }
-  const bz = curve((lo + hi) / 2), sNode = atY(bz, nodes[1]);
-  const plateau = s => { const v = Math.min(1, Math.max(0, Math.min(s / .3, (1 - s) / .3))); return v * v * (3 - 2 * v); };
-  const N = 48, frames = (name, at) => `@keyframes ${name} { ${Array.from({ length: N + 1 }, (_, i) => { const u = i / N, e = at(u), [x, yy] = bz(e);
-    return `${pct(u)}% { transform: translate(${r1(x - x0)}px, ${r1(yy - y0)}px) scale(${(1 - (1 - MIN) * plateau(e)).toFixed(3)}); }`; }).join(' ')} }`;
-  let uNode = 0; while (ease(uNode) < sNode) uNode += .005;   // (when it passes the number)
-  const kf = frames('ag-tv1', ease) + '\n' + frames('ag-tv1-back', u => 1 - ease(u));
-  // the result's move into the card (round 3): it travelled straight down at growing size, covering the query and step
-  // 3's words. Now it lifts and swells on its tile, then travels at that small size on one curve out through the right
-  // gutter, clear of the query strip and of step 3's words, to the card's right end, and grows in place there into the
-  // card, which sits below the words. Its path, in step 3's own units:
+  // its move (round 4): round 3 shrank it to .42 to pass behind step 2's number in the left gutter, and two blind
+  // reviewers read the 6px blip as a teleport. No path at full size runs from step 1's row to step 2 without crossing the
+  // lit hunch, step 2's words or the spine's number, so it hands over in place, the phone's one grammar between stacked
+  // steps: once step 2's words have lit, Detection drifts 8 down out of its place and fades (at .96, never smaller), the
+  // spine's run to step 2 fills, and it drops the last 8 into its place in step 2. The replay mirrors it.
+  const kf = `@keyframes ag-tv1 { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(${DRIFT}px) scale(.96); } }
+@keyframes ag-tv1-back { from { opacity: 0; transform: translateY(${DRIFT}px) scale(.96); } to { opacity: 1; transform: none; } }`;
+  // the result's way into the card (round 4): round 3's small square swung out to the right edge over step 3's words and
+  // back, read as a dead pixel. The query strip sits under the result and step 3's words under that, so no straight
+  // path reaches the card without crossing words; the result hops as Detection does. It lifts and swells on its tile,
+  // drifts down and fades, the spine's run to step 3 fills, and the card blooms in place from its right end, fading in
+  // as it grows (a seed shown alone first read as the same stray square). Its places, in step 3's own units:
   const loc = ([u, v]) => [(u - at[2][0]) / PS, (v - at[2][1]) / PS];
-  const half = TILE0.o * SWELLS.m / 2, E = map(2, [CARD.x + CARD.w + .75 - half, L]), RX = (322 - .125 * (out[0] + E[0])) / .75;
-  const route = s => loc([0, 1].map(k => { const p0 = out[k], p1 = [RX, out[1]][k], p2 = [RX, E[1]][k], p3 = E[k];
-    return (1 - s) ** 3 * p0 + 3 * (1 - s) ** 2 * s * p1 + 3 * (1 - s) * s * s * p2 + s ** 3 * p3; }));
+  const half = TILE0.o * SWELLS.m / 2, E = map(2, [CARD.x + CARD.w + .75 - half, L]);
   return { svg: open('ag-scene ag-scene--m', W, H) + wash('ag-wash-m', boxes) + header(W, 23, MB, true) + stem +
-    // (Detection's traveller under the words: its path keeps to the gutter, and it passes behind step 2's number)
     `<g class="ag-stage"><g class="ag-run ag-r2">${tk(0)}</g><g class="ag-run ag-r3">${tk(1)}</g>${pics[0]}<g class="ag-run ag-r2">${pics[1]}</g>${chip}</g>` + words.join('') +
-    `<g class="ag-stage"><g class="ag-run ag-r3">${pics[2]}</g></g></svg>`, H, kf, route, uNode };
+    `<g class="ag-stage"><g class="ag-run ag-r3">${pics[2]}</g><g class="ag-run ag-r2"><g transform="translate(${at[1][0]} ${at[1][1]}) scale(${PS})">${ringSvg()}</g></g></g></svg>`,
+    H, kf, c0: loc(out), E: loc(E) };
 }
 
 // ---------------------------------------------------------------- motion (one stylesheet for both drawings)
@@ -377,6 +369,15 @@ const LEAD = 0.5;
 //   packet, the analyst and "Analyst decides";
 // - desktop's dotted outline goes as the supervisor's new wire finishes drawing, half a second after Detection lands,
 //   as part of the one move (it had gone mid-scan, a second change of its own).
+// Round 4 the same day (two fresh blind reviews: a motion director, 6.5 / 5.5; a first-time viewer, 7 / 6.5 impressive),
+// which read three of round 3's moves as glitches:
+// - desktop: Reporting's pulse along the header is gone; the result growing into the card is the only move, and
+//   Reporting's part is the beat after it, in place (it readies before the lift, then presses and its pen writes with
+//   the card's as the words appear); the ring is drawn over the card's frame, which had covered it for a frame;
+// - phones: Detection and the result hand over between stacked steps in place (drift down and fade, the spine's run
+//   fills, drop into place), never smaller than .96 and never over words; the dashed line to the analyst shows in the
+//   final frame (its mask's region had cut it);
+// - the notes fade in once, in .2 s, and leave on a .28 s fade, lifting 2.
 const t = {
   // step 1: the report is sent, the supervisor reads it and hands each agent its part along its wire
   rep: [0, .48], hub: [.22, .32], fan0: [.32, .32], fan1: [.4, .32], fan2: [.48, .32], bh: [.53, .32], br: [.61, .32], bd: [.69, .32],
@@ -386,17 +387,17 @@ const t = {
   lg: [4.5, .32], logs: [4.55, .32], q: [4.75, .32], q0: [4.9, .6], hk: [5.0, 2.0], k0: [5.55, .1], s0: [5.65, .9], n0: [6.6, .48],
   gl0: [6.65, 1.95], qx: [7.3, .22], erase: [8.1, .24], q1: [8.4, .6], k1: [9.05, .1], ok: [9.05, .32], gl1: [9.1, 2.0],
   s1: [9.9, .9], dim: [10.9, .32], ring: [11.2, .48], qw: [11.4, .32],
-  // step 3: Reporting readies and sends its pulse, the result lifts and grows into the lead card along the line, the
+  // step 3: Reporting readies, the result lifts and grows into the lead card along the line, Reporting writes it, the
   // card's caption reads alone, then the card goes to the analyst
-  fwd: [11.7, .32], rpath: [11.8, .94], lift: [12.1, .64], detback: [12.1, .32], ln2: [12.2, .32], write: [12.84, .48],
+  fwd: [11.7, .32], lift: [12.1, .64], detback: [12.1, .32], ln2: [12.2, .32], write: [12.84, .48],
   trick: [13.1, .32], pk: [14.1, .52], ana: [14.5, .48], halo: [14.75, .8],
   // the resolve: "Analyst decides", and with it the team and the step captions relight and the light goes
   all: [15.3, .48],
 };
-// the result's move into the card: a swell where it lies (SWELL), then the move, .48 s on desktop; a phone's travels
-// small on its route (.6 s), then grows in place (.45 s). Detection's move between a phone's stacked steps is TV1: it
-// starts .2 s after desktop's, once step 2's words have lit.
-const SWELL = .16, MOVE = { d: t.lift[1] - SWELL, m: [.6, .45] }, TV1 = [t.det[0] + .2, .8];
+// the result's move into the card: a swell where it lies (SWELL), then the move, .48 s on desktop; a phone's leaves
+// its tile (.22 s), then blooms in place into the card (.5 s). Detection's hand-off between a phone's stacked steps is TV1, .6 s: it
+// starts .2 s after desktop's move, once step 2's words have lit.
+const SWELL = .16, MOVE = { d: t.lift[1] - SWELL, m: [.22, .5] }, TV1 = [t.det[0] + .2, .6];
 const SH1 = +(TV1[0] + TV1[1] - t.det[0] - t.det[1]).toFixed(2), SH2 = +(MOVE.m[0] + MOVE.m[1] - MOVE.d).toFixed(2);   // (a phone's two longer moves: everything after each waits for it)
 const T1 = t.lg[0] - .1, LATE = t.lift[0] + .01;   // (on a phone, everything from step 2 waits SH1, everything after the lift SH2 more)
 const tier = s => s >= LATE ? 2 : s >= T1 ? 1 : 0;
@@ -432,6 +433,16 @@ const morph = (name, c0, swell, travel, grow, route) => { const T = SWELL + trav
   // (the teal goes front-loaded, half gone a fifth of the way in and all gone by 45% of the time, when the eased growth
   // is about 60% done)
   return `@keyframes ${name} { ${k.join(' ')} }\n@keyframes ${name}-t { 0%, ${pct(a2)}% { opacity: 1; } ${pct(a2 + .2 * (1 - a2))}% { opacity: .45; } ${pct(a2 + .45 * (1 - a2))}%, 100% { opacity: 0; } }`; };
+// a phone's (round 4): it swells on its tile, drifts DRIFT down as it fades, and the card blooms in place from its right
+// end (E), fading in as it starts to grow, so no lone square shows between; -o is the frame's opacity, on .ag-cf
+const hop = (name, c0, swell, travel, grow, E) => { const T = SWELL + travel + grow, a1 = SWELL / T, a2 = (SWELL + travel) / T, h = a2 - a1;
+  const so = TILE0.o * swell, sr = TILE0.r * swell, card = [CARD.x, CARD.y, CARD.w, CARD.h, 7], dz = DRIFT / PS, OUT = .8;
+  const k = [`0% { ${geo(box(c0, TILE0.o, TILE0.r))} animation-timing-function: ${EZ}; }`, `${pct(a1)}% { ${geo(box(c0, so, sr))} animation-timing-function: ${STD}; }`,
+    `${pct(a1 + OUT * h)}% { ${geo(box([c0[0], c0[1] + dz], so, sr))} animation-timing-function: linear; }`,
+    `${pct(a2)}% { ${geo(box(E, so, sr))} animation-timing-function: ${STD}; }`, `100% { ${geo(card)} }`];
+  return `@keyframes ${name} { ${k.join(' ')} }\n@keyframes ${name}-o { 0% { opacity: 0; } 1%, ${pct(a1)}% { opacity: 1; animation-timing-function: ${STD}; } ` +
+    `${pct(a1 + OUT * h)}%, ${pct(a2)}% { opacity: 0; animation-timing-function: ${EZ}; } ${pct(a2 + .3 * (1 - a2))}%, 100% { opacity: 1; } }\n` +
+    `@keyframes ${name}-t { 0%, ${pct(a2)}% { opacity: 1; } ${pct(a2 + .2 * (1 - a2))}% { opacity: .45; } ${pct(a2 + .45 * (1 - a2))}%, 100% { opacity: 0; } }`; };
 // when each step takes the light, on each layout: step 2 as Detection lands on desktop, and on a phone just before it
 // sets off (round 3: it arrives where the eye already is); step 3 as the result lifts
 const STAGE = { d: [[t.det[0] + t.det[1] - .05, 0], [t.lift[0], 1]], m: [[TV1[0] - .15, 0], [t.lift[0], 1]] };
@@ -467,8 +478,7 @@ ${S} .ag-qc { transform-box: fill-box; transform-origin: 100% 50%; }
 ${S} .ag-hem { transform-box: fill-box; transform-origin: 0 50%; }
 ${S} :is(.ag-wire, .ag-wire2, .ag-ln, .ag-rep-link, .ag-qx) { stroke-dasharray: 1 2; }   /* (drawn: the dash covers the path; undrawn, it sits before the start) */
 ${S} :is(.ag-hpath, .ag-fan) { stroke-dasharray: .12 2; stroke-opacity: 0; }
-${S} .ag-rpath { stroke-dasharray: .08 2; stroke-opacity: 0; }   /* (Reporting's run is longer, so its pulse is a shorter share of it) */
-${S} :is(.ag-hglow, .ag-rglow) { opacity: .25; }
+${S} .ag-hglow { opacity: .25; }
 ${S} .ag-wash { opacity: 0; }
 ${S} { --ag-sh1: 0s; --ag-sh2: 0s; }
 svg.ag-scene--m { --ag-sh1: ${SH1}s; --ag-sh2: ${SH2}s; }   /* (a phone's two longer moves: everything after each waits for it) */
@@ -513,7 +523,7 @@ ${F}:not(.ag-scene--m) .ag-wire-det { animation: ag-on .22s ${STD} .5s both; }
 ${F} :is(.ag-bd, .ag-det1 .ag-b, .ag-tv1) > rect:not(.ag-b-glow) { animation: ag-unlit-s .32s ${STD} .42s both; }
 ${F} :is(.ag-bd, .ag-det1 .ag-b, .ag-tv1) .ag-i { animation: ag-unlit-i .32s ${STD} .42s both; }
 ${F} :is(.ag-bd, .ag-det1 .ag-b) text { animation: ag-unlit-t .32s ${STD} .42s both; }   /* (round 3: :is() so it outranks the playing rule; desktop's name had stayed teal and snapped grey at the replay) */
-${F}--m .ag-tv1 { opacity: 1; animation: ag-tv1-back .52s linear .22s both; }   /* (it takes Detection's place in step 2 and runs its move backwards) */
+${F}--m .ag-tv1 { opacity: 1; animation: ag-tv1-back .3s ${EZ} .3s both; }   /* (as step 2 fades, Detection rises back into its place in step 1, its hand-off backwards) */
 ${F}--m .ag-det1 { animation: ag-unghost .22s ${STD} .5s both; }
 @keyframes ag-return { from { transform: translateX(var(--dx)); } to { transform: none; } }
 @keyframes ag-unghost { from { opacity: ${WAIT}; } to { opacity: 1; } }
@@ -553,6 +563,8 @@ ${F}--m .ag-det1 { animation: ag-unghost .22s ${STD} .5s both; }
 @keyframes ag-shake { 0% { opacity: 0; transform: scale(1.15); } 35% { opacity: 1; transform: none; animation-timing-function: ${STD}; } 50% { transform: translateX(-2px); animation-timing-function: ${STD}; } 65% { transform: translateX(2px); animation-timing-function: ${STD}; } 80% { transform: translateX(-1px); animation-timing-function: ${STD}; } 100% { opacity: 1; transform: none; } }
 @keyframes ag-glint { 0%, 100% { opacity: 0; } 15%, 75% { opacity: 1; } }
 @keyframes ag-rise { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+@keyframes ag-drop { from { opacity: 0; transform: translateY(-${DRIFT}px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes ag-leave { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-2px); } }
 @keyframes ag-say { from { opacity: 0; transform: translateY(4px); } }
 @keyframes ag-beam { 0% { opacity: 0; } 15%, 75% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes ag-bar { 0% { opacity: 0; transform: none; } 10%, 85% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--w)); } }
@@ -567,10 +579,9 @@ ${F}--m .ag-det1 { animation: ag-unghost .22s ${STD} .5s both; }
 @keyframes ag-trace { from { stroke-dashoffset: 1; } }   /* (the spine's run to the next number, filled as the move travels) */
 @keyframes ag-nd { 50% { transform: scale(1.35); stroke-opacity: 1; } }
 @keyframes ag-pk { 0% { opacity: 0; transform: none; } 12%, 88% { opacity: 1; } 100% { opacity: 0; transform: translateX(var(--dx)); } }
-@keyframes ag-comet { 0% { stroke-dashoffset: .08; stroke-opacity: 0; } 8% { stroke-opacity: 1; } 92% { stroke-dashoffset: -.92; stroke-opacity: 1; } 100% { stroke-dashoffset: -.92; stroke-opacity: 0; } }
 @keyframes ag-cfo { 0% { opacity: 0; } 1%, 100% { opacity: 1; } }   /* (hidden until it lifts, so no speck of it shows earlier) */
 ${morph('ag-morph-d', OUTC, SWELLS.d, 0, MOVE.d)}
-${morph('ag-morph-m', PH.route(0), SWELLS.m, MOVE.m[0], MOVE.m[1], PH.route)}
+${hop('ag-morph-m', PH.c0, SWELLS.m, MOVE.m[0], MOVE.m[1], PH.E)}
 ${PH.kf}
 /* step 1: the report is sent, the supervisor hands each agent its part, the hunch is carried to Detection, which moves on */
 ${P} .ag-rep { animation: ${an(t.rep, 'ag-send', STD, 'none')}; }
@@ -600,9 +611,8 @@ ${P} .ag-wire2 { animation: ${an(t.wire2, 'ag-draw', STD)}; }
 ${P} .ag-team { animation: ${an(t.back, 'ag-back', STD, 'forwards')}, ${an(t.all, 'ag-fwd', STD, 'forwards')}; }
 ${P} .ag-repb { animation: ${an(t.back, 'ag-back', STD, 'forwards')}, ${an(t.fwd, 'ag-fwd', STD, 'forwards')}; }
 ${P} .ag-br .ag-b-glow { animation: ${an([t.fwd[0], t.write[0] + t.write[1] + .2 - t.fwd[0]], 'ag-glow', 'linear', 'none')}; }   /* (from when it readies until its pen has written) */
-${P} .ag-br { animation: ${an(t.br, 'ag-recv', STD, 'none')}, ${an([t.fwd[0] + .05, .32], 'ag-recv', STD, 'none')}; }
+${P} .ag-br { animation: ${an(t.br, 'ag-recv', STD, 'none')}, ${an([t.fwd[0] + .05, .32], 'ag-recv', STD, 'none')}, ${an([t.write[0] - .05, .32], 'ag-recv', STD, 'none')}; }   /* (it gets its part, readies, then presses as it writes the lead) */
 ${P} .ag-br .ag-bi { animation: ${an(t.write, 'ag-scribble', STD, 'none')}; }
-${PD} .ag-rpath { animation: ${an(t.rpath, 'ag-comet', STD, 'none')}; }   /* (Reporting's pulse to the card, landing on its pen as the card lands) */
 /* the step captions: the acting step bright, a finished one stepped back, the next one waiting; the light follows */
 ${focus(P, STAGE.d)}
 ${focus(PM, STAGE.m)}
@@ -627,8 +637,9 @@ ${P} .ag-tm { animation: ag-miss .48s ${STD} calc(${d(col(BAR0, 0))}s + var(--c)
 ${P} .ag-tl:not(.ag-tl-out) { animation: ag-on .32s ${EZ} calc(${d(col(BAR1, 0))}s + var(--c) * ${per(BAR1)}s + var(--ag-sh1)) both, ag-dimto ${t.dim[1]}s ${STD} calc(${d(t.dim[0])}s + (5 - var(--d)) * .06s + var(--ag-sh1)) forwards; }   /* (the second: each column lights as the beam crosses it, then they dim from the far edge inward, closing on the unusual one) */
 ${P} .ag-tl-out { animation: ag-light .32s ${EZ} calc(${d(col(BAR1, OUTT[1]))}s + var(--ag-sh1)) both; }
 ${P} .ag-n0 { animation: ${an(t.n0, 'ag-shake', EZ)}, ${an([t.erase[0], .22], 'ag-hide', STD, 'forwards')}; }
-${P} .ag-gl0 { animation: ${an([t.gl0[0], .32], 'ag-rise', EZ, 'forwards')}, ${an([t.gl0[0] + t.gl0[1] - .22, .22], 'ag-hide', STD, 'forwards')}; }   /* (eased in, out a little faster) */
-${P} .ag-gl1 { animation: ${an([t.gl1[0], .32], 'ag-rise', EZ, 'forwards')}, ${an([t.gl1[0] + t.gl1[1] - .22, .22], 'ag-hide', STD, 'forwards')}; }
+/* (round 4: one .2 s fade in, where a .32 s rise read as faint, then full; out on a .28 s fade lifting 2, where a .22 s
+   fade read as a vanish) */
+${[0, 1].map(k => `${P} .ag-gl${k} { animation: ${an([t['gl' + k][0], .2], 'ag-on', STD, 'forwards')}, ${an([t['gl' + k][0] + t['gl' + k][1] - .28, .28], 'ag-leave', STD, 'forwards')}; }`).join('\n')}
 ${P} .ag-beam1 { animation: ${an(t.s1, 'ag-beam', 'linear', 'none')}; }
 ${P} .ag-bar1 { animation: ${an(BAR1, 'ag-bar', 'linear', 'none')}; }
 /* (the count steps 4 a column as the beam lights each column, 4, 8 ... 32, landing as the beam leaves; "found" stays put) */
@@ -643,7 +654,8 @@ ${P} .ag-qw { animation: ${an(t.qw, 'ag-say', EZ)}; }
    words writing in line by line as it lands while Reporting's pen and the card's write together; then the packet runs
    the dashed line, uncovering it, and the analyst lights */
 ${PD} .ag-ln2 { animation: ${an(t.ln2, 'ag-draw')}; }
-${P} .ag-cf { animation: ${an([t.lift[0], .01], 'ag-cfo', 'linear', 'both', 1)}; }
+${PD} .ag-cf { animation: ${an([t.lift[0], .01], 'ag-cfo', 'linear', 'both', 1)}; }
+${PM} .ag-cf { animation: ${an([t.lift[0], t.lift[1] + SH2], 'ag-morph-m-o', 'linear', 'both', 1)}; }   /* (it fades between its tile and the card's end) */
 ${PD} .ag-cfg { animation: ${an(t.lift, 'ag-morph-d', 'linear', 'both', 1)}; }
 ${PD} .ag-cft { animation: ${an(t.lift, 'ag-morph-d', 'linear', 'both', 1)}, ${an(t.lift, 'ag-morph-d-t', 'linear', 'both', 1)}; }
 ${PM} .ag-cfg { animation: ${an([t.lift[0], t.lift[1] + SH2], 'ag-morph-m', 'linear', 'both', 1)}; }
@@ -657,18 +669,17 @@ ${P} .ag-pk { animation: ${an(t.pk, 'ag-pk', STD, 'none')}; }
 ${P} .ag-ana { animation: ${an(t.ana, 'ag-spring', SPRING)}; }
 ${P} .ag-halo { animation: ${an(t.halo, 'ag-halo', EZ, 'none')}; }
 ${P} .ag-decides { animation: ${an([t.all[0], .32], 'ag-say', EZ)}; }   /* (once the halo has spread, so it never crosses it; the resolve comes with it) */
-/* phones: once step 2's words have lit, Detection moves in one eased curve down the left gutter from its place in step 1
-   to its place in step 2, the spine's run to step 2's number filling as it goes and the number pulsing as it passes
-   behind it; the result travels small out through the right gutter and grows into the card in place, the run to step
-   3's number filling with it */
+/* phones: once step 2's words have lit, Detection hands over in place: it drifts down out of step 1 and fades, the
+   spine's run to step 2's number fills, and it drops into its place in step 2 as the number pulses; the result hops the
+   same way, its tile to the card's right end, the run to step 3's number filling, and grows into the card in place */
 ${PM} .ag-tk1 { animation: ${an(TV1, 'ag-trace', STD, 'both', 0)}; }
-${PM} .ag-tv1 { animation: ${an(TV1, 'ag-tv1', 'linear', 'forwards', 0)}, ${an([TV1[0], .01], 'ag-show', 'linear', 'forwards', 0)}, ${an([TV1[0] + TV1[1] + .05, .1], 'ag-hide', 'linear', 'forwards', 0)}; }
-${PM} .ag-s1 .ag-nd { animation: ${an([TV1[0] + PH.uNode * TV1[1] - .08, .32], 'ag-nd', STD, 'none', 0)}; }
-${PM} .ag-det { animation: ${an([TV1[0] + TV1[1] - .1, .12], 'ag-fade', STD, 'both', 0)}, ${an(t.detback, 'ag-back', STD, 'forwards', 1)}, ${an(t.all, 'ag-fwd', STD, 'forwards')}; }   /* (under the traveller, its exact size and place, just before it lands; it steps back as Reporting takes over) */
+${PM} .ag-tv1 { animation: ${an([TV1[0], .32], 'ag-tv1', STD, 'forwards', 0)}; }   /* (forwards only: its first keyframe is visible) */
+${PM} .ag-s1 .ag-nd { animation: ${an([TV1[0] + TV1[1] - .3, .32], 'ag-nd', STD, 'none', 0)}; }   /* (step 2's number pulses as Detection drops in) */
+${PM} .ag-det { animation: ${an([TV1[0] + .25, TV1[1] - .25], 'ag-drop', EZ, 'both', 0)}, ${an(t.detback, 'ag-back', STD, 'forwards', 1)}, ${an(t.all, 'ag-fwd', STD, 'forwards')}; }   /* (it drops into place as its copy in step 1 fades; it steps back as Reporting takes over) */
 ${PM} .ag-det .ag-bd { animation: ${RECV.slice(1).map(s => an([s, .32], 'ag-recv', STD, 'none')).join(', ')}; }
 ${PM} .ag-det .ag-bd .ag-b-glow { animation: ${an([TV1[0] + TV1[1] + .05, +(t.detglow[0] + t.detglow[1] + SH1 - TV1[0] - TV1[1] - .05).toFixed(2)], 'ag-glow', 'linear', 'none', 0)}; }   /* (its glow comes up once it has landed) */
-${PM} .ag-tk2 { animation: ${an([t.lift[0], t.lift[1] + SH2], 'ag-trace', STD, 'both', 1)}; }
-${PM} .ag-s2 .ag-nd { animation: ${an([t.lift[0] + t.lift[1] + SH2 - .1, .32], 'ag-nd', STD, 'none', 1)}; }
+${PM} .ag-tk2 { animation: ${an([t.lift[0] + SWELL - .05, MOVE.m[0] + .25], 'ag-trace', STD, 'both', 1)}; }   /* (the spine's run to step 3 fills as the result hops) */
+${PM} .ag-s2 .ag-nd { animation: ${an([t.lift[0] + SWELL + MOVE.m[0] - .05, .32], 'ag-nd', STD, 'none', 1)}; }   /* (step 3's number pulses as the card blooms) */
 ${PM} .ag-wire-det { animation: none; }   /* (a phone keeps Detection's old wire, to its faint outline, throughout) */
 ${PM} .ag-det1 { animation: ${an([TV1[0], .22], 'ag-ghost', STD, 'both', 0)}; }
 ${PM} .ag-det1 .ag-b { animation: ${an(t.bd, 'ag-recv', STD, 'none')}, ${an([t.lit[0], .32], 'ag-recv', STD, 'none')}; }   /* (it gets its part with the other two, then takes the hunch) */
