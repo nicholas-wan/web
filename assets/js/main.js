@@ -55,12 +55,13 @@
 	var chromeFrame = null;
 	var chromeScrolled = false;
 	// The wrapper-level pill steps away on downward reading progress and returns
-	// on upward intent. Context and sticky navigation parents opt out.
+	// on upward intent. Context and sticky navigation parents opt out. A short
+	// page (the 404) steps away at its end, before it scrolls 160px.
 	var toggleScrollY = window.scrollY;
 	function stepAway(y) {
 		if (navPanelToggle.parentElement !== wrapper) return;
 		if (Math.abs(y - toggleScrollY) < 8) return;
-		if (y > toggleScrollY && y > 160 && !body.classList.contains('is-navPanel-visible'))
+		if (y > toggleScrollY && y > Math.min(160, document.documentElement.scrollHeight - innerHeight - 8) && !body.classList.contains('is-navPanel-visible'))
 			navPanelToggle.classList.add('is-scrolled-away');
 		else
 			navPanelToggle.classList.remove('is-scrolled-away');

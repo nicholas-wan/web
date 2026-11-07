@@ -621,6 +621,9 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
         if ($stops.Count -gt 1) { $summary += ' &rarr; ' + (& $place $stops[$stops.Count - 1]) }
         $label = if ($stops.Count -eq 1) { 'View all 1 stop' } else { "View all $($stops.Count) stops" }
         $buttonClass = if ($match.Groups['buttonClass'].Success) { $match.Groups['buttonClass'].Value } else { 'travel-route__more guangzhou-route__more' }
+        # Every journal's button wears the teal day-strip chip (Nov 2026), including
+        # sources that still name only the older guangzhou-route__more class.
+        if ($buttonClass -notmatch '\btravel-route__more\b') { $buttonClass = "travel-route__more $buttonClass" }
         return $match.Groups['open'].Value + "<p class=`"travel-route-summary`">$summary</p>`n    " +
             "<div class=`"$($match.Groups['routeClass'].Value)`" id=`"$id`">$($match.Groups['stops'].Value)</div>$($match.Groups['gap'].Value)" +
             "<button class=`"$buttonClass`" type=`"button`" aria-expanded=`"false`" aria-controls=`"$id`">$label</button>`n  </div>"

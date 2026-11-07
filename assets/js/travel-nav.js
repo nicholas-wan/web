@@ -102,15 +102,11 @@
       cancel();
     };
     var cleanup = function () {
-      /* Tearing down must also disarm. correct() is reachable from two async
-         entry points that were queued before teardown — the double rAF below and
-         document.fonts.ready — and its only guard is this flag. A landing torn
-         down by a later startAnchorLanding() (fonts still pending at load, or
-         pageshow landing within two frames of load) used to resurrect itself
-         here: it re-armed its own 160ms timer with every cancel listener already
-         removed, so nothing the visitor did could stop it, and it scrolled them
-         back to the anchor minutes into reading. That is the self-scrolling
-         report the landing correction exists to prevent. */
+      /* Tearing down must also disarm. correct() can still run from the double
+         rAF or document.fonts.ready queued earlier, and this flag is its only
+         guard: a landing torn down by a later startAnchorLanding() used to
+         re-arm its 160ms timer with every cancel listener gone, scrolling the
+         visitor back to the anchor minutes into reading. */
       cancelled = true;
       if (timer) window.clearTimeout(timer);
       if (observer) observer.disconnect();
@@ -248,6 +244,7 @@
       if (!moreEnd && document.activeElement === forward && moreStart) back.focus({ preventScroll: true });
       back.disabled = !moreStart;
       forward.disabled = !moreEnd;
+      edgeStrip.classList.toggle('is-scrolled', moreStart);
       /* Nothing to scroll: hide both, never two dimmed arrows. */
       back.hidden = forward.hidden = hidden <= 2;
     };
@@ -317,10 +314,9 @@
     activeSectionId = section.id;
   };
 
-  /* Position-based scrollspy: the current section is the last heading above
-     the 30%-viewport line. Unlike observing the thin <h2> elements with an
-     IntersectionObserver band, this also resolves after anchor jumps and on
-     initial load. */
+  /* Scrollspy: the current section is the last heading above 30% of the
+     viewport (resolves after anchor jumps and on load, unlike an observer);
+     at the page bottom a short last day counts once it is on screen. */
   var update = function () {
     updateNavSurface();
     var line = window.innerHeight * 0.3;
@@ -329,6 +325,8 @@
       if (sectionStart(sections[i]).getBoundingClientRect().top <= line) current = sections[i];
       else break;
     }
+    var last = sections[sections.length - 1];
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 2 && sectionStart(last).getBoundingClientRect().top < innerHeight) current = last;
     setActive(current);
   };
 

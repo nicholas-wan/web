@@ -197,7 +197,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - `<button>` and `[role="button"]` share the `a:focus-visible` teal ring; archive card ring is teal.
 - Small uppercase labels: `--eyebrow-size` (`max(var(--text-floor), 0.7rem)`), `--eyebrow-tracking` (0.12em), brand-700 (atlas/Japan/archive eyebrows, search label, internship labels, day dates, pager spans, footer "Contact").
 - `--radius-control` (0.3rem) for controls; `--color-ink-800`, not `#333`.
-- Day-strip pills: Source Sans 700, brand-600 active. The "Trip sections" label uses the eyebrow token; desktop strips fade at the right edge like phones.
+- Day-strip pills: Source Sans 700, brand-600 active. The "Trip sections" label uses the eyebrow token; desktop strips fade at the right edge like phones, and at the left too once scrolled (Nov 2026). At the page bottom a short last day becomes the active chip once its heading is on screen.
 - Journal days (7 Nov 2026): one 1.1rem (16px) phone gutter, the same as the hero, and an inset 1px `#e5eaeb` divider on every journal (`journal-polish` block, last in `travel-journal.css`).
 - Travel section headings ("Travel journals", "Browse photos", "Explore by destination"): 1.1rem/900. "Show all" is teal 700 like "Another mix"; shortcut counts use `--color-ink-600`. Lightbox captions: 1.5 leading, context line ≥12px.
 - Source Sans Pro ships 700 (latin, via `tools/fonts/subset-source-sans.py` from Source Sans 3) and 900; labels use 700, titles 900. The Shopee peek alone also ships Figtree 400/500/700 (ASCII only); see Fonts.

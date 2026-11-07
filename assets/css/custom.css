@@ -10301,5 +10301,11 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
     -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
     mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
   }
+
+  /* Once scrolled, the left edge fades too instead of cutting a chip (Nov 2026). */
+  .travel-jump-groups.is-scrolled {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
+  }
 }
 /* Route bundle: journal-polish:end */
