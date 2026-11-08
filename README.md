@@ -200,7 +200,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Day-strip pills: Source Sans 700, brand-600 active. The "Trip sections" label uses the eyebrow token; desktop strips fade at the right edge like phones, and at the left too once scrolled (Nov 2026). At the page bottom a short last day becomes the active chip once its heading is on screen.
 - Journal days (7 Nov 2026): one 1.1rem (16px) phone gutter, the same as the hero, and an inset 1px `#e5eaeb` divider on every journal (`journal-polish` block, last in `travel-journal.css`).
 - Travel section headings ("Travel journals", "Browse photos", "Explore by destination"): 1.1rem/900. "Show all" is teal 700 like "Another mix"; shortcut counts use `--color-ink-600`. Lightbox captions: 1.5 leading, context line ≥12px.
-- Source Sans Pro ships 700 (latin, via `tools/fonts/subset-source-sans.py` from Source Sans 3) and 900; labels use 700, titles 900. The Shopee peek alone also ships Figtree 400/500/700 (ASCII only); see Fonts.
+- Source Sans Pro ships 700 (latin, via `tools/fonts/subset-source-sans.py` from Source Sans 3) and 900; labels use 700, titles 900. The Shopee peek and Projects demos also use Figtree 400/500/700 (ASCII only); see Fonts.
 - `.travel-map__place` stays explicit 900 (atlas collision layout).
 - Preload Source Sans 900 everywhere, Raleway on journals, Merriweather only on the text-first pages (Experience, Skills, 404; Nov 2026: on photo-led pages it slowed the banner by 0.2-0.4 s on slow phones). `--font-display` uses size-adjusted `"Source Sans Fallback"` (Arial 86%/97%) against cold-load reflow; the body stack likewise names `"Merriweather Fallback"` (Georgia 105.8% / bold 95.6% / italic 97.3%, Merriweather's ascent and descent), added 7 Nov 2026 when the late swap rewrapped Silicon Valley's lede and moved its banner 25px (CLS 0.004 to 0.056 on slow phones; now 0.004). 105.8% is the middle of the band where the fewest first-screen blocks rewrap (2 across 15 pages at 360-430px, against 16 for plain Georgia). Android has no Georgia and keeps the plain fallback.
 - Phone floor: `font-size: max(var(--text-floor), <rem>)`; `--text-floor` is 12px at ≤736px, else 0.
@@ -271,6 +271,14 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Equal-size cards (all 130px plots; notes reserve two lines below 360px, where the Statistical baseline note wraps; from 360 all three are one line), one plain note each, no "simulated" disclaimer (owner).
 - Charts animate only while open and on screen; reduced motion shows stills.
 - Never show two charts at once or overlay the writeup.
+
+### Projects page contracts
+
+- Four apps have equal cards in a two-column grid, one column below 981px: SquashBot, Nag-bot, Finance tracker and Travel Packing. Brawl Stars stays under Earlier. No This site card.
+- Each card has a working 300 x 560 sample demo, a reset button and three short reasons. The finance header always says Sample; import checks are a simplified explanation, identified in the caption. No app data files or real household/group details ship.
+- Demos run entirely in memory. A guided preview starts once at 90% visibility after 500 ms of settled scrolling, one demo at a time. Taps and keys stop it; swipes re-arm it. Reduced motion skips previews. Start over restores that demo only. Use flat scoped CSS for iOS 16; keep each phone and its reset visible together on phones.
+- Projects sits between Work and Skills. Only its route loads projects.css/projects.js; it shares Work's opening style. The 80 KB per-page JavaScript limit still applies. Archivo is self-hosted from the packing app's OFL font; see assets/fonts/archivo-SOURCES.md.
+- Only SquashBot and Brawl Stars link to source. Nag-bot source is not shared because its repository exposes household details; finance remains private. Do not link tele-nagbot or WeeYingxian/avery. Test counts are omitted because they change between releases.
 
 ### Travel journal contracts
 
@@ -583,9 +591,9 @@ python -I tools/fonts/subset-latin-ext.py
 - Raleway has no caron vowels (ǎ ǐ ǒ ǔ ǚ ǜ), so they fall back as they always did; the script notes it.
 - Characters outside Google's latin and latin-ext ranges (arrows, Greek, CJK, Korean, Vietnamese) never used the web fonts and still fall back to system fonts.
 
-### Figtree (Shopee peek)
+### Figtree (Shopee peek and Projects demos)
 
-`assets/fonts/figtree-{400,500,700}-ascii.woff2` are static ASCII instances of the Figtree variable font, declared in `internship-peek.css` for the Shopee scene only (Shopee's own face is not free; Figtree is its nearest free match):
+`assets/fonts/figtree-{400,500,700}-ascii.woff2` are static ASCII instances of the Figtree variable font, declared in `internship-peek.css` for the Shopee scene and in `projects.css` for the app demos (Shopee's own face is not free; Figtree is its nearest free match):
 
 ```powershell
 python -I tools/fonts/subset-figtree.py <path-to-Figtree[wght].ttf>

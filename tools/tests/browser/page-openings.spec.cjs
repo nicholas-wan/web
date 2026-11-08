@@ -2,6 +2,7 @@ const { test, expect } = require('@playwright/test');
 
 const openings = [
   ['/experience', '.portfolio-headline h1'],
+  ['/projects', '.portfolio-headline h1'],
   ['/skills', '.skills-heading h2'],
   ['/personal', '.personal-timeline__intro h1'],
   ['/travel', '.travel-atlas__header h1']

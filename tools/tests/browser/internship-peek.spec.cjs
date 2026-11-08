@@ -271,6 +271,11 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  // (owner, 1 Nov 2026, on an iPhone 16: "the whole animation is too long and cannot find the screen entirely").
  // (owner, 8 Nov 2026: "Should it take up slightly more of the screen to be readable?": it runs to the card's edges, as
  // wide as the article, and still fits an iPhone 16's 659px Safari viewport, less the 8px the page's framing keeps)
+ // The card grows from scale(.92); visibility can resolve before that transition finishes.
+ await expect.poll(async()=>{
+  const phone=await phoneScene(root).boundingBox(), article=await page.locator('#agentic-ai').boundingBox();
+  return phone.width-(article.width-4);
+ }).toBeGreaterThan(0);
  const pb=await phoneScene(root).boundingBox(), ab=await page.locator('#agentic-ai').boundingBox();
  expect(pb.height).toBeGreaterThan(pb.width*1.5);
  expect(pb.width).toBeGreaterThan(ab.width-4);

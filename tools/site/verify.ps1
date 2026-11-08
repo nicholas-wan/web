@@ -74,7 +74,7 @@ foreach ($journal in $modularJournals) {
     if ($journalSource -match '<(?:!DOCTYPE|html|head|body)\b|<div id="main"|<footer id="footer"') { throw "$($journal.source) must contain journal content only, without a document shell." }
 }
 $pages = Get-ChildItem -LiteralPath $dist -Filter *.html -File
-if ($pages.Count -ne 18) { throw "Expected 18 generated pages, found $($pages.Count)." }
+if ($pages.Count -ne 19) { throw "Expected 19 generated pages, found $($pages.Count)." }
 $retiredPaths = @(
     'league.html',
     'experience_ndu.html',
@@ -102,7 +102,8 @@ $routeCssOwners = @{
     'travel-map-page.css' = @('travel.html')
     'travel-search.css' = @('travel.html')
     'travel-journal.css' = $journalPageNames
-    'experience-page.css' = @('experience.html')
+    'experience-page.css' = @('experience.html', 'projects.html')
+    'projects.css' = @('projects.html')
     'personal-page.css' = @('personal.html')
     'skills-page.css' = @('skills.html')
     'gallery.css' = @($eventPageNames + $journalPageNames)
@@ -131,7 +132,7 @@ foreach ($page in $pages) {
     # Only text-first pages preload Merriweather; on the homepage and the
     # photo-led pages it competed with the banner on slow phones (Nov 2026).
     $bodyFontPreload = $scan -match '<link rel="preload" href="assets/fonts/merriweather-300-latin\.woff2" as="font" type="font/woff2" crossorigin />'
-    $textFirstPage = @('experience.html', 'skills.html', '404.html') -contains $page.Name
+    $textFirstPage = @('experience.html', 'projects.html', 'skills.html', '404.html') -contains $page.Name
     if (-not $textFirstPage -and $bodyFontPreload) { throw "$($page.Name) must not preload the body font." }
     if ($textFirstPage -and -not $bodyFontPreload) { throw "$($page.Name) is missing the body-font preload." }
     # Oct 2026: the display font swaps in on every page's nav and headings and
@@ -206,7 +207,7 @@ foreach ($page in $pages) {
     $navLabels = foreach ($navLink in [regex]::Matches($primaryNav.Groups[1].Value, '(?s)<a\b[^>]*>(.*?)</a>', 'IgnoreCase')) {
         [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($navLink.Groups[1].Value, '<[^>]+>', '') -replace '\s+', ' ').Trim())
     }
-    if (($navLabels -join '|') -ne 'About|Work|Skills|Personal|Travel') { throw "$($page.Name) has inconsistent primary navigation labels." }
+    if (($navLabels -join '|') -ne 'About|Work|Projects|Skills|Personal|Travel') { throw "$($page.Name) has inconsistent primary navigation labels." }
     $sharedNav = [regex]::Match($scan, '(?s)<nav id="nav">.*?</nav>', 'IgnoreCase')
     if (-not $sharedNav.Success) { throw "$($page.Name) is missing the shared navigation block." }
     # Page changes (Oct 2026): the active tab carries an empty highlight mark that
@@ -292,7 +293,8 @@ foreach ($copiedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'asset
         'assets/js/personal-timeline.js', 'assets/js/scramble-reveal.js',
         'assets/js/travel-discovery.js', 'assets/js/photo-search.js', 'assets/js/page-transitions.js',
         'assets/js/anomaly-peek.js', 'assets/js/travel-shortcuts.js', 'assets/js/travel-chronology.js',
-        'assets/css/internship-peek.css', 'assets/js/internship-peek.js')) {
+        'assets/css/internship-peek.css', 'assets/js/internship-peek.js',
+        'assets/css/projects.css', 'assets/js/projects.js')) {
     Assert-DistMatchesSource $copiedAsset
 }
 
@@ -390,6 +392,8 @@ Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 # 10 -> 19 (5 Nov 2026): the education, toolkit-card and tech-stack rules moved
 # here from shared custom.css, which every page loads.
 Assert-FileSizeBudget 'assets\css\skills-page.css' 19
+Assert-FileSizeBudget 'assets\css\projects.css' 60
+Assert-FileSizeBudget 'assets\js\projects.js' 62
 # Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
 Assert-FileSizeBudget 'assets\css\gallery.css' 15
 Assert-FileSizeBudget 'assets\css\icons.css' 4
@@ -992,6 +996,16 @@ if ($personalTimelineJs -notmatch 'readingLine = viewport \* 0\.94' -or $persona
 if ([regex]::Matches($experience, 'data-scramble-list').Count -ne 2 -or [regex]::Matches($experience, 'data-scramble-row data-scramble-lead="1"').Count -ne 2 -or $experience -notmatch 'data-scramble-source>Planning reduced from days to hours<' -or $experience -notmatch 'data-scramble-source>New detection capabilities in daily operational use<' -or $experience -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/scramble-reveal.js'))) { throw "Both experience Outcome rows must scramble independently with one unscrambled lead word." }
 if ($experience -match 'og:image' -or $experience -match 'twitter:card') { throw "The experience page opts out of a share-preview image." }
 if ((Get-Content -LiteralPath (Join-Path $dist 'skills.html') -Raw -Encoding UTF8) -match 'og:image|twitter:card') { throw "The skills page opts out of a share-preview image." }
+Assert-FileSizeBudget 'projects.html' 40
+$projectsCss = Get-Content -LiteralPath (Join-Path $dist 'assets/css/projects.css') -Raw -Encoding UTF8
+$flatProjectsCss = [regex]::Replace($projectsCss, '(?s)@keyframes\s+[\w-]+\s*\{(?:[^{}]|\{[^{}]*\})*\}', '')
+$flatProjectsCss = [regex]::Replace($flatProjectsCss, '@media[^{}]*\{', '')
+if ($flatProjectsCss -match '\{[^{}]*\{') { throw 'Projects CSS must stay unnested for iOS 16.' }
+# Projects: four equal interactive sample demos, route-only assets and no household source links.
+$projectsHtml = Get-Content -LiteralPath (Join-Path $dist 'projects.html') -Raw -Encoding UTF8
+if ($projectsHtml -match 'og:image|twitter:card' -or $projectsHtml -notmatch '<body class="is-preload page-experience page-projects">' -or [regex]::Matches($projectsHtml, 'class="app-card"').Count -ne 4 -or [regex]::Matches($projectsHtml, 'data-demo="(?:squash|nag|finance|packing)"').Count -ne 4 -or $projectsHtml -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/projects.js')) -or $projectsHtml -match 'assets/js/(?:internship-peek|scramble-reveal).js') { throw "Projects must carry four interactive demos, its own script and no share-preview image." }
+if ($projectsHtml -match 'tele-nagbot|WeeYingxian/avery|lab/projects|This site' -or $projectsHtml -notmatch 'class="f-sample">Sample</span>') { throw "Projects must label sample finances and keep household repositories unlinked." }
+
 if ([regex]::Matches($experience, 'January 2021 &ndash; Present').Count -ne 2 -or $experience -notmatch 'Also at DSTA') { throw "Both DSTA cards must carry the January 2021 - Present period, with the slim context line on Cloud Analytics." }
 if ([regex]::Matches($experience, 'class="case-study__company"').Count -ne 4) { throw "Only the agentic AI card and the three internships carry a full company header; Cloud Analytics defers to the hero card." }
 if ($homeHtml -notmatch 'id="about-me"') { throw "Homepage About section anchor is missing." }
@@ -1121,8 +1135,9 @@ if ($personal -notmatch '(?s)personal-event-card__image personal-event-card__ima
 if ($personal -notmatch '<img src="images/personal/cats-banner\.webp" style="--focus-y: 15%"') { throw "The cats banner must keep both faces balanced in the mobile crop." }
 $primaryPagers = @{
     'index.html' = @('href="experience"', '>Work &#8594;</strong>')
-    'experience.html' = @('href="index"', 'href="skills"')
-    'skills.html' = @('href="experience"', 'href="personal"')
+    'experience.html' = @('href="index"', '>Projects &#8594;</strong>')
+    'projects.html' = @('&#8592; Work</strong>', '>Skills &#8594;</strong>')
+    'skills.html' = @('&#8592; Projects</strong>', 'href="personal"')
     'personal.html' = @('href="skills"', 'href="travel"')
     'travel.html' = @('href="personal"', '&#8592; Personal</strong>')
 }

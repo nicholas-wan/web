@@ -532,10 +532,11 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
 }
 
 function Add-PageNavigation([string]$Markup, [string]$Slug) {
-    $sectionOrder = @('index', 'experience', 'skills', 'personal', 'travel')
+    $sectionOrder = @('index', 'experience', 'projects', 'skills', 'personal', 'travel')
     $sectionLabels = @{
         'index' = 'About'
         'experience' = 'Work'
+        'projects' = 'Projects'
         'skills' = 'Skills'
         'personal' = 'Personal'
         'travel' = 'Travel'
@@ -566,6 +567,8 @@ function Add-PageNavigation([string]$Markup, [string]$Slug) {
 function Add-SectionIntro([string]$Markup, [string]$Slug) {
     $intro = switch ($Slug) {
         'experience' { '<div id="selected-work" class="portfolio-headline"><span class="page-opening-eyebrow">Experience</span><h1 id="portfolio-title">Selected work</h1></div>' }
+        # Projects (8 Nov 2026) opens like Work, with a one-line lede under its title.
+        'projects' { '<div id="side-projects" class="portfolio-headline"><span class="page-opening-eyebrow">Projects</span><h1 id="portfolio-title">Side projects</h1><p class="projects-intro">Apps I&#8217;ve built in my own time, for my squash group and for home. Each does something I couldn&#8217;t find in an app. Try the simplified demos below. All figures and messages are sample data.</p></div>' }
         default { $null }
     }
     if (-not $intro) { return $Markup }
@@ -765,7 +768,7 @@ foreach ($bundle in $routeCssParts.Keys) {
     $routeCssBundles[$bundle] = Remove-CssComments ($routeCssParts[$bundle] -join "`n`n")
 }
 $runtimeCssText = @{}
-foreach ($file in @('icons.css', 'main.css', 'noscript.css', 'internship-peek.css')) {
+foreach ($file in @('icons.css', 'main.css', 'noscript.css', 'internship-peek.css', 'projects.css')) {
     $runtimeCssText[$file] = Remove-CssComments (Get-Content -LiteralPath (Join-Path $root "assets\css\$file") -Raw -Encoding UTF8)
 }
 
@@ -782,7 +785,7 @@ $assetVersions = @{}
 foreach ($file in $runtimeCssText.Keys) {
     $assetVersions["assets/css/$file"] = Get-ContentVersion $runtimeCssText[$file]
 }
-foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'travel-shortcuts.js', 'travel-chronology.js')) {
+foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'travel-shortcuts.js', 'travel-chronology.js', 'projects.js')) {
     $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
 }
 $assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
@@ -1237,14 +1240,15 @@ foreach ($page in $pages) {
     $travelDiscoveryScript = if ($slug -eq 'travel') { "<script src=`"$(Get-AssetRef 'assets/js/travel-discovery.js')`"></script>" } else { "" }
     $personalTimelineScript = if ($slug -eq 'personal') { "<script src=`"$(Get-AssetRef 'assets/js/personal-timeline.js')`"></script>" } else { "" }
     $scrambleRevealScript = if ($slug -in @('index', 'experience')) { "<script src=`"$(Get-AssetRef 'assets/js/scramble-reveal.js')`"></script>" } else { "" }
+    $projectsScript = if ($slug -eq 'projects') { "<script src=`"$(Get-AssetRef 'assets/js/projects.js')`"></script>" } else { "" }
     $anomalyPeekScript = if ($slug -eq 'experience') { "<script src=`"$(Get-AssetRef 'assets/js/anomaly-peek.js')`"></script><script src=`"$(Get-AssetRef 'assets/js/internship-peek.js')`"></script>" } else { "" }
     $gameScript = if ($slug -eq 'index') { "<script src=`"$(Get-AssetRef 'assets/js/game.js')`"></script>" } else { "" }
     $listingEffectsScript = if ($slug -in @('skills', 'travel')) { "<script src=`"$(Get-AssetRef 'assets/js/listing-effects.js')`"></script>" } else { "" }
     $journalProgressScript = if ($tripOrder -contains $slug) { "<script src=`"$(Get-AssetRef 'assets/js/journal-progress.js')`"></script>" } else { "" }
     $canvasScript = if ($slug -eq 'index') { "<script src=`"$(Get-AssetRef 'assets/js/canvas-background.js')`"></script>" } else { "" }
     $travelNavigationScripts = if ($slug -eq 'travel') { "<script src=`"$(Get-AssetRef 'assets/js/travel-shortcuts.js')`"></script>`n    <script src=`"$(Get-AssetRef 'assets/js/travel-chronology.js')`"></script>" } else { "" }
-    $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelDiscoveryScript, $travelNavigationScripts, $personalTimelineScript, $scrambleRevealScript, $anomalyPeekScript) | Where-Object { $_ }) -join "`n    "
-    $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
+    $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelDiscoveryScript, $travelNavigationScripts, $personalTimelineScript, $scrambleRevealScript, $anomalyPeekScript, $projectsScript) | Where-Object { $_ }) -join "`n    "
+    $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($slug -eq 'projects') { 'is-preload page-experience page-projects' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
     $routeStylesheets = @()
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-map-page.css')`" />" }
     if ($slug -eq 'travel') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-search.css')`" />"; $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-navigation.css')`" />" }
@@ -1252,6 +1256,8 @@ foreach ($page in $pages) {
     if ($galleryPages -contains $slug) { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/gallery.css')`" />" }
     if ($tripOrder -contains $slug) { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-journal.css')`" />" }
     if ($slug -eq 'experience') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/experience-page.css')`" /><link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/internship-peek.css')`" />" }
+    # Projects speaks the Work page's case-study cards, so it takes Work's bundle and adds its own.
+    if ($slug -eq 'projects') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/experience-page.css')`" /><link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/projects.css')`" />" }
     if ($slug -eq 'personal') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/personal-page.css')`" />" }
     if ($slug -eq 'skills') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/skills-page.css')`" />" }
     $routeStylesheetMarkup = $routeStylesheets -join "`n"
@@ -1260,10 +1266,10 @@ foreach ($page in $pages) {
     if ($slug -eq 'travel') { $routeStylesheetMarkup += "`n    <link rel=`"preload`" href=`"$(Get-AssetRef 'assets/data/travel-scenes.svg')`" as=`"fetch`" crossorigin fetchpriority=`"low`" media=`"(min-width: 737px)`" />" }
     # The professional pages opt out of a share-preview image (owner decision,
     # Jul 2026): scrapers show a text-only card rather than the travel default.
-    $shareImageMeta = if ($slug -in @('experience', 'skills')) { '' } else { "    <meta property=`"og:image`" content=`"__OGIMAGE__`" />`n    <meta name=`"twitter:card`" content=`"summary_large_image`" />" }
+    $shareImageMeta = if ($slug -in @('experience', 'projects', 'skills')) { '' } else { "    <meta property=`"og:image`" content=`"__OGIMAGE__`" />`n    <meta name=`"twitter:card`" content=`"summary_large_image`" />" }
     $introLine = if ($intro) { "    $intro" } else { "" }
     $canvasMarkup = if ($slug -eq 'index') { '    <canvas id="nokey" width="800" height="800" aria-hidden="true"></canvas>' } else { '' }
-    $bodyFontPreloadPages = @('experience', 'skills', '404')
+    $bodyFontPreloadPages = @('experience', 'projects', 'skills', '404')
     $preloadMarkup = '    <link rel="preload" href="assets/fonts/source-sans-pro-900-latin.woff2" as="font" type="font/woff2" crossorigin />'
     # Nov 2026: only pages whose first screen is body text preload Merriweather.
     # On the homepage it starts ~1400px down; on the photo-led pages (journals,
@@ -1349,7 +1355,7 @@ if ($imageDimensionCacheDirty) {
 }
 
 # Publish only runtime assets used by the generated Pages site.
-$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "travel-shortcuts.js", "travel-chronology.js")
+$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "travel-shortcuts.js", "travel-chronology.js", "projects.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCssText.Keys) {

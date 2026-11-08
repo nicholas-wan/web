@@ -1,0 +1,300 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Nicholas Wan - Side Projects</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="Side projects by Nicholas Wan: SquashBot, Nag-bot, a finance tracker and Travel Packing, with interactive sample demos." />
+	<link rel="canonical" href="https://nicholaswan.me/projects" />
+	<link rel="stylesheet" href="assets/css/icons.css" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<link rel="stylesheet" href="assets/css/custom.css" />
+	<link rel="shortcut icon" type="image/png" href="images/favicon.png" />
+	<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+</head>
+<body class="is-preload">
+	<div id="wrapper">
+		<header id="header"><a href="index" class="logo icon fa-home" aria-label="Home"></a></header>
+
+		<div id="main" class="experience-portfolio">
+			<div class="portfolio-overview">
+			<section class="app-grid" aria-labelledby="portfolio-title">
+
+				<article class="app-card" id="squashbot" aria-labelledby="squashbot-title">
+					<figure class="app-card__demo"><a class="app-demo__skip" href="#squashbot-title">Skip SquashBot demo</a>
+						<div class="app-stage"><div class="app-phone"><div class="app-demo app-demo--squash" data-demo="squash"><div class="sq" role="group" aria-label="Interactive demo of SquashBot with sample data">
+  <div class="sq-sb demo-status" aria-hidden="true"><span>9:41</span><span class="demo-island"></span><svg viewBox="0 0 68 12" aria-hidden="true"><path d="M0 8h3v4H0zm4.5-2h3v6h-3zM9 3.5h3V12H9zM13.5 1h3v11h-3zm15 10.6-2.3-2.3a3.3 3.3 0 0 1 4.6 0zm-3.8-3.8-1.5-1.5a7.5 7.5 0 0 1 10.6 0l-1.5 1.5a5.4 5.4 0 0 0-7.6 0zm-3-3-1.5-1.5a11.8 11.8 0 0 1 16.6 0l-1.5 1.5a9.6 9.6 0 0 0-13.6 0zM44 2.5h15v7H44z" fill="currentColor"/><rect x="42" y=".5" width="22" height="11" rx="3.4" fill="none" stroke="currentColor" opacity=".4"/></svg></div>
+  <div class="sq-hd">
+    <span class="sq-bk" aria-hidden="true"><svg viewBox="0 0 11 19" width="11" height="19"><path d="M9.5 1.5 1.8 9.5l7.7 8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Chats</span></span>
+    <div class="sq-ttl"><div class="sq-tn">Squash</div><div class="sq-ts" data-sub>8 members</div></div>
+    <span class="sq-gav" aria-hidden="true">S</span>
+  </div>
+  <button type="button" class="sq-pin" data-pin>
+    <span class="sq-pbar" aria-hidden="true"><span></span><span></span></span>
+    <span class="sq-ptx"><span class="sq-ph">Pinned message</span><span class="sq-pm" data-pm></span></span>
+    <svg class="sq-plist" aria-hidden="true" viewBox="0 0 20 20" width="20" height="20"><path d="M3 5h14M3 10h14M3 15h9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+  </button>
+  <div class="sq-mini-links"><button type="button" data-mini="tab">🧾 Tab <span>↗</span></button><button type="button" data-mini="courts">🎾 Courts <span>↗</span></button></div><div class="sq-chat" data-chat role="log" aria-live="off" data-demo-live aria-relevant="additions" aria-atomic="false"></div>
+  <span class="sq-sample-label">Sample messages</span><div class="sq-chips" role="group" aria-label="Sample bookings to send">
+    <button type="button" class="sq-chip">tmr c4 2100</button>
+    <button type="button" class="sq-chip">fri 8pm court 2</button>
+    <button type="button" class="sq-chip">court four sunday 8-9:30pm</button>
+  </div>
+  <form class="sq-cmp" data-form autocomplete="off">
+    <svg class="sq-clip" aria-hidden="true" viewBox="0 0 24 24" width="24" height="24"><path d="m17.5 11.2-6.6 6.6a4.2 4.2 0 0 1-6-6l7.2-7.2a2.8 2.8 0 0 1 4 4l-7 7a1.4 1.4 0 0 1-2-2l6.4-6.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="sq-fld"><input class="sq-in" data-in type="text" aria-label="Message" placeholder="Message" maxlength="60" enterkeyhint="send" spellcheck="false"></div>
+    <button class="sq-snd" type="submit" aria-label="Send message"><svg class="sq-mic" viewBox="0 0 24 24" width="24" height="24"><path d="M12 3.5a2.8 2.8 0 0 0-2.8 2.8v5.4a2.8 2.8 0 0 0 5.6 0V6.3A2.8 2.8 0 0 0 12 3.5zM6.6 11.4a5.4 5.4 0 0 0 10.8 0M12 16.8v3.4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><svg class="sq-arw" viewBox="0 0 24 24" width="24" height="24"><circle cx="12" cy="12" r="12" fill="#6ab2f2"/><path d="M12 17.5v-11m-4.6 4.6L12 6.5l4.6 4.6" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  </form>
+  <div class="sq-home" aria-hidden="true"></div>
+  <div class="sq-toast" data-toast role="status" aria-live="off" data-demo-live></div>
+</div>
+</div></div></div>
+						<div class="app-card__foot"><figcaption>Tap a sample message to book.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over SquashBot"><span aria-hidden="true">&#8635;</span> Start over</button></div>
+					</figure>
+					<div class="app-card__body">
+						<div class="app-card__head">
+							<div>
+								<p class="app-card__kind"><svg class="app-card__tg" viewBox="0 0 496 512" aria-hidden="true"><use href="#pj-telegram"/></svg>Telegram bot &middot; since Aug 2026</p>
+								<h2 id="squashbot-title" tabindex="-1">SquashBot</h2>
+							</div>
+							<a class="app-card__repo" href="https://github.com/nicholas-wan/squash-bot" target="_blank" rel="noopener noreferrer" aria-label="SquashBot on GitHub"><svg viewBox="0 0 496 512" aria-hidden="true"><use href="#pj-github"/></svg></a>
+						</div>
+						<p class="app-card__dek">Court bookings for my squash group, typed into the group chat.</p>
+						<ul class="app-why" aria-label="Why I built my own">
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-chat"/></svg></span><p><strong>Books from plain text</strong><span>&#8220;tmr c4 2100&#8221; is a booking.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-coins"/></svg></span><p><strong>Splits the court fee</strong><span>Peak or off-peak, among the players.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-eye-off"/></svg></span><p><strong>Quiet in the group</strong><span>Forms and receipts reach only you.</span></p></li>
+						</ul>
+						<p class="app-card__facts"><span>Cloudflare Workers, D1</span></p>
+					</div>
+				</article>
+
+				<article class="app-card" id="nag-bot" aria-labelledby="nagbot-title">
+					<figure class="app-card__demo"><a class="app-demo__skip" href="#nagbot-title">Skip Nag-bot demo</a>
+						<div class="app-stage"><div class="app-phone"><div class="app-demo app-demo--nag" data-demo="nag"><div class="nag" role="group" aria-label="Interactive demo of Nag-bot with sample data">
+  <div class="n-status demo-status" aria-hidden="true"><span>9:41</span><span class="demo-island"></span><svg viewBox="0 0 68 12" aria-hidden="true"><path d="M0 8h3v4H0zm4.5-2h3v6h-3zM9 3.5h3V12H9zM13.5 1h3v11h-3zm15 10.6-2.3-2.3a3.3 3.3 0 0 1 4.6 0zm-3.8-3.8-1.5-1.5a7.5 7.5 0 0 1 10.6 0l-1.5 1.5a5.4 5.4 0 0 0-7.6 0zm-3-3-1.5-1.5a11.8 11.8 0 0 1 16.6 0l-1.5 1.5a9.6 9.6 0 0 0-13.6 0zM44 2.5h15v7H44z" fill="currentColor"/><rect x="42" y=".5" width="22" height="11" rx="3.4" fill="none" stroke="currentColor" opacity=".4"/></svg></div>
+  <div class="n-head">
+    <span class="n-back" aria-hidden="true"><svg viewBox="0 0 10 18" width="9" height="16" stroke-width="2.2"><path d="M8.5 1.5 1.5 9l7 7.5"/></svg>Chats</span>
+    <span class="n-who"><b>Chores</b><small>3 members</small></span>
+    <span class="n-ava" aria-hidden="true">🐾</span>
+  </div>
+  <div class="n-pin">
+    <span class="n-pintext"><b>Pinned message</b><span>🐾 Chores · 🔔 nagging since today 7:30 PM · 💩 wash the litter box</span></span>
+    <button type="button" class="n-pinbtn" data-act="open" aria-label="Open the 🐾 Chores Mini App">🐾 Chores</button>
+  </div>
+  <div class="n-chat">
+    <div class="n-feed">
+      <span class="n-date">Today</span>
+      <div class="n-msg">
+        <div class="n-bubble"><span class="n-name">Nag-Bot</span>🪦 <s>fold the laundry</s> — 24 hours and nobody did it. Latte &amp; Mocha are deeply disappointed.<span class="n-time">8:00 AM</span></div>
+      </div>
+      <div class="n-live"></div>
+    </div>
+    <div class="n-toast" role="status" aria-live="off" data-demo-live></div>
+  </div>
+  <div class="n-input" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="21" height="21"><path d="M16.5 7.5 9 15a2 2 0 0 0 2.8 2.8l8-8a4 4 0 0 0-5.6-5.6l-8.3 8.3a6 6 0 0 0 8.5 8.5l6.6-6.6"/></svg>
+    <span class="n-field">Message<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.2c1.8 2 5.2 2 7 0"/><path d="M9.2 9.8h0m5.6 0h0" stroke-width="2.6"/></svg></span>
+    <svg viewBox="0 0 24 24" width="21" height="21"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5"/><path d="M5 11.5a7 7 0 0 0 14 0M12 18.5v3"/></svg>
+  </div>
+  <div class="n-shade" data-act="close" aria-hidden="true"></div>
+  <div class="n-sheet" role="dialog" aria-label="🐾 Chores Mini App" hidden>
+    <div class="n-sbar">
+      <button type="button" class="n-sleft" data-act="close">Close</button>
+      <span class="n-who"><b>Nag-Bot</b><small>mini app</small></span>
+      <span class="n-more" aria-hidden="true">•••</span>
+    </div>
+    <div class="n-app"></div>
+    <div class="n-atoast" role="status" aria-live="off" data-demo-live></div>
+  </div>
+  <span class="n-home" aria-hidden="true"></span>
+</div>
+</div></div></div>
+						<div class="app-card__foot"><figcaption>Tap Done, or snooze it.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over Nag-bot"><span aria-hidden="true">&#8635;</span> Start over</button></div>
+					</figure>
+					<div class="app-card__body">
+						<div class="app-card__head">
+							<div>
+								<p class="app-card__kind"><svg class="app-card__tg" viewBox="0 0 496 512" aria-hidden="true"><use href="#pj-telegram"/></svg>Telegram bot &middot; since Aug 2026</p>
+								<h2 id="nagbot-title" tabindex="-1">Nag-bot</h2>
+							</div><span class="app-card__repo app-card__repo--private" role="img" aria-label="Source not shared" title="Source not shared"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-lock"/></svg></span>
+						</div>
+						<p class="app-card__dek">Chores for my wife and me, in a Telegram group of our own.</p>
+						<ul class="app-why" aria-label="Why I built my own">
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-bell"/></svg></span><p><strong>Nags until it&#8217;s done</strong><span>Again at 15, 30 and 60 minutes.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-tree"/></svg></span><p><strong>Chores inside chores</strong><span>The big one resets the small ones.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-users"/></svg></span><p><strong>Made for two</strong><span>Shared credit and a weekly winner.</span></p></li>
+						</ul>
+						<p class="app-card__facts"><span>Cloudflare Workers, D1</span></p>
+					</div>
+				</article>
+
+				<article class="app-card" id="finance-tracker" aria-labelledby="finance-title">
+					<figure class="app-card__demo"><a class="app-demo__skip" href="#finance-title">Skip Finance tracker demo</a>
+						<div class="app-stage"><div class="app-phone"><div class="app-demo app-demo--finance" data-demo="finance"><div class="fd" role="group" aria-label="Interactive demo of the finance tracker with sample data">
+<svg class="f-sprite" aria-hidden="true" width="0" height="0"><defs>
+<symbol id="fi-overview" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></symbol>
+<symbol id="fi-spending" viewBox="0 0 24 24"><path d="M21.2 15.9A10 10 0 1 1 8.1 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10Z"/></symbol>
+<symbol id="fi-statements" viewBox="0 0 24 24"><path d="M5 21V4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v17l-3-2-2 2-2-2-2 2-2-2ZM9 8h6M9 12h6"/></symbol>
+<symbol id="fi-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="fi-eye-off" viewBox="0 0 24 24"><path d="M10.7 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-2.2 3.1M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2M2 2l20 20"/></symbol>
+<symbol id="fi-food" viewBox="0 0 24 24"><path d="M4 2v7a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V2M6.5 2v20M20 15V2a5 5 0 0 0-4 5v6h4Zm0 0v7"/></symbol>
+<symbol id="fi-transport" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="7.5" cy="19" r="2"/><circle cx="16.5" cy="19" r="2"/></symbol>
+<symbol id="fi-travel" viewBox="0 0 24 24"><path d="M2.5 13.5 21 4l-4.5 16-5-6.5-4-1.5ZM11.5 13.5 21 4"/></symbol>
+<symbol id="fi-groceries" viewBox="0 0 24 24"><path d="M3 4h2.5l2.2 11h10.6L20.5 7H6.4"/><circle cx="9" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></symbol>
+<symbol id="fi-shopping" viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6ZM9 10V6a3 3 0 0 1 6 0v4"/></symbol>
+<symbol id="fi-bills" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7Z"/></symbol>
+<symbol id="fi-right" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
+<symbol id="fi-ok" viewBox="0 0 24 24"><path d="m6 12.5 4 4 8-9"/></symbol>
+<symbol id="fi-no" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></symbol>
+</defs></svg>
+<div class="f-status demo-status" aria-hidden="true"><span>9:41</span><span class="demo-island"></span><svg viewBox="0 0 68 12" aria-hidden="true"><path d="M0 8h3v4H0zm4.5-2h3v6h-3zM9 3.5h3V12H9zM13.5 1h3v11h-3zm15 10.6-2.3-2.3a3.3 3.3 0 0 1 4.6 0zm-3.8-3.8-1.5-1.5a7.5 7.5 0 0 1 10.6 0l-1.5 1.5a5.4 5.4 0 0 0-7.6 0zm-3-3-1.5-1.5a11.8 11.8 0 0 1 16.6 0l-1.5 1.5a9.6 9.6 0 0 0-13.6 0zM44 2.5h15v7H44z" fill="currentColor"/><rect x="42" y=".5" width="22" height="11" rx="3.4" fill="none" stroke="currentColor" opacity=".4"/></svg></div>
+<div class="f-top"><span class="f-mark" aria-hidden="true">N</span><span class="f-sample">Sample</span><button class="f-ib" data-act="eye" aria-pressed="false" aria-label="Hide amounts"><svg class="f-ic"><use href="#fi-eye"/></svg></button></div>
+<div class="f-bar" hidden><button class="f-back" data-act="back"><svg class="f-ic"><use href="#fi-right"/></svg>Wealth</button></div>
+<div class="f-scroll"></div>
+<div class="f-tabs" role="group" aria-label="Finance tracker sections">
+<button class="f-tab" data-tab="overview"><svg class="f-ic"><use href="#fi-overview"/></svg>Overview</button>
+<button class="f-tab" data-tab="wealth"><svg class="f-ic"><use href="#fi-spending"/></svg>Wealth</button>
+<button class="f-tab" data-tab="ledger"><svg class="f-ic"><use href="#fi-statements"/></svg>Ledger</button>
+</div>
+<span class="f-home" aria-hidden="true"></span>
+<div class="f-sheet-wrap" hidden><span class="f-scrim" data-act="close"></span><div class="f-sheet" role="dialog" tabindex="-1"></div></div>
+<span class="f-finger" aria-hidden="true"></span>
+</div>
+</div></div></div>
+						<div class="app-card__foot"><figcaption>Sample data. Simplified import checks.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over Finance tracker"><span aria-hidden="true">&#8635;</span> Start over</button></div>
+					</figure>
+					<div class="app-card__body">
+						<div class="app-card__head">
+							<div>
+								<p class="app-card__kind"><svg class="app-card__pc" viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-device"/></svg>Runs on my PC &middot; since Jun 2024</p>
+								<h2 id="finance-title" tabindex="-1">Finance tracker</h2>
+							</div>
+							<span class="app-card__repo app-card__repo--private" role="img" aria-label="Private repository" title="Private repository"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-lock"/></svg></span>
+						</div>
+						<p class="app-card__dek">Our bank and card statements, turned into where the money went.</p>
+						<ul class="app-why" aria-label="Why I built my own">
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-home"/></svg></span><p><strong>Statements stay home</strong><span>On my PC and our Wi-Fi only.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-check"/></svg></span><p><strong>Stops on bad numbers</strong><span>An import must add up first.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-users"/></svg></span><p><strong>A copy each</strong><span>My wife runs her own copy.</span></p></li>
+						</ul>
+						<p class="app-card__facts"><span>Python, JavaScript</span></p>
+					</div>
+				</article>
+
+				<article class="app-card" id="travel-packing" aria-labelledby="packing-title">
+					<figure class="app-card__demo"><a class="app-demo__skip" href="#packing-title">Skip Travel Packing demo</a>
+						<div class="app-stage"><div class="app-phone"><div class="app-demo app-demo--packing" data-demo="packing"><div class="pk" role="group" aria-label="Interactive demo of Travel Packing with sample data">
+<svg class="pk-sprite" aria-hidden="true"><defs>
+<g id="pk-plane"><path d="M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z" fill="currentColor" stroke="none"/></g>
+<g id="pk-check"><path d="m5 12.5 4.5 4.5L19 7.5" stroke-width="2.25"/></g>
+<g id="pk-plus"><path d="M12 5v14M5 12h14"/></g>
+<g id="pk-minus"><path d="M5 12h14"/></g>
+<g id="pk-chevron"><path d="m6 9 6 6 6-6"/></g>
+<g id="pk-tag"><path d="M4 4h7.2a2 2 0 0 1 1.4.6l7 7a2 2 0 0 1 0 2.8l-5.2 5.2a2 2 0 0 1-2.8 0l-7-7A2 2 0 0 1 4 11.2Z" fill="currentColor" stroke="none"/><circle cx="8.5" cy="8.5" r="1.5" fill="#fff" stroke="none"/></g>
+<g id="pk-alert"><path d="M12 3 2.5 20h19Z"/><path d="M12 9v5" stroke-width="2"/><circle cx="12" cy="17" r="1.1" fill="currentColor" stroke="none"/></g>
+<g id="pk-edit"><path d="M4 20h4l10.5-10.5a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 16Z"/><path d="m13 7 4 4"/></g>
+<g id="pk-t-hanger"><path d="M14 6a2 2 0 1 0 -4 0c0 1.667 .67 3 2 4h-.008l7.971 4.428a2 2 0 0 1 1.029 1.749v.823a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-.823a2 2 0 0 1 1.029 -1.749l7.971 -4.428"/></g>
+<g id="pk-t-shirt"><path d="M15 4l6 2v5h-3v8a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1v-8h-3v-5l6 -2a3 3 0 0 0 6 0"/></g>
+<g id="pk-t-sock"><path d="M13 3v6l4.798 5.142a4 4 0 0 1 -5.441 5.86l-6.736 -6.41a2 2 0 0 1 -.621 -1.451v-9.141h8z"/><path d="M7.895 15.768c.708 -.721 1.105 -1.677 1.105 -2.768a4 4 0 0 0 -4 -4"/></g>
+<g id="pk-t-shoe"><path d="M4 6h5.426a1 1 0 0 1 .863 .496l1.064 1.823a3 3 0 0 0 1.896 1.407l4.677 1.114a4 4 0 0 1 3.074 3.89v2.27a1 1 0 0 1 -1 1h-16a1 1 0 0 1 -1 -1v-10a1 1 0 0 1 1 -1z"/><path d="M14 13l1 -2"/><path d="M8 18v-1a4 4 0 0 0 -4 -4h-1"/><path d="M10 12l1.5 -3"/></g>
+<g id="pk-t-headphones"><path d="M4 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z"/><path d="M15 13m0 2a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2z"/><path d="M4 15v-3a8 8 0 0 1 16 0v3"/></g>
+<g id="pk-t-battery-charging"><path d="M16 7h1a2 2 0 0 1 2 2v.5a.5 .5 0 0 0 .5 .5a.5 .5 0 0 1 .5 .5v3a.5 .5 0 0 1 -.5 .5a.5 .5 0 0 0 -.5 .5v.5a2 2 0 0 1 -2 2h-2"/><path d="M8 7h-2a2 2 0 0 0 -2 2v6a2 2 0 0 0 2 2h1"/><path d="M12 8l-2 4h3l-2 4"/></g>
+<g id="pk-t-device-mobile"><path d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-14z"/><path d="M11 4h2"/><path d="M12 17v.01"/></g>
+<g id="pk-t-wallet"><path d="M17 8v-3a1 1 0 0 0 -1 -1h-10a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1 -1 1h-12a2 2 0 0 1 -2 -2v-12"/><path d="M20 12v4h-4a2 2 0 0 1 0 -4h4"/></g>
+<g id="pk-t-credit-card"><path d="M3 5m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v8a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z"/><path d="M3 10l18 0"/><path d="M7 15l.01 0"/><path d="M11 15l2 0"/></g>
+<g id="pk-t-plug"><path d="M9.785 6l8.215 8.215l-2.054 2.054a5.81 5.81 0 1 1 -8.215 -8.215l2.054 -2.054z"/><path d="M4 20l3.5 -3.5"/><path d="M15 4l-3.5 3.5"/><path d="M20 9l-3.5 3.5"/></g>
+<g id="pk-t-id"><path d="M3 4m0 3a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v10a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3z"/><path d="M9 10m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0"/><path d="M15 8l2 0"/><path d="M15 12l2 0"/><path d="M7 16l10 0"/></g>
+<g id="pk-t-file-check"><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z"/><path d="M9 15l2 2l4 -4"/></g>
+<g id="pk-t-dental"><path d="M12 5.5c-1.074 -.586 -2.583 -1.5 -4 -1.5c-2.1 0 -4 1.247 -4 5c0 4.899 1.056 8.41 2.671 10.537c.573 .756 1.97 .521 2.567 -.236c.398 -.505 .819 -1.439 1.262 -2.801c.292 -.771 .892 -1.504 1.5 -1.5c.602 0 1.21 .737 1.5 1.5c.443 1.362 .864 2.295 1.262 2.8c.597 .759 2 .993 2.567 .237c1.615 -2.127 2.671 -5.637 2.671 -10.537c0 -3.74 -1.908 -5 -4 -5c-1.423 0 -2.92 .911 -4 1.5z"/><path d="M12 5.5l3 1.5"/></g>
+</defs></svg>
+<div class="pk-status demo-status" aria-hidden="true"><span>9:41</span><span class="demo-island"></span><svg viewBox="0 0 68 12" aria-hidden="true"><path d="M0 8h3v4H0zm4.5-2h3v6h-3zM9 3.5h3V12H9zM13.5 1h3v11h-3zm15 10.6-2.3-2.3a3.3 3.3 0 0 1 4.6 0zm-3.8-3.8-1.5-1.5a7.5 7.5 0 0 1 10.6 0l-1.5 1.5a5.4 5.4 0 0 0-7.6 0zm-3-3-1.5-1.5a11.8 11.8 0 0 1 16.6 0l-1.5 1.5a9.6 9.6 0 0 0-13.6 0zM44 2.5h15v7H44z" fill="currentColor"/><rect x="42" y=".5" width="22" height="11" rx="3.4" fill="none" stroke="currentColor" opacity=".4"/></svg></div>
+<div class="pk-top">
+<svg class="pk-brand" viewBox="0 0 24 24" aria-hidden="true"><use href="#pk-plane"/></svg>
+<div class="pk-tabs" role="group" aria-label="Lists">
+<button class="pk-tab" type="button" data-act="list" data-key="normal" aria-pressed="true">Normal</button>
+<button class="pk-tab" type="button" data-act="list" data-key="extended" aria-pressed="false">Extended</button>
+</div>
+<span class="pk-def" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pk-edit"/></svg></span>
+</div>
+<div class="pk-scroll">
+<div class="pk-head">
+<div class="pk-h1" >Normal trip</div>
+<div class="pk-nights" role="group" aria-label="Nights">
+<button type="button" data-act="nights" data-d="-1" aria-label="Fewer nights"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pk-minus"/></svg></button>
+<span class="pk-nlabel"><b>4</b> nights</span>
+<button type="button" data-act="nights" data-d="1" aria-label="More nights"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pk-plus"/></svg></button>
+</div>
+</div>
+<div class="pk-toolbar">
+<div class="pk-prog"><span class="pk-plabel"><b>0</b> of 24 packed</span><span class="pk-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Packed"></span></div>
+<div class="pk-toggles">
+<button class="pk-toggle" type="button" data-act="hide" aria-pressed="false"><svg class="pk-box" viewBox="0 0 24 24" aria-hidden="true"><use href="#pk-check"/></svg>Hide packed</button>
+<button class="pk-toggle pk-lc" type="button" data-act="last" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pk-alert"/></svg><span>Last call</span><span class="pk-lcn">10 left</span></button>
+</div>
+</div>
+<div class="pk-note" role="status"></div>
+<div class="pk-cubes"></div>
+</div>
+<span class="pk-tap" aria-hidden="true"></span>
+<span class="pk-home" aria-hidden="true"></span>
+</div>
+</div></div></div>
+						<div class="app-card__foot"><figcaption>Change the nights. Tick things off.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over Travel Packing"><span aria-hidden="true">&#8635;</span> Start over</button></div>
+					</figure>
+					<div class="app-card__body">
+						<div class="app-card__head">
+							<div>
+								<p class="app-card__kind"><svg class="app-card__pc" viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-device"/></svg>Runs on my PC &middot; since Oct 2026</p>
+								<h2 id="packing-title" tabindex="-1">Travel Packing</h2>
+							</div>
+						</div>
+						<p class="app-card__dek">The packing list that replaced my spreadsheet.</p>
+						<ul class="app-why" aria-label="Why I built my own">
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-moon"/></svg></span><p><strong>Counts by the night</strong><span>Socks and shirts follow the nights.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-list"/></svg></span><p><strong>One list, two trips</strong><span>Short or long trip, same defaults.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-phone"/></svg></span><p><strong>Tick from a phone</strong><span>Both screens stay in step.</span></p></li>
+						</ul>
+						<p class="app-card__facts"><span>Python, no build step</span></p>
+					</div>
+				</article>
+			</section>
+
+			<section class="project-more" aria-labelledby="more-builds">
+				<h2 class="project-more__label" id="more-builds">Earlier</h2>
+				<ol class="project-index">
+					<li>
+						<span class="project-index__year">2022</span>
+						<div class="project-index__text"><h3>Brawl Stars</h3><p>Python notebooks using the game&#8217;s API to look at club stats and map win rates.</p></div>
+						<a class="project-index__repo" href="https://github.com/nicholas-wan/brawlstars" target="_blank" rel="noopener noreferrer" aria-label="Brawl Stars notebooks on GitHub"><svg viewBox="0 0 496 512" aria-hidden="true"><use href="#pj-github"/></svg></a>
+					</li>
+				</ol>
+			</section>
+
+			</div>
+
+			<!-- the page's icons: Telegram and GitHub from Font Awesome Free 6.5 (CC BY 4.0, as assets/icons/fontawesome); the rest drawn in Tabler's style -->
+			<svg class="pj-sprite" aria-hidden="true" focusable="false">
+				<symbol id="pj-telegram" viewBox="0 0 496 512"><path d="M248 8C111 8 0 119 0 256S111 504 248 504 496 393 496 256 385 8 248 8zM363 176.7c-3.7 39.2-19.9 134.4-28.1 178.3-3.5 18.6-10.3 24.8-16.9 25.4-14.4 1.3-25.3-9.5-39.3-18.7-21.8-14.3-34.2-23.2-55.3-37.2-24.5-16.1-8.6-25 5.3-39.5 3.7-3.8 67.1-61.5 68.3-66.7 .2-.7 .3-3.1-1.2-4.4s-3.6-.8-5.1-.5q-3.3 .7-104.6 69.1-14.8 10.2-26.9 9.9c-8.9-.2-25.9-5-38.6-9.1-15.5-5-27.9-7.7-26.8-16.3q.8-6.7 18.5-13.7 108.4-47.2 144.6-62.3c68.9-28.6 83.2-33.6 92.5-33.8 2.1 0 6.6 .5 9.6 2.9a10.5 10.5 0 0 1 3.5 6.7A43.8 43.8 0 0 1 363 176.7z"/></symbol>
+				<symbol id="pj-github" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></symbol>
+
+				<symbol id="pj-i-chat" viewBox="0 0 24 24"><path d="M8 9h8M8 13h6M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-5l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"/></symbol>
+				<symbol id="pj-i-coins" viewBox="0 0 24 24"><path d="M9 14c0 1.66 2.69 3 6 3s6-1.34 6-3-2.69-3-6-3-6 1.34-6 3zM9 14v4c0 1.66 2.69 3 6 3s6-1.34 6-3v-4M3 6c0 1.07 1.14 2.06 3 2.6s4.14.54 6 0 3-1.53 3-2.6-1.14-2.06-3-2.6-4.14-.54-6 0S3 4.93 3 6zM3 6v10c0 .89.77 1.45 2 2M3 11c0 .89.77 1.45 2 2"/></symbol>
+				<symbol id="pj-i-eye-off" viewBox="0 0 24 24"><path d="M10.6 10.6a2 2 0 0 0 2.8 2.8M9.4 5.4A9.8 9.8 0 0 1 12 5c4 0 7.33 2.33 10 7-.78 1.36-1.6 2.52-2.5 3.5m-2.15 1.85C15.94 18.45 14.06 19 12 19c-4 0-7.33-2.33-10-7 1.22-2.14 2.6-3.72 4.13-4.77M3 3l18 18"/></symbol>
+				<symbol id="pj-i-bell" viewBox="0 0 24 24"><path d="M10 5a2 2 0 1 1 4 0 7 7 0 0 1 4 6v3a4 4 0 0 0 2 3H4a4 4 0 0 0 2-3v-3a7 7 0 0 1 4-6M9 17v1a3 3 0 0 0 6 0v-1"/></symbol>
+				<symbol id="pj-i-tree" viewBox="0 0 24 24"><path d="M4 4h6v4H4zM14 10h6v4h-6zM14 18h6v4h-6zM7 8v10h7M7 12h7"/></symbol>
+				<symbol id="pj-i-users" viewBox="0 0 24 24"><path d="M5 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M16 3.13a4 4 0 0 1 0 7.75M21 21v-2a4 4 0 0 0-3-3.85"/></symbol>
+				<symbol id="pj-i-home" viewBox="0 0 24 24"><path d="M5 12H3l9-9 9 9h-2M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"/></symbol>
+				<symbol id="pj-i-check" viewBox="0 0 24 24"><path d="M12 3a12 12 0 0 0 8.5 3A12 12 0 0 1 12 21 12 12 0 0 1 3.5 6 12 12 0 0 0 12 3M9 12l2 2 4-4"/></symbol>
+				<symbol id="pj-i-moon" viewBox="0 0 24 24"><path d="M12 3h.39a7.5 7.5 0 0 0 7.92 12.45A9 9 0 1 1 12 3z"/></symbol>
+				<symbol id="pj-i-list" viewBox="0 0 24 24"><path d="M3.5 5.5l1.5 1.5 2.5-2.5M3.5 11.5l1.5 1.5 2.5-2.5M3.5 17.5l1.5 1.5 2.5-2.5M11 6h9M11 12h9M11 18h9"/></symbol>
+				<symbol id="pj-i-phone" viewBox="0 0 24 24"><path d="M6 5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2zM11 4h2M12 17v.01"/></symbol>
+				<symbol id="pj-i-device" viewBox="0 0 24 24"><path d="M3 5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zM7 20h10M9 16v4M15 16v4"/></symbol>
+				<symbol id="pj-i-lock" viewBox="0 0 24 24"><path d="M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2zM11 16a1 1 0 1 0 2 0 1 1 0 1 0-2 0M8 11V7a4 4 0 1 1 8 0v4"/></symbol>
+			</svg>
+</div>
+
+		<footer id="footer"><section class="split contact"><section><h2>Contact</h2><ul class="icons alt"><li><a href="mailto:nicholaswan@live.com.sg" class="icon fa fa-envelope"><span class="label">Email</span></a></li><li><a href="https://github.com/nicholas-wan" target="_blank" rel="noopener noreferrer" class="icon fa-github"><span class="label">GitHub</span></a></li><li><a href="https://www.linkedin.com/in/nicholas-wan/" target="_blank" rel="noopener noreferrer" class="icon fa-linkedin"><span class="label">LinkedIn</span></a></li></ul></section></section></footer>
+	</div>
+</body>
+</html>
