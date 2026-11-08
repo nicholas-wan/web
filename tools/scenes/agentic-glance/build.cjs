@@ -172,7 +172,8 @@ function picture(i, phone) {
         (k === 0 ? `<path class="ag-qx" d="M${tx0 - 1} ${Q.y + 9} H${r1(tx0 + len + 1)}" pathLength="1" stroke="${C.mute}" stroke-width="${SW}"/>` : `<g class="ag-qok">${icon('tick', r1(Q.x + Q.w - 15.9), Q.y + 2, 1, C.teal)}</g>`) +
         `<rect class="ag-qc" x="${tx0 - .5}" y="${Q.y + 1.5}" width="${r1(len + 2)}" height="${Q.h - 3}" fill="${C.node}"/>` +
         `<rect class="ag-qk" x="${tx0}" y="${Q.y + 3}" width="1.2" height="${Q.h - 6}" fill="${C.teal}" style="--w:${len}px"/></g>`; });
-    const ny = r1(175 + (phone ? Q.h * (QS - 1) : 0));
+    // (a phone's note sits NOTE_UP nearer its strip, which it belongs to: 9 Nov 2026, NOTE_UP below)
+    const ny = r1(175 + (phone ? Q.h * (QS - 1) - NOTE_UP : 0));
     // ("fields and syntax checked" says what the check was; "query checked" left a reader asking what against, 7 Nov 2026)
     p += '</g></g>' + T(Q.x, ny, 'Empty doesn&#39;t mean safe', 11, C.ink, 'class="ag-gl ag-gl0" font-weight="700"') + T(Q.x, ny, GL1, 11, C.teal, 'class="ag-gl ag-gl1" font-weight="700"');
     if (phone) p += `<g class="ag-det" style="--dx:0px">${badge('ag-bd', DX, L, 'lens', 'Detection', true)}</g>`;
@@ -279,8 +280,12 @@ const TILE0 = { o: G.ts, r: 2 }, SWELLS = { d: 1.35, m: 1.25 };
 // a phone's hand-offs between stacked steps (round 4): what leaves drifts this far down as it fades, what arrives drops
 // the same distance into place
 const DRIFT = 8;
+// (9 Nov 2026: "Fields and syntax checked" ended about 6px above step 3's heading on a phone. The drawing is at its
+// one-screen height, so the room comes from inside it: the note moves NOTE_UP nearer its strip, the top and bottom
+// margins give TRIM each, and step 3 starts ROOM3 lower, about 8px more between the two at the same height)
+const NOTE_UP = 2, TRIM = 3, ROOM3 = 6;
 function phone() {
-  const W = 360, words = [], pics = [], at = [], nodes = [], boxes = []; let y = 56, H = 0;
+  const W = 360, words = [], pics = [], at = [], nodes = [], boxes = []; let y = 56 - TRIM, H = 0;
   STEPS.forEach((st, i) => {
     const [, , y0, y1] = REACH_M[i], ty = r1(y + 19), by = r1(ty + 18.5), top = by + (st.d.length - 1) * MLH + 12 + GAP[i];
     const px = r1(PX - PS * LEFT[i]), py = r1(top - PS * y0), bottom = top + PS * (y1 - y0) - CUT[i];
@@ -288,7 +293,7 @@ function phone() {
     words.push(`<circle cx="${SP}" cy="${nodes[i]}" r="7.5" fill="${C.bg}"/><g class="ag-sw ag-sw${i}"><g class="ag-s ag-s${i}">${node(i, nodes[i])}<text x="${TX}" y="${ty}" font-size="${MT}" font-weight="700" fill="${C.ink}">${STEPS[i].title}</text>${body(st.d, TX, by, MLH, MB)}</g></g>`);
     pics.push(`<g class="ag-p ag-p${i}"><g transform="translate(${px} ${py}) scale(${PS})">${picture(i, true)}</g></g>`);
     boxes.push([4, ty - 22, W - 8, bottom - ty + 30]);
-    y = r1(bottom + 6); H = r1(bottom + 8);
+    y = r1(bottom + 6 + (i === 1 ? ROOM3 : 0)); H = r1(bottom + 8 - TRIM);
   });
   const map = (i, [u, v]) => [at[i][0] + PS * u, at[i][1] + PS * v];
   const [d1, d2, out] = [map(0, [BX[0], L]), map(1, [DX, L]), map(1, OUTC)];
@@ -314,7 +319,7 @@ function phone() {
   // as it grows (a seed shown alone first read as the same stray square). Its places, in step 3's own units:
   const loc = ([u, v]) => [(u - at[2][0]) / PS, (v - at[2][1]) / PS];
   const half = TILE0.o * SWELLS.m / 2, E = map(2, [CARD.x + CARD.w + .75 - half, L]);
-  return { svg: open('ag-scene ag-scene--m', W, H) + wash('ag-wash-m', boxes) + header(W, 23, MB, true) + stem +
+  return { svg: open('ag-scene ag-scene--m', W, H) + wash('ag-wash-m', boxes.map(([x, by, w, h]) => [x, by, w, Math.min(h, H - by)])) + header(W, 23 - TRIM, MB, true) + stem +
     `<g class="ag-stage"><g class="ag-run ag-r2">${tk(0)}</g><g class="ag-run ag-r3">${tk(1)}</g>${pics[0]}<g class="ag-run ag-r2">${pics[1]}</g>${chip}</g>` + words.join('') +
     `<g class="ag-stage"><g class="ag-run ag-r3">${pics[2]}</g><g class="ag-run ag-r2"><g transform="translate(${at[1][0]} ${at[1][1]}) scale(${PS})">${ringSvg()}</g></g></g></svg>`,
     H, kf, c0: loc(out), E: loc(E) };
