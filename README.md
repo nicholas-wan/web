@@ -43,7 +43,7 @@ Decided 16–17 Oct 2026; do not propose otherwise. Details are under [Behaviour
 - Keep the current Home, Skills and Personal designs. The compact Tech stack proposal was rejected (18 Oct 2026).
 - No Work section-shortcut row (declined 18 Oct 2026).
 - Personal: unfocused cards stay dimmed to 0.55; galleries have no photo controls.
-- No skip link, no change to the homepage cards' focus ring; return-to-top stays on phones (except Travel, journals and Personal, where it is hidden).
+- No skip link, no change to the homepage cards' focus ring; return-to-top stays on phones (except Work, Travel, journals, Personal and Projects, where it is hidden).
 - Every gallery or card image ships `-480`/`-800` siblings with a `sizes` matching its slot.
 - Phone text never drops below 12px; section headings on a page share one style.
 - No SEO, analytics or resume-PDF work.
@@ -275,8 +275,9 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 ### Projects page contracts
 
 - Four apps have equal cards in a two-column grid, one column below 981px: SquashBot, Nag-bot, Finance tracker and Travel Packing. Brawl Stars stays under Earlier. No This site card.
+- Each card opens with its kind, name and one-line description, then the demo, then three short reasons and the stack (8 Nov 2026: on phones the name used to arrive after a full phone of demo). Desktop rows line up through `grid-template-rows: subgrid`. The skip link jumps past the demo to the reasons. Reasons state a decision, in plain first person where it fits, and must stay true to each app's own README.
 - Each card has a working 300 x 560 sample demo, a reset button and three short reasons. The finance header always says Sample; import checks are a simplified explanation, identified in the caption. No app data files or real household/group details ship.
-- Demos run entirely in memory. A guided preview starts once at 90% visibility after 500 ms of settled scrolling, one demo at a time. Taps and keys stop it; swipes re-arm it. Reduced motion skips previews. Start over restores that demo only. Use flat scoped CSS for iOS 16; keep each phone and its reset visible together on phones.
+- Demos run entirely in memory. A guided preview starts once at 90% visibility after 500 ms of settled scrolling, one demo at a time. Taps and keys stop it; swipes re-arm it. Reduced motion skips previews. Once a preview ends, and until the reader touches that demo, its next action pulses three times (SquashBot's second sample, Nag-bot's Chores button, Finance's Done, Packing's More nights). Each preview must keep its result on screen (8 Nov 2026 review rounds): SquashBot scrolls the confirm form into view and holds it before Add booking; Nag-bot presses Done by about 2.5 s; Finance ends on the stopped import instead of returning to Overview; Packing folds Basics and Hygiene first so the nights visibly recount the clothes it then ticks. Non-booking text in SquashBot gets a toast rather than silence. On phones the caption and Start over sit left together, clear of the site's fixed Menu pill. Start over restores that demo only. Use flat scoped CSS for iOS 16; keep each phone and its reset visible together on phones.
 - Projects sits between Work and Skills. Only its route loads projects.css/projects.js; it shares Work's opening style. The 80 KB per-page JavaScript limit still applies. Archivo is self-hosted from the packing app's OFL font; see assets/fonts/archivo-SOURCES.md.
 - Only SquashBot and Brawl Stars link to source. Nag-bot source is not shared because its repository exposes household details; finance remains private. Do not link tele-nagbot or WeeYingxian/avery. Test counts are omitted because they change between releases.
 

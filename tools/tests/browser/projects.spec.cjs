@@ -19,6 +19,12 @@ test('Phone frames fit with reset, avoid overflow, and let scroll escape the lis
   await page.setViewportSize({ width: 393, height: 659 });
   await page.goto('/projects');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  // Phones drop the floating return-to-top: it sat on the demos' buttons.
+  await expect(page.locator('#return-to-top')).toBeHidden();
+  for (const id of ['squashbot', 'nag-bot', 'finance-tracker', 'travel-packing']) {
+    const intro = await page.locator(`#${id} .app-card__intro`).boundingBox();
+    expect(intro.y + intro.height).toBeLessThan((await page.locator(`#${id} .app-phone`).boundingBox()).y);
+  }
   for (const id of ['squashbot', 'nag-bot', 'finance-tracker', 'travel-packing']) {
     const app = page.locator(`#${id}`);
     expect((await app.locator('figure').boundingBox()).height).toBeLessThan(659);
@@ -153,7 +159,7 @@ test('Reset hover stays teal and demo headings do not change the page outline', 
   await expect(page.locator('.app-demo h1, .app-demo h2, .app-demo h3, .app-demo [role="heading"]')).toHaveCount(0);
   await page.locator('.app-demo__skip').first().focus();
   await page.keyboard.press('Enter');
-  await expect(page.locator('#squashbot-title')).toBeFocused();
+  await expect(page.locator('#squashbot-why')).toBeFocused();
 });
 
 test('All four demos accept phone-sized interactions without clipped controls', async ({ page }) => {

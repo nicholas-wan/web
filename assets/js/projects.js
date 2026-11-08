@@ -176,7 +176,7 @@ function projectsDemo(selector, init) {
       clearTimeout(S.tt);
       timers.push(S.tt = setTimeout(() => toastEl.classList.remove('is-on'), ms));
     }
-    const placeholder = (t = 'Message') => { input.placeholder = t; };
+    const placeholder = (t = 'Try: court 3 sat 7pm') => { input.placeholder = t; };
     const sendState = () => snd.classList.toggle('is-on', !!input.value.trim());
 
     function showPin(i, flash) {
@@ -202,6 +202,7 @@ function projectsDemo(selector, init) {
       drop(S.av);
       S.av = next && post({ html, court: next, on: onAvail, time: quiet ? '9:15' : 0,
         kb: [[{ t: '🙋 Join', a: 'join' }], [{ t: '⚙️ Admin: add / remove', a: 'admin' }]] }, quiet);
+      if (S.av && !quiet) S.av.el.classList.add('sq-hl');
     }
     function onAvail(a, m) {
       const b = m.court;
@@ -287,7 +288,7 @@ function projectsDemo(selector, init) {
       S.pending = null;
       if (f) return reply(f, text.toLowerCase(), mine);
       const d = draft(text);
-      if (!d) return;
+      if (!d) return toast('Not a booking, so SquashBot stays quiet.', 2600);
       typing(true);
       later(700, () => {
         typing(false);
@@ -295,6 +296,8 @@ function projectsDemo(selector, init) {
         drop(S.prompt);
         S.draft = d;
         S.card = post({ ...card(d), on: onCard });
+        const k = chat.offsetHeight / chat.getBoundingClientRect().height;
+        chat.scrollTo({ top: chat.scrollTop + (S.card.el.getBoundingClientRect().top - chat.getBoundingClientRect().top) * k - 26, behavior: still() ? 'auto' : 'smooth' });
         later(550, () => drop(mine));
       });
     }
@@ -308,7 +311,7 @@ function projectsDemo(selector, init) {
     function openMini(kind, opener) {
       miniOpener = opener;
       const courts = sorted();
-      mini.innerHTML = `<div class="sq-mini__bar"><button type="button" data-mini-close>Close</button><b>SquashBot</b><span>mini app</span></div><div class="sq-mini__body">${kind === 'tab' ? '<div class="sq-mini__title">My tab</div><p>Owed to Nicholas</p><strong>$2.00</strong><div class="sq-mini__row">Court 4 · 10 Nov · 8–9pm<br>$6.00 ÷ 3 players</div>' : '<div class="sq-mini__title">Courts</div>' + courts.map(b => `<div class="sq-mini__row"><b>Court ${esc(b.c)} · ${sd(b.o)}</b><br>${span(b.s,b.e)} · ${slots(free(b))} free</div>`).join('')}</div>`;
+      mini.innerHTML = `<div class="sq-mini__bar"><button type="button" data-mini-close>Close</button><b>SquashBot</b><span>mini app</span></div><div class="sq-mini__body">${kind === 'tab' ? '<div class="sq-mini__title">My tab</div><p>Owed to Nicholas</p><strong>$2.00</strong><div class="sq-mini__row">Court 4 · 10 Nov · 8–9pm<br>$6.00 ÷ 3 players</div>' : '<div class="sq-mini__title">Courts</div>' + courts.map(b => `<div class="sq-mini__row"><b>Court ${esc(b.c)} · ${sd(b.o)}</b><br>${span(b.s,b.e)} · ${free(b) ? `${slots(free(b))} free` : 'full'}</div>`).join('')}</div>`;
       mini.hidden = false; chat.inert = true;
       mini.querySelector('button').addEventListener('click',closeMini);
       mini.querySelector('button').focus({ preventScroll: true });
@@ -345,8 +348,8 @@ function projectsDemo(selector, init) {
       if (S.touched || still()) return;
       const chip = $('.sq-chip');
       plater(700, () => press(chip, () => say(chip.textContent, 1)));
-      plater(2500, () => addKey()?.classList.add('is-ring'));
-      plater(3000, () => press(addKey(), () => onCard('y', S.card)));
+      plater(3300, () => addKey()?.classList.add('is-ring'));
+      plater(4100, () => press(addKey(), () => onCard('y', S.card)));
     }
 
     function build() {
@@ -575,10 +578,10 @@ function projectsDemo(selector, init) {
     root.addEventListener('demo:stop', stopPreview);
     root.addEventListener('demo:visible', () => {
       if (reduced()) return;
-      later(450, () => { s.pre = 0; card().isNew = 1; renderChat(); }, preview);
-      later(1350, () => { s.ring = 1; renderChat(); }, preview);
-      later(5600, () => { const d = $('.is-ring'); if (d) d.classList.add('is-press'); }, preview);
-      later(5850, () => { preview = []; s.ring = 0; complete(0); renderChat(); }, preview);
+      later(250, () => { s.pre = 0; card().isNew = 1; renderChat(); }, preview);
+      later(900, () => { s.ring = 1; renderChat(); }, preview);
+      later(2400, () => { const d = $('.is-ring'); if (d) d.classList.add('is-press'); }, preview);
+      later(2650, () => { preview = []; s.ring = 0; complete(0); renderChat(); }, preview);
     });
     root.addEventListener('demo:reset', () => {
       timers.concat(preview).forEach(clearTimeout);
@@ -651,7 +654,7 @@ ${[['Earned', 24600], ['Spent on cards', 9540], ['Invested', 6000]].map(s => `<s
 <div class="f-list">${row('data-tab="spending"', '', 'spending', 'Key spending', 'Oct 2026 against typical', `<span class="f-rv">${money(TOTAL)}</span>`)}
 ${row('data-tab="statements"', 'is-bad', 'statements', 'Needs attention', '1 import stopped', '<span class="f-badge">1</span>')}</div>`;
   },
-  wealth: () => PAGES.overview().split('<div class="f-card">')[0].replace('>Overview<', '>Wealth<'),
+  wealth: () => PAGES.overview().split('<div class="f-card">')[0].replace('>Overview<', '>Wealth<') + PAGES.spending().replace('<div class="f-title">Spending</div>', ''),
   spending: () => `<div class="f-title">Spending</div><div class="f-hint">Oct 2026 (bar) against your typical month (tick). Tap one for its charges.</div>
 <div class="f-list">${CATS.map(c => `<button class="f-row f-key c-${c.k}" data-cat="${c.k}"><span class="f-ico">${icon(c.k)}</span><span class="f-kn">${c.n}</span><span class="f-rv">${money(c.v)}</span>${icon('right', 'f-chev')}<span class="f-kd ${c.tone}">${c.vs}</span><span class="f-kb" aria-hidden="true"><i style="width:${c.v / 9}%"></i><b style="left:${c.t / 9}%"></b></span></button>`).join('')}</div>`,
   statements: () => `<div class="f-title">Ledger</div><div class="f-hint">Through Oct 2026 · next around 4 Dec</div>
@@ -791,8 +794,8 @@ function init(root) {
       sweep(11, 3, 1500, () => sweep(3, 7, 650, () => {
         later(250, () => { fc('is-down', 0); scrub.end(); });
         tap('.f-tab[data-tab="ledger"]', 250, () => go('statements'));
-        tap('[data-st="1"]', 1300, () => openSheet(1));
-        later(4800, () => { closeSheet(); go('overview'); fc('is-on', 0); playing = false; });
+        tap('[data-st="1"]', 1300, () => { openSheet(1); fc('is-on', 0); });
+        later(3900, () => { fc('is-on', 0); playing = false; });
       }));
     });
   }
@@ -834,7 +837,7 @@ const CATS = [
       ['Pants', 'hanger', [0.5, 1, 2, 4], 'One worn on the day'], ['Socks', 'sock', [0.8, 0, 3, 7]], ['Thick Socks', 'sock', [0.5, 0, 2, 4], '', 'x']]],
     ['Footwear', [['Sports Shoes', 'shoe', 1], ['Slippers', 'shoe', 1], ['Boots', 'shoe', 1, 'Thick shoes for cold trips', 'x']]]]],
   ['Basics', '#0F6E6B', '#0C5F5C', '15,110,107', [
-    ['Backpack', [['Earpiece', 'headphones', 1], ['Portable Charger', 'battery-charging', 2, 'Plus one wire each', 'e'], ['ESIM', 'device-mobile', 1, 'Buy and install before flying', 'e']]],
+    ['Backpack', [['Earpiece', 'headphones', 1], ['Portable Charger', 'battery-charging', 2, 'Plus one wire each', 'e'], ['eSIM', 'device-mobile', 1, 'Buy and install before flying', 'e']]],
     ['Funds', [['Wallet', 'wallet', 1, '', 'e'], ['Debit/Credit Cards', 'credit-card', 1, '', 'e'], ['Travel Adaptor', 'plug', 1, '', 'e']]],
     ['Travel Info', [['Passport', 'id', 1, '', 'e'], ['Travel Confirmations', 'file-check', 1, '', 'e']]]]],
   ['Hygiene', '#2E5FA6', '#27508F', '46,95,166', [
@@ -965,22 +968,22 @@ function init(root) {
     if (previewing) { previewing = false; stop(); tap.className = 'pk-tap'; }
   });
   function moveTap(el, jump) {
-    const r = el.getBoundingClientRect(), p = root.getBoundingClientRect();
+    const r = el.getBoundingClientRect(), p = root.getBoundingClientRect(), k = root.offsetWidth / p.width;
     tap.style.transition = jump ? 'none' : '';
-    tap.style.translate = `${r.left + r.width / 2 - p.left}px ${r.top + r.height / 2 - p.top}px`;
+    tap.style.translate = `${(r.left + r.width / 2 - p.left) * k}px ${(r.top + r.height / 2 - p.top) * k}px`;
   }
   function preview() {
     if (previewing || touched || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     previewing = true;
-    const plus = () => $('[data-act=nights][data-d="1"]');
-    moveTap(plus(), true);
+    const plus = () => $('[data-act=nights][data-d="1"]'), head = c => () => $(`[data-cat="${c}"] .pk-chead`);
+    moveTap(head('Basics')(), true);
     later(() => tap.classList.add('on'), 60);
-    [[plus, 600], [plus, 1350], [() => box('underwear'), 2700], [() => box('sleep-shirt'), 3900]].forEach(([get, at], k) => {
+    [[head('Basics'), 500], [head('Hygiene'), 1050], [plus, 2000], [plus, 2700], [() => box('underwear'), 3700], [() => box('sleep-shirt'), 4700]].forEach(([get, at], k) => {
       if (k) later(() => moveTap(get()), at - 450);
       later(() => { tap.classList.remove('press'); void tap.offsetWidth; tap.classList.add('press'); get().click(); }, at);
     });
-    later(() => tap.classList.remove('on'), 4500);
-    later(() => { previewing = false; tap.className = 'pk-tap'; }, 4800);
+    later(() => tap.classList.remove('on'), 5200);
+    later(() => { previewing = false; tap.className = 'pk-tap'; }, 5500);
   }
 
   root.addEventListener('demo:visible', () => later(preview, 250));
