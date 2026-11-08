@@ -269,9 +269,21 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await expect(scene(root)).toBeHidden();
  // Phones draw the same full pictures above the words, stacked, and the whole drawing fits one phone screen
  // (owner, 1 Nov 2026, on an iPhone 16: "the whole animation is too long and cannot find the screen entirely").
- const pb=await phoneScene(root).boundingBox();
+ // (owner, 8 Nov 2026: "Should it take up slightly more of the screen to be readable?": it runs to the card's edges, as
+ // wide as the article, and still fits an iPhone 16's 659px Safari viewport, less the 8px the page's framing keeps)
+ const pb=await phoneScene(root).boundingBox(), ab=await page.locator('#agentic-ai').boundingBox();
  expect(pb.height).toBeGreaterThan(pb.width*1.5);
- expect(pb.height).toBeLessThan(600);
+ expect(pb.width).toBeGreaterThan(ab.width-4);
+ expect(pb.height*393/390).toBeLessThan(651);
+ // The spotlight: once the tap has framed it, the rest of the page dims; scrolling it away lifts the dim for good.
+ const spot=card(root);
+ await expect(spot).toHaveClass(/is-spot/);
+ await page.evaluate(()=>scrollBy(0,400));
+ await expect(spot).not.toHaveClass(/is-spot/);
+ await page.evaluate(()=>scrollBy(0,-400));
+ await page.waitForTimeout(300);
+ await expect(spot).not.toHaveClass(/is-spot/);
+ await expect(spot).toHaveClass(/is-open/);
  await expect(phoneScene(root).locator('.ag-t')).toHaveCount(32);
  await expect(phoneScene(root).locator('.ag-logo')).toHaveCount(1);
  // Phones join the steps on a spine (owner, 1 Nov 2026: "the connectivity between panels is not good on mobile"): three

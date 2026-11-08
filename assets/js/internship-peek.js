@@ -145,6 +145,7 @@
   function close(r, swap) {
     if (!r) return;
     if (r === active) zoom.stop();
+    if (lit === card(r)) unspot();
     chip(r).setAttribute('aria-expanded', 'false');
     const c = card(r);
     if (r.grow) { r.grow.cancel(); r.grow = null; }
@@ -197,6 +198,43 @@
     play(r);
     loop(r);
   }
+  // Phones: a card marked data-spotlight takes the screen once a tap has
+  // framed it (owner, 8 Nov 2026: "when clicking the icon, it scrolls then
+  // takes the entire screen? but can continue scrolling down"). The rest of
+  // the page dims while nearly all the card that fits is on screen, and the
+  // dim lifts for good once it scrolls away, a tap lands outside it, or it
+  // closes; it returns only with the next tap on the chip.
+  const phone = matchMedia('(max-width: 736px)');
+  let lit = null, litRaf = 0;
+  const litCheck = () => {
+    litRaf = 0;
+    if (!lit) return;
+    const b = lit.getBoundingClientRect(), vh = innerHeight, fits = Math.min(b.height, vh);
+    const seen = Math.min(b.bottom, vh) - Math.max(b.top, 0);
+    if (seen >= fits * 0.92) lit.classList.add('is-spot');
+    // (it lifts as soon as the card starts to leave: a blind review saw the next card arrive still grey at 0.7)
+    else if (lit.classList.contains('is-spot') && seen < fits * 0.88) unspot();
+  };
+  const onLitScroll = () => { if (!litRaf) litRaf = requestAnimationFrame(litCheck); };
+  function unspot() {
+    if (!lit) return;
+    lit.classList.remove('is-spot');
+    lit = null;
+    removeEventListener('scroll', onLitScroll);
+    removeEventListener('resize', onLitScroll);
+  }
+  // Armed once the card has grown (else a half-grown card counts as all on
+  // screen), so it lights as the page's glide lands.
+  function spotlight(r) {
+    const c = card(r);
+    unspot();
+    if (!phone.matches || !('spotlight' in c.dataset)) return;
+    lit = c;
+    const arm = () => { if (lit !== c || active !== r) return; addEventListener('scroll', onLitScroll, { passive: true }); addEventListener('resize', onLitScroll, { passive: true }); litCheck(); };
+    if (r.grow && r.grow.finished) r.grow.finished.then(arm, () => {});
+    else arm();
+  }
+  document.addEventListener('click', e => { if (lit && !lit.contains(e.target)) unspot(); }, true);
   // A scene longer than REPLAY allows still holds its final frame for HOLD.
   function loop(r) {
     const c = card(r), end = Math.max(0, ...c.getAnimations({ subtree: true }).map(a => a.effect.getComputedTiming().endTime).filter(Number.isFinite));
@@ -228,7 +266,7 @@
     });
     b.addEventListener('click', () => {
       if (pinned === r) { pinned = null; close(r); }
-      else { pinned = r; open(r); requestAnimationFrame(() => { if (active === r) reveal(r); }); }
+      else { pinned = r; open(r); requestAnimationFrame(() => { if (active === r) { reveal(r); spotlight(r); } }); }
     });
     r.addEventListener('focusout', e => { if (!r.contains(e.relatedTarget) && pinned !== r) close(r); });
   });

@@ -211,7 +211,7 @@ const logo = (x, y, s) => `<g class="ag-logo"><rect x="${x}" y="${y}" width="${s
   `<g transform="translate(${r1(x + s * .17)} ${r1(y + s * .17)}) scale(${+(s * .66 / 24).toFixed(4)})">${MARK.map(d => `<path d="${d}"/>`).join('')}</g></g>`;
 const PRODUCT = 'Agentic Threat Hunting', HEADLINE = 'From a ransomware report to one lead';
 function header(w, y, fh, phone) {
-  const s = r1(fh * (phone ? 1.45 : 1.25)), sx = 16 + s + 6, line = phone ? y + 35 : y + 11;
+  const s = r1(fh * (phone ? 1.45 : 1.25)), sx = 16 + s + 6, line = phone ? y + 33 : y + 11;
   let h = `<g class="ag-head">${logo(16, r1(y - s + fh * (phone ? .38 : .3)), s)}<text x="${sx}" y="${y}" font-size="${fh}" font-weight="700" fill="${C.ink}">${PRODUCT}` +
     (phone ? '</text>' : `<tspan dx="8" font-weight="400" fill="${C.dim}">|</tspan><tspan dx="8" font-weight="400" fill="${C.body}">${HEADLINE}</tspan></text>`);
   if (phone) h += `<text x="16" y="${y + 21}" font-size="${fh}" fill="${C.body}">${HEADLINE}</text>`;
@@ -260,7 +260,7 @@ function desktop() {
 // progress only: its run to the next number fills as each move travels, and the number lights as it lands.)
 // (7 Nov 2026, round 2: each picture starts on one left edge, the report's and the hunch's, x 84; they were centred,
 // which gave the three panels three left edges)
-const PS = 1.08, SP = 20, TX = 36, PX = 84, MB = 13.6, MT = 14.6, MLH = 17;   // (words, titles, line height)
+const PS = 1.05, SP = 20, TX = 36, PX = 84, MB = 13.6, MT = 14.6, MLH = 17;   // (words, titles, line height)
 const LEFT = [16, DX - 14, CARD.x];   // (each picture's left edge, in the desktop's units)
 // the cubic-bezier curves as functions, so a sampled move eases exactly like the CSS beside it
 const cubic = (x1, y1, x2, y2) => u => { let lo = 0, hi = 1, s = u;
@@ -280,7 +280,7 @@ const TILE0 = { o: G.ts, r: 2 }, SWELLS = { d: 1.35, m: 1.25 };
 // the same distance into place
 const DRIFT = 8;
 function phone() {
-  const W = 360, words = [], pics = [], at = [], nodes = [], boxes = []; let y = 60, H = 0;
+  const W = 360, words = [], pics = [], at = [], nodes = [], boxes = []; let y = 56, H = 0;
   STEPS.forEach((st, i) => {
     const [, , y0, y1] = REACH_M[i], ty = r1(y + 19), by = r1(ty + 18.5), top = by + (st.d.length - 1) * MLH + 12 + GAP[i];
     const px = r1(PX - PS * LEFT[i]), py = r1(top - PS * y0), bottom = top + PS * (y1 - y0) - CUT[i];
@@ -288,7 +288,7 @@ function phone() {
     words.push(`<circle cx="${SP}" cy="${nodes[i]}" r="7.5" fill="${C.bg}"/><g class="ag-sw ag-sw${i}"><g class="ag-s ag-s${i}">${node(i, nodes[i])}<text x="${TX}" y="${ty}" font-size="${MT}" font-weight="700" fill="${C.ink}">${STEPS[i].title}</text>${body(st.d, TX, by, MLH, MB)}</g></g>`);
     pics.push(`<g class="ag-p ag-p${i}"><g transform="translate(${px} ${py}) scale(${PS})">${picture(i, true)}</g></g>`);
     boxes.push([4, ty - 22, W - 8, bottom - ty + 30]);
-    y = r1(bottom + 10); H = r1(bottom + 10);
+    y = r1(bottom + 6); H = r1(bottom + 8);
   });
   const map = (i, [u, v]) => [at[i][0] + PS * u, at[i][1] + PS * v];
   const [d1, d2, out] = [map(0, [BX[0], L]), map(1, [DX, L]), map(1, OUTC)];

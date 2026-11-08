@@ -1,7 +1,7 @@
 /* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
 .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / 266; }
-.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 677.4; }
+.internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / 654.1; }
 @media screen and (max-width: 736px) { .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { display: none; } }   /* (phones show the --m drawing: phone-scenes block) */
 /* (the frame is the card's own outline, on its own 12px corners: the drawing's frame, at 1.15 px a unit, had rounder
    corners than the card and left a wedge of the card outside it; a phone shows none, its card bounded by the page) */
@@ -125,7 +125,7 @@ svg.ag-scene .ag-q1 .ag-qk { opacity: 0; }
 @keyframes ag-cfo { 0% { opacity: 0; } 1%, 100% { opacity: 1; } }   /* (hidden until it lifts, so no speck of it shows earlier) */
 @keyframes ag-morph-d { 0% { x: 352.75px; y: 100.25px; width: 7.5px; height: 7.5px; rx: 1.25px; animation-timing-function: cubic-bezier(.22,.8,.32,1); } 25% { x: 351.175px; y: 98.675px; width: 10.65px; height: 10.65px; rx: 1.95px; animation-timing-function: cubic-bezier(.4,0,.2,1); } 100% { x: 432px; y: 75.5px; width: 98px; height: 57px; rx: 7px; } }
 @keyframes ag-morph-d-t { 0%, 25% { opacity: 1; } 40% { opacity: .45; } 58.75%, 100% { opacity: 0; } }
-@keyframes ag-morph-m { 0% { x: 560.806px; y: -87.34299999999999px; width: 7.5px; height: 7.5px; rx: 1.25px; animation-timing-function: cubic-bezier(.22,.8,.32,1); } 18.18% { x: 559.681px; y: -88.46799999999999px; width: 9.75px; height: 9.75px; rx: 1.75px; animation-timing-function: cubic-bezier(.4,0,.2,1); } 38.18% { x: 559.681px; y: -81.06px; width: 9.75px; height: 9.75px; rx: 1.75px; animation-timing-function: linear; } 43.18% { x: 520.25px; y: 99.125px; width: 9.75px; height: 9.75px; rx: 1.75px; animation-timing-function: cubic-bezier(.4,0,.2,1); } 100% { x: 432px; y: 75.5px; width: 98px; height: 57px; rx: 7px; } }
+@keyframes ag-morph-m { 0% { x: 560.75px; y: -86.036px; width: 7.5px; height: 7.5px; rx: 1.25px; animation-timing-function: cubic-bezier(.22,.8,.32,1); } 18.18% { x: 559.625px; y: -87.161px; width: 9.75px; height: 9.75px; rx: 1.75px; animation-timing-function: cubic-bezier(.4,0,.2,1); } 38.18% { x: 559.625px; y: -79.542px; width: 9.75px; height: 9.75px; rx: 1.75px; animation-timing-function: linear; } 43.18% { x: 520.25px; y: 99.125px; width: 9.75px; height: 9.75px; rx: 1.75px; animation-timing-function: cubic-bezier(.4,0,.2,1); } 100% { x: 432px; y: 75.5px; width: 98px; height: 57px; rx: 7px; } }
 @keyframes ag-morph-m-o { 0% { opacity: 0; } 1%, 18.18% { opacity: 1; animation-timing-function: cubic-bezier(.4,0,.2,1); } 38.18%, 43.18% { opacity: 0; animation-timing-function: cubic-bezier(.22,.8,.32,1); } 60.23%, 100% { opacity: 1; } }
 @keyframes ag-morph-m-t { 0%, 43.18% { opacity: 1; } 54.55% { opacity: .45; } 68.75%, 100% { opacity: 0; } }
 @keyframes ag-tv1 { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(8px) scale(.96); } }
