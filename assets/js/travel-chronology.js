@@ -276,14 +276,15 @@
   icon.querySelector('.chronology-preview-cue')?.remove();icon.classList.remove('journal-is-selected');icon.removeAttribute('aria-describedby');
   const art=icon.querySelector('.authored-scene');art.classList.remove('is-active');
   // One copy of each scene: the phone row borrows the desktop SVG instead of duplicating it.
-  const home=trip.querySelector('.authored-scene'),svg=home.querySelector('svg');art.querySelector('svg').remove();
+  const home=trip.querySelector('.authored-scene');art.querySelector('svg')?.remove();
   const card=original.cloneNode(true);card.className='mobile-journal-card';card.removeAttribute('style');card.removeAttribute('data-reveal');card.querySelectorAll('noscript').forEach(n=>n.remove());card.querySelector('img').sizes='(max-width:736px) 160px, 800px';card.querySelector('.actions')?.remove();card.querySelector('header p')?.remove();
   const photo=card.querySelector('a.travel-card__image,a.image');if(photo){const cue=document.createElement('span');cue.className='mobile-photo-cta';cue.textContent='Read journal →';photo.setAttribute('aria-label','Read journal — '+trip.querySelector('.chronology-label').textContent);cue.setAttribute('aria-hidden','true');photo.append(cue);}
-  row.append(icon,card);list.append(row);return {row,icon,art,home,svg,index:i,visible:false};
+  row.append(icon,card);list.append(row);return {row,icon,art,home,index:i,visible:false};
  }).filter(Boolean);grid.before(list);
  const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let timer,active,frame;
  // Each scene's single SVG lives in whichever presentation is showing (phone rail or desktop timeline).
- const share=()=>entries.forEach(e=>(media.matches?e.art:e.home).append(e.svg));share();media.addEventListener('change',share);
+ // The artwork arrives after this runs (see below), so each row picks its SVG up on scenes-ready.
+ const share=()=>entries.forEach(e=>{e.svg=e.svg||e.home.querySelector('svg');if(e.svg)(media.matches?e.art:e.home).append(e.svg);});share();media.addEventListener('change',share);source.addEventListener('scenes-ready',share);
  function clear(){clearTimeout(timer);if(active)active.art.classList.remove('is-active');active=null;}
  function play(entry){clear();active=entry;void entry.art.getBoundingClientRect();entry.art.classList.add('is-active');timer=setTimeout(()=>{clear();update();},Number(entry.art.dataset.duration)||6200);}
  // Repeat the scene nearest where phone readers look (about 40% down the screen); the playing scene
@@ -301,6 +302,21 @@
  media.addEventListener('change',update);reduced.addEventListener('change',update);document.addEventListener('visibilitychange',update);
  new MutationObserver(()=>{list.hidden=grid.hidden;update();}).observe(grid,{attributes:true,attributeFilter:['hidden']});
 
+})();
+
+/* Scene artwork (8 Nov 2026): the build ships the ten SVGs as one cached file. Fetch it once a scene
+   is on screen or the page has loaded, so it never shares the first screen's link, and fill the
+   fixed-size desktop slots (no layout shift); scenes-ready hands each one to the phone rail. */
+(()=>{
+ const source=document.querySelector('.journal-chronology[data-scenes]');if(!source)return;let pending;
+ const load=()=>{if(pending)return;pending=fetch(source.dataset.scenes).then(r=>{if(!r.ok)throw r;return r.text();}).then(text=>{
+  const t=document.createElement('template');t.innerHTML=text;const svgs=[...t.content.firstElementChild.children];
+  source.querySelectorAll('.chronology-trip .authored-scene').forEach((art,i)=>svgs[i]&&art.append(svgs[i]));observer.disconnect();source.dispatchEvent(new Event('scenes-ready'));
+ },()=>{pending=null;});};
+ // A failed fetch retries on the next scene that comes on screen.
+ const observer=new IntersectionObserver(items=>items.some(i=>i.isIntersecting)&&load());document.querySelectorAll('.authored-scene').forEach(a=>observer.observe(a));
+ // Wider screens preloaded the file with the CSS (build.ps1); phones wait for load.
+ if(document.readyState==='complete'||matchMedia('(min-width:737px)').matches)load();else addEventListener('load',load);
 })();
 
 /* Look closer (21 Oct 2026): a quiet loupe appears on the scene a reader is on (hover or focus on

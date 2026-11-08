@@ -45,3 +45,23 @@ test.describe('mobile reading animation',()=>{
 test('no JavaScript retains ten visible journal covers',async({browser})=>{
  const context=await browser.newContext({javaScriptEnabled:false,viewport:{width:390,height:844}});const page=await context.newPage();await page.goto(BASE + '/travel');await expect(page.locator('.travel-card img:visible')).toHaveCount(10);await context.close();
 });
+
+// Scene artwork ships as one cached file (8 Nov 2026): phones fetch it after load and the rail
+// borrows each single SVG; wider screens use the head preload, so the file is fetched once.
+test('scene artwork waits for load on phones and fills each visible slot once',async({page})=>{
+ const requests=[];page.on('request',r=>{if(r.url().includes('travel-scenes.svg'))requests.push(r.url());});
+ await page.setViewportSize({width:390,height:844});await page.goto('/travel');
+ await expect(page.locator('.mobile-journal-list .authored-scene > svg')).toHaveCount(10);
+ await expect(page.locator('.journal-chronology .authored-scene > svg')).toHaveCount(0);
+ const timing=await page.evaluate(()=>({load:performance.getEntriesByType('navigation')[0].loadEventStart,scenes:performance.getEntriesByType('resource').find(e=>e.name.includes('travel-scenes.svg')).startTime}));
+ expect(timing.scenes).toBeGreaterThanOrEqual(timing.load);expect(requests).toHaveLength(1);
+ await page.setViewportSize({width:1280,height:900});
+ await expect(page.locator('.journal-chronology .authored-scene > svg')).toHaveCount(10);
+ await expect(page.locator('.mobile-journal-list .authored-scene > svg')).toHaveCount(0);
+});
+test('wider screens fetch the preloaded scene artwork once',async({page})=>{
+ const requests=[];page.on('request',r=>{if(r.url().includes('travel-scenes.svg'))requests.push(r.url());});
+ await page.setViewportSize({width:1280,height:900});await page.goto('/travel');
+ await expect(page.locator('.journal-chronology .authored-scene > svg')).toHaveCount(10);
+ await page.waitForLoadState('load');expect(requests).toHaveLength(1);
+});

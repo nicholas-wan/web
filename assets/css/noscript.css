@@ -48,3 +48,11 @@
 			display: none !important;
 		}
 	}
+
+/* Travel timeline: scene artwork arrives by script (travel-scenes.svg, 8 Nov 2026), so without
+   JavaScript the empty slots fold away and the names sit beside their dots. */
+.journal-chronology .authored-scene{display:none}
+.journal-chronology .chronology-track{height:150px}
+.journal-chronology .chronology-trip{top:62px}
+.journal-chronology .chronology-line{top:70px}
+.journal-chronology .chronology-trip:not(.lane-1) .chronology-name{top:-50px}
