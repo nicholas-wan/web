@@ -10118,23 +10118,33 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes mm-river{0%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}20%{opacity:.85}50%{transform:translateX(.8px);stroke:#c8b4ec}80%{opacity:.85;stroke:#ec8fb5}}
 @keyframes mm-river-b{0%,6%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}26%{opacity:.85}56%{transform:translateX(-.8px);stroke:#9a79e8}86%{opacity:.85;stroke:#ec8fb5}}
 @media(max-width:736px){
- .travel-timeline.travel-phone-rail .mobile-journal-row{grid-template-columns:128px minmax(0,1fr);column-gap:10px}
- .travel-timeline.travel-phone-rail .mobile-journal-row::before{left:63px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{width:128px!important}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{max-width:128px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{max-width:124px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{--tile:128px;width:var(--tile)!important;height:calc(var(--tile)*.75)!important;min-width:0;overflow:hidden;border-radius:12px}
+ /* Tiles 150px from 390px wide, 140px from 361px, 118px at 360px and below (9 Nov 2026). */
+ .travel-timeline.travel-phone-rail .mobile-journal-row{grid-template-columns:150px minmax(0,1fr);column-gap:10px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row::before{left:74px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{width:150px!important}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{max-width:150px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{max-width:146px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{--tile:150px;width:var(--tile)!important;height:calc(var(--tile)*.75)!important;min-width:0;overflow:hidden;border-radius:13px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene>svg{width:calc(var(--tile)*var(--vw,120)/var(--cw))!important;height:calc(var(--tile)*var(--vh,80)/var(--cw))!important;max-width:none;margin:calc(var(--tile)*(var(--vy,0) - var(--cy))/var(--cw)) 0 0 calc(var(--tile)*(var(--vx,0) - var(--cx))/var(--cw))}
  .mobile-journal-row .mm-dusk-tile{display:inline}
  /* Soft resting skies; the scene that is playing comes up to full colour with a sage ring. */
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{position:relative;background:none!important;transition:box-shadow .4s ease}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene::before{content:"";position:absolute;inset:0;opacity:.55;transition:opacity .5s ease}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene::before{content:"";position:absolute;inset:0;opacity:.55;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene>svg{position:relative}
- .mobile-journal-row .mm-dusk-tile{opacity:.55;transition:opacity .5s ease}
+ .mobile-journal-row .mm-dusk-tile{opacity:.55;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active .mm-dusk-tile{opacity:1}
+ /* Held mid-flick on its opening frame: a lighter tint (the resting 55% read as unloaded images), full on the stop.
+    Paris at night held nearer full, as 78% of its navy read slate grey. */
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held .mm-dusk-tile{opacity:.78}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held[data-scene="2"]::before{opacity:.9}
+ /* A lit river boat crosses Guangzhou left to right, 9s a crossing; parked left of the tower at rest, the crossing's first frame. travel-rail.js
+    leaves mv- animations running across the scene's own loop. */
+ .mobile-journal-row .gz-boat{display:inline;transform:translate(36.67px,76.4px) scale(1.5)}
+ .mobile-journal-row .authored-scene.is-active .gz-boat{animation:mv-boat 9s linear -3s infinite}
+ @keyframes mv-boat{from{transform:translate(-10px,76.4px) scale(1.5)}to{transform:translate(130px,76.4px) scale(1.5)}}
  /* Every scene on screen plays (9 Nov 2026); the ring marks the one on the reading line. */
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-focus{box-shadow:0 0 0 2px #a8c8b6}
- /* Small movers drawn bigger on the 128px tiles so they read on a flick. Each scales its inner
+ /* Small movers drawn bigger on the phone tiles so they read on a flick. Each scales its inner
     drawing (or r / stroke-width), never the animated element, so its path is unchanged. */
  .travel-timeline.travel-phone-rail .mobile-journal-row .dl-tram>g{scale:1.8}
  .travel-timeline.travel-phone-rail .mobile-journal-row .gg-car>*{scale:2.2}
@@ -10159,11 +10169,20 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#d5e1d6,#eef2ea)}
 }
+@media(max-width:389px){
+ .travel-timeline.travel-phone-rail .mobile-journal-row{grid-template-columns:140px minmax(0,1fr)}
+ .travel-timeline.travel-phone-rail .mobile-journal-row::before{left:69px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{width:140px!important}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{max-width:140px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{max-width:136px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{--tile:140px}
+}
 @media(max-width:360px){
  .travel-timeline.travel-phone-rail .mobile-journal-row{grid-template-columns:118px minmax(0,1fr);column-gap:8px}
  .travel-timeline.travel-phone-rail .mobile-journal-row::before{left:58px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{width:118px!important}
  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{max-width:118px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{max-width:114px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{--tile:118px}
 }
 @media(prefers-reduced-motion:reduce){

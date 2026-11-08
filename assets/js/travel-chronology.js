@@ -281,24 +281,12 @@
   const photo=card.querySelector('a.travel-card__image,a.image');if(photo){const cue=document.createElement('span');cue.className='mobile-photo-cta';cue.textContent='Read journal →';photo.setAttribute('aria-label','Read journal — '+trip.querySelector('.chronology-label').textContent);cue.setAttribute('aria-hidden','true');photo.append(cue);}
   row.append(icon,card);list.append(row);return {row,icon,art,home,index:i,visible:false};
  }).filter(Boolean);grid.before(list);
- const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');const playing=new Map();let focus,frame;
- // 9 Nov 2026: all scenes on screen play; nearest (28px lead) is the focus.
- const OPEN={guangzhou:900,australia:1500,germany:800,usacanada:400,seoul:1200};
+ const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let frame;
  // Each scene's single SVG lives in whichever presentation is showing (phone rail or desktop timeline).
  // The artwork arrives later (see below); each row picks its SVG up on scenes-ready.
- const share=()=>{entries.forEach(e=>{e.svg=e.svg||e.home.querySelector('svg');if(e.svg)(media.matches?e.art:e.home).append(e.svg);});clear();update();};share();media.addEventListener('change',share);source.addEventListener('scenes-ready',share);
- function start(e){if(playing.has(e))return;const a=e.art;a.classList.add('is-active');
-  const anims=a.getAnimations({subtree:true}).filter(x=>x.animationName),at=OPEN[e.icon.getAttribute('href').slice(12)]||0,ms=(+a.dataset.duration||6200)-at;
-  const seek=()=>anims.forEach(x=>{x.currentTime=at;x.play();}),loop=()=>{seek();a.dataset.loop=-~a.dataset.loop;playing.set(e,setTimeout(loop,ms));};if(at)seek();playing.set(e,setTimeout(loop,ms));}
- function stop(e){clearTimeout(playing.get(e));playing.delete(e);e.art.classList.remove('is-active');}
- function pick(e){if(focus!==e){focus?.art.classList.remove('is-focus');focus=e;e?.art.classList.add('is-focus');}}
- function clear(){[...playing.keys()].forEach(stop);pick(null);}
- function update(){
-  if(!media.matches||reduced.matches||document.hidden||list.hidden){clear();return;}
-  let nearest=null,distance=Infinity;const shown=new Set();
-  entries.forEach(entry=>{const box=entry.art.getBoundingClientRect(),visible=Math.min(innerHeight,box.bottom)-Math.max(0,box.top);if(!box.height||visible<box.height/2)return;shown.add(entry);const delta=Math.abs((box.top+box.bottom)/2-innerHeight*.4)-(entry===focus?28:0);if(delta<distance){nearest=entry;distance=delta;}});
-  [...playing.keys()].forEach(e=>{if(!shown.has(e))stop(e);});shown.forEach(start);pick(nearest);
- }
+ const share=()=>{entries.forEach(e=>{e.svg=e.svg||e.home.querySelector('svg');if(e.svg)(media.matches?e.art:e.home).append(e.svg);});window.travelRail?.reset();update();};share();media.addEventListener('change',share);source.addEventListener('scenes-ready',share);
+ // travel-rail.js decides which scenes play and how (9 Nov 2026).
+ function update(){window.travelRail?.update({entries,media,reduced,list});}
  function requestUpdate(){if(frame)return;frame=requestAnimationFrame(()=>{frame=0;update();});}
  entries.forEach(e=>e.icon.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();e.row.classList.add('mobile-selected');entries.filter(x=>x!==e).forEach(x=>x.row.classList.remove('mobile-selected'));update();}));
  const observer=new IntersectionObserver(requestUpdate,{threshold:[0,.5,1]});entries.forEach(e=>observer.observe(e.art));

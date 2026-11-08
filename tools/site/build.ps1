@@ -785,7 +785,7 @@ $assetVersions = @{}
 foreach ($file in $runtimeCssText.Keys) {
     $assetVersions["assets/css/$file"] = Get-ContentVersion $runtimeCssText[$file]
 }
-foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'travel-shortcuts.js', 'travel-chronology.js', 'projects.js')) {
+foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'travel-shortcuts.js', 'travel-rail.js', 'travel-chronology.js', 'projects.js')) {
     $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
 }
 $assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
@@ -1249,7 +1249,7 @@ foreach ($page in $pages) {
     $listingEffectsScript = if ($slug -in @('skills', 'travel')) { "<script src=`"$(Get-AssetRef 'assets/js/listing-effects.js')`"></script>" } else { "" }
     $journalProgressScript = if ($tripOrder -contains $slug) { "<script src=`"$(Get-AssetRef 'assets/js/journal-progress.js')`"></script>" } else { "" }
     $canvasScript = if ($slug -eq 'index') { "<script src=`"$(Get-AssetRef 'assets/js/canvas-background.js')`"></script>" } else { "" }
-    $travelNavigationScripts = if ($slug -eq 'travel') { "<script src=`"$(Get-AssetRef 'assets/js/travel-shortcuts.js')`"></script>`n    <script src=`"$(Get-AssetRef 'assets/js/travel-chronology.js')`"></script>" } else { "" }
+    $travelNavigationScripts = if ($slug -eq 'travel') { "<script src=`"$(Get-AssetRef 'assets/js/travel-shortcuts.js')`"></script>`n    <script src=`"$(Get-AssetRef 'assets/js/travel-rail.js')`"></script>`n    <script src=`"$(Get-AssetRef 'assets/js/travel-chronology.js')`"></script>" } else { "" }
     $optionalScripts = (@($gameScript, $listingEffectsScript, $journalProgressScript, $canvasScript, $galleryScript, $travelNavScript, $travelDiscoveryScript, $travelNavigationScripts, $personalTimelineScript, $scrambleRevealScript, $anomalyPeekScript, $projectsScript) | Where-Object { $_ }) -join "`n    "
     $bodyClass = if ($slug -eq 'index') { 'is-preload page-home' } elseif ($eventPages -contains $slug) { 'is-preload page-personal page-event' } elseif ($tripOrder -contains $slug) { 'is-preload page-travel-journal' } elseif ($slug -eq 'projects') { 'is-preload page-experience page-projects' } elseif ($activePage -in @('experience', 'skills', 'personal')) { "is-preload page-$activePage" } else { 'is-preload' }
     $routeStylesheets = @()
@@ -1358,7 +1358,7 @@ if ($imageDimensionCacheDirty) {
 }
 
 # Publish only runtime assets used by the generated Pages site.
-$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "travel-shortcuts.js", "travel-chronology.js", "projects.js")
+$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "travel-shortcuts.js", "travel-rail.js", "travel-chronology.js", "projects.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCssText.Keys) {

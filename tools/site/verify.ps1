@@ -149,7 +149,7 @@ foreach ($page in $pages) {
     if ($page.Name -ne 'index.html' -and ($scan -match '<canvas id="nokey"|assets/js/canvas-background\.js')) { throw "$($page.Name) must not run the homepage background canvas." }
     if ($page.Name -ne 'index.html' -and $scan -match 'assets/js/game\.js') { throw "$($page.Name) must not load the homepage interaction bundle." }
     if ($page.Name -ne 'experience.html' -and $scan -match 'assets/js/anomaly-peek\.js') { throw "$($page.Name) must not load the Work page's anomaly peek." }
-    foreach ($travelScript in @('travel-shortcuts.js', 'travel-chronology.js')) {
+    foreach ($travelScript in @('travel-shortcuts.js', 'travel-rail.js', 'travel-chronology.js')) {
         $hasTravelScript = $scan -match [regex]::Escape((Get-DistAssetRef "assets/js/$travelScript"))
         if (($page.Name -eq 'travel.html') -ne $hasTravelScript) { throw "$travelScript must load only on Travel." }
     }
@@ -294,7 +294,7 @@ foreach ($copiedAsset in @('assets/css/icons.css', 'assets/css/main.css', 'asset
         'assets/js/gallery.js', 'assets/js/travel-nav.js', 'assets/js/travel-map.js',
         'assets/js/personal-timeline.js', 'assets/js/scramble-reveal.js',
         'assets/js/travel-discovery.js', 'assets/js/photo-search.js', 'assets/js/page-transitions.js',
-        'assets/js/anomaly-peek.js', 'assets/js/travel-shortcuts.js', 'assets/js/travel-chronology.js',
+        'assets/js/anomaly-peek.js', 'assets/js/travel-shortcuts.js', 'assets/js/travel-rail.js', 'assets/js/travel-chronology.js',
         'assets/css/internship-peek.css', 'assets/js/internship-peek.js',
         'assets/css/projects.css', 'assets/js/projects.js')) {
     Assert-DistMatchesSource $copiedAsset
@@ -345,6 +345,8 @@ Assert-FileSizeBudget 'assets\js\travel-shortcuts.js' 4
 # Repeating scene sequence, travelling pulse and interaction/pause lifecycle.
 # Includes synchronized journal previews and the mobile animated rail.
 Assert-FileSizeBudget 'assets\js\travel-chronology.js' 30
+# The phone rail's player (9 Nov 2026): flick hold, opening beat, movers and rest.
+Assert-FileSizeBudget 'assets\js\travel-rail.js' 8
 $chronologySource = Get-Content -LiteralPath (Join-Path $dist 'assets/js/travel-chronology.js') -Raw -Encoding UTF8
 if ($chronologySource -notmatch "track.style.minWidth='0'") { throw 'Travel timeline must fit the page instead of requiring horizontal scrolling.' }
 $travelDeferredMarkup = Get-Content -LiteralPath (Join-Path $dist 'travel.html') -Raw -Encoding UTF8
