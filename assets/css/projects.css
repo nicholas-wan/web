@@ -608,3 +608,7 @@ to{box-shadow:0 0 0 9px rgba(17,110,107,0)}
 .app-demo--finance .f-rec{justify-content:center;width:100%;min-height:40px;border:1px solid var(--b);border-radius:12px;color:var(--t3);font-weight:600;opacity:.6}
 .app-demo--finance .f-sheet p{text-align:left}
 body.pj-under #navPanelToggle{visibility:hidden}
+.page-projects .app-rail__tab.is-live video{box-shadow:0 0 0 2px var(--color-brand-600)}
+.page-projects .sq{background:url(../../images/projects/squash-wallpaper.svg) 50% 100%/cover,var(--bg)}
+.page-projects .sq-gav{gap:3px;background:radial-gradient(circle at 34% 30%,#4a4d52,#111214 70%)}
+.page-projects .sq-gav i{width:5px;height:5px;border-radius:50%;background:#f5c542}

@@ -1064,11 +1064,21 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 			t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
 			cards[k].hidden = wide.matches && !on;
 			if (wide.matches && !v.src) { v.poster = v.dataset.poster; v.src = v.dataset.src; }
-			if (on || still.matches || !wide.matches) v.pause(); else v.play().catch(() => {});
 		});
 		if (focus) tabs[i].focus();
+		cue();
 		document.dispatchEvent(new Event('scroll'));
 	}
+	// One thumbnail plays at a time, each in turn; hovering a tab plays its own.
+	const vids = tabs.map(t => t.querySelector('video'));
+	let turn = 0, hover = -1;
+	function cue() {
+		const run = wide.matches && !still.matches, k = hover >= 0 ? hover : [0, 1, 2, 3].filter(n => n !== cur)[turn % 3];
+		vids.forEach((v, n) => { tabs[n].classList.toggle('is-live', run && n === k && n !== cur); if (n !== k || !run) v.pause(); });
+		if (run && k !== cur) { if (hover < 0) vids[k].currentTime = 0; vids[k].play().catch(() => {}); }
+	}
+	vids.forEach(v => v.addEventListener('ended', () => { if (hover < 0) { turn++; cue(); } }));
+	tabs.forEach((t, n) => { t.addEventListener('pointerenter', () => { hover = n; cue(); }); t.addEventListener('pointerleave', () => { hover = -1; cue(); }); });
 	rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) show(tabs.indexOf(t)); });
 	rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur }[e.key]; if (d) { e.preventDefault(); show((cur + d) % 4, 1); } });
 	[wide, still].forEach(m => m.addEventListener('change', () => show(cur)));
