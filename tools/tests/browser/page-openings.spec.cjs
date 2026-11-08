@@ -29,7 +29,10 @@ for (const width of [320, 375, 1366]) {
     for (let i = 1; i < titles.length; i++) {
       expect(Math.abs(titles[i].x - titles[0].x), openings[i][0] + ' title left edge').toBeLessThanOrEqual(1);
       expect(Math.abs(titles[i].y - titles[0].y), openings[i][0] + ' title top edge').toBeLessThanOrEqual(1);
-      expect(titles[i].typography, openings[i][0] + ' title style').toEqual(titles[0].typography);
+      // Projects is the one dark page (owner, 9 Nov 2026), so only its title colour differs.
+      const [want, got] = openings[i][0] === '/projects'
+        ? [{ ...titles[0].typography, color: 'rgb(236, 237, 240)' }, titles[i].typography] : [titles[0].typography, titles[i].typography];
+      expect(got, openings[i][0] + ' title style').toEqual(want);
     }
   });
 }

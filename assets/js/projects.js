@@ -9,10 +9,10 @@ function projectsDemo(selector, init) {
 	}), {rootMargin:'500px'});
 	roots.forEach(root => io.observe(root));
 }
-/* SquashBot demo. Wording is the bot's own (squashbot/src); sample data only. "Now" is Fri 13 Nov 2026, 9:41am. */
+/* SquashBot demo in the bot's own words (squashbot/src). "Now" is Fri 13 Nov 2026, 9:41am. */
 (() => {
 	'use strict';
-	const WD = 'Sun Mon Tue Wed Thu Fri Sat'.split(' ');
+	const U = 'DodgerBlueee', WD = 'Sun Mon Tue Wed Thu Fri Sat'.split(' ');
 	const MO = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
 	const NUM = { one: 1, two: 2, three: 3, four: 4, five: 5 };
 	const CW = '(\\d{1,2}|one|two|three|four|five)';
@@ -180,10 +180,9 @@ function projectsDemo(selector, init) {
 		const placeholder = (t = 'Try: court 3 sat 7pm') => { input.placeholder = t; };
 		const sendState = () => snd.classList.toggle('is-on', !!input.value.trim());
 
-		const OK = [[{ t: '👍 OK', a: 'ok' }]], gone = (a, m) => drop(m);
 		function showPin(i, flash) {
 			S.pin = i;
-			pm.textContent = i ? '💰 Squash tab · owed to Nicholas Alex · $2.00' : S.board;
+			pm.textContent = i ? `💰 Squash tab · owed to Nicholas ${U} · $2.00` : S.board;
 			pin.setAttribute('aria-label', `Pinned message ${2 - i} of 2: ${pm.textContent}`);
 			pinBtn.textContent = i ? '🧾 Tab' : '🎾 Courts';
 			pinBtn.dataset.mini = i ? 'tab' : 'courts';
@@ -195,9 +194,23 @@ function projectsDemo(selector, init) {
 			}
 		}
 		function sync(quiet) {
-			const board = `📌 Court schedule ${sorted().map((b) => `${b.o > 1 ? sd(b.o) : b.o ? 'Tomorrow' : 'Today'} · ${span(b.s, b.e)} · C${esc(b.c)} · ${
-				free(b) ? slots(free(b)) : 'full'}${b.by ? ' ↳ booked by Alex' : ''}`).join(' ')}`;
-			if (board !== S.board) { S.board = board; showPin(0, !quiet); }
+			const rows = ['📌 <b>Court schedule</b>', ''].concat(...sorted().map((b) => {
+				const l = `${b.o > 1 ? sd(b.o) : b.o ? 'Tomorrow' : 'Today'} · ${span(b.s, b.e)} · <b>C${esc(b.c)}</b> · ${free(b) ? slots(free(b)) : 'full'}`;
+				return [free(b) ? l : `<s>${l}</s>`].concat(b.by ? [`↳ <i>booked by ${U}</i>`] : []);
+			}));
+			const board = rows.join(' ').replace(/<[^>]+>/g, '').replace('  ', ' ');
+			if (board !== S.board) {
+				S.board = board;
+				showPin(0, !quiet);
+				if (S.bd) {
+					edit(S.bd, { html: rows });
+					if (!quiet) {
+						S.bd.el.classList.add('sq-hl');
+						later(380, () => { const el = S.bd?.el, r = chat.getBoundingClientRect(); if (el) chat.scrollTo({ top: chat.scrollTop + (el.getBoundingClientRect().top - r.top) * chat.offsetHeight / r.height - 6, behavior: still() ? 'auto' : 'smooth' }); });
+					}
+				}
+				else S.bd = post({ html: rows, time: '9:15', kb: [[{ t: '🎾 Courts', a: 'c' }]], on: (a, m, key) => openMini('courts', key) }, quiet);
+			}
 			const next = sorted().find((b) => free(b) > 0 && (b.o || b.s > NOW));
 			const html = next && [`🙋 <b>${slots(free(next))} left on Court ${esc(next.c)}</b>`,
 				`${next.o > 1 ? `In ${next.o} days` : next.o ? 'Tomorrow' : 'Today'} · ${sd(next.o)} · ${span(next.s, next.e)}`,
@@ -210,11 +223,9 @@ function projectsDemo(selector, init) {
 		}
 		const onAvail = (a, m) => join(m.court);
 		function join(b, quiet) {
-			if (b.ppl.includes('Alex')) return toast('You are already on that court.', 2400);
-			b.ppl.push('Alex');
-			toast('You are in.');
-			if (!quiet) post({ html: [`✅ <b>You are on</b> Court ${esc(b.c)}`,
-				`${sd(b.o)} · ${span(b.s, b.e)} · ${free(b) ? `${slots(free(b))} · ${b.ppl.length}/${b.cap}` : 'full'}`, `👥 ${named(b).map(tag).join(', ')}`], kb: OK, on: gone });
+			if (b.ppl.includes(U)) return toast('You are already on that court.', 2400);
+			b.ppl.push(U);
+			toast(`You are in: Court ${b.c}, ${sd(b.o)}.`);
 			later(400, sync);
 		}
 
@@ -250,16 +261,14 @@ function projectsDemo(selector, init) {
 					: d.s > 1260 ? 'The last slot starts at 9pm. Choose an earlier start time.'
 							: e > 1320 ? 'Courts close at 10pm. Choose an earlier finish time.' : '';
 			if (err) { d.is = [err]; return edit(m, card(d)); }
-			const b = { c: d.c, o: d.o, s: d.s, e, cap: 3, ppl: ['Nicholas', 'Alex'], by: 1 };
+			const b = { c: d.c, o: d.o, s: d.s, e, cap: 3, ppl: ['Nicholas', U], by: 1 };
 			S.courts.push(b);
 			S.draft = S.card = S.pending = null;
 			drop(S.prompt);
 			placeholder();
 			toast('✅ Booking added');
 			drop(m);
-			later(300, () => post({ html: [`🎾 <b>Court ${esc(d.c)} booked</b>`, `${cd(d.o)} ${dt(d.o).getUTCFullYear()} · ${span(d.s, e)}`,
-				`👥 ${named(b).map(tag).join(', ')} · ${slots(free(b))} · 2/3`], kb: OK, on: gone }));
-			later(700, sync);
+			later(450, sync);
 		}
 		const FLD = { d: ['date', '13 Aug, tomorrow, or Friday'], c: ['court', '4 or Court A'], t: ['time', '9pm or 8pm-9:30pm'] };
 		function ask(f, again) {
@@ -267,7 +276,7 @@ function projectsDemo(selector, init) {
 			drop(S.prompt);
 			S.pending = f;
 			S.prompt = post({ html: again ? [`⚠️ ${f === 'c' ? 'Reply with a court number or name, such as 4 or Court A.' : `I couldn’t read that ${name}.`} Please reply again.`]
-				: [`${tag('Alex')}, reply with the ${name}.`, `Example: <code>${ex}</code>`] });
+				: [`${tag(U)}, reply with the ${name}.`, `Example: <code>${ex}</code>`] });
 			placeholder(`Type the ${name}`);
 			focus(input);
 		}
@@ -314,7 +323,7 @@ function projectsDemo(selector, init) {
 		root.appendChild(mini);
 		let miniOpener;
 		function closeMini() { mini.hidden = true; chat.inert = false; if (miniOpener) miniOpener.focus({ preventScroll: true }); }
-		/* The Mini App as squashbot/public/app draws it: title and Close, the Courts | Tab switch, then rows. */
+		/* The Mini App as squashbot/public/app draws it: title, Close, Courts | Tab, then rows. */
 		function openMini(kind, opener, again) {
 			if (opener) miniOpener = opener;
 			const tab = kind === 'tab', row = (a, b) => `<div class="sq-mr"><span>${a}</span>${b}</div>`;
@@ -322,7 +331,7 @@ function projectsDemo(selector, init) {
 				`<button type="button" data-mk="${k}" aria-pressed="${k === kind}">${l}</button>`).join('')}</div>${tab
 				? `<div class="sq-mcard"><strong>$2.00</strong>You owe Nicholas</div><div class="sq-mlbl">Your history</div><div class="sq-msec">${row('Court 4 · 10 Nov · 8pm–9pm · $6.00&nbsp;÷&nbsp;3', '<b>$2.00</b>')}</div><p>Courts are $6/hour from 6pm, on weekends and on public holidays, $3/hour otherwise, split across everyone who played.</p>`
 				: `<div class="sq-msec">${sorted().map((b, i) => row(`<b>Court ${esc(b.c)} · ${sd(b.o)}</b>${span(b.s, b.e)} · ${free(b) ? `${free(b)} left` : 'full'} · ${b.ppl.length}/${b.cap}<br>👥 ${named(b).join(', ')}${b.ppl.length > named(b).length ? ` + ${b.ppl.length - named(b).length}` : ''}`,
-					b.ppl.includes('Alex') ? `<button type="button" data-mj="${i}" class="is-out">Leave</button>` : free(b) ? `<button type="button" data-mj="${i}">Join</button>` : '<i>Full</i>')).join('')}</div><p>Tap a court to seat or remove players, or to change it.</p><button type="button" class="sq-madd" data-ma>➕ Add booking</button>`}`;
+					b.ppl.includes(U) ? `<button type="button" data-mj="${i}" class="is-out">Leave</button>` : free(b) ? `<button type="button" data-mj="${i}">Join</button>` : '<i>Full</i>')).join('')}</div><p>Tap a court to seat or remove players, or to change it.</p><button type="button" class="sq-madd" data-ma>➕ Add booking</button>`}`;
 			mini.hidden = false; chat.inert = true; toastEl.classList.remove('is-on');
 			(mini.querySelector(again) || mini.querySelector('button')).focus({ preventScroll: true });
 		}
@@ -331,7 +340,7 @@ function projectsDemo(selector, init) {
 			if (!t) return;
 			if (d.mk) return openMini(d.mk, 0, `[data-mk="${d.mk}"]`);
 			if (d.mj) {
-				const b = sorted()[d.mj], k = b.ppl.indexOf('Alex');
+				const b = sorted()[d.mj], k = b.ppl.indexOf(U);
 				if (k < 0) join(b, 1); else { b.ppl.splice(k, 1); later(400, sync); }
 				return openMini('courts', 0, `[data-mj="${d.mj}"]`);
 			}
@@ -349,7 +358,8 @@ function projectsDemo(selector, init) {
 			if (m && m.on) m.on(key.dataset.a, m, key);
 		});
 		pin.addEventListener('click', () => showPin(S.pin ? 0 : 1));
-		root.querySelectorAll('.sq-chip').forEach((c) => c.addEventListener('click', () => say(c.textContent, 1)));
+		const chips = root.querySelectorAll('.sq-chip'), send = (c) => { c.hidden = true; say(c.textContent, 1); };
+		chips.forEach((c) => c.addEventListener('click', () => send(c)));
 		$('[data-form]').addEventListener('submit', (e) => { e.preventDefault(); say(input.value); });
 		input.addEventListener('input', sendState);
 
@@ -369,7 +379,7 @@ function projectsDemo(selector, init) {
 		function preview() {
 			if (S.touched || still()) return;
 			const chip = $('.sq-chip');
-			plater(700, () => press(chip, () => say(chip.textContent, 1)));
+			plater(700, () => press(chip, () => send(chip)));
 			plater(3300, () => addKey()?.classList.add('is-ring'));
 			plater(4100, () => press(addKey(), () => onCard('y', S.card)));
 		}
@@ -378,15 +388,15 @@ function projectsDemo(selector, init) {
 			timers.concat(ptimers).forEach(clearTimeout);
 			timers = []; ptimers = [];
 			S = { msgs: [], touched: false,
-				courts: [{ c: '1', o: 2, s: 600, e: 720, cap: 3, ppl: ['Nicholas'] }, { c: '2', o: 4, s: 1200, e: 1260, cap: 3, ppl: ['Nicholas', '', ''] }] };
+				courts: [{ c: '1', o: 2, s: 600, e: 720, cap: 3, ppl: ['Nicholas'] }, { c: '2', o: 4, s: 1200, e: 1260, cap: 3, ppl: ['Nicholas', '', ''] },
+					{ c: '5', o: 6, s: 1140, e: 1230, cap: 3, ppl: ['Nicholas', 'Priya'] }] };
 			chat.innerHTML = '<div class="sq-day">Today</div>';
+			chips.forEach((c) => { c.hidden = false; });
 			toastEl.classList.remove('is-on');
 			typing(false);
 			input.value = '';
 			sendState();
 			placeholder();
-			post({ html: ['💰 <b>Squash tab</b> · owed to Nicholas', '', 'Alex · <b>$2.00</b>'], time: '9:02',
-				kb: [[{ t: '🧾 Tab', a: 'tab' }]], on: (a, m, key) => openMini('tab', key) }, 1);
 			sync(1);
 
 			chat.scrollTop = chat.scrollHeight;
@@ -402,13 +412,13 @@ function projectsDemo(selector, init) {
 })();
 
 
-/* Nag-bot demo. Wording from nag-bot's src/ and its Mini App (public/app). Sample data only. */
+/* Nag-bot demo. Wording from nag-bot's src/ and its Mini App (public/app). */
 (() => {
 	const ME = 'Nicholas', CH = 'wash the litter box', NOW = '7:45 PM', MAX = 3, NEXT = 'in 42 days · Dec 20, 7:30 PM';
 
 	const PRE = [['30m', '8:15 PM'], ['1h', '8:45 PM'], ['2h', '9:45 PM'], ['3h', '10:45 PM'], ['6h', 'tomorrow 1:45 AM'],
-		['🌙 9pm today', '9:00 PM'], ['📅 Tomorrow', 'tomorrow 7:45 PM', 1],
-		['📅 1 week', 'in 7 days · Nov 15, 7:45 PM', 1], ['📅 2 weeks', 'in 14 days · Nov 22, 7:45 PM', 1]]
+		['🌙 9pm today', '9:00 PM'], ['📅 Tomorrow', 'tomorrow 7:45 PM', 2.5],
+		['📅 1 week', 'in 7 days · Nov 15, 7:45 PM', 9], ['📅 2 weeks', 'in 14 days · Nov 22, 7:45 PM', 9]]
 		.map(([l, w, post]) => [l, /^[ti]/.test(w) ? w : `today ${w}`, post]);
 
 	const CHORES = [['wash', '💩', CH, 'every 6 weeks', '7:30 PM'],
@@ -419,7 +429,7 @@ function projectsDemo(selector, init) {
 	].map(([id, e, t, cad, at, parent, st]) => ({ id, e, t, cad, at, rep: cad[0].toUpperCase() + cad.slice(1), parent, st }));
 	const byId = (id) => CHORES.find((c) => c.id === id);
 
-	const PEOPLE = [['Alex', 5, 3], [ME, 4, 2]], RECENT = [['🗑️', 'trash', ME, 'Nov 8, 7:05 PM'], ['💩', 'clear poop', 'Alex', 'Nov 7, 9:12 PM'], ['🍽️', 'dishes', 'together', 'Nov 7, 8:40 PM']];
+	const PEOPLE = [['DodgerBlueee', 5, 3], [ME, 4, 2]], RECENT = [['🗑️', 'trash', ME, 'Nov 8, 7:05 PM'], ['💩', 'clear poop', 'DodgerBlueee', 'Nov 7, 9:12 PM'], ['🍽️', 'dishes', 'together', 'Nov 7, 8:40 PM']];
 	const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 	const B = (label, act, arg, cls, more = '') => `<button type="button"${cls ? ` class="${cls}"` : ''} data-act="${act}"${arg != null ? ` data-arg="${arg}"` : ''}${more}>${label}</button>`;
 	const emo = (e) => `<span class="n-emo" aria-hidden="true">${e}</span>`;
@@ -435,18 +445,26 @@ function projectsDemo(selector, init) {
 		root.dataset.nagReady = '1';
 		const $ = (q) => root.querySelector(q);
 		const nag = $('.nag'), live = $('.n-live'), pinMsg = $('.n-pinmsg'), sheet = $('.n-sheet'), app = $('.n-app'), sleft = $('.n-sleft'), pinBtn = $('.n-pinbtn');
-		const chatToast = $('.n-toast'), appToast = $('.n-atoast'), behind = [$('.n-pin'), $('.n-chat')];
+		const chatToast = $('.n-toast'), appToast = $('.n-atoast'), chat = $('.n-chat'), behind = [$('.n-pin'), chat];
 		let s, seq = 0, timers = [], preview = [];
 		const later = (ms, fn, list = timers) => list.push(setTimeout(fn, ms));
-		const fresh = () => ({ st: 'nagging', used: 0, snz: null, tog: 0, msgs: [{ id: ++seq, k: 'card' }] });
+		const fresh = () => ({ st: 'nagging', used: 0, snz: null, tog: 0, msgs: ['board', 'sn', 'card'].map((k) => ({ id: ++seq, k })) });
 
 		const card = () => s.msgs.find((m) => m.k === 'card');
-		function view(m) {
+		const lead = ([t, u]) => (u ? '🔔 ' : '') + t.replace('snoozed · ', '😴 ');
+		function go(el) { // scroll el into view, with the board's top if it fits, and flash it
+			let y = 0;
+			for (let n = el; n && n !== chat; n = n.offsetParent) y += n.offsetTop;
+			chat.scrollTop = Math.min(y - 8, Math.max(live.offsetTop - 8, y + el.offsetHeight + 8 - chat.clientHeight));
+			el.classList.add('is-flash');
+		}
+		function view(m) { // board = nag-bot's pinned choreListHtml
+			if (m.k === 'board') return ['<span class="n-name">Nag-Bot</span>🐾 <b>Chores</b>' + board().map(([c, st]) => `<span class="n-brow">${lead(st)}\n${c.e} <b>${c.t}</b> · <i>${c.cad}</i></span>`).join(''), [[['🐾 Chores', 'open']]]];
 			if (m.k === 'nd') return [`↩️ <b>${CH}</b> — not done after all, says ${ME}.`];
 			if (m.k === 'back') return [`↩️ Restored <b>${CH}</b>`, [[['✅ OK', 'ok', m.id]]]];
 			if (m.k === 'del') return [`🗑️ ${ME} deleted <s>${CH}</s>`, [[['↩️ Undo', 'undo', m.id], ['✅ OK', 'ok', m.id]]]];
 			if (s.st === 'done') {
-				return [`😻 <s>${CH}</s> — done by ${ME}${s.tog ? ' &amp; Alex' : ''} at ${NOW}. ${s.tog ? 'Latte' : 'Mocha'} purrs approvingly.` +
+				return [`😻 <s>${CH}</s> — done by ${ME}${s.tog ? ' &amp; DodgerBlueee' : ''} at ${NOW}. Latte purrs approvingly.` +
 					`<span class="n-reset${s.glow ? ' is-glow' : ''}">↪️ Resets too: clear poop, shake the litter box</span>`, [[['↩️ Not done', 'nd'], ['✅ OK', 'ok', m.id]]]];
 			}
 			const keys = m.kb ? SNOOZE_KB : s.snz ? SNOOZED_KB : NAG_KB;
@@ -455,16 +473,16 @@ function projectsDemo(selector, init) {
 		}
 		function renderChat() {
 			live.innerHTML = s.msgs.map((m) => {
+				const n = m.isNew ? ' is-new' : '', t = `<span class="n-time">${m.k === 'board' ? 'edited 7:30 PM' : (m.ed ? 'edited ' : '') + NOW}</span>`;
+				m.isNew = 0;
+				if (m.k[0] == 's') return `<div class="n-msg n-stk${n}"><img src="${m.k == 'sn' ? 'images/projects/nag-sticker-nag.webp" alt="Sticker: Mocha' : 'images/projects/nag-sticker-done.webp" alt="Sticker: Latte'}" width="120" height="120">${t}</div>`; // literal paths: the build publishes only images it can find
 				const [html, keys] = view(m);
 				const kb = keys ? `<div class="n-kb">${keys.map((r) => `<div class="n-row">${r.map(([l, a, arg]) => B(l, a, arg, a === 'done' && s.ring ? 'is-ring' : '')).join('')}</div>`).join('')}</div>` : '';
-				const cls = (m.isNew ? ' is-new' : '') + (m.k === 'card' && s.pre ? ' is-pre' : '');
-				m.isNew = 0;
-				return `<div class="n-msg${cls}"><div class="n-bubble">${html}<span class="n-time">${m.ed ? 'edited ' : ''}${NOW}</span></div>${kb}</div>`;
+				return `<div class="n-msg${n}"><div class="n-bubble">${html}${t}</div>${kb}</div>`;
 			}).join('');
-			const [c, [st, urgent]] = board()[0];
-			pinMsg.textContent = `🐾 Chores ${urgent ? '🔔 ' : c.id === 'wash' && s.snz ? '😴 ' : ''}${st.replace('snoozed · ', '')} ${c.e} ${c.t} · ${c.cad}`;
-			const all = root.querySelectorAll('.n-msg');
-			all.forEach((el, i) => el.classList.toggle('n-last', i === all.length - 1));
+			const [c, st] = board()[0];
+			pinMsg.textContent = `🐾 Chores ${lead(st)} ${c.e} ${c.t} · ${c.cad}`;
+			live.lastElementChild.classList.add('n-last');
 			s.glow = 0;
 		}
 		function toast(text, el = chatToast) {
@@ -474,12 +492,14 @@ function projectsDemo(selector, init) {
 			timers.push(el.t = setTimeout(() => el.classList.remove('is-show'), 1400 + text.length * 30));
 		}
 		const push = (k) => s.msgs.push({ id: ++seq, k, isNew: !reduced() });
-		const drop = (id) => { s.msgs = s.msgs.filter((m) => m.id !== +id); };
+		const drop = (id) => { s.msgs = s.msgs.filter((m) => m.id !== +id && m.k !== id); };
 		const edit = () => Object.assign(card(), { kb: 0, ed: 1 });
 		function complete(tog, app) {
 			if (s.st !== 'nagging') return;
 			Object.assign(s, { st: 'done', tog, snz: null, glow: !reduced() });
 			card() ? edit() : push('card');
+			drop('sn');
+			push('sd');
 			if (!app) toast('Purrs 😻');
 			return 1;
 		}
@@ -498,12 +518,13 @@ function projectsDemo(selector, init) {
 				edit();
 				toast((p[2] ? `Postponed — back ${p[1]} 📅` : `Snoozed until ${p[1]} 😴`) + (left ? ` · ${left} snooze${left > 1 ? 's' : ''} left` : ' · last snooze'));
 			},
-			hide: () => { drop(card().id); toast(`Hidden — back ${s.snz[1]} 😴`); },
+			hide: () => { drop(card().id); drop('sn'); toast(`Hidden — back ${s.snz[1]} 😴`); },
 			nd: () => { Object.assign(s, { st: 'nagging', tog: 0 }); edit(); push('nd'); toast('Taken back ↩️'); },
 			ok: drop,
-			del: () => { drop(card().id); s.st = 'deleted'; push('del'); toast('Deleted 🗑 — tap ↩️ Undo in the chat if that was a slip.'); },
+			del: () => { drop(card().id); drop('sn'); s.st = 'deleted'; push('del'); toast('Deleted 🗑 — tap ↩️ Undo in the chat if that was a slip.'); },
 			undo: (id) => { Object.assign(s.msgs.find((m) => m.id === +id), { k: 'back', ed: 1 }); s.st = 'back'; toast('Restored 😺'); },
 			open: () => sheetOpen(1),
+			pin: () => later(0, () => go($('.n-bubble'))),
 			close: () => (s.scr === 'chore' ? ([s.scr, s.chore] = s.trail.pop()) : sheetOpen(0)),
 			tab: (v) => { s.scr = v; },
 			chore: (id) => { s.trail.push([s.scr, s.chore]); Object.assign(s, { scr: 'chore', chore: id }); },
@@ -517,7 +538,7 @@ function projectsDemo(selector, init) {
 			const after = s.st === 'done';
 			if (c.id !== 'wash') return [c.st[after && c.st[1] ? 1 : 0], 0, CHORES.indexOf(c) + after];
 			if (after || s.st === 'back') return [NEXT, 0, 9];
-			return s.snz ? [`snoozed · ${s.snz[1]}`, 0, 0] : ['nagging since 7:30 PM', 1, 0];
+			return s.snz ? [`snoozed · ${s.snz[1]}`, 0, s.snz[2] || 0] : ['nagging since 7:30 PM', 1, 0];
 		}
 		function board() { return CHORES.filter(alive).map((c) => [c, status(c)]).sort((a, b) => a[1][2] - b[1][2]); }
 		function list() {
@@ -587,26 +608,28 @@ function projectsDemo(selector, init) {
 
 			if (!root.contains(document.activeElement)) {
 				const same = [...root.querySelectorAll('[data-act]')].find((x) => x.dataset.act + x.dataset.arg === key && x.offsetParent);
-				(same || (s.open ? sleft : live.querySelector('.n-msg:last-child button')) || pinBtn).focus({ preventScroll: true });
+				(same || (s.open ? sleft : [...live.querySelectorAll('button')].pop()) || pinBtn).focus({ preventScroll: true });
 			}
 		});
-		root.addEventListener('keydown', (e) => { if (e.key === 'Escape' && s.open) sheetOpen(0); if (e.key === 'Tab' && s.open) { const bs = [...sheet.querySelectorAll('button')].filter(b => b.offsetParent); const first = bs[0], last = bs[bs.length - 1]; if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } } });
+		root.addEventListener('keydown', (e) => {
+			if (!s.open) return;
+			if (e.key === 'Escape') sheetOpen(0);
+			const bs = [...sheet.querySelectorAll('button')].filter((b) => b.offsetParent), [a, z] = e.shiftKey ? [bs[0], bs.pop()] : [bs.pop(), bs[0]];
+			if (e.key === 'Tab' && document.activeElement === a) { e.preventDefault(); z.focus(); }
+		});
 
-		function stopPreview() {
-			if (!preview.length && !s.pre) return;
+		root.addEventListener('demo:stop', () => {
 			preview.forEach(clearTimeout);
 			preview = [];
-			s.ring = s.pre = 0;
-
-			root.querySelectorAll('.is-ring, .is-pre').forEach((el) => el.classList.remove('is-ring', 'is-pre'));
-		}
-		root.addEventListener('demo:stop', stopPreview);
+			if (s.ring) { s.ring = 0; renderChat(); }
+		});
 		root.addEventListener('demo:visible', () => {
 			if (reduced()) return;
-			later(250, () => { s.pre = 0; card().isNew = 1; renderChat(); }, preview);
+			later(250, () => { s.msgs.slice(1).forEach((m) => { m.isNew = 1; }); renderChat(); }, preview);
 			later(900, () => { s.ring = 1; renderChat(); }, preview);
 			later(2400, () => { const d = $('.is-ring'); if (d) d.classList.add('is-press'); }, preview);
-			later(2650, () => { preview = []; s.ring = 0; complete(0); renderChat(); }, preview);
+			later(2650, () => { s.ring = 0; complete(0); renderChat(); }, preview);
+			later(3700, () => go([...live.querySelectorAll('.n-brow')].pop()), preview);
 		});
 		root.addEventListener('demo:reset', () => {
 			timers.concat(preview).forEach(clearTimeout);
@@ -618,10 +641,10 @@ function projectsDemo(selector, init) {
 			behind.forEach((el) => { el.inert = false; });
 			s = fresh();
 			render();
+			chat.scrollTop = 0;
 		});
 
 		s = fresh();
-		s.pre = false;
 		renderChat();
 	}
 
@@ -631,9 +654,9 @@ function projectsDemo(selector, init) {
 })();
 
 
-/* Finance tracker demo: the owner's phone tabs (finance_tracker app/index.html), each page in the app's own words. All data invented. */
+/* Finance tracker demo: the owner's phone tabs (finance_tracker app/index.html) in the app's words. Data invented. */
 (() => {
-const NW = [444400, 447900, 451200, 449100, 455800, 460300, 463900, 461200, 468700, 479750, 481300, 486200];
+const NW = [177760, 179160, 180480, 179640, 182320, 184120, 185560, 184480, 187480, 191900, 192520, 194480];
 const MONTHS = NW.map((_, i) => 'Nov Dec Jan Feb Mar Apr May Jun Jul Aug Sep Oct'.split(' ')[i] + (i < 2 ? ' 2025' : ' 2026'));
 const LO = Math.min(...NW), Y = v => 52 - (v - LO) / (Math.max(...NW) - LO) * 46;
 const F = [0, 2].map(d => new Intl.NumberFormat('en-SG', { minimumFractionDigits: d, maximumFractionDigits: d }));
@@ -645,11 +668,11 @@ const icon = (id, c = '') => `<svg class="f-ic ${c}" aria-hidden="true"><use hre
 const rows = s => s.split(';').map(r => r.split('|'));
 
 const CATS = [
-	['food', 'Food &amp; dining', 720, 'Paradise Dynasty 30 186.4|Jumbo Seafood 22 248|Toast Box 18 12.6|Shake Shack 11 82|Imperial Treasure 4 250'],
-	['transport', 'Transport', 260, 'SimplyGo 31 62.4|Grab 24 28.6|ComfortDelGro 19 19|Gojek 16 22|SimplyGo 8 58|Grab 3 20'],
-	['travel', 'Travel', 450, 'Scoot 27 412|Agoda 27 168|Klook 14 40'],
-	['delivery', 'Grab + Foodpanda', 560, 'GrabFood 29 168.3|Foodpanda 23 92.7|GrabFood 15 141.5|GrabFood 9 64.8|Foodpanda 2 72.7'],
-	['games', 'Games', 300, 'Steam 26 119.8|Nintendo 20 46.2|PlayStation 13 88|Steam 5 126'],
+	['food', 'Food &amp; dining', 288, 'Paradise Dynasty 30 74.56|Jumbo Seafood 22 99.2|Ya Kun 18 5.04|Shake Shack 11 32.8|Imperial Treasure 4 100'],
+	['transport', 'Transport', 104, 'SimplyGo 31 24.96|Grab 24 11.44|ComfortDelGro 19 7.6|Gojek 16 8.8|SimplyGo 8 23.2|Grab 3 8'],
+	['travel', 'Travel', 180, 'Scoot 27 164.8|Trip.com 27 67.2|Klook 14 16'],
+	['delivery', 'Grab + Foodpanda', 224, 'GrabFood 29 67.32|Foodpanda 23 37.08|GrabFood 15 56.6|GrabFood 9 25.92|Foodpanda 2 29.08'],
+	['games', 'Games', 120, 'Steam 26 47.92|Nintendo 20 18.48|PlayStation 13 35.2|Steam 5 50.4'],
 	['flag', 'Possible card testing', 0, 'Zen Digital 27 4.9|Quickpay Gift 27 12.3|Nova Store 27 19.5']
 ].map(([k, n, t, s]) => {
 	const c = { k, n, t }, tx = c.tx = s.split('|').map(r => { const p = r.split(' '), amt = +p.pop(), day = +p.pop(); return { who: p.join(' '), day, amt, c }; });
@@ -663,17 +686,18 @@ FLAG.tone = 'f-bad';
 FLAG.vs = '3 small charges (S$20.00 or less each) on one day from 3 merchants never seen before, S$36.70 in total';
 const TOTAL = CATS.reduce((a, c) => a + c.v, 0);
 const ALL = CATS.concat(FLAG).flatMap(c => c.tx).sort((a, b) => b.day - a.day);
-/* Per person: premiums, cash %, policies, shortfall, then cover needed and in force (S$k): death, TPD, critical illness. */
-const INS = [[3240, 58, 4, '1 past', 'S$150k on critical illness', 600, 650, 600, 650, 300, 150], [2180, 71, 3, 'none past', 'S$100k on death and S$100k on TPD', 400, 300, 400, 300, 250, 250]];
+/* Per person: premiums, cash %, policies, past, shortfall; cover needed and in force (S$k) for death, TPD, CI. */
+const INS = [[1296, 58, 4, '1 past', 'S$60k on critical illness', 240, 260, 240, 260, 120, 60], [872, 71, 3, 'none past', 'S$40k on death and S$40k on TPD', 160, 120, 160, 120, 100, 100]];
 /* Home register; state 1 needs info, 2 covered, 3 no active cover. */
-const HOME = rows('Castlery sofa|1|Cost to confirm|;Samsung fridge|2|Ends 2 Feb 2027|S$2,150;Daikin aircon|2|Ends 14 Mar 2028|S$4,280;Hansgrohe shower|2|Ends 20 Jun 2029|S$860;Bosch washer|3|Expired · 9 Aug 2026|S$1,190');
+const HOME = rows('Castlery sofa|1|Cost to confirm|;Samsung fridge|2|Ends 2 Feb 2027|S$860;Daikin aircon|2|Ends 14 Mar 2028|S$1,712;Hansgrohe shower|2|Ends 20 Jun 2029|S$344;Bosch washer|3|Expired · 9 Aug 2026|S$476');
 
 const row = (attrs, cls, ico, title, sub, end, tag = 'button') => `<${tag} class="f-row ${cls}" ${attrs}><span class="f-ico">${icon(ico)}</span><span class="f-rt"><span>${title}</span><span>${sub}</span></span>${end}${tag < 'c' ? icon('right', 'f-chev') : ''}</${tag}>`;
 const info = (ico, title, sub, end) => row('', '', ico, title, sub, `<span class="f-rv">${end}</span>`, 'div');
-const line = (cls, who, sub, end, tag = 'div') => `<${tag} class="f-tr ${cls}"><span class="f-ini" style="--h:${[...who].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 360, 7)}" aria-hidden="true">${who[0]}</span><span class="f-tn"><span>${who}</span><span>${sub}</span></span><span class="f-ta">${end}</span></${tag.slice(0, 6)}>`;
+const LOGO = 'Grab Foodpanda Klook Steam SimplyGo Ya Trip'.split(' ');
+const line = (cls, who, sub, end, tag = 'div') => `<${tag} class="f-tr ${cls}"><span class="f-ini" style="--h:${[...who].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 360, 7)};--i:${LOGO.findIndex(n => who.startsWith(n))}" aria-hidden="true">${who[0]}</span><span class="f-tn"><span>${who}</span><span>${sub}</span></span><span class="f-ta">${end}</span></${tag.slice(0, 6)}>`;
 const txs = list => `<div>${list.map((r, i) =>
 	(i && list[i - 1].day === r.day ? '' : `<div class="f-day">${'Sun Mon Tue Wed Thu Fri Sat'.split(' ')[new Date(2026, 9, r.day).getDay()]} ${r.day} Oct</div>`) +
-	(r.c === FLAG ? line('c-flag', r.who, 'New merchant', money(r.amt, 2), 'button data-act="risk"') : line('c-' + r.c.k, r.who, r.c.n, money(r.amt, 2)))).join('')}</div>`;
+	line('c-' + r.c.k, r.who, r.c === FLAG ? 'New merchant' : r.c.n, '−' + money(r.amt, 2), r.c === FLAG ? 'button data-act="risk"' : 'div')).join('')}</div>`;
 const T = t => `<div class="f-title">${t}</div>`;
 const seg = (names, on, c = 'f-seg', b = 0) => `<div class="${c}">${names.map((n, i) => `<button data-sub="${i + b}" aria-pressed="${i + b === on}">${n}</button>`).join('')}</div>`;
 const tiles = t => `<div class="f-stats">${t.map(([l, v, s = '']) => `<span>${l}<b>${v}</b><small>${s}</small></span>`).join('')}</div>`;
@@ -688,29 +712,29 @@ const hero = () => {
 };
 const PAGES = {
 	overview: () => T('Overview') + `
-<div class="f-ok">${icon('ok')}Source checks passed: 186 rows, each traced to its statement</div>${hero()}
+<div class="f-ok">${icon('ok')}186 rows checked against their statements</div>${hero()}
 <div class="f-list">${row('data-cat="flag"', 'is-bad', 'flag', 'Needs attention', 'Possible card testing', '<span class="f-badge">1</span>')}
 ${row('data-tab="spending"', '', 'spending', 'Key spending', 'Oct 2026 against typical', `<span class="f-rv">${money(TOTAL)}</span>`)}</div>
-<div class="f-card f-pv"><span class="f-lbl">Last 3 statements · Aug–Oct 2026</span>${tiles([['Income', 'S$24,600'], ['Spent on cards', 'S$9,540'], ['Invested', 'S$6,000']])}
-<span class="f-note">Card spending S$3,180 a month, <span class="f-good">6% lower</span> than the three statements before.</span></div>`,
+<div class="f-card f-pv"><span class="f-lbl">Last 3 statements · Aug–Oct 2026</span>${tiles([['Income', 'S$9,840'], ['Spent on cards', 'S$3,816'], ['Invested', 'S$2,400']])}
+<span class="f-note">Card spending S$1,272 a month, <span class="f-good">6% lower</span> than the three statements before.</span></div>`,
 	/* The eye hides all of Wealth, as privacy.js hides #pane-wealth. */
 	wealth: s => T('Wealth') + seg(['Income', 'Net worth', 'Investments'], s) + `<div class="f-page f-pv">${[
-		`<div class="f-card"><span class="f-lbl">Income outlook · salary credits through Oct 2026</span>${tiles([['2026 take-home pay so far', 'S$71,400', '+4.2% vs same period 2025'], ['2026 take-home forecast', 'S$86,900', 'S$80,600 floor']])}</div>
-<div class="f-card"><span class="f-lbl">Long-range forecast · 5% midpoint</span>${tiles([3, 5, 10].map(y => [y + ' years', money(86900 * 1.05 ** y), 'in ' + (2026 + y)]))}</div>`,
-		hero() + `<div class="f-list">${info('up', 'Assets', 'Cash, CPF, investments, property', 'S$812,400')}${info('statements', 'Liabilities', 'Home loan', 'S$326,200')}</div>`,
-		card('Portfolio · 2 accounts', 'S$128,400', '<span class="f-pill">+S$9,850 (+8.3%)</span> past year') +
-		`<div class="f-list">${info('wallet', 'Interactive Brokers', 'statements to 31 Oct 2026 · <span class="f-good">✓ numbers tally</span>', '+S$9,120')}${info('wallet', 'SRS', 'Phillip Securities (POEMS) · statement to 31 Oct 2026', '+S$730')}</div>`
+		`<div class="f-card"><span class="f-lbl">Income outlook · salary credits through Oct 2026</span>${tiles([['2026 take-home pay so far', 'S$28,560', '+4.2% vs same period 2025'], ['2026 take-home forecast', 'S$34,760', 'S$32,240 floor']])}</div>
+<div class="f-card"><span class="f-lbl">Long-range forecast · 5% midpoint</span>${tiles([3, 5, 10].map(y => [y + ' years', money(34760 * 1.05 ** y), 'in ' + (2026 + y)]))}</div>`,
+		hero() + `<div class="f-list">${info('up', 'Assets', 'Cash, CPF, investments, property', 'S$324,960')}${info('statements', 'Liabilities', 'Home loan', 'S$130,480')}</div>`,
+		card('Portfolio · 2 accounts', 'S$51,360', '<span class="f-pill">+S$3,940 (+8.3%)</span> past year') +
+		`<div class="f-list">${info('wallet', 'Interactive Brokers', 'statements to 31 Oct 2026 · <span class="f-good">✓ numbers tally</span>', '+S$3,648')}${info('wallet', 'SRS', 'Phillip Securities (POEMS) · statement to 31 Oct 2026', '+S$292')}</div>`
 	][s]}</div>`,
 	insurance: s => {
 		const [p, cash, n, past, short, ...g] = INS[s], gap = i => g[i * 2] - g[i * 2 + 1];
 		return T('Insurance') + seg(['Nicholas', 'Alex'], s) + `<div class="f-why">Cover short ${short}</div>
 ${tiles([['Total premiums', money(p), `${cash}% cash · ${100 - cash}% CPF`], ['Active policies', n, past]])}<div class="f-card"><span class="f-lbl">Where the cover falls short</span>${['Death', 'TPD', 'Critical illness'].map((b, i) => `<div class="f-gap">${b}<span class="f-${gap(i) > 0 ? 'bad">Short S$' + gap(i) + ',000' : 'good">Covered'}</span><i style="--w:${Math.min(100, g[i * 2 + 1] / g[i * 2] * 100)}%"></i></div>`).join('')}</div>`;
 	},
-	home: s => T('Home') + card('Your home · 5 items', 'S$8,480', 'Recorded home costs · 4 priced · 1 unpriced') +
+	home: s => T('Home') + card('Your home · 5 items', 'S$3,392', 'Recorded home costs · 4 priced · 1 unpriced') +
 		seg(['Needs info', 'Covered', 'No active cover'].map((n, i) => `${n}<b><i class="k${i + 1}"></i>${HOME.filter(h => h[1] == i + 1).length}</b>`), s, 'f-chips', 1) + `<div>${HOME.filter(h => !s || h[1] == s).map(([n, k, w, v]) => line('k' + k, n, w, v)).join('')}</div>`,
-	activity: s => T('Activity') + seg(['Transactions', 'Games'], s) + `<div class="f-hint">${s ? '4 purchases' : ALL.length + ' charges'} in Oct 2026</div>${txs(s ? CATS[4].tx : ALL)}`,
+	activity: s => T('Activity') + seg(['Transactions', 'Games'], s) + `<div class="f-cnt">${s ? '4 purchases' : ALL.length + ' card transactions'}<b>${money(s ? CATS[4].v : TOTAL + FLAG.x)} spent</b></div>${txs(s ? CATS[4].tx : ALL)}`,
 	spending: () => `<div class="f-title">Key spending</div><div class="f-hint">Oct 2026 (bar) against your typical statement (tick). Tap one for its charges.</div>
-<div class="f-list">${CATS.map(c => `<button class="f-row f-key c-${c.k}" data-cat="${c.k}"><span class="f-ico">${icon(c.k)}</span><span class="f-kn">${c.n}</span><span class="f-rv">${money(c.v)}</span>${icon('right', 'f-chev')}<span class="f-kd ${c.tone}">${c.vs}</span><span class="f-kb" aria-hidden="true"><i style="width:${c.v / 9}%"></i><b style="left:${c.t / 9}%"></b></span></button>`).join('')}</div>`,
+<div class="f-list">${CATS.map(c => `<button class="f-row f-key c-${c.k}" data-cat="${c.k}"><span class="f-ico">${icon(c.k)}</span><span class="f-kn">${c.n}</span><span class="f-rv">${money(c.v)}</span>${icon('right', 'f-chev')}<span class="f-kd ${c.tone}">${c.vs}</span><span class="f-kb" aria-hidden="true"><i style="width:${c.v / 3.6}%"></i><b style="left:${c.t / 3.6}%"></b></span></button>`).join('')}</div>`,
 	cat: c => `<div class="f-title">${c.n}</div><div class="f-sum">${money(c.x, 2)}</div><div class="f-hint ${c === FLAG ? 'f-bad' : ''}">${c === FLAG ? 'Tue 27 Oct · tap a charge for its check' : `${c.tx.length} charges in Oct 2026 · <span class="${c.tone}">${c.vs}</span>`}</div>${txs(c.tx)}`
 };
 
@@ -893,7 +917,7 @@ function init(root) {
 	const $ = s => root.querySelector(s), cubes = $('.pk-cubes'), tap = $('.pk-tap'), scroller = $('.pk-scroll');
 	const box = id => cubes.querySelector(`[data-id="${id}"] input`);
 	let S, timers = [], previewing = false, touched = false;
-	/* A trip already under way, so the per-category counts and bars have something to say. */
+	/* A trip under way, so the per-category counts and bars say something. */
 	const PRE = Object.fromEntries('earpiece wallet debit-credit-cards toothbrush toothpaste shorts slippers'.split(' ').map(k => [k, true]));
 	const fresh = () => ({ key: 'normal', hide: false, last: false, folded: new Set(), normal: { nights: 4, ...PRE }, extended: { nights: 7 } });
 	const items = (L = S[S.key]) => ITEMS.filter(i => S.key === 'extended' || !i.ext)
@@ -1047,7 +1071,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 })();
 
 
-/* Desktop shows one project at a time; the rail's thumbnails, recorded from each demo, switch between them. */
+/* Desktop shows one project at a time; the rail's thumbnails (recorded from each demo) switch them. */
 (() => {
 	const rail = document.querySelector('.app-rail');
 	if (!rail) return;
@@ -1063,7 +1087,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 			if (wide.matches && !v.src) { v.poster = v.dataset.poster; v.src = v.dataset.src; }
 		});
 		if (focus) tabs[i].focus();
-		rail.style.setProperty('--dwell', [9, 7, 12.5, 10][i] + 's');
+		rail.style.setProperty('--dwell', [9, 8, 12.5, 10][i] + 's');
 		cue();
 		hold();
 		document.dispatchEvent(new Event('scroll'));
@@ -1087,7 +1111,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 	cards.forEach(c => ['pointerup', 'keydown'].forEach(t => c.addEventListener(t, quit)));
 	addEventListener('scroll', hold, { passive: true });
 	rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { quit(); show(tabs.indexOf(t)); } });
-	rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur }[e.key]; if (d) { e.preventDefault(); quit(); show((cur + d) % 4, 1); } });
+	rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur || 4 }[e.key]; if (d) { e.preventDefault(); quit(); show((cur + d) % 4, 1); } });
 	const start = () => { auto = wide.matches && !still.matches ? 1 : 0; rail.classList.toggle('is-auto', !!auto); show(cur); };
 	[wide, still].forEach(m => m.addEventListener('change', start));
 	// Phones: the site's Menu pill steps aside while a demo's top bar is under it.
@@ -1095,8 +1119,8 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 	start();
 })();
 
-/* One guided preview at a time, after 500 ms of settled scrolling and 90% visibility.
-	 A swipe pauses and re-arms the preview; an intentional tap or key hands control to the reader. */
+/* One guided preview at a time, after 500 ms of settled scrolling at 90% visibility.
+	 A swipe pauses and re-arms it; a tap or key hands control to the reader. */
 (() => {
 	const demos = [...document.querySelectorAll('.app-demo')];
 	const motion = matchMedia('(prefers-reduced-motion: reduce)');

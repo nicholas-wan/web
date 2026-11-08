@@ -394,7 +394,9 @@ Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 # 10 -> 19 (5 Nov 2026): the education, toolkit-card and tech-stack rules moved
 # here from shared custom.css, which every page loads.
 Assert-FileSizeBudget 'assets\css\skills-page.css' 19
-Assert-FileSizeBudget 'assets\css\projects.css' 63
+# 63 -> 74 (9 Nov 2026): the dark showcase, Nag-bot's Day theme, Finance's dark theme,
+# Nag-bot's board and stickers, and the More features rows.
+Assert-FileSizeBudget 'assets\css\projects.css' 74
 Assert-FileSizeBudget 'assets\js\projects.js' 69
 # Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
 Assert-FileSizeBudget 'assets\css\gallery.css' 15
@@ -998,7 +1000,8 @@ if ($personalTimelineJs -notmatch 'readingLine = viewport \* 0\.94' -or $persona
 if ([regex]::Matches($experience, 'data-scramble-list').Count -ne 2 -or [regex]::Matches($experience, 'data-scramble-row data-scramble-lead="1"').Count -ne 2 -or $experience -notmatch 'data-scramble-source>Planning reduced from days to hours<' -or $experience -notmatch 'data-scramble-source>New detection capabilities in daily operational use<' -or $experience -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/scramble-reveal.js'))) { throw "Both experience Outcome rows must scramble independently with one unscrambled lead word." }
 if ($experience -match 'og:image' -or $experience -match 'twitter:card') { throw "The experience page opts out of a share-preview image." }
 if ((Get-Content -LiteralPath (Join-Path $dist 'skills.html') -Raw -Encoding UTF8) -match 'og:image|twitter:card') { throw "The skills page opts out of a share-preview image." }
-Assert-FileSizeBudget 'projects.html' 40
+# 40 -> 46 (9 Nov 2026): a More features row of three cards on each app.
+Assert-FileSizeBudget 'projects.html' 46
 $projectsCss = Get-Content -LiteralPath (Join-Path $dist 'assets/css/projects.css') -Raw -Encoding UTF8
 $flatProjectsCss = [regex]::Replace($projectsCss, '(?s)@keyframes\s+[\w-]+\s*\{(?:[^{}]|\{[^{}]*\})*\}', '')
 $flatProjectsCss = [regex]::Replace($flatProjectsCss, '@media[^{}]*\{', '')
@@ -1006,7 +1009,8 @@ if ($flatProjectsCss -match '\{[^{}]*\{') { throw 'Projects CSS must stay unnest
 # Projects: four equal interactive sample demos, route-only assets and no household source links.
 $projectsHtml = Get-Content -LiteralPath (Join-Path $dist 'projects.html') -Raw -Encoding UTF8
 if ($projectsHtml -match 'og:image|twitter:card' -or $projectsHtml -notmatch '<body class="is-preload page-experience page-projects">' -or [regex]::Matches($projectsHtml, 'class="app-card"').Count -ne 4 -or [regex]::Matches($projectsHtml, 'data-demo="(?:squash|nag|finance|packing)"').Count -ne 4 -or $projectsHtml -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/projects.js')) -or $projectsHtml -match 'assets/js/(?:internship-peek|scramble-reveal).js') { throw "Projects must carry four interactive demos, its own script and no share-preview image." }
-if ($projectsHtml -match 'tele-nagbot|WeeYingxian/avery|lab/projects|This site' -or $projectsHtml -notmatch 'class="f-sample">Sample</span>') { throw "Projects must label sample finances and keep household repositories unlinked." }
+# Owner, 9 Nov 2026: no Sample label on Finance (its figures are invented and scaled down instead).
+if ($projectsHtml -match 'WeeYingxian/avery|lab/projects|This site|class="f-sample"') { throw "Projects must keep household repositories unlinked and Finance without a Sample label." }
 
 if ([regex]::Matches($experience, 'January 2021 &ndash; Present').Count -ne 2 -or $experience -notmatch 'Also at DSTA') { throw "Both DSTA cards must carry the January 2021 - Present period, with the slim context line on Cloud Analytics." }
 if ([regex]::Matches($experience, 'class="case-study__company"').Count -ne 4) { throw "Only the agentic AI card and the three internships carry a full company header; Cloud Analytics defers to the hero card." }

@@ -14,8 +14,9 @@ test('Projects has four equal apps, sample labels and safe source links between 
   await expect(page.locator('.app-why li')).toHaveCount(12);
   await expect(page.locator('.app-demo__reset')).toHaveCount(4);
   await expect(page.locator('.app-demo__skip')).toHaveCount(4);
-  await expect(page.locator('.f-sample')).toHaveText('Sample');
-  await expect(page.locator('#nag-bot a:not(.app-demo__skip), #finance-tracker a:not(.app-demo__skip)')).toHaveCount(0);
+  await expect(page.locator('#finance-tracker .f-top')).not.toContainText('Sample');
+  await expect(page.locator('#nag-bot a.app-card__repo')).toHaveAttribute('href', 'https://github.com/nicholas-wan/tele-nagbot');
+  await expect(page.locator('#finance-tracker a:not(.app-demo__skip)')).toHaveCount(0);
   await expect(page.locator('.site-pager__link--previous')).toHaveAttribute('href', 'experience');
   await expect(page.locator('.site-pager__link--next')).toHaveAttribute('href', 'skills');
   await expect(page.locator('.project-index h3')).toHaveText('Brawl Stars');
@@ -58,7 +59,8 @@ test('Squash booking updates the court Mini App and resets', async ({ page }) =>
   await expect(app.locator('[data-chat]')).toContainText('Confirm this squash booking');
   await app.getByRole('button', { name: 'Add booking', exact: false }).click();
   await expect(app.locator('[data-pm]')).toContainText('C4');
-  await expect(app.locator('[data-chat]')).toContainText('Court 4 booked');
+  await expect(app.locator('[data-chat]')).toContainText('Tomorrow · 9pm · C4 · 1 slot');
+  await expect(app.locator('[data-chat] .sq-m--bot')).toHaveCount(2);
   await app.locator('[data-mini="courts"]').click();
   await expect(app.locator('.sq-mini')).toContainText('Court 4');
   await app.locator('.sq-mini [data-mk="tab"]').click();
@@ -77,7 +79,7 @@ test('Nag snooze, shared credit and half sheet work', async ({ page }) => {
   await app.getByRole('button', { name: '30m', exact: true }).click();
   await expect(app.locator('.n-live')).toContainText('Snoozed');
   await app.getByRole('button', { name: 'Done together', exact: false }).click();
-  await expect(app.locator('.n-live')).toContainText('Nicholas & Alex');
+  await expect(app.locator('.n-live')).toContainText('Nicholas & DodgerBlueee');
   await expect(app.locator('.n-pinmsg')).not.toContainText('nagging');
   await app.locator('.n-pinbtn').click();
   await expect(app.locator('.n-sheet')).toBeVisible();
@@ -119,7 +121,7 @@ test('Finance chart, masking, drill-down and the six phone tabs reset independen
   await expect(app.locator('.f-scroll')).toContainText('numbers tally');
   await app.locator('.f-tab[data-tab="insurance"]').click();
   await app.getByRole('button', { name: 'Alex' }).click();
-  await expect(app.locator('.f-scroll .f-why')).toHaveText('Cover short S$100k on death and S$100k on TPD');
+  await expect(app.locator('.f-scroll .f-why')).toHaveText('Cover short S$40k on death and S$40k on TPD');
   await app.locator('.f-tab[data-tab="home"]').click();
   await app.getByRole('button', { name: /No active cover/ }).click();
   await expect(app.locator('.f-scroll .f-tr')).toHaveCount(1);
@@ -195,6 +197,7 @@ test('All four demos accept phone-sized interactions without clipped controls', 
   await page.locator('#squashbot .sq-chip').first().click();
   await page.locator('#squashbot [data-a="y"]').click();
   await expect(page.locator('#squashbot [data-pm]')).toContainText('C4');
+  await page.locator('#nag-bot .app-demo').scrollIntoViewIfNeeded();
   await page.locator('#nag-bot').getByRole('button',{name:'Snooze…',exact:false}).click();
   await page.locator('#nag-bot').getByRole('button',{name:'30m',exact:true}).click();
   await expect(page.locator('#nag-bot .n-live')).toContainText('Snoozed');

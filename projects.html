@@ -19,9 +19,9 @@
 		<div id="main" class="experience-portfolio">
 			<div class="portfolio-overview">
 			<div class="app-rail" role="tablist" aria-label="Projects">
-				<button class="app-rail__tab" type="button" role="tab" id="tab-squashbot" aria-controls="squashbot" aria-selected="false" tabindex="-1"><video muted playsinline preload="none" aria-hidden="true" data-src="images/projects/squashbot.mp4" data-poster="images/projects/squashbot-poster.webp"></video><span><b>SquashBot</b><small>Bookings from our group chat</small></span></button>
+				<button class="app-rail__tab" type="button" role="tab" id="tab-squashbot" aria-controls="squashbot" aria-selected="false" tabindex="-1"><video muted playsinline preload="none" aria-hidden="true" data-src="images/projects/squashbot.mp4" data-poster="images/projects/squashbot-poster.webp"></video><span><b>SquashBot</b><small>Courts from our group chat</small></span></button>
 				<button class="app-rail__tab" type="button" role="tab" id="tab-nag-bot" aria-controls="nag-bot" aria-selected="false" tabindex="-1"><video muted playsinline preload="none" aria-hidden="true" data-src="images/projects/nag-bot.mp4" data-poster="images/projects/nag-bot-poster.webp"></video><span><b>Nag-bot</b><small>Chores that nag back</small></span></button>
-				<button class="app-rail__tab" type="button" role="tab" id="tab-finance-tracker" aria-controls="finance-tracker" aria-selected="false" tabindex="-1"><video muted playsinline preload="none" aria-hidden="true" data-src="images/projects/finance.mp4" data-poster="images/projects/finance-poster.webp"></video><span><b>Finance tracker</b><small>Self-hosted, flags odd charges</small></span></button>
+				<button class="app-rail__tab" type="button" role="tab" id="tab-finance-tracker" aria-controls="finance-tracker" aria-selected="false" tabindex="-1"><video muted playsinline preload="none" aria-hidden="true" data-src="images/projects/finance.mp4" data-poster="images/projects/finance-poster.webp"></video><span><b>Finance tracker</b><small>Flags odd charges</small></span></button>
 				<button class="app-rail__tab" type="button" role="tab" id="tab-travel-packing" aria-controls="travel-packing" aria-selected="false" tabindex="-1"><video muted playsinline preload="none" aria-hidden="true" data-src="images/projects/packing.mp4" data-poster="images/projects/packing-poster.webp"></video><span><b>Travel Packing</b><small>Lists that scale with the trip</small></span></button>
 			</div>
 			<section class="app-grid" aria-labelledby="portfolio-title">
@@ -30,12 +30,12 @@
 					<header class="app-card__intro">
 						<div class="app-card__head">
 							<div>
-								<p class="app-card__kind"><svg class="app-card__tg" viewBox="0 0 496 512" aria-hidden="true"><use href="#pj-telegram"/></svg>Telegram bot &middot; since Aug 2026</p>
+								<img class="app-card__icon" src="images/projects/icon-squashbot.webp" alt="SquashBot logo: a racket and ball" width="56" height="56" decoding="async"><p class="app-card__kind"><svg class="app-card__tg" viewBox="0 0 496 512" aria-hidden="true"><use href="#pj-telegram"/></svg>Telegram bot &middot; since Aug 2026</p>
 								<h2 id="squashbot-title" tabindex="-1">SquashBot</h2>
 							</div>
 							<a class="app-card__repo" href="https://github.com/nicholas-wan/squash-bot" target="_blank" rel="noopener noreferrer" aria-label="SquashBot on GitHub"><svg viewBox="0 0 496 512" aria-hidden="true"><use href="#pj-github"/></svg></a>
 						</div>
-						<p class="app-card__dek">Court bookings and fee splits for my squash group, run from our group chat.</p>
+						<p class="app-card__dek">Court bookings and fee splits for my squash group, in our group chat.</p>
 					</header>
 					<figure class="app-card__demo"><a class="app-demo__skip" href="#squashbot-why">Skip SquashBot demo</a>
 						<div class="app-stage"><div class="app-phone"><div class="app-demo app-demo--squash" data-demo="squash"><div class="sq" role="group" aria-label="Interactive demo of SquashBot with sample data">
@@ -64,25 +64,30 @@
   <div class="sq-toast" data-toast role="status" aria-live="off" data-demo-live></div>
 </div>
 </div></div></div>
-						<div class="app-card__foot"><figcaption>Tap a sample message to book as Alex.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over SquashBot"><span aria-hidden="true">&#8635;</span> Start over</button></div>
+						<div class="app-card__foot"><figcaption>Tap a sample message to book as DodgerBlueee.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over SquashBot"><span aria-hidden="true">&#8635;</span> Start over</button></div>
 					</figure>
 					<div class="app-card__body">
 						<ul class="app-why" id="squashbot-why" tabindex="-1" aria-label="Why I built my own">
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-chat"/></svg></span><p><strong>Reads how we already type</strong><span>&#8220;tmr c4 2100&#8221; is Court 4, 9pm tomorrow; it asks if a part is missing.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-id"/></svg></span><p><strong>Debts follow IDs, not usernames</strong><span>A recycled @handle can&#8217;t inherit someone else&#8217;s tab.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-coins"/></svg></span><p><strong>Bills only courts that were played</strong><span>Cancelled courts cost nothing; nobody can drop out once play starts.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-chat"/></svg></span><p><strong>Book a court by typing it</strong><span>&#8220;tmr c4 2100&#8221; is Court 4, 9pm tomorrow; it asks for anything missing.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-coins"/></svg></span><p><strong>Splitwise, without the typing</strong><span>Each played court is split among its players onto one running tab.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-id"/></svg></span><p><strong>No app or account to join</strong><span>One tap to join, no app; the tab follows Telegram IDs, not @handles.</span></p></li>
 						</ul>
 						<p class="app-card__facts"><span>Cloudflare Workers, D1</span></p>
 					</div>
+					<section class="app-more" aria-labelledby="squashbot-more"><h3 id="squashbot-more">More features.</h3><ul>
+						<li><p><strong>Reminders before you play</strong>A private &#8220;Squash today!&#8221; on the day, and another two hours before.</p><img src="images/projects/squashbot-remind.webp" alt="A private SquashBot reminder: Squash today! Court 5, Thu 19 Nov, 7pm to 8:30pm, with Nicholas, Priya and DodgerBlueee." width="840" height="1040" loading="lazy" decoding="async"></li>
+						<li><p><strong>The tab, court by court</strong>What you owe on top, then every court behind it with its price and split.</p><img src="images/projects/squashbot-tab.webp" alt="The Mini App&#8217;s Tab: you owe Nicholas $9.00, then three courts, each with its price divided by three." width="840" height="1040" loading="lazy" decoding="async"></li>
+						<li><p><strong>Join or book in the app</strong>The Mini App lists every court with Join, Leave or Full, and adds bookings.</p><img src="images/projects/squashbot-mini.webp" alt="The SquashBot Mini App listing three courts with Join buttons, one marked Full." width="840" height="1040" loading="lazy" decoding="async"></li>
+					</ul></section>
 				</article>
 
 				<article class="app-card" id="nag-bot" aria-labelledby="nagbot-title">
 					<header class="app-card__intro">
 						<div class="app-card__head">
 							<div>
-								<p class="app-card__kind"><svg class="app-card__tg" viewBox="0 0 496 512" aria-hidden="true"><use href="#pj-telegram"/></svg>Telegram bot &middot; since Aug 2026</p>
+								<img class="app-card__icon" src="images/projects/icon-nag-bot.svg" alt="Nag-bot avatar: a paw" width="56" height="56" decoding="async"><p class="app-card__kind"><svg class="app-card__tg" viewBox="0 0 496 512" aria-hidden="true"><use href="#pj-telegram"/></svg>Telegram bot &middot; since Aug 2026</p>
 								<h2 id="nagbot-title" tabindex="-1">Nag-bot</h2>
-							</div><span class="app-card__repo app-card__repo--private" role="img" aria-label="Source not shared" title="Source not shared"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-lock"/></svg></span>
+							</div><a class="app-card__repo" href="https://github.com/nicholas-wan/tele-nagbot" target="_blank" rel="noopener noreferrer" aria-label="Nag-bot on GitHub"><svg viewBox="0 0 496 512" aria-hidden="true"><use href="#pj-github"/></svg></a>
 						</div>
 						<p class="app-card__dek">Chores for my wife and me, in a Telegram group of our own.</p>
 					</header>
@@ -95,22 +100,16 @@
     <span class="n-ava" aria-hidden="true">🐾</span>
   </div>
   <div class="n-pin">
-    <span class="n-pintext"><b>Pinned message</b><span class="n-pinmsg">🐾 Chores 🔔 nagging since 7:30 PM 💩 wash the litter box · every 6 weeks</span></span>
+    <button type="button" class="n-pintext" data-act="pin"><b>Pinned message</b><span class="n-pinmsg">🐾 Chores 🔔 nagging since 7:30 PM 💩 wash the litter box · every 6 weeks</span></button>
     <button type="button" class="n-pinbtn" data-act="open" aria-label="Open the 🐾 Chores Mini App">🐾 Chores</button>
   </div>
   <div class="n-chat">
     <div class="n-feed">
       <span class="n-date">Today</span>
-      <div class="n-msg">
-        <div class="n-bubble"><span class="n-name">Nag-Bot</span>🪦 <s>fold the laundry</s> — 24 hours and nobody did it. Latte &amp; Mocha are deeply disappointed.<span class="n-time">8:00 AM</span></div>
-      </div>
-      <div class="n-msg">
-        <div class="n-bubble">😻 <s>trash</s> — done by Nicholas at 7:05 PM. The cats purr approvingly.<span class="n-time">7:05 PM</span></div>
-      </div>
       <div class="n-live"></div>
     </div>
-    <div class="n-toast" role="status" aria-live="off" data-demo-live></div>
   </div>
+  <div class="n-toast" role="status" aria-live="off" data-demo-live></div>
   <div class="n-input" aria-hidden="true">
     <svg viewBox="0 0 24 24" width="21" height="21"><path d="M16.5 7.5 9 15a2 2 0 0 0 2.8 2.8l8-8a4 4 0 0 0-5.6-5.6l-8.3 8.3a6 6 0 0 0 8.5 8.5l6.6-6.6"/></svg>
     <span class="n-field">Message<svg viewBox="0 0 24 24" width="18" height="18"><circle cx="12" cy="12" r="9"/><path d="M8.5 14.2c1.8 2 5.2 2 7 0"/><path d="M9.2 9.8h0m5.6 0h0" stroke-width="2.6"/></svg></span>
@@ -133,24 +132,29 @@
 					</figure>
 					<div class="app-card__body">
 						<ul class="app-why" id="nagbot-why" tabindex="-1" aria-label="Why I built my own">
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-bell"/></svg></span><p><strong>Keeps nagging, within reason</strong><span>Re-nags 15, 30, then 60 minutes apart, but never overnight.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-spark"/></svg></span><p><strong>The AI suggests; a tap decides</strong><span>Workers AI proposes a time; nothing applies until it&#8217;s tapped.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-bolt"/></svg></span><p><strong>A Done answers in 43&#8239;ms</strong><span>Was 657&#8239;ms; I batched its database calls. Benchmarked with simulated delays.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-bell"/></svg></span><p><strong>Nags until it&#8217;s done</strong><span>Re-nags at 15, 30 and 60 minutes until it&#8217;s done; quiet overnight.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-chat"/></svg></span><p><strong>Shared, and fair</strong><span>It lives in our group chat; rotating chores go to whoever did least.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-spark"/></svg></span><p><strong>The AI suggests; a tap decides</strong><span>Type chores in plain words; Workers AI suggests a missing time to tap.</span></p></li>
 						</ul>
 						<p class="app-card__facts"><span>Cloudflare Workers, D1, Workers AI</span></p>
 					</div>
+					<section class="app-more" aria-labelledby="nagbot-more"><h3 id="nagbot-more">More features.</h3><ul>
+						<li><p><strong>A weekly leaderboard</strong>Medals, a 🔥 reign for repeat winners and a Done together count, reset each Monday.</p><img src="images/projects/nag-stats.webp" alt="The Mini App's Stats tab: DodgerBlueee first with 5 chores and a 3-week reign, Nicholas second with 4, and 2 done together." width="840" height="1040" loading="lazy" decoding="async"></li>
+						<li><p><strong>Chores that reset together</strong>Doing a chore resets the ones under it: a litter box wash covers clear poop and the shake.</p><img src="images/projects/nag-family.webp" alt="The clear poop chore in the Mini App with its family: wash the litter box above it, shake the litter box below." width="840" height="1040" loading="lazy" decoding="async"></li>
+						<li><p><strong>Vacation mode</strong>&#8220;/pause all 14&#8221; mutes every chore for 14 days, with no flood of nags on return.</p><img src="images/projects/nag-vacation.webp" alt="The chat after someone sends /pause all 14: the bot replies that all chores are paused until Sun, Nov 22 and the cats will nap on your luggage." width="840" height="1040" loading="lazy" decoding="async"></li>
+					</ul></section>
 				</article>
 
 				<article class="app-card" id="finance-tracker" aria-labelledby="finance-title">
 					<header class="app-card__intro">
 						<div class="app-card__head">
 							<div>
-								<p class="app-card__kind"><svg class="app-card__pc" viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-home"/></svg>Self-hosted &middot; since Jun 2024</p>
+								<img class="app-card__icon" src="images/projects/icon-finance.svg" alt="Finance tracker icon: rising bars" width="56" height="56" decoding="async"><p class="app-card__kind"><svg class="app-card__pc" viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-home"/></svg>Self-hosted &middot; since Jun 2024</p>
 								<h2 id="finance-title" tabindex="-1">Finance tracker</h2>
 							</div>
 							<span class="app-card__repo app-card__repo--private" role="img" aria-label="Source not shared" title="Source not shared"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-lock"/></svg></span>
 						</div>
-						<p class="app-card__dek">My self-hosted money dashboard: it imports bank and broker statements and flags suspicious charges.</p>
+						<p class="app-card__dek">My money dashboard: it imports bank and broker statements and flags suspicious charges.</p>
 					</header>
 					<figure class="app-card__demo"><a class="app-demo__skip" href="#finance-why">Skip Finance tracker demo</a>
 						<div class="app-stage"><div class="app-phone"><div class="app-demo app-demo--finance" data-demo="finance"><div class="fd" role="group" aria-label="Interactive demo of the finance tracker with sample data">
@@ -175,7 +179,7 @@
 <symbol id="fi-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v11h-6v-7H9v7H3Z"/></symbol>
 </defs></svg>
 <div class="f-status demo-status" aria-hidden="true"><span>9:41</span><span class="demo-island"></span><svg viewBox="0 0 68 12" aria-hidden="true"><path d="M0 8h3v4H0zm4.5-2h3v6h-3zM9 3.5h3V12H9zM13.5 1h3v11h-3zm15 10.6-2.3-2.3a3.3 3.3 0 0 1 4.6 0zm-3.8-3.8-1.5-1.5a7.5 7.5 0 0 1 10.6 0l-1.5 1.5a5.4 5.4 0 0 0-7.6 0zm-3-3-1.5-1.5a11.8 11.8 0 0 1 16.6 0l-1.5 1.5a9.6 9.6 0 0 0-13.6 0zM44 2.5h15v7H44z" fill="currentColor"/><rect x="42" y=".5" width="22" height="11" rx="3.4" fill="none" stroke="currentColor" opacity=".4"/></svg></div>
-<div class="f-top"><span class="f-mark" aria-hidden="true">N</span><span class="f-sample">Sample</span><button class="f-ib" data-act="eye" aria-pressed="false" aria-label="Hide amounts"><svg class="f-ic"><use href="#fi-eye"/></svg></button></div>
+<div class="f-top"><span class="f-mark" aria-hidden="true">N</span><button class="f-ib" data-act="eye" aria-pressed="false" aria-label="Hide amounts"><svg class="f-ic"><use href="#fi-eye"/></svg></button></div>
 <div class="f-bar" hidden><button class="f-back" data-act="back"><svg class="f-ic"><use href="#fi-right"/></svg><span>Overview</span></button></div>
 <div class="f-scroll"></div>
 <div class="f-tabs" role="group" aria-label="Finance tracker sections">
@@ -194,19 +198,24 @@
 					</figure>
 					<div class="app-card__body">
 						<ul class="app-why" id="finance-why" tabindex="-1" aria-label="Why I built my own">
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-lock"/></svg></span><p><strong>Paired phones, read only</strong><span>A one-time pairing link; unpairing locks a phone out at once.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-check"/></svg></span><p><strong>Flags card testing and probes</strong><span>Small charges at new merchants; relabelling one never silences its check.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-bolt"/></svg></span><p><strong>Downloads to dashboard, one command</strong><span>Files and imports bank and broker statements, then bins the downloads.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-lock"/></svg></span><p><strong>No bank logins handed out</strong><span>It reads downloaded statements on my PC; phones get a read-only copy.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-check"/></svg></span><p><strong>Catches card testing</strong><span>Flags the small charges fraudsters try first; relabels never hide one.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-bolt"/></svg></span><p><strong>Every statement, one command</strong><span>Files and imports bank and broker statements, then bins the downloads.</span></p></li>
 						</ul>
 						<p class="app-card__facts"><span>Python, JavaScript</span></p>
 					</div>
+					<section class="app-more" aria-labelledby="finance-more"><h3 id="finance-more">More features.</h3><ul>
+						<li><p><strong>Where our cover falls short</strong>Our policies against rule-of-thumb cover for death, TPD and critical illness, shortfall first.</p><img src="images/projects/finance-insurance.webp" alt="Sample Insurance screen for Nicholas: cover short S$60k on critical illness. Death and TPD are covered; the critical illness bar is half full, short S$60,000." width="840" height="1040" loading="lazy" decoding="async"></li>
+						<li><p><strong>Every appliance and its warranty</strong>Each item&#8217;s cost and warranty end, with a missing price or receipt flagged.</p><img src="images/projects/finance-home.webp" alt="Sample Home register: one item needs info, three are covered, one has no active cover. A sofa&#8217;s cost is still to confirm; a fridge and an aircon show their warranty end dates and prices." width="840" height="1040" loading="lazy" decoding="async"></li>
+						<li><p><strong>Broker gains that tally</strong>Gains from the broker&#8217;s own statements, net of deposits; the import stops if they don&#8217;t add up.</p><img src="images/projects/finance-invest.webp" alt="Sample Investments screen: a S$51,360 portfolio up S$3,940 over the past year, with Interactive Brokers statements to 31 Oct 2026 marked numbers tally." width="840" height="1040" loading="lazy" decoding="async"></li>
+					</ul></section>
 				</article>
 
 				<article class="app-card" id="travel-packing" aria-labelledby="packing-title">
 					<header class="app-card__intro">
 						<div class="app-card__head">
 							<div>
-								<p class="app-card__kind"><svg class="app-card__pc" viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-home"/></svg>Self-hosted &middot; since Oct 2026</p>
+								<img class="app-card__icon" src="images/projects/icon-packing.svg" alt="Travel Packing icon: a plane" width="56" height="56" decoding="async"><p class="app-card__kind"><svg class="app-card__pc" viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-home"/></svg>Self-hosted &middot; since Oct 2026</p>
 								<h2 id="packing-title" tabindex="-1">Travel Packing</h2>
 							</div><span class="app-card__repo app-card__repo--private" role="img" aria-label="Source not shared" title="Source not shared"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pj-i-lock"/></svg></span>
 						</div>
@@ -272,12 +281,17 @@
 					</figure>
 					<div class="app-card__body">
 						<ul class="app-why" id="packing-why" tabindex="-1" aria-label="Why I built my own">
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-moon"/></svg></span><p><strong>Scales with the nights</strong><span>Underwear, socks, and shirts recount when the nights change.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-moon"/></svg></span><p><strong>Counts that scale with the trip</strong><span>Change the nights and underwear, socks and shirts recount themselves.</span></p></li>
 							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-list"/></svg></span><p><strong>Last call at the door</strong><span>One tap shows only the essentials still unpacked.</span></p></li>
 							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-phone"/></svg></span><p><strong>Two screens, no lost ticks</strong><span>Phone and laptop merge per item; a clashing edit goes to History.</span></p></li>
 						</ul>
 						<p class="app-card__facts"><span>Python, JavaScript</span></p>
 					</div>
+					<section class="app-more" aria-labelledby="packing-more"><h3 id="packing-more">More features.</h3><ul>
+						<li><p><strong>One master list</strong>Every item&#8217;s rule, note and lists live in Defaults; Reset returns a trip to them.</p><img src="images/projects/packing-defaults.webp" alt="The Defaults page for Clothes: each item shows its quantity rule, such as 0.8 per night, 3&#8211;7 for Socks, and Normal and Extended chips; Thick Socks is only in Extended." width="840" height="1040" loading="lazy" decoding="async"></li>
+						<li><p><strong>A list for longer trips</strong>Its own ticks and counts, plus cold-weather items like Thick Socks and Boots.</p><img src="images/projects/packing-extended.webp" alt="The Extended trip list: Pants 4, Socks 6, Thick Socks 4, then Footwear with Sports Shoes, Slippers and Boots, noted Thick shoes for cold trips." width="840" height="1040" loading="lazy" decoding="async"></li>
+						<li><p><strong>Save and reload trips</strong>History keeps both lists, Defaults and every tick; reloading first saves your progress.</p><img src="images/projects/packing-history.webp" alt="The Trip history dialog: a saved trip named Weekend away, with Normal trip 48/50 packed over 5 nights and a Reload trip button, above a recovery copy from before resetting Normal trip." width="840" height="1040" loading="lazy" decoding="async"></li>
+					</ul></section>
 				</article>
 			</section>
 
