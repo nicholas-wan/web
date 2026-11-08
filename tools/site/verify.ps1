@@ -270,6 +270,8 @@ foreach ($page in $pages) {
     # 256 -> 320 (21 Oct 2026, owner): the ten timeline scenes were redrawn to hold up
     # at 5x in the "look closer" viewer, and travel.html inlines them. SVG compresses
     # roughly 6-8x over the wire, so the transfer cost is a few KB, not the raw delta.
+    # Since 8 Nov 2026 the scenes ship in assets/data/travel-scenes.svg (budget below)
+    # and travel.html is about 80 KB; the 320 KB ceiling stays for the journals.
     if ($page.Length -gt 320KB) { throw "$($page.Name) exceeds the 320 KB generated-HTML budget." }
     Warn-BudgetHeadroom "$($page.Name) HTML" $page.Length 320KB
 }
@@ -349,6 +351,24 @@ if ($travelDeferredMarkup -notmatch "(?s)<section class=`"posts travel-grid`".*?
 
 if ([regex]::Matches($travelDeferredMarkup, 'data-journal-src="').Count -ne 10 -or [regex]::Matches($travelDeferredMarkup, 'data-journal-srcset="').Count -ne 10) {
     throw 'Travel must defer all ten responsive journal covers until their visible presentation approaches.'
+}
+
+# Timeline scenes (8 Nov 2026): the ten scene SVGs were about 60 KB of the page's 75 KB
+# gzipped and delayed the phone's CSS. They ship as one versioned file instead: the page
+# keeps ten empty fixed-size slots, wider screens preload the file beside the CSS, phones
+# fetch it at load (or when a scene comes on screen), and the phone rail still borrows
+# the single desktop copy. 240 KB is the scenes' share of the old 320 KB page budget.
+Assert-FileSizeBudget 'assets\data\travel-scenes.svg' 240
+$travelScenes = Get-Content -LiteralPath (Join-Path $dist 'assets\data\travel-scenes.svg') -Raw -Encoding UTF8
+$travelScenesRef = [regex]::Escape((Get-DistAssetRef 'assets/data/travel-scenes.svg'))
+$travelChronologyMarkup = [regex]::Match($travelDeferredMarkup, '(?s)<section aria-labelledby="chronology-title".*?</section>').Value
+if ($travelChronologyMarkup -notmatch ('^<section aria-labelledby="chronology-title" class="journal-chronology" data-scenes="' + $travelScenesRef + '">') -or $travelChronologyMarkup -match '<svg\b' -or [regex]::Matches($travelChronologyMarkup, '<span aria-hidden="true" class="authored-scene[^"]*"[^>]*\bdata-scene="\d"[^>]*></span>').Count -ne 10 -or $travelDeferredMarkup -notmatch ('(?s)<head>.*<link rel="preload" href="' + $travelScenesRef + '" as="fetch" crossorigin fetchpriority="low" media="\(min-width: 737px\)" />.*</head>') -or $travelScenes -notmatch '^<svg xmlns="http://www\.w3\.org/2000/svg"><svg\b' -or [regex]::Matches($travelScenes, '<svg\b').Count -ne 11) {
+    throw 'Travel must ship its ten timeline scenes in the versioned travel-scenes.svg (preloaded on wider screens), leaving ten empty scene slots and no inline SVG in the chronology.'
+}
+# Without JavaScript the artwork never arrives, so the static timeline folds its empty slots.
+if ((Get-Content -LiteralPath (Join-Path $dist 'assets\css\noscript.css') -Raw -Encoding UTF8) -notmatch '\.journal-chronology \.authored-scene\{display:none\}') { throw 'Without JavaScript the travel timeline must fold its empty scene slots (noscript.css).' }
+if ($chronologySource -notmatch 'pending=fetch\(source\.dataset\.scenes\)' -or $chronologySource -notmatch "source\.querySelectorAll\('\.chronology-trip \.authored-scene'\)\.forEach\(\(art,i\)=>svgs\[i\]&&art\.append\(svgs\[i\]\)\)" -or $chronologySource -notmatch "matchMedia\('\(min-width:737px\)'\)\.matches\)load\(\);else addEventListener\('load',load\)" -or $chronologySource -notmatch "e\.svg=e\.svg\|\|e\.home\.querySelector\('svg'\);if\(e\.svg\)\(media\.matches\?e\.art:e\.home\)\.append\(e\.svg\)" -or $chronologySource -notmatch "source\.addEventListener\('scenes-ready',share\)") {
+    throw 'The chronology runtime must fetch the scenes on wider screens at once and on phones at load or on approach, fill the desktop slots, and hand each single SVG to the phone rail.'
 }
 
 # 30 -> 31: journal lede leading and the Australia hero gap and intro treatment (Oct 2026).

@@ -1037,6 +1037,23 @@ $photoIndexPhotos = foreach ($entry in $photoEntries) {
 $photoIndexJson = '{"version":2,"variants":"' + (($photoEntries | ForEach-Object { $_.Variants }) -join '') + '","trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + '],"covers":[' + ($photoIndexCovers -join ',') + "]}`n"
 $assetVersions['assets/data/photo-index.json'] = Get-ContentVersion $photoIndexJson
 
+# Timeline scenes (8 Nov 2026): the partial stays the source of truth, but the ten
+# scene SVGs (about 60 KB of the page's 75 KB gzipped) ship as one cached file that
+# travel-chronology.js fetches into the empty fixed-size slots, so the phone's first
+# screen no longer shares the slow link with artwork that sits below the fold.
+$travelChronologyHtml = (Get-Content -LiteralPath (Join-Path $root 'partials/travel-chronology.html') -Raw -Encoding UTF8).Trim()
+$travelSceneSvgs = New-Object System.Collections.Generic.List[string]
+$travelChronologyHtml = [regex]::Replace($travelChronologyHtml, '(<span aria-hidden="true" class="authored-scene[^"]*"[^>]*>)(<svg\b[\s\S]*?</svg>)(?=</span>)', {
+    param($m)
+    $travelSceneSvgs.Add($m.Groups[2].Value)
+    return $m.Groups[1].Value
+})
+if ($travelSceneSvgs.Count -ne 10 -or $travelChronologyHtml -match '<svg\b' -or @($travelSceneSvgs | Where-Object { [regex]::Matches($_, '<svg\b').Count -ne 1 }).Count) {
+    throw "partials/travel-chronology.html must hold exactly ten un-nested scene SVGs, one directly inside each .authored-scene."
+}
+$travelScenesSvg = '<svg xmlns="http://www.w3.org/2000/svg">' + ($travelSceneSvgs -join "`n") + "</svg>`n"
+$assetVersions['assets/data/travel-scenes.svg'] = Get-ContentVersion $travelScenesSvg
+
 # Small, inert postcard seeds make discovery available without fetching the
 # full index. The browser only attaches four thumbnails; the rest stay inert.
 $exploreThemes = Get-Content -LiteralPath (Join-Path $root 'journals\explore-themes.json') -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -1117,7 +1134,7 @@ foreach ($page in $pages) {
     }
     if ($slug -eq 'travel') {
         $main = $main.Replace('<!-- TRAVEL_SHORTCUTS -->', (Get-Content -LiteralPath (Join-Path $root 'partials/travel-shortcuts.html') -Raw -Encoding UTF8).Trim())
-        $main = $main.Replace('<!-- TRAVEL_CHRONOLOGY -->', (Get-Content -LiteralPath (Join-Path $root 'partials/travel-chronology.html') -Raw -Encoding UTF8).Trim())
+        $main = $main.Replace('<!-- TRAVEL_CHRONOLOGY -->', $travelChronologyHtml.Replace('data-scenes="assets/data/travel-scenes.svg"', "data-scenes=`"$(Get-AssetRef 'assets/data/travel-scenes.svg')`""))
         # The photo search script is not a <script src> on the travel page: that
         # page sits at its 80 KB JavaScript ceiling, and the search is only
         # needed once a visitor focuses the field. An inline loader reads the
@@ -1238,6 +1255,9 @@ foreach ($page in $pages) {
     if ($slug -eq 'personal') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/personal-page.css')`" />" }
     if ($slug -eq 'skills') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/skills-page.css')`" />" }
     $routeStylesheetMarkup = $routeStylesheets -join "`n"
+    # Wider screens show the timeline at the first screen's edge, so they fetch its scenes
+    # beside the CSS, as when they were inline; phones fetch them later (travel-chronology.js).
+    if ($slug -eq 'travel') { $routeStylesheetMarkup += "`n    <link rel=`"preload`" href=`"$(Get-AssetRef 'assets/data/travel-scenes.svg')`" as=`"fetch`" crossorigin fetchpriority=`"low`" media=`"(min-width: 737px)`" />" }
     # The professional pages opt out of a share-preview image (owner decision,
     # Jul 2026): scrapers show a text-only card rather than the travel default.
     $shareImageMeta = if ($slug -in @('experience', 'skills')) { '' } else { "    <meta property=`"og:image`" content=`"__OGIMAGE__`" />`n    <meta name=`"twitter:card`" content=`"summary_large_image`" />" }
@@ -1348,6 +1368,7 @@ foreach ($file in $runtimeJs) {
 }
 New-Item -ItemType Directory -Path (Join-Path $out "assets\data") -Force | Out-Null
 Write-Utf8 (Join-Path $out 'assets\data\photo-index.json') $photoIndexJson
+Write-Utf8 (Join-Path $out 'assets\data\travel-scenes.svg') $travelScenesSvg
 Sync-Directory (Join-Path $root "assets\fonts") (Join-Path $out "assets\fonts")
 Sync-Directory (Join-Path $root "assets\icons") (Join-Path $out "assets\icons")
 # Copied before the image scan so the manifest's icon references get published.
