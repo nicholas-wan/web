@@ -7423,8 +7423,11 @@ body.lightbox-open {
   align-items: center;
 }
 
+/* Cards in one year zigzag, overlapping a little. At -4.75rem their dots sat
+   about 94px apart against about 216px across years, so each year's pair
+   bunched on the rail (9 Nov 2026 reviews); -2.5rem gives about 130px. */
 .personal-timeline-event + .personal-timeline-event {
-  margin-top: -4.75rem;
+  margin-top: -2.5rem;
 }
 
 .personal-timeline-event::before {
@@ -7440,7 +7443,7 @@ body.lightbox-open {
   box-shadow: 0 0 0 0.35rem #fff;
   content: "";
   transform: translate(-50%, -50%);
-  transition: background 0.25s ease, transform 0.25s ease;
+  transition: background 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .personal-timeline-event::after {
@@ -7458,6 +7461,14 @@ body.lightbox-open {
 .personal-timeline-event.is-past::before {
   background: var(--timeline-accent);
   transform: translate(-50%, -50%) scale(1.08);
+}
+
+/* Desktop dims only cards already read, so up to three can look current. The
+   card being read gets a ringed dot on the rail (9 Nov 2026 reviews). */
+.personal-timeline.is-enhanced .personal-timeline-event.is-focus::before {
+  background: var(--timeline-accent);
+  box-shadow: 0 0 0 0.3rem #fff, 0 0 0 0.55rem color-mix(in srgb, var(--timeline-accent) 28%, #fff);
+  transform: translate(-50%, -50%) scale(1.25);
 }
 
 .personal-event-card {
