@@ -281,19 +281,23 @@
   const photo=card.querySelector('a.travel-card__image,a.image');if(photo){const cue=document.createElement('span');cue.className='mobile-photo-cta';cue.textContent='Read journal →';photo.setAttribute('aria-label','Read journal — '+trip.querySelector('.chronology-label').textContent);cue.setAttribute('aria-hidden','true');photo.append(cue);}
   row.append(icon,card);list.append(row);return {row,icon,art,home,index:i,visible:false};
  }).filter(Boolean);grid.before(list);
- const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let timer,active,frame;
+ const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');const playing=new Map();let focus,frame;
+ // 9 Nov 2026: all scenes on screen play; nearest (28px lead) is the focus.
+ const OPEN={guangzhou:900,australia:1500,germany:800,usacanada:400,seoul:1200};
  // Each scene's single SVG lives in whichever presentation is showing (phone rail or desktop timeline).
- // The artwork arrives after this runs (see below), so each row picks its SVG up on scenes-ready.
- const share=()=>entries.forEach(e=>{e.svg=e.svg||e.home.querySelector('svg');if(e.svg)(media.matches?e.art:e.home).append(e.svg);});share();media.addEventListener('change',share);source.addEventListener('scenes-ready',share);
- function clear(){clearTimeout(timer);if(active)active.art.classList.remove('is-active');active=null;}
- function play(entry){clear();active=entry;void entry.art.getBoundingClientRect();entry.art.classList.add('is-active');timer=setTimeout(()=>{clear();update();},Number(entry.art.dataset.duration)||6200);}
- // Repeat the scene nearest where phone readers look (about 40% down the screen); the playing scene
- // keeps a 28px advantage so it does not flicker between two rows mid-scroll.
+ // The artwork arrives later (see below); each row picks its SVG up on scenes-ready.
+ const share=()=>{entries.forEach(e=>{e.svg=e.svg||e.home.querySelector('svg');if(e.svg)(media.matches?e.art:e.home).append(e.svg);});clear();update();};share();media.addEventListener('change',share);source.addEventListener('scenes-ready',share);
+ function start(e){if(playing.has(e))return;const a=e.art;a.classList.add('is-active');
+  const anims=a.getAnimations({subtree:true}).filter(x=>x.animationName),at=OPEN[e.icon.getAttribute('href').slice(12)]||0,ms=(+a.dataset.duration||6200)-at;
+  const seek=()=>anims.forEach(x=>{x.currentTime=at;x.play();}),loop=()=>{seek();a.dataset.loop=-~a.dataset.loop;playing.set(e,setTimeout(loop,ms));};if(at)seek();playing.set(e,setTimeout(loop,ms));}
+ function stop(e){clearTimeout(playing.get(e));playing.delete(e);e.art.classList.remove('is-active');}
+ function pick(e){if(focus!==e){focus?.art.classList.remove('is-focus');focus=e;e?.art.classList.add('is-focus');}}
+ function clear(){[...playing.keys()].forEach(stop);pick(null);}
  function update(){
   if(!media.matches||reduced.matches||document.hidden||list.hidden){clear();return;}
-  let nearest=null,distance=Infinity;
-  entries.forEach(entry=>{const box=entry.art.getBoundingClientRect(),visible=Math.min(innerHeight,box.bottom)-Math.max(0,box.top);if(!box.height||visible<box.height/2)return;const delta=Math.abs((box.top+box.bottom)/2-innerHeight*.4)-(entry===active?28:0);if(delta<distance){nearest=entry;distance=delta;}});
-  if(nearest!==active){if(nearest)play(nearest);else clear();}
+  let nearest=null,distance=Infinity;const shown=new Set();
+  entries.forEach(entry=>{const box=entry.art.getBoundingClientRect(),visible=Math.min(innerHeight,box.bottom)-Math.max(0,box.top);if(!box.height||visible<box.height/2)return;shown.add(entry);const delta=Math.abs((box.top+box.bottom)/2-innerHeight*.4)-(entry===focus?28:0);if(delta<distance){nearest=entry;distance=delta;}});
+  [...playing.keys()].forEach(e=>{if(!shown.has(e))stop(e);});shown.forEach(start);pick(nearest);
  }
  function requestUpdate(){if(frame)return;frame=requestAnimationFrame(()=>{frame=0;update();});}
  entries.forEach(e=>e.icon.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();e.row.classList.add('mobile-selected');entries.filter(x=>x!==e).forEach(x=>x.row.classList.remove('mobile-selected'));update();}));
@@ -342,8 +346,8 @@
   // A tap also places it, so phones still offer it when reduced motion stops playback.
   trip.addEventListener('click',()=>{if(phone.matches)place(s);});});
  loupe.addEventListener('pointerenter',()=>clearTimeout(hide));loupe.addEventListener('pointerleave',away);loupe.addEventListener('blur',away);
- // Phones have no hover: the loupe rides on whichever scene is playing.
- new MutationObserver(list=>list.forEach(m=>{if(phone.matches&&m.target.classList.contains('is-active')&&m.target.closest('.mobile-journal-row'))place(m.target);}))
+ // Phones have no hover: the loupe rides on the focused scene.
+ new MutationObserver(list=>list.forEach(m=>{if(phone.matches&&m.target.classList.contains('is-focus')&&m.target.closest('.mobile-journal-row'))place(m.target);}))
   .observe(document.querySelector('.mobile-journal-list')||document.body,{subtree:true,attributes:true,attributeFilter:['class']});
  loupe.addEventListener('click',()=>{if(!scene)return;const trip=scene.closest('.chronology-trip'),art=scene.cloneNode(true);
   art.style.background=getComputedStyle(scene,'::before').backgroundImage;

@@ -25,20 +25,25 @@ test('travel image failure preserves geometry and readable journal links',async(
 
 test.describe('mobile reading animation',()=>{
  test.use({hasTouch:true,reducedMotion:'no-preference'});
- test('nearest scene repeats and follows the reader',async({page})=>{
+ test('every scene on screen repeats; the nearest is the focus and follows the reader',async({page})=>{
   await page.clock.install();await page.setViewportSize({width:390,height:844});await page.goto('/travel');
-  const scenes=page.locator('.mobile-journal-list .authored-scene');
+  const scenes=page.locator('.mobile-journal-list .authored-scene'),active=page.locator('.mobile-journal-list .is-active'),focus=page.locator('.mobile-journal-list .is-focus');
+  await expect(page.locator('.mobile-journal-list .authored-scene > svg')).toHaveCount(10);
   await scenes.nth(2).evaluate(el=>el.scrollIntoView({block:'center'}));await page.clock.runFor(100);
-  await expect(scenes.nth(2)).toHaveClass(/is-active/);
-  await scenes.nth(2).evaluate(el=>{window.sceneRestarts=0;new MutationObserver(records=>{window.sceneRestarts+=records.length;}).observe(el,{attributes:true,attributeFilter:['class']});});
+  await expect(scenes.nth(2)).toHaveClass(/is-active/);await expect(scenes.nth(2)).toHaveClass(/is-focus/);
+  await expect(focus).toHaveCount(1);expect(await active.count()).toBeGreaterThan(1);
+  // Repeats rewind the scene in place: the loop counter moves, the class list does not.
+  await scenes.nth(2).evaluate(el=>{window.sceneLoops=0;window.sceneClassChanges=0;new MutationObserver(records=>records.forEach(r=>{if(r.attributeName==='data-loop')window.sceneLoops++;else window.sceneClassChanges++;})).observe(el,{attributes:true,attributeFilter:['class','data-loop']});});
   await page.clock.runFor(15000);await expect(scenes.nth(2)).toHaveClass(/is-active/);
-  expect(await page.evaluate(()=>window.sceneRestarts)).toBeGreaterThanOrEqual(4);
+  expect(await page.evaluate(()=>[window.sceneLoops,window.sceneClassChanges])).toEqual([2,0]);
+  // Australia opens part-way in, with its ferry already in the tile.
+  await scenes.nth(3).evaluate(el=>el.scrollIntoView({block:'center'}));await page.clock.runFor(100);
+  expect(await scenes.nth(3).evaluate(el=>Math.min(...el.getAnimations({subtree:true}).filter(a=>a.animationName).map(a=>a.currentTime)))).toBeGreaterThanOrEqual(1500);
   await scenes.nth(5).evaluate(el=>el.scrollIntoView({block:'center'}));await page.clock.runFor(100);
-  await expect(scenes.nth(5)).toHaveClass(/is-active/);await expect(scenes.nth(2)).not.toHaveClass(/is-active/);
-  await expect(page.locator('.mobile-journal-list .is-active')).toHaveCount(1);
-  await page.emulateMedia({reducedMotion:'reduce'});await expect(page.locator('.mobile-journal-list .is-active')).toHaveCount(0);
-  await page.emulateMedia({reducedMotion:'no-preference'});await expect(scenes.nth(5)).toHaveClass(/is-active/);
-  await page.evaluate(()=>scrollTo(0,0));await page.clock.runFor(100);await expect(page.locator('.mobile-journal-list .is-active')).toHaveCount(0);
+  await expect(scenes.nth(5)).toHaveClass(/is-focus/);await expect(scenes.nth(2)).not.toHaveClass(/is-active/);await expect(focus).toHaveCount(1);
+  await page.emulateMedia({reducedMotion:'reduce'});await expect(active).toHaveCount(0);await expect(focus).toHaveCount(0);
+  await page.emulateMedia({reducedMotion:'no-preference'});await expect(scenes.nth(5)).toHaveClass(/is-focus/);
+  await page.evaluate(()=>scrollTo(0,0));await page.clock.runFor(100);await expect(active).toHaveCount(0);
  });
 });
 

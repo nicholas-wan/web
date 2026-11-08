@@ -10220,7 +10220,19 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene>svg{position:relative}
  .mobile-journal-row .mm-dusk-tile{opacity:.55;transition:opacity .5s ease}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active .mm-dusk-tile{opacity:1}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active{box-shadow:0 0 0 2px #a8c8b6}
+ /* Every scene on screen plays (9 Nov 2026); the ring marks the one on the reading line. */
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-focus{box-shadow:0 0 0 2px #a8c8b6}
+ /* Small movers drawn bigger on the 128px tiles so they read on a flick. Each scales its inner
+    drawing (or r / stroke-width), never the animated element, so its path is unchanged. */
+ .travel-timeline.travel-phone-rail .mobile-journal-row .dl-tram>g{scale:1.8}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .gg-car>*{scale:2.2}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .cl-gull>g{scale:1.4;translate:0 4px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .mm-leaf>*{scale:1.3}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .mm-swan>path{scale:1.12}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .mm-star{r:.44px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .mm-flake{r:.55px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .mm-drop{stroke-width:.38px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .cr-liberty-glint{r:7px}
  /* The tile lines up with the top of its journal photo. */
  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{padding-top:0!important}
  /* Each phone tile sits on its own soft sky (Fuji overcast, as in fuji1). */
