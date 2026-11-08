@@ -8355,11 +8355,10 @@ body.page-home #nav {
 
   /* object-fit: cover crops rather than scales, so at a fixed card width the
      box ratio alone decides how much of a photo survives — and any ratio the
-     sources do not share reads as zooming in. Five of the nine photos are 3:2,
+     sources do not share reads as zooming in. Five of the eight photos are 3:2,
      so the open card matches them exactly and crops nothing; it also stays
      taller than the 16/9 base, keeping the focused card's extra presence. A
-     taller 4/3 box instead cut the sides off the wide photos, taking the
-     near-2:1 Brawl Stars artwork from 90% of its width down to 68%. */
+     taller 4/3 box instead cut the sides off the wide photos. */
   .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card__image {
     aspect-ratio: 3 / 2;
   }
@@ -8370,19 +8369,10 @@ body.page-home #nav {
     aspect-ratio: 4 / 3;
   }
 
-  /* Brawl Stars is artwork rather than a photograph, so the composition reads
-     as a whole and cropping it is more obvious than cropping a scene. At
-     nearly 2:1 it is the widest source on the page: a 3:2 frame takes a
-     quarter of its width off, while its own near-16/9 frame keeps the artwork
-     almost complete, which is how this tile is meant to read. */
-  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card__image--brawl {
-    aspect-ratio: 16 / 9;
-  }
-
   /* Folded, the photo has to give height back, and every step shorter shows
      less of it: 32/9 halved what each card displayed. At 2:1 the 3:2 photos
-     keep three quarters of their height and Brawl Stars is almost whole, while
-     the card still loses most of its height once the description folds too. */
+     keep three quarters of their height, while the card still loses most of
+     its height once the description folds too. */
   .personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__image {
     aspect-ratio: 2 / 1;
   }
