@@ -7427,28 +7427,6 @@ body.lightbox-open {
   margin-top: -4.75rem;
 }
 
-/* Phone focus swaps are laid out atomically, then these compositor-only FLIP
-   transforms recreate the old geometry and ease each visible event into its
-   new position and height. The document itself stays still for Safari. */
-.personal-timeline-event.is-focus-flipping {
-  transform: translate3d(0, var(--focus-flip-y, 0px), 0);
-  transition: none;
-  will-change: transform;
-}
-
-.personal-timeline-event.is-focus-flipping.is-focus-flipping-active {
-  transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.personal-timeline-event.is-focus-revealing .personal-event-card {
-  clip-path: inset(0 0 var(--focus-reveal-bottom, 0px) 0 round var(--radius-card));
-  transition: none !important;
-}
-
-.personal-timeline-event.is-focus-revealing.is-focus-flipping-active .personal-event-card {
-  transition: border-color 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease, transform 0.18s ease, grid-template-columns 0.18s ease, clip-path 0.18s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
-}
-
 .personal-timeline-event::before {
   position: absolute;
   top: 50%;
@@ -7515,7 +7493,7 @@ body.lightbox-open {
   appearance: none;
   text-decoration: none;
   overflow: hidden;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.28s ease, transform 0.28s ease, grid-template-columns 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) !important;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, opacity 0.28s ease, transform 0.28s ease !important;
 }
 
 .personal-timeline-event--left .personal-event-card {
@@ -7554,10 +7532,6 @@ body.lightbox-open {
   min-height: 100%;
   background: #edf2f2;
   overflow: hidden;
-  /* No min-height transition here: the frame drives card height, and below the
-     737px single-rail breakpoint the focus handoff must change height in one
-     atomic pass (Safari lurches otherwise). The desktop smoothing transition is
-     scoped to min-width: 737px alongside the focus/condensed min-height rules. */
 }
 
 /* Desktop tiles are portrait and mobile tiles are 16/9, so a single crop cannot
@@ -7570,7 +7544,7 @@ body.lightbox-open {
   min-height: 9.75rem;
   object-fit: cover;
   object-position: var(--focus-x, 50%) var(--focus-y, 50%);
-  transition: transform 0.35s ease, min-height 0.32s ease;
+  transition: transform 0.35s ease;
 }
 
 .personal-event-card__image--slideshow {
@@ -7790,13 +7764,6 @@ body.lightbox-open {
   align-items: flex-start;
   justify-content: center;
   padding: 0.85rem;
-  transition: padding-block 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.personal-timeline.is-enhanced .personal-event-card__body > span:not(.personal-event-card__meta) {
-  max-height: var(--detail-height, none);
-  overflow: hidden;
-  transition: max-height 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), padding-top 0.32s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.22s ease;
 }
 
 .personal-event-card__meta {
@@ -7816,7 +7783,6 @@ body.lightbox-open {
   font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.2;
-  transition: margin 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .personal-event-card__body > span:not(.personal-event-card__meta):not(.personal-event-card__open) {
@@ -7872,18 +7838,6 @@ body.lightbox-open {
   --card-lift: -4px;
 }
 
-.personal-timeline.is-measuring .personal-timeline-event,
-.personal-timeline.is-measuring .personal-event-card,
-.personal-timeline.is-measuring .personal-event-card *,
-/* Fast desktop scrolling piles half-finished fold transitions across many
-   cards. is-resnapping suppresses those transitions so the folds snap in one
-   pass; personal-timeline.js keeps the focused card fixed while it does and
-   drops the class as scroll velocity decays so the settle frame animates. */
-.personal-timeline.is-resnapping .personal-event-card,
-.personal-timeline.is-resnapping .personal-event-card * {
-  transition: none !important;
-}
-
 /* The card nearest the reading focus leads. Scale keeps that emphasis out of
    the layout, so growing a card can never nudge the page under the reader. */
 .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card {
@@ -7894,16 +7848,29 @@ body.lightbox-open {
   box-shadow: var(--shadow-card-hover) !important;
 }
 
-/* Out-of-focus cards recede firmly — the mild 0.74 fade read as a rendering
-   accident rather than a reading cue. Opacity only: it stays compositor-safe
-   and the card revives under deliberate pointer or keyboard attention. */
-.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card {
+/* Out-of-focus cards recede through their photo alone (9 Nov 2026). Fading the
+   whole card to 0.55 was fine while dimmed cards folded their text away; with
+   every description shown it left grey text on white near 2:1, so the text
+   stays at full contrast and the photo drains most of its colour instead (fully
+   grey turned the yellow Code in the Community poster a muddy beige) — a clear
+   cue, unlike the mild 0.74 card fade that read as a rendering accident. Paint
+   only, no layout; the card revives under pointer or keyboard attention. */
+.personal-timeline.is-enhanced .personal-timeline-event.is-dimmed .personal-event-card {
   --card-scale: 0.995;
-  opacity: 0.55;
 }
 
-.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card:hover,
-.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card:focus-visible {
+.personal-timeline.is-enhanced .personal-event-card__image {
+  transition: filter 0.28s ease, opacity 0.28s ease;
+}
+
+.personal-timeline.is-enhanced .personal-timeline-event.is-dimmed .personal-event-card__image {
+  filter: saturate(0.35);
+  opacity: 0.8;
+}
+
+.personal-timeline.is-enhanced .personal-timeline-event.is-dimmed .personal-event-card:hover .personal-event-card__image,
+.personal-timeline.is-enhanced .personal-timeline-event.is-dimmed .personal-event-card:focus-visible .personal-event-card__image {
+  filter: none;
   opacity: 1;
 }
 
@@ -7928,41 +7895,6 @@ body.lightbox-open {
     min-height: 0;
     max-height: none;
   }
-
-  .personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__image {
-    min-height: 5.75rem;
-  }
-}
-
-/* The focused card's reveal is mostly horizontal. Growing it by height alone
-   sets a card height the three or four lines of text cannot fill, and the
-   leftover becomes an empty band beside the words — the taller the reveal, the
-   wider that band reads. Taking most of the growth in width instead enlarges
-   the picture by more than height alone did, while still leaving the card
-   taller than its neighbours. */
-@media screen and (min-width: 737px) {
-  /* Desktop-only: the frame's min-height sets card height, so easing it on the
-     shared resize curve makes the height grow in step with the width instead of
-     snapping while the column glides. Scoped above the single-rail breakpoint so
-     the atomic phone/tablet-narrow handoff keeps its instant height change. */
-  .personal-timeline.is-enhanced .personal-event-card__image {
-    transition: min-height 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  /* The focused card grows in height, which squares its frame up again and
-     crops the 3:2 photos harder than any other state — so its width has to grow
-     further still to keep pace. */
-  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card {
-    --image-col: 17rem;
-  }
-
-  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card__image {
-    min-height: 12rem;
-  }
-
-  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card--upright {
-    --image-col: 12.5rem;
-  }
 }
 
 /* Latte & Mocha is upright and Code in the Community is square, so the wide
@@ -7972,18 +7904,24 @@ body.lightbox-open {
   --image-col: 9.5rem;
 }
 
-.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__body {
-  padding-block: 0.6rem;
-}
+/* Every card keeps one size whatever the scroll position (9 Nov 2026). Cards
+   used to fold once read and grow when focused, so the page changed height
+   under the card being read: on-screen cards moved by themselves on 40% of
+   desktop frames, which no scroll anchoring could hide. Focus now only
+   outlines, lifts and dims (opacity and transform), and every card shows its
+   photo and description at the size the focused card used to approach. */
+@media screen and (min-width: 737px) {
+  .personal-timeline.is-enhanced .personal-event-card {
+    --image-col: 14.5rem;
+  }
 
-.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__body > strong {
-  margin-bottom: 0;
-}
+  .personal-timeline.is-enhanced .personal-event-card--upright {
+    --image-col: 11rem;
+  }
 
-.personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__body > span:not(.personal-event-card__meta) {
-  max-height: 0;
-  padding-top: 0;
-  opacity: 0;
+  .personal-timeline.is-enhanced .personal-event-card__image {
+    min-height: 10.5rem;
+  }
 }
 
 .personal-event-card--static {
@@ -8264,7 +8202,7 @@ body.page-home #nav {
   }
 
   .personal-timeline-year__events {
-    gap: 0.65rem;
+    gap: 1.25rem;
   }
 
   .personal-timeline-event {
@@ -8320,17 +8258,6 @@ body.page-home #nav {
     --card-scale-y: 1.01;
   }
 
-  /* Safari keeps momentum scrolling on a separate path from layout. Animating
-     the outgoing description closed while the incoming one opens makes their
-     heights diverge for several frames, so the page moves underneath the
-     finger on every reverse-scroll handoff. Apply both halves in one layout
-     pass on phones; the card's compositor-only opacity and scale still ease. */
-  .personal-event-card__body,
-  .personal-timeline.is-enhanced .personal-event-card__body > span:not(.personal-event-card__meta),
-  .personal-event-card__body > strong {
-    transition: none;
-  }
-
 }
 
 @media screen and (max-width: 520px) {
@@ -8340,9 +8267,6 @@ body.page-home #nav {
 
   .personal-event-card__image {
     aspect-ratio: 16 / 9;
-    /* This ratio is the other intrinsic-height half of the phone handoff. It
-       must switch in the same layout pass as the description above. */
-    transition: none;
   }
 
   .personal-event-card__image img {
@@ -8353,33 +8277,10 @@ body.page-home #nav {
     min-height: 0;
   }
 
-  /* object-fit: cover crops rather than scales, so at a fixed card width the
-     box ratio alone decides how much of a photo survives — and any ratio the
-     sources do not share reads as zooming in. Five of the eight photos are 3:2,
-     so the open card matches them exactly and crops nothing; it also stays
-     taller than the 16/9 base, keeping the focused card's extra presence. A
-     taller 4/3 box instead cut the sides off the wide photos. */
-  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card__image {
+  /* The upright and square photos lose half their picture to a 16/9 frame,
+     so they keep a squarer one. */
+  .personal-timeline.is-enhanced .personal-event-card--upright .personal-event-card__image {
     aspect-ratio: 3 / 2;
-  }
-
-  /* The upright and square photos lose half their picture to a 3:2 frame that
-     fits the landscape cards exactly, so they keep the taller box here too. */
-  .personal-timeline.is-enhanced .personal-timeline-event.is-focus .personal-event-card--upright .personal-event-card__image {
-    aspect-ratio: 4 / 3;
-  }
-
-  /* Folded, the photo has to give height back, and every step shorter shows
-     less of it: 32/9 halved what each card displayed. At 2:1 the 3:2 photos
-     keep three quarters of their height, while the card still loses most of
-     its height once the description folds too. */
-  .personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__image {
-    aspect-ratio: 2 / 1;
-  }
-
-  .personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__image,
-  .personal-timeline.is-enhanced .personal-timeline-event.is-condensed .personal-event-card__image img {
-    min-height: 0;
   }
 
 }

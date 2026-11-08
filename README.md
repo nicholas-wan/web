@@ -42,7 +42,7 @@ Decided 16–17 Oct 2026; do not propose otherwise. Details are under [Behaviour
 - Skills cards carry no case-study links.
 - Keep the current Home, Skills and Personal designs. The compact Tech stack proposal was rejected (18 Oct 2026).
 - No Work section-shortcut row (declined 18 Oct 2026).
-- Personal: unfocused cards stay dimmed to 0.55; galleries have no photo controls.
+- Personal: unfocused cards recede through their photo (`saturate(0.35)`, 0.8 opacity) while their text keeps full contrast (9 Nov 2026; the earlier 0.55 whole-card dim only worked while dimmed cards hid their text); galleries have no photo controls.
 - No skip link, no change to the homepage cards' focus ring; return-to-top stays on phones (except Work, Travel, journals, Personal and Projects, where it is hidden).
 - Every gallery or card image ships `-480`/`-800` siblings with a `sizes` matching its slot.
 - Phone text never drops below 12px; section headings on a page share one style.
@@ -191,7 +191,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
   - Phone sheet: no "Navigate" heading; a three-across grid of icon tiles (one 30rem column on tablets, close button aligned to it), social icons centred below. Hover and focus only edge a tile; the current page's tile is filled with a 2px teal ring. Opening it focuses the sheet itself, not a tile (WebKit rings a scripted-focus tile, which read as selected); Tab enters the tiles. A tap on the dim closes it on `pointerup` (iOS sends no click there), and the dim stays hit-testable while it fades, so that tap never follows a link under it.
   - One trigger everywhere (8 Nov 2026 review): home's pill, kept in the body (`verify.ps1`), is the same labelled Menu pill as other pages and steps away on scroll too; it had been an unlabelled circle that never hid, with no recorded reason.
   - The build sets `aria-current` on the current tab: `page`, or `true` on journals and event pages (`verify.ps1` checks icons and `aria-current`).
-- Motion tokens (`custom.css`): 150ms feedback, 220ms card/nav, 320ms images, 480ms reveals (60ms stagger), 520ms large moves. Scramble, timeline FLIP, nav sheet, atlas fly-to keep their own timings.
+- Motion tokens (`custom.css`): 150ms feedback, 220ms card/nav, 320ms images, 480ms reveals (60ms stagger), 520ms large moves. Scramble, nav sheet, atlas fly-to keep their own timings.
 - Primary pagers: unboxed, short teal rule, small arrow travel; static under reduced motion.
 - Pager text aligns via `--pager-pad` (x=208 desktop, 29px phones).
 - `a.travel-pagination__next::after` must outrank `.travel-pagination a::after` (rule under right-aligned "Next").
@@ -365,16 +365,11 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Cats, house, pre-wedding rotate five photos; crossfades overlap.
 - Use animation longhands (shorthand resets `animation-delay`).
 - On touch, later frames stay `display: none` until `warmGallery` marks the card warm, once it is on screen, ahead of activation and the first crossfade. Since 6 Nov 2026 `warmGallery` loads the first frame at high priority and frames 3-5 at low through a detached image, handing their sources back (and showing them) once that arrives: laid out, even hidden or at opacity 0, Chrome raised every hidden frame to high priority alongside the visible photos. The second frame loads in place (7 Nov 2026): it is due two seconds after activation, and handed back through the detached image it faded to an empty frame on slow 4G and Chrome logged its fade-in as a new, larger LCP (the opened Cats card, 2.1 s to 5.6 s). A frame still loading when its fade-in starts pauses the whole slideshow (`animationstart`, `is-awaiting-frame`) until that photo arrives or fails, so the crossfade waits instead of fading to nothing.
-- Per-image `--focus-x`/`--focus-y`; no per-class `object-position`. The Brawl Stars card was taken off the timeline (owner, 9 Nov 2026); it stays on Projects under Earlier.
-- Frames target 3:2: desktop `--image-col` widens as a card opens; mobile 2/1 folded, 3/2 open. Latte & Mocha and Code in the Community use `personal-event-card--upright` to keep a squarer frame (widening crops them harder).
+- Per-image `--focus-x`/`--focus-y`; no per-class `object-position`. `house_1` sits at `--focus-y: 70%` so the photographer's mark stays out of the steady frame. The Brawl Stars card was taken off the timeline (owner, 9 Nov 2026); it stays on Projects under Earlier.
+- Frames target 3:2 where they can: every desktop card has `--image-col` 14.5rem and a 10.5rem photo floor; phones (520px and below) use 16/9. Latte & Mocha and Code in the Community use `personal-event-card--upright` to keep a squarer frame (11rem on desktop, 3/2 on phones; widening crops them harder).
 - Measure before retuning ratios; the timeline column caps cards at ~451px, not `max-width`.
 - Desktop photo sets a card-height floor, never a ceiling; frames absolutely positioned.
-- Phones: exactly one card open. Desktop folds only read cards. Focus sticky by 48px.
-- Phone handoffs change height atomically; never animate description height, body spacing, title margin or aspect ratio there (iPhone Safari momentum lurch).
-- At reading speed, smooth only the adjacent outgoing/incoming pair (FLIP, clipped reveal in `personal-timeline.js`); fast flicks are instant. Opacity, transforms, clipping are safe.
-- Desktop fold/focus resizes share one 320ms `cubic-bezier(0.2, 0.8, 0.2, 1)` across width, description height, spacing and photo `min-height`.
-- Scope the `min-height` transition to `min-width: 737px`, never the `.personal-event-card__image` base rule (lurch below 736px `singleRail`).
-- Fast desktop scroll snaps folds via `is-resnapping` (the `is-measuring` pattern); `personal-timeline.js` pins the focused card by one-frame correction; slow reads use native anchoring. Keep its `!singleRail`/`!reducedMotion` guards; never write scroll mid-fold.
+- Cards never change size with scroll position (owner, 9 Nov 2026: scrolling was "very clunky"). The old fold/unfold moved on-screen cards by themselves on 40% of desktop frames (layout shift 0.42 desktop, 0.92 phone); steady cards measure 0 for both. Focus only outlines, lifts and dims: opacity, transform, filter, border and shadow, never width, height, padding, margin, aspect ratio or `min-height`. Phones dim every card but the one being read; desktop dims only read cards; at the top and foot of the page every card on screen is undimmed. Cards start their entrance as soon as any of them is on screen. Phone cards in one year sit 1.25rem apart. Focus sticky by 48px. `personal-timeline.js` never writes scroll. A scroll-driven `animation-timeline: view()` opacity fade was tried instead of the class dim and dropped: about 4x the long frames on a phone viewport.
 - `data-category` is structural; no category colours or legend.
 
 ### Travel archive contracts
