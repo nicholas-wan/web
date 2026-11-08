@@ -568,6 +568,20 @@ python -I tools/fonts/subset-source-sans.py <path-to-SourceSans3VF-Upright> --we
 - Keep its `main.css` overrides when regenerating: `ascent-override: 98.4%; descent-override: 27.3%; line-gap-override: 0%`.
 - `main.css` declares a size-adjusted Arial fallback so cold loads do not reflow headings.
 
+### Latin-ext subsets
+
+Since 8 Nov 2026 the latin-ext faces (Merriweather 300/700 and both italics, Raleway 400, Source Sans Pro 900) ship as `assets/fonts/*-latin-ext-used.woff2`: only the latin-ext letters the site sets, about 2-4.5 KB each. Today that is the pinyin tone vowels and the Japanese long vowels (ā ē ě ī ō ū ǎ ǐ ǒ ǔ ǚ ǜ) plus their capitals, because `text-transform` sets titles such as Nagoya-jō in caps. The full Google files (17-41 KB) were fetched at top priority beside the journal banner for a few letters; on a slow phone this cut Japan's fonts from 134 to 99 KB and Guangzhou's from 152 to 104 KB, with text pixel-identical in Chromium and WebKit.
+
+- The full files are kept, unpublished, in `tools/fonts/latin-ext/` as the source. Outlines, hinting, metrics and features are copied unchanged.
+- `verify.ps1` scans every built `.html`, `.js`, `.json` and `.css` (HTML entities decoded, both cases of each letter) and fails when a latin-ext character is missing from the subsets' shared `unicode-range`; without it the letter would quietly render in Georgia or Arial. When it fails, build, then regenerate the fonts and the `main.css` ranges, then rebuild:
+
+```powershell
+python -I tools/fonts/subset-latin-ext.py
+```
+
+- Raleway has no caron vowels (ǎ ǐ ǒ ǔ ǚ ǜ), so they fall back as they always did; the script notes it.
+- Characters outside Google's latin and latin-ext ranges (arrows, Greek, CJK, Korean, Vietnamese) never used the web fonts and still fall back to system fonts.
+
 ### Figtree (Shopee peek)
 
 `assets/fonts/figtree-{400,500,700}-ascii.woff2` are static ASCII instances of the Figtree variable font, declared in `internship-peek.css` for the Shopee scene only (Shopee's own face is not free; Figtree is its nearest free match):
