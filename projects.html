@@ -39,15 +39,14 @@
     <div class="sq-ttl"><div class="sq-tn">Squash</div><div class="sq-ts" data-sub>8 members</div></div>
     <span class="sq-gav" aria-hidden="true">S</span>
   </div>
-  <button type="button" class="sq-pin" data-pin>
+  <div class="sq-pin"><button type="button" class="sq-pinx" data-pin>
     <span class="sq-pbar" aria-hidden="true"><span></span><span></span></span>
     <span class="sq-ptx"><span class="sq-ph">Pinned message</span><span class="sq-pm" data-pm></span></span>
-    <svg class="sq-plist" aria-hidden="true" viewBox="0 0 20 20" width="20" height="20"><path d="M3 5h14M3 10h14M3 15h9" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-  </button>
-  <div class="sq-mini-links"><button type="button" data-mini="tab">🧾 Tab <span>↗</span></button><button type="button" data-mini="courts">🎾 Courts <span>↗</span></button></div><div class="sq-chat" data-chat role="log" aria-live="off" data-demo-live aria-relevant="additions" aria-atomic="false"></div>
-  <span class="sq-sample-label">Sample messages</span><div class="sq-chips" role="group" aria-label="Sample bookings to send">
+  </button><button type="button" class="sq-pinbtn" data-mini="courts">🎾 Courts</button></div>
+  <div class="sq-chat" data-chat role="log" aria-live="off" data-demo-live aria-relevant="additions" aria-atomic="false"></div>
+  <span class="sq-sample-label">Sample messages, sent as a group admin</span><div class="sq-chips" role="group" aria-label="Sample bookings to send">
     <button type="button" class="sq-chip">tmr c4 2100</button>
-    <button type="button" class="sq-chip">fri 8pm court 2</button>
+    <button type="button" class="sq-chip">squash fri 8pm</button>
     <button type="button" class="sq-chip">court four sunday 8-9:30pm</button>
   </div>
   <form class="sq-cmp" data-form autocomplete="off">
@@ -65,7 +64,7 @@
 						<ul class="app-why" id="squashbot-why" tabindex="-1" aria-label="Why I built my own">
 							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-chat"/></svg></span><p><strong>Reads how we already type</strong><span>&#8220;tmr c4 2100&#8221; is Court 4, 9pm tomorrow.</span></p></li>
 							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-help"/></svg></span><p><strong>Asks instead of guessing</strong><span>Nothing is saved until the booker confirms it.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-coins"/></svg></span><p><strong>Bills only courts that were played</strong><span>Joining closes at the start, so nobody dodges a share.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-coins"/></svg></span><p><strong>Bills only courts that were played</strong><span>Cancelled courts cost nothing; nobody can drop out once play starts.</span></p></li>
 						</ul>
 						<p class="app-card__facts"><span>Cloudflare Workers, D1</span></p>
 					</div>
@@ -83,28 +82,24 @@
 					</header>
 					<figure class="app-card__demo"><a class="app-demo__skip" href="#nagbot-why">Skip Nag-bot demo</a>
 						<div class="app-stage"><div class="app-phone"><div class="app-demo app-demo--nag" data-demo="nag"><div class="nag" role="group" aria-label="Interactive demo of Nag-bot with sample data">
-  <div class="n-status demo-status" aria-hidden="true"><span>9:41</span><span class="demo-island"></span><svg viewBox="0 0 68 12" aria-hidden="true"><path d="M0 8h3v4H0zm4.5-2h3v6h-3zM9 3.5h3V12H9zM13.5 1h3v11h-3zm15 10.6-2.3-2.3a3.3 3.3 0 0 1 4.6 0zm-3.8-3.8-1.5-1.5a7.5 7.5 0 0 1 10.6 0l-1.5 1.5a5.4 5.4 0 0 0-7.6 0zm-3-3-1.5-1.5a11.8 11.8 0 0 1 16.6 0l-1.5 1.5a9.6 9.6 0 0 0-13.6 0zM44 2.5h15v7H44z" fill="currentColor"/><rect x="42" y=".5" width="22" height="11" rx="3.4" fill="none" stroke="currentColor" opacity=".4"/></svg></div>
+  <div class="n-status demo-status" aria-hidden="true"><span>7:45</span><span class="demo-island"></span><svg viewBox="0 0 68 12" aria-hidden="true"><path d="M0 8h3v4H0zm4.5-2h3v6h-3zM9 3.5h3V12H9zM13.5 1h3v11h-3zm15 10.6-2.3-2.3a3.3 3.3 0 0 1 4.6 0zm-3.8-3.8-1.5-1.5a7.5 7.5 0 0 1 10.6 0l-1.5 1.5a5.4 5.4 0 0 0-7.6 0zm-3-3-1.5-1.5a11.8 11.8 0 0 1 16.6 0l-1.5 1.5a9.6 9.6 0 0 0-13.6 0zM44 2.5h15v7H44z" fill="currentColor"/><rect x="42" y=".5" width="22" height="11" rx="3.4" fill="none" stroke="currentColor" opacity=".4"/></svg></div>
   <div class="n-head">
     <span class="n-back" aria-hidden="true"><svg viewBox="0 0 10 18" width="9" height="16" stroke-width="2.2"><path d="M8.5 1.5 1.5 9l7 7.5"/></svg>Chats</span>
     <span class="n-who"><b>Chores</b><small>3 members</small></span>
     <span class="n-ava" aria-hidden="true">🐾</span>
   </div>
   <div class="n-pin">
-    <span class="n-pintext"><b>Pinned message</b><span>🐾 Chores · 🔔 nagging since today 7:30 PM · 💩 wash the litter box</span></span>
+    <span class="n-pintext"><b>Pinned message</b><span class="n-pinmsg">🐾 Chores 🔔 nagging since 7:30 PM 💩 wash the litter box · every 6 weeks</span></span>
     <button type="button" class="n-pinbtn" data-act="open" aria-label="Open the 🐾 Chores Mini App">🐾 Chores</button>
   </div>
   <div class="n-chat">
     <div class="n-feed">
-      <span class="n-date">Yesterday</span>
-      <div class="n-msg">
-        <div class="n-bubble"><span class="n-name">Nag-Bot</span>🍽️ <s>dishes</s> — done by Nicholas &amp; Alex.<span class="n-time">8:40 PM</span></div>
-      </div>
       <span class="n-date">Today</span>
       <div class="n-msg">
         <div class="n-bubble"><span class="n-name">Nag-Bot</span>🪦 <s>fold the laundry</s> — 24 hours and nobody did it. Latte &amp; Mocha are deeply disappointed.<span class="n-time">8:00 AM</span></div>
       </div>
       <div class="n-msg">
-        <div class="n-bubble">😺 <s>trash</s> — done by Nicholas.<span class="n-time">7:05 PM</span></div>
+        <div class="n-bubble">😻 <s>trash</s> — done by Nicholas at 7:05 PM. The cats purr approvingly.<span class="n-time">7:05 PM</span></div>
       </div>
       <div class="n-live"></div>
     </div>
@@ -128,13 +123,13 @@
   <span class="n-home" aria-hidden="true"></span>
 </div>
 </div></div></div>
-						<div class="app-card__foot"><figcaption>Answer the nag, or open the Chores app.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over Nag-bot"><span aria-hidden="true">&#8635;</span> Start over</button></div>
+						<div class="app-card__foot"><figcaption>Tap the bot&#8217;s buttons, or open the Chores app.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over Nag-bot"><span aria-hidden="true">&#8635;</span> Start over</button></div>
 					</figure>
 					<div class="app-card__body">
 						<ul class="app-why" id="nagbot-why" tabindex="-1" aria-label="Why I built my own">
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-bell"/></svg></span><p><strong>Keeps nagging, within reason</strong><span>Again at 15, 30, and 60 minutes, never 11pm&#8211;8am.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-bell"/></svg></span><p><strong>Keeps nagging, within reason</strong><span>Re-nags 15, 30, then 60 minutes apart, but never overnight.</span></p></li>
 							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-tree"/></svg></span><p><strong>One chore can reset others</strong><span>Washing the litter box resets the scooping too.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-users"/></svg></span><p><strong>Credit for doing it together</strong><span>We both score, and each week has a winner.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-bolt"/></svg></span><p><strong>A Done answers in 43&#8239;ms</strong><span>Benchmarked with simulated network delays, down from 657&#8239;ms.</span></p></li>
 						</ul>
 						<p class="app-card__facts"><span>Cloudflare Workers, D1</span></p>
 					</div>
@@ -162,34 +157,36 @@
 <symbol id="fi-food" viewBox="0 0 24 24"><path d="M4 2v7a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2V2M6.5 2v20M20 15V2a5 5 0 0 0-4 5v6h4Zm0 0v7"/></symbol>
 <symbol id="fi-transport" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="13" rx="2"/><path d="M3 10h18"/><circle cx="7.5" cy="19" r="2"/><circle cx="16.5" cy="19" r="2"/></symbol>
 <symbol id="fi-travel" viewBox="0 0 24 24"><path d="M2.5 13.5 21 4l-4.5 16-5-6.5-4-1.5ZM11.5 13.5 21 4"/></symbol>
-<symbol id="fi-groceries" viewBox="0 0 24 24"><path d="M3 4h2.5l2.2 11h10.6L20.5 7H6.4"/><circle cx="9" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></symbol>
-<symbol id="fi-shopping" viewBox="0 0 24 24"><path d="M5 8h14l-1 13H6ZM9 10V6a3 3 0 0 1 6 0v4"/></symbol>
-<symbol id="fi-bills" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7Z"/></symbol>
+<symbol id="fi-delivery" viewBox="0 0 24 24"><circle cx="5.5" cy="17" r="3"/><circle cx="18.5" cy="17" r="3"/><path d="M5.5 17h6l3-7h3l1 7M14.5 10 13 6h-2.5"/></symbol>
+<symbol id="fi-games" viewBox="0 0 24 24"><path d="M6 8h12a4 4 0 0 1 4 4v3a3 3 0 0 1-5.4 1.8L15 15H9l-1.6 1.8A3 3 0 0 1 2 15v-3a4 4 0 0 1 4-4ZM7 11v3M5.5 12.5h3M15.5 12h.01M18 13.5h.01"/></symbol>
+<symbol id="fi-wallet" viewBox="0 0 24 24"><path d="M17 8V5a1 1 0 0 0-1-1H6a2 2 0 0 0 0 4h12a1 1 0 0 1 1 1v3m0 4v3a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2V6"/><path d="M20 12v4h-4a2 2 0 0 1 0-4h4"/></symbol>
+<symbol id="fi-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></symbol>
+<symbol id="fi-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
 <symbol id="fi-right" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></symbol>
 <symbol id="fi-ok" viewBox="0 0 24 24"><path d="m6 12.5 4 4 8-9"/></symbol>
 <symbol id="fi-no" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></symbol>
 </defs></svg>
 <div class="f-status demo-status" aria-hidden="true"><span>9:41</span><span class="demo-island"></span><svg viewBox="0 0 68 12" aria-hidden="true"><path d="M0 8h3v4H0zm4.5-2h3v6h-3zM9 3.5h3V12H9zM13.5 1h3v11h-3zm15 10.6-2.3-2.3a3.3 3.3 0 0 1 4.6 0zm-3.8-3.8-1.5-1.5a7.5 7.5 0 0 1 10.6 0l-1.5 1.5a5.4 5.4 0 0 0-7.6 0zm-3-3-1.5-1.5a11.8 11.8 0 0 1 16.6 0l-1.5 1.5a9.6 9.6 0 0 0-13.6 0zM44 2.5h15v7H44z" fill="currentColor"/><rect x="42" y=".5" width="22" height="11" rx="3.4" fill="none" stroke="currentColor" opacity=".4"/></svg></div>
 <div class="f-top"><span class="f-mark" aria-hidden="true">N</span><span class="f-sample">Sample</span><button class="f-ib" data-act="eye" aria-pressed="false" aria-label="Hide amounts"><svg class="f-ic"><use href="#fi-eye"/></svg></button></div>
-<div class="f-bar" hidden><button class="f-back" data-act="back"><svg class="f-ic"><use href="#fi-right"/></svg>Wealth</button></div>
+<div class="f-bar" hidden><button class="f-back" data-act="back"><svg class="f-ic"><use href="#fi-right"/></svg><span>Overview</span></button></div>
 <div class="f-scroll"></div>
 <div class="f-tabs" role="group" aria-label="Finance tracker sections">
 <button class="f-tab" data-tab="overview"><svg class="f-ic"><use href="#fi-overview"/></svg>Overview</button>
-<button class="f-tab" data-tab="wealth"><svg class="f-ic"><use href="#fi-spending"/></svg>Wealth</button>
-<button class="f-tab" data-tab="ledger"><svg class="f-ic"><use href="#fi-statements"/></svg>Ledger</button>
+<button class="f-tab" data-tab="wealth"><svg class="f-ic"><use href="#fi-wallet"/></svg>Wealth</button>
+<button class="f-tab" data-tab="activity"><svg class="f-ic"><use href="#fi-list"/></svg>Activity</button>
 </div>
 <span class="f-home" aria-hidden="true"></span>
 <div class="f-sheet-wrap" hidden><span class="f-scrim" data-act="close"></span><div class="f-sheet" role="dialog" tabindex="-1"></div></div>
 <span class="f-finger" aria-hidden="true"></span>
 </div>
 </div></div></div>
-						<div class="app-card__foot"><figcaption>Drag the chart or open Ledger. Import checks are simplified.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over Finance tracker"><span aria-hidden="true">&#8635;</span> Start over</button></div>
+						<div class="app-card__foot"><figcaption>Drag the chart. The import log is simplified.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over Finance tracker"><span aria-hidden="true">&#8635;</span> Start over</button></div>
 					</figure>
 					<div class="app-card__body">
 						<ul class="app-why" id="finance-why" tabindex="-1" aria-label="Why I built my own">
 							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-home"/></svg></span><p><strong>Nothing leaves the house</strong><span>It runs on my PC; phones read it over our Wi-Fi.</span></p></li>
 							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-check"/></svg></span><p><strong>Stops when totals don&#8217;t add up</strong><span>The last good data stays untouched.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-copy"/></svg></span><p><strong>Same code, separate data</strong><span>My wife runs her own copy; updates are a git pull.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-alert"/></svg></span><p><strong>Flags card testing</strong><span>Three charges of S$20 or less in a day, all at new merchants.</span></p></li>
 						</ul>
 						<p class="app-card__facts"><span>Python, JavaScript</span></p>
 					</div>
@@ -215,7 +212,6 @@
 <g id="pk-chevron"><path d="m6 9 6 6 6-6"/></g>
 <g id="pk-tag"><path d="M4 4h7.2a2 2 0 0 1 1.4.6l7 7a2 2 0 0 1 0 2.8l-5.2 5.2a2 2 0 0 1-2.8 0l-7-7A2 2 0 0 1 4 11.2Z" fill="currentColor" stroke="none"/><circle cx="8.5" cy="8.5" r="1.5" fill="#fff" stroke="none"/></g>
 <g id="pk-alert"><path d="M12 3 2.5 20h19Z"/><path d="M12 9v5" stroke-width="2"/><circle cx="12" cy="17" r="1.1" fill="currentColor" stroke="none"/></g>
-<g id="pk-edit"><path d="M4 20h4l10.5-10.5a2 2 0 0 0 0-2.8l-1.2-1.2a2 2 0 0 0-2.8 0L4 16Z"/><path d="m13 7 4 4"/></g>
 <g id="pk-t-hanger"><path d="M14 6a2 2 0 1 0 -4 0c0 1.667 .67 3 2 4h-.008l7.971 4.428a2 2 0 0 1 1.029 1.749v.823a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-.823a2 2 0 0 1 1.029 -1.749l7.971 -4.428"/></g>
 <g id="pk-t-shirt"><path d="M15 4l6 2v5h-3v8a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1v-8h-3v-5l6 -2a3 3 0 0 0 6 0"/></g>
 <g id="pk-t-sock"><path d="M13 3v6l4.798 5.142a4 4 0 0 1 -5.441 5.86l-6.736 -6.41a2 2 0 0 1 -.621 -1.451v-9.141h8z"/><path d="M7.895 15.768c.708 -.721 1.105 -1.677 1.105 -2.768a4 4 0 0 0 -4 -4"/></g>
@@ -234,10 +230,10 @@
 <div class="pk-top">
 <svg class="pk-brand" viewBox="0 0 24 24" aria-hidden="true"><use href="#pk-plane"/></svg>
 <div class="pk-tabs" role="group" aria-label="Lists">
-<button class="pk-tab" type="button" data-act="list" data-key="normal" aria-pressed="true">Normal</button>
-<button class="pk-tab" type="button" data-act="list" data-key="extended" aria-pressed="false">Extended</button>
+<button class="pk-tab" type="button" data-act="list" data-key="normal" aria-pressed="true">Normal trip</button>
+<button class="pk-tab" type="button" data-act="list" data-key="extended" aria-pressed="false">Extended trip</button>
 </div>
-<span class="pk-def" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pk-edit"/></svg></span>
+<span class="pk-def" aria-hidden="true">✎ Defaults</span>
 </div>
 <div class="pk-scroll">
 <div class="pk-head">
@@ -249,10 +245,10 @@
 </div>
 </div>
 <div class="pk-toolbar">
-<div class="pk-prog"><span class="pk-plabel"><b>0</b> of 24 packed</span><span class="pk-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Packed"></span></div>
+<div class="pk-prog"><span class="pk-plabel"><b>0</b> of 20 packed</span><span class="pk-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Packed"></span></div>
 <div class="pk-toggles">
 <button class="pk-toggle" type="button" data-act="hide" aria-pressed="false"><svg class="pk-box" viewBox="0 0 24 24" aria-hidden="true"><use href="#pk-check"/></svg>Hide packed</button>
-<button class="pk-toggle pk-lc" type="button" data-act="last" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pk-alert"/></svg><span>Last call</span><span class="pk-lcn">10 left</span></button>
+<button class="pk-toggle pk-lc" type="button" data-act="last" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#pk-alert"/></svg><span>Last call</span><span class="pk-lcn">8 left</span></button>
 </div>
 </div>
 <div class="pk-note" role="status"></div>
@@ -262,13 +258,13 @@
 <span class="pk-home" aria-hidden="true"></span>
 </div>
 </div></div></div>
-						<div class="app-card__foot"><figcaption>Change the nights. Tick things off.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over Travel Packing"><span aria-hidden="true">&#8635;</span> Start over</button></div>
+						<div class="app-card__foot"><figcaption>Change the nights, then try Last call.</figcaption><button class="app-demo__reset" type="button" aria-label="Start over Travel Packing"><span aria-hidden="true">&#8635;</span> Start over</button></div>
 					</figure>
 					<div class="app-card__body">
 						<ul class="app-why" id="packing-why" tabindex="-1" aria-label="Why I built my own">
 							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-moon"/></svg></span><p><strong>Scales with the nights</strong><span>Underwear, socks, and shirts recount when the nights change.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-code"/></svg></span><p><strong>No framework, no build step</strong><span>Three files and a Python server, nothing to upgrade.</span></p></li>
-							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-phone"/></svg></span><p><strong>Works from my phone too</strong><span>Ticks from both screens merge item by item.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-list"/></svg></span><p><strong>Last call at the door</strong><span>One tap shows only the essentials still unpacked.</span></p></li>
+							<li><span class="app-why__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#pj-i-phone"/></svg></span><p><strong>Two screens, no lost ticks</strong><span>Edits merge item by item; a clash is kept in History.</span></p></li>
 						</ul>
 						<p class="app-card__facts"><span>Python, JavaScript</span></p>
 					</div>
@@ -296,16 +292,16 @@
 				<symbol id="pj-i-chat" viewBox="0 0 24 24"><path d="M8 9h8M8 13h6M18 4a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-5l-5 3v-3H6a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z"/></symbol>
 				<symbol id="pj-i-bell" viewBox="0 0 24 24"><path d="M10 5a2 2 0 1 1 4 0 7 7 0 0 1 4 6v3a4 4 0 0 0 2 3H4a4 4 0 0 0 2-3v-3a7 7 0 0 1 4-6M9 17v1a3 3 0 0 0 6 0v-1"/></symbol>
 				<symbol id="pj-i-tree" viewBox="0 0 24 24"><path d="M4 4h6v4H4zM14 10h6v4h-6zM14 18h6v4h-6zM7 8v10h7M7 12h7"/></symbol>
-				<symbol id="pj-i-users" viewBox="0 0 24 24"><path d="M5 7a4 4 0 1 0 8 0 4 4 0 1 0-8 0M3 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2M16 3.13a4 4 0 0 1 0 7.75M21 21v-2a4 4 0 0 0-3-3.85"/></symbol>
+				<symbol id="pj-i-bolt" viewBox="0 0 24 24"><path d="M13 3v7h6l-8 11v-7H5z"/></symbol>
 				<symbol id="pj-i-home" viewBox="0 0 24 24"><path d="M5 12H3l9-9 9 9h-2M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7M9 21v-6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v6"/></symbol>
 				<symbol id="pj-i-check" viewBox="0 0 24 24"><path d="M12 3a12 12 0 0 0 8.5 3A12 12 0 0 1 12 21 12 12 0 0 1 3.5 6 12 12 0 0 0 12 3M9 12l2 2 4-4"/></symbol>
 				<symbol id="pj-i-moon" viewBox="0 0 24 24"><path d="M12 3h.39a7.5 7.5 0 0 0 7.92 12.45A9 9 0 1 1 12 3z"/></symbol>
 				<symbol id="pj-i-phone" viewBox="0 0 24 24"><path d="M6 5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2zM11 4h2M12 17v.01"/></symbol>
 				<symbol id="pj-i-device" viewBox="0 0 24 24"><path d="M3 5a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1zM7 20h10M9 16v4M15 16v4"/></symbol>
 				<symbol id="pj-i-help" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0 9 9 0 1 0-18 0M12 17v.01M12 13.5a2 2 0 0 0 .9-3.8 2 2 0 0 0-2.4.5"/></symbol>
-				<symbol id="pj-i-copy" viewBox="0 0 24 24"><path d="M8 10.5A2.5 2.5 0 0 1 10.5 8h8A2.5 2.5 0 0 1 21 10.5v8a2.5 2.5 0 0 1-2.5 2.5h-8A2.5 2.5 0 0 1 8 18.5zM16 8V5.5A2.5 2.5 0 0 0 13.5 3h-8A2.5 2.5 0 0 0 3 5.5v8A2.5 2.5 0 0 0 5.5 16H8"/></symbol>
+				<symbol id="pj-i-alert" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 10h18M7 15h2M17 13v2"/></symbol>
 				<symbol id="pj-i-coins" viewBox="0 0 24 24"><path d="M9 14c0 1.66 2.69 3 6 3s6-1.34 6-3-2.69-3-6-3-6 1.34-6 3zM9 14v4c0 1.66 2.69 3 6 3s6-1.34 6-3v-4M3 6c0 1.07 1.14 2.06 3 2.6s4.14.54 6 0 3-1.53 3-2.6-1.14-2.06-3-2.6-4.14-.54-6 0S3 4.93 3 6zM3 6v10c0 .89.77 1.45 2 2M3 11c0 .89.77 1.45 2 2"/></symbol>
-				<symbol id="pj-i-code" viewBox="0 0 24 24"><path d="m7 8-4 4 4 4M17 8l4 4-4 4M14 4l-4 16"/></symbol>
+				<symbol id="pj-i-list" viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h6M4 6l1 1 2-2M4 12l1 1 2-2M5 18h.01"/></symbol>
 				<symbol id="pj-i-lock" viewBox="0 0 24 24"><path d="M5 13a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2zM11 16a1 1 0 1 0 2 0 1 1 0 1 0-2 0M8 11V7a4 4 0 1 1 8 0v4"/></symbol>
 			</svg>
 </div>

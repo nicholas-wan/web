@@ -52,8 +52,11 @@ test('Squash booking updates the court Mini App and resets', async ({ page }) =>
   await expect(app.locator('[data-chat]')).toContainText('Confirm this squash booking');
   await app.getByRole('button', { name: 'Add booking', exact: false }).click();
   await expect(app.locator('[data-pm]')).toContainText('C4');
+  await expect(app.locator('[data-chat]')).toContainText('Court 4 booked');
   await app.locator('[data-mini="courts"]').click();
   await expect(app.locator('.sq-mini')).toContainText('Court 4');
+  await app.locator('.sq-mini [data-mk="tab"]').click();
+  await expect(app.locator('.sq-mini')).toContainText('You owe Nicholas');
   await page.keyboard.press('Escape');
   await expect(app.locator('.sq-mini')).toBeHidden();
   await app.getByRole('button', { name: 'Start over SquashBot' }).click();
@@ -68,6 +71,7 @@ test('Nag snooze, shared credit and half sheet work', async ({ page }) => {
   await expect(app.locator('.n-live')).toContainText('Snoozed');
   await app.getByRole('button', { name: 'Done together', exact: false }).click();
   await expect(app.locator('.n-live')).toContainText('Nicholas & Alex');
+  await expect(app.locator('.n-pinmsg')).not.toContainText('nagging');
   await app.locator('.n-pinbtn').click();
   await expect(app.locator('.n-sheet')).toBeVisible();
   expect((await app.locator('.n-sheet').boundingBox()).height).toBeLessThan(350);
@@ -93,11 +97,13 @@ test('Finance chart, masking, drill-down and stopped import reset independently'
   await app.locator('.f-back').click();
   await app.locator('.f-back').click();
   await app.getByRole('button', { name: /Needs attention/ }).click();
-  await app.locator('[data-st="1"]').click();
+  await expect(app.locator('.f-title')).toHaveText('Possible card testing');
+  await app.locator('.f-back').click();
+  await app.locator('[data-act="log"]').click();
   await expect(app.getByRole('dialog')).toContainText('not imported');
   await expect(app.getByRole('dialog')).toHaveAttribute('aria-modal','true');
   await page.keyboard.press('Escape');
-  await expect(app.locator('[data-st="1"]')).toBeFocused();
+  await expect(app.locator('[data-act="log"]')).toBeFocused();
   await app.getByRole('button', { name: 'Start over Finance tracker' }).click();
   await expect(app.getByRole('slider')).toHaveAttribute('aria-valuenow', '11');
   await expect(app.getByRole('button', { name: 'Hide amounts' })).toBeVisible();
@@ -172,8 +178,7 @@ test('All four demos accept phone-sized interactions without clipped controls', 
   await page.locator('#nag-bot').getByRole('button',{name:'30m',exact:true}).click();
   await expect(page.locator('#nag-bot .n-live')).toContainText('Snoozed');
   await page.locator('#finance-tracker .app-demo').scrollIntoViewIfNeeded();
-  await page.locator('#finance-tracker [data-tab="ledger"]').click();
-  await page.locator('#finance-tracker [data-st="1"]').click();
+  await page.locator('#finance-tracker [data-act="log"]').click();
   await expect(page.locator('#finance-tracker .f-res')).toContainText('not imported');
   await page.locator('#travel-packing .app-demo').scrollIntoViewIfNeeded();
   await page.locator('#travel-packing').getByRole('button',{name:'More nights',exact:true}).click();

@@ -73,9 +73,9 @@
   // Hovers wait (lock) until the mouse moves: the ease slides chips under it.
   const layoutTop = el => { const p = el.offsetParent; return (p ? p.getBoundingClientRect().top + p.clientTop : 0) + el.offsetTop; };
   const layoutLeft = el => { const p = el.offsetParent; return (p ? p.getBoundingClientRect().left + p.clientLeft : 0) + el.offsetLeft; };
-  const box = (el, gap) => { const cs = getComputedStyle(el); return [
-    { paddingTop: '0px', paddingBottom: '0px', borderTopWidth: '0px', borderBottomWidth: '0px', marginTop: `${-gap}px` },
-    { paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, borderTopWidth: cs.borderTopWidth, borderBottomWidth: cs.borderBottomWidth, marginTop: cs.marginTop }]; };
+  const box = (el, gap) => { const cs = getComputedStyle(el), m = el.style.minHeight; return [
+    { paddingTop: '0px', paddingBottom: '0px', borderTopWidth: '0px', borderBottomWidth: '0px', marginTop: `${-gap}px`, ...m && { minHeight: '0px' } },
+    { paddingTop: cs.paddingTop, paddingBottom: cs.paddingBottom, borderTopWidth: cs.borderTopWidth, borderBottomWidth: cs.borderBottomWidth, marginTop: cs.marginTop, ...m && { minHeight: m } }]; };
   const zoom = window.peekZoom = { lock: false, stop() {}, top: layoutTop,
     grow(el, chipEl, inline, from, gap = 0) {
       if (from) {
@@ -159,7 +159,7 @@
         clearTimeout(r.settle);
         r.settle = setTimeout(() => { if (!c.classList.contains('is-open')) c.classList.remove('is-playing', 'is-still', 'is-fading'); }, 240);
       } else c.classList.remove('is-open', 'is-playing', 'is-still', 'is-fading');
-      c.style.overflow = c.style.animation = '';
+      c.style.overflow = c.style.animation = c.style.minHeight = '';
     });
     c.inert = true;
     clearInterval(r.loop);
@@ -172,6 +172,8 @@
   // and card, else the card, measured at the card's final height.
   function reveal(r) {
     const c = card(r), grow = (r.finalHeight || c.offsetHeight) - c.offsetHeight, cardBottom = layoutTop(c) + c.offsetHeight + grow;
+    // A spotlit card's top to the top (frame keeps 16px; its 8px margin unfolds).
+    if (c.style.minHeight) return zoom.frame([[c.getBoundingClientRect().top + (motion.matches ? 16 : 24), 1e5]], true);
     const art = r.closest('.case-study'), hint = art && art.querySelector('.internship-demo-hint');
     const a = (art || chip(r)).getBoundingClientRect();
     const top = c.getBoundingClientRect().top, bottom = Math.max(cardBottom, chip(r).getBoundingClientRect().bottom);
@@ -198,39 +200,38 @@
     play(r);
     loop(r);
   }
-  // Phones: a card marked data-spotlight takes the screen once a tap has
-  // framed it (owner, 8 Nov 2026: "when clicking the icon, it scrolls then
-  // takes the entire screen? but can continue scrolling down"). The rest of
-  // the page dims while nearly all the card that fits is on screen, and the
-  // dim lifts for good once it scrolls away, a tap lands outside it, or it
-  // closes; it returns only with the next tap on the chip.
+  // Phones: a tap makes a data-spotlight card as tall as the screen then is
+  // (fill) and frames its top at the top (owner, 8 Nov 2026: "it scrolls then
+  // takes the entire screen?", "needs to scroll a bit lower"). The page dims
+  // and its edge lights while nearly all of it that fits is on screen; both
+  // lift for good once it scrolls away, a tap lands outside it or it closes.
   const phone = matchMedia('(max-width: 736px)');
-  let lit = null, litRaf = 0;
+  let lit = null, litRaf = 0, LIT = ['scroll', 'resize'];
   const litCheck = () => {
     litRaf = 0;
     if (!lit) return;
     const b = lit.getBoundingClientRect(), vh = innerHeight, fits = Math.min(b.height, vh);
     const seen = Math.min(b.bottom, vh) - Math.max(b.top, 0);
     if (seen >= fits * 0.92) lit.classList.add('is-spot');
-    // (it lifts as soon as the card starts to leave: a blind review saw the next card arrive still grey at 0.7)
+    // (lifts early: a blind review saw the next card arrive still grey at 0.7)
     else if (lit.classList.contains('is-spot') && seen < fits * 0.88) unspot();
   };
   const onLitScroll = () => { if (!litRaf) litRaf = requestAnimationFrame(litCheck); };
+  const fill = c => { c.style.minHeight = phone.matches && 'spotlight' in c.dataset ? innerHeight + 'px' : ''; };
   function unspot() {
     if (!lit) return;
     lit.classList.remove('is-spot');
     lit = null;
-    removeEventListener('scroll', onLitScroll);
-    removeEventListener('resize', onLitScroll);
+    LIT.forEach(e => removeEventListener(e, onLitScroll));
   }
-  // Armed once the card has grown (else a half-grown card counts as all on
-  // screen), so it lights as the page's glide lands.
+  // Armed once grown (a half-grown card counts as all on screen), so it
+  // lights as the page's glide lands.
   function spotlight(r) {
     const c = card(r);
     unspot();
-    if (!phone.matches || !('spotlight' in c.dataset)) return;
+    if (!c.style.minHeight) return;
     lit = c;
-    const arm = () => { if (lit !== c || active !== r) return; addEventListener('scroll', onLitScroll, { passive: true }); addEventListener('resize', onLitScroll, { passive: true }); litCheck(); };
+    const arm = () => { if (lit !== c || active !== r) return; LIT.forEach(e => addEventListener(e, onLitScroll, { passive: true })); litCheck(); };
     if (r.grow && r.grow.finished) r.grow.finished.then(arm, () => {});
     else arm();
   }
@@ -266,7 +267,7 @@
     });
     b.addEventListener('click', () => {
       if (pinned === r) { pinned = null; close(r); }
-      else { pinned = r; open(r); requestAnimationFrame(() => { if (active === r) { reveal(r); spotlight(r); } }); }
+      else { pinned = r; fill(card(r)); open(r); requestAnimationFrame(() => { if (active === r) { reveal(r); spotlight(r); } }); }
     });
     r.addEventListener('focusout', e => { if (!r.contains(e.relatedTarget) && pinned !== r) close(r); });
   });

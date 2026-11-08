@@ -212,12 +212,14 @@ foreach ($page in $pages) {
     if (-not $sharedNav.Success) { throw "$($page.Name) is missing the shared navigation block." }
     # Page changes (Oct 2026): the active tab carries an empty highlight mark that
     # glides between tabs, and page-transitions.js must load in <head> so its
-    # pagereveal listener exists before first paint.
-    if ($page.Name -ne '404.html' -and [regex]::Matches($sharedNav.Value, '<li class="active"><a\b[^>]*>[^<]*</a><span class="nav-active-mark" aria-hidden="true"></span></li>').Count -ne 1) { throw "$($page.Name) must carry exactly one nav-active-mark inside its active tab." }
+    # pagereveal listener exists before first paint. Since 8 Nov 2026 each tab
+    # holds an icon and a label, and the active link carries aria-current.
+    if ($page.Name -ne '404.html' -and [regex]::Matches($sharedNav.Value, '<li class="active"><a\b[^>]*\baria-current="(?:page|true)"[^>]*>(?:(?!</a>).)*</a><span class="nav-active-mark" aria-hidden="true"></span></li>').Count -ne 1) { throw "$($page.Name) must carry exactly one nav-active-mark and aria-current inside its active tab." }
+    if ([regex]::Matches($sharedNav.Value, '<li\b[^>]*><a\b[^>]*><svg class="nav-icon"[^>]*aria-hidden="true"').Count -ne 6) { throw "$($page.Name) must give every primary tab its hidden icon." }
     $pageHeadEnd = $scan.IndexOf('</head>')
     $transitionsScript = $scan.IndexOf('assets/js/page-transitions.js')
     if ($transitionsScript -lt 0 -or $pageHeadEnd -lt 0 -or $transitionsScript -gt $pageHeadEnd) { throw "$($page.Name) must load page-transitions.js in its <head>." }
-    $navSignature = ((($sharedNav.Value -replace ' class="active"', '') -replace '<span class="nav-active-mark" aria-hidden="true"></span>', '') -replace '\s+', ' ').Trim()
+    $navSignature = (((($sharedNav.Value -replace ' class="active"', '') -replace ' aria-current="(?:page|true)"', '') -replace '<span class="nav-active-mark" aria-hidden="true"></span>', '') -replace '\s+', ' ').Trim()
     [void]$navSignatures.Add($navSignature)
     if ([regex]::IsMatch($scan, '<img\b(?=[^>]*\balt="")[^>]*>', 'IgnoreCase')) { throw "$($page.Name) contains an image with empty alt text." }
     # gallery.js backfills alt from captions at runtime, which leaves no-script
@@ -850,7 +852,7 @@ foreach ($journalName in $journalPageNames) {
         if ($sectionNav -notmatch ('href="#' + $heading.Groups[1].Value + '"')) { throw "$journalName has an unreachable journal section: $($heading.Groups[1].Value)" }
     }
     if ($journalMarkup -notmatch '<body class="is-preload page-travel-journal">') { throw "$journalName is missing the shared mobile travel-navigation scope." }
-    if ($journalMarkup -notmatch '<li class="active"><a href="travel">Travel</a>') { throw "$journalName must highlight Travel in the global navigation." }
+    if ($journalMarkup -notmatch '<li class="active"><a aria-current="true" href="travel"><svg class="nav-icon"[^>]*>.*?</svg><span>Travel</span></a>') { throw "$journalName must highlight Travel in the global navigation." }
     if ($journalMarkup -notmatch 'class="[^"]*journal-banner[^"]*"') { throw "$journalName is missing its explicit high-resolution journal banner marker." }
     if ($journalMarkup -notmatch '<main id="main"[^>]*data-journal-template="v2"' -or [regex]::Matches($journalMarkup, 'class="travel-section-nav').Count -ne 1 -or [regex]::Matches($journalMarkup, 'class="travel-pagination"').Count -ne 1 -or $journalMarkup -notmatch [regex]::Escape((Get-DistAssetRef 'assets/css/travel-journal.css')) -or $journalMarkup -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/travel-nav.js')) -or $journalMarkup -match '{{[A-Z_]+}}') { throw "$journalName is not rendered exactly once through the shared travel journal template and scroll guard." }
 }

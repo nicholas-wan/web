@@ -35,6 +35,31 @@ test('phone navigation traps and restores keyboard focus with normal motion', as
   await expect(toggle).toBeFocused();
 });
 
+// Menu revamp (8 Nov 2026): every tab carries a hidden icon beside its label,
+// the current tab says so with aria-current, and the phone sheet lays the six
+// pages out as a three-across grid of tiles at least 44px tall.
+test('menu tabs show page icons, mark the current page, and tile the phone sheet', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/projects');
+  await expect(page.locator('#nav .links a')).toHaveText(['About', 'Work', 'Projects', 'Skills', 'Personal', 'Travel']);
+  await expect(page.locator('#nav .links a svg.nav-icon[aria-hidden="true"]')).toHaveCount(6);
+  await expect(page.locator('#nav .links a[aria-current]')).toHaveCount(1);
+  await expect(page.locator('#nav .links li.active a')).toHaveAttribute('aria-current', 'page');
+  await page.goto('/travel_2026_guangzhou');
+  await expect(page.locator('#nav .links li.active a')).toHaveAttribute('aria-current', 'true');
+  await expect(page.locator('#nav .links li.active a')).toHaveText('Travel');
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/projects');
+  await page.getByRole('link', { name: 'Open navigation menu' }).click();
+  const tiles = page.getByRole('dialog', { name: 'Site navigation' }).locator('.links a');
+  await expect(tiles).toHaveCount(6);
+  const boxes = await tiles.evaluateAll(items => items.map(a => a.getBoundingClientRect().toJSON()));
+  expect(new Set(boxes.map(box => Math.round(box.top))).size).toBe(2);
+  for (const box of boxes) expect(box.height).toBeGreaterThanOrEqual(44);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+});
+
 test('phone gallery prepares hidden neighbours before horizontal navigation', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/travel_2026_guangzhou');

@@ -283,6 +283,14 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  // The spotlight: once the tap has framed it, the rest of the page dims; scrolling it away lifts the dim for good.
  const spot=card(root);
  await expect(spot).toHaveClass(/is-spot/);
+ // It takes the whole screen (owner, 8 Nov 2026: "needs to scroll a bit lower as doesnt take the full page"): a screen tall,
+ // its top at the top; and it reads as lit ("the dim makes the screen a bit too dark. spotlight needs to be obvious"): a
+ // lighter veil and a teal edge.
+ await expect.poll(async()=>Math.abs((await spot.boundingBox()).y)).toBeLessThan(2);
+ expect((await spot.boundingBox()).height).toBeGreaterThan(843);
+ expect(await spot.evaluate(c=>getComputedStyle(c,'::before').boxShadow)).toContain('0.62');
+ await expect.poll(()=>spot.evaluate(c=>+getComputedStyle(c,'::after').opacity)).toBe(1);
+ expect(await spot.evaluate(c=>getComputedStyle(c,'::after').boxShadow)).toContain('rgba(40, 215, 197');
  await page.evaluate(()=>scrollBy(0,400));
  await expect(spot).not.toHaveClass(/is-spot/);
  await page.evaluate(()=>scrollBy(0,-400));

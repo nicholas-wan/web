@@ -1218,7 +1218,10 @@ foreach ($page in $pages) {
     if ($navigation.Contains($activeMarker)) {
         # The empty mark after the active link carries the tab highlight, so a
         # page change can glide it to the new tab (custom.css "Page changes").
-        $markedNavigation = [regex]::Replace($navigation, '(<li ' + [regex]::Escape($activeMarker) + ')>(<a\b.*?</a>)</li>', '$1 class="active">$2<span class="nav-active-mark" aria-hidden="true"></span></li>')
+        # aria-current is "page" on the tab's own page, "true" on a journal or
+        # event page inside that section (Nov 2026).
+        $currentValue = if ($activePage -eq $slug) { 'page' } else { 'true' }
+        $markedNavigation = [regex]::Replace($navigation, '(<li ' + [regex]::Escape($activeMarker) + ')>(<a\b)(.*?</a>)</li>', '$1 class="active">$2 aria-current="' + $currentValue + '"$3<span class="nav-active-mark" aria-hidden="true"></span></li>')
         if ($markedNavigation -eq $navigation) { throw "Could not add the nav-active-mark to the $activePage tab; check partials/site-navigation.html." }
         $navigation = $markedNavigation
     }

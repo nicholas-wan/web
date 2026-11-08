@@ -97,7 +97,6 @@
 	navPanel.setAttribute('aria-hidden', 'true');
 	navPanel.innerHTML =
 		'<span class="nav-panel__handle" aria-hidden="true"></span>' +
-		'<div class="nav-panel__header"><span>Navigate</span></div>' +
 		'<nav></nav>' +
 		'<a href="#navPanel" class="close" aria-label="Close navigation menu"></a>';
 	body.appendChild(navPanel);
