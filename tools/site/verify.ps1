@@ -380,7 +380,7 @@ if (Get-ChildItem -LiteralPath (Join-Path $dist 'assets\fonts') -Filter 'fontawe
 # The Merriweather files are static single-weight instances of the upstream
 # variable font; a regression back to the ~95KB variable files doubles the
 # body-font payload on every page.
-foreach ($merriweatherCut in @('merriweather-300-latin', 'merriweather-700-latin', 'merriweather-300-italic-latin', 'merriweather-700-italic-latin', 'merriweather-300-latin-ext', 'merriweather-700-latin-ext', 'merriweather-300-italic-latin-ext', 'merriweather-700-italic-latin-ext')) {
+foreach ($merriweatherCut in @('merriweather-300-latin', 'merriweather-700-latin', 'merriweather-300-italic-latin', 'merriweather-700-italic-latin')) {
     Assert-FileSizeBudget "assets\fonts\$merriweatherCut.woff2" 48
 }
 # Source Sans Pro 700 is a static latin instance of the ~170 KB Source Sans 3
@@ -396,6 +396,54 @@ foreach ($leagueCut in @('playfair-900-italic-league', 'librebaskerville-400-lea
     Assert-FileSizeBudget "assets\fonts\$leagueCut.woff2" 6
 }
 $mainCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\main.css') -Raw -Encoding UTF8
+# Nov 2026: the latin-ext faces hold only the latin-ext letters the site sets
+# (pinyin tones, Japanese long vowels; README.md, "Fonts"). The full ~37 KB
+# Google files were fetched at top priority beside the banner for a few
+# letters. Text outside the subset would silently fall back to Georgia or
+# Arial, so any latin-ext character in the built pages, scripts or data must
+# be in every subset's unicode-range.
+$latinExtCuts = @('merriweather-300-latin-ext', 'merriweather-700-latin-ext', 'merriweather-300-italic-latin-ext', 'merriweather-700-italic-latin-ext', 'raleway-400-latin-ext', 'source-sans-pro-900-latin-ext')
+foreach ($latinExtCut in $latinExtCuts) {
+    Assert-FileSizeBudget "assets\fonts\$latinExtCut-used.woff2" 6
+    if (Test-Path -LiteralPath (Join-Path $dist "assets\fonts\$latinExtCut.woff2")) { throw "The full $latinExtCut.woff2 is published again; ship the -used subset (tools/fonts/subset-latin-ext.py)." }
+}
+function ConvertFrom-UnicodeRange([string]$Range) {
+    $points = New-Object 'System.Collections.Generic.HashSet[int]'
+    foreach ($part in $Range -split ',') {
+        $bounds = $part.Trim() -replace '^U\+', '' -split '-'
+        $low = [Convert]::ToInt32($bounds[0], 16)
+        $high = if ($bounds.Count -gt 1) { [Convert]::ToInt32($bounds[1], 16) } else { $low }
+        for ($cp = $low; $cp -le $high; $cp++) { [void]$points.Add($cp) }
+    }
+    return , $points
+}
+$latinExtRanges = @([regex]::Matches($mainCss, 'src:\s*url\("\.\./fonts/[a-z0-9-]+-latin-ext-used\.woff2"\)\s*format\("woff2"\);\s*unicode-range:\s*([^;]+);') | ForEach-Object { ($_.Groups[1].Value -replace '\s+', '') })
+if ($latinExtRanges.Count -ne $latinExtCuts.Count -or @($latinExtRanges | Sort-Object -Unique).Count -ne 1) { throw "main.css must declare all $($latinExtCuts.Count) -latin-ext-used faces with one shared unicode-range; rerun tools/fonts/subset-latin-ext.py." }
+$latinExtCovered = ConvertFrom-UnicodeRange $latinExtRanges[0]
+# Google Fonts' latin-ext range minus its latin one (latin wins the overlap).
+$latinExtOnly = ConvertFrom-UnicodeRange 'U+100-2BA,U+2BD-2C5,U+2C7-2CC,U+2CE-2D7,U+2DD-2FF,U+304,U+308,U+329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF'
+$latinExtOnly.ExceptWith((ConvertFrom-UnicodeRange 'U+0-FF,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD'))
+$latinExtUsed = New-Object 'System.Collections.Generic.HashSet[int]'
+$latinExtUncovered = @()
+$latinExtClass = '[{0}-{1}{2}-{3}{4}-{5}{6}{7}-{8}{9}-{10}]' -f [char]0x100, [char]0x2FF, [char]0x1D00, [char]0x1EFF, [char]0x20A0, [char]0x20C0, [char]0x2113, [char]0x2C60, [char]0x2C7F, [char]0xA720, [char]0xA7FF
+# -Include is ignored beside -LiteralPath in Windows PowerShell 5.1, so filter by extension.
+$latinExtScan = Get-ChildItem -LiteralPath $dist -Recurse -File | Where-Object { @('.html', '.js', '.json', '.css') -contains $_.Extension -and $_.FullName.Substring($dist.Length) -notmatch '^\\images\\' }
+foreach ($scanFile in $latinExtScan) {
+    $scanText = Get-Content -LiteralPath $scanFile.FullName -Raw -Encoding UTF8
+    if ($scanFile.Extension -eq '.html') { $scanText = [System.Net.WebUtility]::HtmlDecode($scanText) }
+    foreach ($match in [regex]::Matches($scanText, $latinExtClass)) {
+        # text-transform renders the other case too ("Nagoya-jo" with a
+        # macron is set in capitals on the Japan page).
+        $char = [char]$match.Value
+        foreach ($cp in @([int]$char, [int][char]::ToUpperInvariant($char), [int][char]::ToLowerInvariant($char))) {
+            if (-not $latinExtOnly.Contains($cp) -or -not $latinExtUsed.Add($cp)) { continue }
+            if (-not $latinExtCovered.Contains($cp)) { $latinExtUncovered += ('U+{0:X4} in {1}' -f $cp, $scanFile.FullName.Substring($dist.Length + 1)) }
+        }
+    }
+}
+if ($latinExtUncovered.Count) { throw "Latin-ext characters outside the font subsets: $($latinExtUncovered -join '; '). Run python -I tools/fonts/subset-latin-ext.py, then rebuild." }
+$latinExtStale = @($latinExtCovered | Where-Object { -not $latinExtUsed.Contains($_) })
+if ($latinExtStale.Count) { Write-Warning ("The latin-ext subsets still carry characters the site no longer uses: " + (($latinExtStale | ForEach-Object { 'U+{0:X4}' -f $_ }) -join ', ') + '. Rerun tools/fonts/subset-latin-ext.py to drop them.') }
 # Nov 2026: photo-led pages no longer preload Merriweather, so their first
 # screen paints in the fallback; plain Georgia rewrapped Silicon Valley's lede.
 if ($sharedCustomCss -notmatch '--font-body:\s*"Merriweather", "Merriweather Fallback", Georgia, serif;' -or $mainCss -notmatch '(?s)@font-face\s*\{[^}]*font-family:\s*"Merriweather Fallback";[^}]*font-weight:\s*100 500;[^}]*src:\s*local\("Georgia"\);[^}]*size-adjust:\s*10[5-6](?:\.\d)?%') { throw 'The body stack must name the size-adjusted "Merriweather Fallback" face (Nov 2026 swap reflow fix).' }
