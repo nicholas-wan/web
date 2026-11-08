@@ -12,9 +12,7 @@
 	var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 	var mobileNav = window.matchMedia('(max-width: 980px)');
 
-	// Reveal content as soon as its DOM and interaction handlers are ready.
-	// The homepage keeps its load-synchronised intro/scramble choreography;
-	// content pages should not remain under the theme fade while images load.
+	// Reveal content once ready; the homepage waits for load (its intro).
 	function revealPage() {
 		window.setTimeout(function() {
 			body.classList.remove('is-preload');
@@ -48,18 +46,16 @@
 		navPanelToggle.classList.add('alt');
 	}
 
-	// The scroll-driven chrome (the menu pill's tone, its step away, and
-	// return-to-top) shares one frame that reads everything before it writes
-	// anything, so no write forces the next read to restyle the page.
+	// The scroll-driven chrome shares one frame: all reads, then all writes.
 	var returnToTop = document.getElementById('return-to-top');
 	var chromeFrame = null;
 	var chromeScrolled = false;
-	// The wrapper-level pill steps away on downward reading progress and returns
-	// on upward intent. Context and sticky navigation parents opt out. A short
-	// page (the 404) steps away at its end, before it scrolls 160px.
+	// The floating pill (wrapper, or body on home) steps away on downward
+	// reading and returns on upward intent; context and sticky bars opt out.
 	var toggleScrollY = window.scrollY;
 	function stepAway(y) {
-		if (navPanelToggle.parentElement !== wrapper) return;
+		var p = navPanelToggle.parentElement;
+		if (p !== wrapper && p !== body) return;
 		if (Math.abs(y - toggleScrollY) < 8) return;
 		if (y > toggleScrollY && y > Math.min(160, document.documentElement.scrollHeight - innerHeight - 8) && !body.classList.contains('is-navPanel-visible'))
 			navPanelToggle.classList.add('is-scrolled-away');
@@ -94,6 +90,7 @@
 	navPanel.setAttribute('role', 'dialog');
 	navPanel.setAttribute('aria-modal', 'true');
 	navPanel.setAttribute('aria-label', 'Site navigation');
+	navPanel.tabIndex = -1;
 	navPanel.setAttribute('aria-hidden', 'true');
 	navPanel.innerHTML =
 		'<span class="nav-panel__handle" aria-hidden="true"></span>' +
@@ -151,7 +148,8 @@
 		}, panelDelay + 10);
 	});
 
-	document.addEventListener('click', function(event) {
+	// (iOS sends no click for a tap on the dim)
+	document.addEventListener('pointerup', function(event) {
 		if (!body.classList.contains('is-navPanel-visible')) return;
 		if (navPanel.contains(event.target) || navPanelToggle.contains(event.target)) return;
 		closePanel();
@@ -181,12 +179,12 @@
 		navPanelToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
 		navPanel.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
 		if (isOpen && !navPanelWasOpen) {
-			var firstLink = navPanel.querySelector('nav a');
+			// The dialog itself: WebKit rang a focused tile, which looked selected.
 			var focusTries = 0;
 			(function focusIntoPanel() {
-				if (!firstLink || !body.classList.contains('is-navPanel-visible')) return;
-				firstLink.focus({ preventScroll: true });
-				if (document.activeElement !== firstLink && ++focusTries < 30)
+				if (!body.classList.contains('is-navPanel-visible')) return;
+				navPanel.focus({ preventScroll: true });
+				if (document.activeElement !== navPanel && ++focusTries < 30)
 					window.setTimeout(focusIntoPanel, 20);
 			})();
 		}
@@ -212,9 +210,9 @@
 		if (!focusable.length) return;
 		var first = focusable[0];
 		var last = focusable[focusable.length - 1];
-		if (!navPanel.contains(document.activeElement)) {
+		if (!navPanel.contains(document.activeElement) || document.activeElement === navPanel) {
 			event.preventDefault();
-			first.focus();
+			(event.shiftKey ? last : first).focus();
 		}
 		else if (event.shiftKey && document.activeElement === first) {
 			event.preventDefault();

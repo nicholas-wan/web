@@ -12,9 +12,8 @@
   const touch = matchMedia('(max-width: 736px), (hover: none)');
   const REPLAY = 10000, HOLD = 3000, FADE = 240, GRACE = 130;
   const fadeOf = c => +c.dataset.fade || FADE;
-  // Phones keep the cards display:none until a tap, which would leave the
-  // scenes' faces unrequested until a scene had already started. Warm them
-  // once the page has loaded, so they never compete with the text's fonts.
+  // Phones keep the cards display:none until a tap, so the scenes' faces are
+  // warmed once the page has loaded, after the text's fonts.
   const warmFonts = () => { if (document.fonts) ['400 11px Figtree', '500 11px Figtree', '700 11px Figtree', 'italic 900 8px "League Mark"', '8px "League Serif"', 'italic 8px "League Serif"'].forEach(f => document.fonts.load(f)); };
   if (document.readyState === 'complete') warmFonts();
   else addEventListener('load', warmFonts, { once: true });
@@ -63,14 +62,13 @@
     r.fade = setTimeout(() => { if (active === r) play(r); }, fadeOf(card(r)));
   }
   // Smart zoom (owner, 25 Oct 2026), shared with anomaly-peek.js as
-  // window.peekZoom. grow(): a card grows out of its chip (CSS, --grow-x); an
-  // inline one unfolds the space below, padding and all; a swap in one slot
-  // (`from`, the old height) neither zooms again nor fades in blank. shut(): a
-  // swap goes at once; an inline card folds away. frame(spans): after a click
-  // or tap the page centres the first [top, bottom] span (viewport px) that
-  // fits, else puts the last one's top near the top: a 700-1000ms cosine ease
-  // (touch: the browser's smooth scroll), stopped by any scroll, touch or key.
-  // Hovers wait (lock) until the mouse moves: the ease slides chips under it.
+  // window.peekZoom. grow(): a card grows out of its chip (--grow-x); an inline
+  // one unfolds the space below; a swap in one slot (`from`, the old height)
+  // neither zooms nor fades in blank. shut(): a swap goes at once; an inline
+  // card folds away. frame(spans): centres the first [top, bottom] span that
+  // fits, else puts the last one's top near the top, in a 700-1000ms ease
+  // (touch: native smooth scroll) any scroll, touch or key stops. Hovers wait
+  // (lock) until the mouse moves.
   const layoutTop = el => { const p = el.offsetParent; return (p ? p.getBoundingClientRect().top + p.clientTop : 0) + el.offsetTop; };
   const layoutLeft = el => { const p = el.offsetParent; return (p ? p.getBoundingClientRect().left + p.clientLeft : 0) + el.offsetLeft; };
   const box = (el, gap) => { const cs = getComputedStyle(el), m = el.style.minHeight; return [
@@ -172,8 +170,8 @@
   // and card, else the card, measured at the card's final height.
   function reveal(r) {
     const c = card(r), grow = (r.finalHeight || c.offsetHeight) - c.offsetHeight, cardBottom = layoutTop(c) + c.offsetHeight + grow;
-    // A spotlit card's top to the top (frame keeps 16px; its 8px margin unfolds).
-    if (c.style.minHeight) return zoom.frame([[c.getBoundingClientRect().top + (motion.matches ? 16 : 24), 1e5]], true);
+    // A spotlit card's top to the top: 8px under the chip (its margin unfolds).
+    if (c.style.minHeight) return zoom.frame([[chip(r).getBoundingClientRect().bottom + 24, 1e5]], true);
     const art = r.closest('.case-study'), hint = art && art.querySelector('.internship-demo-hint');
     const a = (art || chip(r)).getBoundingClientRect();
     const top = c.getBoundingClientRect().top, bottom = Math.max(cardBottom, chip(r).getBoundingClientRect().bottom);
@@ -200,11 +198,9 @@
     play(r);
     loop(r);
   }
-  // Phones: a tap makes a data-spotlight card as tall as the screen then is
-  // (fill) and frames its top at the top (owner, 8 Nov 2026: "it scrolls then
-  // takes the entire screen?", "needs to scroll a bit lower"). The page dims
-  // and its edge lights while nearly all of it that fits is on screen; both
-  // lift for good once it scrolls away, a tap lands outside it or it closes.
+  // Phones: a tap makes a data-spotlight card a screen tall (fill), its top
+  // framed at the top. The page dims while it is on screen, lifting for good
+  // (spent) as it scrolls away or on a tap outside; is-top hides the Menu pill.
   const phone = matchMedia('(max-width: 736px)');
   let lit = null, litRaf = 0, LIT = ['scroll', 'resize'];
   const litCheck = () => {
@@ -212,15 +208,18 @@
     if (!lit) return;
     const b = lit.getBoundingClientRect(), vh = innerHeight, fits = Math.min(b.height, vh);
     const seen = Math.min(b.bottom, vh) - Math.max(b.top, 0);
+    lit.classList.toggle('is-top', b.top < 56 && b.bottom > 0);
+    if (lit.spent) return;
     if (seen >= fits * 0.92) lit.classList.add('is-spot');
-    // (lifts early: a blind review saw the next card arrive still grey at 0.7)
-    else if (lit.classList.contains('is-spot') && seen < fits * 0.88) unspot();
+    else if (lit.classList.contains('is-spot') && seen < fits * 0.88) lift();
   };
   const onLitScroll = () => { if (!litRaf) litRaf = requestAnimationFrame(litCheck); };
   const fill = c => { c.style.minHeight = phone.matches && 'spotlight' in c.dataset ? innerHeight + 'px' : ''; };
+  const lift = () => { if (lit) { lit.classList.remove('is-spot'); lit.spent = 1; } };
   function unspot() {
     if (!lit) return;
-    lit.classList.remove('is-spot');
+    lift();
+    lit.classList.remove('is-top');
     lit = null;
     LIT.forEach(e => removeEventListener(e, onLitScroll));
   }
@@ -231,11 +230,13 @@
     unspot();
     if (!c.style.minHeight) return;
     lit = c;
+    c.spent = 0;
     const arm = () => { if (lit !== c || active !== r) return; LIT.forEach(e => addEventListener(e, onLitScroll, { passive: true })); litCheck(); };
     if (r.grow && r.grow.finished) r.grow.finished.then(arm, () => {});
     else arm();
   }
-  document.addEventListener('click', e => { if (lit && !lit.contains(e.target)) unspot(); }, true);
+  // (iOS sends no click for a tap on a plain gutter)
+  document.addEventListener('pointerup', e => { if (lit && !lit.contains(e.target)) lift(); }, true);
   // A scene longer than REPLAY allows still holds its final frame for HOLD.
   function loop(r) {
     const c = card(r), end = Math.max(0, ...c.getAnimations({ subtree: true }).map(a => a.effect.getComputedTiming().endTime).filter(Number.isFinite));

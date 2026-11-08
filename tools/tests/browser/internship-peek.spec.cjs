@@ -291,10 +291,26 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  expect(await spot.evaluate(c=>getComputedStyle(c,'::before').boxShadow)).toContain('0.62');
  await expect.poll(()=>spot.evaluate(c=>+getComputedStyle(c,'::after').opacity)).toBe(1);
  expect(await spot.evaluate(c=>getComputedStyle(c,'::after').boxShadow)).toContain('rgba(40, 215, 197');
+ // (8 Nov 2026 review: a phone-wide card hid a 1px .5 hairline, so the edge is 2px at .85; on a tall screen the drawing
+ // sat at the top over about 200px of empty card, so it is centred)
+ // (once its one swell of light on landing has settled)
+ await expect.poll(()=>spot.evaluate(c=>getComputedStyle(c,'::after').boxShadow)).toMatch(/^rgba\(40, 215, 197, 0\.85\) 0px 0px 0px 2px inset/);
+ const sb=await spot.boundingBox(), db=await phoneScene(root).boundingBox();
+ expect(Math.abs((db.y-sb.y)-(sb.y+sb.height-db.y-db.height))).toBeLessThan(4);
  await page.evaluate(()=>scrollBy(0,400));
  await expect(spot).not.toHaveClass(/is-spot/);
  await page.evaluate(()=>scrollBy(0,-400));
  await page.waitForTimeout(300);
+ await expect(spot).not.toHaveClass(/is-spot/);
+ await expect(spot).toHaveClass(/is-open/);
+ // The Menu pill stays away while the open card is under it, though the light has lifted (it had come back over the
+ // chart's title on a scroll up).
+ await expect(page.locator('#navPanelToggle')).toBeHidden();
+ // A tap on the dimmed gutter beside the card lifts it (pointerup: iOS sends no click there).
+ await chip(root).click();
+ await chip(root).click();
+ await expect(spot).toHaveClass(/is-spot/);
+ await page.mouse.click(4, 420);
  await expect(spot).not.toHaveClass(/is-spot/);
  await expect(spot).toHaveClass(/is-open/);
  await expect(phoneScene(root).locator('.ag-t')).toHaveCount(32);

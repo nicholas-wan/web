@@ -25,6 +25,9 @@ test('phone navigation traps and restores keyboard focus with normal motion', as
   await toggle.click();
   const dialog = page.getByRole('dialog', { name: 'Site navigation' });
   await expect(dialog).toBeVisible();
+  // Focus lands on the dialog itself (WebKit ringed a focused tile, which read as selected); Tab enters the tiles.
+  await expect(dialog).toBeFocused();
+  await page.keyboard.press('Tab');
   await expect(dialog.locator('nav a').first()).toBeFocused();
   for (let i = 0; i < 12; i++) {
     await page.keyboard.press('Tab');
@@ -58,6 +61,27 @@ test('menu tabs show page icons, mark the current page, and tile the phone sheet
   expect(new Set(boxes.map(box => Math.round(box.top))).size).toBe(2);
   for (const box of boxes) expect(box.height).toBeGreaterThanOrEqual(44);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
+});
+
+// 8 Nov 2026 review: a tap on the dim closes the sheet on touch WebKit too (it sends no click there), without following
+// a link under the dim; and home's trigger is the same labelled Menu pill as every other page.
+test('a tap on the dim closes the phone sheet, and home has the labelled pill', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.goto(BASE + '/skills');
+  const toggle = page.getByRole('link', { name: 'Open navigation menu' });
+  const box = await toggle.boundingBox();
+  await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+  await expect(page.getByRole('dialog', { name: 'Site navigation' })).toBeVisible();
+  const home = await page.locator('#header .logo').boundingBox();
+  await page.touchscreen.tap(home.x + home.width / 2, home.y + home.height / 2);
+  await expect(page.getByRole('dialog', { name: 'Site navigation' })).toBeHidden();
+  await page.waitForTimeout(400);
+  await expect(page).toHaveURL(/\/skills$/);
+  await page.goto(BASE + '/index');
+  await expect(page.locator('#navPanelToggle')).toHaveText('Menu');
+  await expect(page.locator('#navPanelToggle')).toHaveCSS('font-size', /^1[2-9]/);
+  await context.close();
 });
 
 test('phone gallery prepares hidden neighbours before horizontal navigation', async ({ page }) => {

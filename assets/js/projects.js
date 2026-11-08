@@ -320,8 +320,8 @@ function projectsDemo(selector, init) {
 			const tab = kind === 'tab', row = (a, b) => `<div class="sq-mr"><span>${a}</span>${b}</div>`;
 			mini.innerHTML = `<div class="sq-mtop"><b>${tab ? 'Tab' : 'Courts'}</b><button type="button" data-mx>Close</button></div><div class="sq-mseg">${[['courts', '🎾 Courts'], ['tab', '🧾 Tab']].map(([k, l]) =>
 				`<button type="button" data-mk="${k}" aria-pressed="${k === kind}">${l}</button>`).join('')}</div>${tab
-				? `<div class="sq-mcard"><strong>$2.00</strong>You owe Nicholas</div><div class="sq-mlbl">Your history</div><div class="sq-msec">${row('Court 4 · 10 Nov · 8pm–9pm · $6.00 ÷ 3', '<b>$2.00</b>')}</div><p>Courts are $6/hour from 6pm, on weekends and on public holidays, $3/hour otherwise, split across everyone who played.</p>`
-				: `<div class="sq-msec">${sorted().map((b, i) => row(`<b>Court ${esc(b.c)} · ${sd(b.o)}</b>${span(b.s, b.e)} · ${free(b) ? `${free(b)} left` : 'full'} · ${b.ppl.length}/${b.cap}<br>👥 ${named(b).join(', ')}`,
+				? `<div class="sq-mcard"><strong>$2.00</strong>You owe Nicholas</div><div class="sq-mlbl">Your history</div><div class="sq-msec">${row('Court 4 · 10 Nov · 8pm–9pm · $6.00&nbsp;÷&nbsp;3', '<b>$2.00</b>')}</div><p>Courts are $6/hour from 6pm, on weekends and on public holidays, $3/hour otherwise, split across everyone who played.</p>`
+				: `<div class="sq-msec">${sorted().map((b, i) => row(`<b>Court ${esc(b.c)} · ${sd(b.o)}</b>${span(b.s, b.e)} · ${free(b) ? `${free(b)} left` : 'full'} · ${b.ppl.length}/${b.cap}<br>👥 ${named(b).join(', ')}${b.ppl.length > named(b).length ? ` + ${b.ppl.length - named(b).length}` : ''}`,
 					b.ppl.includes('Alex') ? `<button type="button" data-mj="${i}" class="is-out">Leave</button>` : free(b) ? `<button type="button" data-mj="${i}">Join</button>` : '<i>Full</i>')).join('')}</div><p>Tap a court to seat or remove players, or to change it.</p><button type="button" class="sq-madd" data-ma>➕ Add booking</button>`}`;
 			mini.hidden = false; chat.inert = true; toastEl.classList.remove('is-on');
 			(mini.querySelector(again) || mini.querySelector('button')).focus({ preventScroll: true });
@@ -631,15 +631,18 @@ function projectsDemo(selector, init) {
 })();
 
 
-/* Finance tracker demo: phone Overview, spending, and import checks that fail closed. All data invented. */
+/* Finance tracker demo: the owner's phone tabs (finance_tracker app/index.html), each page in the app's own words. All data invented. */
 (() => {
 const NW = [444400, 447900, 451200, 449100, 455800, 460300, 463900, 461200, 468700, 479750, 481300, 486200];
 const MONTHS = NW.map((_, i) => 'Nov Dec Jan Feb Mar Apr May Jun Jul Aug Sep Oct'.split(' ')[i] + (i < 2 ? ' 2025' : ' 2026'));
 const LO = Math.min(...NW), Y = v => 52 - (v - LO) / (Math.max(...NW) - LO) * 46;
 const F = [0, 2].map(d => new Intl.NumberFormat('en-SG', { minimumFractionDigits: d, maximumFractionDigits: d }));
 
-const money = (n, d, sign) => `<span class="f-m">${sign ? '+' : ''}S$<span class="f-d">${F[d ? 1 : 0].format(n)}</span></span>`;
+/* Amounts are written "S$1,234"; M gives each the markup Hide amounts masks. */
+const money = (n, d, sign) => (sign ? '+' : '') + 'S$' + F[d ? 1 : 0].format(n);
+const M = h => h.replace(/S\$([\d,.]*\d)/g, '<span class="f-m">S$<span class="f-d">$1</span></span>');
 const icon = (id, c = '') => `<svg class="f-ic ${c}" aria-hidden="true"><use href="#fi-${id}"/></svg>`;
+const rows = s => s.split(';').map(r => r.split('|'));
 
 const CATS = [
 	['food', 'Food &amp; dining', 720, 'Paradise Dynasty 30 186.4|Jumbo Seafood 22 248|Toast Box 18 12.6|Shake Shack 11 82|Imperial Treasure 4 250'],
@@ -647,7 +650,7 @@ const CATS = [
 	['travel', 'Travel', 450, 'Scoot 27 412|Agoda 27 168|Klook 14 40'],
 	['delivery', 'Grab + Foodpanda', 560, 'GrabFood 29 168.3|Foodpanda 23 92.7|GrabFood 15 141.5|GrabFood 9 64.8|Foodpanda 2 72.7'],
 	['games', 'Games', 300, 'Steam 26 119.8|Nintendo 20 46.2|PlayStation 13 88|Steam 5 126'],
-	['flag', 'Possible card testing', 0, 'Zen Digital 27 1|Quickpay Gift 27 2.5|Nova Store 27 4.9']
+	['flag', 'Possible card testing', 0, 'Zen Digital 27 4.9|Quickpay Gift 27 12.3|Nova Store 27 19.5']
 ].map(([k, n, t, s]) => {
 	const c = { k, n, t }, tx = c.tx = s.split('|').map(r => { const p = r.split(' '), amt = +p.pop(), day = +p.pop(); return { who: p.join(' '), day, amt, c }; });
 	const v = c.v = Math.round(c.x = tx.reduce((a, r) => a + r.amt, 0)), pc = Math.round((v - t) / t * 100);
@@ -657,16 +660,25 @@ const CATS = [
 });
 const FLAG = CATS.pop();
 FLAG.tone = 'f-bad';
-FLAG.vs = '3 small charges (S$20.00 or less each) on one day from 3 merchants never seen before, S$8.40 in total';
+FLAG.vs = '3 small charges (S$20.00 or less each) on one day from 3 merchants never seen before, S$36.70 in total';
 const TOTAL = CATS.reduce((a, c) => a + c.v, 0);
 const ALL = CATS.concat(FLAG).flatMap(c => c.tx).sort((a, b) => b.day - a.day);
-const CK = [['Statement month read', 'Oct 2026, matches its file name'], ['Every row read', '31 rows, none unreadable'],
-	['Balance carries over', `Opens at Sep’s closing ${money(18420.55, 2)}`], ['Totals don’t add up', `Rows ${money(6912.4, 2)}, printed ${money(6972.4, 2)}`]];
+/* Per person: premiums, cash %, policies, shortfall, then cover needed and in force (S$k): death, TPD, critical illness. */
+const INS = [[3240, 58, 4, '1 past', 'S$150k on critical illness', 600, 650, 600, 650, 300, 150], [2180, 71, 3, 'none past', 'S$100k on death and S$100k on TPD', 400, 300, 400, 300, 250, 250]];
+/* Home register; state 1 needs info, 2 covered, 3 no active cover. */
+const HOME = rows('Castlery sofa|1|Cost to confirm|;Samsung fridge|2|Ends 2 Feb 2027|S$2,150;Daikin aircon|2|Ends 14 Mar 2028|S$4,280;Hansgrohe shower|2|Ends 20 Jun 2029|S$860;Bosch washer|3|Expired · 9 Aug 2026|S$1,190');
+const SPLIT = rows('|Opening position|What you owed, carried forward from the 2025 closing balance|1,200;−|Your credit for shared spending|Half of each month\'s share of S$7,680|3,840;−|Alex direct charges|Charges assigned fully to Alex|410;−|Payments you made to Alex|1 recorded payment|500;+|Payments received from Alex|3 recorded payments|2,500;=|Alex owes you||1,050');
 
-const row = (attrs, cls, ico, title, sub, end) => `<button class="f-row ${cls}" ${attrs}><span class="f-ico">${icon(ico)}</span><span class="f-rt"><span>${title}</span><span>${sub}</span></span>${end}${icon('right', 'f-chev')}</button>`;
+const row = (attrs, cls, ico, title, sub, end, tag = 'button') => `<${tag} class="f-row ${cls}" ${attrs}><span class="f-ico">${icon(ico)}</span><span class="f-rt"><span>${title}</span><span>${sub}</span></span>${end}${tag < 'c' ? icon('right', 'f-chev') : ''}</${tag}>`;
+const info = (ico, title, sub, end) => row('', '', ico, title, sub, `<span class="f-rv">${end}</span>`, 'div');
+const line = (cls, who, sub, end, tag = 'div') => `<${tag} class="f-tr ${cls}"><span class="f-ini" style="--h:${[...who].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 360, 7)}" aria-hidden="true">${who[0]}</span><span class="f-tn"><span>${who}</span><span>${sub}</span></span><span class="f-ta">${end}</span></${tag.slice(0, 6)}>`;
 const txs = list => `<div>${list.map((r, i) =>
 	(i && list[i - 1].day === r.day ? '' : `<div class="f-day">${'Sun Mon Tue Wed Thu Fri Sat'.split(' ')[new Date(2026, 9, r.day).getDay()]} ${r.day} Oct</div>`) +
-	`<div class="f-tr c-${r.c.k}"><span class="f-ini" style="--h:${[...r.who].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 360, 7)}" aria-hidden="true">${r.who[0]}</span><span class="f-tn"><span>${r.who}</span><span>${r.c === FLAG ? 'New merchant' : r.c.n}</span></span><span class="f-ta">${money(r.amt, 2)}</span></div>`).join('')}</div>`;
+	(r.c === FLAG ? line('c-flag', r.who, 'New merchant', money(r.amt, 2), 'button data-act="risk"') : line('c-' + r.c.k, r.who, r.c.n, money(r.amt, 2)))).join('')}</div>`;
+const T = t => `<div class="f-title">${t}</div>`;
+const seg = (names, on, c = 'f-seg', b = 0) => `<div class="${c}">${names.map((n, i) => `<button data-sub="${i + b}" aria-pressed="${i + b === on}">${n}</button>`).join('')}</div>`;
+const tiles = t => `<div class="f-stats">${t.map(([l, v, s = '']) => `<span>${l}<b>${v}</b><small>${s}</small></span>`).join('')}</div>`;
+const card = (lbl, fig, note) => `<div class="f-card"><span class="f-lbl">${lbl}</span><span class="f-fig">${fig}</span><span class="f-note">${note}</span></div>`;
 const hero = () => {
 	const line = NW.map((v, i) => (i ? 'L' : 'M') + (i * 300 / 11).toFixed(1) + ' ' + Y(v).toFixed(1)).join('');
 	return `<div class="f-worth"><span class="f-lbl">Net worth</span><span class="f-fig">${money(NW[11])}</span>
@@ -676,18 +688,33 @@ const hero = () => {
 <span class="f-axis"><span>${MONTHS[0]}</span><span>${MONTHS[11]}</span></span></div>`;
 };
 const PAGES = {
-	overview: () => `<div class="f-title">Overview</div>
-<button class="f-stat" data-act="log">${icon('statements')}<span><b>Oct 2026 statement may be missing</b>Import stopped</span>${icon('right', 'f-chev')}</button>${hero()}
-<div class="f-card"><span class="f-lbl">Last 3 statements · Aug–Oct 2026</span><div class="f-stats">
-${[['Income', 24600], ['Spent on cards', 9540], ['Invested', 6000]].map(s => `<span>${s[0]}<b>${money(s[1])}</b></span>`).join('')}</div>
-<span class="f-note">Card spending ${money(3180)} a month, <span class="f-good">6% lower</span> than the three statements before.</span></div>
-<div class="f-list">${row('data-cat="flag"', 'is-bad', 'flag', 'Needs attention', 'Possible card testing · 27 Oct', '<span class="f-badge">1</span>')}
-${row('data-tab="spending"', '', 'spending', 'Key spending', 'Oct 2026 against typical', `<span class="f-rv">${money(TOTAL)}</span>`)}</div>`,
-	wealth: () => `<div class="f-title">Wealth</div><div class="f-seg" aria-hidden="true"><span>Income</span><span class="on">Net worth</span><span>Investments</span></div>${hero()}`,
-	activity: () => `<div class="f-title">Activity</div><div class="f-hint">${ALL.length} charges in Oct 2026</div>${txs(ALL)}`,
+	overview: () => T('Overview') + `
+<div class="f-ok">${icon('ok')}Source checks passed: 186 rows, each traced to its statement</div>${hero()}
+<div class="f-list">${row('data-cat="flag"', 'is-bad', 'flag', 'Needs attention', 'Possible card testing', '<span class="f-badge">1</span>')}
+${row('data-tab="spending"', '', 'spending', 'Key spending', 'Oct 2026 against typical', `<span class="f-rv">${money(TOTAL)}</span>`)}</div>
+<div class="f-card f-pv"><span class="f-lbl">Last 3 statements · Aug–Oct 2026</span>${tiles([['Income', 'S$24,600'], ['Spent on cards', 'S$9,540'], ['Invested', 'S$6,000']])}
+<span class="f-note">Card spending S$3,180 a month, <span class="f-good">6% lower</span> than the three statements before.</span></div>`,
+	/* The eye hides all of Wealth, as privacy.js hides #pane-wealth. */
+	wealth: s => T('Wealth') + seg(['Income', 'Net worth', 'Investments'], s) + `<div class="f-page f-pv">${[
+		`<div class="f-card"><span class="f-lbl">Income outlook · salary credits through Oct 2026</span>${tiles([['2026 take-home pay so far', 'S$71,400', '+4.2% vs same period 2025'], ['2026 take-home forecast', 'S$86,900', 'S$80,600 floor']])}</div>
+<div class="f-card"><span class="f-lbl">Long-range forecast · 5% midpoint</span>${tiles([3, 5, 10].map(y => [y + ' years', money(86900 * 1.05 ** y), 'in ' + (2026 + y)]))}</div>`,
+		hero() + `<div class="f-list">${info('up', 'Assets', 'Cash, CPF, investments, property', 'S$812,400')}${info('statements', 'Liabilities', 'Home loan', 'S$326,200')}</div>`,
+		card('Portfolio · 2 accounts', 'S$128,400', '<span class="f-pill">+S$9,850 (+8.3%)</span> past year') +
+		`<div class="f-list">${info('wallet', 'Interactive Brokers', 'statements to 31 Oct 2026 · <span class="f-good">✓ numbers tally</span>', '+S$9,120')}${info('wallet', 'SRS', 'Phillip Securities (POEMS) · statement to 31 Oct 2026', '+S$730')}</div>`
+	][s]}</div>`,
+	insurance: s => {
+		const [p, cash, n, past, short, ...g] = INS[s], gap = i => g[i * 2] - g[i * 2 + 1];
+		return T('Insurance') + seg(['Nicholas', 'Alex'], s) + `<div class="f-why">Cover short ${short}</div>
+${tiles([['Total premiums', money(p), `${cash}% cash · ${100 - cash}% CPF`], ['Active policies', n, past]])}<div class="f-card"><span class="f-lbl">Where the cover falls short</span>${['Death', 'TPD', 'Critical illness'].map((b, i) => `<div class="f-gap">${b}<span class="f-${gap(i) > 0 ? 'bad">Short S$' + gap(i) + ',000' : 'good">Covered'}</span><i style="--w:${Math.min(100, g[i * 2 + 1] / g[i * 2] * 100)}%"></i></div>`).join('')}</div>`;
+	},
+	home: s => T('Home') + card('Your home · 5 items', 'S$8,480', 'Recorded home costs · 4 priced · 1 unpriced') +
+		seg(['Needs info', 'Covered', 'No active cover'].map((n, i) => `${n}<b><i class="k${i + 1}"></i>${HOME.filter(h => h[1] == i + 1).length}</b>`), s, 'f-chips', 1) + `<div>${HOME.filter(h => !s || h[1] == s).map(([n, k, w, v]) => line('k' + k, n, w, v)).join('')}</div>`,
+	split: () => T('Split') + card('Alex owes you · full year 2026 to date', 'S$1,050', 'after shared spending and payments') +
+		`<div class="f-card"><span class="f-lbl">How this balance is calculated</span><span class="f-ok">${icon('ok')}Balances to the cent</span>${SPLIT.map(([o, l, d, v]) => `<div class="f-calc"><b>${o}</b><span>${l}<small>${d}</small></span>S$${v}.00</div>`).join('')}</div>`,
+	activity: s => T('Activity') + seg(['Transactions', 'Games'], s) + `<div class="f-hint">${s ? '4 purchases' : ALL.length + ' charges'} in Oct 2026</div>${txs(s ? CATS[4].tx : ALL)}`,
 	spending: () => `<div class="f-title">Key spending</div><div class="f-hint">Oct 2026 (bar) against your typical statement (tick). Tap one for its charges.</div>
 <div class="f-list">${CATS.map(c => `<button class="f-row f-key c-${c.k}" data-cat="${c.k}"><span class="f-ico">${icon(c.k)}</span><span class="f-kn">${c.n}</span><span class="f-rv">${money(c.v)}</span>${icon('right', 'f-chev')}<span class="f-kd ${c.tone}">${c.vs}</span><span class="f-kb" aria-hidden="true"><i style="width:${c.v / 9}%"></i><b style="left:${c.t / 9}%"></b></span></button>`).join('')}</div>`,
-	cat: c => `<div class="f-title">${c.n}</div><div class="f-sum">${money(c.x, 2)}</div><div class="f-hint ${c === FLAG ? 'f-bad' : ''}">${c === FLAG ? c.vs : `${c.tx.length} charges in Oct 2026 · <span class="${c.tone}">${c.vs}</span>`}</div>${txs(c.tx)}`
+	cat: c => `<div class="f-title">${c.n}</div><div class="f-sum">${money(c.x, 2)}</div><div class="f-hint ${c === FLAG ? 'f-bad' : ''}">${c === FLAG ? 'Tue 27 Oct · tap a charge for its check' : `${c.tx.length} charges in Oct 2026 · <span class="${c.tone}">${c.vs}</span>`}</div>${txs(c.tx)}`
 };
 
 function init(root) {
@@ -697,15 +724,15 @@ function init(root) {
 	const $ = s => fd.querySelector(s);
 	const scroll = $('.f-scroll'), wrap = $('.f-sheet-wrap'), sheet = $('.f-sheet'), finger = $('.f-finger'), eye = $('[data-act="eye"]');
 	const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
-	let tab, cat, opener, savedTop = 0, timers = [], ticks = [], raf = 0, playing = false, touched = false, scrub, finish;
+	let tab, cat, sub, opener, savedTop = 0, timers = [], raf = 0, playing = false, touched = false, scrub;
 
 	function render(push) {
 		const c = cat && CATS.concat(FLAG).find(x => x.k === cat);
 		$('.f-top').hidden = !!c; $('.f-bar').hidden = !c && tab !== 'spending';
 		$('.f-back span').textContent = c && c !== FLAG ? 'Key spending' : 'Overview';
-		scroll.innerHTML = `<div class="f-page${push && !still() ? ' is-push' : ''}">${c ? PAGES.cat(c) : PAGES[tab]()}</div>`;
+		scroll.innerHTML = M(`<div class="f-page${push && !still() ? ' is-push' : ''}">${c ? PAGES.cat(c) : PAGES[tab](sub[tab] ?? +(tab === 'wealth'))}</div>`);
 		fd.querySelectorAll('.f-tab').forEach(t => t.setAttribute('aria-pressed', t.dataset.tab === (tab === 'spending' ? 'overview' : tab)));
-		scrub = !c && tab !== 'spending' && tab !== 'activity' && bindScrub();
+		scrub = $('.f-spark') && bindScrub();
 	}
 	function go(t) { tab = t; cat = null; render(); scroll.scrollTop = 0; }
 
@@ -718,11 +745,11 @@ function init(root) {
 			const x = idx * 300 / 11;
 			mk.setAttribute('x1', x); mk.setAttribute('x2', x);
 			worth.classList.add('is-scrub');
-			fig.innerHTML = money(NW[idx]);
+			fig.innerHTML = M(money(NW[idx]));
 			axis.innerHTML = `<span class="f-at">${MONTHS[idx]}</span>`;
 			aria(idx);
 		};
-		const aria = i => { spark.setAttribute('aria-valuenow', i); spark.setAttribute('aria-valuetext', MONTHS[i] + ', S$' + F[0].format(NW[i])); };
+		const aria = i => { spark.setAttribute('aria-valuenow', i); spark.setAttribute('aria-valuetext', MONTHS[i] + ', ' + money(NW[i])); };
 		const end = () => { down = false; idx = 11; worth.classList.remove('is-scrub'); fig.innerHTML = rest[0]; axis.innerHTML = rest[1]; aria(11); };
 		const fromX = x => { const b = spark.getBoundingClientRect(); at(Math.round(Math.min(1, Math.max(0, (x - b.left) / b.width)) * 11)); };
 		spark.addEventListener('pointerdown', e => { down = true; try { spark.setPointerCapture(e.pointerId); } catch (_) {} fromX(e.clientX); });
@@ -737,29 +764,17 @@ function init(root) {
 		return { at, end };
 	}
 
-	/* The checks run in the import script on the PC, not in the app; this sheet is its log, simplified. */
+	/* The check drawer as the app words it; a paired phone is a read-only copy. */
 	function openSheet(user) {
-		opener = user && $('[data-act="log"]');
-		sheet.innerHTML = `<div class="f-sh"><span><b>Import log</b><span class="f-hint">Oct 2026 bank statement</span></span><button class="f-done" data-act="close">Done</button></div>
-<div class="f-term"><code>&gt; python file_statements.py</code><div class="f-checks">${CK.map(c => `<div class="f-ck is-wait"><i>${icon('ok')}</i><span>${c[0]}<small>${c[1]}</small></span></div>`).join('')}</div></div>
-<div class="f-res is-wait is-no" role="status" aria-live="${user ? 'polite' : 'off'}"><b>Totals don’t add up — not imported</b>Nothing published was touched; the last good data, through Sep 2026, stays.</div>`;
+		opener = user;
+		sheet.innerHTML = `<div class="f-sh"><span><b>Medium priority check</b><span class="f-hint">Tue 27 Oct · 3 charges</span></span><button class="f-done" data-act="close">Done</button></div>
+<p class="f-why">${FLAG.vs}</p><p class="f-hint">Refunds are netted before this check. This is an anomaly, not a fraud verdict.</p>
+<button class="f-rec" disabled>I recognize this</button><div class="f-res is-no" role="status"><b>Read-only copy</b>Open Finances on the computer to save this.</div>`;
 		if (user) sheet.setAttribute('aria-modal', 'true'); else sheet.removeAttribute('aria-modal');
 		wrap.hidden = false;
-		const cks = sheet.querySelectorAll('.f-ck'), res = $('.f-res');
-		const settle = n => {
-			cks[n].className = 'f-ck ' + (n > 2 ? 'is-no' : 'is-ok');
-			if (n > 2) cks[n].querySelector('use').setAttribute('href', '#fi-no');
-		};
-		finish = () => { ticks.forEach(clearTimeout); ticks = []; cks.forEach((_, n) => settle(n)); res.classList.remove('is-wait'); };
-		if (still()) finish();
-		else {
-			cks.forEach((_, n) => ticks.push(setTimeout(() => settle(n), 400 + n * 400)));
-			ticks.push(setTimeout(finish, 1800));
-		}
 		if (user) $('.f-done').focus();
 	}
 	function closeSheet() {
-		ticks.forEach(clearTimeout); ticks = [];
 		if (wrap.hidden) return;
 		wrap.hidden = true; sheet.innerHTML = '';
 		if (opener) opener.focus({ preventScroll: true });
@@ -767,7 +782,7 @@ function init(root) {
 	}
 
 	fd.addEventListener('click', e => {
-		const t = e.target.closest('[data-act],[data-tab],[data-cat]');
+		const t = e.target.closest('[data-act],[data-tab],[data-cat],[data-sub]');
 		if (!t) return;
 		const a = t.dataset.act;
 		if (a === 'eye') {
@@ -779,8 +794,9 @@ function init(root) {
 			const k = cat; cat = null; if (!k || k === 'flag') go('overview'); else render(); scroll.scrollTop = savedTop;
 			const backTo = k ? $(`[data-cat="${k}"]`) : $('[data-tab="spending"]'); if (backTo) backTo.focus({ preventScroll: true });
 		} else if (a === 'close') closeSheet();
-		else if (a === 'log') openSheet(1);
+		else if (a === 'risk') openSheet(t);
 		else if (t.dataset.tab) { go(t.dataset.tab); const target = $(`.f-tab[data-tab="${tab === 'spending' ? 'overview' : tab}"]`); if (target) target.focus({ preventScroll: true }); }
+		else if (t.dataset.sub) { const i = +t.dataset.sub; sub[tab] = sub[tab] === i ? null : i; render(); $(`[data-sub="${i}"]`).focus(); }
 		else { savedTop = scroll.scrollTop; cat = t.dataset.cat; render(1); scroll.scrollTop = 0; $('.f-back').focus(); }
 	});
 	fd.addEventListener('keydown', e => {
@@ -818,8 +834,9 @@ function init(root) {
 			fc('is-down', 1);
 			sweep(11, 3, 1500, () => sweep(3, 7, 650, () => {
 				later(250, () => { fc('is-down', 0); scrub.end(); });
-				tap('[data-act="log"]', 350, () => { openSheet(); fc('is-on', 0); });
-				later(4600, () => { closeSheet(); playing = false; });
+				tap('[data-cat="flag"]', 350, () => { cat = 'flag'; render(1); });
+				tap('[data-act="risk"]', 1600, () => { openSheet(); fc('is-on', 0); });
+				later(5600, () => { closeSheet(); playing = false; });
 			}));
 		});
 	}
@@ -831,7 +848,6 @@ function init(root) {
 		cancelAnimationFrame(raf);
 		finger.className = 'f-finger';
 		if (scrub) scrub.end();
-		if (!wrap.hidden) finish();
 	}
 	root.addEventListener('demo:stop', stop);
 
@@ -839,7 +855,7 @@ function init(root) {
 		playing = true; stop(); touched = false;
 		opener = null; closeSheet();
 		if (fd.classList.contains('is-masked')) eye.click();
-		go('overview');
+		sub = {}; go('overview');
 	}
 	root.addEventListener('demo:visible', play);
 	root.addEventListener('demo:reset', reset);
@@ -880,7 +896,9 @@ function init(root) {
 	const $ = s => root.querySelector(s), cubes = $('.pk-cubes'), tap = $('.pk-tap'), scroller = $('.pk-scroll');
 	const box = id => cubes.querySelector(`[data-id="${id}"] input`);
 	let S, timers = [], previewing = false, touched = false;
-	const fresh = () => ({ key: 'normal', hide: false, last: false, folded: new Set(), normal: { nights: 4 }, extended: { nights: 7 } });
+	/* A trip already under way, so the per-category counts and bars have something to say. */
+	const PRE = Object.fromEntries('earpiece wallet debit-credit-cards toothbrush toothpaste shorts slippers'.split(' ').map(k => [k, true]));
+	const fresh = () => ({ key: 'normal', hide: false, last: false, folded: new Set(), normal: { nights: 4, ...PRE }, extended: { nights: 7 } });
 	const items = (L = S[S.key]) => ITEMS.filter(i => S.key === 'extended' || !i.ext)
 		.map(i => ({ ...i, packed: !!L[i.id], qty: L[i.id + '#'] || qtyFor(i.rule, L.nights) }));
 	const shown = i => (!S.last || (i.ess && !i.packed)) && (!S.hide || !i.packed);
@@ -1031,6 +1049,33 @@ const start = () => projectsDemo('.app-demo--packing', init);
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 
+
+/* Desktop shows one project at a time; the rail's looping thumbnails, recorded from each demo, switch between them. */
+(() => {
+	const rail = document.querySelector('.app-rail');
+	if (!rail) return;
+	const tabs = [...rail.children], wide = matchMedia('(min-width: 981px)'), still = matchMedia('(prefers-reduced-motion: reduce)');
+	const cards = tabs.map(t => document.getElementById(t.getAttribute('aria-controls')));
+	let cur = Math.max(0, cards.findIndex(c => '#' + c.id === location.hash));
+	function show(i, focus) {
+		cur = i;
+		tabs.forEach((t, k) => {
+			const v = t.querySelector('video'), on = k === i;
+			t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
+			cards[k].hidden = wide.matches && !on;
+			if (wide.matches && !v.src) { v.poster = v.dataset.poster; v.src = v.dataset.src; }
+			if (on || still.matches || !wide.matches) v.pause(); else v.play().catch(() => {});
+		});
+		if (focus) tabs[i].focus();
+		document.dispatchEvent(new Event('scroll'));
+	}
+	rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) show(tabs.indexOf(t)); });
+	rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur }[e.key]; if (d) { e.preventDefault(); show((cur + d) % 4, 1); } });
+	[wide, still].forEach(m => m.addEventListener('change', () => show(cur)));
+	// Phones: the site's Menu pill steps aside while a demo's top bar is under it.
+	addEventListener('scroll', () => document.body.classList.toggle('pj-under', !wide.matches && cards.some(c => { const r = c.querySelector('.app-demo').getBoundingClientRect(); return r.top < 76 && r.bottom > 76; })), { passive: true });
+	show(cur);
+})();
 
 /* One guided preview at a time, after 500 ms of settled scrolling and 90% visibility.
 	 A swipe pauses and re-arms the preview; an intentional tap or key hands control to the reader. */

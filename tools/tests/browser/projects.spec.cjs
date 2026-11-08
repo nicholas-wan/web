@@ -1,5 +1,11 @@
 const { test, expect } = require('@playwright/test');
 
+// Desktop shows one project at a time; its rail tab brings a card into view.
+async function show(page, id) {
+  const tab = page.locator(`.app-rail [aria-controls="${id}"]`);
+  if (await tab.isVisible()) await tab.click();
+}
+
 test('Projects has four equal apps, sample labels and safe source links between Work and Skills', async ({ page }) => {
   await page.goto('/projects');
   await expect(page.locator('#nav .links li.active a')).toHaveText('Projects');
@@ -65,6 +71,7 @@ test('Squash booking updates the court Mini App and resets', async ({ page }) =>
 
 test('Nag snooze, shared credit and half sheet work', async ({ page }) => {
   await page.goto('/projects');
+  await show(page, 'nag-bot');
   const app = page.locator('#nag-bot');
   await app.getByRole('button', { name: 'Snooze…', exact: false }).click();
   await app.getByRole('button', { name: '30m', exact: true }).click();
@@ -81,8 +88,9 @@ test('Nag snooze, shared credit and half sheet work', async ({ page }) => {
   await expect(app.locator('.n-live')).toContainText('nag #2');
 });
 
-test('Finance chart, masking, drill-down and stopped import reset independently', async ({ page }) => {
+test('Finance chart, masking, drill-down and the six phone tabs reset independently', async ({ page }) => {
   await page.goto('/projects');
+  await show(page, 'finance-tracker');
   const app = page.locator('#finance-tracker');
   await app.scrollIntoViewIfNeeded();
   const chart = app.getByRole('slider');
@@ -98,26 +106,40 @@ test('Finance chart, masking, drill-down and stopped import reset independently'
   await app.locator('.f-back').click();
   await app.getByRole('button', { name: /Needs attention/ }).click();
   await expect(app.locator('.f-title')).toHaveText('Possible card testing');
-  await app.locator('.f-back').click();
-  await app.locator('[data-act="log"]').click();
-  await expect(app.getByRole('dialog')).toContainText('not imported');
+  await app.locator('[data-act="risk"]').first().click();
+  await expect(app.getByRole('dialog')).toContainText('not a fraud verdict');
   await expect(app.getByRole('dialog')).toHaveAttribute('aria-modal','true');
+  await expect(app.getByRole('button', { name: 'I recognize this' })).toBeDisabled();
   await page.keyboard.press('Escape');
-  await expect(app.locator('[data-act="log"]')).toBeFocused();
+  await expect(app.locator('[data-act="risk"]').first()).toBeFocused();
+  await expect(app.locator('.f-tab')).toHaveText(['Overview', 'Wealth', 'Insurance', 'Home', 'Split', 'Activity']);
+  await app.locator('.f-tab[data-tab="wealth"]').click();
+  await app.getByRole('button', { name: 'Investments' }).click();
+  await expect(app.locator('.f-scroll')).toContainText('numbers tally');
+  await app.locator('.f-tab[data-tab="insurance"]').click();
+  await app.getByRole('button', { name: 'Alex' }).click();
+  await expect(app.locator('.f-scroll .f-why')).toHaveText('Cover short S$100k on death and S$100k on TPD');
+  await app.locator('.f-tab[data-tab="home"]').click();
+  await app.getByRole('button', { name: /No active cover/ }).click();
+  await expect(app.locator('.f-scroll .f-tr')).toHaveCount(1);
+  await app.locator('.f-tab[data-tab="split"]').click();
+  await expect(app.locator('.f-calc')).toHaveCount(6);
   await app.getByRole('button', { name: 'Start over Finance tracker' }).click();
+  await expect(app.locator('.f-title')).toHaveText('Overview');
   await expect(app.getByRole('slider')).toHaveAttribute('aria-valuenow', '11');
   await expect(app.getByRole('button', { name: 'Hide amounts' })).toBeVisible();
 });
 
 test('Packing computes quantities, packs essentials, filters and resets', async ({ page }) => {
   await page.goto('/projects');
+  await show(page, 'travel-packing');
   const app = page.locator('#travel-packing');
   await app.scrollIntoViewIfNeeded();
   await expect(app.locator('.pk-cname')).toHaveText(['Basics', 'Hygiene', 'Clothes']);
   await app.getByRole('button', { name: 'More nights', exact: true }).click();
   await expect(app.locator('.pk-nlabel')).toHaveText('5 nights');
   await app.getByRole('checkbox', { name: 'Passport, essential', exact: true }).check();
-  await expect(app.locator('.pk-plabel')).toContainText('1 of');
+  await expect(app.locator('.pk-plabel')).toContainText('8 of');
   await app.locator('.pk-lc').click();
   await expect(app.locator('[data-id="passport"]')).toHaveCount(0);
   await expect(app.locator('.pk-note')).toContainText('still to pack');
@@ -178,11 +200,29 @@ test('All four demos accept phone-sized interactions without clipped controls', 
   await page.locator('#nag-bot').getByRole('button',{name:'30m',exact:true}).click();
   await expect(page.locator('#nag-bot .n-live')).toContainText('Snoozed');
   await page.locator('#finance-tracker .app-demo').scrollIntoViewIfNeeded();
-  await page.locator('#finance-tracker [data-act="log"]').click();
-  await expect(page.locator('#finance-tracker .f-res')).toContainText('not imported');
+  await page.locator('#finance-tracker [data-cat="flag"]').click();
+  await page.locator('#finance-tracker [data-act="risk"]').first().click();
+  await expect(page.locator('#finance-tracker .f-res')).toContainText('Read-only copy');
   await page.locator('#travel-packing .app-demo').scrollIntoViewIfNeeded();
   await page.locator('#travel-packing').getByRole('button',{name:'More nights',exact:true}).click();
   await expect(page.locator('#travel-packing .pk-nlabel')).toHaveText('5 nights');
-  await page.locator('#travel-packing').getByRole('checkbox',{name:'Earpiece',exact:true}).check();
-  await expect(page.locator('#travel-packing .pk-plabel')).toContainText('1 of');
+  await page.locator('#travel-packing').getByRole('checkbox',{name:'Sports Shoes',exact:true}).check();
+  await expect(page.locator('#travel-packing .pk-plabel')).toContainText('8 of');
+});
+
+test('Desktop shows one project at a time and the rail switches with clicks and arrow keys', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/projects');
+  await expect(page.locator('.app-card:visible')).toHaveCount(1);
+  await expect(page.locator('#squashbot')).toBeVisible();
+  await page.locator('.app-rail [aria-controls="finance-tracker"]').click();
+  await expect(page.locator('#finance-tracker')).toBeVisible();
+  await expect(page.locator('#squashbot')).toBeHidden();
+  await expect(page.locator('.app-rail [aria-controls="finance-tracker"]')).toHaveAttribute('aria-selected', 'true');
+  await page.keyboard.press('ArrowRight');
+  await expect(page.locator('#travel-packing')).toBeVisible();
+  await expect(page.locator('.app-rail [aria-controls="travel-packing"]')).toBeFocused();
+  await page.setViewportSize({ width: 393, height: 659 });
+  await expect(page.locator('.app-rail')).toBeHidden();
+  await expect(page.locator('.app-card:visible')).toHaveCount(4);
 });

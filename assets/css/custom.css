@@ -5048,10 +5048,15 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     transition: color var(--motion-fast) ease;
   }
 
-  /* Hover stays lighter than the current tab's 0.08 fill, so the two never
-     read as one selected block. */
+  /* Hover (0.07 fill, a softer teal icon) shows, yet stays weaker than the
+     current tab (0.11 fill, bright teal icon, teal underline), so the two
+     never read as one selected block (8 Nov 2026: 0.04 hardly showed). */
   #nav ul.links li a:hover {
-    background-color: rgba(255, 255, 255, 0.04);
+    background-color: rgba(255, 255, 255, 0.07);
+  }
+
+  #nav ul.links li a:hover .nav-icon {
+    color: rgba(40, 215, 197, 0.7);
   }
 
   #nav ul.links li.active .nav-icon {
@@ -5082,7 +5087,7 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     display: block;
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.11);
     box-shadow: inset 0 -2px 0 rgba(40, 215, 197, 0.72);
     pointer-events: none;
     view-transition-name: nav-active-mark;
@@ -5097,6 +5102,19 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     min-width: 3rem;
     min-height: 3rem;
   }
+}
+
+/* Home and the social icons sit on the dark bar, where the site-wide ring
+   (brand-600 at 0.55) is about 2.1:1; they take the tabs' ring (inside the
+   icons, which fill the bar's height). */
+#header .logo:focus-visible,
+#nav ul.icons a:focus-visible {
+  outline: 2px solid rgba(40, 215, 197, 0.9);
+  outline-offset: 2px;
+}
+
+#nav ul.icons a:focus-visible {
+  outline-offset: -4px;
 }
 
 /* Below 981px the nav moves into the menu sheet, which styles its own
@@ -5246,36 +5264,24 @@ body:not(.page-home) #wrapper.fade-in::before {
     font-size: max(var(--text-floor), 0.8rem);
   }
 
-  .page-home #navPanelToggle {
-    width: 3rem;
-    min-width: 3rem;
-    padding-right: 0;
-    padding-left: 0;
-    font-size: 0;
-  }
-
-  .page-home #navPanelToggle::before {
-    margin-right: 0;
-    font-size: 1rem;
-  }
-
   /* The floating pill otherwise sits over card text at reading position.
      main.js steps it away on downward scroll and restores it on upward
      intent; keyboard focus and the open sheet always bring it back. Scoped
-     to the wrapper-level pill: context bars and the travel sticky nav
-     re-home the toggle as a static, always-visible control. */
-  #wrapper > #navPanelToggle {
+     to the floating pill (the body's on home, where it is labelled too, so
+     every page has one trigger, 8 Nov 2026): context bars and the travel
+     sticky nav re-home the toggle as a static, always-visible control. */
+  :is(#wrapper, body) > #navPanelToggle {
     transition: transform 0.25s ease, opacity 0.25s ease;
   }
 
-  #wrapper > #navPanelToggle.is-scrolled-away {
+  :is(#wrapper, body) > #navPanelToggle.is-scrolled-away {
     opacity: 0;
     pointer-events: none;
     transform: translateY(-0.75rem);
   }
 
-  #wrapper > #navPanelToggle.is-scrolled-away:focus-visible,
-  body.is-navPanel-visible #wrapper > #navPanelToggle.is-scrolled-away {
+  :is(#wrapper, body) > #navPanelToggle.is-scrolled-away:focus-visible,
+  body.is-navPanel-visible :is(#wrapper, body) > #navPanelToggle.is-scrolled-away {
     opacity: 1;
     pointer-events: auto;
     transform: none;
@@ -5290,17 +5296,21 @@ body:not(.page-home) #wrapper.fade-in::before {
     backdrop-filter: blur(3px);
     content: "";
     opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.28s ease;
+    visibility: hidden;
+    transition: opacity 0.28s ease, visibility 0s linear 0.28s;
   }
 
   body.is-navPanel-visible {
     overflow: hidden;
   }
 
+  /* The dim closes the sheet on pointerup (main.js) and stays hit-testable
+     while it fades, so the click that follows a tap lands on it, not on a
+     link that was under it (8 Nov 2026). */
   body.is-navPanel-visible::before {
     opacity: 1;
-    pointer-events: auto;
+    visibility: visible;
+    transition: opacity 0.28s ease;
   }
 
   body.is-navPanel-visible #wrapper {
@@ -5330,6 +5340,11 @@ body:not(.page-home) #wrapper.fade-in::before {
   body.is-navPanel-visible #navPanel {
     box-shadow: 0 -1rem 2.75rem rgba(3, 14, 30, 0.18);
     transform: translateY(0);
+  }
+
+  /* (opening focuses the sheet itself, which needs no ring; Tab enters the tiles) */
+  #navPanel:focus {
+    outline: none;
   }
 
   .nav-panel__handle {
@@ -5454,7 +5469,7 @@ body:not(.page-home) #wrapper.fade-in::before {
 /* Reduced motion keeps the scroll-away pill but swaps the slide for an
    instant show/hide. Must follow the 980px block so it wins the tie. */
 @media screen and (max-width: 980px) and (prefers-reduced-motion: reduce) {
-  #wrapper > #navPanelToggle {
+  :is(#wrapper, body) > #navPanelToggle {
     transition: none;
   }
 }
