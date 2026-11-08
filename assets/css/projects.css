@@ -268,7 +268,7 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .app-demo--finance .f-page{display:grid;gap:12px}
 .app-demo--finance .is-push{animation:fin-push 280ms var(--ease) both}
 .app-demo--finance .f-title{margin-bottom:-4px;font-size:28px;font-weight:700;line-height:1.15;letter-spacing:-.025em}
-.app-demo--finance :is(.f-hint,.f-lbl,.f-axis,.f-stats,.f-rt span+span,.f-kd,.f-tn span+span,.f-calc small){color:var(--t3)}
+.app-demo--finance :is(.f-hint,.f-lbl,.f-axis,.f-stats,.f-rt span+span,.f-kd,.f-tn span+span){color:var(--t3)}
 .app-demo--finance :is(.f-rt span+span,.f-kd){font-size:12.5px;font-weight:400}
 .app-demo--finance .f-hint{font-size:13px;line-height:1.4}
 .app-demo--finance .f-m{white-space:nowrap}
@@ -581,8 +581,6 @@ to{box-shadow:0 0 0 9px rgba(17,110,107,0)}
 .app-demo--finance .f-gap span{font-size:12.5px}
 .app-demo--finance .f-gap i{grid-column:1/-1;height:6px;border-radius:6px;background:var(--s2)}
 .app-demo--finance .f-gap i::before{content:"";display:block;width:var(--w);height:100%;border-radius:inherit;background:var(--br)}
-.app-demo--finance .f-calc{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:8px;padding-top:9px;border-top:1px solid var(--b);font-size:13.5px;font-weight:600;line-height:1.3}
-.app-demo--finance .f-calc small{display:block;font-size:12px;font-weight:400}
 .f-hint.f-bad{color:var(--r)}
 .page-projects .app-rail{display:none}
 @media (min-width:981px){.page-projects .app-grid{display:block;margin:0;padding:0;border:0;--ps:.9}
@@ -612,3 +610,10 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .sq{background:url(../../images/projects/squash-wallpaper.svg) 50% 100%/cover,var(--bg)}
 .page-projects .sq-gav{gap:3px;background:radial-gradient(circle at 34% 30%,#4a4d52,#111214 70%)}
 .page-projects .sq-gav i{width:5px;height:5px;border-radius:50%;background:#f5c542}
+.page-projects .app-rail__tab{position:relative}
+.page-projects .app-rail.is-auto [aria-selected=true]::after{content:"";position:absolute;right:14px;bottom:6px;left:14px;height:2px;border-radius:1px;background:var(--color-brand-600);transform-origin:0;animation:pj-fill var(--dwell) linear forwards}
+.page-projects .app-rail.is-hold [aria-selected=true]::after{animation-play-state:paused}
+@keyframes pj-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media (min-width:981px){.page-projects .app-grid{--ps:.88}
+.page-projects .app-card .app-demo{height:640px;contain-intrinsic-size:300px 640px}
+.page-projects .app-card .app-phone{margin-bottom:calc(658px*var(--ps) - 658px)}}

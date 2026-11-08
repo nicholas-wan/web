@@ -394,8 +394,8 @@ Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 # 10 -> 19 (5 Nov 2026): the education, toolkit-card and tech-stack rules moved
 # here from shared custom.css, which every page loads.
 Assert-FileSizeBudget 'assets\css\skills-page.css' 19
-Assert-FileSizeBudget 'assets\css\projects.css' 62
-Assert-FileSizeBudget 'assets\js\projects.js' 68
+Assert-FileSizeBudget 'assets\css\projects.css' 63
+Assert-FileSizeBudget 'assets\js\projects.js' 69
 # Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
 Assert-FileSizeBudget 'assets\css\gallery.css' 15
 Assert-FileSizeBudget 'assets\css\icons.css' 4

@@ -81,7 +81,8 @@ test('Nag snooze, shared credit and half sheet work', async ({ page }) => {
   await expect(app.locator('.n-pinmsg')).not.toContainText('nagging');
   await app.locator('.n-pinbtn').click();
   await expect(app.locator('.n-sheet')).toBeVisible();
-  expect((await app.locator('.n-sheet').boundingBox()).height).toBeLessThan(350);
+  // A half sheet: well under the phone's height, whatever size the phone is drawn at.
+  expect((await app.locator('.n-sheet').boundingBox()).height).toBeLessThan((await app.locator('.app-demo').boundingBox()).height * 0.65);
   await page.keyboard.press('Escape');
   await expect(app.locator('.n-pinbtn')).toBeFocused();
   await app.getByRole('button', { name: 'Start over Nag-bot' }).click();
@@ -112,7 +113,7 @@ test('Finance chart, masking, drill-down and the six phone tabs reset independen
   await expect(app.getByRole('button', { name: 'I recognize this' })).toBeDisabled();
   await page.keyboard.press('Escape');
   await expect(app.locator('[data-act="risk"]').first()).toBeFocused();
-  await expect(app.locator('.f-tab')).toHaveText(['Overview', 'Wealth', 'Insurance', 'Home', 'Split', 'Activity']);
+  await expect(app.locator('.f-tab')).toHaveText(['Overview', 'Wealth', 'Insurance', 'Home', 'Activity']);
   await app.locator('.f-tab[data-tab="wealth"]').click();
   await app.getByRole('button', { name: 'Investments' }).click();
   await expect(app.locator('.f-scroll')).toContainText('numbers tally');
@@ -122,8 +123,6 @@ test('Finance chart, masking, drill-down and the six phone tabs reset independen
   await app.locator('.f-tab[data-tab="home"]').click();
   await app.getByRole('button', { name: /No active cover/ }).click();
   await expect(app.locator('.f-scroll .f-tr')).toHaveCount(1);
-  await app.locator('.f-tab[data-tab="split"]').click();
-  await expect(app.locator('.f-calc')).toHaveCount(6);
   await app.getByRole('button', { name: 'Start over Finance tracker' }).click();
   await expect(app.locator('.f-title')).toHaveText('Overview');
   await expect(app.getByRole('slider')).toHaveAttribute('aria-valuenow', '11');

@@ -667,7 +667,6 @@ const ALL = CATS.concat(FLAG).flatMap(c => c.tx).sort((a, b) => b.day - a.day);
 const INS = [[3240, 58, 4, '1 past', 'S$150k on critical illness', 600, 650, 600, 650, 300, 150], [2180, 71, 3, 'none past', 'S$100k on death and S$100k on TPD', 400, 300, 400, 300, 250, 250]];
 /* Home register; state 1 needs info, 2 covered, 3 no active cover. */
 const HOME = rows('Castlery sofa|1|Cost to confirm|;Samsung fridge|2|Ends 2 Feb 2027|S$2,150;Daikin aircon|2|Ends 14 Mar 2028|S$4,280;Hansgrohe shower|2|Ends 20 Jun 2029|S$860;Bosch washer|3|Expired · 9 Aug 2026|S$1,190');
-const SPLIT = rows('|Opening position|What you owed, carried forward from the 2025 closing balance|1,200;−|Your credit for shared spending|Half of each month\'s share of S$7,680|3,840;−|Alex direct charges|Charges assigned fully to Alex|410;−|Payments you made to Alex|1 recorded payment|500;+|Payments received from Alex|3 recorded payments|2,500;=|Alex owes you||1,050');
 
 const row = (attrs, cls, ico, title, sub, end, tag = 'button') => `<${tag} class="f-row ${cls}" ${attrs}><span class="f-ico">${icon(ico)}</span><span class="f-rt"><span>${title}</span><span>${sub}</span></span>${end}${tag < 'c' ? icon('right', 'f-chev') : ''}</${tag}>`;
 const info = (ico, title, sub, end) => row('', '', ico, title, sub, `<span class="f-rv">${end}</span>`, 'div');
@@ -709,8 +708,6 @@ ${tiles([['Total premiums', money(p), `${cash}% cash · ${100 - cash}% CPF`], ['
 	},
 	home: s => T('Home') + card('Your home · 5 items', 'S$8,480', 'Recorded home costs · 4 priced · 1 unpriced') +
 		seg(['Needs info', 'Covered', 'No active cover'].map((n, i) => `${n}<b><i class="k${i + 1}"></i>${HOME.filter(h => h[1] == i + 1).length}</b>`), s, 'f-chips', 1) + `<div>${HOME.filter(h => !s || h[1] == s).map(([n, k, w, v]) => line('k' + k, n, w, v)).join('')}</div>`,
-	split: () => T('Split') + card('Alex owes you · full year 2026 to date', 'S$1,050', 'after shared spending and payments') +
-		`<div class="f-card"><span class="f-lbl">How this balance is calculated</span><span class="f-ok">${icon('ok')}Balances to the cent</span>${SPLIT.map(([o, l, d, v]) => `<div class="f-calc"><b>${o}</b><span>${l}<small>${d}</small></span>S$${v}.00</div>`).join('')}</div>`,
 	activity: s => T('Activity') + seg(['Transactions', 'Games'], s) + `<div class="f-hint">${s ? '4 purchases' : ALL.length + ' charges'} in Oct 2026</div>${txs(s ? CATS[4].tx : ALL)}`,
 	spending: () => `<div class="f-title">Key spending</div><div class="f-hint">Oct 2026 (bar) against your typical statement (tick). Tap one for its charges.</div>
 <div class="f-list">${CATS.map(c => `<button class="f-row f-key c-${c.k}" data-cat="${c.k}"><span class="f-ico">${icon(c.k)}</span><span class="f-kn">${c.n}</span><span class="f-rv">${money(c.v)}</span>${icon('right', 'f-chev')}<span class="f-kd ${c.tone}">${c.vs}</span><span class="f-kb" aria-hidden="true"><i style="width:${c.v / 9}%"></i><b style="left:${c.t / 9}%"></b></span></button>`).join('')}</div>`,
@@ -1050,7 +1047,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 })();
 
 
-/* Desktop shows one project at a time; the rail's looping thumbnails, recorded from each demo, switch between them. */
+/* Desktop shows one project at a time; the rail's thumbnails, recorded from each demo, switch between them. */
 (() => {
 	const rail = document.querySelector('.app-rail');
 	if (!rail) return;
@@ -1066,25 +1063,36 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 			if (wide.matches && !v.src) { v.poster = v.dataset.poster; v.src = v.dataset.src; }
 		});
 		if (focus) tabs[i].focus();
+		rail.style.setProperty('--dwell', [9, 7, 12.5, 10][i] + 's');
 		cue();
+		hold();
 		document.dispatchEvent(new Event('scroll'));
 	}
 	// One thumbnail plays at a time, each in turn; hovering a tab plays its own.
 	const vids = tabs.map(t => t.querySelector('video'));
-	let turn = 0, hover = -1;
+	let turn = 0, hover = -1, auto = 0, over = 0;
 	function cue() {
-		const run = wide.matches && !still.matches, k = hover >= 0 ? hover : [0, 1, 2, 3].filter(n => n !== cur)[turn % 3];
+		const run = wide.matches && !still.matches, k = hover >= 0 ? hover : auto ? (cur + 1) % 4 : [0, 1, 2, 3].filter(n => n !== cur)[turn % 3];
 		vids.forEach((v, n) => { tabs[n].classList.toggle('is-live', run && n === k && n !== cur); if (n !== k || !run) v.pause(); });
 		if (run && k !== cur) { if (hover < 0) vids[k].currentTime = 0; vids[k].play().catch(() => {}); }
 	}
 	vids.forEach(v => v.addEventListener('ended', () => { if (hover < 0) { turn++; cue(); } }));
 	tabs.forEach((t, n) => { t.addEventListener('pointerenter', () => { hover = n; cue(); }); t.addEventListener('pointerleave', () => { hover = -1; cue(); }); });
-	rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) show(tabs.indexOf(t)); });
-	rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur }[e.key]; if (d) { e.preventDefault(); show((cur + d) % 4, 1); } });
-	[wide, still].forEach(m => m.addEventListener('change', () => show(cur)));
+	// It also turns by itself: the chosen tab's bar fills while its phone is fully on screen and unhovered, then the next app
+	// takes over and replays its preview (its thumbnail plays as "up next"). A tab click or a touch on a demo ends it for good.
+	function hold() { const r = cards[cur].querySelector('.app-demo').getBoundingClientRect(); rail.classList.toggle('is-hold', !!over || r.top < 0 || r.bottom > innerHeight); }
+	const quit = () => { auto = 0; rail.classList.remove('is-auto'); cue(); };
+	rail.addEventListener('animationend', e => { if (!auto || e.animationName !== 'pj-fill') return; const n = (cur + 1) % 4, d = cards[n].querySelector('.app-demo'); if (!d.dataset.user) delete d.dataset.seen; show(n); });
+	[rail, ...cards].forEach(el => { el.addEventListener('pointerenter', () => { over = 1; hold(); }); el.addEventListener('pointerleave', () => { over = 0; hold(); }); });
+	cards.forEach(c => ['pointerup', 'keydown'].forEach(t => c.addEventListener(t, quit)));
+	addEventListener('scroll', hold, { passive: true });
+	rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { quit(); show(tabs.indexOf(t)); } });
+	rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur }[e.key]; if (d) { e.preventDefault(); quit(); show((cur + d) % 4, 1); } });
+	const start = () => { auto = wide.matches && !still.matches ? 1 : 0; rail.classList.toggle('is-auto', !!auto); show(cur); };
+	[wide, still].forEach(m => m.addEventListener('change', start));
 	// Phones: the site's Menu pill steps aside while a demo's top bar is under it.
 	addEventListener('scroll', () => document.body.classList.toggle('pj-under', !wide.matches && cards.some(c => { const r = c.querySelector('.app-demo').getBoundingClientRect(); return r.top < 76 && r.bottom > 76; })), { passive: true });
-	show(cur);
+	start();
 })();
 
 /* One guided preview at a time, after 500 ms of settled scrolling and 90% visibility.
