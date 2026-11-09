@@ -9743,6 +9743,9 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes da-cologne-upper{0%,24%{opacity:0}36%,84%{opacity:.95}100%{opacity:0}}
 
 .depth-sydney .dl-ferry{transform:translateX(-34px)}
+/* The phone rail opens Sydney 1.5s in (travel-rail.js OPEN), so its still ferry and gull wait there and never pop.
+   Desktop plays from frame 0, so it keeps the frame-0 pose. */
+@media(max-width:736px) and (prefers-reduced-motion:no-preference){.mobile-journal-row .depth-sydney .dl-ferry{transform:translateX(3.06px)}.mobile-journal-row .depth-sydney .cl-gull{transform:translate(49.17px,7.62px)}}
 .depth-sydney.is-active .dl-ferry{animation:dl-ferry-pass var(--polish-duration,6800ms) linear both}
 .depth-sydney.is-active .dl-ferry-foam{animation:dl-ferry-foam var(--polish-duration,6800ms) linear both}
 @keyframes dl-ferry-pass{from{transform:translateX(-34px)}to{transform:translateX(134px)}}

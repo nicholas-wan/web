@@ -49,8 +49,11 @@
   if(held)freeze(s);else schedule(s);
   return s;
  }
- function hold(s){clearTimeout(s.timer);s.resting=true;s.restAt=scrollY;s.anims.concat(s.extra).forEach(x=>x.pause());}
- function freeze(s){clearTimeout(s.timer);s.bursts.forEach(clearTimeout);s.bursts=[];s.anims.forEach(x=>{x.playbackRate=1;});s.anims.concat(s.extra).forEach(x=>x.pause());s.fx=s.fx.filter(x=>x.playState!=='finished');s.fx.forEach(x=>x.pause());}
+ // WebKit can resolve a pause a frame late against a bogus clock (seen 9 Nov 2026: Sydney's ferry paused at
+ // 3s read -11s and vanished), so pin the time it paused at.
+ const halt=x=>{const t=x.currentTime;x.pause();if(t!=null)x.currentTime=t;};
+ function hold(s){clearTimeout(s.timer);s.resting=true;s.restAt=scrollY;s.anims.concat(s.extra).forEach(halt);}
+ function freeze(s){clearTimeout(s.timer);s.bursts.forEach(clearTimeout);s.bursts=[];s.anims.forEach(x=>{x.playbackRate=1;});s.anims.concat(s.extra).forEach(halt);s.fx=s.fx.filter(x=>x.playState!=='finished');s.fx.forEach(halt);}
  // play() rewinds an animation sitting at its end; leave those for the loop's own rewind.
  function resume(s){if(s.resting){s.resting=s.ending=false;s.passes=0;}s.anims.concat(s.extra).forEach(x=>{if(!(x.currentTime>=x.effect.getComputedTiming().endTime))x.play();});s.fx.forEach(x=>{if(x.playState==='paused')x.play();});schedule(s);}
  function stop(e){const s=playing.get(e);if(!s)return;freeze(s);s.extra.concat(s.fx).forEach(x=>{if(!x.animationName)x.cancel();});e.art.classList.remove('is-active','is-held');playing.delete(e);}

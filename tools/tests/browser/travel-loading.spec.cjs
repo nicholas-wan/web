@@ -63,6 +63,8 @@ test.describe('mobile reading animation',()=>{
   // After the second pass it plays on to a lit frame and rests there, still in colour with its ring.
   await page.clock.runFor(10000);
   expect(await states(3)).toEqual(['paused']);expect(await page.evaluate(()=>window.sceneClassChanges)).toBe(0);
+  // WebKit once resolved this pause against a bogus clock and parked the ferry at -11s, off the tile.
+  await page.waitForTimeout(100);expect((await anims(3)).every(a=>a.t>=0)).toBe(true);
   // A nudge (even a quick one) leaves it resting; about a row of scrolling plays it again.
   await scroll({by:60});await page.clock.runFor(200);expect(await states(3)).toEqual(['paused']);
   await scroll({by:140});await page.clock.runFor(200);expect(await states(3)).toEqual(['running']);
@@ -71,17 +73,17 @@ test.describe('mobile reading animation',()=>{
   await page.emulateMedia({reducedMotion:'no-preference'});await expect(focus).toHaveCount(1);
   await page.evaluate(()=>scrollTo(0,0));await page.waitForTimeout(100);await page.clock.runFor(200);await expect(active).toHaveCount(0);
  });
- // The Liberty ferry's first frame is its resting pose (docked), so starting the scene never makes it jump.
- test('the Liberty ferry starts where the still drawing has it, docked at the island',async({page})=>{
+ // Boats start where the still drawing has them, so starting a scene never makes one jump or pop in:
+ // Sydney's ferry waits at the rail's opening point, the Liberty ferry docked (its frame 0 too).
+ for(const [i,sel,name] of [[3,'.dl-ferry','Sydney'],[5,'.cr-liberty-ferry','Liberty']])test(`the ${name} ferry starts where the still drawing has it`,async({page})=>{
   await page.clock.install();await page.setViewportSize({width:390,height:844});await page.goto('/travel');
-  const {scenes,scroll}=rail(page),ferry=scenes.nth(5).locator('.cr-liberty-ferry');
+  const {scenes,scroll}=rail(page),boat=scenes.nth(i).locator(sel);
   await expect(page.locator('.mobile-journal-list .authored-scene > svg')).toHaveCount(10);
   await page.clock.pauseAt(Date.now()+1000);
-  await scenes.nth(5).evaluate(el=>el.scrollIntoView({block:'center'}));const still=await ferry.boundingBox();
-  await scroll({to:4});await scroll({to:5});await expect(scenes.nth(5)).toHaveClass(/is-held/);
-  // Held on its opening frame (what a reader sees first), and at frame 0 (each repeat).
-  const held=await ferry.boundingBox();await ferry.evaluate(el=>el.getAnimations()[0].currentTime=0);const first=await ferry.boundingBox();
-  expect(Math.abs(held.x-still.x)).toBeLessThan(1);expect(Math.abs(first.x-still.x)).toBeLessThan(1);expect(still.x).toBeGreaterThan(0);
+  await scenes.nth(i).evaluate(el=>el.scrollIntoView({block:'center'}));const still=await boat.boundingBox();
+  await scroll({to:i-1});await scroll({to:i});await expect(scenes.nth(i)).toHaveClass(/is-held/);
+  const held=await boat.boundingBox();expect(Math.abs(held.x-still.x)).toBeLessThan(1);
+  if(name==='Liberty'){await boat.evaluate(el=>el.getAnimations()[0].currentTime=0);expect(Math.abs((await boat.boundingBox()).x-still.x)).toBeLessThan(1);expect(still.x).toBeGreaterThan(0);}
  });
 });
 
