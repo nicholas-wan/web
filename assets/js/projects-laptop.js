@@ -36,7 +36,7 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 .page-projects .pkl-ptop b{display:block;margin-top:2px;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}
 .page-projects .pkl-proute{display:grid;grid-template-columns:auto 1fr auto;align-items:start;gap:0 12px;padding:8px 14px 0}
 .page-projects .pkl-proute .to{text-align:right}
-.page-projects .pkl-pcode{display:block;font-size:26px;line-height:1;font-weight:700!important;letter-spacing:.02em}
+.page-projects .pkl-pcode{display:block;font-size:27px;line-height:1;font-weight:700!important;font-stretch:110%;letter-spacing:.02em}
 .page-projects .pkl-proute i{margin-top:3px;letter-spacing:.08em}
 .page-projects .pkl-pline{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:5px;height:26px;color:#0F6E6B}
 .page-projects .pkl-pline u{display:block;height:1px;background:rgba(21,32,31,.28)}
@@ -44,7 +44,9 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 .page-projects .pkl-pfields{display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:0 22px;padding:10px 14px 11px}
 .page-projects .pkl-pfields>div>b{display:inline-flex;align-items:center;height:22px;margin-top:3px;font-size:10px}
 .page-projects .pkl-pill,.page-projects .pkl-chip{display:inline-block;height:22px;margin-top:3px;padding:0 9px;border:1px solid rgba(21,32,31,.28);border-radius:999px;font-size:10px;line-height:20px;color:#44524F}
-.page-projects .pkl-pstub{border-left:1px solid rgba(21,32,31,.13);border-radius:0 8px 8px 0}
+.page-projects .pkl-pstub{position:relative;border-left:1px solid rgba(21,32,31,.13);border-radius:0 8px 8px 0}
+.page-projects .pkl-pseal{position:absolute;right:12px;top:30px;padding:3px 8px 2px;border:2px solid #0C5F5C;border-radius:4px;box-shadow:inset 0 0 0 1px #fff,inset 0 0 0 2px #0C5F5C;color:#0C5F5C;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;transform:rotate(-9deg);opacity:.9;animation:pkl-seal .42s ease-out both}
+@keyframes pkl-seal{0%{opacity:0;transform:rotate(-16deg) scale(1.6)}70%{opacity:.9;transform:rotate(-8deg) scale(.97)}}
 .page-projects .pkl-psay{padding:8px 12px 0;font-size:9px;line-height:1.3;color:#44524F}
 .page-projects .pkl-psay b{display:block;font-size:14px;line-height:1.15;letter-spacing:-.01em}
 .page-projects .pkl-pfine{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;padding:8px 12px 10px}
@@ -147,8 +149,8 @@ function draw() {
 <div class="pkl-ptop"><div><i>Passenger</i><b>Nicholas Wan</b></div><div><i>Trip</i><b>${key === 'normal' ? 'Normal trip' : 'Extended trip'}</b></div></div>
 <div class="pkl-proute"><div><b class="pkl-pcode">SIN</b><i>Singapore</i></div><span class="pkl-pline"><u></u>${use('plane')}<u></u></span><div class="to"><b class="pkl-pcode">${to}</b><i>${city}</i></div></div>
 <div class="pkl-pfields"><div><i>Date</i><span class="pkl-chip">${day(days)}</span></div><div><i>Nights</i><span class="pkl-pill">− <b>${L.nights}</b> nights +</span></div><div><i>Return</i><b>${day(days + L.nights)}</b></div><div><i>Boarding</i><b>Opens ${day(days - 1)}</b></div></div></div>
-<div class="pkl-pstub"><div class="pkl-pband"><span>${to}</span></div><div class="pkl-psay"><b>${days} days to go</b>Last call opens the day before</div>
-<div class="pkl-pfine"><div class="w"><i>Passenger</i><b>Nicholas Wan</b></div><div><i>Route</i><b>SIN${use('plane')}${to}</b></div><div><i>Date</i><b>${day(days)}</b></div><div><i>Nights</i><b>${L.nights}</b></div><div><i>Return</i><b>${day(days + L.nights)}</b></div></div></div></div>
+<div class="pkl-pstub"><div class="pkl-pband"><span>${to}</span></div><div class="pkl-psay"><b>${days} days to go</b>${key === 'normal' ? 'Chengdu 8–16 °C · rain on 2 of 5 days' : 'Last call opens the day before'}</div>${n === all.length ? '<span class="pkl-pseal">Packed</span>' : ''}
+<div class="pkl-pfine"><div><i>Route</i><b>SIN${use('plane')}${to}</b></div><div><i>Date</i><b>${day(days)}</b></div><div><i>Nights</i><b>${L.nights}</b></div><div><i>Return</i><b>${day(days + L.nights)}</b></div></div></div></div>
 <div class="pkl-bar"><span><b>${n}</b> of ${all.length} packed</span><em><u style="width:${n / all.length * 100}%"></u></em><span class="pkl-sp"></span><span class="pkl-btn">Hide packed</span><span class="pkl-btn">Last call · ${left ? left + ' left' : 'Clear'}</span></div>
 <div class="pkl-cols">${CATS.map(cube).join('')}</div>`;
 	// The phone often re-renders without a change here; leave the laptop alone then, so its fades and bars run on.
