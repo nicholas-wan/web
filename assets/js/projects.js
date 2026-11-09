@@ -689,11 +689,11 @@ const ALL = CATS.concat(FLAG).flatMap(c => c.tx).sort((a, b) => b.day - a.day);
 /* Per person: premiums, cash %, policies, past, shortfall; cover needed and in force (S$k) for death, TPD, CI. */
 const INS = [[1296, 58, 4, '1 past', 'S$60k on critical illness', 240, 260, 240, 260, 120, 60], [872, 71, 3, 'none past', 'S$40k on death and S$40k on TPD', 160, 120, 160, 120, 100, 100]];
 /* Home register; state 1 needs info, 2 covered, 3 no active cover. */
-const HOME = rows('Castlery sofa|1|Cost to confirm|;Samsung fridge|2|Ends 2 Feb 2027|S$860;Daikin aircon|2|Ends 14 Mar 2028|S$1,712;Hansgrohe shower|2|Ends 20 Jun 2029|S$344;Bosch washer|3|Expired · 9 Aug 2026|S$476');
+const HOME = rows('FortyTwo sofa|1|Cost to confirm|;Hitachi fridge|2|Ends 2 Feb 2027|S$860;Daikin aircon|2|Ends 14 Mar 2028|S$1,712;Rinnai hob|2|Ends 20 Jun 2029|S$344;Bosch washer|3|Expired · 9 Aug 2026|S$476');
 
 const row = (attrs, cls, ico, title, sub, end, tag = 'button') => `<${tag} class="f-row ${cls}" ${attrs}><span class="f-ico">${icon(ico)}</span><span class="f-rt"><span>${title}</span><span>${sub}</span></span>${end}${tag < 'c' ? icon('right', 'f-chev') : ''}</${tag}>`;
 const info = (ico, title, sub, end) => row('', '', ico, title, sub, `<span class="f-rv">${end}</span>`, 'div');
-const LOGO = 'Grab Foodpanda Klook Steam SimplyGo Ya Trip'.split(' ');
+const LOGO = 'Grab Foodpanda Klook Steam SimplyGo Ya Trip FortyTwo Hitachi Daikin Rinnai Bosch'.split(' ');
 const line = (cls, who, sub, end, tag = 'div') => `<${tag} class="f-tr ${cls}"><span class="f-ini" style="--h:${[...who].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 360, 7)};--i:${LOGO.findIndex(n => who.startsWith(n))}" aria-hidden="true">${who[0]}</span><span class="f-tn"><span>${who}</span><span>${sub}</span></span><span class="f-ta">${end}</span></${tag.slice(0, 6)}>`;
 const txs = list => `<div>${list.map((r, i) =>
 	(i && list[i - 1].day === r.day ? '' : `<div class="f-day">${'Sun Mon Tue Wed Thu Fri Sat'.split(' ')[new Date(2026, 9, r.day).getDay()]} ${r.day} Oct</div>`) +
