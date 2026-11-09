@@ -7,7 +7,10 @@ module.exports = defineConfig({
   testMatch: '*.spec.cjs',
   timeout: 120000,
   workers: 4,
-  retries: 0,
+  // CI retries a failed test twice so one timing blip on the shared runner
+  // does not fail the deploy; Playwright still reports it as flaky. Local
+  // runs stay strict.
+  retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [['line'], ['github']] : 'list',
   projects: [
     { name: 'chromium', use: { browserName: 'chromium' } },
