@@ -20,7 +20,8 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 .page-projects .cpf-t{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:3/2;box-sizing:border-box;border:1px solid #ffffff14;border-radius:14px;background:#1b1c1f;color:#9a9a9f}
 .page-projects .cpf-t svg{width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .page-projects .cpf-pc{color:var(--app);border-color:color-mix(in srgb,var(--app) 38%,transparent);box-shadow:0 10px 30px -14px color-mix(in srgb,var(--app) 45%,transparent)}
-.page-projects .cpf-dot{fill:#f09595;stroke:none;transform-box:fill-box;transform-origin:center}
+.page-projects .cpf-dot{fill:currentColor;stroke:none;transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 0 3px currentColor)}
+.page-projects .cpf-line{stroke-dasharray:1}
 .page-projects .cpf-flow li+li .cpf-t::before{content:"";position:absolute;top:50%;left:-37px;width:36px;height:1px;background:#ffffff2e;transform-origin:0}
 .page-projects .cpf-flow li+li .cpf-t::after{content:"";position:absolute;top:calc(50% - 1.5px);left:-37px;width:4px;height:4px;border-radius:50%;background:var(--app);opacity:0}
 .page-projects .cpf-flow>li>span:last-child{font:400 13px/1.3 Archivo,system-ui,sans-serif;color:#8e8e93;white-space:nowrap}
@@ -28,12 +29,15 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 .page-projects .cpf-flow.is-run .cpf-t{animation:cpf-up .45s cubic-bezier(.22,1,.36,1) calc(var(--i,0) * 120ms) both}
 .page-projects .cpf-flow.is-run li+li .cpf-t::before{animation:cpf-line .25s ease-out calc(var(--i) * 120ms + 280ms) both}
 .page-projects .cpf-flow.is-run li+li .cpf-t::after{animation:cpf-run .5s ease-in-out calc(var(--i) * 120ms + 520ms) both}
+.page-projects .cpf-flow:not(.is-run) .cpf-line{stroke-dashoffset:1}
+.page-projects .cpf-flow.is-run .cpf-line{animation:cpf-draw .7s ease-out .4s both}
 .page-projects .cpf-flow.is-run .cpf-dot{animation:cpf-pop .3s ease-out 1.05s both}
 @keyframes cpf-up{from{opacity:0;transform:translateY(8px)}}
 @keyframes cpf-line{from{transform:scaleX(0)}}
+@keyframes cpf-draw{from{stroke-dashoffset:1}}
 @keyframes cpf-run{15%{opacity:1}85%{opacity:1}to{left:-6px;opacity:0}}
 @keyframes cpf-pop{from{opacity:0;transform:scale(0)}}
-@media (prefers-reduced-motion: reduce){.page-projects .cpf-flow *,.page-projects .cpf-flow *::before,.page-projects .cpf-flow *::after{animation:none!important}.page-projects .cpf-flow:not(.is-run) .cpf-t{opacity:1}}
+@media (prefers-reduced-motion: reduce){.page-projects .cpf-flow *,.page-projects .cpf-flow *::before,.page-projects .cpf-flow *::after{animation:none!important}.page-projects .cpf-flow:not(.is-run) .cpf-t{opacity:1}.page-projects .cpf-flow .cpf-line{stroke-dashoffset:0!important}}
 .page-projects .cpn--lock{display:flex;align-items:flex-end;gap:18px}
 .page-projects .cpn--lock figcaption{max-width:12rem;margin:0 0 .3rem}
 .page-projects .cpl{flex:none;width:226px;height:468px;padding:7px;box-sizing:border-box;border-radius:34px;background:#050607;box-shadow:inset 0 0 0 1px #3b4047,0 24px 50px -24px color-mix(in srgb,var(--app) 60%,transparent)}
@@ -64,8 +68,9 @@ const watch = (src, draw) => {
 };
 const on = (fig, html) => { fig.querySelector('.cpl').innerHTML = html; fig.classList.add('is-on'); };
 
-/* Finance: three tiles, downloads, the PC that checks them, the phone's read-only copy (design review, 9 Nov 2026:
-   one shape, one icon each, gold only where the work happens). They play once each time they scroll into view. */
+/* Finance: three tiles, downloads, the PC that checks them (its laptop draws the tracker's new desktop hero line, ending
+   on today's point), and the iPhone it syncs to (design review, 9 Nov 2026: one shape, one icon each, gold only where
+   the work happens). They play once each time they scroll into view. */
 if (figs.finance) {
 	const flow = $('.cpf-flow', figs.finance);
 	figs.finance.classList.add('is-on');
