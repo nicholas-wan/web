@@ -144,8 +144,7 @@ test('Companion devices follow their phones on wide screens and never load on na
   expect(loads).toHaveLength(1);
   expect(loads[0]).toMatch(/projects-companions\.js\?v=/);
   await expect(flow).toHaveClass(/is-run/);
-  await expect(flow).toContainText('186 rows checked');
-  await expect(fin.locator('.cpn--flow figcaption')).toHaveText('No bank login ever leaves the PC.');
+  await expect(flow.locator('li > span:last-child')).toHaveText(['Bank PDFs downloaded', 'Checked on the PC', 'Read-only on phone']);
   await show(page, 'nag-bot');
   const nag = page.locator('#nag-bot');
   await nag.scrollIntoViewIfNeeded();

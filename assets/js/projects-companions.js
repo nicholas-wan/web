@@ -3,8 +3,7 @@
    this on screens 1100px and up only, outside the page's 80 KB ceiling. Each one is decorative (inert, aria-hidden)
    and follows its phone demo live:
    - Finance: where the work happens (owner, 9 Nov 2026, on a laptop that only repeated the phone: "What value does it
-     show?"). Statements are downloaded, filed and checked on the PC, and the phone reads a copy, so no bank login
-     leaves the PC. The three steps play once each time they scroll into view, then nudge the phone's badge.
+     show?"). Statements are downloaded and checked on the PC, and the phone reads a copy, so no bank login leaves it.
    - Nag-bot and SquashBot: another member's lock screen, where each new message in the chat arrives as a Telegram
      notification, newest on top. The pinned board is edited in place, so it never notifies. */
 (() => {
@@ -13,37 +12,28 @@ const figs = { finance: $('.cpn[data-for=finance]'), nag: $('.cpn[data-for=nag]'
 document.head.append(Object.assign(document.createElement('style'), { textContent: `
 .page-projects .cpn{margin:1.6rem 0 0!important;padding:0;box-sizing:border-box}
 .page-projects .cpn figcaption{margin:.55rem 0 0;font:400 .875rem/1.35 Archivo,system-ui,sans-serif;color:#9aa0a8;text-align:left}
-.page-projects .cpf-flow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;max-width:560px;margin:0!important;padding:0;list-style:none;counter-reset:s}
-.page-projects .cpf-flow li{position:relative;display:grid;grid-template-rows:150px auto;gap:10px;margin:0;padding:0}
-.page-projects .cpf-flow li+li::before{content:"";position:absolute;top:72px;left:-19px;width:16px;height:2px;border-radius:2px;background:linear-gradient(90deg,#2d2f34,var(--app));transform-origin:0;transition:transform .35s}
-.page-projects .cpf-flow>li>span{font:500 .8rem/1.35 Archivo,system-ui,sans-serif;color:#c9ccd1;text-align:left}
-.page-projects .cpf-flow>li>span::before{counter-increment:s;content:counter(s);display:inline-grid;place-items:center;width:17px;height:17px;margin-right:6px;border-radius:50%;background:color-mix(in srgb,var(--app) 22%,transparent);color:var(--app);font-size:.68rem;font-weight:700}
-.page-projects .cpf-v{align-self:end;display:grid;gap:5px;box-sizing:border-box;font:500 10px/1.3 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;color:#eceae4;text-align:left}
-.page-projects .cpf-v b{color:inherit!important;font-weight:650;font-size:11px}
-.page-projects .cpf-v i{display:block;overflow:hidden;font-style:normal;white-space:nowrap;text-overflow:ellipsis;transition:opacity .35s,transform .35s}
-.page-projects .cpf-dl{position:relative;height:128px;padding:20px 10px 10px;border-radius:4px 10px 10px 10px;background:linear-gradient(#2b2d33,#202226);box-shadow:inset 0 0 0 1px #3a3d44}
-.page-projects .cpf-dl::before{content:"";position:absolute;top:-8px;left:0;width:42%;height:12px;border-radius:5px 5px 0 0;background:#2b2d33;box-shadow:inset 1px 1px 0 #3a3d44,inset -1px 0 0 #3a3d44}
-.page-projects .cpf-dl i{padding:5px 6px 5px 22px;border-radius:5px;background:#ffffff0d url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 14'%3E%3Cpath d='M1 1h7l3 3v9H1z' fill='%23e5484d'/%3E%3C/svg%3E") 6px 50%/10px no-repeat;color:#b9bcc2}
-.page-projects .cpf-pc{position:relative;height:132px;padding:6px 6px 10px;border-radius:7px 7px 2px 2px;background:#1b1c20;box-shadow:inset 0 0 0 1px #34363c}
-.page-projects .cpf-pc::after{content:"";position:absolute;left:-9px;right:-9px;bottom:-7px;height:7px;border-radius:0 0 7px 7px;background:linear-gradient(#3a3d43,#17181b)}
-.page-projects .cpf-pc>div,.page-projects .cpf-ph>div{display:grid;gap:3px;height:100%;box-sizing:border-box;padding:7px 8px;border-radius:3px;background:#161614;align-content:start}
-.page-projects .cpf-pc>div>b{color:#4fc79e!important}
-.page-projects .cpf-pc i::before{content:"✓ ";color:#4fc79e}
-.page-projects .cpf-pc .cpf-ok{margin-top:3px;color:#5dcaa5}
-.page-projects .cpf-pc .cpf-ok::before,.page-projects .cpf-pc .cpf-bad::before{content:""}
-.page-projects .cpf-pc .cpf-bad{color:#f09595;font-weight:650}
-.page-projects .cpf-ph{justify-self:center;width:86px;height:150px;padding:5px;border-radius:16px;background:#050607;box-shadow:inset 0 0 0 1px #3b4047}
-.page-projects .cpf-ph>div{position:relative;border-radius:12px;padding:30px 7px 7px;gap:2px}
-.page-projects .cpf-ph i{color:#f09595;font-size:9px;white-space:normal}
-.page-projects .cpf-ph em{position:absolute;top:30px;right:7px;display:grid;place-items:center;width:15px;height:15px;border-radius:50%;background:#f09595;color:#2b0d0d;font:700 9px/1 system-ui;font-style:normal;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
-.page-projects .cpf-ph small{position:absolute;left:7px;right:7px;bottom:9px;padding:3px 0;border-radius:6px;background:#341313;color:#f09595;font-size:8.5px;text-align:center}
-.page-projects .cpf-flow:not(.is-run) li+li::before{transform:scaleX(0)}
-.page-projects .cpf-flow:not(.is-run) i,.page-projects .cpf-flow:not(.is-run) .cpf-ph small{opacity:0;transform:translateY(4px)}
-.page-projects .cpf-flow:not(.is-run) .cpf-ph em{transform:scale(0)}
-.page-projects .cpf-flow.is-run :is(i,small,em),.page-projects .cpf-flow.is-run li+li::before{transition-delay:var(--d,0s)}
-.page-projects #finance-tracker .f-badge.cpf-ping{animation:cpf-ping .8s 2}
-@keyframes cpf-ping{40%{transform:scale(1.35);box-shadow:0 0 0 6px #f0959533}}
-@media (prefers-reduced-motion: reduce){.page-projects .cpf-flow *,.page-projects .cpf-flow li::before{transition:none!important}.page-projects #finance-tracker .f-badge.cpf-ping{animation:none}}
+.page-projects .cpn--flow{margin-top:2.4rem!important}
+.page-projects .cpf-flow{display:flex;gap:36px;max-width:516px;margin:0!important;padding:0;list-style:none}
+.page-projects .cpf-flow li{flex:1;min-width:0;display:grid;gap:10px;justify-items:center;margin:0;padding:0}
+.page-projects .cpf-flow li:nth-child(2){--i:1}
+.page-projects .cpf-flow li:nth-child(3){--i:2}
+.page-projects .cpf-t{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:3/2;box-sizing:border-box;border:1px solid #ffffff14;border-radius:14px;background:#1b1c1f;color:#9a9a9f}
+.page-projects .cpf-t svg{width:40px;height:40px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.page-projects .cpf-pc{color:var(--app);border-color:color-mix(in srgb,var(--app) 38%,transparent);box-shadow:0 10px 30px -14px color-mix(in srgb,var(--app) 45%,transparent)}
+.page-projects .cpf-dot{fill:#f09595;stroke:none;transform-box:fill-box;transform-origin:center}
+.page-projects .cpf-flow li+li .cpf-t::before{content:"";position:absolute;top:50%;left:-37px;width:36px;height:1px;background:#ffffff2e;transform-origin:0}
+.page-projects .cpf-flow li+li .cpf-t::after{content:"";position:absolute;top:calc(50% - 1.5px);left:-37px;width:4px;height:4px;border-radius:50%;background:var(--app);opacity:0}
+.page-projects .cpf-flow>li>span:last-child{font:400 13px/1.3 Archivo,system-ui,sans-serif;color:#8e8e93;white-space:nowrap}
+.page-projects .cpf-flow:not(.is-run) .cpf-t{opacity:0}
+.page-projects .cpf-flow.is-run .cpf-t{animation:cpf-up .45s cubic-bezier(.22,1,.36,1) calc(var(--i,0) * 120ms) both}
+.page-projects .cpf-flow.is-run li+li .cpf-t::before{animation:cpf-line .25s ease-out calc(var(--i) * 120ms + 280ms) both}
+.page-projects .cpf-flow.is-run li+li .cpf-t::after{animation:cpf-run .5s ease-in-out calc(var(--i) * 120ms + 520ms) both}
+.page-projects .cpf-flow.is-run .cpf-dot{animation:cpf-pop .3s ease-out 1.05s both}
+@keyframes cpf-up{from{opacity:0;transform:translateY(8px)}}
+@keyframes cpf-line{from{transform:scaleX(0)}}
+@keyframes cpf-run{15%{opacity:1}85%{opacity:1}to{left:-6px;opacity:0}}
+@keyframes cpf-pop{from{opacity:0;transform:scale(0)}}
+@media (prefers-reduced-motion: reduce){.page-projects .cpf-flow *,.page-projects .cpf-flow *::before,.page-projects .cpf-flow *::after{animation:none!important}.page-projects .cpf-flow:not(.is-run) .cpf-t{opacity:1}}
 .page-projects .cpn--lock{display:flex;align-items:flex-end;gap:18px}
 .page-projects .cpn--lock figcaption{max-width:12rem;margin:0 0 .3rem}
 .page-projects .cpl{flex:none;width:226px;height:468px;padding:7px;box-sizing:border-box;border-radius:34px;background:#050607;box-shadow:inset 0 0 0 1px #3b4047,0 24px 50px -24px color-mix(in srgb,var(--app) 60%,transparent)}
@@ -74,19 +64,12 @@ const watch = (src, draw) => {
 };
 const on = (fig, html) => { fig.querySelector('.cpl').innerHTML = html; fig.classList.add('is-on'); };
 
-/* Finance: downloads, then the PC files and checks them, then the phone's read-only copy. Each line comes in on a
-   delay (--d), so the steps read left to right; leaving the view resets them for the next visit. */
+/* Finance: three tiles, downloads, the PC that checks them, the phone's read-only copy (design review, 9 Nov 2026:
+   one shape, one icon each, gold only where the work happens). They play once each time they scroll into view. */
 if (figs.finance) {
-	const f = figs.finance, flow = $('.cpf-flow', f), still = matchMedia('(prefers-reduced-motion: reduce)');
-	[...f.querySelectorAll('i, small, em, li')].forEach((e, n) => e.style.setProperty('--d', `${n * 0.22}s`));
-	f.classList.add('is-on');
-	let t;
-	new IntersectionObserver(([e]) => {
-		clearTimeout(t);
-		flow.classList.toggle('is-run', e.isIntersecting);
-		const b = $('#finance-tracker .f-badge');
-		if (e.isIntersecting && b && !still.matches) t = setTimeout(() => { b.classList.remove('cpf-ping'); void b.offsetWidth; b.classList.add('cpf-ping'); }, 3600);
-	}, { threshold: 0.6 }).observe(flow);
+	const flow = $('.cpf-flow', figs.finance);
+	figs.finance.classList.add('is-on');
+	new IntersectionObserver(([e]) => flow.classList.toggle('is-run', e.isIntersecting), { threshold: 0.6 }).observe(flow);
 }
 
 /* A lock screen fed by a chat: wallpaper, date, clock and the newest notifications on top. */
