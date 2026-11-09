@@ -888,7 +888,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 })();
 
 
-/* Travel Packing demo: items, rules, notes and essentials from data/seed.json; quantities by the app's computeQty. */
+/* Travel Packing demo: sample items and rules from data/seed.json; quantities by the app's computeQty. */
 (() => {
 
 const CATS = [
@@ -914,6 +914,8 @@ const count = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 function init(root) {
 	if (root.dataset.pkReady || !root.querySelector('.pk .pk-cubes')) return;
 	root.dataset.pkReady = 1;
+	/* Pass dates N days out. */
+	root.querySelectorAll('[data-day]').forEach(e => e.textContent = new Date(Date.now() + e.dataset.day * 864e5).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }));
 	const $ = s => root.querySelector(s), cubes = $('.pk-cubes'), tap = $('.pk-tap'), scroller = $('.pk-scroll');
 	const box = id => cubes.querySelector(`[data-id="${id}"] input`);
 	let S, timers = [], previewing = false, touched = false;
@@ -934,7 +936,7 @@ function init(root) {
 	function render() {
 		const all = items();
 		root.querySelectorAll('.pk-tab').forEach(t => t.setAttribute('aria-pressed', t.dataset.key === S.key));
-		$('.pk-h1').textContent = S.key === 'normal' ? 'Normal trip' : 'Extended trip';
+		root.dataset.key = S.key;
 		$('[data-act=hide]').setAttribute('aria-pressed', S.hide);
 		$('.pk-lc').setAttribute('aria-pressed', S.last);
 		cubes.innerHTML = CATS.map(([cat, head, ink, rgb, groups]) => {
@@ -1102,8 +1104,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 	}
 	vids.forEach(v => v.addEventListener('ended', () => { if (hover < 0) { turn++; cue(); } }));
 	tabs.forEach((t, n) => { t.addEventListener('pointerenter', () => { hover = n; cue(); }); t.addEventListener('pointerleave', () => { hover = -1; cue(); }); });
-	// It also turns by itself: the chosen tab's bar fills while its phone is fully on screen and unhovered, then the next app
-	// takes over and replays its preview (its thumbnail plays as "up next"). A tab click or a touch on a demo ends it for good.
+	// It also turns by itself while the chosen phone is fully on screen and unhovered; a tab click or a touch on a demo ends it for good.
 	function hold() { const r = cards[cur].querySelector('.app-demo').getBoundingClientRect(); rail.classList.toggle('is-hold', !!over || r.top < 0 || r.bottom > innerHeight); }
 	const quit = () => { auto = 0; rail.classList.remove('is-auto'); cue(); };
 	rail.addEventListener('animationend', e => { if (!auto || e.animationName !== 'pj-fill') return; const n = (cur + 1) % 4, d = cards[n].querySelector('.app-demo'); if (!d.dataset.user) delete d.dataset.seen; show(n); });
@@ -1119,8 +1120,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 	start();
 })();
 
-/* One guided preview at a time, after 500 ms of settled scrolling at 90% visibility.
-	 A swipe pauses and re-arms it; a tap or key hands control to the reader. */
+/* One guided preview at a time, after 500 ms of settled scrolling at 90% visibility; a tap or key hands control to the reader. */
 (() => {
 	const demos = [...document.querySelectorAll('.app-demo')];
 	const motion = matchMedia('(prefers-reduced-motion: reduce)');

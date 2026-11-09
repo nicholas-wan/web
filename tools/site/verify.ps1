@@ -398,13 +398,15 @@ Assert-FileSizeBudget 'assets\css\personal-page.css' 32
 Assert-FileSizeBudget 'assets\css\skills-page.css' 19
 # 63 -> 74 (9 Nov 2026): the dark showcase, Nag-bot's Day theme, Finance's dark theme,
 # Nag-bot's board and stickers, and the More features rows.
-Assert-FileSizeBudget 'assets\css\projects.css' 74
+# 74 -> 76 (9 Nov 2026): Travel Packing's demo head is the app's boarding pass, with the plane on its progress line.
+Assert-FileSizeBudget 'assets\css\projects.css' 76
 # 69 -> 70 (9 Nov 2026): the loader for Travel Packing's laptop; the page stays under 80 KB.
 Assert-FileSizeBudget 'assets\js\projects.js' 70
 # projects-laptop.js is injected on wide screens by projects.js (Travel Packing's laptop, 9 Nov 2026),
 # so it is outside the per-page <script src> ceiling and carries its own budget, styles and the
 # demo's sample items included.
-Assert-FileSizeBudget 'assets\js\projects-laptop.js' 14
+# 14 -> 18 (9 Nov 2026): the laptop's list head is the app's boarding pass, as the phone demo's is.
+Assert-FileSizeBudget 'assets\js\projects-laptop.js' 18
 # projects-companions.js loads the same way (9 Nov 2026): Finance's laptop and the bots' lock screens.
 Assert-FileSizeBudget 'assets\js\projects-companions.js' 12
 # Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).

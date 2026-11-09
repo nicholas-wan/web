@@ -24,9 +24,33 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 .page-projects .pkl-tabs span{height:46px;line-height:46px}
 .page-projects .pkl-tabs .on{color:#15201F;background:linear-gradient(#0F6E6B,#0F6E6B) 0 100%/100% 2px no-repeat}
 .page-projects .pkl-share{padding:3px 9px;border-radius:999px;background:rgba(15,110,107,.12);color:#0C5F5C;font-size:12.5px;font-weight:600}
-.page-projects .pkl-head{display:flex;flex:none;align-items:center;gap:10px;padding:14px 22px 8px}
-.page-projects .pkl-h{font-size:26px;line-height:1.2;letter-spacing:-.01em;color:#15201F!important}
-.page-projects .pkl-pill{padding:5px 12px;border:1px solid rgba(21,32,31,.28);border-radius:999px;font-size:13.5px;color:#44524F}
+/* The list head is the app's boarding pass (packing styles.css "boarding pass"), at the laptop's scale. */
+.page-projects .pkl-pass{display:grid;flex:none;grid-template-columns:1fr 176px;margin:12px 22px 0;border:1px solid rgba(21,32,31,.13);border-radius:8px;background:#fff;-webkit-mask:radial-gradient(circle at calc(100% - 176px) 0,#0000 7px,#000 7.5px) top/100% 51% no-repeat,radial-gradient(circle at calc(100% - 176px) 100%,#0000 7px,#000 7.5px) bottom/100% 51% no-repeat;mask:radial-gradient(circle at calc(100% - 176px) 0,#0000 7px,#000 7.5px) top/100% 51% no-repeat,radial-gradient(circle at calc(100% - 176px) 100%,#0000 7px,#000 7.5px) bottom/100% 51% no-repeat}
+.page-projects .pkl-pband{display:flex;align-items:center;justify-content:space-between;height:22px;margin:-1px -1px 0;padding:0 12px;border-radius:8px 0 0 0;background:#0F6E6B;color:#fff;font-size:8px;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.page-projects .pkl-pband span{display:inline-flex;align-items:center;gap:5px}
+.page-projects .pkl-pband span+span{opacity:.78;font-weight:500}
+.page-projects .pkl-pband svg{width:11px;height:11px}
+.page-projects .pkl-pstub>.pkl-pband{margin-left:-1px;border-radius:0 8px 0 0;font-size:9px}
+.page-projects .pkl-pass i{display:block;font-style:normal;font-size:7.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#647170}
+.page-projects .pkl-ptop{display:flex;gap:26px;padding:9px 14px 0}
+.page-projects .pkl-ptop b{display:block;margin-top:2px;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase}
+.page-projects .pkl-proute{display:grid;grid-template-columns:auto 1fr auto;align-items:start;gap:0 12px;padding:8px 14px 0}
+.page-projects .pkl-proute .to{text-align:right}
+.page-projects .pkl-pcode{display:block;font-size:26px;line-height:1;font-weight:700!important;letter-spacing:.02em}
+.page-projects .pkl-proute i{margin-top:3px;letter-spacing:.08em}
+.page-projects .pkl-pline{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:5px;height:26px;color:#0F6E6B}
+.page-projects .pkl-pline u{display:block;height:1px;background:rgba(21,32,31,.28)}
+.page-projects .pkl-pline svg{width:14px;height:14px}
+.page-projects .pkl-pfields{display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:0 22px;padding:10px 14px 11px}
+.page-projects .pkl-pfields>div>b{display:inline-flex;align-items:center;height:22px;margin-top:3px;font-size:10px}
+.page-projects .pkl-pill,.page-projects .pkl-chip{display:inline-block;height:22px;margin-top:3px;padding:0 9px;border:1px solid rgba(21,32,31,.28);border-radius:999px;font-size:10px;line-height:20px;color:#44524F}
+.page-projects .pkl-pstub{border-left:1px solid rgba(21,32,31,.13);border-radius:0 8px 8px 0}
+.page-projects .pkl-psay{padding:8px 12px 0;font-size:9px;line-height:1.3;color:#44524F}
+.page-projects .pkl-psay b{display:block;font-size:14px;line-height:1.15;letter-spacing:-.01em}
+.page-projects .pkl-pfine{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px;padding:8px 12px 10px}
+.page-projects .pkl-pfine .w{grid-column:1/-1}
+.page-projects .pkl-pfine b{display:flex;align-items:center;gap:3px;margin-top:1px;font-size:9px;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap}
+.page-projects .pkl-pfine svg{width:9px;height:9px;color:#0F6E6B}
 .page-projects .pkl-pill b,.page-projects .pkl-bar b{color:#15201F!important}
 .page-projects .pkl-sp{flex:1}
 .page-projects .pkl-btn{padding:5px 11px;border:1px solid rgba(21,32,31,.2);border-radius:7px;background:#fff;font-size:13px;font-weight:500;color:#15201F;white-space:nowrap}
@@ -78,6 +102,9 @@ const ITEMS = CATS.flatMap(([cat, color, groups]) => groups.flatMap(([group, lis
 	({ id: name.toLowerCase().replace(/\W+/g, '-'), name, icon, rule, cat, color, group, ess: f.includes('e'), ext: f.includes('x') }))));
 const qtyFor = (r, n) => (r.length ? Math.max(r[2], Math.min(r[3], Math.ceil(n * r[0]) + r[1])) : r);
 const PRE = 'earpiece wallet debit-credit-cards toothbrush toothpaste shorts slippers'.split(' ');
+/* The pass's trips, as projects.html gives the phone: destination code, city and days to departure. */
+const TRIP = { normal: ['CTU', 'Chengdu', 12], extended: ['HRB', 'Harbin', 40] };
+const day = n => new Date(Date.now() + n * 864e5).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
 const fresh = () => ({ normal: { nights: 4, packed: new Set(PRE), qty: {} }, extended: { nights: 7, packed: new Set(), qty: {} } });
 const use = (id, cls = '') => `<svg class="${cls}" viewBox="0 0 24 24" aria-hidden="true"><use href="#pk-${id}"/></svg>`;
 let S = fresh(), key = 'normal', last = '';
@@ -104,7 +131,7 @@ function draw() {
 	read();
 	const L = S[key], now = performance.now();
 	const all = ITEMS.filter(i => key === 'extended' || !i.ext).map(i => ({ ...i, packed: L.packed.has(i.id), qty: L.qty[i.id] || qtyFor(i.rule, L.nights) }));
-	const n = all.filter(i => i.packed).length, left = all.filter(i => i.ess && !i.packed).length;
+	const n = all.filter(i => i.packed).length, left = all.filter(i => i.ess && !i.packed).length, [to, city, days] = TRIP[key];
 	const row = i => {
 		const t = now - (flashAt.get(i.id) ?? -1e9);
 		return `<div class="pkl-row${i.packed ? ' is-packed' : ''}${t < 1000 ? ` is-flash" style="--c:${i.color};animation-delay:-${Math.round(t)}ms` : `" style="--c:${i.color}`}"><span class="pkl-box">${i.packed ? use('check') : ''}</span>${use('t-' + i.icon, 'pkl-ti')}<span class="pkl-name">${i.name}</span>${i.ess ? use('tag', 'pkl-ess') : ''}${i.qty > 1 ? `<span class="pkl-qty">×${i.qty}</span>` : ''}</div>`;
@@ -116,7 +143,12 @@ function draw() {
 				[...gi.filter(i => !i.packed), ...gi.filter(i => i.packed)].map(row).join('')}` : ''; }).join('')}</div>`;
 	};
 	const html = `<div class="pkl-top">${use('plane', 'pkl-brand')}<b>Travel Packing</b><span class="pkl-tabs"><span${key === 'normal' ? ' class="on"' : ''}>Normal trip</span><span${key === 'extended' ? ' class="on"' : ''}>Extended trip</span><span>✎ Defaults</span></span><span class="pkl-share">Sharing on Wi-Fi</span></div>
-<div class="pkl-head"><b class="pkl-h">${key === 'normal' ? 'Normal trip' : 'Extended trip'}</b><span class="pkl-pill">− <b>${L.nights}</b> nights +</span><span class="pkl-sp"></span><span class="pkl-btn pkl-btn--p">+ Save trip</span><span class="pkl-btn pkl-btn--r">Reset</span></div>
+<div class="pkl-pass"><div class="pkl-pmain"><div class="pkl-pband"><span>${use('plane')}Travel Packing</span><span>Boarding pass</span></div>
+<div class="pkl-ptop"><div><i>Passenger</i><b>Nicholas Wan</b></div><div><i>Trip</i><b>${key === 'normal' ? 'Normal trip' : 'Extended trip'}</b></div></div>
+<div class="pkl-proute"><div><b class="pkl-pcode">SIN</b><i>Singapore</i></div><span class="pkl-pline"><u></u>${use('plane')}<u></u></span><div class="to"><b class="pkl-pcode">${to}</b><i>${city}</i></div></div>
+<div class="pkl-pfields"><div><i>Date</i><span class="pkl-chip">${day(days)}</span></div><div><i>Nights</i><span class="pkl-pill">− <b>${L.nights}</b> nights +</span></div><div><i>Return</i><b>${day(days + L.nights)}</b></div><div><i>Boarding</i><b>Opens ${day(days - 1)}</b></div></div></div>
+<div class="pkl-pstub"><div class="pkl-pband"><span>${to}</span></div><div class="pkl-psay"><b>${days} days to go</b>Last call opens the day before</div>
+<div class="pkl-pfine"><div class="w"><i>Passenger</i><b>Nicholas Wan</b></div><div><i>Route</i><b>SIN${use('plane')}${to}</b></div><div><i>Date</i><b>${day(days)}</b></div><div><i>Nights</i><b>${L.nights}</b></div><div><i>Return</i><b>${day(days + L.nights)}</b></div></div></div></div>
 <div class="pkl-bar"><span><b>${n}</b> of ${all.length} packed</span><em><u style="width:${n / all.length * 100}%"></u></em><span class="pkl-sp"></span><span class="pkl-btn">Hide packed</span><span class="pkl-btn">Last call · ${left ? left + ' left' : 'Clear'}</span></div>
 <div class="pkl-cols">${CATS.map(cube).join('')}</div>`;
 	// The phone often re-renders without a change here; leave the laptop alone then, so its fades and bars run on.
