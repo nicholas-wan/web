@@ -568,7 +568,7 @@ function Add-SectionIntro([string]$Markup, [string]$Slug) {
     $intro = switch ($Slug) {
         'experience' { '<div id="selected-work" class="portfolio-headline"><span class="page-opening-eyebrow">Experience</span><h1 id="portfolio-title">Selected work</h1></div>' }
         # Projects (8 Nov 2026) opens like Work, with a one-line lede under its title.
-        'projects' { '<div id="side-projects" class="portfolio-headline"><span class="page-opening-eyebrow">Projects</span><h1 id="portfolio-title">Side projects</h1><p class="projects-intro">Apps I&#8217;ve built in my own time, for my squash group and at home. Under each demo are three decisions I made. The demos are simplified, with sample data.</p></div>' }
+        'projects' { '<div id="side-projects" class="portfolio-headline"><span class="page-opening-eyebrow">Projects</span><h1 id="portfolio-title">Side projects</h1><p class="projects-intro">Apps I&#8217;ve built in my own time, for my squash group and at home. Each demo is a simplified copy with sample data.</p></div>' }
         default { $null }
     }
     if (-not $intro) { return $Markup }

@@ -44,21 +44,8 @@
 .page-projects .app-why p span{display:block;margin-top:.15rem;font:300 .84rem/1.45 Merriweather,Georgia,serif;color:var(--pj-body)}
 .page-projects .app-card__facts{display:flex;flex-wrap:wrap;margin-top:1.1rem!important;font:600 .78rem/1.5 "Source Sans Pro",sans-serif;letter-spacing:.02em;color:var(--pj-muted)}
 .page-projects .app-card__facts span+span::before{content:"\00b7";margin:0 .5rem;color:#a9b9b8}
-.page-projects .project-more{margin-top:3.2rem;padding-top:2.2rem;border-top:1px solid var(--pj-line)}
-.page-projects .project-more__label{margin:0 0 .4rem;font:700 .7rem/1.2 "Source Sans Pro",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--color-brand-700)}
-.page-projects .project-index{margin:0;padding:0;list-style:none}
-.page-projects .project-index li{display:grid;grid-template-columns:5.6rem minmax(0,1fr) auto;align-items:center;gap:1.2rem;margin:0;padding:.5rem 0}
-.page-projects .project-index__year{font:600 .8rem/1.5 "Source Sans Pro",sans-serif;font-variant-numeric:tabular-nums;color:var(--pj-muted)}
-.page-projects .project-index h3{display:inline;margin:0 .5rem 0 0;font:700 .95rem/1.6 Merriweather,Georgia,serif;letter-spacing:0;text-transform:none;color:var(--pj-ink)!important}
-.page-projects .project-index p{display:inline;margin:0;font:300 .88rem/1.7 Merriweather,Georgia,serif;color:var(--pj-body);text-align:left}
-.page-projects .project-index__repo{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin-right:-.5rem;border-radius:50%;border-bottom:0;color:var(--pj-ink)}
-.page-projects .project-index__repo svg{width:20px;height:20px;fill:currentColor}
-.page-projects .project-index__repo:hover{background:var(--pj-stage);color:var(--color-brand-700)}
 @media screen and (max-width: 736px){.page-projects .app-grid{margin-top:1.6rem;padding-top:1.8rem;gap:2.2rem}
 .page-projects .app-card h2{font-size:1.3rem}
-.page-projects .project-index li{grid-template-columns:minmax(0,1fr) auto;gap:.2rem .8rem}
-.page-projects .project-index__year{grid-column:1 / -1}
-.page-projects .project-index h3,.page-projects .project-index p{display:block}
 }
 @font-face{font-family:Archivo;font-style:normal;font-weight:100 900;font-display:swap;src:url("../fonts/archivo-latin.woff2") format("woff2")}
 .app-demo--squash .sq{--bg:#0e1621;--bar:#17212b;--in:#182533;--out:#2b5278;--ac:#6ab2f2;--tx:#f5f5f5;--hint:#7d8e9d;--kb:#1f2e3d;--line:#0a1118;position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);color:var(--tx);text-align:left;font:400 13px/17px system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:0;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
@@ -508,7 +495,6 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .page-projects .app-card__foot{gap:.35rem}
 .page-projects .app-card__foot figcaption{font-size:12px}
 .page-projects .app-demo__reset{font-size:12px!important}
-.page-projects .project-index li{align-items:start}
 }
 .sq-mini{--s:#17212b;--h:#7d8e9d;--a:#5288c1;position:absolute;inset:auto 0 0;z-index:4;max-height:calc(100% - 120px);overflow:auto;padding:12px 12px 22px;border-radius:14px 14px 0 0;background:#0e1621;color:#f5f5f5;font:14px/1.35 -apple-system,BlinkMacSystemFont,system-ui,sans-serif;text-align:left;box-shadow:0 -8px 24px #0009}
 .page-projects .sq-mini button{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font:600 13px/1.2 inherit;color:#fff!important;text-transform:none!important;letter-spacing:0!important;white-space:nowrap}
@@ -752,7 +738,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .app-demo--finance .c-flag{--cb:#341313;--cf:#f09595;--dot:#f09595}
 .app-demo--finance .k1{--dot:#fac775}
 html .page-projects .portfolio-headline h1{color:#ecedf0}
-.page-projects .page-opening-eyebrow,.page-projects .project-more__label{color:#8d939c}
+.page-projects .page-opening-eyebrow{color:#8d939c}
 .page-projects .site-pager{background:#111214;border-top-color:#25282d!important}
 .page-projects .site-pager__link>strong{color:#ecedf0}
 .page-projects .site-pager__link>span{color:#8d939c}

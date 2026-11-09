@@ -19,7 +19,7 @@ test('Projects has four equal apps, sample labels and safe source links between 
   await expect(page.locator('#finance-tracker a:not(.app-demo__skip)')).toHaveCount(0);
   await expect(page.locator('.site-pager__link--previous')).toHaveAttribute('href', 'experience');
   await expect(page.locator('.site-pager__link--next')).toHaveAttribute('href', 'skills');
-  await expect(page.locator('.project-index h3')).toHaveText('Brawl Stars');
+  await expect(page.locator('.project-more')).toHaveCount(0);
 });
 
 test('Phone frames fit with reset, avoid overflow, and let scroll escape the list', async ({ page }) => {
