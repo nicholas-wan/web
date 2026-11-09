@@ -34,7 +34,7 @@ test('Phone frames fit with reset, avoid overflow, and let scroll escape the lis
   }
   for (const id of ['squashbot', 'nag-bot', 'finance-tracker', 'travel-packing']) {
     const app = page.locator(`#${id}`);
-    expect((await app.locator('figure').boundingBox()).height).toBeLessThan(659);
+    expect((await app.locator('figure.app-card__demo').boundingBox()).height).toBeLessThan(659);
     const foot = await app.locator('.app-card__foot').boundingBox();
     const phone = await app.locator('.app-phone').boundingBox();
     expect(foot.y + foot.height).toBeLessThan(phone.y + 2);
@@ -129,6 +129,34 @@ test('Finance chart, masking, drill-down and the six phone tabs reset independen
   await expect(app.locator('.f-title')).toHaveText('Overview');
   await expect(app.getByRole('slider')).toHaveAttribute('aria-valuenow', '11');
   await expect(app.getByRole('button', { name: 'Hide amounts' })).toBeVisible();
+});
+
+test('Packing laptop follows the phone on wide screens and never loads on narrow ones', async ({ page }) => {
+  const loads = [];
+  page.on('request', (r) => { if (r.url().includes('projects-laptop.js')) loads.push(r.url()); });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/projects');
+  await show(page, 'travel-packing');
+  const app = page.locator('#travel-packing'), lap = app.locator('.pkl');
+  await app.scrollIntoViewIfNeeded();
+  await expect(lap).toBeVisible();
+  expect(loads[0]).toMatch(/projects-laptop\.js\?v=/);
+  await expect(lap.locator('.pkl-bar > span').first()).toHaveText('7 of 20 packed');
+  await app.getByRole('checkbox', { name: 'Passport, essential', exact: true }).check();
+  await app.getByRole('button', { name: 'More nights', exact: true }).click();
+  await expect(lap.locator('.pkl-bar > span').first()).toHaveText('8 of 20 packed');
+  await expect(lap.locator('.pkl-pill')).toContainText('5 nights');
+  await expect(lap.locator('.pkl-row.is-packed .pkl-name', { hasText: 'Passport' })).toHaveCount(1);
+  await app.getByRole('button', { name: 'Start over Travel Packing' }).click();
+  await expect(lap.locator('.pkl-bar > span').first()).toHaveText('7 of 20 packed');
+  const narrow = await page.context().newPage(), narrowLoads = [];
+  narrow.on('request', (r) => { if (r.url().includes('projects-laptop.js')) narrowLoads.push(r.url()); });
+  await narrow.setViewportSize({ width: 1024, height: 800 });
+  await narrow.goto('/projects');
+  await narrow.waitForLoadState('load');
+  await expect(narrow.locator('#travel-packing .pkl')).toBeHidden();
+  expect(narrowLoads).toHaveLength(0);
+  await narrow.close();
 });
 
 test('Packing computes quantities, packs essentials, filters and resets', async ({ page }) => {

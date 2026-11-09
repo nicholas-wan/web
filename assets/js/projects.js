@@ -1066,7 +1066,7 @@ function init(root) {
 	render();
 }
 
-const start = () => projectsDemo('.app-demo--packing', init);
+const start = () => { projectsDemo('.app-demo--packing', init); const l = document.querySelector('.pkl'); if (l && innerWidth > 1099) document.head.append(Object.assign(document.createElement('script'), { src: l.dataset.script })); };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 
