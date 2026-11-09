@@ -172,8 +172,8 @@ test('Previews serialize, resume after swipes and hand over after a tap', async 
   await expect(page.locator('[data-playing]')).toHaveCount(0);
   await app.dispatchEvent('pointercancel', { pointerId: 1 });
   await expect(app).toHaveAttribute('data-playing', '1');
-  // The resumed preview may already have sent the first chip, which then leaves the row.
-  await app.locator('.sq-chip:visible').first().click();
+  // The resumed preview sends the first chip, which then leaves the row; the reader taps the second.
+  await app.locator('.sq-chip').nth(1).click();
   await expect(app).toHaveAttribute('data-user', '1');
   await expect(app).not.toHaveAttribute('data-playing', '1');
   await page.waitForTimeout(3500);
