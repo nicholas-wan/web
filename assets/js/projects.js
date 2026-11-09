@@ -668,12 +668,12 @@ const icon = (id, c = '') => `<svg class="f-ic ${c}" aria-hidden="true"><use hre
 const rows = s => s.split(';').map(r => r.split('|'));
 
 const CATS = [
-	['food', 'Food &amp; dining', 288, 'Paradise Dynasty 30 74.56|Jumbo Seafood 22 99.2|Ya Kun 18 5.04|Shake Shack 11 32.8|Imperial Treasure 4 100'],
-	['transport', 'Transport', 104, 'SimplyGo 31 24.96|Grab 24 11.44|ComfortDelGro 19 7.6|Gojek 16 8.8|SimplyGo 8 23.2|Grab 3 8'],
-	['travel', 'Travel', 180, 'Scoot 27 164.8|Trip.com 27 67.2|Klook 14 16'],
+	['food', 'Food &amp; dining', 288, 'Watami 30 74.56|Starbucks 22 18.4|Ya Kun 18 5.04|McDonald’s 11 32.8|Watami 4 100'],
+	['transport', 'Transport', 104, 'SimplyGo 31 24.96|Grab 24 11.44|TADA 19 7.6|Grab 16 8.8|SimplyGo 8 23.2|Grab 3 8'],
+	['travel', 'Travel', 180, 'Trip.com 27 164.8|KKday 27 67.2|Klook 14 16'],
 	['delivery', 'Grab + Foodpanda', 224, 'GrabFood 29 67.32|Foodpanda 23 37.08|GrabFood 15 56.6|GrabFood 9 25.92|Foodpanda 2 29.08'],
-	['games', 'Games', 120, 'Steam 26 47.92|Nintendo 20 18.48|PlayStation 13 35.2|Steam 5 50.4'],
-	['flag', 'Possible card testing', 0, 'Zen Digital 27 4.9|Quickpay Gift 27 12.3|Nova Store 27 19.5']
+	['games', 'Games', 120, 'Steam 26 47.92|HoYoverse 20 18.48|Kuro Games 13 35.2|Steam 5 50.4'],
+	['flag', 'Possible card testing', 0, 'G2G 27 4.9|Xsolla 27 12.3|ZeusX 27 19.5']
 ].map(([k, n, t, s]) => {
 	const c = { k, n, t }, tx = c.tx = s.split('|').map(r => { const p = r.split(' '), amt = +p.pop(), day = +p.pop(); return { who: p.join(' '), day, amt, c }; });
 	const v = c.v = Math.round(c.x = tx.reduce((a, r) => a + r.amt, 0)), pc = Math.round((v - t) / t * 100);
@@ -693,7 +693,7 @@ const HOME = rows('FortyTwo sofa|1|Cost to confirm|;Hitachi fridge|2|Ends 2 Feb 
 
 const row = (attrs, cls, ico, title, sub, end, tag = 'button') => `<${tag} class="f-row ${cls}" ${attrs}><span class="f-ico">${icon(ico)}</span><span class="f-rt"><span>${title}</span><span>${sub}</span></span>${end}${tag < 'c' ? icon('right', 'f-chev') : ''}</${tag}>`;
 const info = (ico, title, sub, end) => row('', '', ico, title, sub, `<span class="f-rv">${end}</span>`, 'div');
-const LOGO = 'Grab Foodpanda Klook Steam SimplyGo Ya Trip FortyTwo Hitachi Daikin Rinnai Bosch'.split(' ');
+const LOGO = 'Grab Foodpanda Klook Steam SimplyGo Ya Trip FortyTwo Hitachi Daikin Rinnai Bosch Watami Starbucks McDonald TADA KKday HoYoverse Kuro G2G Xsolla ZeusX'.split(' ');
 const line = (cls, who, sub, end, tag = 'div') => `<${tag} class="f-tr ${cls}"><span class="f-ini" style="--h:${[...who].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 360, 7)};--i:${LOGO.findIndex(n => who.startsWith(n))}" aria-hidden="true">${who[0]}</span><span class="f-tn"><span>${who}</span><span>${sub}</span></span><span class="f-ta">${end}</span></${tag.slice(0, 6)}>`;
 const txs = list => `<div>${list.map((r, i) =>
 	(i && list[i - 1].day === r.day ? '' : `<div class="f-day">${'Sun Mon Tue Wed Thu Fri Sat'.split(' ')[new Date(2026, 9, r.day).getDay()]} ${r.day} Oct</div>`) +
