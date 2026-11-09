@@ -79,7 +79,7 @@ function projectsDemo(selector, init) {
 		if (f) {
 			const [name, q, n, def] = {
 				d: ['date', 'Which date?', 2, [0, 1, 2, 3, 4, 5, 6]],
-				c: ['court', 'Which court?', 4, ['1', '2', '3', '4', '5'].filter((c) => c !== d.prior)],
+				c: ['court', 'Which court?', 4, ['1', '2', '3', '4'].filter((c) => c !== d.prior)],
 				t: ['time', 'What time?', 3, [420, 480, 720, 1020, 1080, 1140, 1200, 1260]],
 			}[f];
 			const keys = (d.ch[f] = d.ch[f] || def).map((v, i) => ({ t: f === 'd' ? cd(v) : f === 'c' ? `Court ${v}` : ck(v), a: f + i }));
@@ -194,9 +194,9 @@ function projectsDemo(selector, init) {
 			}
 		}
 		function sync(quiet) {
-			const rows = ['📌 <b>Court schedule</b>', ''].concat(...sorted().map((b) => {
+			const rows = ['📌 <b>Court schedule</b>', ''].concat(sorted().map((b) => {
 				const l = `${b.o > 1 ? sd(b.o) : b.o ? 'Tomorrow' : 'Today'} · ${span(b.s, b.e)} · <b>C${esc(b.c)}</b> · ${free(b) ? slots(free(b)) : 'full'}`;
-				return [free(b) ? l : `<s>${l}</s>`].concat(b.by ? [`↳ <i>booked by ${U}</i>`] : []);
+				return free(b) ? l : `<s>${l}</s>`;
 			}));
 			const board = rows.join(' ').replace(/<[^>]+>/g, '').replace('  ', ' ');
 			if (board !== S.board) {
@@ -261,7 +261,7 @@ function projectsDemo(selector, init) {
 					: d.s > 1260 ? 'The last slot starts at 9pm. Choose an earlier start time.'
 							: e > 1320 ? 'Courts close at 10pm. Choose an earlier finish time.' : '';
 			if (err) { d.is = [err]; return edit(m, card(d)); }
-			const b = { c: d.c, o: d.o, s: d.s, e, cap: 3, ppl: ['Nicholas', U], by: 1 };
+			const b = { c: d.c, o: d.o, s: d.s, e, cap: 3, ppl: ['Nicholas', U] };
 			S.courts.push(b);
 			S.draft = S.card = S.pending = null;
 			drop(S.prompt);
@@ -389,7 +389,7 @@ function projectsDemo(selector, init) {
 			timers = []; ptimers = [];
 			S = { msgs: [], touched: false,
 				courts: [{ c: '1', o: 2, s: 600, e: 720, cap: 3, ppl: ['Nicholas'] }, { c: '2', o: 4, s: 1200, e: 1260, cap: 3, ppl: ['Nicholas', '', ''] },
-					{ c: '5', o: 6, s: 1140, e: 1230, cap: 3, ppl: ['Nicholas', 'Priya'] }] };
+					{ c: '3', o: 6, s: 1140, e: 1230, cap: 3, ppl: ['Nicholas', 'Priya'] }] };
 			chat.innerHTML = '<div class="sq-day">Today</div>';
 			chips.forEach((c) => { c.hidden = false; });
 			toastEl.classList.remove('is-on');

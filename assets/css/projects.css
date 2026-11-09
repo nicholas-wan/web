@@ -491,7 +491,6 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .page-projects .f-ini:not([style*="i:-"]){background:#fff url(../../images/projects/finance-logos.webp) 0 calc(var(--i)*-34px)/34px;color:#0000}
 .page-projects .f-cnt{display:flex;justify-content:space-between;align-items:baseline;margin-top:2px;color:var(--t3);font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.04em}
 .page-projects .f-cnt b{color:var(--t);font-size:15px;text-transform:none;letter-spacing:0}
-.page-projects .sq-sample-label{flex:none;padding:2px 10px 0;font-size:12px;color:#b2c4d3}
 .page-projects .sq-bk{width:70px;font-size:13px}
 .page-projects .sq-gav{margin-left:36px}
 .page-projects .sq-chat{-webkit-mask-image:linear-gradient(transparent 4px,#000 30px);mask-image:linear-gradient(transparent 4px,#000 30px)}
