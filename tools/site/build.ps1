@@ -785,7 +785,7 @@ $assetVersions = @{}
 foreach ($file in $runtimeCssText.Keys) {
     $assetVersions["assets/css/$file"] = Get-ContentVersion $runtimeCssText[$file]
 }
-foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'travel-shortcuts.js', 'travel-rail.js', 'travel-chronology.js', 'projects.js', 'projects-laptop.js')) {
+foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'travel-shortcuts.js', 'travel-rail.js', 'travel-chronology.js', 'projects.js', 'projects-laptop.js', 'projects-companions.js')) {
     $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
 }
 $assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
@@ -1140,6 +1140,8 @@ foreach ($page in $pages) {
         # JavaScript ceiling and only wide screens show the laptop. projects.js injects it
         # from this attribute's versioned URL.
         $main = $main.Replace('data-script="assets/js/projects-laptop.js"', "data-script=`"$(Get-AssetRef 'assets/js/projects-laptop.js')`"")
+        # The companion devices (Finance's laptop, the bots' lock screens) load the same way.
+        $main = $main.Replace('data-script="assets/js/projects-companions.js"', "data-script=`"$(Get-AssetRef 'assets/js/projects-companions.js')`"")
     }
     if ($slug -eq 'travel') {
         $main = $main.Replace('<!-- TRAVEL_SHORTCUTS -->', (Get-Content -LiteralPath (Join-Path $root 'partials/travel-shortcuts.html') -Raw -Encoding UTF8).Trim())
@@ -1364,7 +1366,7 @@ if ($imageDimensionCacheDirty) {
 }
 
 # Publish only runtime assets used by the generated Pages site.
-$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "travel-shortcuts.js", "travel-rail.js", "travel-chronology.js", "projects.js", "projects-laptop.js")
+$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "travel-shortcuts.js", "travel-rail.js", "travel-chronology.js", "projects.js", "projects-laptop.js", "projects-companions.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCssText.Keys) {

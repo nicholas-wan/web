@@ -1066,7 +1066,7 @@ function init(root) {
 	render();
 }
 
-const start = () => { projectsDemo('.app-demo--packing', init); const l = document.querySelector('.pkl'); if (l && innerWidth > 1099) document.head.append(Object.assign(document.createElement('script'), { src: l.dataset.script })); };
+const start = () => { projectsDemo('.app-demo--packing', init); if (innerWidth > 1099) new Set([...document.querySelectorAll('[data-script]')].map(f => f.dataset.script)).forEach(src => document.head.append(Object.assign(document.createElement('script'), { src }))); };
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 

@@ -94,7 +94,8 @@ test('Nag snooze, shared credit and half sheet work', async ({ page }) => {
 test('Finance chart, masking, drill-down and the six phone tabs reset independently', async ({ page }) => {
   await page.goto('/projects');
   await show(page, 'finance-tracker');
-  const app = page.locator('#finance-tracker');
+  // The phone's own figure: the laptop beside it (wide screens) copies the same page.
+  const app = page.locator('#finance-tracker figure.app-card__demo');
   await app.scrollIntoViewIfNeeded();
   const chart = app.getByRole('slider');
   await chart.focus(); await page.keyboard.press('ArrowLeft');
@@ -129,6 +130,41 @@ test('Finance chart, masking, drill-down and the six phone tabs reset independen
   await expect(app.locator('.f-title')).toHaveText('Overview');
   await expect(app.getByRole('slider')).toHaveAttribute('aria-valuenow', '11');
   await expect(app.getByRole('button', { name: 'Hide amounts' })).toBeVisible();
+});
+
+test('Companion devices follow their phones on wide screens and never load on narrow ones', async ({ page }) => {
+  const loads = [];
+  page.on('request', (r) => { if (r.url().includes('projects-companions.js')) loads.push(r.url()); });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/projects');
+  await show(page, 'finance-tracker');
+  const fin = page.locator('#finance-tracker'), lap = fin.locator('.cpn--laptop');
+  await fin.scrollIntoViewIfNeeded();
+  await expect(lap).toBeVisible();
+  expect(loads).toHaveLength(1);
+  expect(loads[0]).toMatch(/projects-companions\.js\?v=/);
+  await expect(lap.locator('.cpf-tabs .on')).toHaveText('Overview');
+  await fin.locator('.f-tab[data-tab="wealth"]').click();
+  await expect(lap.locator('.cpf-tabs .on')).toHaveText('Wealth');
+  await expect(lap.locator('.f-title')).toHaveText('Wealth');
+  await fin.getByRole('button', { name: 'Hide amounts' }).click();
+  await expect(lap.locator('.cpf .fd')).toHaveClass(/is-masked/);
+  await show(page, 'nag-bot');
+  const nag = page.locator('#nag-bot');
+  await nag.scrollIntoViewIfNeeded();
+  await nag.locator('.n-kb button', { hasText: 'Done' }).first().click();
+  await expect(nag.locator('.cpl-n')).toContainText('done by Nicholas');
+  await show(page, 'squashbot');
+  const sq = page.locator('#squashbot');
+  await expect(sq.locator('.cpl-n')).toContainText('slots left on Court 1');
+  const narrow = await page.context().newPage(), narrowLoads = [];
+  narrow.on('request', (r) => { if (r.url().includes('projects-companions.js')) narrowLoads.push(r.url()); });
+  await narrow.setViewportSize({ width: 1024, height: 800 });
+  await narrow.goto('/projects');
+  await narrow.waitForLoadState('load');
+  await expect(narrow.locator('.cpn').first()).toBeHidden();
+  expect(narrowLoads).toHaveLength(0);
+  await narrow.close();
 });
 
 test('Packing laptop follows the phone on wide screens and never loads on narrow ones', async ({ page }) => {

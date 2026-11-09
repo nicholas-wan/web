@@ -405,6 +405,8 @@ Assert-FileSizeBudget 'assets\js\projects.js' 70
 # so it is outside the per-page <script src> ceiling and carries its own budget, styles and the
 # demo's sample items included.
 Assert-FileSizeBudget 'assets\js\projects-laptop.js' 14
+# projects-companions.js loads the same way (9 Nov 2026): Finance's laptop and the bots' lock screens.
+Assert-FileSizeBudget 'assets\js\projects-companions.js' 12
 # Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
 Assert-FileSizeBudget 'assets\css\gallery.css' 15
 Assert-FileSizeBudget 'assets\css\icons.css' 4

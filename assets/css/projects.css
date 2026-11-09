@@ -746,4 +746,4 @@ html .page-projects .portfolio-headline h1{color:#ecedf0}
 .app-demo--squash .sq .sq-chip[hidden]{display:none}
 .page-projects .app-demo .demo-island{background:#000}
 /* Travel Packing's laptop is styled by projects-laptop.js, which loads on wide screens only; until then it stays hidden. */
-.page-projects .pkl:not(.is-on){display:none}
+.page-projects :is(.pkl,.cpn):not(.is-on){display:none}
