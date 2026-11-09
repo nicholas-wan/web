@@ -10,9 +10,9 @@
 const $ = (s, r = document) => r.querySelector(s);
 const figs = { finance: $('.cpn[data-for=finance]'), nag: $('.cpn[data-for=nag]'), squash: $('.cpn[data-for=squash]') };
 document.head.append(Object.assign(document.createElement('style'), { textContent: `
-.page-projects .cpn{margin:1.6rem 0 0!important;padding:0;box-sizing:border-box}
+.page-projects .cpn{margin:2rem 0 0!important;padding:0;box-sizing:border-box}
 .page-projects .cpn figcaption{margin:.55rem 0 0;font:400 .875rem/1.35 Archivo,system-ui,sans-serif;color:#9aa0a8;text-align:left}
-.page-projects .cpn--flow{margin-top:2.4rem!important}
+.page-projects .cpn--flow{margin-top:2rem!important}
 .page-projects .cpf-flow{display:flex;gap:36px;max-width:516px;margin:0!important;padding:0;list-style:none}
 .page-projects .cpf-flow li{flex:1;min-width:0;display:grid;gap:10px;justify-items:center;margin:0;padding:0}
 .page-projects .cpf-flow li:nth-child(2){--i:1}
@@ -24,7 +24,7 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 .page-projects .cpf-line{stroke-dasharray:1}
 .page-projects .cpf-flow li+li .cpf-t::before{content:"";position:absolute;top:50%;left:-37px;width:36px;height:1px;background:#ffffff2e;transform-origin:0}
 .page-projects .cpf-flow li+li .cpf-t::after{content:"";position:absolute;top:calc(50% - 1.5px);left:-37px;width:4px;height:4px;border-radius:50%;background:var(--app);opacity:0}
-.page-projects .cpf-flow>li>span:last-child{font:400 13px/1.3 Archivo,system-ui,sans-serif;color:#8e8e93;white-space:nowrap}
+.page-projects .cpf-flow>li>span:last-child{font:400 14px/1.3 Archivo,system-ui,sans-serif;color:#8e8e93;white-space:nowrap}
 .page-projects .cpf-flow:not(.is-run) .cpf-t{opacity:0}
 .page-projects .cpf-flow.is-run .cpf-t{animation:cpf-up .45s cubic-bezier(.22,1,.36,1) calc(var(--i,0) * 120ms) both}
 .page-projects .cpf-flow.is-run li+li .cpf-t::before{animation:cpf-line .25s ease-out calc(var(--i) * 120ms + 280ms) both}
@@ -38,9 +38,9 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 @keyframes cpf-run{15%{opacity:1}85%{opacity:1}to{left:-6px;opacity:0}}
 @keyframes cpf-pop{from{opacity:0;transform:scale(0)}}
 @media (prefers-reduced-motion: reduce){.page-projects .cpf-flow *,.page-projects .cpf-flow *::before,.page-projects .cpf-flow *::after{animation:none!important}.page-projects .cpf-flow:not(.is-run) .cpf-t{opacity:1}.page-projects .cpf-flow .cpf-line{stroke-dashoffset:0!important}}
-.page-projects .cpn--lock{display:flex;align-items:flex-end;gap:18px}
-.page-projects .cpn--lock figcaption{max-width:12rem;margin:0 0 .3rem}
-.page-projects .cpl{flex:none;width:226px;height:468px;padding:7px;box-sizing:border-box;border-radius:34px;background:#050607;box-shadow:inset 0 0 0 1px #3b4047,0 24px 50px -24px color-mix(in srgb,var(--app) 60%,transparent)}
+.page-projects .cpn--lock{display:block}
+.page-projects .cpn--lock figcaption{max-width:20rem;margin:1rem 0 0}
+.page-projects .cpl{flex:none;width:226px;height:410px;padding:7px;box-sizing:border-box;border-radius:34px;background:#050607;box-shadow:inset 0 0 0 1px #3b4047,0 24px 50px -24px color-mix(in srgb,var(--app) 60%,transparent)}
 .page-projects .cpl-s{position:relative;height:100%;overflow:hidden;border-radius:28px;background:var(--wall);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;text-align:center}
 .page-projects .cpl-s::before{content:"";position:absolute;top:8px;left:50%;width:62px;height:18px;margin-left:-31px;border-radius:10px;background:#000}
 .page-projects .cpl-s p{margin:0;text-align:center!important;color:#fff!important}

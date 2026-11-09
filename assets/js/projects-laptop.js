@@ -7,13 +7,13 @@
 (() => {
 const fig = document.querySelector('.pkl'), app = fig && fig.querySelector('.pkl-app'), phone = document.querySelector('#travel-packing .pk');
 if (!app || !phone) return;
-document.head.append(Object.assign(document.createElement('style'), { textContent: `.page-projects .pkl{margin:1rem 0 0!important;padding:0 10px;max-width:520px;box-sizing:border-box}
+document.head.append(Object.assign(document.createElement('style'), { textContent: `.page-projects .pkl{margin:2rem 0 0!important;padding:0 10px;max-width:520px;box-sizing:border-box}
 .page-projects .pkl-lid{position:relative;padding:9px 9px 14px;border-radius:14px 14px 4px 4px;background:linear-gradient(#26282d,#1b1c20);box-shadow:inset 0 0 0 1px #34363c,0 24px 60px -18px rgba(95,208,197,.22),0 18px 40px -20px #000}
 .page-projects .pkl-lid::before{content:"";position:absolute;top:4px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:#3a3d43}
 .page-projects .pkl-screen{position:relative;aspect-ratio:16/10;overflow:hidden;border-radius:3px;background:#ECEAE4}
 .page-projects .pkl-base{position:relative;height:11px;margin:0 -10px;border-radius:0 0 10px 10px/0 0 9px 9px;background:linear-gradient(#3a3d43,#232529 55%,#17181b);box-shadow:0 10px 18px -10px #000}
 .page-projects .pkl-base::before{content:"";position:absolute;top:0;left:50%;width:16%;height:4px;transform:translateX(-50%);border-radius:0 0 6px 6px;background:#17181b}
-.page-projects .pkl figcaption{margin:.4rem 0 0 -10px;font:400 .875rem/1.35 Archivo,system-ui,sans-serif;color:#9aa0a8;text-align:left}
+.page-projects .pkl figcaption{margin:1rem 0 0 -10px;font:400 .875rem/1.35 Archivo,system-ui,sans-serif;color:#9aa0a8;text-align:left}
 .page-projects .pkl-app{position:absolute;top:0;left:0;display:flex;flex-direction:column;width:760px;height:475px;transform-origin:0 0;overflow:hidden;background:#ECEAE4;color:#15201F;font:400 14px/1.3 Archivo,system-ui,sans-serif;text-align:left;letter-spacing:0;-webkit-font-smoothing:antialiased}
 .page-projects .pkl-app svg{fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 .page-projects .pkl-app b{color:inherit!important;font-weight:600}
