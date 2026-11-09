@@ -4,15 +4,15 @@
    - Mid-flick (over 900px/s) playing scenes freeze, and arrivals are set on their opening frame and held at
      a lighter tint, so the frame on screen is exactly where each carries on. On the stop (or below 400px/s)
      they start top to bottom, 70ms apart: the sky comes up to full and the scene runs its own animation
-     fast for half a second (ferries zip on, Seoul's doors swing open, Cologne lights, night falls on Paris).
+     fast for half a second (the Liberty ferry pulls away, Seoul's doors swing open, Cologne lights, night falls on Paris).
      Small movers can't be seen mid-flick, so this puts the motion where the eye is, and keeps flicks smooth.
    - A scene opens just before its own main moment, on its first pass only; repeats run from 0, since each
      scene's last frame matches its first. Two passes, then it plays on to a lit frame and rests there until
      the page scrolls about a row. */
 (() => {
  'use strict';
- const OPEN={guangzhou:700,australia:1500,germany:150,usacanada:1900,seoul:800};
- const REST={chengdu_zhangjiajie:1600,guangzhou:2400,japan:1600,australia:3000,germany:2400,usacanada:3200,perth:1400,europe:1800,siliconvalley:3400,seoul:2400};
+ const OPEN={guangzhou:700,australia:1500,germany:150,usacanada:600,seoul:800};
+ const REST={chengdu_zhangjiajie:1600,guangzhou:2400,japan:1600,australia:3000,germany:2400,usacanada:5500,perth:1400,europe:1800,siliconvalley:3400,seoul:2400};
  const FAST=900,SLOW=400,SETTLE=140,NUDGE=150,STAGGER=70,PASSES=2;
  const BURST=[[3,250],[2,150],[1.4,150]];// rate, ms
  const STEADY=new Set(['mm-flag']);// sped up, Perth's flag shows how stiff its wave is
@@ -35,14 +35,14 @@
   (PUSH[key(e)]||[]).forEach(p=>e.art.querySelectorAll(p.sel).forEach((el,i)=>{try{s.fx.push(el.animate(p.kf,{duration:p.duration,delay:delay+(p.delay||0)+(p.step||0)*i,easing:ease,composite:'add'}));}catch(x){}}));
   if(key(e)==='europe')e.art.querySelectorAll('.mm-star').forEach((el,i)=>{if(i%2===0)s.fx.push(el.animate(SPARKLE,{duration:900,delay:delay+100+i*2,easing:ease,fill:'backwards'}));});
  }
- // Golden Gate fog drifts across; Guangzhou's river boat is CSS (mv-boat). Neither is rewound by the loop.
+ // Golden Gate fog drifts across, apart from the scene's own loop, which never rewinds it.
  const drift=e=>key(e)!=='siliconvalley'?[]:[['.gg-fog',-12],['.gg-fog-front',10]].flatMap(([sel,dx])=>[...e.art.querySelectorAll(sel)].map(el=>
   el.animate([{transform:'none'},{transform:`translateX(${dx}px)`},{transform:'none'}],{duration:9000,iterations:Infinity,easing:'ease-in-out',composite:'add'})));
  function start(e,held){
   if(playing.has(e))return playing.get(e);
   const a=e.art,k=key(e),at=OPEN[k]||0;a.classList.toggle('is-held',held);a.classList.add('is-active');
-  const all=a.getAnimations({subtree:true}).filter(x=>x.animationName),anims=all.filter(x=>!x.animationName.startsWith('mv-'));
-  const s={anims,extra:[...all.filter(x=>x.animationName.startsWith('mv-')),...drift(e)],full:+a.dataset.duration||6200,rest:REST[k]||1500,passes:0,held,bursts:[],fx:[]};
+  const anims=a.getAnimations({subtree:true}).filter(x=>x.animationName);
+  const s={anims,extra:drift(e),full:+a.dataset.duration||6200,rest:REST[k]||1500,passes:0,held,bursts:[],fx:[]};
   const seek=t=>anims.forEach(x=>{x.currentTime=t;x.play();});
   s.loop=()=>{seek(0);if(++s.passes>=PASSES)s.ending=true;schedule(s);};
   if(at)seek(at);playing.set(e,s);

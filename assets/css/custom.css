@@ -9628,7 +9628,7 @@ html .page-skills #main > .post { border-top:0; }
 /* V2 keeps Fuji's sun in place: weather and light move continuously. */
 /* A short arm rests against the outer torso; the paw lifts its held bamboo to eat. */
 
-.cr-liberty-glint,.cr-liberty-ripple{opacity:0}.authored-scene.is-active .cr-liberty-glint{animation:cr-glint var(--polish-duration) ease both}.authored-scene.is-active .cr-liberty-ferry{animation:cr-ferry var(--polish-duration) linear both}.authored-scene.is-active .cr-ripple-a{animation:cr-ripple-a var(--polish-duration) ease both}.authored-scene.is-active .cr-ripple-b{animation:cr-ripple-b var(--polish-duration) ease both}@keyframes cr-ferry{0%,5%{transform:translateX(0)}95%,100%{transform:translateX(153px)}}@keyframes cr-ripple-a{0%,30%,100%{opacity:0}45%{opacity:.8}70%{opacity:0}}@keyframes cr-ripple-b{0%,58%,100%{opacity:0}73%{opacity:.8}94%{opacity:0}}@media(prefers-reduced-motion:reduce){.authored-scene .cr-liberty-ferry{transform:translateX(47px)}.authored-scene .cr-liberty-glint,.authored-scene .cr-liberty-ferry,.authored-scene .cr-liberty-ripple{animation:none!important}}
+.cr-liberty-glint,.cr-liberty-ripple{opacity:0}.authored-scene.is-active .cr-liberty-glint{animation:cr-glint var(--polish-duration) ease both}.authored-scene.is-active .cr-liberty-ferry{animation:cr-ferry var(--polish-duration) linear both}.authored-scene.is-active .cr-ripple-a{animation:cr-ripple-a var(--polish-duration) ease both}.authored-scene.is-active .cr-ripple-b{animation:cr-ripple-b var(--polish-duration) ease both}@keyframes cr-ferry{0%,28%{transform:translateX(0);animation-timing-function:cubic-bezier(.55,0,.9,.55)}50%{transform:translateX(-96px);animation-timing-function:step-end}56%{transform:translateX(66px);animation-timing-function:cubic-bezier(.12,.55,.3,1)}80%,100%{transform:translateX(0)}}@keyframes cr-ripple-a{0%,36%,100%{opacity:0}44%{opacity:.8}62%{opacity:0}}@keyframes cr-ripple-b{0%,68%,100%{opacity:0}80%{opacity:.8}96%{opacity:0}}@media(prefers-reduced-motion:reduce){.authored-scene .cr-liberty-glint,.authored-scene .cr-liberty-ferry,.authored-scene .cr-liberty-ripple{animation:none!important}}
 
 
 .cl-gull{transform:translate(17px,9px)}.cl-wing{transform-origin:0 0}
@@ -10114,8 +10114,8 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene.is-active .mm-led{animation:mm-led var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .mm-river path{animation:mm-river var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .mm-river path+path{animation-name:mm-river-b}
-@keyframes mm-led{0%,100%{opacity:.12;fill:#db9bcf}50%{opacity:.16;fill:#db9bcf}}
-@keyframes mm-river{0%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}20%{opacity:.85}50%{transform:translateX(.8px);stroke:#c8b4ec}80%{opacity:.85;stroke:#ec8fb5}}
+@keyframes mm-led{0%,100%{opacity:.12;fill:#db9bcf}28%{opacity:.34;fill:#a98df0}52%{opacity:.3;fill:#62c9d9}64%{opacity:.32;fill:#b9a6ee}76%{opacity:.3;fill:#f29ac4}}
+@keyframes mm-river{0%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}20%{opacity:.85}50%{transform:translateX(.8px);stroke:#9ad7e2}80%{opacity:.85;stroke:#ec8fb5}}
 @keyframes mm-river-b{0%,6%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}26%{opacity:.85}56%{transform:translateX(-.8px);stroke:#9a79e8}86%{opacity:.85;stroke:#ec8fb5}}
 @media(max-width:736px){
  /* Tiles 150px from 390px wide, 140px from 361px, 118px at 360px and below (9 Nov 2026). */
@@ -10137,11 +10137,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
     Paris at night held nearer full, as 78% of its navy read slate grey. */
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held .mm-dusk-tile{opacity:.78}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held[data-scene="2"]::before{opacity:.9}
- /* A lit river boat crosses Guangzhou left to right, 9s a crossing; parked left of the tower at rest, the crossing's first frame. travel-rail.js
-    leaves mv- animations running across the scene's own loop. */
- .mobile-journal-row .gz-boat{display:inline;transform:translate(36.67px,76.4px) scale(1.5)}
- .mobile-journal-row .authored-scene.is-active .gz-boat{animation:mv-boat 9s linear -3s infinite}
- @keyframes mv-boat{from{transform:translate(-10px,76.4px) scale(1.5)}to{transform:translate(130px,76.4px) scale(1.5)}}
  /* Every scene on screen plays (9 Nov 2026); the ring marks the one on the reading line. */
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-focus{box-shadow:0 0 0 2px #a8c8b6}
  /* Small movers drawn bigger on the phone tiles so they read on a flick. Each scales its inner
