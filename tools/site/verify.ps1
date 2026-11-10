@@ -1016,7 +1016,8 @@ if ((Get-Content -LiteralPath (Join-Path $dist 'skills.html') -Raw -Encoding UTF
 Assert-FileSizeBudget 'projects.html' 46
 $projectsCss = Get-Content -LiteralPath (Join-Path $dist 'assets/css/projects.css') -Raw -Encoding UTF8
 $flatProjectsCss = [regex]::Replace($projectsCss, '(?s)@keyframes\s+[\w-]+\s*\{(?:[^{}]|\{[^{}]*\})*\}', '')
-$flatProjectsCss = [regex]::Replace($flatProjectsCss, '@media[^{}]*\{', '')
+# @supports wraps the phones' fitted demo scale (10 Nov 2026); like @media it is a conditional group, not selector nesting.
+$flatProjectsCss = [regex]::Replace($flatProjectsCss, '@(?:media|supports)[^{}]*\{', '')
 if ($flatProjectsCss -match '\{[^{}]*\{') { throw 'Projects CSS must stay unnested for iOS 16.' }
 # Projects: four equal interactive sample demos, route-only assets and no household source links.
 $projectsHtml = Get-Content -LiteralPath (Join-Path $dist 'projects.html') -Raw -Encoding UTF8

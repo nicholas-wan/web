@@ -44,9 +44,9 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 .page-projects .cpl-s{position:relative;height:100%;overflow:hidden;border-radius:28px;background:var(--wall);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;text-align:center}
 .page-projects .cpl-s::before{content:"";position:absolute;top:8px;left:50%;width:62px;height:18px;margin-left:-31px;border-radius:10px;background:#000}
 .page-projects .cpl-s p{margin:0;text-align:center!important;color:#fff!important}
-.page-projects .cpl-s .cpl-d{margin-top:46px;font:600 12.5px/1.3 inherit;opacity:.85}
+.page-projects .cpl-s .cpl-d{margin-top:38px;font:600 12.5px/1.3 inherit;opacity:.85}
 .page-projects .cpl-s .cpl-c{font:600 62px/1.05 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;letter-spacing:-.02em}
-.page-projects .cpl-n{position:absolute;left:8px;right:8px;bottom:34px;display:grid;gap:6px}
+.page-projects .cpl-n{position:absolute;left:8px;right:8px;top:156px;display:grid;gap:6px}
 .page-projects .cpl-n div{display:grid;grid-template-columns:24px minmax(0,1fr) auto;column-gap:8px;padding:9px 10px;border-radius:15px;background:#ffffff38;-webkit-backdrop-filter:blur(14px) saturate(1.4);backdrop-filter:blur(14px) saturate(1.4);text-align:left;font-size:10.5px;line-height:1.3}
 .page-projects .cpl-n i{grid-row:span 2;width:24px;height:24px;border-radius:6px;background:linear-gradient(#2aabee,#229ed9) center/100%}
 .page-projects .cpl-n i::before{content:"";display:block;width:100%;height:100%;background:#fff;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 11.6 17.3 6.8c.6-.2 1.1.1.9.9l-2 9.6c-.2.7-.6.8-1.2.5l-3.1-2.3-1.5 1.4c-.2.2-.3.3-.6.3l.2-3.2 5.8-5.3c.3-.2-.1-.4-.4-.2l-7.2 4.5-3.1-1c-.7-.2-.7-.7.1-1Z'/%3E%3C/svg%3E") center/70% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 11.6 17.3 6.8c.6-.2 1.1.1.9.9l-2 9.6c-.2.7-.6.8-1.2.5l-3.1-2.3-1.5 1.4c-.2.2-.3.3-.6.3l.2-3.2 5.8-5.3c.3-.2-.1-.4-.4-.2l-7.2 4.5-3.1-1c-.7-.2-.7-.7.1-1Z'/%3E%3C/svg%3E") center/70% no-repeat}

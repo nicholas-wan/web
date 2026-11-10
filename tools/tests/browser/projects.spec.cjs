@@ -289,3 +289,80 @@ test('Desktop shows one project at a time and the rail switches with clicks and 
   await expect(page.locator('.app-rail')).toBeHidden();
   await expect(page.locator('.app-card:visible')).toHaveCount(4);
 });
+
+test('Phones draw the demo as large as the handset allows and keep it with its caption', async ({ page }) => {
+  // [viewport, smallest demo width expected]: a small phone keeps 0.88, taller ones grow with the screen.
+  for (const [width, height, least, most] of [[375, 553, 263, 265], [393, 659, 288, 300], [430, 746, 330, 345]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/projects');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+    for (const id of ['squashbot', 'travel-packing']) {
+      const demo = await page.locator(`#${id} .app-demo`).boundingBox();
+      expect(demo.width).toBeGreaterThan(least);
+      expect(demo.width).toBeLessThan(most);
+      if (height > 553) expect((await page.locator(`#${id} figure.app-card__demo`).boundingBox()).height).toBeLessThan(height);
+      const foot = await page.locator(`#${id} .app-card__foot`).boundingBox();
+      expect(foot.y + foot.height).toBeLessThan((await page.locator(`#${id} .app-phone`).boundingBox()).y + 2);
+    }
+  }
+});
+
+test('On touch screens a demo list scrolls only after the demo is tapped', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 393, height: 659 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.goto('/projects');
+  const app = page.locator('#travel-packing'), list = app.locator('.pk-scroll');
+  await app.locator('.app-demo').scrollIntoViewIfNeeded();
+  await expect(app.locator('.pk-cname')).toHaveCount(3);
+  expect(await list.evaluate(e => getComputedStyle(e).overflowY)).toBe('hidden');
+  await app.getByRole('button', { name: 'More nights', exact: true }).tap();
+  await expect(app.locator('.app-demo')).toHaveAttribute('data-user', '1');
+  expect(await list.evaluate(e => getComputedStyle(e).overflowY)).toBe('auto');
+  await context.close();
+});
+
+test('Packing preview keeps what it changes on screen and any part of a row ticks it', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 393, height: 659 });
+  await page.goto('/projects');
+  const app = page.locator('#travel-packing'), demo = app.locator('.app-demo');
+  await demo.evaluate(e => scrollTo(0, e.getBoundingClientRect().top + scrollY - (innerHeight - e.getBoundingClientRect().height) / 2));
+  await expect(demo).toHaveAttribute('data-playing', '1', { timeout: 15000 });
+  // Each state lasts well under a second, so one frame-by-frame wait checks the words and where they are together.
+  const during = (text) => page.waitForFunction((text) => {
+    const d = document.querySelector('#travel-packing .app-demo'), s = d.querySelector('.pk-scroll').getBoundingClientRect();
+    const on = (e) => { const r = e && e.getBoundingClientRect(); return !!e && r.height > 0 && r.top >= s.top && r.bottom <= s.bottom; };
+    const count = d.querySelector('[data-id="underwear"] output'), note = d.querySelector('.pk-note');
+    // The nights change with the stepper and a Clothes count on screen together.
+    if (text === '6 nights') return d.querySelector('.pk-nlabel').textContent.trim() === text && on(d.querySelector('.pk-nights')) && on(count) && count.textContent === '7';
+    // eSIM is ticked where the reader can see it.
+    return note.textContent.includes(text) && on(note) && !d.querySelector('[data-id="esim"]:not(.leaving)');
+  }, text, { polling: 'raf', timeout: 15000 });
+  await during('6 nights');
+  await during('5 essentials still to pack');
+  await expect(demo).not.toHaveAttribute('data-playing', '1', { timeout: 10000 });
+  await expect.poll(() => app.locator('.pk-scroll').evaluate(e => e.scrollTop)).toBe(0);
+  await app.locator('[data-id="passport"] .pk-ti').click();
+  await expect(app.getByRole('checkbox', { name: 'Passport, essential', exact: true })).toBeChecked();
+});
+
+test('Desktop carousel holds only for the phone or the rail, and follows the hash', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 1440, height: 1100 });
+  await page.goto('/projects');
+  const rail = page.locator('.app-rail');
+  await page.locator('#squashbot .app-demo').scrollIntoViewIfNeeded();
+  // The first card is simply there; only a card that replaces another fades in.
+  expect(await page.locator('#squashbot').evaluate(e => e.getAnimations().length)).toBe(0);
+  // The pointer on the reasons no longer stops it; on the phone it does.
+  await page.locator('#squashbot .app-why li').first().hover();
+  await expect(rail).toHaveClass(/is-auto/);
+  await expect(rail).not.toHaveClass(/is-hold/);
+  await page.locator('#squashbot .app-phone').hover();
+  await expect(rail).toHaveClass(/is-hold/);
+  await page.evaluate(() => { location.hash = '#nag-bot'; });
+  await expect(page.locator('#nag-bot')).toBeVisible();
+  await expect(page.locator('#squashbot')).toBeHidden();
+  await expect(page.locator('.app-rail [aria-controls="nag-bot"]')).toHaveAttribute('aria-selected', 'true');
+  await expect(rail).toHaveClass(/is-turn/);
+});

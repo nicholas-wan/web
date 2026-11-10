@@ -1,9 +1,10 @@
-/* Each isolated sample app initializes only within 500px of the viewport. */
+/* 85% of a demo on screen: the bar for its preview and for the desktop carousel to turn. */
+const pjVisible = d => { const b = d.getBoundingClientRect(); return Math.max(0, Math.min(innerHeight, b.bottom) - Math.max(0,b.top)) / b.height >= .85; };
+/* Each sample app initializes only within 500px of the viewport. */
 function projectsDemo(selector, init) {
 	const roots = [...document.querySelectorAll(selector)];
 	const boot = root => { if (!root.dataset.initialized) { root.dataset.initialized='1'; init(root); } };
 	roots.forEach(root => root.addEventListener('focusin', () => boot(root), {once:true}));
-	if (!('IntersectionObserver' in window)) return roots.forEach(boot);
 	const io = new IntersectionObserver(entries => entries.forEach(e => {
 		if (e.isIntersecting) { boot(e.target); io.unobserve(e.target); }
 	}), {rootMargin:'500px'});
@@ -626,10 +627,10 @@ function setup(root) {
 	root.addEventListener('demo:visible', () => {
 		if (reduced()) return;
 		later(250, () => { s.msgs.slice(1).forEach((m) => { m.isNew = 1; }); renderChat(); }, preview);
-		later(900, () => { s.ring = 1; renderChat(); }, preview);
-		later(2400, () => { const d = $('.is-ring'); if (d) d.classList.add('is-press'); }, preview);
-		later(2650, () => { s.ring = 0; complete(0); renderChat(); }, preview);
-		later(3700, () => go([...live.querySelectorAll('.n-brow')].pop()), preview);
+		later(600, () => { s.ring = 1; renderChat(); }, preview);
+		later(1450, () => { const d = $('.is-ring'); if (d) d.classList.add('is-press'); }, preview);
+		later(1700, () => { s.ring = 0; complete(0); renderChat(); }, preview);
+		later(4200, () => go([...live.querySelectorAll('.n-brow')].pop()), preview);
 	});
 	root.addEventListener('demo:reset', () => {
 		timers.concat(preview).forEach(clearTimeout);
@@ -1008,7 +1009,7 @@ function init(root) {
 	}
 
 	root.addEventListener('click', e => {
-		const el = e.target.closest('[data-act], .pk-label'), act = el && el.dataset.act;
+		const el = e.target.closest('[data-act], .pk-label, .pk-ti'), act = el && el.dataset.act;
 		if (!el) return;
 		if (!act) el.parentNode.querySelector('input').click();
 		else if (act === 'list' && S.key !== el.dataset.key) { S.key = el.dataset.key; render(); scroller.scrollTop = 0; }
@@ -1041,15 +1042,17 @@ function init(root) {
 	function preview() {
 		if (previewing || touched || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 		previewing = true;
-		const plus = () => $('[data-act=nights][data-d="1"]'), head = c => () => $(`[data-cat="${c}"] .pk-chead`);
+		const plus = () => $('[data-act=nights][data-d="1"]'), head = c => () => $(`[data-cat="${c}"] .pk-chead`), to = (top, at) => later(() => scroller.scrollTo({ top, behavior: 'smooth' }), at);
 		moveTap(head('Basics')(), true);
 		later(() => tap.classList.add('on'), 60);
-		[[head('Basics'), 500], [head('Hygiene'), 1000], [plus, 1800], [plus, 2400], [() => $('.pk-lc'), 3300], [head('Basics'), 4200], [() => box('esim'), 4900], [() => $('.pk-note [data-act=last]'), 5700]].forEach(([get, at], k) => {
+		[[head('Basics'), 450], [head('Hygiene'), 900], [plus, 2050], [plus, 2600], [head('Basics'), 3300], [() => $('.pk-lc'), 4000], [() => box('esim'), 5150], [() => $('.pk-note [data-act=last]'), 5850]].forEach(([get, at], k) => {
 			if (k) later(() => moveTap(get()), at - 420);
 			later(() => { tap.classList.remove('press'); void tap.offsetWidth; tap.classList.add('press'); get().click(); }, at);
 		});
-		later(() => tap.classList.remove('on'), 6000);
-		later(() => { previewing = false; tap.className = 'pk-tap'; }, 6300);
+		/* The list follows the taps: the stepper with Clothes under it, Last call's note with the essentials, then back to the top. */
+		to(112, 950); to(222, 4050); to(0, 5900);
+		later(() => tap.classList.remove('on'), 6050);
+		later(() => { previewing = false; tap.className = 'pk-tap'; }, 6350);
 	}
 
 	root.addEventListener('demo:visible', () => later(preview, 250));
@@ -1079,8 +1082,10 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 	if (!rail) return;
 	const tabs = [...rail.children], wide = matchMedia('(min-width: 981px)'), still = matchMedia('(prefers-reduced-motion: reduce)');
 	const cards = tabs.map(t => document.getElementById(t.getAttribute('aria-controls')));
-	let cur = Math.max(0, cards.findIndex(c => '#' + c.id === location.hash));
+	const at = () => cards.findIndex(c => '#' + c.id === location.hash);
+	let cur = Math.max(0, at());
 	function show(i, focus) {
+		if (i !== cur) rail.classList.add('is-turn');
 		cur = i;
 		tabs.forEach((t, k) => {
 			const v = t.querySelector('video'), on = k === i;
@@ -1104,15 +1109,16 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 	}
 	vids.forEach(v => v.addEventListener('ended', () => { if (hover < 0) { turn++; cue(); } }));
 	tabs.forEach((t, n) => { t.addEventListener('pointerenter', () => { hover = n; cue(); }); t.addEventListener('pointerleave', () => { hover = -1; cue(); }); });
-	// It also turns by itself while the chosen phone is fully on screen and unhovered; a tab click or a touch on a demo ends it for good.
-	function hold() { const r = cards[cur].querySelector('.app-demo').getBoundingClientRect(); rail.classList.toggle('is-hold', !!over || r.top < 0 || r.bottom > innerHeight); }
+	// It also turns by itself while 85% of the chosen phone is on screen and the pointer is off the phone and the rail; a tab click or a touch on a demo ends it for good.
+	function hold() { rail.classList.toggle('is-hold', !!over || !pjVisible(cards[cur].querySelector('.app-demo'))); }
 	const quit = () => { auto = 0; rail.classList.remove('is-auto'); cue(); };
 	rail.addEventListener('animationend', e => { if (!auto || e.animationName !== 'pj-fill') return; const n = (cur + 1) % 4, d = cards[n].querySelector('.app-demo'); if (!d.dataset.user) delete d.dataset.seen; show(n); });
-	[rail, ...cards].forEach(el => { el.addEventListener('pointerenter', () => { over = 1; hold(); }); el.addEventListener('pointerleave', () => { over = 0; hold(); }); });
+	[rail, ...document.querySelectorAll('.app-phone')].forEach(el => { el.addEventListener('pointerenter', () => { over = 1; hold(); }); el.addEventListener('pointerleave', () => { over = 0; hold(); }); });
 	cards.forEach(c => ['pointerup', 'keydown'].forEach(t => c.addEventListener(t, quit)));
 	addEventListener('scroll', hold, { passive: true });
 	rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { quit(); show(tabs.indexOf(t)); } });
 	rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur || 4 }[e.key]; if (d) { e.preventDefault(); quit(); show((cur + d) % 4, 1); } });
+	addEventListener('hashchange', () => { const i = at(); if (i >= 0 && cards[i].hidden) { quit(); show(i); cards[i].scrollIntoView(); } });
 	const start = () => { auto = wide.matches && !still.matches ? 1 : 0; rail.classList.toggle('is-auto', !!auto); show(cur); };
 	[wide, still].forEach(m => m.addEventListener('change', start));
 	// Phones: the site's Menu pill steps aside while a demo's top bar is under it.
@@ -1120,13 +1126,12 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 	start();
 })();
 
-/* One guided preview at a time, after 500 ms of settled scrolling at 90% visibility; a tap or key hands control to the reader. */
+/* One guided preview at a time, after 500 ms of settled scrolling at 85% visibility; a tap or key hands control to the reader. */
 (() => {
 	const demos = [...document.querySelectorAll('.app-demo')];
 	const motion = matchMedia('(prefers-reduced-motion: reduce)');
 	let active = null, paused = null, settle = 0, finish = 0, busy = null, busyAt = 0;
 	const emit = (d, name) => d.dispatchEvent(new CustomEvent(name));
-	const visible = d => { const b = d.getBoundingClientRect(); return Math.max(0, Math.min(innerHeight, b.bottom) - Math.max(0,b.top)) / b.height >= .9; };
 	function stop() {
 		clearTimeout(finish);
 		if (active) { emit(active,'demo:stop'); delete active.dataset.playing; active = null; }
@@ -1134,8 +1139,8 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 	function choose() {
 		if (active || paused || motion.matches || document.hidden) return;
 		const wait = busyAt + 8000 - Date.now();
-		if (busy && wait > 0 && visible(busy)) { settle = setTimeout(choose, wait); return; }
-		const d = demos.find(d => !d.dataset.seen && !d.dataset.user && visible(d));
+		if (busy && wait > 0 && pjVisible(busy)) { settle = setTimeout(choose, wait); return; }
+		const d = demos.find(d => !d.dataset.seen && !d.dataset.user && pjVisible(d));
 		if (!d) return;
 		active=d; d.dataset.playing='1'; d.dataset.seen='1';
 		emit(d,'demo:reset'); emit(d,'demo:visible');
@@ -1143,11 +1148,11 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 	}
 	function schedule() { clearTimeout(settle); settle=setTimeout(choose,500); }
 	document.addEventListener('scroll', () => {
-		if (active && !visible(active)) { const d=active; stop(); delete d.dataset.seen; }
+		if (active && !pjVisible(active)) { const d=active; stop(); delete d.dataset.seen; }
 		schedule();
 	}, { capture:true, passive:true });
 	window.addEventListener('resize',schedule,{passive:true});
-	document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); else schedule(); });
+	document.addEventListener('visibilitychange', () => { if (document.hidden) { const d = active; stop(); if (d) delete d.dataset.seen; } else schedule(); });
 	motion.addEventListener('change', () => { stop(); schedule(); });
 	demos.forEach(d => {
 		d.addEventListener('pointerdown', () => { if (active === d) { paused=d; stop(); } }, {capture:true,passive:true});
