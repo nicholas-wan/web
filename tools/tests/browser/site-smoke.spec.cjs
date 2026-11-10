@@ -84,6 +84,61 @@ test('a tap on the dim closes the phone sheet, and home has the labelled pill', 
   await context.close();
 });
 
+// 10 Nov 2026 (owner: "index page has huge white space"): the desktop About scene settles as one
+// frame, photo and copy over the cards, with no dead band above the photo or between it and the cards.
+test('desktop About settles with the photo and cards in one frame', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  for (const [width, height] of [[1440, 900], [1366, 768], [820, 1180]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/index');
+    await page.waitForLoadState('load');
+    // The pin starts where the section's top meets --swipe-top and lasts the section's height less the stage's.
+    const settle = await page.evaluate(() => {
+      const section = document.querySelector('.intro-swipe');
+      const stage = section.querySelector('.intro-swipe__stage');
+      const pin = parseFloat(section.style.getPropertyValue('--swipe-top'));
+      return section.getBoundingClientRect().top + scrollY - pin + section.offsetHeight - stage.offsetHeight;
+    });
+    await page.evaluate(y => window.scrollTo(0, y), settle);
+    await expect.poll(() => page.evaluate(() => document.querySelector('.intro-swipe').style.getPropertyValue('--p'))).toMatch(/^(1\.0000|0\.99)/);
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.querySelector('.homepage-link:last-child')).opacity)).toBe('1');
+    const frame = await page.evaluate(() => {
+      const photo = document.querySelector('.intro-swipe__photo img').getBoundingClientRect();
+      const cards = document.querySelector('.homepage-links').getBoundingClientRect();
+      return { top: photo.top, gap: cards.top - photo.bottom, bottom: innerHeight - cards.bottom, ratio: photo.width / photo.height };
+    });
+    expect(frame.top).toBeGreaterThanOrEqual(0);
+    expect(frame.bottom).toBeGreaterThanOrEqual(0);
+    expect(frame.gap).toBeLessThan(80);
+    // Centred as one cluster: the space above the photo matches the space under the cards.
+    expect(Math.abs(frame.top - frame.bottom)).toBeLessThan(40);
+    // The photo keeps its 3:4 shape (portrait tablets once letterboxed it inside a tall white card).
+    expect(Math.abs(frame.ratio - 0.75)).toBeLessThan(0.01);
+  }
+});
+
+// Each hero circle opens outwards from a fixed slot, so its icon and its neighbour stay where they are.
+test('hero buttons open outwards without moving each other', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/index');
+  const buttons = page.locator('#intro .portfolio-hero__cta');
+  await expect(buttons).toHaveCount(2);
+  expect(await buttons.evaluateAll(items => items.map(a => new URL(a.href).pathname + new URL(a.href).hash))).toEqual(['/experience#selected-work', '/projects']);
+  const rest = await buttons.evaluateAll(items => items.map(a => a.getBoundingClientRect().toJSON()));
+  for (const index of [0, 1]) {
+    await buttons.nth(index).hover();
+    await expect(buttons.nth(index).locator('.portfolio-hero__cta-label')).toHaveCSS('opacity', '1');
+    const open = await buttons.evaluateAll(items => items.map(a => a.getBoundingClientRect().toJSON()));
+    expect(open[index].width).toBeGreaterThan(rest[index].width + 80);
+    // The inner edge (and so the icon) of the open one holds, and the other does not move at all.
+    const inner = index === 0 ? 'right' : 'left';
+    expect(Math.abs(open[index][inner] - rest[index][inner])).toBeLessThan(1);
+    expect(Math.abs(open[1 - index].left - rest[1 - index].left)).toBeLessThan(1);
+    await page.mouse.move(5, 5);
+    await expect.poll(() => buttons.nth(index).evaluate(a => a.getBoundingClientRect().width)).toBeLessThan(rest[index].width + 1);
+  }
+});
+
 test('phone gallery prepares hidden neighbours before horizontal navigation', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/travel_2026_guangzhou');

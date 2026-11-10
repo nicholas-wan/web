@@ -35,7 +35,7 @@ Edit under `images/` (or `images-webp/`), delete its `-480`/`-800`/`-1200` sibli
 
 Decided 16–17 Oct 2026; do not propose otherwise. Details are under [Behaviour contracts](#behaviour-contracts).
 
-- Hero: desktop button stays a 3rem icon circle that reveals its label on hover (phones keep the pill); copy is approved text; the canvas keeps its calm signals.
+- Hero: desktop buttons stay 3rem icon circles that reveal their label on hover (phones keep the pills); copy is approved text; the canvas keeps its calm signals. Two buttons since 10 Nov 2026 (owner: "next to the view selected work maybe can also add a projects icon"): selected work, then Projects.
 - Motion is calm and earns its place; decorative effects (entrance reveals, magnetic buttons, spotlight grids) are declined.
 - Pages crossfade in 220ms with no black load wait; desktop tab-page titles glide into place.
 - Work: no contact line; anomaly charts open one at a time from their chips, never over the writeup, with no "simulated" note. Phishing domains leads the three charts; its fake keeps the padlock (most phishing sites use HTTPS).
@@ -238,7 +238,9 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Measure About's real offset, not hero height, or the glide falls short.
 - Forward snap: 90ms momentum debounce. Reverse: first 32ms timer after upward intent.
 - Desktop and reduced motion scroll plainly. Never reintroduce CSS mandatory snap (unslowable, fights the About swipe).
-- Hero: name, scrambling headline, support line, selected-work CTA.
+- Hero: name, scrambling headline, support line, selected-work CTA, Projects CTA (`View projects`, the nav's `</>`).
+  - Desktop: each circle sits in a fixed 3rem slot and opens outwards, the first to the left with its icon on the right, the second to the right. Never let one push the other: a pill that shoved its neighbour slid it out from under a pointer moving across.
+  - 980px and below: two labelled pills, side by side on tablets, stacked on phones.
   - Headline: `I build agentic AI products for real-world security operations.`
   - Support: `Product direction · DSTA`
 - Headline is owner-approved: propose, never silently rewrite. No multi-line paragraph hero or hero skills list.
@@ -249,7 +251,11 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Keep the intro stacking fix (load fade can cover the hero) when changing hero layers or entrances.
 - Phones: About photo stays low and bottom-anchored; `game.js` reads swipe progress from it.
 - Phones: scene is one `svh`, not sticky, settling at the About top so cards follow the next scroll.
-- Desktop: taller sticky scrub, centred About cluster. Never unify the two.
+- Desktop: sticky scrub, centred About cluster. Never unify the two.
+  - 10 Nov 2026 (owner: "index page has huge white space and looks awkward"): the stage is only as tall as its row, not a full viewport, and pins where the photo and the three cards together sit centred (`--swipe-top`, measured in `game.js`). The scene settles as one frame, photo and copy over the cards. Measured at 1440×900: nav to photo 299px → 72px, photo to cards 195px → 48px, page 2812px → 2398px.
+  - The scrub's scroll distance is the section's 32vh `::after`; where the page ends sooner (portrait tablets) `game.js` runs it over the scroll that is left. Desktop cards finish their entrance within a 14% rise so they are whole when the scene settles.
+  - The stage reaches the sheet's side edges (negative margin matching the article's 8rem / 4rem padding), so the photo's shadow is whole and the copy slides in from the sheet's edge.
+  - The photo's desktop size is one `height: min(62vh, 45.33vw)`; two max- caps letterboxed it inside a tall white card on portrait tablets.
 
 ### Experience page contracts
 

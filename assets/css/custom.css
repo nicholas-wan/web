@@ -618,6 +618,84 @@
   }
 }
 
+/* Desktop (10 Nov 2026, owner: "index page has huge white space"): the stage
+   was a full viewport with the photo centred in it, which left ~300px of blank
+   sheet above the photo on arrival and ~200px between the photo and the cards.
+   The stage is now only as tall as its row and pins where photo and cards
+   together sit centred (game.js measures --swipe-top), so the cards rise into
+   the frame as the copy slides in. The ::after is the scrub's scroll distance. */
+@media screen and (min-width: 737px) {
+  #main.homepage > .post.featured {
+    padding-top: 3rem;
+    padding-bottom: 3.5rem;
+  }
+
+  .intro-swipe {
+    height: auto;
+    margin-bottom: 0;
+  }
+
+  .intro-swipe::after {
+    content: "";
+    display: block;
+    height: 32vh;
+  }
+
+  .intro-swipe.is-static::after {
+    display: none;
+  }
+
+  /* The block padding keeps the photo's shadow inside the stage's clip. The
+     stage also reaches out to the sheet's own edges (the article's 8rem side
+     padding, 4rem at 1280px and below), so the shadow is whole on the left
+     and the copy slides in from the sheet's edge, not from mid-sheet. */
+  .intro-swipe__stage {
+    top: var(--swipe-top, max(0px, calc(19vh - 7.85rem)));
+    height: auto;
+    margin: 0 -8rem;
+    padding: 1.5rem 8rem 2rem;
+  }
+
+  /* Reduced motion has no slide to clip, so the stage stays in the column. */
+  .intro-swipe.is-static .intro-swipe__stage {
+    margin: 0;
+  }
+
+  #main.homepage .homepage-links {
+    margin-top: 1rem;
+  }
+
+  .intro-swipe .intro-swipe__text .aboutblock {
+    text-wrap: pretty;
+  }
+
+  .homepage .homepage-link__desc {
+    text-wrap: balance;
+  }
+
+  /* One height for both caps (45.33vw is the 3:4 photo at 34vw wide). As two
+     max- rules the box stayed 62vh tall where the width cap bound first
+     (portrait tablets) and letterboxed the photo inside a tall white card. A
+     set height also holds the space before the lazy photo loads, which the
+     pin measurement relies on. */
+  .intro-swipe__photo img {
+    height: min(62vh, 45.33vw);
+  }
+
+  /* The copy takes the spare width, so the photo's left edge and the copy's
+     right edge line up with the cards now sitting right under them. */
+  .intro-swipe__text {
+    flex-grow: 1;
+  }
+}
+
+@media screen and (min-width: 737px) and (max-width: 1280px) {
+  .intro-swipe__stage {
+    margin: 0 -4rem;
+    padding: 1.5rem 4rem 2rem;
+  }
+}
+
 .homepage .aboutblock {
   max-width: 48rem;
   margin: 0 auto 2rem;
@@ -3996,7 +4074,43 @@ body.is-map-fullscreen .travel-atlas__layout {
 }
 
 #intro .portfolio-hero__actions li {
+  flex: none;
   padding: 0;
+}
+
+/* Two icon circles (10 Nov 2026). Each sits in a 3rem slot and opens outwards
+   over the space beside the pair, the first to the left with its icon on the
+   right and the second to the right, so neither icon moves under the pointer
+   and opening one never pushes the other away from it. */
+@media screen and (min-width: 981px) {
+  #intro .portfolio-hero__actions li {
+    display: flex;
+    width: 3rem;
+  }
+
+  #intro .portfolio-hero__actions li:first-child {
+    justify-content: flex-end;
+  }
+
+  #intro .portfolio-hero__actions .portfolio-hero__cta {
+    flex: none;
+  }
+
+  #intro .portfolio-hero__actions li:first-child .portfolio-hero__cta-icon {
+    right: 0;
+    left: auto;
+  }
+
+  #intro .portfolio-hero__actions li:first-child .portfolio-hero__cta-label {
+    margin: 0 3rem 0 0;
+    padding: 0 0.55rem 0 1rem;
+    transform: translateX(0.4rem);
+  }
+
+  #intro .portfolio-hero__actions li:first-child .portfolio-hero__cta:hover .portfolio-hero__cta-label,
+  #intro .portfolio-hero__actions li:first-child .portfolio-hero__cta:focus-visible .portfolio-hero__cta-label {
+    transform: none;
+  }
 }
 
 #intro .portfolio-hero__cta {
@@ -4032,6 +4146,12 @@ body.is-map-fullscreen .travel-atlas__layout {
   width: 12.75rem;
   background: rgba(18, 138, 134, 0.13);
   color: #ffffff !important;
+}
+
+/* The shorter label opens to a shorter pill with the same end padding. */
+#intro .portfolio-hero__cta--projects:hover,
+#intro .portfolio-hero__cta--projects:focus-visible {
+  width: 10.45rem;
 }
 
 #intro .portfolio-hero__cta:hover {

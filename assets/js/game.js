@@ -76,6 +76,9 @@
     if (reduce) { section.classList.add('is-static'); return; }
     var photo = section.querySelector('.intro-swipe__photo');
     var text = section.querySelector('.intro-swipe__text');
+    var stage = section.querySelector('.intro-swipe__stage');
+    var links = document.querySelector('.homepage .homepage-links');
+    var pinTop = 0;
 
     // Measure at rest (--p: 1) so the start positions are exact whatever the
     // layout width: desktop centers the photo; the stacked mobile variant
@@ -97,14 +100,27 @@
       else { section.style.removeProperty('--p'); }
       if (prevPhoto) { section.style.setProperty('--photo-p', prevPhoto); }
       else { section.style.removeProperty('--photo-p'); }
+      /* Desktop pins the stage where the photo and the cards under it sit
+         centred as one cluster, so the scene settles with no dead band between
+         them. Offsets are layout values, so the cards' scrub cannot skew it. */
+      if (window.innerWidth > 736 && links) {
+        var pad = parseFloat(getComputedStyle(stage).paddingTop) || 0;
+        var cluster = stage.offsetHeight - pad + links.offsetTop + links.offsetHeight - (section.offsetTop + section.offsetHeight);
+        pinTop = Math.max(0, Math.round((window.innerHeight - cluster) / 2 - pad));
+        section.style.setProperty('--swipe-top', pinTop + 'px');
+      }
     }
 
     function read() {
       var phone = window.innerWidth <= 736;
-      var scrollable = section.offsetHeight - window.innerHeight;
+      /* The stage pins at pinTop and travels the section's height less its
+         own. Where the page ends before that (a tall window), the scrub runs
+         over the scroll that is left, so the copy always arrives. */
       var sectionTop = section.getBoundingClientRect().top;
+      var room = document.documentElement.scrollHeight - window.innerHeight - window.scrollY + pinTop - sectionTop;
+      var scrollable = Math.min(section.offsetHeight - stage.offsetHeight, room);
       var p = phone ? 0 : scrollable > 0
-        ? Math.min(1, Math.max(0, -sectionTop / scrollable))
+        ? Math.min(1, Math.max(0, (pinTop - sectionTop) / scrollable))
         : 1;
       var textProgress = p;
       /* On phones, begin the horizontal motion when the portrait itself first
@@ -282,7 +298,10 @@
         var top = r.top - (1 - last[i]) * LIFT;
         // 0 as the card's top crosses the viewport bottom, 1 once it has
         // risen 35% of the viewport; each card trails the one before it.
-        var p = (vh - top) / (vh * 0.35) - i * 0.15;
+        // Desktop cards rest about 20% up when the About scene settles, so
+        // they finish inside that rise instead of stopping half-faded.
+        var wide = window.innerWidth > 736;
+        var p = (vh - top) / (vh * (wide ? 0.14 : 0.35)) - i * (wide ? 0.12 : 0.15);
         p = Math.min(1, Math.max(0, p));
         last[i] = p;
         var iconP = Math.min(1, Math.max(0, (p - 0.2) / 0.68));
