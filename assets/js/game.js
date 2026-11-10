@@ -119,9 +119,16 @@
       var sectionTop = section.getBoundingClientRect().top;
       var room = document.documentElement.scrollHeight - window.innerHeight - window.scrollY + pinTop - sectionTop;
       var scrollable = Math.min(section.offsetHeight - stage.offsetHeight, room);
+      /* Desktop runs the scrub while the scene is still rising: from its top
+         55% of a viewport short of the pin to the pin itself, eased out, so
+         the copy arrives with the photo and the scene is whole when the nav
+         docks. It began at the pin before, which left a portrait with no
+         words under the nav. The pin then only brings the cards up. */
+      var lead = window.innerHeight * 0.55;
       var p = phone ? 0 : scrollable > 0
-        ? Math.min(1, Math.max(0, (pinTop - sectionTop) / scrollable))
+        ? Math.min(1, Math.max(0, (pinTop + lead - sectionTop) / lead))
         : 1;
+      p = 1 - (1 - p) * (1 - p);
       var textProgress = p;
       /* On phones, begin the horizontal motion when the portrait itself first
          enters the bottom of the viewport. Waiting for the sticky section to
@@ -145,8 +152,8 @@
 
     addFrameJob(read);
     /* A phone URL-bar resize changes only the height, and the phone photo's
-       42vh cap tracks the large viewport, which the URL bar never moves, so
-       those resizes skip measure()'s forced layouts. Desktop sizes the photo
+       39svh width tracks the small viewport, which the URL bar never moves,
+       so those resizes skip measure()'s forced layouts. Desktop sizes the photo
        by 62vh of a real window, so every desktop resize re-measures. read()
        takes the viewport height and always runs, in the shared next frame. */
     var measuredWidth = window.innerWidth;

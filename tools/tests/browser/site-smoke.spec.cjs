@@ -117,6 +117,58 @@ test('desktop About settles with the photo and cards in one frame', async ({ pag
   }
 });
 
+// 10 Nov 2026 (owner: "is it weird that the photo suddenly pops up? with nothing in between"): the
+// scrub starts before the pin, so the copy is already arriving when the nav reaches the top.
+test('desktop About copy arrives with the photo, not after it', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  for (const [width, height] of [[1440, 900], [1366, 768], [1920, 1080]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/index');
+    await page.waitForLoadState('load');
+    const navTop = await page.evaluate(() => document.getElementById('nav').getBoundingClientRect().top + scrollY);
+    await page.evaluate(y => window.scrollTo(0, y), navTop);
+    await expect.poll(() => page.evaluate(() => parseFloat(document.querySelector('.intro-swipe').style.getPropertyValue('--p')))).toBeGreaterThan(0.8);
+    const frame = await page.evaluate(() => {
+      const photo = document.querySelector('.intro-swipe__photo img').getBoundingClientRect();
+      const title = document.querySelector('.intro-swipe__text h3').getBoundingClientRect();
+      const sheet = document.querySelector('#main .post.featured').getBoundingClientRect();
+      return { photoBottom: photo.bottom, titleLeft: title.left, titleRight: title.right, photoRight: photo.right, sheetRight: sheet.right, vh: innerHeight };
+    });
+    // The whole photo is in view and the title is on the sheet beside it.
+    expect(frame.photoBottom).toBeLessThanOrEqual(frame.vh);
+    expect(frame.titleLeft).toBeGreaterThan(frame.photoRight);
+    expect(frame.titleRight).toBeLessThan(frame.sheetRight);
+  }
+});
+
+// 10 Nov 2026 (owner: "the index page is kind of weird now"): the phone About cluster is centred in
+// its one-viewport scene; bottom-anchored, all the spare height was one blank band above "About me".
+test('phone About is centred in its scene with a 3:4 photo', async ({ browser }) => {
+  for (const [width, height] of [[390, 844], [390, 664], [320, 568]]) {
+    const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: true, reducedMotion: 'no-preference' });
+    const page = await context.newPage();
+    await page.goto(BASE + '/index');
+    await page.waitForLoadState('load');
+    const top = await page.evaluate(() => document.querySelector('.intro-swipe').getBoundingClientRect().top + scrollY);
+    await page.evaluate(y => window.scrollTo(0, Math.ceil(y)), top);
+    await expect.poll(() => page.evaluate(() => document.querySelector('.intro-swipe').style.getPropertyValue('--photo-p'))).toMatch(/^(1.0000|0.99)/);
+    const frame = await page.evaluate(() => {
+      const scene = document.querySelector('.intro-swipe').getBoundingClientRect();
+      const head = document.querySelector('.intro-swipe__head').getBoundingClientRect();
+      const copy = document.querySelector('.intro-swipe__text').getBoundingClientRect();
+      const photo = document.querySelector('.intro-swipe__photo img').getBoundingClientRect();
+      return { above: head.top - scene.top, below: scene.bottom - copy.bottom, ratio: photo.width / photo.height, left: photo.left, right: photo.right, vw: innerWidth };
+    });
+    expect(frame.above).toBeGreaterThanOrEqual(0);
+    expect(frame.below).toBeGreaterThanOrEqual(0);
+    expect(Math.abs(frame.above - frame.below)).toBeLessThan(4);
+    expect(Math.abs(frame.ratio - 0.75)).toBeLessThan(0.01);
+    expect(frame.left).toBeGreaterThanOrEqual(0);
+    expect(frame.right).toBeLessThanOrEqual(frame.vw);
+    await context.close();
+  }
+});
+
 // Each hero circle opens outwards from a fixed slot, so its icon and its neighbour stay where they are.
 test('hero buttons open outwards without moving each other', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });

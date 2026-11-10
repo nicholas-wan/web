@@ -553,15 +553,19 @@
     margin-bottom: 0;
   }
 
-  /* Mobile scene: bottom-anchored cluster — the photo must keep its low
-     rest position because the mobile swipe math in game.js scrubs from the
-     photo's settled top. All spare height lands above the heading; inside
-     the cluster the rhythm is fixed: 1rem heading→photo, 1rem photo→text,
-     0.75rem h3→paragraph, 3vh below the paragraph. */
+  /* Mobile scene (10 Nov 2026): the cluster is centred in the scene, so the
+     spare height splits above the opening and below the copy. Bottom-anchored,
+     all of it sat above "About me" as one blank band. game.js scrubs from the
+     photo's settled top wherever that is. Inside the cluster the rhythm is
+     fixed: 1.25rem heading→photo, 1rem photo→text. */
   .intro-swipe__stage {
     position: relative;
     top: auto;
-    justify-content: flex-end;
+    justify-content: center;
+    /* Out to the sheet's edges by the 1rem the head and row pad back in, so
+       the opening, photo and copy share the cards' left edge and the photo's
+       shadow still has room inside the stage's clip. */
+    margin: 0 -1rem;
   }
 
   .intro-swipe__head {
@@ -579,17 +583,18 @@
     display: none;
   }
 
-  /* The photo starts on the same left edge as the opening and the copy. */
+  /* The photo starts on the same left edge as the opening and the copy. The
+     figure spans the row so the image's 100% is the column's width. */
   .intro-swipe__photo {
-    align-self: flex-start;
+    align-self: stretch;
   }
 
   .intro-swipe__row {
     flex: 0 0 auto;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 1rem;
-    padding: 0 1rem 3vh;
+    padding: 0 1rem;
   }
 
   .intro-swipe__photo {
@@ -598,9 +603,15 @@
     transform: translateX(calc((1 - var(--photo-p, var(--p, 1))) * var(--swipe-photo, -110vw)));
   }
 
+  /* One width, never two caps (two letterbox the photo): 39svh wide is 52svh
+     tall at 3:4, which leaves the opening and the copy room in one small
+     viewport. svh, so the URL bar never resizes it. */
   .intro-swipe__photo img {
-    max-width: 100%;
-    max-height: 42vh;
+    width: min(100%, 39vh);
+    width: min(100%, 39svh);
+    max-width: none;
+    max-height: none;
+    height: auto;
   }
 
   .intro-swipe__text {
@@ -623,7 +634,10 @@
    sheet above the photo on arrival and ~200px between the photo and the cards.
    The stage is now only as tall as its row and pins where photo and cards
    together sit centred (game.js measures --swipe-top), so the cards rise into
-   the frame as the copy slides in. The ::after is the scrub's scroll distance. */
+   the frame. The ::after is the pinned scroll distance, over which the cards
+   come up under a scene that has already settled: the scrub itself runs while
+   the scene is still rising (game.js), so the photo never sits on the sheet
+   alone. */
 @media screen and (min-width: 737px) {
   #main.homepage > .post.featured {
     padding-top: 3rem;
@@ -638,7 +652,7 @@
   .intro-swipe::after {
     content: "";
     display: block;
-    height: 32vh;
+    height: 16vh;
   }
 
   .intro-swipe.is-static::after {
@@ -686,6 +700,9 @@
      right edge line up with the cards now sitting right under them. */
   .intro-swipe__text {
     flex-grow: 1;
+    /* Squared, so the copy is still faint while the sheet's edge crosses it
+       and reads as text only once it is inside. */
+    opacity: calc(var(--p, 1) * var(--p, 1));
   }
 }
 
