@@ -105,7 +105,10 @@ test('desktop About settles with the photo and cards in one frame', async ({ pag
     const frame = await page.evaluate(() => {
       const photo = document.querySelector('.intro-swipe__photo img').getBoundingClientRect();
       const cards = document.querySelector('.homepage-links').getBoundingClientRect();
-      return { top: photo.top, gap: cards.top - photo.bottom, bottom: innerHeight - cards.bottom, ratio: photo.width / photo.height };
+      // From 981px the nav docks over the sheet, and the cluster centres in the space under it.
+      const nav = document.getElementById('nav');
+      const navBottom = getComputedStyle(nav).position === 'sticky' ? nav.getBoundingClientRect().bottom : 0;
+      return { top: photo.top - navBottom, gap: cards.top - photo.bottom, bottom: innerHeight - cards.bottom, ratio: photo.width / photo.height };
     });
     expect(frame.top).toBeGreaterThanOrEqual(0);
     expect(frame.bottom).toBeGreaterThanOrEqual(0);
@@ -138,6 +141,39 @@ test('desktop About copy arrives with the photo, not after it', async ({ page })
     expect(frame.photoBottom).toBeLessThanOrEqual(frame.vh);
     expect(frame.titleLeft).toBeGreaterThan(frame.photoRight);
     expect(frame.titleRight).toBeLessThan(frame.sheetRight);
+  }
+});
+
+// 10 Nov 2026 (owner: "desktop should glide too"): a wheel scroll that stops partway down the hero
+// glides on to the settled About frame, photo and copy over all three cards. Owner, the same day:
+// "the header bar is on neither resting frame", so the bar runs along the hero's foot and docks
+// over the settled scene.
+test('desktop hero gate glides to the settled About frame, with the bar on both frames', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  for (const [width, height] of [[1440, 900], [1366, 768], [1024, 640]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/index');
+    await page.waitForLoadState('load');
+    const settle = await page.evaluate(() => {
+      const section = document.querySelector('.intro-swipe');
+      const stage = section.querySelector('.intro-swipe__stage');
+      const pin = parseFloat(getComputedStyle(stage).top);
+      return Math.round(section.getBoundingClientRect().top + scrollY - pin + section.offsetHeight - stage.offsetHeight);
+    });
+    const navAt = () => page.evaluate(() => { const r = document.getElementById('nav').getBoundingClientRect(); return { top: Math.round(r.top), bottom: Math.round(r.bottom), vh: innerHeight }; });
+    const hero = await navAt();
+    expect(hero.bottom).toBe(hero.vh);
+    await page.mouse.move(width / 2, height / 2);
+    await page.mouse.wheel(0, 200);
+    // Within a pixel: WebKit rounds the fractional pin differently.
+    await expect.poll(() => page.evaluate(s => Math.abs(scrollY - s), settle), { timeout: 4000 }).toBeLessThanOrEqual(1);
+    await expect.poll(() => page.evaluate(() => getComputedStyle(document.querySelector('.homepage-link:last-child')).opacity)).toBe('1');
+    expect((await navAt()).top).toBe(0);
+    const cardsBottom = await page.evaluate(() => document.querySelector('.homepage-links').getBoundingClientRect().bottom);
+    expect(cardsBottom).toBeLessThanOrEqual(height);
+    // A wheel back up glides home, where the bar again runs along the foot.
+    await page.mouse.wheel(0, -120);
+    await expect.poll(() => page.evaluate(() => Math.round(scrollY)), { timeout: 4000 }).toBe(0);
   }
 });
 

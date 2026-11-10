@@ -8279,6 +8279,31 @@ body.page-home #nav {
   margin-top: 0;
 }
 
+/* Desktop home (10 Nov 2026, owner: "the header bar is on neither resting
+   frame"): the hero gate glides between two frames, the hero and the settled
+   About scene, and the bar was on neither. The hero now leaves the bar's
+   height so it runs along the first screen's foot, and the bar docks at the
+   top over the sheet, opaque (the 0.36 teal over black, as it reads on other
+   pages), so the About scene settles under it (game.js centres it below). */
+@media screen and (min-width: 981px) {
+  body.page-home #intro {
+    min-height: calc(100vh - 3.25rem);
+  }
+
+  body.page-home #nav {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #030708;
+  }
+
+  /* Short windows (1024x640): bar, photo and cards must fit one screen, so
+     the photo also yields to the height less the bar, cards and gaps. */
+  body.page-home .intro-swipe__photo img {
+    height: min(62vh, 45.33vw, calc(100vh - 19rem));
+  }
+}
+
 @media all and (max-width: 600px) {
   .homepage .homepage-links {
     margin-top: 0.5rem;

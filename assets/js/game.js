@@ -78,6 +78,7 @@
     var text = section.querySelector('.intro-swipe__text');
     var stage = section.querySelector('.intro-swipe__stage');
     var links = document.querySelector('.homepage .homepage-links');
+    var nav = document.getElementById('nav');
     var pinTop = 0;
 
     // Measure at rest (--p: 1) so the start positions are exact whatever the
@@ -102,11 +103,14 @@
       else { section.style.removeProperty('--photo-p'); }
       /* Desktop pins the stage where the photo and the cards under it sit
          centred as one cluster, so the scene settles with no dead band between
-         them. Offsets are layout values, so the cards' scrub cannot skew it. */
+         them. Offsets are layout values, so the cards' scrub cannot skew it.
+         Where the nav docks (981px and up), the cluster centres in the space
+         under it, so the settled frame keeps the bar. */
       if (window.innerWidth > 736 && links) {
         var pad = parseFloat(getComputedStyle(stage).paddingTop) || 0;
         var cluster = stage.offsetHeight - pad + links.offsetTop + links.offsetHeight - (section.offsetTop + section.offsetHeight);
-        pinTop = Math.max(0, Math.round((window.innerHeight - cluster) / 2 - pad));
+        var dock = nav && getComputedStyle(nav).position === 'sticky' ? nav.offsetHeight : 0;
+        pinTop = dock + Math.max(0, Math.round((window.innerHeight - dock - cluster) / 2 - pad));
         section.style.setProperty('--swipe-top', pinTop + 'px');
       }
     }
@@ -174,10 +178,11 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 1b. Phone hero gate: a scroll settling partway across the gated     */
-  /*     band glides to the About section's true top, where the portrait */
-  /*     finishes its rightward sweep. Desktop and reduced motion scroll */
-  /*     plainly; new touch or wheel input cancels an in-flight glide.   */
+  /* 1b. Hero gate: a scroll settling partway across the gated band      */
+  /*     glides on to About. Phones land on its true top, where the      */
+  /*     portrait finishes its sweep; wider screens land where the pin   */
+  /*     ends, the scene whole over its cards. Reduced motion scrolls    */
+  /*     plainly; touch, wheel, scroll keys or a scrollbar press cancel. */
   /* ------------------------------------------------------------------ */
   function initHeroSnap() {
     if (!document.body.classList.contains('page-home') || reduce) { return; }
@@ -188,10 +193,16 @@
     var settleTimer = 0;
     var settleDirection = 0;
     var touching = false;
+    var pressing = false;
     var lastY = window.scrollY;
+    var restY = lastY;
+    var jumped = false;
     var direction = 0;
+    var width = window.innerWidth;
     var FORWARD_SETTLE_MS = 90;
     var REVERSE_SETTLE_MS = 32;
+    var NUDGE = 24;
+    var SCROLL_KEY = /^(ArrowUp|ArrowDown|PageUp|PageDown|Home|End| |Spacebar)$/;
 
     function cancelGlide() {
       if (glideFrame !== null) {
@@ -205,36 +216,65 @@
        is its document offset: the nav/main/article spacing between them left
        the mobile glide short, with the portrait still partly translated. */
     function farEdge() {
-      var introHeight = intro.getBoundingClientRect().height;
       var section = document.querySelector('.intro-swipe');
-      if (!section) { return introHeight; }
-      return section.getBoundingClientRect().top + window.scrollY;
+      if (!section) { return intro.getBoundingClientRect().height; }
+      var top = section.getBoundingClientRect().top + window.scrollY;
+      if (mobile.matches) { return top; }
+      /* Wider screens pin the stage at its sticky top while the cards rise
+         under it. Land where the pin ends, with all three cards in, or at the
+         page's end if that comes first. */
+      var stage = section.querySelector('.intro-swipe__stage');
+      var pin = parseFloat(getComputedStyle(stage).top) || 0;
+      var settled = top - pin + section.offsetHeight - stage.offsetHeight;
+      return Math.min(settled, document.documentElement.scrollHeight - window.innerHeight);
     }
 
-    function glide(target) {
+    function glide(target, duration) {
       cancelGlide();
       var from = window.scrollY;
+      var sign = target > from ? 1 : -1;
       var delta = target - from;
-      if (!delta) { return; }
-      var DURATION = 900;
+      if (Math.abs(delta) < 1) { restY = from; return; }
       var start = null;
+      var expected = from;
+      function finish() {
+        glideFrame = null;
+        lastY = restY = window.scrollY;
+      }
       function step(now) {
+        var y = window.scrollY;
+        /* The browser's own smooth scroll (keys, the return-to-top button) may
+           still be running when an upward glide starts. Follow it instead of
+           pulling against it, then ease on from wherever it stops. */
+        if (Math.abs(y - expected) > 1) {
+          from = expected = y;
+          delta = target - y;
+          start = null;
+          if (delta * sign < 4) {
+            if (delta * sign > 0) { window.scrollTo(0, target); }
+            finish();
+            return;
+          }
+          glideFrame = requestAnimationFrame(step);
+          return;
+        }
         if (start === null) { start = now; }
-        var t = Math.min(1, (now - start) / DURATION);
+        var t = Math.min(1, (now - start) / (duration || 900));
         var eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
         window.scrollTo(0, from + delta * eased);
+        expected = window.scrollY;
         if (t < 1) { glideFrame = requestAnimationFrame(step); }
-        else { glideFrame = null; lastY = window.scrollY; }
+        else { finish(); }
       }
       glideFrame = requestAnimationFrame(step);
     }
 
-    function armSettle() {
+    function armSettle(restart) {
       var reversing = direction < 0;
       /* Keep the first reverse timer so momentum cannot postpone it; replace
          a pending forward timer when the direction turns upward. */
       if (settleTimer) {
-        if (reversing && settleDirection < 0) { return; }
+        if (reversing && settleDirection < 0 && !restart) { return; }
         clearTimeout(settleTimer);
       }
       settleDirection = reversing ? -1 : 1;
@@ -244,35 +284,107 @@
     function settle() {
       settleTimer = 0;
       settleDirection = 0;
-      if (!direction) { return; }
-      if (touching || glideFrame !== null || !mobile.matches) { return; }
+      if (!direction && !jumped) { return; }
+      if (touching || pressing || glideFrame !== null) { return; }
       var edge = farEdge();
       var y = window.scrollY;
-      if (y <= 1 || y >= edge - 1) { return; }
+      var wasJump = jumped;
+      jumped = false;
+      if (y <= 1 || y >= edge - 1) { restY = y; return; }
+      /* A link, find-in-page or restored scroll that lands mid-band settles on
+         the nearer frame, which keeps what it landed on in view. */
+      if (wasJump) { glide(y < edge - y ? 0 : edge); return; }
+      /* A nudge of a few pixels off a frame (trackpad jitter, a small look
+         back) springs back instead of crossing the whole band. */
+      var frame = restY <= 1 ? 0 : restY >= edge - 1 ? edge : -1;
+      if (frame >= 0 && Math.abs(y - frame) < NUDGE) { glide(frame, 400); return; }
       glide(direction > 0 ? edge : 0);
     }
 
-    // Read in the shared frame, so the scroll position never forces a restyle.
+    /* A scroll is the reader's own while it follows wheel, key, touch or
+       scrollbar input; each moving frame extends the window, so momentum
+       counts too. Anything else (a link, find-in-page, focus, a restored or
+       scripted scroll such as return-to-top) is a jump. Read in the shared
+       frame, so the scroll position never forces a restyle. */
+    var inputAt = -1e9;
+    function input() { inputAt = performance.now(); }
     addFrameJob(function (scrolled) {
       if (!scrolled || glideFrame !== null) { return; }
       var y = window.scrollY;
-      if (y !== lastY) { direction = y > lastY ? 1 : -1; lastY = y; }
+      if (y !== lastY) {
+        var now = performance.now();
+        var own = touching || pressing || now - inputAt < 250;
+        if (own) { inputAt = now; }
+        jumped = !own;
+        direction = own ? (y > lastY ? 1 : -1) : 0;
+        lastY = y;
+      }
       armSettle();
     });
 
-    // Also cancel on wheel for narrow pointer-driven viewports.
-    window.addEventListener('wheel', cancelGlide, { passive: true });
+    /* The wheel scrolls before this passive listener runs, and a glide's next
+       frame overwrites that scroll, so take the direction from the wheel itself
+       (a wheel up mid-glide turns back). Each wheel restarts the settle timer,
+       so a trackpad stream settles once it stops. */
+    window.addEventListener('wheel', function (event) {
+      if (!event.deltaY) { return; }
+      input();
+      pressing = false;
+      cancelGlide();
+      direction = event.deltaY > 0 ? 1 : -1;
+      armSettle(true);
+    }, { passive: true });
+    // Only scrolling keys take the scroll back; they scroll after keydown.
+    window.addEventListener('keydown', function (event) {
+      if (SCROLL_KEY.test(event.key)) { input(); pressing = false; cancelGlide(); }
+    });
+    /* A press on the scrollbar holds like a finger. A browser may not report
+       its release, so the next buttonless mousemove also counts as one. Other
+       clicks never scroll, so they leave a glide alone. */
+    function unpress() {
+      if (pressing) { pressing = false; armSettle(); }
+    }
+    window.addEventListener('mousedown', function (event) {
+      var root = document.documentElement;
+      if (event.clientX < root.clientWidth && event.clientY < root.clientHeight) { return; }
+      input();
+      pressing = true;
+      cancelGlide();
+    });
+    window.addEventListener('mouseup', unpress);
+    window.addEventListener('mousemove', function (event) {
+      if (!event.buttons) { unpress(); }
+    }, { passive: true });
 
     window.addEventListener('touchstart', function () {
+      input();
       touching = true;
       cancelGlide();
     }, { passive: true });
     var release = function (event) {
+      input();
       touching = event.touches && event.touches.length > 0;
       if (!touching) { armSettle(); }
     };
     window.addEventListener('touchend', release, { passive: true });
     window.addEventListener('touchcancel', release, { passive: true });
+
+    // A new width moves the frames: re-aim a glide that is under way.
+    window.addEventListener('resize', function () {
+      if (window.innerWidth === width) { return; }
+      width = window.innerWidth;
+      if (glideFrame !== null) { cancelGlide(); armSettle(true); }
+    });
+
+    /* A reload or a return through history can restore the scroll mid-band
+       before this runs; settle it on the nearer frame once the page is up. */
+    function settleRestored() {
+      // A reader already scrolling owns the scroll; their settle handles it.
+      if (touching || pressing || glideFrame !== null || performance.now() - inputAt < 1000) { return; }
+      lastY = window.scrollY;
+      if (lastY > 1) { jumped = true; armSettle(true); }
+    }
+    window.addEventListener('pageshow', function () { setTimeout(settleRestored, 120); });
   }
 
   /* ------------------------------------------------------------------ */

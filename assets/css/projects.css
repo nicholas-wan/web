@@ -662,6 +662,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects{--pj-ink:#ecedf0;--pj-body:#a9aeb6;--pj-muted:#8d939c;--pj-line:#25282d;--pj-rule:#25282d;--pj-stage:#1b1d20}
 .page-projects #main{background:#111214}
 .page-projects #main>*{border-top-color:#25282d}
+@media (min-width:981px){.page-projects #nav{background:linear-gradient(#25282d 0 0) 50% 100%/calc(100% - 4rem) 1px no-repeat}}
 .page-projects #squashbot,.page-projects #tab-squashbot{--app:#6ab2f2}
 .page-projects #nag-bot,.page-projects #tab-nag-bot{--app:#f28a52}
 .page-projects #finance-tracker,.page-projects #tab-finance-tracker{--app:#e3b341}
