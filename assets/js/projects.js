@@ -1078,93 +1078,93 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 
 /* Desktop shows one project at a time; the rail's thumbnails (recorded from each demo) switch them. */
 (() => {
-	const rail = document.querySelector('.app-rail');
-	if (!rail) return;
-	const tabs = [...rail.children], wide = matchMedia('(min-width: 981px)'), still = matchMedia('(prefers-reduced-motion: reduce)');
-	const cards = tabs.map(t => document.getElementById(t.getAttribute('aria-controls')));
-	const at = () => cards.findIndex(c => '#' + c.id === location.hash);
-	let cur = Math.max(0, at());
-	function show(i, focus) {
-		if (i !== cur) rail.classList.add('is-turn');
-		cur = i;
-		tabs.forEach((t, k) => {
-			const v = t.querySelector('video'), on = k === i;
-			t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
-			cards[k].hidden = wide.matches && !on;
-			if (wide.matches && !v.src) { v.poster = v.dataset.poster; v.src = v.dataset.src; }
-		});
-		if (focus) tabs[i].focus();
-		rail.style.setProperty('--dwell', [9, 8, 12.5, 10][i] + 's');
-		cue();
-		hold();
-		document.dispatchEvent(new Event('scroll'));
-	}
-	// One thumbnail plays at a time, each in turn; hovering a tab plays its own.
-	const vids = tabs.map(t => t.querySelector('video'));
-	let turn = 0, hover = -1, auto = 0, over = 0;
-	function cue() {
-		const run = wide.matches && !still.matches, k = hover >= 0 ? hover : auto ? (cur + 1) % 4 : [0, 1, 2, 3].filter(n => n !== cur)[turn % 3];
-		vids.forEach((v, n) => { tabs[n].classList.toggle('is-live', run && n === k && n !== cur); if (n !== k || !run) v.pause(); });
-		if (run && k !== cur) { if (hover < 0) vids[k].currentTime = 0; vids[k].play().catch(() => {}); }
-	}
-	vids.forEach(v => v.addEventListener('ended', () => { if (hover < 0) { turn++; cue(); } }));
-	tabs.forEach((t, n) => { t.addEventListener('pointerenter', () => { hover = n; cue(); }); t.addEventListener('pointerleave', () => { hover = -1; cue(); }); });
-	// It also turns by itself while 85% of the chosen phone is on screen and the pointer is off the phone and the rail; a tab click or a touch on a demo ends it for good.
-	function hold() { rail.classList.toggle('is-hold', !!over || !pjVisible(cards[cur].querySelector('.app-demo'))); }
-	const quit = () => { auto = 0; rail.classList.remove('is-auto'); cue(); };
-	rail.addEventListener('animationend', e => { if (!auto || e.animationName !== 'pj-fill') return; const n = (cur + 1) % 4, d = cards[n].querySelector('.app-demo'); if (!d.dataset.user) delete d.dataset.seen; show(n); });
-	[rail, ...document.querySelectorAll('.app-phone')].forEach(el => { el.addEventListener('pointerenter', () => { over = 1; hold(); }); el.addEventListener('pointerleave', () => { over = 0; hold(); }); });
-	cards.forEach(c => ['pointerup', 'keydown'].forEach(t => c.addEventListener(t, quit)));
-	addEventListener('scroll', hold, { passive: true });
-	rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { quit(); show(tabs.indexOf(t)); } });
-	rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur || 4 }[e.key]; if (d) { e.preventDefault(); quit(); show((cur + d) % 4, 1); } });
-	addEventListener('hashchange', () => { const i = at(); if (i >= 0 && cards[i].hidden) { quit(); show(i); cards[i].scrollIntoView(); } });
-	const start = () => { auto = wide.matches && !still.matches ? 1 : 0; rail.classList.toggle('is-auto', !!auto); show(cur); };
-	[wide, still].forEach(m => m.addEventListener('change', start));
-	// Phones: the site's Menu pill steps aside while a demo's top bar is under it.
-	addEventListener('scroll', () => document.body.classList.toggle('pj-under', !wide.matches && cards.some(c => { const r = c.querySelector('.app-demo').getBoundingClientRect(); return r.top < 76 && r.bottom > 76; })), { passive: true });
-	start();
+const rail = document.querySelector('.app-rail');
+if (!rail) return;
+const tabs = [...rail.children], wide = matchMedia('(min-width: 981px)'), still = matchMedia('(prefers-reduced-motion: reduce)');
+const cards = tabs.map(t => document.getElementById(t.getAttribute('aria-controls')));
+const at = () => cards.findIndex(c => '#' + c.id === location.hash);
+let cur = Math.max(0, at());
+function show(i, focus) {
+	if (i !== cur) rail.classList.add('is-turn');
+	cur = i;
+	tabs.forEach((t, k) => {
+		const v = t.querySelector('video'), on = k === i;
+		t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
+		cards[k].hidden = wide.matches && !on;
+		if (wide.matches && !v.src) { v.poster = v.dataset.poster; v.src = v.dataset.src; }
+	});
+	if (focus) tabs[i].focus();
+	rail.style.setProperty('--dwell', [9, 8, 12.5, 10][i] + 's');
+	cue();
+	hold();
+	document.dispatchEvent(new Event('scroll'));
+}
+// One thumbnail plays at a time, each in turn; hovering a tab plays its own.
+const vids = tabs.map(t => t.querySelector('video'));
+let turn = 0, hover = -1, auto = 0, over = 0;
+function cue() {
+	const run = wide.matches && !still.matches, k = hover >= 0 ? hover : auto ? (cur + 1) % 4 : [0, 1, 2, 3].filter(n => n !== cur)[turn % 3];
+	vids.forEach((v, n) => { tabs[n].classList.toggle('is-live', run && n === k && n !== cur); if (n !== k || !run) v.pause(); });
+	if (run && k !== cur) { if (hover < 0) vids[k].currentTime = 0; vids[k].play().catch(() => {}); }
+}
+vids.forEach(v => v.addEventListener('ended', () => { if (hover < 0) { turn++; cue(); } }));
+tabs.forEach((t, n) => { t.addEventListener('pointerenter', () => { hover = n; cue(); }); t.addEventListener('pointerleave', () => { hover = -1; cue(); }); });
+// It also turns by itself while 85% of the chosen phone is on screen and the pointer is off the phone and the rail; a tab click or a touch on a demo ends it for good.
+function hold() { rail.classList.toggle('is-hold', !!over || !pjVisible(cards[cur].querySelector('.app-demo'))); }
+const quit = () => { auto = 0; rail.classList.remove('is-auto'); cue(); };
+rail.addEventListener('animationend', e => { if (!auto || e.animationName !== 'pj-fill') return; const n = (cur + 1) % 4, d = cards[n].querySelector('.app-demo'); if (!d.dataset.user) delete d.dataset.seen; show(n); });
+[rail, ...document.querySelectorAll('.app-phone')].forEach(el => { el.addEventListener('pointerenter', () => { over = 1; hold(); }); el.addEventListener('pointerleave', () => { over = 0; hold(); }); });
+cards.forEach(c => ['pointerup', 'keydown'].forEach(t => c.addEventListener(t, quit)));
+addEventListener('scroll', hold, { passive: true });
+rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { quit(); show(tabs.indexOf(t)); } });
+rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur || 4 }[e.key]; if (d) { e.preventDefault(); quit(); show((cur + d) % 4, 1); } });
+addEventListener('hashchange', () => { const i = at(); if (i >= 0 && cards[i].hidden) { quit(); show(i); cards[i].scrollIntoView(); } });
+const start = () => { auto = wide.matches && !still.matches ? 1 : 0; rail.classList.toggle('is-auto', !!auto); show(cur); };
+[wide, still].forEach(m => m.addEventListener('change', start));
+// Phones: the site's Menu pill steps aside while a demo's top bar is under it.
+addEventListener('scroll', () => document.body.classList.toggle('pj-under', !wide.matches && cards.some(c => { const r = c.querySelector('.app-demo').getBoundingClientRect(); return r.top < 76 && r.bottom > 76; })), { passive: true });
+start();
 })();
 
 /* One guided preview at a time, after 500 ms of settled scrolling at 85% visibility; a tap or key hands control to the reader. */
 (() => {
-	const demos = [...document.querySelectorAll('.app-demo')];
-	const motion = matchMedia('(prefers-reduced-motion: reduce)');
-	let active = null, paused = null, settle = 0, finish = 0, busy = null, busyAt = 0;
-	const emit = (d, name) => d.dispatchEvent(new CustomEvent(name));
-	function stop() {
-		clearTimeout(finish);
-		if (active) { emit(active,'demo:stop'); delete active.dataset.playing; active = null; }
-	}
-	function choose() {
-		if (active || paused || motion.matches || document.hidden) return;
-		const wait = busyAt + 8000 - Date.now();
-		if (busy && wait > 0 && pjVisible(busy)) { settle = setTimeout(choose, wait); return; }
-		const d = demos.find(d => !d.dataset.seen && !d.dataset.user && pjVisible(d));
-		if (!d) return;
-		active=d; d.dataset.playing='1'; d.dataset.seen='1';
-		emit(d,'demo:reset'); emit(d,'demo:visible');
-		finish=setTimeout(() => { stop(); schedule(); }, d.dataset.demo === 'finance' ? 10000 : 6500);
-	}
-	function schedule() { clearTimeout(settle); settle=setTimeout(choose,500); }
-	document.addEventListener('scroll', () => {
-		if (active && !pjVisible(active)) { const d=active; stop(); delete d.dataset.seen; }
-		schedule();
-	}, { capture:true, passive:true });
-	window.addEventListener('resize',schedule,{passive:true});
-	document.addEventListener('visibilitychange', () => { if (document.hidden) { const d = active; stop(); if (d) delete d.dataset.seen; } else schedule(); });
-	motion.addEventListener('change', () => { stop(); schedule(); });
-	demos.forEach(d => {
-		d.addEventListener('pointerdown', () => { if (active === d) { paused=d; stop(); } }, {capture:true,passive:true});
-		d.addEventListener('pointercancel', () => { if (paused === d) { paused=null; delete d.dataset.seen; schedule(); } }, {passive:true});
-		const own = () => { d.querySelectorAll('[data-demo-live]').forEach(e => e.setAttribute('aria-live','polite')); d.dataset.user='1'; busy = d; busyAt = Date.now(); if (paused === d) paused=null; if (active === d) stop(); emit(d,'demo:stop'); schedule(); };
-		d.addEventListener('pointerup',own,{capture:true,passive:true});
-		d.addEventListener('keydown',own,{capture:true});
-		const reset=d.closest('.app-card').querySelector('.app-demo__reset');
-		reset.addEventListener('click', () => {
-			if (active === d) stop(); if (paused === d) paused=null;
-			d.dataset.user='1'; emit(d,'demo:reset'); reset.focus({preventScroll:true}); schedule();
-		});
-	});
+const demos = [...document.querySelectorAll('.app-demo')];
+const motion = matchMedia('(prefers-reduced-motion: reduce)');
+let active = null, paused = null, settle = 0, finish = 0, busy = null, busyAt = 0;
+const emit = (d, name) => d.dispatchEvent(new CustomEvent(name));
+function stop() {
+	clearTimeout(finish);
+	if (active) { emit(active,'demo:stop'); delete active.dataset.playing; active = null; }
+}
+function choose() {
+	if (active || paused || motion.matches || document.hidden) return;
+	const wait = busyAt + 8000 - Date.now();
+	if (busy && wait > 0 && pjVisible(busy)) { settle = setTimeout(choose, wait); return; }
+	const d = demos.find(d => !d.dataset.seen && !d.dataset.user && pjVisible(d));
+	if (!d) return;
+	active=d; d.dataset.playing='1'; d.dataset.seen='1';
+	emit(d,'demo:reset'); emit(d,'demo:visible');
+	finish=setTimeout(() => { stop(); schedule(); }, d.dataset.demo === 'finance' ? 10000 : 6500);
+}
+function schedule() { clearTimeout(settle); settle=setTimeout(choose,500); }
+document.addEventListener('scroll', () => {
+	if (active && !pjVisible(active)) { const d=active; stop(); delete d.dataset.seen; }
 	schedule();
+}, { capture:true, passive:true });
+window.addEventListener('resize',schedule,{passive:true});
+document.addEventListener('visibilitychange', () => { if (document.hidden) { const d = active; stop(); if (d) delete d.dataset.seen; } else schedule(); });
+motion.addEventListener('change', () => { stop(); schedule(); });
+demos.forEach(d => {
+	d.addEventListener('pointerdown', () => { if (active === d) { paused=d; stop(); } }, {capture:true,passive:true});
+	d.addEventListener('pointercancel', () => { if (paused === d) { paused=null; delete d.dataset.seen; schedule(); } }, {passive:true});
+	const own = () => { d.querySelectorAll('[data-demo-live]').forEach(e => e.setAttribute('aria-live','polite')); d.dataset.user='1'; busy = d; busyAt = Date.now(); if (paused === d) paused=null; if (active === d) stop(); emit(d,'demo:stop'); schedule(); };
+	d.addEventListener('pointerup',own,{capture:true,passive:true});
+	d.addEventListener('keydown',own,{capture:true});
+	const reset=d.closest('.app-card').querySelector('.app-demo__reset');
+	reset.addEventListener('click', () => {
+		if (active === d) stop(); if (paused === d) paused=null;
+		d.dataset.user='1'; emit(d,'demo:reset'); reset.focus({preventScroll:true}); schedule();
+	});
+});
+schedule();
 })();
