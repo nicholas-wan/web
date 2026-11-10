@@ -144,6 +144,22 @@ test('desktop About copy arrives with the photo, not after it', async ({ page })
   }
 });
 
+// 11 Nov 2026 (review of the staged entrance): it plays on the first view of Home in a visit; a
+// return from another page starts at rest, so no blurred name ghosts the page transition.
+test('the staged hero entrance plays once per visit', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const nameAnimation = () => page.evaluate(() => getComputedStyle(document.querySelector('#intro h1')).animationName);
+  await page.goto('/index');
+  await page.waitForLoadState('load');
+  expect(await nameAnimation()).not.toBe('none');
+  await page.goto('/experience');
+  await page.goto('/index');
+  await page.waitForLoadState('load');
+  expect(await page.evaluate(() => document.documentElement.classList.contains('hero-seen'))).toBe(true);
+  expect(await nameAnimation()).toBe('none');
+});
+
 // 10 Nov 2026 (owner: "desktop should glide too"): a wheel scroll that stops partway down the hero
 // glides on to the settled About frame, photo and copy over all three cards. Owner, the same day:
 // "the header bar is on neither resting frame", so the bar runs along the hero's foot and docks

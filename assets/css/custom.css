@@ -8213,7 +8213,8 @@ body.page-home #intro {
    on the homepage lasts until window load.
    Timing: the summary is held 240ms off screen (invisible anyway) so the
    scramble's own 180ms visible hold begins as the name lands; it then runs
-   its usual 1.2s. Reduced motion: none of this runs, all shown at once. */
+   its usual 1.2s. Reduced motion: none of this runs, all shown at once.
+   Once per visit: html.hero-seen (page-transitions.js) shows a return at rest. */
 @media (prefers-reduced-motion: no-preference) {
   @keyframes a-name {
     from { opacity: 0.25; filter: blur(0.14em); }
@@ -8227,22 +8228,22 @@ body.page-home #intro {
     from, to { translate: 0 -300vh; }
   }
 
-  body.page-home #intro h1 {
+  html:not(.hero-seen) body.page-home #intro h1 {
     animation: a-name 560ms cubic-bezier(0.2, 0.7, 0.2, 1) backwards !important;
   }
-  body.page-home #intro .portfolio-hero__summary {
+  html:not(.hero-seen) body.page-home #intro .portfolio-hero__summary {
     animation: a-hold 240ms step-end !important;
   }
-  body.page-home #intro .portfolio-hero__scramble-row {
+  html:not(.hero-seen) body.page-home #intro .portfolio-hero__scramble-row {
     animation: a-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) 300ms backwards !important;
   }
-  body.page-home #intro .portfolio-hero__scramble-support {
+  html:not(.hero-seen) body.page-home #intro .portfolio-hero__scramble-support {
     animation: a-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) 420ms backwards !important;
   }
-  body.page-home #intro .portfolio-hero__actions > li {
+  html:not(.hero-seen) body.page-home #intro .portfolio-hero__actions > li {
     animation: a-rise 420ms cubic-bezier(0.2, 0.7, 0.2, 1) 540ms backwards !important;
   }
-  body.page-home #intro .portfolio-hero__actions > li + li {
+  html:not(.hero-seen) body.page-home #intro .portfolio-hero__actions > li + li {
     animation-delay: 660ms !important;
   }
 }

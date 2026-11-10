@@ -50,6 +50,8 @@
     initCardScrub();
     initHeroBurst();
     initKonami();
+    // The staged hero entrance has played; later views this visit start at rest.
+    try { sessionStorage.setItem('heroSeen', '1'); } catch (e) {}
   });
 
   /* The intro fades once the main content crosses the old Scrollex handoff

@@ -1,20 +1,21 @@
-// Page changes: custom.css names the active-tab mark, and on desktop tab
-// pages the page title, so a cross-document view transition glides each to
-// its new place. Either sits a change out when it would fly instead:
-// off-screen on either page, an #anchor landing, an event page (no header,
-// so the nav sits higher), or the homepage under its intro fade. In <head>
-// so pagereveal is heard before first paint.
+// Page changes: custom.css names the active-tab mark and, on desktop tab
+// pages, the title; a view transition glides each to its place. Each sits
+// out a change where it would fly: off-screen on either page, an #anchor
+// landing, an event page (nav higher), or home under its intro fade. In
+// <head> so pagereveal is heard and hero-seen set before paint.
 (function () {
+  try { if (sessionStorage.heroSeen) document.documentElement.classList.add('hero-seen'); } catch (e) {}
+
   function named() {
     var list = [];
     var mark = document.querySelector('#nav .nav-active-mark');
     if (mark) list.push(mark);
-    // Titles are only named at 981px and up (custom.css), so phones skip the style
-    // reads: a journal has one <h2> per day and each read cost a style recalc.
+    // Named only at 981px+ (custom.css); phones skip the reads (a journal
+    // has an <h2> per day, each read a recalc).
     if (!window.matchMedia('(min-width: 981px)').matches) return list;
     var titles = document.querySelectorAll('#main h1, #main h2');
     var i;
-    // Clear every inline name before reading any, so the reads share one recalc.
+    // Clear all inline names before any read, so reads share one recalc.
     for (i = 0; i < titles.length; i++) titles[i].style.viewTransitionName = '';
     for (i = 0; i < titles.length; i++) {
       if (getComputedStyle(titles[i]).viewTransitionName === 'page-title') list.push(titles[i]);
