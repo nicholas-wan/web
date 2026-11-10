@@ -264,7 +264,8 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await page.setViewportSize({width:390,height:844});
  await page.goto('/experience');
  await chip(root).click();
- await expect(card(root)).toHaveCSS('position','static');
+ // (in the flow, not floating; positioned, so its veil and edge take its own box: 10 Nov 2026)
+ await expect(card(root)).toHaveCSS('position','relative');
  await expect(phoneScene(root)).toBeVisible();
  await expect(scene(root)).toBeHidden();
  // Phones draw the same full pictures above the words, stacked, and the whole drawing fits one phone screen
@@ -324,6 +325,82 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  for(const o of await phoneScene(root).locator('.ag-tv').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
 });
+// 10 Nov 2026 (owner: "fix", then "add the polish ones also", after a review that measured each of these on recordings).
+test('agentic AI chart: a hover opens it in view, a click dims the page behind it, a short phone shows all of it, reduced motion keeps its edge on the card, and it pauses off screen',async({page})=>{
+ const root=peek(page,'agentic'), c=card(root), scene=c.locator('svg.ag-scene--m');
+ // Desktop: as the chip first scrolls into view it sits low on the screen, with no room for the card below it. A hover
+ // never scrolls, so the card opened under the fold (1 to 24% of it on screen at four laptop sizes); it now opens above.
+ await page.setViewportSize({width:1366,height:657});
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.goto('/experience');
+ await chip(root).evaluate(e=>scrollBy(0,e.getBoundingClientRect().bottom-(innerHeight-60)));
+ await page.waitForTimeout(150);
+ const y=await page.evaluate(()=>scrollY);
+ await chip(root).hover();
+ await expect(c).toHaveClass(/is-above/);
+ await page.waitForTimeout(600);
+ const b=await c.boundingBox();
+ expect(b.y).toBeGreaterThanOrEqual(0);
+ expect(b.y+b.height).toBeLessThanOrEqual(657);
+ expect(await page.evaluate(()=>scrollY)).toBe(y);
+ // A hover's preview dims the page a little (the card lands on the job's own words) and the call to action it covers
+ // goes; a click pins it and the page dims fully behind it, until it closes.
+ await expect.poll(()=>c.evaluate(e=>getComputedStyle(e,'::before').opacity)).toBe('0.6');
+ await expect(page.locator('#agentic-ai .internship-demo-hint')).toBeHidden();
+ await chip(root).click();
+ await expect(c).toHaveClass(/is-spot/);
+ await expect.poll(()=>c.evaluate(e=>getComputedStyle(e,'::before').opacity)).toBe('1');
+ await page.keyboard.press('Escape');
+ await expect(c).not.toHaveClass(/is-spot/);
+ await page.mouse.move(0,0);
+ // With room below it still opens below its chip.
+ await chip(root).evaluate(e=>scrollBy(0,e.getBoundingClientRect().top-120));
+ await page.waitForTimeout(150);
+ await chip(root).hover();
+ await expect(c).toHaveClass(/is-open/);
+ await expect(c).not.toHaveClass(/is-above/);
+ await page.mouse.move(0,0);
+ // A short phone (375x548, an iPhone SE): the drawing narrows to fit the screen, so the lead card and the analyst are
+ // on it (they sat 68px under the fold), and it never narrows below 85% of the card.
+ await page.setViewportSize({width:375,height:548});
+ await page.emulateMedia({reducedMotion:'reduce'});
+ await page.goto('/experience');
+ await chip(root).click();
+ await expect.poll(async()=>Math.abs((await c.boundingBox()).y)).toBeLessThan(2);
+ const sb=await scene.boundingBox(), cb=await c.boundingBox();
+ expect(sb.y).toBeGreaterThanOrEqual(-1);
+ expect(sb.y+sb.height).toBeLessThanOrEqual(549);
+ expect(sb.width).toBeGreaterThan(cb.width*.85-1);
+ // Reduced motion: the spotlight's edge is the card's own box (it drew 20px inside each side, through the step numbers).
+ expect(await c.evaluate(e=>Math.abs(parseFloat(getComputedStyle(e,'::after').width)-e.getBoundingClientRect().width))).toBeLessThan(1);
+ // A phone draws its two smallest strings at the labels' size; desktop keeps 9.
+ for(const s of [/^Ransomware report$/,/^ATT&CK T1053\.005$/]){
+  await expect(scene.locator('text',{hasText:s})).toHaveAttribute('font-size','10');
+  await expect(c.locator('svg.ag-scene:not(.ag-scene--m) text',{hasText:s})).toHaveAttribute('font-size','9');
+ }
+ // The rewind brings a phone's faint Detection back in place in step 1; its lit copy stays out of it (it rose back over
+ // the faint one and greyed after: a doubled badge, then a teal flash, on every loop).
+ await c.evaluate(e=>e.classList.add('is-fading'));
+ await page.waitForTimeout(450);
+ expect(await scene.locator('.ag-tv1').evaluate(e=>+getComputedStyle(e).opacity)).toBe(0);
+ expect(await scene.locator('.ag-det1').evaluate(e=>getComputedStyle(e).animationName)).toBe('ag-unghost');
+ // Off screen the run pauses, and goes on from the same frame when it is back.
+ await page.setViewportSize({width:390,height:844});
+ await page.emulateMedia({reducedMotion:'no-preference'});
+ await page.goto('/experience');
+ await chip(root).click();
+ await expect(c).toHaveClass(/is-playing/);
+ const count=state=>c.evaluate((e,s)=>e.getAnimations({subtree:true}).filter(a=>a.animationName&&a.playState===s).length,state);
+ await page.waitForTimeout(1800);
+ expect(await count('running')).toBeGreaterThan(0);
+ await page.evaluate(()=>scrollTo(0,0));
+ await expect.poll(()=>count('running')).toBe(0);
+ expect(await count('paused')).toBeGreaterThan(0);
+ await c.evaluate(e=>e.scrollIntoView({block:'start'}));
+ await expect.poll(()=>count('paused')).toBe(0);
+ expect(await count('running')).toBeGreaterThan(0);
+});
+
 test('phone charts stay open while the page scrolls and a finger lands elsewhere; the chip closes them',async({page})=>{
  await page.setViewportSize({width:390,height:844});
  await page.goto('/experience');

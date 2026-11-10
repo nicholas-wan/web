@@ -81,11 +81,17 @@ G.w = 8 * (G.ts + G.tg) - G.tg; G.h = 4 * (G.ts + G.tg) - G.tg;
 const OUTC = [G.x + OUTT[1] * (G.ts + G.tg) + G.ts / 2, G.y + OUTT[0] * (G.ts + G.tg) + G.ts / 2];
 // (7 Nov 2026, round 3: the query strip ends on the logs' right edge, 385, and the card's top is the logs' top, 75.5,
 // its centre on the line)
-const Q = { x: 224, y: 143, w: 161, h: 16 }, CARD = { x: 432, y: 75.5, w: 98, h: 57 }, AX = 586, R = 16, QS = 1.2;
+const Q = { x: 224, y: 143, w: 161, h: 16 }, CARD = { x: 432, y: 75.5, w: 98, h: 57 }, AXD = 586, R = 16, QS = 1.2;
 // (HX: the hunch's words in its pill, 6.3 from either end like the report's and the query's, measured with bold
 // rendering; HW: the pill's width, so the hunch and the query sit 12 apart, as the step columns' words do; PENY: the
 // card's pen centred on its first row; GL1: what the check was, in sentence case like the chart's other notes)
 const HX = 22.3, HW = 196, PENY = 6.8, GL1 = 'Fields and syntax checked';
+// (10 Nov 2026: a phone draws its two smallest strings, "Ransomware report" and "ATT&CK T1053.005", at the labels' 10
+// rather than 9; they rendered 8.9px at 375 wide and 9.4px on an iPhone 16, under every other label. Each needs room: the
+// report's pill is REPX wider, the supervisor and its wires' root moving 5 right (the link between them 5 long, not 9:
+// moved the whole 9, a blind review read the tree as lopsided), and the lead card CARDX wider, the analyst moving right
+// with it. A phone has the width; desktop, where they render over 10px, keeps 9 and its layout.)
+const REPX = 9, CARDX = 11, CARDM = { ...CARD, w: CARD.w + CARDX };
 // each step's picture: its reach in the desktop's units [left, right, top, bottom] (phones scale and stack them by the
 // top and bottom, and line their left edges up by LEFT; on a phone step 2 reaches further right and lower, for its
 // larger query strip)
@@ -98,7 +104,7 @@ const REACH_M = [[16, 16 + HW, 48, 163], [220, r1(Q.x + Q.w * QS + 1), 59, 178],
 const badge = (cls, cx, cy, ic, name, on) => `<g class="ag-b ${cls}"><rect class="ag-b-glow" x="${cx - 18}" y="${cy - 18}" width="36" height="36" rx="11" fill="none" stroke="${C.teal}" stroke-width="5" stroke-opacity=".22"/>` +
   `<rect x="${cx - 14}" y="${cy - 14}" width="28" height="28" rx="7" fill="${C.node}" stroke="${on ? C.teal : C.dim}" stroke-width="${SE}"/>` +
   `<g class="ag-bi">${icon(ic, r1(cx - 8.4), r1(cy - 8.4), 1.4, on ? C.teal : C.mute)}</g>${T(cx, cy + 28, name, 10, on ? C.teal : C.mute, 'text-anchor="middle"')}</g>`;   // (.ag-bi: the icon's own group, so it can move without losing its place)
-const wire = x => `M${HUB[0]} ${HUB[1] + 8} C${HUB[0]} ${HUB[1] + 20} ${x} ${L - 30} ${x} ${L - 14}`;
+const wire = (x, ux = HUB[0]) => `M${ux} ${HUB[1] + 8} C${ux} ${HUB[1] + 20} ${x} ${L - 30} ${x} ${L - 14}`;
 // (round 4: round 3's pulse from Reporting along the lane under the header to the card's pen is gone; two blind reviewers
 // read it as a stray comet over the title, running with no track while the result grew into the card. Reporting's part
 // is now a second beat in place: it readies before the result lifts, and presses and writes as the card's pen does.)
@@ -114,16 +120,17 @@ const ringSvg = () => `<g class="ag-ring"><circle cx="${OUTC[0]}" cy="${OUTC[1]}
 function picture(i, phone) {
   if (i === 0) {
     const [hx, rx, dx] = phone ? [BX[1], BX[2], BX[0]] : BX;
-    let p = `<g class="ag-team">${[hx, rx, dx].map((x, k) => `<path class="ag-wire ag-arm${k}${k === 2 ? ' ag-wire-det' : ''}" d="${wire(x)}" pathLength="1" stroke="${C.dim}" fill="none"/>`).join('')}` +
+    const ux = HUB[0] + (phone ? REPX - 4 : 0), rw = 104 + (phone ? REPX : 0);   // (the supervisor's x and the report pill's width: a phone's larger "Ransomware report", REPX above)
+    let p = `<g class="ag-team">${[hx, rx, dx].map((x, k) => `<path class="ag-wire ag-arm${k}${k === 2 ? ' ag-wire-det' : ''}" d="${wire(x, ux)}" pathLength="1" stroke="${C.dim}" fill="none"/>`).join('')}` +
       // (the supervisor hands each agent its part: a pulse down each wire, the same teal token as every other hand-off)
-      [hx, rx, dx].map((x, k) => `<path class="ag-fan ag-fan${k}" d="${wire(x)}" pathLength="1" stroke="${C.teal}" stroke-width="2.6" stroke-linecap="round" fill="none"/>`).join('') +
-      `<g class="ag-hub"><circle cx="${HUB[0]}" cy="${HUB[1]}" r="8" fill="${C.node}" stroke="${C.dim}" stroke-width="${SE}"/><circle cx="${HUB[0]}" cy="${HUB[1]}" r="2.6" fill="${C.dim}"/></g>${T(HUB[0] + 13, HUB[1] + 3.3, 'Supervisor')}` +
+      [hx, rx, dx].map((x, k) => `<path class="ag-fan ag-fan${k}" d="${wire(x, ux)}" pathLength="1" stroke="${C.teal}" stroke-width="2.6" stroke-linecap="round" fill="none"/>`).join('') +
+      `<g class="ag-hub"><circle cx="${ux}" cy="${HUB[1]}" r="8" fill="${C.node}" stroke="${C.dim}" stroke-width="${SE}"/><circle cx="${ux}" cy="${HUB[1]}" r="2.6" fill="${C.dim}"/></g>${T(ux + 13, HUB[1] + 3.3, 'Supervisor')}` +
       badge('ag-bh', hx, L, 'bulb', 'Hypothesis') +
       // Detection's place in step 1: a dotted outline once it has moved on (owner); always drawn, under Detection while it is there
       `<rect class="ag-slot" x="${dx - 14}" y="${L - 14}" width="28" height="28" rx="7" fill="none" stroke="${C.dim}" stroke-dasharray="3.124 3.124"/>` +
       (phone ? `<g class="ag-det1">${badge('', dx, L, 'lens', 'Detection', true)}</g>` : '') + '</g>';
-    p += `<g class="ag-rep"><rect x="16" y="${HUB[1] - 8}" width="104" height="16" rx="4" fill="${C.node}" stroke="${C.rule}"/>${icon('doc', 19, HUB[1] - 6.6, 1.1, C.ink)}${T(35, HUB[1] + 3.3, 'Ransomware report', 9, C.body)}</g>` +
-      `<path class="ag-rep-link" d="M120 ${HUB[1]} H${HUB[0] - 9}" stroke="${C.dim}" pathLength="1" fill="none"/>`;
+    p += `<g class="ag-rep"><rect x="16" y="${HUB[1] - 8}" width="${rw}" height="16" rx="4" fill="${C.node}" stroke="${C.rule}"/>${icon('doc', 19, HUB[1] - 6.6, 1.1, C.ink)}${T(35, HUB[1] + 3.3, 'Ransomware report', phone ? 10 : 9, C.body)}</g>` +
+      `<path class="ag-rep-link" d="M${16 + rw} ${HUB[1]} H${ux - 9}" stroke="${C.dim}" pathLength="1" fill="none"/>`;
     p += `<g class="ag-repb">${badge('ag-br', rx, L, 'pen', 'Reporting')}</g>`;
     // (the hunch shares the query strip's row, height and baseline: 16 high at y 143, words on 154.3)
     p += `<g class="ag-run ag-r1"><g class="ag-hunch"><rect x="16" y="143" width="${HW}" height="16" rx="4" fill="${C.node}" stroke="${C.teal}" stroke-opacity="${PART}"/>` +
@@ -133,7 +140,7 @@ function picture(i, phone) {
       // query reads as the hunch put to work; opacity only, laid exactly over the words)
       `<text class="ag-hk" x="${HX}" y="154.3" font-size="10" fill="${C.teal}" fill-opacity="0"><tspan font-weight="700">Hunch:</tspan> attackers hide in <tspan fill-opacity="1">scheduled tasks</tspan></text></g>` +
       // (the hunch's pulse: a bright core over a soft glow, so the hand-off reads at a glance)
-      ['ag-hglow" stroke-width="9', 'ag-hcore" stroke-width="3.6'].map(k => `<path class="ag-hpath ${k}" d="M${hx} ${L - 14} C${hx} ${L - 30} ${HUB[0]} ${HUB[1] + 20} ${HUB[0]} ${HUB[1] + 8} C${HUB[0]} ${HUB[1] + 20} ${dx} ${L - 30} ${dx} ${L - 14}" pathLength="1" stroke="${C.teal}" stroke-linecap="round" fill="none"/>`).join('') + '</g>';
+      ['ag-hglow" stroke-width="9', 'ag-hcore" stroke-width="3.6'].map(k => `<path class="ag-hpath ${k}" d="M${hx} ${L - 14} C${hx} ${L - 30} ${ux} ${HUB[1] + 20} ${ux} ${HUB[1] + 8} C${ux} ${HUB[1] + 20} ${dx} ${L - 30} ${dx} ${L - 14}" pathLength="1" stroke="${C.teal}" stroke-linecap="round" fill="none"/>`).join('') + '</g>';
     return p;
   }
   if (i === 1) {
@@ -188,12 +195,12 @@ function picture(i, phone) {
   // query pills' baseline, 154.3, so the row reads as one line; a phone keeps it under the card. "Analyst decides" sits
   // under the analyst as each agent's name sits under its badge (round 3: on one baseline 18 apart, the two read as one
   // sentence).
-  const { x, y, w, h } = CARD, cap = phone ? y + h + 16 : 154.3, oy = y + .5;
+  const { x, y, w, h } = phone ? CARDM : CARD, cap = phone ? y + h + 16 : 154.3, oy = y + .5, AX = AXD + (phone ? CARDX : 0);   // (a phone's wider card, and its analyst as far from it: CARDX above)
   return `<g class="ag-card"><g class="ag-cf"><rect class="ag-cfg" x="${x}" y="${y}" width="${w}" height="${h}" rx="7" fill="${C.node}" stroke="${C.teal}" stroke-width="${SE}"/>` +
     `<rect class="ag-cfg ag-cft" x="${x}" y="${y}" width="${w}" height="${h}" rx="7" fill="${C.teal}"/></g>` +
     `<g class="ag-cc ag-cc0">${icon('flag', x + 6.9, oy + 7.5, 1.2, C.teal)}<text x="${x + 24.9}" y="${oy + 18.5}" font-size="10.5" font-weight="700" fill="${C.ink}">1 lead</text></g>` +
     `<g class="ag-cpen">${icon('pen', x + w - 24.5, oy + PENY, 1.35, C.teal)}</g>` +
-    `<g class="ag-cc ag-cc1">${T(x + 10.5, oy + 35.5, 'Scheduled Task', 10, C.body)}</g><g class="ag-cc ag-cc2">${T(x + 10.5, oy + 47.5, 'ATT&amp;CK T1053.005', 9, C.mute)}</g></g>` +
+    `<g class="ag-cc ag-cc1">${T(x + 10.5, oy + 35.5, 'Scheduled Task', 10, C.body)}</g><g class="ag-cc ag-cc2">${T(x + 10.5, oy + 47.5, 'ATT&amp;CK T1053.005', phone ? 10 : 9, C.mute)}</g></g>` +
     `<g class="ag-trick">${T(x, cap, 'A known attacker trick', 10, C.body)}</g>` +
     // (the dashed line to the analyst extends behind the packet as it runs: a mask over it widens in step with it. Round
     // 4: the mask's region is its own, since the default, -10% to 120% of the viewport, ended at x 396 on a phone's 360-wide
@@ -310,15 +317,14 @@ function phone() {
   // lit hunch, step 2's words or the spine's number, so it hands over in place, the phone's one grammar between stacked
   // steps: once step 2's words have lit, Detection drifts 8 down out of its place and fades (at .96, never smaller), the
   // spine's run to step 2 fills, and it drops the last 8 into its place in step 2. The replay mirrors it.
-  const kf = `@keyframes ag-tv1 { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(${DRIFT}px) scale(.96); } }
-@keyframes ag-tv1-back { from { opacity: 0; transform: translateY(${DRIFT}px) scale(.96); } to { opacity: 1; transform: none; } }`;
+  const kf = `@keyframes ag-tv1 { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(${DRIFT}px) scale(.96); } }`;
   // the result's way into the card (round 4): round 3's small square swung out to the right edge over step 3's words and
   // back, read as a dead pixel. The query strip sits under the result and step 3's words under that, so no straight
   // path reaches the card without crossing words; the result hops as Detection does. It lifts and swells on its tile,
   // drifts down and fades, the spine's run to step 3 fills, and the card blooms in place from its right end, fading in
   // as it grows (a seed shown alone first read as the same stray square). Its places, in step 3's own units:
   const loc = ([u, v]) => [(u - at[2][0]) / PS, (v - at[2][1]) / PS];
-  const half = TILE0.o * SWELLS.m / 2, E = map(2, [CARD.x + CARD.w + .75 - half, L]);
+  const half = TILE0.o * SWELLS.m / 2, E = map(2, [CARDM.x + CARDM.w + .75 - half, L]);
   return { svg: open('ag-scene ag-scene--m', W, H) + wash('ag-wash-m', boxes.map(([x, by, w, h]) => [x, by, w, Math.min(h, H - by)])) + header(W, 23 - TRIM, MB, true) + stem +
     `<g class="ag-stage"><g class="ag-run ag-r2">${tk(0)}</g><g class="ag-run ag-r3">${tk(1)}</g>${pics[0]}<g class="ag-run ag-r2">${pics[1]}</g>${chip}</g>` + words.join('') +
     `<g class="ag-stage"><g class="ag-run ag-r3">${pics[2]}</g><g class="ag-run ag-r2"><g transform="translate(${at[1][0]} ${at[1][1]}) scale(${PS})">${ringSvg()}</g></g></g></svg>`,
@@ -399,6 +405,12 @@ const t = {
   // the resolve: "Analyst decides", and with it the team and the step captions relight and the light goes
   all: [15.3, .48],
 };
+// (10 Nov 2026: the hunch read alone for about 1.3 s before its pulse left, and a blind viewer read the stillness as dead
+// time just as the story starts. The hunch never leaves the screen, so it can still be read after, and the hold is
+// halved: everything from the pulse on, and the end of Hypothesis's glow, comes HUNCH_CUT sooner.)
+const HUNCH_CUT = .65, FROM = t.hf[0];
+for (const k in t) if (t[k][0] >= FROM) t[k][0] = +(t[k][0] - HUNCH_CUT).toFixed(2);
+t.hyp[1] = +(t.hyp[1] - HUNCH_CUT).toFixed(2);
 // the result's move into the card: a swell where it lies (SWELL), then the move, .48 s on desktop; a phone's leaves
 // its tile (.22 s), then blooms in place into the card (.5 s). Detection's hand-off between a phone's stacked steps is TV1, .6 s: it
 // starts .2 s after desktop's move, once step 2's words have lit.
@@ -441,7 +453,7 @@ const morph = (name, c0, swell, travel, grow, route) => { const T = SWELL + trav
 // a phone's (round 4): it swells on its tile, drifts DRIFT down as it fades, and the card blooms in place from its right
 // end (E), fading in as it starts to grow, so no lone square shows between; -o is the frame's opacity, on .ag-cf
 const hop = (name, c0, swell, travel, grow, E) => { const T = SWELL + travel + grow, a1 = SWELL / T, a2 = (SWELL + travel) / T, h = a2 - a1;
-  const so = TILE0.o * swell, sr = TILE0.r * swell, card = [CARD.x, CARD.y, CARD.w, CARD.h, 7], dz = DRIFT / PS, OUT = .8;
+  const so = TILE0.o * swell, sr = TILE0.r * swell, card = [CARDM.x, CARDM.y, CARDM.w, CARDM.h, 7], dz = DRIFT / PS, OUT = .8;
   const k = [`0% { ${geo(box(c0, TILE0.o, TILE0.r))} animation-timing-function: ${EZ}; }`, `${pct(a1)}% { ${geo(box(c0, so, sr))} animation-timing-function: ${STD}; }`,
     `${pct(a1 + OUT * h)}% { ${geo(box([c0[0], c0[1] + dz], so, sr))} animation-timing-function: linear; }`,
     `${pct(a2)}% { ${geo(box(E, so, sr))} animation-timing-function: ${STD}; }`, `100% { ${geo(card)} }`];
@@ -525,11 +537,13 @@ ${F} .ag-sw1 { animation-delay: .1s; }
 ${F}:not(.ag-scene--m) .ag-det { animation: ag-return .52s ${EZ} .22s both; }
 ${F}:not(.ag-scene--m) .ag-slot { animation: ag-on .22s ${STD} .22s both; }
 ${F}:not(.ag-scene--m) .ag-wire-det { animation: ag-on .22s ${STD} .5s both; }
-${F} :is(.ag-bd, .ag-det1 .ag-b, .ag-tv1) > rect:not(.ag-b-glow) { animation: ag-unlit-s .32s ${STD} .42s both; }
-${F} :is(.ag-bd, .ag-det1 .ag-b, .ag-tv1) .ag-i { animation: ag-unlit-i .32s ${STD} .42s both; }
+${F} :is(.ag-bd, .ag-det1 .ag-b) > rect:not(.ag-b-glow) { animation: ag-unlit-s .32s ${STD} .42s both; }
+${F} :is(.ag-bd, .ag-det1 .ag-b) .ag-i { animation: ag-unlit-i .32s ${STD} .42s both; }
 ${F} :is(.ag-bd, .ag-det1 .ag-b) text { animation: ag-unlit-t .32s ${STD} .42s both; }   /* (round 3: :is() so it outranks the playing rule; desktop's name had stayed teal and snapped grey at the replay) */
-${F}--m .ag-tv1 { opacity: 1; animation: ag-tv1-back .3s ${EZ} .3s both; }   /* (as step 2 fades, Detection rises back into its place in step 1, its hand-off backwards) */
-${F}--m .ag-det1 { animation: ag-unghost .22s ${STD} .5s both; }
+/* (10 Nov 2026: on a phone the faint Detection left in step 1 comes back in place, to full strength as it greys, badge
+   and name together. Its lit copy used to rise back over it first and grey over the next .3 s: a recording showed a
+   doubled badge, then a bright teal one for about .2 s, a flash on every loop.) */
+${F}--m .ag-det1 { animation: ag-unghost .32s ${STD} .42s both; }
 @keyframes ag-return { from { transform: translateX(var(--dx)); } to { transform: none; } }
 @keyframes ag-unghost { from { opacity: ${WAIT}; } to { opacity: 1; } }
 @keyframes ag-dimcap { from { opacity: 1; } to { opacity: ${WAIT}; } }

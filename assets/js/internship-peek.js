@@ -10,7 +10,7 @@
   const roots = [...document.querySelectorAll('.internship-demo-peek')];
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   const touch = matchMedia('(max-width: 736px), (hover: none)');
-  const REPLAY = 10000, HOLD = 3000, FADE = 240, GRACE = 130;
+  const REPLAY = 10000, HOLD = 3000, FADE = 240, GRACE = 130, TICK = 250;
   const fadeOf = c => +c.dataset.fade || FADE;
   // Phones keep the cards display:none until a tap, so the scenes' faces are
   // warmed once the page has loaded, after the text's fonts.
@@ -189,6 +189,9 @@
     const c = card(r);
     if (r.grow) { r.grow.cancel(); r.grow = null; }
     c.inert = false;
+    // No room below, room above: a data-spotlight card opens above its chip.
+    const b = chip(r).getBoundingClientRect(), h = c.offsetHeight + 8;
+    c.classList.toggle('is-above', !touch.matches && 'spotlight' in c.dataset && innerHeight - b.bottom < h && b.top > h);
     c.classList.add('is-open');
     const g = zoom.grow(c, chip(r), touch.matches, swapFrom);
     r.finalHeight = g.h;
@@ -201,6 +204,7 @@
   // Phones: a tap makes a data-spotlight card a screen tall (fill), its top
   // framed at the top. The page dims while it is on screen, lifting for good
   // (spent) as it scrolls away or on a tap outside; is-top hides the Menu pill.
+  // Desktop: the page dims behind it once a click has pinned and framed it.
   const phone = matchMedia('(max-width: 736px)');
   let lit = null, litRaf = 0, LIT = ['scroll', 'resize'];
   const litCheck = () => {
@@ -228,7 +232,7 @@
   function spotlight(r) {
     const c = card(r);
     unspot();
-    if (!c.style.minHeight) return;
+    if (!('spotlight' in c.dataset)) return;
     lit = c;
     c.spent = 0;
     const arm = () => { if (lit !== c || active !== r) return; LIT.forEach(e => addEventListener(e, onLitScroll, { passive: true })); litCheck(); };
@@ -238,10 +242,18 @@
   // (iOS sends no click for a tap on a plain gutter)
   document.addEventListener('pointerup', e => { if (lit && !lit.contains(e.target)) lift(); }, true);
   // A scene longer than REPLAY allows still holds its final frame for HOLD.
+  // Off screen or in a hidden tab the scene and its replay clock both pause.
   function loop(r) {
-    const c = card(r), end = Math.max(0, ...c.getAnimations({ subtree: true }).map(a => a.effect.getComputedTiming().endTime).filter(Number.isFinite));
+    const c = card(r), all = () => c.getAnimations({ subtree: true }).filter(a => a.animationName);
+    const per = Math.max(REPLAY, HOLD + fadeOf(c) + Math.max(0, ...all().map(a => a.effect.getComputedTiming().endTime).filter(Number.isFinite)));
+    let ran = 0, on = true;
     clearInterval(r.loop);
-    r.loop = setInterval(() => { if (!document.hidden && onScreen(c)) replay(r); }, Math.max(REPLAY, end + HOLD + fadeOf(c)));
+    r.loop = setInterval(() => {
+      const now = !document.hidden && onScreen(c);
+      if (now !== on) all().forEach(a => { if (now) { if (a.playState === 'paused') a.play(); } else if (a.playState === 'running') a.pause(); });
+      on = now;
+      if (on && (ran += TICK) >= per) { ran = 0; replay(r); }
+    }, TICK);
   }
   // The pointer has left the chip row and the card: after a short grace a
   // pinned card returns, otherwise the preview closes.
@@ -290,13 +302,6 @@
     close(active);
   });
   motion.addEventListener('change', () => { if (active) { play(active); loop(active); } });
-  document.addEventListener('visibilitychange', () => {
-    if (!active || !active.getAnimations) return;
-    active.getAnimations({ subtree: true }).forEach(a => {
-      if (document.hidden && a.playState === 'running') a.pause();
-      else if (!document.hidden && a.playState === 'paused') a.play();
-    });
-  });
   // A floating card closes once its chip is well off screen (it watches the
   // chip: a peek in a shared row has no box). Inline cards stay open while the
   // page scrolls (owner: phone charts must not close on scrolling).
