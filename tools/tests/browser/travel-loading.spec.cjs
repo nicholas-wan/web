@@ -85,6 +85,19 @@ test.describe('mobile reading animation',()=>{
   const held=await boat.boundingBox();expect(Math.abs(held.x-still.x)).toBeLessThan(1);
   if(name==='Liberty'){await boat.evaluate(el=>el.getAnimations()[0].currentTime=0);expect(Math.abs((await boat.boundingBox()).x-still.x)).toBeLessThan(1);expect(still.x).toBeGreaterThan(0);}
  });
+ // main.css switches every animation off under body.is-preload for about 100ms after load. A scene the rail started
+ // then held no animations: it played one pass by itself and never looped, rested or paused (10 Nov 2026).
+ test('a reload with the rail on screen still hands the rail its scenes',async({page})=>{
+  await page.setViewportSize({width:390,height:844});await page.goto('/travel');
+  const {scenes}=rail(page),times=()=>scenes.nth(3).evaluate(el=>el.getAnimations({subtree:true}).filter(a=>a.animationName).map(a=>a.currentTime));
+  await expect(page.locator('.mobile-journal-list .authored-scene > svg')).toHaveCount(10);
+  await scenes.nth(3).evaluate(el=>el.scrollIntoView({block:'center'}));await expect(scenes.nth(3)).toHaveClass(/is-active/);
+  // WebKit only restores a scroll position it has had a moment to record.
+  await page.waitForTimeout(800);await page.reload();await expect(scenes.nth(3)).toHaveClass(/is-active/);
+  // The rail opens Australia 1.5s in; left to themselves its animations start from 0.
+  await expect.poll(async()=>(await times()).length).toBeGreaterThan(0);
+  expect(Math.min(...await times())).toBeGreaterThanOrEqual(1500);
+ });
 });
 
 test('no JavaScript retains ten visible journal covers',async({browser})=>{

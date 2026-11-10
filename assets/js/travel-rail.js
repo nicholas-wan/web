@@ -11,8 +11,8 @@
      the page scrolls about a row. */
 (() => {
  'use strict';
- const OPEN={guangzhou:700,australia:1500,germany:150,usacanada:600,seoul:800};
- const REST={chengdu_zhangjiajie:1600,guangzhou:2400,japan:1600,australia:3000,germany:2400,usacanada:5500,perth:1400,europe:1800,siliconvalley:3400,seoul:2400};
+ const OPEN={guangzhou:700,australia:1500,germany:150,usacanada:300,seoul:800};
+ const REST={chengdu_zhangjiajie:1600,guangzhou:2400,japan:1600,australia:3000,germany:2400,usacanada:6500,perth:1400,europe:1800,siliconvalley:3400,seoul:2400};
  const FAST=900,SLOW=400,SETTLE=140,NUDGE=150,STAGGER=70,PASSES=2;
  const BURST=[[3,250],[2,150],[1.4,150]];// rate, ms
  const STEADY=new Set(['mm-flag']);// sped up, Perth's flag shows how stiff its wave is
@@ -23,7 +23,7 @@
   japan:[push('.mm-leaf','translate(-14px,-3px)',900,{step:45}),push('.cn-fuji-maple','rotate(2.5deg)',900)]};
  // The Eiffel Tower's hourly sparkle, on every other light (all of them turned the tower white).
  const SPARKLE=[{opacity:0,transform:'scale(1)'},{opacity:1,transform:'scale(1.7)',offset:.2},{opacity:.8,transform:'scale(1.2)',offset:.6}];
- const playing=new Map();let ctx,focus=null,flicking=false,lastY=scrollY,lastT=performance.now(),speed=0,settleTimer;
+ const playing=new Map();let ctx,focus=null,flicking=false,lastY=scrollY,lastT=performance.now(),speed=0,settleTimer,wait;
 
  // The slowest animation: Perth's flag skips the beat's speed-up, so it runs behind the rest.
  const clock=s=>s.anims.length?Math.min(...s.anims.map(a=>a.currentTime||0)):0;
@@ -61,6 +61,8 @@
 
  function update(c){
   ctx=c;const {entries,media,reduced,list}=c;
+  // body.is-preload (main.css) turns all animation off; a scene started then holds none.
+  if(document.body.classList.contains('is-preload')){clearTimeout(wait);wait=setTimeout(()=>update(c),120);return;}
   if(!media.matches||reduced.matches||document.hidden||list.hidden){[...playing.keys()].forEach(stop);pick(null);return;}
   let nearest=null,distance=Infinity;const shown=[];
   entries.forEach(e=>{const box=e.art.getBoundingClientRect(),visible=Math.min(innerHeight,box.bottom)-Math.max(0,box.top);if(!box.height||visible<box.height/2)return;shown.push(e);const d=Math.abs((box.top+box.bottom)/2-innerHeight*.4)-(e===focus?28:0);if(d<distance){nearest=e;distance=d;}});
