@@ -107,7 +107,7 @@ if (figs.nag) {
 
 if (figs.squash) {
 	const chat = $('#squashbot [data-chat]');
-	if (chat) lock(figs.squash, chat, { wall: 'radial-gradient(120% 70% at 50% 0%,#3b6ea5,#1b3654 48%,#0b1622)', date: 'Friday 13 November', clock: '9:41', group: 'Squash',
+	if (chat) lock(figs.squash, chat, { wall: 'radial-gradient(120% 70% at 50% 0%,#3b6ea5,#1b3654 48%,#0b1622)', date: new Date(Date.now() + (12 - new Date().getDay()) % 7 * 864e5).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).replace(',', ''), clock: '9:41', group: 'Squash',
 		read: () => [...chat.querySelectorAll('.sq-m')].filter((m) => !/Court schedule/.test(m.textContent)).map((m) => {
 			const lines = [...m.querySelectorAll('.sq-tx > div')].map(flat).filter(Boolean).join('\n');
 			return [m.classList.contains('sq-m--me') ? 'DodgerBlueee' : 'SquashBot', lines];

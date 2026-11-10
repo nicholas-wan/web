@@ -366,3 +366,16 @@ test('Desktop carousel holds only for the phone or the rail, and follows the has
   await expect(page.locator('.app-rail [aria-controls="nag-bot"]')).toHaveAttribute('aria-selected', 'true');
   await expect(rail).toHaveClass(/is-turn/);
 });
+
+test('SquashBot dates start from the coming Friday, whatever today is', async ({ page }) => {
+  await page.clock.install({ time: new Date('2026-12-30T10:00:00') });
+  await page.goto('/projects');
+  const app = page.locator('#squashbot');
+  // Wed 30 Dec 2026: the demo's Friday is 1 Jan 2027, and nothing in it is in the past.
+  await expect(app.locator('[data-chat]')).toContainText('Sun 3 Jan · 10am–12pm · C1');
+  await app.locator('.sq-chip', { hasText: 'court four sunday' }).click();
+  await expect(app.locator('[data-chat]')).toContainText('Sun, 3 Jan 2027');
+  await app.locator('[data-mini="courts"]').first().click();
+  await app.locator('.sq-mini [data-mk="tab"]').click();
+  await expect(app.locator('.sq-mini')).toContainText('Court 4 · 29 Dec · 8pm–9pm');
+});

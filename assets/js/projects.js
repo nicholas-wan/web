@@ -1,6 +1,6 @@
-/* 85% of a demo on screen: the bar for its preview and for the desktop carousel to turn. */
+/* 85% on screen: the bar for a preview and for the carousel to turn. */
 const pjVisible = d => { const b = d.getBoundingClientRect(); return Math.max(0, Math.min(innerHeight, b.bottom) - Math.max(0,b.top)) / b.height >= .85; };
-/* Each sample app initializes only within 500px of the viewport. */
+/* Each sample app boots within 500px of the viewport. */
 function projectsDemo(selector, init) {
 	const roots = [...document.querySelectorAll(selector)];
 	const boot = root => { if (!root.dataset.initialized) { root.dataset.initialized='1'; init(root); } };
@@ -10,7 +10,7 @@ function projectsDemo(selector, init) {
 	}), {rootMargin:'500px'});
 	roots.forEach(root => io.observe(root));
 }
-/* SquashBot demo in the bot's own words (squashbot/src). "Now" is Fri 13 Nov 2026, 9:41am. */
+/* SquashBot demo in the bot's own words (squashbot/src). "Now" is the coming Friday, 9:41am. */
 (() => {
 'use strict';
 const U = 'DodgerBlueee', WD = 'Sun Mon Tue Wed Thu Fri Sat'.split(' ');
@@ -20,7 +20,7 @@ const CW = '(\\d{1,2}|one|two|three|four|five)';
 const COURT = `\\b(?:courts?|crt|ct|c)\\s*#?\\s*${CW}\\b`;
 const MW = '(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*';
 const NOW = 581;
-const T0 = Date.UTC(2026, 10, 13);
+const D = new Date(), T0 = Date.UTC(D.getFullYear(), D.getMonth(), D.getDate() + (12 - D.getDay()) % 7);
 const dt = (o) => new Date(T0 + o * 864e5);
 const sd = (o) => { const d = dt(o); return `${WD[d.getUTCDay()]} ${d.getUTCDate()} ${MO[d.getUTCMonth()]}`; };
 const cd = (o) => sd(o).replace(' ', ', ');
@@ -44,7 +44,8 @@ function pDate(t) {
 	let m = t.match(new RegExp(`\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+${MW}`));
 	if (m) {
 		const at = (y) => (Date.UTC(y, MO.findIndex((x) => x.toLowerCase() === m[2]), m[1]) - T0) / 864e5;
-		return at(2026) < -180 ? at(2027) : at(2026);
+		const y = dt(0).getUTCFullYear();
+		return at(y) < -180 ? at(y + 1) : at(y);
 	}
 	if (!(m = t.match(/\b(next\s+)?(sun|mon|tue|wed|thu|fri|sat)[a-z]*\b/))) return null;
 	const a = (WD.findIndex((x) => x.toLowerCase() === m[2]) + 2) % 7;
@@ -330,7 +331,7 @@ function init(root) {
 		const tab = kind === 'tab', row = (a, b) => `<div class="sq-mr"><span>${a}</span>${b}</div>`;
 		mini.innerHTML = `<div class="sq-mtop"><b>${tab ? 'Tab' : 'Courts'}</b><button type="button" data-mx>Close</button></div><div class="sq-mseg">${[['courts', '🎾 Courts'], ['tab', '🧾 Tab']].map(([k, l]) =>
 			`<button type="button" data-mk="${k}" aria-pressed="${k === kind}">${l}</button>`).join('')}</div>${tab
-			? `<div class="sq-mcard"><strong>$2.00</strong>You owe Nicholas</div><div class="sq-mlbl">Your history</div><div class="sq-msec">${row('Court 4 · 10 Nov · 8pm–9pm · $6.00&nbsp;÷&nbsp;3', '<b>$2.00</b>')}</div><p>Courts are $6/hour from 6pm, on weekends and on public holidays, $3/hour otherwise, split across everyone who played.</p>`
+			? `<div class="sq-mcard"><strong>$2.00</strong>You owe Nicholas</div><div class="sq-mlbl">Your history</div><div class="sq-msec">${row(`Court 4 · ${sd(-3).slice(4)} · 8pm–9pm · $6.00&nbsp;÷&nbsp;3`, '<b>$2.00</b>')}</div><p>Courts are $6/hour from 6pm, on weekends and on public holidays, $3/hour otherwise, split across everyone who played.</p>`
 			: `<div class="sq-msec">${sorted().map((b, i) => row(`<b>Court ${esc(b.c)} · ${sd(b.o)}</b>${span(b.s, b.e)} · ${free(b) ? `${free(b)} left` : 'full'} · ${b.ppl.length}/${b.cap}<br>👥 ${named(b).join(', ')}${b.ppl.length > named(b).length ? ` + ${b.ppl.length - named(b).length}` : ''}`,
 				b.ppl.includes(U) ? `<button type="button" data-mj="${i}" class="is-out">Leave</button>` : free(b) ? `<button type="button" data-mj="${i}">Join</button>` : '<i>Full</i>')).join('')}</div><p>Tap a court to seat or remove players, or to change it.</p><button type="button" class="sq-madd" data-ma>➕ Add booking</button>`}`;
 		mini.hidden = false; chat.inert = true; toastEl.classList.remove('is-on');
@@ -494,7 +495,7 @@ function setup(root) {
 	}
 	const push = (k) => s.msgs.push({ id: ++seq, k, isNew: !reduced() });
 	const drop = (id) => { s.msgs = s.msgs.filter((m) => m.id !== +id && m.k !== id); };
-	const edit = () => Object.assign(card(), { kb: 0, ed: 1 });
+	const edit = () => Object.assign(card(), { kb: 0, ed: 1, isNew: !reduced() });
 	function complete(tog, app) {
 		if (s.st !== 'nagging') return;
 		Object.assign(s, { st: 'done', tog, snz: null, glow: !reduced() });
@@ -1049,7 +1050,7 @@ function init(root) {
 			if (k) later(() => moveTap(get()), at - 420);
 			later(() => { tap.classList.remove('press'); void tap.offsetWidth; tap.classList.add('press'); get().click(); }, at);
 		});
-		/* The list follows the taps: the stepper with Clothes under it, Last call's note with the essentials, then back to the top. */
+		/* The list follows the taps: stepper, Last call's note, back to the top. */
 		to(112, 950); to(222, 4050); to(0, 5900);
 		later(() => tap.classList.remove('on'), 6050);
 		later(() => { previewing = false; tap.className = 'pk-tap'; }, 6350);
@@ -1085,12 +1086,15 @@ const cards = tabs.map(t => document.getElementById(t.getAttribute('aria-control
 const at = () => cards.findIndex(c => '#' + c.id === location.hash);
 let cur = Math.max(0, at());
 function show(i, focus) {
-	if (i !== cur) rail.classList.add('is-turn');
+	const turn = i !== cur && !still.matches;
+	if (turn) rail.classList.add('is-turn');
 	cur = i;
 	tabs.forEach((t, k) => {
 		const v = t.querySelector('video'), on = k === i;
 		t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
-		cards[k].hidden = wide.matches && !on;
+		const c = cards[k], off = wide.matches && !on;
+		// The leaving card fades out over the arriving one.
+		if (turn && off && !c.hidden) { c.classList.add('is-out'); setTimeout(() => { c.classList.remove('is-out'); c.hidden = wide.matches && k !== cur; }, 300); } else c.hidden = off;
 		if (wide.matches && !v.src) { v.poster = v.dataset.poster; v.src = v.dataset.src; }
 	});
 	if (focus) tabs[i].focus();
@@ -1109,20 +1113,20 @@ function cue() {
 }
 vids.forEach(v => v.addEventListener('ended', () => { if (hover < 0) { turn++; cue(); } }));
 tabs.forEach((t, n) => { t.addEventListener('pointerenter', () => { hover = n; cue(); }); t.addEventListener('pointerleave', () => { hover = -1; cue(); }); });
-// It also turns by itself while 85% of the chosen phone is on screen and the pointer is off the phone and the rail; a tab click or a touch on a demo ends it for good.
+// It turns by itself while 85% of the phone is on screen and the pointer is off the phone and rail; a click or key ends it.
 function hold() { rail.classList.toggle('is-hold', !!over || !pjVisible(cards[cur].querySelector('.app-demo'))); }
 const quit = () => { auto = 0; rail.classList.remove('is-auto'); cue(); };
 rail.addEventListener('animationend', e => { if (!auto || e.animationName !== 'pj-fill') return; const n = (cur + 1) % 4, d = cards[n].querySelector('.app-demo'); if (!d.dataset.user) delete d.dataset.seen; show(n); });
 [rail, ...document.querySelectorAll('.app-phone')].forEach(el => { el.addEventListener('pointerenter', () => { over = 1; hold(); }); el.addEventListener('pointerleave', () => { over = 0; hold(); }); });
 cards.forEach(c => ['pointerup', 'keydown'].forEach(t => c.addEventListener(t, quit)));
-addEventListener('scroll', hold, { passive: true });
+addEventListener('scroll', hold);
 rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { quit(); show(tabs.indexOf(t)); } });
 rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur || 4 }[e.key]; if (d) { e.preventDefault(); quit(); show((cur + d) % 4, 1); } });
 addEventListener('hashchange', () => { const i = at(); if (i >= 0 && cards[i].hidden) { quit(); show(i); cards[i].scrollIntoView(); } });
 const start = () => { auto = wide.matches && !still.matches ? 1 : 0; rail.classList.toggle('is-auto', !!auto); show(cur); };
 [wide, still].forEach(m => m.addEventListener('change', start));
 // Phones: the site's Menu pill steps aside while a demo's top bar is under it.
-addEventListener('scroll', () => document.body.classList.toggle('pj-under', !wide.matches && cards.some(c => { const r = c.querySelector('.app-demo').getBoundingClientRect(); return r.top < 76 && r.bottom > 76; })), { passive: true });
+addEventListener('scroll', () => document.body.classList.toggle('pj-under', !wide.matches && cards.some(c => { const r = c.querySelector('.app-demo').getBoundingClientRect(); return r.top < 76 && r.bottom > 76; })));
 start();
 })();
 
@@ -1150,15 +1154,15 @@ function schedule() { clearTimeout(settle); settle=setTimeout(choose,500); }
 document.addEventListener('scroll', () => {
 	if (active && !pjVisible(active)) { const d=active; stop(); delete d.dataset.seen; }
 	schedule();
-}, { capture:true, passive:true });
-window.addEventListener('resize',schedule,{passive:true});
+}, true);
+addEventListener('resize',schedule);
 document.addEventListener('visibilitychange', () => { if (document.hidden) { const d = active; stop(); if (d) delete d.dataset.seen; } else schedule(); });
 motion.addEventListener('change', () => { stop(); schedule(); });
 demos.forEach(d => {
-	d.addEventListener('pointerdown', () => { if (active === d) { paused=d; stop(); } }, {capture:true,passive:true});
-	d.addEventListener('pointercancel', () => { if (paused === d) { paused=null; delete d.dataset.seen; schedule(); } }, {passive:true});
+	d.addEventListener('pointerdown', () => { if (active === d) { paused=d; stop(); } }, true);
+	d.addEventListener('pointercancel', () => { if (paused === d) { paused=null; delete d.dataset.seen; schedule(); } });
 	const own = () => { d.querySelectorAll('[data-demo-live]').forEach(e => e.setAttribute('aria-live','polite')); d.dataset.user='1'; busy = d; busyAt = Date.now(); if (paused === d) paused=null; if (active === d) stop(); emit(d,'demo:stop'); schedule(); };
-	d.addEventListener('pointerup',own,{capture:true,passive:true});
+	d.addEventListener('pointerup',own,true);
 	d.addEventListener('keydown',own,{capture:true});
 	const reset=d.closest('.app-card').querySelector('.app-demo__reset');
 	reset.addEventListener('click', () => {
