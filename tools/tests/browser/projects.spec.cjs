@@ -379,3 +379,24 @@ test('SquashBot dates start from the coming Friday, whatever today is', async ({
   await app.locator('.sq-mini [data-mk="tab"]').click();
   await expect(app.locator('.sq-mini')).toContainText('Court 4 · 29 Dec · 8pm–9pm');
 });
+
+test('More features shows demo slices on desktop and phone tops on phones', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/projects');
+  for (const id of ['squashbot', 'nag-bot', 'finance-tracker', 'travel-packing']) {
+    await show(page, id);
+    const imgs = page.locator(`#${id} .app-more img`);
+    await expect(imgs).toHaveCount(3);
+    for (const img of await imgs.all()) {
+      await img.scrollIntoViewIfNeeded();
+      await expect.poll(() => img.evaluate((i) => i.complete && i.currentSrc)).toMatch(/-slice\.webp$/);
+      // Each slice keeps the demo's text size inside its card: never wider than the card, never cropped sideways.
+      const [w, card] = await img.evaluate((i) => [i.getBoundingClientRect().width, i.closest('li').clientWidth]);
+      expect(w).toBeLessThanOrEqual(card - 47);
+    }
+  }
+  await page.setViewportSize({ width: 393, height: 659 });
+  const phone = page.locator('#squashbot .app-more img').first();
+  await phone.scrollIntoViewIfNeeded();
+  await expect.poll(() => phone.evaluate((i) => i.complete && i.currentSrc)).toMatch(/squashbot-mini\.webp$/);
+});

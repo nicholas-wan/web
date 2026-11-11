@@ -400,7 +400,8 @@ Assert-FileSizeBudget 'assets\css\skills-page.css' 19
 # Nag-bot's board and stickers, and the More features rows.
 # 74 -> 76 (9 Nov 2026): Travel Packing's demo head is the app's boarding pass, with the plane on its progress line.
 # 76 -> 77 (9 Nov 2026): the demo pass's PACKED stamp and plane marker.
-Assert-FileSizeBudget 'assets\css\projects.css' 77
+# 77 -> 79 (12 Nov 2026): More features on desktop shows slices of each demo on cards in the app's own colour.
+Assert-FileSizeBudget 'assets\css\projects.css' 79
 # 69 -> 70 (9 Nov 2026): the loader for Travel Packing's laptop; the page stays under 80 KB.
 Assert-FileSizeBudget 'assets\js\projects.js' 70
 # projects-laptop.js is injected on wide screens by projects.js (Travel Packing's laptop, 9 Nov 2026),
@@ -1026,6 +1027,9 @@ if ($flatProjectsCss -match '\{[^{}]*\{') { throw 'Projects CSS must stay unnest
 # Projects: four equal interactive sample demos, route-only assets and no household source links.
 $projectsHtml = Get-Content -LiteralPath (Join-Path $dist 'projects.html') -Raw -Encoding UTF8
 if ($projectsHtml -match 'og:image|twitter:card' -or $projectsHtml -notmatch '<body class="is-preload page-experience page-projects">' -or [regex]::Matches($projectsHtml, 'class="app-card"').Count -ne 4 -or [regex]::Matches($projectsHtml, 'data-demo="(?:squash|nag|finance|packing)"').Count -ne 4 -or $projectsHtml -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/projects.js')) -or $projectsHtml -match 'assets/js/(?:internship-peek|scramble-reveal).js') { throw "Projects must carry four interactive demos, its own script and no share-preview image." }
+# More features on desktop (12 Nov 2026): each of the twelve cards swaps its phone top for a slice of the demo from 981px up;
+# phones keep the phone tops.
+if ([regex]::Matches($projectsHtml, '<picture><source media="\(min-width:981px\)" srcset="images/projects/[a-z]+-[a-z]+-slice\.webp" width="\d+" height="\d+"><img src="images/projects/[a-z]+-[a-z]+\.webp"').Count -ne 12) { throw 'Each More features card needs its desktop slice source before its phone image.' }
 # Owner, 9 Nov 2026: no Sample label on Finance (its figures are invented and scaled down instead).
 if ($projectsHtml -match 'WeeYingxian/avery|lab/projects|This site|class="f-sample"') { throw "Projects must keep household repositories unlinked and Finance without a Sample label." }
 
