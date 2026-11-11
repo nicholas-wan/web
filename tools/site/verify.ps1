@@ -500,7 +500,8 @@ if ($travelJournalCss -notmatch '\.page-travel-journal header\.major > \.date \{
 if ($experiencePageCss -notmatch '#main > \.portfolio-headline \{' -or $personalPageCss -notmatch '\.personal-timeline-page > \.personal-timeline \{' -or $skillsPageCss -notmatch '\.page-skills \.skills-heading::before \{') { throw 'A page-specific CSS bundle is missing its route-owned rules.' }
 Assert-FileSizeBudget 'assets\js\main.js' 18
 # 14 -> 20: the hunt lens (11 Nov 2026) adds the lens mesh, hunts and touch drift.
-Assert-FileSizeBudget 'assets\js\canvas-background.js' 20
+# 20 -> 25: sonar (11 Nov 2026) adds hidden threats that stay found, the lens lean and the find waves.
+Assert-FileSizeBudget 'assets\js\canvas-background.js' 25
 # 22 -> 24: phone hero glide (initHeroSnap, Jul 2026).
 Assert-FileSizeBudget 'assets\js\game.js' 24
 Assert-FileSizeBudget 'assets\js\listing-effects.js' 8
