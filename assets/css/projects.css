@@ -782,17 +782,20 @@ html .page-projects .portfolio-headline h1{color:#ecedf0}
 .page-projects .app-demo .demo-island{background:#000}
 /* Travel Packing's laptop is styled by projects-laptop.js, which loads on wide screens only; until then it stays hidden. */
 .page-projects :is(.pkl,.cpn):not(.is-on){display:none}
-/* More features on desktop (12 Nov 2026, owner: "Yes, build G3"): each card is the app's own screen colour (the two light
-   apps a dark card tinted with theirs) and shows a slice of the live demo cut to the part that proves its title, in place
-   of the phone top. --w is the slice's CSS width and --r its share of the row's widest, so a row shrinks as one. */
-@media (min-width:981px){.page-projects .app-more li{border-color:color-mix(in srgb,var(--app) 14%,#2d2f34)}
+/* More features on desktop (13 Nov 2026, owner: "Ship G4"; G3 of 12 Nov before it): every card the same, after Copilot
+   Money's "A few more things": the title, then a gradient well in the app's colour run to 8px from the card, holding the
+   one element of the live demo that proves the title, centred and framed. Phones keep the phone tops (the well is
+   display: contents there). */
+.page-projects .app-more__well{display:contents}
+@media (min-width:981px){.page-projects .app-more li{padding:24px 24px 8px;border-color:color-mix(in srgb,var(--app) 14%,#2d2f34)}
 .page-projects #squashbot .app-more li{background:#0e1621}
 .page-projects #finance-tracker .app-more li{background:#161614}
-.page-projects :is(#nag-bot,#travel-packing) .app-more li{background:color-mix(in srgb,var(--app) 7%,#16171a);border-color:color-mix(in srgb,var(--app) 16%,#2d2f34)}
-.page-projects .app-more p{margin-bottom:1.25rem}
+.page-projects :is(#nag-bot,#travel-packing) .app-more li{background:color-mix(in srgb,var(--app) 6%,#16171a)}
+.page-projects .app-more p{margin-bottom:1.1rem}
 .page-projects .app-more strong{min-height:2.3em}
-.page-projects .app-more img{width:min(calc(var(--r) * 100%),calc(var(--w) * 1px));max-width:none;margin:0 0 24px}
-.page-projects .app-more img:not([data-whole]){-webkit-mask-image:linear-gradient(#000 calc(100% - 48px),#0000);mask-image:linear-gradient(#000 calc(100% - 48px),#0000)}
-.page-projects :is(#nag-bot,#travel-packing) .app-more img{border-radius:12px;filter:brightness(.92)}
-.page-projects #travel-packing .app-more li{height:21rem}
-.page-projects #travel-packing .app-more img{-webkit-mask-image:none;mask-image:none}}
+.page-projects .app-more__well{display:grid;place-items:center;height:212px;margin:0 -16px;border-radius:16px;background:linear-gradient(135deg,color-mix(in srgb,var(--app) 16%,#0000),color-mix(in srgb,var(--app) 4%,#0000))}
+.page-projects .app-more__well picture{display:contents}
+.page-projects .app-more img{width:auto;height:auto;min-width:min(250px,88%);max-width:88%;max-height:84%;margin:0;border-radius:12px}
+.page-projects :is(#squashbot,#finance-tracker) .app-more img{border:1px solid #ffffff1f;box-shadow:0 10px 28px #00000080}
+.page-projects :is(#nag-bot,#travel-packing) .app-more img{filter:brightness(.94);box-shadow:0 12px 32px #00000066}}
+@media (min-width:981px) and (max-width:1180px){.page-projects .app-more__well{height:196px}}

@@ -380,7 +380,7 @@ test('SquashBot dates start from the coming Friday, whatever today is', async ({
   await expect(app.locator('.sq-mini')).toContainText('Court 4 · 29 Dec · 8pm–9pm');
 });
 
-test('More features shows demo slices on desktop and phone tops on phones', async ({ page }) => {
+test('More features shows framed demo tiles on desktop and phone tops on phones', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/projects');
   for (const id of ['squashbot', 'nag-bot', 'finance-tracker', 'travel-packing']) {
@@ -389,10 +389,11 @@ test('More features shows demo slices on desktop and phone tops on phones', asyn
     await expect(imgs).toHaveCount(3);
     for (const img of await imgs.all()) {
       await img.scrollIntoViewIfNeeded();
-      await expect.poll(() => img.evaluate((i) => i.complete && i.currentSrc)).toMatch(/-slice\.webp$/);
-      // Each slice keeps the demo's text size inside its card: never wider than the card, never cropped sideways.
-      const [w, card] = await img.evaluate((i) => [i.getBoundingClientRect().width, i.closest('li').clientWidth]);
-      expect(w).toBeLessThanOrEqual(card - 47);
+      await expect.poll(() => img.evaluate((i) => i.complete && i.currentSrc)).toMatch(/-tile\.webp$/);
+      // Each tile sits whole inside its well: never cropped, never wider or taller than the well.
+      const [r, well] = await img.evaluate((i) => [i.getBoundingClientRect().toJSON(), i.closest('.app-more__well').getBoundingClientRect().toJSON()]);
+      expect(r.left).toBeGreaterThanOrEqual(well.left); expect(r.right).toBeLessThanOrEqual(well.right);
+      expect(r.top).toBeGreaterThanOrEqual(well.top); expect(r.bottom).toBeLessThanOrEqual(well.bottom);
     }
   }
   await page.setViewportSize({ width: 393, height: 659 });
