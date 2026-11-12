@@ -568,7 +568,11 @@ to{box-shadow:0 0 0 9px rgba(17,110,107,0)}
 @media screen and (max-width:980px){.page-projects .app-card + .app-card{padding-top:2.2rem;border-top:1px solid var(--pj-line)}
 .page-projects .app-why{border-top:0;padding-top:.5rem}
 }
-.page-projects .app-demo--finance[data-seen]:not([data-user]):not([data-playing]) button.f-tr{animation:pk-beacon 1.5s ease-out .8s 3}
+.page-projects .app-demo--finance[data-seen]:not([data-user]):not([data-playing]) .is-bad .f-badge{animation:f-beacon 1.5s ease-out .3s 3}
+.page-projects .app-demo[data-playing] .f-res{visibility:hidden}
+@keyframes f-beacon{from{box-shadow:0 0 0 0 var(--r)}
+to{box-shadow:0 0 0 12px transparent}
+}
 .page-projects .n-plus{opacity:.45}
 .page-projects :is(.sq-toast,.n-toast){background:#0d1117f5;box-shadow:0 6px 18px #0007}
 @media (max-width:736px){.page-projects .app-card__foot{justify-content:flex-start}

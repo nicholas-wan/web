@@ -346,6 +346,26 @@ test('Packing preview keeps what it changes on screen and any part of a row tick
   await expect(app.getByRole('checkbox', { name: 'Passport, essential', exact: true })).toBeChecked();
 });
 
+test('Finance preview shows a flagged charge check, taps Done and back, and rests on Overview with Needs attention pulsing', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 393, height: 852 });
+  await page.goto('/projects');
+  const app = page.locator('#finance-tracker'), demo = app.locator('figure.app-card__demo .app-demo');
+  await demo.evaluate(e => scrollTo(0, e.getBoundingClientRect().top + scrollY - (innerHeight - e.getBoundingClientRect().height) / 2));
+  await expect(demo).toHaveAttribute('data-playing', '1', { timeout: 15000 });
+  const title = demo.locator('.f-scroll .f-title');
+  await expect(title).toHaveText('Possible card testing', { timeout: 6000 });
+  await expect(demo.locator('.f-sheet')).toContainText('Medium priority check', { timeout: 4000 });
+  // The read-only note is for readers who tap; the preview hides it.
+  expect(await demo.locator('.f-res').evaluate(e => getComputedStyle(e).visibility)).toBe('hidden');
+  await expect(demo.locator('.f-sheet-wrap')).toBeHidden({ timeout: 6000 });
+  await expect(title).toHaveText('Overview', { timeout: 4000 });
+  await expect(demo).not.toHaveAttribute('data-playing', '1', { timeout: 6000 });
+  await expect(demo.locator('.f-sheet-wrap')).toBeHidden();
+  await expect(demo.locator('.f-tab[data-tab="overview"]')).toHaveAttribute('aria-pressed', 'true');
+  expect(await demo.locator('.is-bad .f-badge').evaluate(e => getComputedStyle(e).animationName)).toBe('f-beacon');
+});
+
 test('Desktop carousel holds only for the phone or the rail, and follows the hash', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.setViewportSize({ width: 1440, height: 1100 });

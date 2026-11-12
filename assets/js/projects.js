@@ -1,4 +1,4 @@
-/* 85% on screen: the bar for a preview and for the carousel to turn. */
+/* 85% on screen: the bar for a preview and the carousel to turn. */
 const pjVisible = d => { const b = d.getBoundingClientRect(); return Math.max(0, Math.min(innerHeight, b.bottom) - Math.max(0,b.top)) / b.height >= .85; };
 /* Each sample app boots within 500px of the viewport. */
 function projectsDemo(selector, init) {
@@ -10,7 +10,7 @@ function projectsDemo(selector, init) {
 	}), {rootMargin:'500px'});
 	roots.forEach(root => io.observe(root));
 }
-/* SquashBot demo in the bot's own words (squashbot/src). "Now" is the coming Friday, 9:41am. */
+/* SquashBot demo in the bot's words (squashbot/src). "Now" is the coming Friday, 9:41am. */
 (() => {
 'use strict';
 const U = 'DodgerBlueee', WD = 'Sun Mon Tue Wed Thu Fri Sat'.split(' ');
@@ -325,7 +325,7 @@ function init(root) {
 	root.appendChild(mini);
 	let miniOpener;
 	function closeMini() { mini.hidden = true; chat.inert = false; if (miniOpener) miniOpener.focus({ preventScroll: true }); }
-	/* The Mini App as squashbot/public/app draws it: title, Close, Courts | Tab, then rows. */
+	/* The Mini App as squashbot/public/app draws it: title, Close, Courts | Tab, rows. */
 	function openMini(kind, opener, again) {
 		if (opener) miniOpener = opener;
 		const tab = kind === 'tab', row = (a, b) => `<div class="sq-mr"><span>${a}</span>${b}</div>`;
@@ -656,14 +656,14 @@ else init();
 })();
 
 
-/* Finance tracker demo: the owner's phone tabs (finance_tracker app/index.html) in the app's words. Data invented. */
+/* Finance tracker demo: its phone tabs (finance_tracker app/index.html), its words. Data invented. */
 (() => {
 const NW = [177760, 179160, 180480, 179640, 182320, 184120, 185560, 184480, 187480, 191900, 192520, 194480];
 const MONTHS = NW.map((_, i) => 'Nov Dec Jan Feb Mar Apr May Jun Jul Aug Sep Oct'.split(' ')[i] + (i < 2 ? ' 2025' : ' 2026'));
 const LO = Math.min(...NW), Y = v => 52 - (v - LO) / (Math.max(...NW) - LO) * 46;
 const F = [0, 2].map(d => new Intl.NumberFormat('en-SG', { minimumFractionDigits: d, maximumFractionDigits: d }));
 
-/* Amounts are written "S$1,234"; M gives each the markup Hide amounts masks. */
+/* Amounts read "S$1,234"; M adds the markup Hide amounts masks. */
 const money = (n, d, sign) => (sign ? '+' : '') + 'S$' + F[d ? 1 : 0].format(n);
 const M = h => h.replace(/S\$([\d,.]*\d)/g, '<span class="f-m">S$<span class="f-d">$1</span></span>');
 const icon = (id, c = '') => `<svg class="f-ic ${c}" aria-hidden="true"><use href="#fi-${id}"/></svg>`;
@@ -688,9 +688,9 @@ FLAG.tone = 'f-bad';
 FLAG.vs = '3 small charges (S$20.00 or less each) on one day from 3 merchants never seen before, S$36.70 in total';
 const TOTAL = CATS.reduce((a, c) => a + c.v, 0);
 const ALL = CATS.concat(FLAG).flatMap(c => c.tx).sort((a, b) => b.day - a.day);
-/* Per person: premiums, cash %, policies, past, shortfall; cover needed and in force (S$k) for death, TPD, CI. */
+/* Per person: premiums, cash %, policies, past, shortfall; cover needed, in force (S$k): death, TPD, CI. */
 const INS = [[1296, 58, 4, '1 past', 'S$60k on critical illness', 240, 260, 240, 260, 120, 60], [872, 71, 3, 'none past', 'S$40k on death and S$40k on TPD', 160, 120, 160, 120, 100, 100]];
-/* Home register; state 1 needs info, 2 covered, 3 no active cover. */
+/* Home register; 1 needs info, 2 covered, 3 no active cover. */
 const HOME = rows('FortyTwo sofa|1|Cost to confirm|;Hitachi fridge|2|Ends 2 Feb 2027|S$860;Daikin aircon|2|Ends 14 Mar 2028|S$1,712;Rinnai hob|2|Ends 20 Jun 2029|S$344;Bosch washer|3|Expired · 9 Aug 2026|S$476');
 
 const row = (attrs, cls, ico, title, sub, end, tag = 'button') => `<${tag} class="f-row ${cls}" ${attrs}><span class="f-ico">${icon(ico)}</span><span class="f-rt"><span>${title}</span><span>${sub}</span></span>${end}${tag < 'c' ? icon('right', 'f-chev') : ''}</${tag}>`;
@@ -787,7 +787,7 @@ function init(root) {
 		return { at, end };
 	}
 
-	/* The check drawer as the app words it; a paired phone is a read-only copy. */
+	/* The check drawer in the app's words; a paired phone is a read-only copy. */
 	function openSheet(user) {
 		opener = user;
 		sheet.innerHTML = `<div class="f-sh"><span><b>Medium priority check</b><span class="f-hint">Tue 27 Oct · 3 charges</span></span><button class="f-done" data-act="close">Done</button></div>
@@ -846,8 +846,9 @@ function init(root) {
 	};
 	const tap = (sel, ms, fn) => {
 		later(ms, () => place($(sel), .5));
+		later(ms + 350, () => fc('is-on', 1));
 		later(ms + 550, () => fc('is-down', 1));
-		later(ms + 700, () => { fc('is-down', 0); fn(); });
+		later(ms + 700, () => { fc('is-down', 0); fc('is-on', 0); fn(); });
 	};
 	function play() {
 		if (playing || touched || still()) return;
@@ -858,8 +859,10 @@ function init(root) {
 			sweep(11, 3, 1500, () => sweep(3, 7, 650, () => {
 				later(250, () => { fc('is-down', 0); scrub.end(); });
 				tap('[data-cat="flag"]', 350, () => { cat = 'flag'; render(1); });
-				tap('[data-act="risk"]', 1600, () => { openSheet(); fc('is-on', 0); });
-				later(5600, () => { closeSheet(); playing = false; });
+				tap('[data-act="risk"]', 2000, openSheet);
+				tap('.f-done', 5600, closeSheet);
+				tap('.f-back', 6800, () => go('overview'));
+				later(7700, () => playing = false);
 			}));
 		});
 	}
@@ -890,7 +893,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 })();
 
 
-/* Travel Packing demo: sample items and rules from data/seed.json; quantities by the app's computeQty. */
+/* Travel Packing demo: items and rules from data/seed.json; quantities by the app's computeQty. */
 (() => {
 
 const CATS = [
@@ -921,7 +924,7 @@ function init(root) {
 	const $ = s => root.querySelector(s), cubes = $('.pk-cubes'), tap = $('.pk-tap'), scroller = $('.pk-scroll');
 	const box = id => cubes.querySelector(`[data-id="${id}"] input`);
 	let S, timers = [], previewing = false, touched = false;
-	/* A trip under way, so the per-category counts and bars say something. */
+	/* A trip under way, so category counts and bars say something. */
 	const PRE = Object.fromEntries('earpiece wallet debit-credit-cards toothbrush toothpaste shorts slippers'.split(' ').map(k => [k, true]));
 	const fresh = () => ({ key: 'normal', hide: false, last: false, folded: new Set(), normal: { nights: 4, ...PRE }, extended: { nights: 7 } });
 	const items = (L = S[S.key]) => ITEMS.filter(i => S.key === 'extended' || !i.ext)
@@ -1050,7 +1053,7 @@ function init(root) {
 			if (k) later(() => moveTap(get()), at - 420);
 			later(() => { tap.classList.remove('press'); void tap.offsetWidth; tap.classList.add('press'); get().click(); }, at);
 		});
-		/* The list follows the taps: stepper, Last call's note, back to the top. */
+		/* The list follows the taps: stepper, Last call's note, back to top. */
 		to(112, 950); to(222, 4050); to(0, 5900);
 		later(() => tap.classList.remove('on'), 6050);
 		later(() => { previewing = false; tap.className = 'pk-tap'; }, 6350);
@@ -1077,7 +1080,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 })();
 
 
-/* Desktop shows one project at a time; the rail's thumbnails (recorded from each demo) switch them. */
+/* Desktop shows one project at a time; the rail's thumbnails (from each demo) switch them. */
 (() => {
 const rail = document.querySelector('.app-rail');
 if (!rail) return;
@@ -1093,17 +1096,17 @@ function show(i, focus) {
 		const v = t.querySelector('video'), on = k === i;
 		t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
 		const c = cards[k], off = wide.matches && !on;
-		// The leaving card fades out over the arriving one.
+		// The leaving card fades over the arriving one.
 		if (turn && off && !c.hidden) { c.classList.add('is-out'); setTimeout(() => { c.classList.remove('is-out'); c.hidden = wide.matches && k !== cur; }, 300); } else c.hidden = off;
 		if (wide.matches && !v.src) { v.poster = v.dataset.poster; v.src = v.dataset.src; }
 	});
 	if (focus) tabs[i].focus();
-	rail.style.setProperty('--dwell', [9, 8, 12.5, 10][i] + 's');
+	rail.style.setProperty('--dwell', [9, 8, 14.5, 10][i] + 's');
 	cue();
 	hold();
 	document.dispatchEvent(new Event('scroll'));
 }
-// One thumbnail plays at a time, each in turn; hovering a tab plays its own.
+// One thumbnail plays at a time, in turn; hovering a tab plays its own.
 const vids = tabs.map(t => t.querySelector('video'));
 let turn = 0, hover = -1, auto = 0, over = 0;
 function cue() {
@@ -1113,7 +1116,7 @@ function cue() {
 }
 vids.forEach(v => v.addEventListener('ended', () => { if (hover < 0) { turn++; cue(); } }));
 tabs.forEach((t, n) => { t.addEventListener('pointerenter', () => { hover = n; cue(); }); t.addEventListener('pointerleave', () => { hover = -1; cue(); }); });
-// It turns by itself while 85% of the phone is on screen and the pointer is off the phone and rail; a click or key ends it.
+// It turns by itself while 85% of the phone shows and the pointer is off phone and rail; a click or key ends it.
 function hold() { rail.classList.toggle('is-hold', !!over || !pjVisible(cards[cur].querySelector('.app-demo'))); }
 const quit = () => { auto = 0; rail.classList.remove('is-auto'); cue(); };
 rail.addEventListener('animationend', e => { if (!auto || e.animationName !== 'pj-fill') return; const n = (cur + 1) % 4, d = cards[n].querySelector('.app-demo'); if (!d.dataset.user) delete d.dataset.seen; show(n); });
@@ -1125,12 +1128,12 @@ rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3,
 addEventListener('hashchange', () => { const i = at(); if (i >= 0 && cards[i].hidden) { quit(); show(i); cards[i].scrollIntoView(); } });
 const start = () => { auto = wide.matches && !still.matches ? 1 : 0; rail.classList.toggle('is-auto', !!auto); show(cur); };
 [wide, still].forEach(m => m.addEventListener('change', start));
-// Phones: the site's Menu pill steps aside while a demo's top bar is under it.
+// Phones: the Menu pill steps aside while a demo's top bar is under it.
 addEventListener('scroll', () => document.body.classList.toggle('pj-under', !wide.matches && cards.some(c => { const r = c.querySelector('.app-demo').getBoundingClientRect(); return r.top < 76 && r.bottom > 76; })));
 start();
 })();
 
-/* One guided preview at a time, after 500 ms of settled scrolling at 85% visibility; a tap or key hands control to the reader. */
+/* One guided preview at a time, after 500 ms settled at 85% visible; a tap or key hands over to the reader. */
 (() => {
 const demos = [...document.querySelectorAll('.app-demo')];
 const motion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -1148,7 +1151,7 @@ function choose() {
 	if (!d) return;
 	active=d; d.dataset.playing='1'; d.dataset.seen='1';
 	emit(d,'demo:reset'); emit(d,'demo:visible');
-	finish=setTimeout(() => { stop(); schedule(); }, d.dataset.demo === 'finance' ? 10000 : 6500);
+	finish=setTimeout(() => { stop(); schedule(); }, d.dataset.demo === 'finance' ? 11000 : 6500);
 }
 function schedule() { clearTimeout(settle); settle=setTimeout(choose,500); }
 document.addEventListener('scroll', () => {
