@@ -387,6 +387,36 @@ test('Desktop carousel holds only for the phone or the rail, and follows the has
   await expect(rail).toHaveClass(/is-turn/);
 });
 
+test('Nag-bot and Finance dates follow the calendar, whatever today is', async ({ page }) => {
+  await page.clock.install({ time: new Date('2027-03-03T10:00:00') });
+  await page.goto('/projects');
+  // Wed 3 Mar 2027: Nag-bot's now is Sun 28 Feb, and Finance's statements run to Sun 28 Feb.
+  await show(page, 'nag-bot');
+  const nag = page.locator('#nag-bot');
+  await nag.locator('.n-pinbtn').click();
+  await nag.locator('[data-act="tab"][data-arg="stats"]').click();
+  await expect(nag.locator('.n-label').first()).toHaveText(/^Week of Feb 22 · /);
+  await expect(nag.locator('.n-app')).toContainText('Nicholas · Feb 28, 7:05 PM');
+  await expect(nag.locator('.n-app')).toContainText('DodgerBlueee · Feb 27, 9:12 PM');
+  await show(page, 'finance-tracker');
+  const fin = page.locator('#finance-tracker');
+  await expect(fin.locator('.f-scroll')).toContainText('Feb 2027 against typical');
+  await expect(fin.locator('.f-scroll')).toContainText('Last 3 statements · Dec 2026–Feb 2027');
+  await expect(fin.locator('.f-axis')).toHaveText('Mar 2026Feb 2027');
+  await fin.locator('[data-cat="flag"]').click();
+  await expect(fin.locator('.f-scroll .f-hint')).toHaveText('Sat 27 Feb · tap a charge for its check');
+  await fin.locator('.f-tab[data-tab="activity"]').click();
+  await expect(fin.locator('.f-day').first()).toHaveText('Sun 28 Feb');
+  await fin.locator('.f-tab[data-tab="home"]').click();
+  await expect(fin.locator('.f-scroll')).toContainText('Ends 2 Jun 2027');
+  await expect(fin.locator('.f-scroll')).toContainText('Expired · 9 Dec 2026');
+  await fin.locator('.f-tab[data-tab="wealth"]').click();
+  await fin.getByRole('button', { name: 'Income' }).click();
+  await expect(fin.locator('.f-scroll')).toContainText('2027 take-home pay so farS$5,372');
+  await fin.getByRole('button', { name: 'Investments' }).click();
+  await expect(fin.locator('.f-scroll')).toContainText('statement to 28 Feb 2027');
+});
+
 test('SquashBot dates start from the coming Friday, whatever today is', async ({ page }) => {
   await page.clock.install({ time: new Date('2026-12-30T10:00:00') });
   await page.goto('/projects');

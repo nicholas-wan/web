@@ -10,11 +10,13 @@ function projectsDemo(selector, init) {
 	}), {rootMargin:'500px'});
 	roots.forEach(root => io.observe(root));
 }
+const MO = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' '), WD = 'Sun Mon Tue Wed Thu Fri Sat'.split(' ');
+const pjStill = matchMedia('(prefers-reduced-motion: reduce)'), pjFocus = el => el && el.focus({ preventScroll: true });
+const pjReady = f => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', f) : f();
 /* SquashBot demo in the bot's words (squashbot/src). "Now" is the coming Friday, 9:41am. */
 (() => {
 'use strict';
-const U = 'DodgerBlueee', WD = 'Sun Mon Tue Wed Thu Fri Sat'.split(' ');
-const MO = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' ');
+const U = 'DodgerBlueee';
 const NUM = { one: 1, two: 2, three: 3, four: 4, five: 5 };
 const CW = '(\\d{1,2}|one|two|three|four|five)';
 const COURT = `\\b(?:courts?|crt|ct|c)\\s*#?\\s*${CW}\\b`;
@@ -103,10 +105,10 @@ function init(root) {
 	root.dataset.sqReady = '1';
 	const $ = (s) => root.querySelector(s);
 	const [chat, pin, pm, sub, toastEl, input, snd, pinBtn, pinBox] = ['[data-chat]', '[data-pin]', '[data-pm]', '[data-sub]', '[data-toast]', '[data-in]', '.sq-snd', '.sq-pinbtn', '.sq-pin'].map($);
-	const motion = matchMedia('(prefers-reduced-motion: reduce)');
+	const motion = pjStill;
 	const still = () => motion.matches;
 	const keyed = () => document.activeElement?.matches(':focus-visible');
-	const focus = (el) => el && el.focus({ preventScroll: true });
+	const focus = pjFocus;
 	let S = null; let timers = []; let ptimers = [];
 	const later = (ms, fn) => timers.push(setTimeout(fn, still() ? 0 : ms));
 	const plater = (ms, fn) => ptimers.push(setTimeout(fn, ms));
@@ -324,7 +326,7 @@ function init(root) {
 	mini.setAttribute('role', 'dialog'); mini.setAttribute('aria-label', 'SquashBot Mini App');
 	root.appendChild(mini);
 	let miniOpener;
-	function closeMini() { mini.hidden = true; chat.inert = false; if (miniOpener) miniOpener.focus({ preventScroll: true }); }
+	function closeMini() { mini.hidden = true; chat.inert = false; focus(miniOpener); }
 	/* The Mini App as squashbot/public/app draws it: title, Close, Courts | Tab, rows. */
 	function openMini(kind, opener, again) {
 		if (opener) miniOpener = opener;
@@ -335,7 +337,7 @@ function init(root) {
 			: `<div class="sq-msec">${sorted().map((b, i) => row(`<b>Court ${esc(b.c)} · ${sd(b.o)}</b>${span(b.s, b.e)} · ${free(b) ? `${free(b)} left` : 'full'} · ${b.ppl.length}/${b.cap}<br>👥 ${named(b).join(', ')}${b.ppl.length > named(b).length ? ` + ${b.ppl.length - named(b).length}` : ''}`,
 				b.ppl.includes(U) ? `<button type="button" data-mj="${i}" class="is-out">Leave</button>` : free(b) ? `<button type="button" data-mj="${i}">Join</button>` : '<i>Full</i>')).join('')}</div><p>Tap a court to seat or remove players, or to change it.</p><button type="button" class="sq-madd" data-ma>➕ Add booking</button>`}`;
 		mini.hidden = false; chat.inert = true; toastEl.classList.remove('is-on');
-		(mini.querySelector(again) || mini.querySelector('button')).focus({ preventScroll: true });
+		pjFocus(mini.querySelector(again) || mini.querySelector('button'));
 	}
 	mini.addEventListener('click', (e) => {
 		const t = e.target.closest('button'), d = t && t.dataset;
@@ -409,18 +411,19 @@ function init(root) {
 }
 
 const boot = () => projectsDemo('.app-demo--squash', init);
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-else boot();
+pjReady(boot);
 })();
 
 
 /* Nag-bot demo. Wording from nag-bot's src/ and its Mini App (public/app). */
 (() => {
-const ME = 'Nicholas', CH = 'wash the litter box', NOW = '7:45 PM', MAX = 3, NEXT = 'in 42 days · Dec 20, 7:30 PM';
+/* Now is the latest Sunday, 7:45 PM. */
+const dd = d => { const t = new Date; t.setDate(t.getDate() - t.getDay() + d); return MO[t.getMonth()] + ' ' + t.getDate(); };
+const ME = 'Nicholas', CH = 'wash the litter box', NOW = '7:45 PM', MAX = 3, NEXT = `in 42 days · ${dd(42)}, 7:30 PM`;
 
 const PRE = [['30m', '8:15 PM'], ['1h', '8:45 PM'], ['2h', '9:45 PM'], ['3h', '10:45 PM'], ['6h', 'tomorrow 1:45 AM'],
 	['🌙 9pm today', '9:00 PM'], ['📅 Tomorrow', 'tomorrow 7:45 PM', 2.5],
-	['📅 1 week', 'in 7 days · Nov 15, 7:45 PM', 9], ['📅 2 weeks', 'in 14 days · Nov 22, 7:45 PM', 9]]
+	['📅 1 week', `in 7 days · ${dd(7)}, 7:45 PM`, 9], ['📅 2 weeks', `in 14 days · ${dd(14)}, 7:45 PM`, 9]]
 	.map(([l, w, post]) => [l, /^[ti]/.test(w) ? w : `today ${w}`, post]);
 
 const CHORES = [['wash', '💩', CH, 'every 6 weeks', '7:30 PM'],
@@ -431,8 +434,8 @@ const CHORES = [['wash', '💩', CH, 'every 6 weeks', '7:30 PM'],
 ].map(([id, e, t, cad, at, parent, st]) => ({ id, e, t, cad, at, rep: cad[0].toUpperCase() + cad.slice(1), parent, st }));
 const byId = (id) => CHORES.find((c) => c.id === id);
 
-const PEOPLE = [['DodgerBlueee', 5, 3], [ME, 4, 2]], RECENT = [['🗑️', 'trash', ME, 'Nov 8, 7:05 PM'], ['💩', 'clear poop', 'DodgerBlueee', 'Nov 7, 9:12 PM'], ['🍽️', 'dishes', 'together', 'Nov 7, 8:40 PM']];
-const reduced = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+const PEOPLE = [['DodgerBlueee', 5, 3], [ME, 4, 2]], RECENT = [['🗑️', 'trash', ME, dd(0) + ', 7:05 PM'], ['💩', 'clear poop', 'DodgerBlueee', dd(-1) + ', 9:12 PM'], ['🍽️', 'dishes', 'together', dd(-1) + ', 8:40 PM']];
+const reduced = () => pjStill.matches;
 const B = (label, act, arg, cls, more = '') => `<button type="button"${cls ? ` class="${cls}"` : ''} data-act="${act}"${arg != null ? ` data-arg="${arg}"` : ''}${more}>${label}</button>`;
 const emo = (e) => `<span class="n-emo" aria-hidden="true">${e}</span>`;
 const main = (t, ...lines) => `<span class="n-main"><span class="n-t">${t}</span>${lines.map((l) => `<span class="n-m">${l}</span>`).join('')}</span>`;
@@ -553,9 +556,9 @@ function setup(root) {
 	function stats() {
 		const now = s.st === 'done', tog = 2 + (now && s.tog);
 		const people = PEOPLE.map(([n, c, solo]) => (now && (s.tog || n === ME) ? [n, c + 1, solo + !s.tog] : [n, c, solo])).sort((a, b) => b[1] - a[1]);
-		const recent = now ? [['💩', CH, s.tog ? 'together' : ME, `Nov 8, ${NOW}`], ...RECENT] : RECENT;
+		const recent = now ? [['💩', CH, s.tog ? 'together' : ME, `${dd(0)}, ${NOW}`], ...RECENT] : RECENT;
 		const row = (e, inner, n = '') => `<div class="n-r">${emo(e)}${inner}${n !== '' ? `<span class="n-count">${n}</span>` : ''}</div>`;
-		return `<div class="n-label">Week of Nov 2 · ${people.reduce((n, p) => n + p[2], tog)} done</div><div class="n-sec">` +
+		return `<div class="n-label">Week of ${dd(-6)} · ${people.reduce((n, p) => n + p[2], tog)} done</div><div class="n-sec">` +
 			people.map(([n, c, solo], i) => row(['🥇', '🥈'][i], main(n, [`${solo} solo`, c > solo && `${c - solo} together`, !i && '🔥 3-week reign'].filter(Boolean).join(' · ')), c)).join('') +
 			row('🤝', '<span class="n-main">Done together</span>', tog) + '</div><div class="n-note">🪦 1 chore expired with nobody on it</div>' +
 			`<div class="n-label">Done</div><div class="n-sec">${recent.map(([e, t, who, when]) => row(e, plain(main(t, `${who} · ${when}`)))).join('')}</div>` +
@@ -596,7 +599,7 @@ function setup(root) {
 			sheet.hidden = false;
 		} else timers.push(sheet.t = setTimeout(() => { sheet.hidden = true; }, reduced() ? 0 : 330));
 		nag.classList.toggle('is-open', !!on);
-		(on ? sleft : pinBtn).focus({ preventScroll: true });
+		pjFocus(on ? sleft : pinBtn);
 	}
 
 	const render = () => { renderChat(); if (s.open) renderApp(); };
@@ -606,11 +609,11 @@ function setup(root) {
 		const was = s.scr + s.chore, key = b.dataset.act + b.dataset.arg;
 		act[b.dataset.act](b.dataset.arg);
 		render();
-		if (s.open && was !== s.scr + s.chore) { app.scrollTop = 0; sleft.focus({ preventScroll: true }); }
+		if (s.open && was !== s.scr + s.chore) { app.scrollTop = 0; pjFocus(sleft); }
 
 		if (!root.contains(document.activeElement)) {
 			const same = [...root.querySelectorAll('[data-act]')].find((x) => x.dataset.act + x.dataset.arg === key && x.offsetParent);
-			(same || (s.open ? sleft : [...live.querySelectorAll('button')].pop()) || pinBtn).focus({ preventScroll: true });
+			pjFocus(same || (s.open ? sleft : [...live.querySelectorAll('button')].pop()) || pinBtn);
 		}
 	});
 	root.addEventListener('keydown', (e) => {
@@ -651,15 +654,18 @@ function setup(root) {
 }
 
 const init = () => projectsDemo('.app-demo--nag', setup);
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-else init();
+pjReady(init);
 })();
 
 
 /* Finance tracker demo: its phone tabs (finance_tracker app/index.html), its words. Data invented. */
 (() => {
 const NW = [177760, 179160, 180480, 179640, 182320, 184120, 185560, 184480, 187480, 191900, 192520, 194480];
-const MONTHS = NW.map((_, i) => 'Nov Dec Jan Feb Mar Apr May Jun Jul Aug Sep Oct'.split(' ')[i] + (i < 2 ? ' 2025' : ' 2026'));
+/* Statements run to E, the end of last month. */
+const E = new Date; E.setDate(0);
+const SY = E.getFullYear(), SM = E.getMonth(), mo = (k, y) => { const t = SY * 12 + SM + k; return MO[t % 12] + (y ? ' ' + (t / 12 | 0) : ''); };
+const ST = mo(0, 1), LAST = E.getDate() + ' ' + ST, MONTHS = NW.map((_, i) => mo(i - 11, 1));
+const wd = d => WD[new Date(SY, SM, d).getDay()] + ` ${d} ` + mo(0);
 const LO = Math.min(...NW), Y = v => 52 - (v - LO) / (Math.max(...NW) - LO) * 46;
 const F = [0, 2].map(d => new Intl.NumberFormat('en-SG', { minimumFractionDigits: d, maximumFractionDigits: d }));
 
@@ -677,7 +683,7 @@ const CATS = [
 	['games', 'Games', 120, 'Steam 26 47.92|HoYoverse 20 18.48|Kuro Games 13 35.2|Steam 5 50.4'],
 	['flag', 'Possible card testing', 0, 'G2G 27 4.9|Xsolla 27 12.3|ZeusX 27 19.5']
 ].map(([k, n, t, s]) => {
-	const c = { k, n, t }, tx = c.tx = s.split('|').map(r => { const p = r.split(' '), amt = +p.pop(), day = +p.pop(); return { who: p.join(' '), day, amt, c }; });
+	const c = { k, n, t }, tx = c.tx = s.split('|').map(r => { const p = r.split(' '), amt = +p.pop(), day = Math.min(+p.pop(), E.getDate()); return { who: p.join(' '), day, amt, c }; });
 	const v = c.v = Math.round(c.x = tx.reduce((a, r) => a + r.amt, 0)), pc = Math.round((v - t) / t * 100);
 	c.tone = Math.abs(pc) < 5 ? '' : pc > 0 ? 'f-bad' : 'f-good';
 	c.vs = (Math.abs(pc) < 5 ? 'in line with' : (pc > 0 ? '+' : '−') + Math.abs(pc) + '% vs') + ' typical ' + money(t);
@@ -691,14 +697,14 @@ const ALL = CATS.concat(FLAG).flatMap(c => c.tx).sort((a, b) => b.day - a.day);
 /* Per person: premiums, cash %, policies, past, shortfall; cover needed, in force (S$k): death, TPD, CI. */
 const INS = [[1296, 58, 4, '1 past', 'S$60k on critical illness', 240, 260, 240, 260, 120, 60], [872, 71, 3, 'none past', 'S$40k on death and S$40k on TPD', 160, 120, 160, 120, 100, 100]];
 /* Home register; 1 needs info, 2 covered, 3 no active cover. */
-const HOME = rows('FortyTwo sofa|1|Cost to confirm|;Hitachi fridge|2|Ends 2 Feb 2027|S$860;Daikin aircon|2|Ends 14 Mar 2028|S$1,712;Rinnai hob|2|Ends 20 Jun 2029|S$344;Bosch washer|3|Expired · 9 Aug 2026|S$476');
+const HOME = rows(`FortyTwo sofa|1|Cost to confirm|;Hitachi fridge|2|Ends 2 ${mo(4, 1)}|S$860;Daikin aircon|2|Ends 14 ${mo(17, 1)}|S$1,712;Rinnai hob|2|Ends 20 ${mo(32, 1)}|S$344;Bosch washer|3|Expired · 9 ${mo(-2, 1)}|S$476`);
 
 const row = (attrs, cls, ico, title, sub, end, tag = 'button') => `<${tag} class="f-row ${cls}" ${attrs}><span class="f-ico">${icon(ico)}</span><span class="f-rt"><span>${title}</span><span>${sub}</span></span>${end}${tag < 'c' ? icon('right', 'f-chev') : ''}</${tag}>`;
 const info = (ico, title, sub, end) => row('', '', ico, title, sub, `<span class="f-rv">${end}</span>`, 'div');
 const LOGO = 'Grab Foodpanda Klook Steam SimplyGo Ya Trip FortyTwo Hitachi Daikin Rinnai Bosch Watami Starbucks McDonald TADA KKday HoYoverse Kuro G2G Xsolla ZeusX'.split(' ');
 const line = (cls, who, sub, end, tag = 'div') => `<${tag} class="f-tr ${cls}"><span class="f-ini" style="--h:${[...who].reduce((a, ch) => (a * 31 + ch.charCodeAt(0)) % 360, 7)};--i:${LOGO.findIndex(n => who.startsWith(n))}" aria-hidden="true">${who[0]}</span><span class="f-tn"><span>${who}</span><span>${sub}</span></span><span class="f-ta">${end}</span></${tag.slice(0, 6)}>`;
 const txs = list => `<div>${list.map((r, i) =>
-	(i && list[i - 1].day === r.day ? '' : `<div class="f-day">${'Sun Mon Tue Wed Thu Fri Sat'.split(' ')[new Date(2026, 9, r.day).getDay()]} ${r.day} Oct</div>`) +
+	(i && list[i - 1].day === r.day ? '' : `<div class="f-day">${wd(r.day)}</div>`) +
 	line('c-' + r.c.k, r.who, r.c === FLAG ? 'New merchant' : r.c.n, '−' + money(r.amt, 2), r.c === FLAG ? 'button data-act="risk"' : 'div')).join('')}</div>`;
 const T = t => `<div class="f-title">${t}</div>`;
 const seg = (names, on, c = 'f-seg', b = 0) => `<div class="${c}">${names.map((n, i) => `<button data-sub="${i + b}" aria-pressed="${i + b === on}">${n}</button>`).join('')}</div>`;
@@ -707,7 +713,7 @@ const card = (lbl, fig, note) => `<div class="f-card"><span class="f-lbl">${lbl}
 const hero = () => {
 	const line = NW.map((v, i) => (i ? 'L' : 'M') + (i * 300 / 11).toFixed(1) + ' ' + Y(v).toFixed(1)).join('');
 	return `<div class="f-worth"><span class="f-lbl">Net worth</span><span class="f-fig">${money(NW[11])}</span>
-<span class="f-chg"><span class="f-pill">${money(NW[11] - NW[9], 0, 1)} since your visit on 14 Aug</span><span>${money(NW[11] - NW[0], 0, 1)} <span class="f-good">(+${((NW[11] - NW[0]) / NW[0] * 100).toFixed(1)}%)</span> since 8 ${MONTHS[0]}</span></span>
+<span class="f-chg"><span class="f-pill">${money(NW[11] - NW[9], 0, 1)} since your visit on 14 ${mo(-2)}</span><span>${money(NW[11] - NW[0], 0, 1)} <span class="f-good">(+${((NW[11] - NW[0]) / NW[0] * 100).toFixed(1)}%)</span> since 8 ${MONTHS[0]}</span></span>
 <div class="f-spark" tabindex="0" role="slider" aria-label="Net worth by month" aria-valuemin="0" aria-valuemax="11">
 <svg viewBox="0 0 300 56" preserveAspectRatio="none" aria-hidden="true"><path d="${line}L300 56L0 56Z"/><path d="${line}"/><line y1="0" y2="56"/></svg></div>
 <span class="f-axis"><span>${MONTHS[0]}</span><span>${MONTHS[11]}</span></span></div>`;
@@ -716,16 +722,16 @@ const PAGES = {
 	overview: () => T('Overview') + `
 <div class="f-ok">${icon('ok')}186 rows checked against their statements</div>${hero()}
 <div class="f-list">${row('data-cat="flag"', 'is-bad', 'flag', 'Needs attention', 'Possible card testing', '<span class="f-badge">1</span>')}
-${row('data-tab="spending"', '', 'spending', 'Key spending', 'Oct 2026 against typical', `<span class="f-rv">${money(TOTAL)}</span>`)}</div>
-<div class="f-card f-pv"><span class="f-lbl">Last 3 statements · Aug–Oct 2026</span>${tiles([['Income', 'S$9,840'], ['Spent on cards', 'S$3,816'], ['Invested', 'S$2,400']])}
+${row('data-tab="spending"', '', 'spending', 'Key spending', ST + ' against typical', `<span class="f-rv">${money(TOTAL)}</span>`)}</div>
+<div class="f-card f-pv"><span class="f-lbl">Last 3 statements · ${mo(-2, SM < 2)}–${ST}</span>${tiles([['Income', 'S$9,840'], ['Spent on cards', 'S$3,816'], ['Invested', 'S$2,400']])}
 <span class="f-note">Card spending S$1,272 a month, <span class="f-good">6% lower</span> than the three statements before.</span></div>`,
 	/* The eye hides all of Wealth, as privacy.js hides #pane-wealth. */
 	wealth: s => T('Wealth') + seg(['Income', 'Net worth', 'Investments'], s) + `<div class="f-page f-pv">${[
-		`<div class="f-card"><span class="f-lbl">Income outlook · salary credits through Oct 2026</span>${tiles([['2026 take-home pay so far', 'S$28,560', '+4.2% vs same period 2025'], ['2026 take-home forecast', 'S$34,760', 'S$32,240 floor']])}</div>
-<div class="f-card"><span class="f-lbl">Long-range forecast · 5% midpoint</span>${tiles([3, 5, 10].map(y => [y + ' years', money(34760 * 1.05 ** y), 'in ' + (2026 + y)]))}</div>`,
+		`<div class="f-card"><span class="f-lbl">Income outlook · salary credits through ${ST}</span>${tiles([[SY + ' take-home pay so far', money(2686 * (SM + 1)), '+4.2% vs same period ' + (SY - 1)], [SY + ' take-home forecast', 'S$34,760', 'S$32,240 floor']])}</div>
+<div class="f-card"><span class="f-lbl">Long-range forecast · 5% midpoint</span>${tiles([3, 5, 10].map(y => [y + ' years', money(34760 * 1.05 ** y), 'in ' + (SY + y)]))}</div>`,
 		hero() + `<div class="f-list">${info('up', 'Assets', 'Cash, CPF, investments, property', 'S$324,960')}${info('statements', 'Liabilities', 'Home loan', 'S$130,480')}</div>`,
 		card('Portfolio · 2 accounts', 'S$51,360', '<span class="f-pill">+S$3,940 (+8.3%)</span> past year') +
-		`<div class="f-list">${info('wallet', 'Interactive Brokers', 'statements to 31 Oct 2026 · <span class="f-good">✓ numbers tally</span>', '+S$3,648')}${info('wallet', 'SRS', 'Phillip Securities (POEMS) · statement to 31 Oct 2026', '+S$292')}</div>`
+		`<div class="f-list">${info('wallet', 'Interactive Brokers', `statements to ${LAST} · <span class="f-good">✓ numbers tally</span>`, '+S$3,648')}${info('wallet', 'SRS', 'Phillip Securities (POEMS) · statement to ' + LAST, '+S$292')}</div>`
 	][s]}</div>`,
 	insurance: s => {
 		const [p, cash, n, past, short, ...g] = INS[s], gap = i => g[i * 2] - g[i * 2 + 1];
@@ -735,9 +741,9 @@ ${tiles([['Total premiums', money(p), `${cash}% cash · ${100 - cash}% CPF`], ['
 	home: s => T('Home') + card('Your home · 5 items', 'S$3,392', 'Recorded home costs · 4 priced · 1 unpriced') +
 		seg(['Needs info', 'Covered', 'No active cover'].map((n, i) => `${n}<b><i class="k${i + 1}"></i>${HOME.filter(h => h[1] == i + 1).length}</b>`), s, 'f-chips', 1) + `<div>${HOME.filter(h => !s || h[1] == s).map(([n, k, w, v]) => line('k' + k, n, w, v)).join('')}</div>`,
 	activity: s => T('Activity') + seg(['Transactions', 'Games'], s) + `<div class="f-cnt">${s ? '4 purchases' : ALL.length + ' card transactions'}<b>${money(s ? CATS[4].v : TOTAL + FLAG.x)} spent</b></div>${txs(s ? CATS[4].tx : ALL)}`,
-	spending: () => `<div class="f-title">Key spending</div><div class="f-hint">Oct 2026 (bar) against your typical statement (tick). Tap one for its charges.</div>
+	spending: () => `<div class="f-title">Key spending</div><div class="f-hint">${ST} (bar) against your typical statement (tick). Tap one for its charges.</div>
 <div class="f-list">${CATS.map(c => `<button class="f-row f-key c-${c.k}" data-cat="${c.k}"><span class="f-ico">${icon(c.k)}</span><span class="f-kn">${c.n}</span><span class="f-rv">${money(c.v)}</span>${icon('right', 'f-chev')}<span class="f-kd ${c.tone}">${c.vs}</span><span class="f-kb" aria-hidden="true"><i style="width:${c.v / 3.6}%"></i><b style="left:${c.t / 3.6}%"></b></span></button>`).join('')}</div>`,
-	cat: c => `<div class="f-title">${c.n}</div><div class="f-sum">${money(c.x, 2)}</div><div class="f-hint ${c === FLAG ? 'f-bad' : ''}">${c === FLAG ? 'Tue 27 Oct · tap a charge for its check' : `${c.tx.length} charges in Oct 2026 · <span class="${c.tone}">${c.vs}</span>`}</div>${txs(c.tx)}`
+	cat: c => `<div class="f-title">${c.n}</div><div class="f-sum">${money(c.x, 2)}</div><div class="f-hint ${c === FLAG ? 'f-bad' : ''}">${c === FLAG ? wd(27) + ' · tap a charge for its check' : `${c.tx.length} charges in ${ST} · <span class="${c.tone}">${c.vs}</span>`}</div>${txs(c.tx)}`
 };
 
 function init(root) {
@@ -746,7 +752,7 @@ function init(root) {
 	fd.dataset.ready = 1;
 	const $ = s => fd.querySelector(s);
 	const scroll = $('.f-scroll'), wrap = $('.f-sheet-wrap'), sheet = $('.f-sheet'), finger = $('.f-finger'), eye = $('[data-act="eye"]');
-	const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+	const still = () => pjStill.matches;
 	let tab, cat, sub, opener, savedTop = 0, timers = [], raf = 0, playing = false, touched = false, scrub;
 
 	function render(push) {
@@ -790,7 +796,7 @@ function init(root) {
 	/* The check drawer in the app's words; a paired phone is a read-only copy. */
 	function openSheet(user) {
 		opener = user;
-		sheet.innerHTML = `<div class="f-sh"><span><b>Medium priority check</b><span class="f-hint">Tue 27 Oct · 3 charges</span></span><button class="f-done" data-act="close">Done</button></div>
+		sheet.innerHTML = `<div class="f-sh"><span><b>Medium priority check</b><span class="f-hint">${wd(27)} · 3 charges</span></span><button class="f-done" data-act="close">Done</button></div>
 <p class="f-why">${FLAG.vs}</p><p class="f-hint">Refunds are netted before this check. This is an anomaly, not a fraud verdict.</p>
 <button class="f-rec" disabled>I recognize this</button><div class="f-res is-no" role="status"><b>Read-only copy</b>Open Finances on the computer to save this.</div>`;
 		if (user) sheet.setAttribute('aria-modal', 'true'); else sheet.removeAttribute('aria-modal');
@@ -800,7 +806,7 @@ function init(root) {
 	function closeSheet() {
 		if (wrap.hidden) return;
 		wrap.hidden = true; sheet.innerHTML = '';
-		if (opener) opener.focus({ preventScroll: true });
+		pjFocus(opener);
 		opener = null;
 	}
 
@@ -815,10 +821,10 @@ function init(root) {
 			eye.firstChild.firstChild.setAttribute('href', on ? '#fi-eye-off' : '#fi-eye');
 		} else if (a === 'back') {
 			const k = cat; cat = null; if (!k || k === 'flag') go('overview'); else render(); scroll.scrollTop = savedTop;
-			const backTo = k ? $(`[data-cat="${k}"]`) : $('[data-tab="spending"]'); if (backTo) backTo.focus({ preventScroll: true });
+			pjFocus(k ? $(`[data-cat="${k}"]`) : $('[data-tab="spending"]'));
 		} else if (a === 'close') closeSheet();
 		else if (a === 'risk') openSheet(t);
-		else if (t.dataset.tab) { go(t.dataset.tab); const target = $(`.f-tab[data-tab="${tab === 'spending' ? 'overview' : tab}"]`); if (target) target.focus({ preventScroll: true }); }
+		else if (t.dataset.tab) { go(t.dataset.tab); pjFocus($(`.f-tab[data-tab="${tab === 'spending' ? 'overview' : tab}"]`)); }
 		else if (t.dataset.sub) { const i = +t.dataset.sub; sub[tab] = sub[tab] === i ? null : i; render(); $(`[data-sub="${i}"]`).focus(); }
 		else { savedTop = scroll.scrollTop; cat = t.dataset.cat; render(1); scroll.scrollTop = 0; $('.f-back').focus(); }
 	});
@@ -889,7 +895,7 @@ function init(root) {
 }
 
 const boot = () => projectsDemo('.app-demo--finance', init);
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+pjReady(boot);
 })();
 
 
@@ -995,7 +1001,7 @@ function init(root) {
 			const next = [...cubes.querySelectorAll('.pk-item:not(.leaving)')].find(r => el.compareDocumentPosition(r) & 4);
 			render();
 			scroller.scrollTop = top;
-			if (focused) (leaving ? next ? box(next.dataset.id) : $('.pk-lc') : box(id)).focus({ preventScroll: true });
+			if (focused) pjFocus(leaving ? next ? box(next.dataset.id) : $('.pk-lc') : box(id));
 		}, leaving ? 300 : 260, true);
 	}
 
@@ -1044,7 +1050,7 @@ function init(root) {
 		tap.style.translate = `${(r.left + r.width / 2 - p.left) * k}px ${(r.top + r.height / 2 - p.top) * k}px`;
 	}
 	function preview() {
-		if (previewing || touched || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		if (previewing || touched || pjStill.matches) return;
 		previewing = true;
 		const plus = () => $('[data-act=nights][data-d="1"]'), head = c => () => $(`[data-cat="${c}"] .pk-chead`), to = (top, at) => later(() => scroller.scrollTo({ top, behavior: 'smooth' }), at);
 		moveTap(head('Basics')(), true);
@@ -1076,7 +1082,7 @@ function init(root) {
 }
 
 const start = () => { projectsDemo('.app-demo--packing', init); if (innerWidth > 1099) new Set([...document.querySelectorAll('[data-script]')].map(f => f.dataset.script)).forEach(src => document.head.append(Object.assign(document.createElement('script'), { src }))); };
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+pjReady(start);
 })();
 
 
@@ -1084,7 +1090,7 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 (() => {
 const rail = document.querySelector('.app-rail');
 if (!rail) return;
-const tabs = [...rail.children], wide = matchMedia('(min-width: 981px)'), still = matchMedia('(prefers-reduced-motion: reduce)');
+const tabs = [...rail.children], wide = matchMedia('(min-width: 981px)'), still = pjStill;
 const cards = tabs.map(t => document.getElementById(t.getAttribute('aria-controls')));
 const at = () => cards.findIndex(c => '#' + c.id === location.hash);
 let cur = Math.max(0, at());
@@ -1136,7 +1142,7 @@ start();
 /* One guided preview at a time, after 500 ms settled at 85% visible; a tap or key hands over to the reader. */
 (() => {
 const demos = [...document.querySelectorAll('.app-demo')];
-const motion = matchMedia('(prefers-reduced-motion: reduce)');
+const motion = pjStill;
 let active = null, paused = null, settle = 0, finish = 0, busy = null, busyAt = 0;
 const emit = (d, name) => d.dispatchEvent(new CustomEvent(name));
 function stop() {
@@ -1170,7 +1176,7 @@ demos.forEach(d => {
 	const reset=d.closest('.app-card').querySelector('.app-demo__reset');
 	reset.addEventListener('click', () => {
 		if (active === d) stop(); if (paused === d) paused=null;
-		d.dataset.user='1'; emit(d,'demo:reset'); reset.focus({preventScroll:true}); schedule();
+		d.dataset.user='1'; emit(d,'demo:reset'); pjFocus(reset); schedule();
 	});
 });
 schedule();
