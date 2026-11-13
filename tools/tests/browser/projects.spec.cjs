@@ -241,6 +241,40 @@ test('Previews serialize, resume after swipes and hand over after a tap', async 
   await expect(app.locator('[data-pm]')).not.toContainText('C4');
 });
 
+test('A phone preview starts at 70% on screen and plays on through a short scroll', async ({ page }) => {
+  // 13 Nov 2026 review: at 85% a 62%-screen flick jumped over a whole preview, and a 160px glance stopped one.
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 390, height: 664 });
+  await page.goto('/projects');
+  const app = page.locator('#squashbot .app-demo');
+  await app.evaluate(d => { const r = d.getBoundingClientRect(); scrollBy(0, r.bottom - innerHeight + r.height * .25); });
+  await expect(app).toHaveAttribute('data-playing', '1');
+  await page.mouse.wheel(0, 160);
+  await page.waitForTimeout(1000);
+  await expect(app).toHaveAttribute('data-playing', '1');
+});
+
+test('Desktop: a clicked tab plays at once, and focus in a card ends the carousel', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/projects');
+  await page.mouse.move(1434, 500);
+  await page.locator('.app-rail [role=tab]').nth(2).click();
+  await page.locator('#finance-tracker .app-demo').evaluate(d => scrollBy(0, d.getBoundingClientRect().bottom - innerHeight + 12));
+  await expect(page.locator('#finance-tracker .app-demo')).toHaveAttribute('data-playing', '1');
+  await page.locator('.app-rail [role=tab]').nth(3).click();
+  // The hidden Finance preview stops once its card has faded, so Packing's starts within about a second.
+  await expect(page.locator('#travel-packing .app-demo')).toHaveAttribute('data-playing', '1', { timeout: 2500 });
+  await page.reload();
+  await page.mouse.move(1434, 500);
+  await expect(page.locator('.app-rail')).toHaveClass(/is-auto/);
+  const link = page.locator('#squashbot a.app-card__repo');
+  await link.focus();
+  await expect(page.locator('.app-rail')).not.toHaveClass(/is-auto/);
+  await page.waitForTimeout(10000);
+  await expect(link).toBeFocused();
+});
+
 test('Reset hover stays teal and demo headings do not change the page outline', async ({ page }) => {
   await page.goto('/projects');
   const reset=page.getByRole('button',{name:'Start over SquashBot'});

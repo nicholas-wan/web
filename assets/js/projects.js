@@ -1,5 +1,5 @@
-/* 85% on screen: the bar for a preview and the carousel to turn. */
-const pjVisible = d => { const b = d.getBoundingClientRect(); return Math.max(0, Math.min(innerHeight, b.bottom) - Math.max(0,b.top)) / b.height >= .85; };
+/* Share of a demo on screen; 85% for the carousel to turn. */
+const pjVisible = (d, f = .85) => { const b = d.getBoundingClientRect(); return Math.max(0, Math.min(innerHeight, b.bottom) - Math.max(0,b.top)) / b.height >= f; };
 /* Each sample app boots within 500px of the viewport. */
 function projectsDemo(selector, init) {
 	const roots = [...document.querySelectorAll(selector)];
@@ -172,7 +172,7 @@ function init(root) {
 		if (had) focus(input);
 	}
 	function typing(on) {
-		sub.textContent = on ? 'SquashBot is typing…' : '8 members';
+		sub.textContent = on ? 'SquashBot is typing…' : '4 members';
 		sub.classList.toggle('is-typing', on);
 	}
 	function toast(text, ms = 1700) {
@@ -1103,7 +1103,7 @@ function show(i, focus) {
 		t.setAttribute('aria-selected', on); t.tabIndex = on ? 0 : -1;
 		const c = cards[k], off = wide.matches && !on;
 		// The leaving card fades over the arriving one.
-		if (turn && off && !c.hidden) { c.classList.add('is-out'); setTimeout(() => { c.classList.remove('is-out'); c.hidden = wide.matches && k !== cur; }, 300); } else c.hidden = off;
+		if (turn && off && !c.hidden) { c.classList.add('is-out'); setTimeout(() => { c.classList.remove('is-out'); c.hidden = wide.matches && k !== cur; document.dispatchEvent(new Event('scroll')); }, 300); } else c.hidden = off;
 		if (wide.matches && !v.src) { v.poster = v.dataset.poster; v.src = v.dataset.src; }
 	});
 	if (focus) tabs[i].focus();
@@ -1127,7 +1127,7 @@ function hold() { rail.classList.toggle('is-hold', !!over || !pjVisible(cards[cu
 const quit = () => { auto = 0; rail.classList.remove('is-auto'); cue(); };
 rail.addEventListener('animationend', e => { if (!auto || e.animationName !== 'pj-fill') return; const n = (cur + 1) % 4, d = cards[n].querySelector('.app-demo'); if (!d.dataset.user) delete d.dataset.seen; show(n); });
 [rail, ...document.querySelectorAll('.app-phone')].forEach(el => { el.addEventListener('pointerenter', () => { over = 1; hold(); }); el.addEventListener('pointerleave', () => { over = 0; hold(); }); });
-cards.forEach(c => ['pointerup', 'keydown'].forEach(t => c.addEventListener(t, quit)));
+[rail, ...cards].forEach(c => ['pointerup', 'keydown', 'focusin'].forEach(t => c.addEventListener(t, quit)));
 addEventListener('scroll', hold);
 rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { quit(); show(tabs.indexOf(t)); } });
 rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur || 4 }[e.key]; if (d) { e.preventDefault(); quit(); show((cur + d) % 4, 1); } });
@@ -1139,7 +1139,7 @@ addEventListener('scroll', () => document.body.classList.toggle('pj-under', !wid
 start();
 })();
 
-/* One guided preview at a time, after 500 ms settled at 85% visible; a tap or key hands over to the reader. */
+/* One guided preview at a time, after 500 ms settled at 70% visible, playing on to 40%; a tap or key hands over to the reader. */
 (() => {
 const demos = [...document.querySelectorAll('.app-demo')];
 const motion = pjStill;
@@ -1153,7 +1153,7 @@ function choose() {
 	if (active || paused || motion.matches || document.hidden) return;
 	const wait = busyAt + 8000 - Date.now();
 	if (busy && wait > 0 && pjVisible(busy)) { settle = setTimeout(choose, wait); return; }
-	const d = demos.find(d => !d.dataset.seen && !d.dataset.user && pjVisible(d));
+	const d = demos.find(d => !d.dataset.seen && !d.dataset.user && pjVisible(d, .7));
 	if (!d) return;
 	active=d; d.dataset.playing='1'; d.dataset.seen='1';
 	emit(d,'demo:reset'); emit(d,'demo:visible');
@@ -1161,7 +1161,7 @@ function choose() {
 }
 function schedule() { clearTimeout(settle); settle=setTimeout(choose,500); }
 document.addEventListener('scroll', () => {
-	if (active && !pjVisible(active)) { const d=active; stop(); delete d.dataset.seen; }
+	if (active && !pjVisible(active, .4)) { const d=active; stop(); delete d.dataset.seen; }
 	schedule();
 }, true);
 addEventListener('resize',schedule);

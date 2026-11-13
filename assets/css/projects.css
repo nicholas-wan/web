@@ -773,3 +773,5 @@ html .page-projects .portfolio-headline h1{color:#ecedf0}
 .page-projects .app-card__proof b{font-size:1.1rem;font-weight:650;letter-spacing:-.01em;color:var(--pj-ink)}
 .page-projects .app-card__proof i{font-style:normal;margin:0 .6rem;color:#3a3e45}
 @media screen and (max-width:736px){.page-projects .app-card__head .app-card__proof{grid-column:1/-1;margin:.6rem 0 1rem;font-size:max(.95rem,13px)}}
+/* Rail subtitles hold two lines, so the four names line up when one fits on a line (13 Nov 2026 review). */
+.page-projects .app-rail small{min-height:2.6em}
