@@ -623,9 +623,8 @@
       glow(d.px, d.py, 9, AMBER, 0.12 * d.w + 0.1 * hk);
       dot(d.px, d.py, 1.6, 'rgba(' + AMBER + ',' + (0.7 * d.w).toFixed(3) + ')');
     });
-    ctx.restore();
 
-    // The network, as before; the lens lifts what it covers by about 15%.
+    // The network, as before but kept off the text; the lens lifts what it covers by about 15%.
     for (i = 0; i < balls.length; i++) { place(balls[i]); balls[i].lw = fall(balls[i].x, balls[i].y); }
     for (i = 0; i < balls.length; i++) {
       for (j = i + 1; j < balls.length; j++) {
@@ -641,11 +640,26 @@
       dot(b.px, b.py, R, 'rgba(' + TEAL + ',' + Math.min(1, Math.max(b.alpha + 0.15 * b.lw, b.glow)).toFixed(3) + ')');
     });
 
-    clipText();
     threats.forEach(function (d) { if (d.threat.found) { drawFind(d, t); } });
     if (signal && signal.trail.length) { drawTrail(signal.trail); }
     if (hunt && hunt.trail.length) { drawTrail(hunt.trail); }
     ctx.restore();
+
+    // Last, a soft edge around the clipped-out text: 8px rings, each erasing
+    // what the rings outside it would have stacked up to. No network line ends
+    // hard at the text, and the lens glass never shows a rectangular bite.
+    if (box) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      for (var e = compactCanvas ? 40 : 64, n = 1; e > 0; e -= 8, n++) {
+        ctx.fillStyle = 'rgba(0,0,0,' + (1 - Math.pow(0.76, n)).toFixed(3) + ')';
+        ctx.beginPath(); textRect(e); textRect(e - 8); ctx.fill('evenodd');
+      }
+      ctx.restore();
+    }
+  }
+  function textRect(e) {
+    if (ctx.roundRect) { ctx.roundRect(box.x - e, box.y - e, box.w + 2 * e, box.h + 2 * e, 24 + e); } else { ctx.rect(box.x - e, box.y - e, box.w + 2 * e, box.h + 2 * e); }
   }
 
   function update(f) {
