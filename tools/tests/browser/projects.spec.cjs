@@ -390,8 +390,13 @@ test('Finance preview shows a flagged charge check, taps Done and back, and rest
   const title = demo.locator('.f-scroll .f-title');
   await expect(title).toHaveText('Possible card testing', { timeout: 6000 });
   await expect(demo.locator('.f-sheet')).toContainText('Medium priority check', { timeout: 4000 });
-  // The read-only note is for readers who tap; the preview hides it.
-  expect(await demo.locator('.f-res').evaluate(e => getComputedStyle(e).visibility)).toBe('hidden');
+  // The read-only note is for readers who tap; the preview drops it, and the drawer hugs its content.
+  expect(await demo.locator('.f-res').evaluate(e => getComputedStyle(e).display)).toBe('none');
+  const [sheetTop, phoneMid] = await demo.evaluate(d => [d.querySelector('.f-sheet').getBoundingClientRect().top, (r => r.top + r.height / 2)(d.getBoundingClientRect())]);
+  expect(sheetTop).toBeGreaterThan(phoneMid);
+  // Drawn at 0.9 so no Finance text lands under 10px on a phone (0.8 put 42% of it there).
+  expect(await demo.evaluate(d => Math.min(...[...d.querySelectorAll('.fd *')].filter(e => e.offsetHeight && [...e.childNodes].some(n => n.nodeType === 3 && n.textContent.trim()))
+    .map(e => parseFloat(getComputedStyle(e).fontSize) * e.getBoundingClientRect().height / e.offsetHeight)))).toBeGreaterThanOrEqual(10);
   await expect(demo.locator('.f-sheet-wrap')).toBeHidden({ timeout: 6000 });
   await expect(title).toHaveText('Overview', { timeout: 4000 });
   await expect(demo).not.toHaveAttribute('data-playing', '1', { timeout: 6000 });

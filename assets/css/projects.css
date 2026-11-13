@@ -267,12 +267,12 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .app-demo--finance .f-fig{font-size:38px;font-weight:700;line-height:1.05;letter-spacing:-.03em}
 .app-demo--finance .f-chg{display:flex;flex-wrap:wrap;gap:5px 10px;color:var(--t2);font-size:12.5px}
 .app-demo--finance .f-pill{padding:3px 9px;border-radius:99px;font-weight:650;background:color-mix(in srgb,var(--g) 18%,transparent);color:var(--g)}
-.app-demo--finance .f-spark{position:relative;height:64px;margin:8px -16px 0;touch-action:pan-y;cursor:ew-resize}
+.app-demo--finance .f-spark{position:relative;height:44px;margin:8px -16px 0;touch-action:pan-y;cursor:ew-resize}
 .app-demo--finance .f-spark svg{display:block;width:100%;height:100%;fill:var(--tint)}
 .app-demo--finance .f-spark :is(path+path,line){fill:none;stroke:var(--br);stroke-width:2.25;stroke-linejoin:round;vector-effect:non-scaling-stroke}
 .app-demo--finance .f-spark line{stroke-width:1.5}
 .app-demo--finance .f-worth:not(.is-scrub) line,.app-demo--finance .is-scrub .f-chg{visibility:hidden}
-.app-demo--finance .f-axis{display:flex;justify-content:space-between;margin:-6px -16px 0;padding:4px 16px 11px;background:var(--tint);font-size:12px}
+.app-demo--finance .f-axis{display:flex;justify-content:space-between;margin:-6px -16px 0;padding:4px 16px 11px;background:var(--tint);font-size:12.5px}
 .app-demo--finance .f-at{margin:0 auto;color:var(--t);font-weight:600}
 .app-demo--finance .f-card{display:grid;gap:10px;padding:14px}
 .app-demo--finance .f-card>.f-lbl{color:var(--t2);font-weight:650}
@@ -306,7 +306,7 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .app-demo--finance .f-tn span+span::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--dot)}
 .app-demo--finance .f-ta{font-weight:600}
 .app-demo--finance .f-tabs{flex:none;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:1px;padding:4px 3px 0;background:var(--bg);border-top:.5px solid var(--b)}
-.app-demo--finance .f-tab{--bc:var(--t2);min-width:0;white-space:nowrap!important;flex-direction:column;justify-content:center;gap:3px;min-height:50px;padding:5px 1px 4px;border-radius:10px;font-size:10.5px;font-weight:500;line-height:1.1;letter-spacing:-.01em}
+.app-demo--finance .f-tab{--bc:var(--t2);min-width:0;white-space:nowrap!important;flex-direction:column;justify-content:center;gap:3px;min-height:50px;padding:5px 1px 4px;border-radius:10px;font-size:11.5px;font-weight:500;line-height:1.1;letter-spacing:-.01em}
 .app-demo--finance .f-tab svg{opacity:.75}
 .app-demo--finance .f-tab[aria-pressed=true]{--bc:var(--br)}
 .app-demo--finance .f-tab[aria-pressed=true] svg{opacity:1}
@@ -475,12 +475,12 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .page-projects .app-demo--packing .demo-island,.page-projects .app-demo--finance .demo-island{background:#17212b}
 .page-projects .sq,.page-projects .nag{font-family:-apple-system,BlinkMacSystemFont,Figtree,"Segoe UI","Apple Color Emoji","Segoe UI Emoji",sans-serif}
 /* Finance is laid out at an iPhone's 375px and drawn at .8, so it keeps the real app's proportions; the phone's own status bar and home bar stay full size. */
-.page-projects .app-demo--finance .fd{inset:0 auto auto 0;width:125%;height:125%;transform:scale(.8);transform-origin:0 0;background:radial-gradient(circle at 50% -160px,#26372fb8,#0000 520px),var(--bg)}
-.page-projects .fd>:is(.f-status,.f-home){zoom:1.25}
+.page-projects .app-demo--finance .fd{inset:0 auto auto 0;width:111.111%;height:111.111%;transform:scale(.9);transform-origin:0 0;background:radial-gradient(circle at 50% -160px,#26372fb8,#0000 520px),var(--bg)}
+.page-projects .fd>:is(.f-status,.f-home){zoom:1.1111}
 .page-projects :is(.f-top,.f-bar){height:52px;padding:4px 6px 0 14px;background:none;color:#eceae4}
 .page-projects .f-ib{width:44px;height:44px;border-radius:50%}
 .page-projects .f-ib[aria-pressed=true]{background:#4fc79e2e}
-.page-projects .f-title{margin:10px 0 6px}
+.page-projects .f-title{margin:4px 0}
 .page-projects .f-page{gap:14px}
 .page-projects .f-finger{width:42px;height:42px;margin:-21px}
 .page-projects .f-day{background:#161614cc;-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
@@ -569,7 +569,8 @@ to{box-shadow:0 0 0 9px rgba(17,110,107,0)}
 .page-projects .app-why{border-top:0;padding-top:.5rem}
 }
 .page-projects .app-demo--finance[data-seen]:not([data-user]):not([data-playing]) .is-bad .f-badge{animation:f-beacon 1.5s ease-out .3s 3}
-.page-projects .app-demo[data-playing] .f-res{visibility:hidden}
+.page-projects .app-demo[data-playing] .f-res{display:none}
+.page-projects .app-demo[data-playing] .f-sheet{padding-bottom:8px}
 @keyframes f-beacon{from{box-shadow:0 0 0 0 var(--r)}
 to{box-shadow:0 0 0 12px transparent}
 }
@@ -579,7 +580,7 @@ to{box-shadow:0 0 0 12px transparent}
 .page-projects .app-demo__reset{margin:0 0 0 -.5rem}
 .page-projects .app-grid{margin-top:1.2rem;padding-top:1.4rem}
 }
-.page-projects .f-sheet{min-height:calc(100% - 110px);box-sizing:border-box;align-content:start}
+.page-projects .f-sheet{box-sizing:border-box;align-content:start}
 .page-projects .sq-hl .sq-bub{animation:sq-hl 1.4s ease-out .3s 2}
 @keyframes sq-hl{40%{box-shadow:0 0 0 2px #6ab2f2}
 }
@@ -588,7 +589,7 @@ to{box-shadow:0 0 0 12px transparent}
 .app-demo--finance .f-seg{display:flex;gap:2px;padding:2px;border-radius:10px;background:var(--s2);font-size:13px;font-weight:600}
 .app-demo--finance .f-seg button{--bc:var(--t2);flex:1;justify-content:center;min-height:32px;border-radius:8px}
 .app-demo--finance .f-seg [aria-pressed=true]{--bc:var(--t);background:#4a4a46;box-shadow:inset 0 0 0 1px #ffffff1a,0 1px 2px #00000024,0 1px 6px #00000014}
-.app-demo--finance .f-chips{display:flex;gap:8px;margin-right:-14px;padding-right:14px;overflow-x:auto;scrollbar-width:none}
+.app-demo--finance .f-chips{display:flex;gap:8px;margin-right:-14px;padding-right:14px;overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,#000 80%,#0000);mask-image:linear-gradient(90deg,#000 80%,#0000)}
 .app-demo--finance .f-chips button{flex:none;gap:7px;height:36px;padding:0 13px;border-radius:99px;--bc:var(--t2);background:var(--s);font-size:14px;white-space:nowrap}
 .app-demo--finance .f-chips b{display:contents;color:var(--t);font-weight:700}
 .app-demo--finance div.f-row{grid-template-columns:32px minmax(0,1fr) auto}
