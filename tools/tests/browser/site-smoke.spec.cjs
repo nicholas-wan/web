@@ -347,3 +347,17 @@ test('phones: return-to-top steps off the footer, and a two-stop route has no Vi
   await page.goto('/travel_2023_perth');
   await expect(page.locator('.guangzhou-day__route .travel-route__more').first()).toBeVisible();
 });
+
+test('home has four cards in nav order, and the last finishes its entrance at the page end on a tall phone', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 430, height: 932 });
+  await page.goto('/');
+  const cards = page.locator('.homepage .homepage-link');
+  await expect(cards.locator('.homepage-link__label')).toHaveText(['Selected work', 'Projects', 'Skills', 'Personal']);
+  await expect(cards.nth(1)).toHaveAttribute('href', 'projects');
+  await page.evaluate(async () => { for (let y = 0; y <= document.documentElement.scrollHeight; y += 80) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 30)); } });
+  await expect.poll(() => cards.last().evaluate((c) => +getComputedStyle(c).opacity)).toBe(1);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const tops = await cards.evaluateAll((cs) => cs.map((c) => Math.round(c.getBoundingClientRect().top)));
+  expect(new Set(tops).size).toBe(1);
+});

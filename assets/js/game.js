@@ -409,9 +409,11 @@
       var vh = window.innerHeight || document.documentElement.clientHeight;
       // Read every card before writing any, so a write cannot force a layout.
       var rects = Array.prototype.map.call(cards, function (card) { return card.getBoundingClientRect(); });
-      return function () { write(vh, rects); };
+      // Scroll still left below; the page may end before a low card has risen.
+      var left = Math.max(0, document.documentElement.scrollHeight - vh - window.scrollY);
+      return function () { write(vh, rects, left); };
     }
-    function write(vh, rects) {
+    function write(vh, rects, left) {
       for (var i = 0; i < cards.length; i++) {
         var r = rects[i];
         // Rects include the scrub translate; undo it so progress reads the
@@ -422,7 +424,13 @@
         // Desktop cards rest about 20% up when the About scene settles, so
         // they finish inside that rise instead of stopping half-faded.
         var wide = window.innerWidth > 736;
-        var p = (vh - top) / (vh * (wide ? 0.14 : 0.35)) - i * (wide ? 0.12 : 0.15);
+        var rise = vh * (wide ? 0.14 : 0.35), lag = i * (wide ? 0.12 : 0.15);
+        var p = (vh - top) / rise - lag;
+        // Four cards on a tall phone: the last could stop part-faded at the
+        // page's end (14 Nov 2026), so a card that cannot finish there is
+        // scaled to land exactly at the end. Cards that finish are unchanged.
+        var end = (vh - top + left) / rise - lag;
+        if (end > 0 && end < 1) p /= end;
         p = Math.min(1, Math.max(0, p));
         last[i] = p;
         var iconP = Math.min(1, Math.max(0, (p - 0.2) / 0.68));

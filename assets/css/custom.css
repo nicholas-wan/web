@@ -4310,6 +4310,37 @@ body.is-map-fullscreen .travel-atlas__layout {
   line-height: 1.45;
 }
 
+/* Four cards since 14 Nov 2026 (owner: "Add as a fourth card"): Selected work,
+   Projects, Skills, Personal. Wide screens keep one row, the cards' height
+   unchanged, with each icon beside its title so the narrower copy has the full
+   width; tablets use two rows of two; phones stack them. */
+@media screen and (min-width: 981px) {
+  .homepage .homepage-links {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .homepage .homepage-link {
+    padding-right: 1.25rem;
+  }
+
+  .homepage .homepage-link__label {
+    padding-right: 2.5rem;
+  }
+
+  .homepage .homepage-link__icon {
+    top: 1rem;
+    transform:
+      translateY(calc((1 - var(--ip, 1)) * 0.4rem))
+      scale(calc(0.92 + var(--ip, 1) * 0.08));
+  }
+}
+
+@media screen and (min-width: 601px) and (max-width: 980px) {
+  .homepage .homepage-links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 /* Route bundle: experience-base:start */
 /* Single-line page headline replacing the boxed Selected-work banner.
    #main > out-ranks main.css's ID-weighted `#main > *` spacing. */
