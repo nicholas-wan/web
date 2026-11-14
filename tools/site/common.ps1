@@ -11,6 +11,15 @@ function Get-ContentVersion([string]$Content) {
     return -join ($hash[0..3] | ForEach-Object { $_.ToString('x2') })
 }
 
+# SHA-256 of a file as upper-case hex, like Get-FileHash but without the
+# cmdlet's per-call cost (802 discovery thumbnails in build and verify, Nov 2026).
+function Get-FileSha256([string]$Path) {
+    $sha = [System.Security.Cryptography.SHA256]::Create()
+    $stream = [IO.File]::OpenRead($Path)
+    try { return [BitConverter]::ToString($sha.ComputeHash($stream)).Replace('-', '') }
+    finally { $stream.Dispose(); $sha.Dispose() }
+}
+
 # Published CSS ships without comments (about a third of its gzip size, Nov 2026).
 # The sources keep them; /*! ... */ comments (the icon licence) are kept. Quoted
 # strings are matched first so a "/*" inside one is never treated as a comment.

@@ -374,11 +374,15 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
     $copied = 0
     $missing = [System.Collections.Generic.List[string]]::new()
 
+    # String joins, not Join-Path: three cmdlet calls per image cost about a second (Nov 2026).
+    $webpBase = if ($WebpRoot) { $WebpRoot.TrimEnd('\') + '\' } else { $null }
+    $imageBase = $ImageRoot.TrimEnd('\') + '\'
+    $outputBase = $OutputRoot.TrimEnd('\') + '\'
     foreach ($reference in ($references | Sort-Object)) {
         $relative = $reference.Substring('images/'.Length) -replace '/', '\\'
         $source = $null
-        $webpCandidate = if ($WebpRoot) { Join-Path $WebpRoot $relative } else { $null }
-        $imageCandidate = Join-Path $ImageRoot $relative
+        $webpCandidate = if ($webpBase) { $webpBase + $relative } else { $null }
+        $imageCandidate = $imageBase + $relative
         if ($webpCandidate -and (Get-SourceImageInfo $webpCandidate $SourceIndex)) { $source = $webpCandidate }
         elseif (Get-SourceImageInfo $imageCandidate $SourceIndex) { $source = $imageCandidate }
         if (-not $source) {
@@ -386,7 +390,7 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
             continue
         }
 
-        $destination = Join-Path $OutputRoot ($reference -replace '/', '\\')
+        $destination = $outputBase + ($reference -replace '/', '\\')
         $destinationInfo = $publishedImageIndex[[IO.Path]::GetFullPath($destination).ToLowerInvariant()]
         $copyRequired = -not $destinationInfo
         if (-not $copyRequired) {
@@ -805,9 +809,14 @@ function Get-AssetRef([string]$Path) {
 # generation so the travel page can carry its content hash. Tile ids and the
 # tile scan match tools/photos/seed_photo_tags.py; section ids must match the h2
 # ids Add-TravelNavigation assigns, which verify.ps1 checks against the pages.
+# Built once: PowerShell 5.1 turns a scriptblock into a regex callback on every
+# call, and the photo index makes about 10,000 calls (6 s of a 13 s build, Nov 2026).
+# Almost no string has a control character, so only those pay for the callback.
+$jsonControlChars = [regex]::new('[\x00-\x1f]')
+$jsonControlEscape = [System.Text.RegularExpressions.MatchEvaluator] { param($m) '\u{0:x4}' -f [int][char]$m.Value }
 function ConvertTo-JsonString([string]$Value) {
     $escaped = $Value.Replace('\', '\\').Replace('"', '\"')
-    $escaped = [regex]::Replace($escaped, '[\x00-\x1f]', { param($m) '\u{0:x4}' -f [int][char]$m.Value })
+    if ($jsonControlChars.IsMatch($escaped)) { $escaped = $jsonControlChars.Replace($escaped, $jsonControlEscape) }
     return '"' + $escaped + '"'
 }
 
@@ -978,8 +987,8 @@ foreach ($entry in $photoEntries) {
             }
         }
     }
-    $entry | Add-Member -NotePropertyName Variants -NotePropertyValue $variants
-    $entry | Add-Member -NotePropertyName Srcset -NotePropertyValue $srcset
+    $entry.PSObject.Properties.Add([psnoteproperty]::new('Variants', $variants))
+    $entry.PSObject.Properties.Add([psnoteproperty]::new('Srcset', $srcset))
 }
 # Search tags include contextual subjects that may be outside a thumbnail crop.
 # Discovery is stricter: only manually reviewed image/topic/crop pairs qualify.
@@ -997,7 +1006,7 @@ foreach ($review in $exploreReviews) {
     if (-not $photo -or $photo.Video -or $exploreIds[$review.id]) { throw "Invalid or duplicate reviewed postcard: $($review.id)" }
     $exploreIds[$review.id] = $true
     $source = Resolve-SourceImagePath $photo.Thumb
-    if ($review.thumb -cne $photo.Thumb -or -not $source -or (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash -ine $review.sha256) {
+    if ($review.thumb -cne $photo.Thumb -or -not $source -or (Get-FileSha256 $source) -ine $review.sha256) {
         throw "Postcard image changed; visually review its crop before updating explore-covers.json: $($review.id)"
     }
     if ($null -eq $review.fx -or $null -eq $review.fy -or $review.fx -lt 0 -or $review.fx -gt 100 -or $review.fy -lt 0 -or $review.fy -gt 100 -or -not @($review.tags).Count) {
@@ -1018,7 +1027,7 @@ foreach ($review in $exploreReviews) {
 $photoIndexCovers = foreach ($cover in $exploreCoverPhotos) {
     $position = $photoPositions[$cover.Id]
     $photo = $photoEntries[$position]
-    $coverTags = @($cover.Tags | ForEach-Object { [Array]::IndexOf($photo.Tags, $_) }) -join ','
+    $coverTags = @(foreach ($tag in $cover.Tags) { [Array]::IndexOf($photo.Tags, $tag) }) -join ','
     $focus = if ($cover.FocusX -ne 50 -or $cover.FocusY -ne 50) { ',' + $cover.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + ',' + $cover.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) } else { '' }
     '[' + $position + ',[' + $coverTags + ']' + $focus + ']'
 }
@@ -1027,11 +1036,11 @@ $photoIndexTrips = foreach ($journal in $journalManifest) {
     '{"slug":' + (ConvertTo-JsonString $journal.slug) + ',"label":' + (ConvertTo-JsonString $journal.label) + ',"order":' + [int]$journal.order + ',"year":' + $year + '}'
 }
 $photoIndexTags = foreach ($property in $tagVocabulary.PSObject.Properties) {
-    $synonyms = @($property.Value.synonyms | ForEach-Object { ConvertTo-JsonString $_ }) -join ','
+    $synonyms = @(foreach ($synonym in $property.Value.synonyms) { ConvertTo-JsonString $synonym }) -join ','
     '{"tag":' + (ConvertTo-JsonString $property.Name) + ',"facet":' + (ConvertTo-JsonString $property.Value.facet) + ',"count":' + [int]$photoTagCounts[$property.Name] + ',"synonyms":[' + $synonyms + ']}'
 }
 $photoIndexPhotos = foreach ($entry in $photoEntries) {
-    $tags = @($entry.Tags | ForEach-Object { ConvertTo-JsonString $_ }) -join ','
+    $tags = @(foreach ($tag in $entry.Tags) { ConvertTo-JsonString $tag }) -join ','
     $video = if ($entry.Video) { 'true' } else { 'false' }
     $focus = if ($entry.FocusX -ne 50 -or $entry.FocusY -ne 50) { ',"fx":' + $entry.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + ',"fy":' + $entry.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) } else { '' }
     '{"id":' + (ConvertTo-JsonString $entry.Id) + ',"src":' + (ConvertTo-JsonString $entry.Src) + ',"thumb":' + (ConvertTo-JsonString $entry.Thumb) +
@@ -1039,7 +1048,7 @@ $photoIndexPhotos = foreach ($entry in $photoEntries) {
         ',"sectionTitle":' + (ConvertTo-JsonString $entry.SectionTitle) + ',"place":' + (ConvertTo-JsonString $entry.Place) + ',"caption":' + (ConvertTo-JsonString $entry.Caption) +
         ',"alt":' + (ConvertTo-JsonString $entry.Alt) + ',"tags":[' + $tags + '],"video":' + $video + $focus + '}'
 }
-$photoIndexJson = '{"version":2,"variants":"' + (($photoEntries | ForEach-Object { $_.Variants }) -join '') + '","trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + '],"covers":[' + ($photoIndexCovers -join ',') + "]}`n"
+$photoIndexJson = '{"version":2,"variants":"' + (@(foreach ($photoEntry in $photoEntries) { $photoEntry.Variants }) -join '') + '","trips":[' + ($photoIndexTrips -join ',') + '],"tags":[' + ($photoIndexTags -join ',') + '],"photos":[' + ($photoIndexPhotos -join ',') + '],"covers":[' + ($photoIndexCovers -join ',') + "]}`n"
 $assetVersions['assets/data/photo-index.json'] = Get-ContentVersion $photoIndexJson
 
 # Timeline scenes (8 Nov 2026): the partial stays the source of truth, but the ten

@@ -242,19 +242,23 @@ foreach ($page in $pages) {
         # JPEG photos' -480/-800 tiers (and banners' -1200, 6 Nov 2026) are WebP where
         # make-responsive-variants.py --webp-tiers made them (5 Nov 2026): never
         # mixed, never a .jpg beside its .webp.
-        $tierExtensions = @([regex]::Matches($match.Groups[1].Value, '-(?:480|800|1200)\.(jpg|webp) (?:480|800|1200)w') | ForEach-Object { $_.Groups[1].Value } | Select-Object -Unique)
+        $tierExtensions = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+        foreach ($tier in [regex]::Matches($match.Groups[1].Value, '-(?:480|800|1200)\.(jpg|webp) (?:480|800|1200)w')) { [void]$tierExtensions.Add($tier.Groups[1].Value) }
         if ($tierExtensions.Count -gt 1) { throw "$($page.Name) mixes JPEG and WebP -480/-800/-1200 tiers in one srcset: $($match.Groups[1].Value)" }
         foreach ($jpegTier in [regex]::Matches($match.Groups[1].Value, '(images/[^\s,]+-(?:480|800|1200))\.jpg (?:480|800|1200)w')) {
             if (Test-Path -LiteralPath (Join-Path $root (($jpegTier.Groups[1].Value + '.webp') -replace '/', '\'))) { throw "$($page.Name) serves $($jpegTier.Groups[1].Value).jpg although its WebP tier exists." }
         }
     }
+    # .NET checks instead of Join-Path/Test-Path: thousands of references per build (Nov 2026).
     foreach ($reference in $references) {
         if ($reference -match '^(https?:|//|mailto:|javascript:)') { continue }
-        $target = Join-Path $dist ($reference -replace '/', '\')
-        if (-not (Test-Path -LiteralPath $target) -and [IO.Path]::GetExtension($reference) -eq '') {
+        $target = $dist.TrimEnd('\') + '\' + ($reference -replace '/', '\').TrimStart('\')
+        $exists = [IO.File]::Exists($target) -or [IO.Directory]::Exists($target)
+        if (-not $exists -and [IO.Path]::GetExtension($reference) -eq '') {
             $target = "$target.html"
+            $exists = [IO.File]::Exists($target)
         }
-        if (-not (Test-Path -LiteralPath $target)) { throw "$($page.Name) references missing file: $reference" }
+        if (-not $exists) { throw "$($page.Name) references missing file: $reference" }
     }
     $scriptBytes = 0
     foreach ($scriptMatch in [regex]::Matches($scan, '<script\b[^>]*\bsrc="(assets/js/[^"?]+)')) {
@@ -570,6 +574,10 @@ for ($i = 0; $i -lt $photoIndex.photos.Count; $i++) {
 $coverReviews = Get-Content -LiteralPath (Join-Path $root 'journals/explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 if (@($photoIndex.covers).Count -ne $coverReviews.Count) { throw 'The photo index must include every reviewed discovery cover.' }
 $publishedCovers = @{}
+# Reviews by id, built once: a Where-Object scan per cover cost about 7 s (Nov 2026).
+# Case-sensitive like -ceq; the first review with an id wins, like Select-Object -First 1.
+$coverReviewsById = New-Object 'System.Collections.Generic.Dictionary[string,object]' ([System.StringComparer]::Ordinal)
+foreach ($coverReview in $coverReviews) { $reviewId = [string]$coverReview.id; if (-not $coverReviewsById.ContainsKey($reviewId)) { $coverReviewsById[$reviewId] = $coverReview } }
 foreach ($row in $photoIndex.covers) {
     if ($row.Count -notin @(2, 4) -or ($row[0] -isnot [int] -and $row[0] -isnot [long]) -or $row[0] -lt 0 -or $row[0] -ge $photoIndex.photos.Count -or @($row[1]).Count -eq 0) { throw 'Invalid compact discovery cover.' }
     $photo = $photoIndex.photos[$row[0]]
@@ -581,11 +589,12 @@ foreach ($row in $photoIndex.covers) {
     if ($row.Count -eq 4) { $cover.fx = $row[2]; $cover.fy = $row[3] }
     if ($publishedCovers.ContainsKey($cover.id)) { throw "Duplicate discovery cover: $($cover.id)" }
     $publishedCovers[$cover.id] = $cover
-    $review = $coverReviews | Where-Object { $_.id -ceq $cover.id } | Select-Object -First 1
+    $review = $null
+    [void]$coverReviewsById.TryGetValue([string]$cover.id, [ref]$review)
     if (-not $review -or -not $photo -or $photo.video -or $review.thumb -cne $photo.thumb -or $cover.fx -ne $review.fx -or $cover.fy -ne $review.fy -or ($cover.tags -join '|') -cne ($review.tags -join '|')) {
         throw "Discovery cover no longer matches its visual review: $($cover.id)"
     }
-    if ((Get-FileHash -LiteralPath (Join-Path $dist $photo.thumb) -Algorithm SHA256).Hash -ine $review.sha256) { throw "Published discovery thumbnail changed since visual review: $($cover.id)" }
+    if ((Get-FileSha256 (Join-Path $dist $photo.thumb)) -ine $review.sha256) { throw "Published discovery thumbnail changed since visual review: $($cover.id)" }
 }
 $coverTemplate = [regex]::Match($travel, '(?s)<template id="photo-explore-seeds">(.*?)</template>').Groups[1].Value
 foreach ($card in [regex]::Matches($coverTemplate, '(?s)<a\b.*?</a>')) {

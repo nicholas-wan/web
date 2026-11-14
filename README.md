@@ -57,6 +57,7 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 - Match CI on Windows with `powershell.exe -NoProfile -File tools/site.ps1 check`; a PowerShell 7 pass is not enough. In 5.1, `@(...)` around a root-array `ConvertFrom-Json` nests it: assign the result directly.
 - Builds are incremental (`assets/fonts` and `assets/icons` are mirrored, so a removed source file also leaves `dist/`); use `build -Clean` after removing other files or to reset.
 - `-Output` must be a `dist*` folder directly inside the repo, as `-Clean` empties it.
+- Speed (15 Nov 2026, measured on this laptop; output byte-identical before and after): `check` 28 s to 15 s, clean build 16 s to 8 s, unchanged rebuild 13.5 s to 6 s. Windows PowerShell 5.1 is slow at per-item work, so keep hot loops (per photo, per image, per reference) free of: a scriptblock passed to `[regex]::Replace` (it was rebuilt on every call; `ConvertTo-JsonString` alone cost 6 s), `Where-Object`/`ForEach-Object`/`Select-Object` pipelines (use `foreach`, a dictionary or a `HashSet`; verify's cover lookup scanned every review per cover, about 7 s), and `Join-Path`/`Test-Path`/`Get-FileHash`/`Add-Member` (use string joins, `[IO.File]::Exists`, `Get-FileSha256` in `common.ps1` and `PSObject.Properties.Add`). To find a slow step, time a copy of the script with a stopwatch line before each top-level statement.
 
 ### Checks and output
 
