@@ -421,7 +421,7 @@ $journalBySlug = @{}
 $tripLabels = @{}
 # Per-page share/preview image; pages not listed fall back to the hero.
 $defaultOgImage = "images/travel/2025_japan/day8_amanohashidate/kyoto4-800.jpg"
-$ogImages = @{ "travel" = "images/travel/2026_guangzhou/day5/canton-tower-couple.webp" }
+$ogImages = @{ "travel" = "images/travel/2026_guangzhou/day5/canton-tower-couple.webp"; "projects" = "images/projects/share.jpg" }
 foreach ($journal in $journalManifest) {
     if ($journalBySlug.ContainsKey($journal.slug)) { throw "Duplicate travel journal slug: $($journal.slug)" }
     $journalBySlug[$journal.slug] = $journal
@@ -1277,7 +1277,8 @@ foreach ($page in $pages) {
     if ($slug -eq 'travel') { $routeStylesheetMarkup += "`n    <link rel=`"preload`" href=`"$(Get-AssetRef 'assets/data/travel-scenes.svg')`" as=`"fetch`" crossorigin fetchpriority=`"low`" media=`"(min-width: 737px)`" />" }
     # The professional pages opt out of a share-preview image (owner decision,
     # Jul 2026): scrapers show a text-only card rather than the travel default.
-    $shareImageMeta = if ($slug -in @('experience', 'projects', 'skills')) { '' } else { "    <meta property=`"og:image`" content=`"__OGIMAGE__`" />`n    <meta name=`"twitter:card`" content=`"summary_large_image`" />" }
+    # Projects has its own picture of the four demos instead (owner, 14 Nov 2026: "Yes, add it").
+    $shareImageMeta = if ($slug -in @('experience', 'skills')) { '' } else { "    <meta property=`"og:image`" content=`"__OGIMAGE__`" />`n    <meta name=`"twitter:card`" content=`"summary_large_image`" />" }
     $introLine = if ($intro) { "    $intro" } else { "" }
     $canvasMarkup = if ($slug -eq 'index') { '    <canvas id="nokey" width="800" height="800" aria-hidden="true"></canvas>' } else { '' }
     $bodyFontPreloadPages = @('experience', 'projects', 'skills', '404')
