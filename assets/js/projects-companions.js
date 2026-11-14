@@ -52,7 +52,7 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 .page-projects .cpl-n i::before{content:"";display:block;width:100%;height:100%;background:#fff;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 11.6 17.3 6.8c.6-.2 1.1.1.9.9l-2 9.6c-.2.7-.6.8-1.2.5l-3.1-2.3-1.5 1.4c-.2.2-.3.3-.6.3l.2-3.2 5.8-5.3c.3-.2-.1-.4-.4-.2l-7.2 4.5-3.1-1c-.7-.2-.7-.7.1-1Z'/%3E%3C/svg%3E") center/70% no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 11.6 17.3 6.8c.6-.2 1.1.1.9.9l-2 9.6c-.2.7-.6.8-1.2.5l-3.1-2.3-1.5 1.4c-.2.2-.3.3-.6.3l.2-3.2 5.8-5.3c.3-.2-.1-.4-.4-.2l-7.2 4.5-3.1-1c-.7-.2-.7-.7.1-1Z'/%3E%3C/svg%3E") center/70% no-repeat}
 .page-projects .cpl-n b{font-weight:650;color:#fff!important}
 .page-projects .cpl-n small{font-size:9.5px;opacity:.7}
-.page-projects .cpl-n span{grid-column:2/-1;white-space:pre-line;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.page-projects .cpl-n span{grid-column:2/-1;white-space:pre-line;text-wrap:balance;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
 .page-projects .cpl-n .is-new{animation:cpl-in .45s cubic-bezier(.22,1,.36,1) both}
 .page-projects .cpl-h{position:absolute;left:50%;bottom:8px;width:84px;height:4px;margin-left:-42px;border-radius:4px;background:#fff}
 @keyframes cpl-in{from{opacity:0;transform:translateY(-14px) scale(.96)}}
@@ -87,16 +87,18 @@ const lock = (fig, chat, { wall, date, clock, group, read }) => {
 		list.innerHTML = items.map(([who, text]) => {
 			const key = who + text, fresh = !first && !seen.has(key);
 			seen.add(key);
-			return `<div class="${fresh ? 'is-new' : ''}"><i></i><b>${group}</b><small>now</small><span>${who}: ${text.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</span></div>`;
+			return `<div class="${fresh ? 'is-new' : ''}"><i></i><b>${group}</b><small>now</small><span>${who}: ${text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/ (?=\d)|(?<=\d) /g, '\u00a0')}</span></div>`;
 		}).join('');
 		first = false;
 	});
 };
+/* A lock-screen date n days from today, as the demo's own day: Nag-bot's Sunday, SquashBot's coming Friday. */
+const day = (n) => new Date(Date.now() + n * 864e5).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).replace(',', '');
 const flat = (el) => el.textContent.replace(/[ \t\r]+/g, ' ').replace(/ *\n */g, '\n').trim();
 
 if (figs.nag) {
 	const live = $('#nag-bot .n-live');
-	if (live) lock(figs.nag, live, { wall: 'radial-gradient(120% 70% at 50% 0%,#e9a36f,#b4663d 45%,#5b2d1a)', date: 'Monday 9 November', clock: '7:45', group: 'Chores',
+	if (live) lock(figs.nag, live, { wall: 'radial-gradient(120% 70% at 50% 0%,#e9a36f,#b4663d 45%,#5b2d1a)', date: day(-new Date().getDay()), clock: '7:45', group: 'Chores',
 		read: () => [...live.querySelectorAll('.n-msg')].filter((m) => !m.querySelector('.n-brow')).map((m) => {
 			if (m.classList.contains('n-stk')) return ['Nag-Bot', 'Sticker'];
 			const b = m.querySelector('.n-bubble').cloneNode(true);
@@ -107,7 +109,7 @@ if (figs.nag) {
 
 if (figs.squash) {
 	const chat = $('#squashbot [data-chat]');
-	if (chat) lock(figs.squash, chat, { wall: 'radial-gradient(120% 70% at 50% 0%,#3b6ea5,#1b3654 48%,#0b1622)', date: new Date(Date.now() + (12 - new Date().getDay()) % 7 * 864e5).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }).replace(',', ''), clock: '9:41', group: 'Squash',
+	if (chat) lock(figs.squash, chat, { wall: 'radial-gradient(120% 70% at 50% 0%,#3b6ea5,#1b3654 48%,#0b1622)', date: day((12 - new Date().getDay()) % 7), clock: '9:41', group: 'Squash',
 		read: () => [...chat.querySelectorAll('.sq-m')].filter((m) => !/Court schedule/.test(m.textContent)).map((m) => {
 			const lines = [...m.querySelectorAll('.sq-tx > div')].map(flat).filter(Boolean).join('\n');
 			return [m.classList.contains('sq-m--me') ? 'DodgerBlueee' : 'SquashBot', lines];

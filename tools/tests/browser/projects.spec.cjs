@@ -437,6 +437,13 @@ test('Nag-bot and Finance dates follow the calendar, whatever today is', async (
   await expect(nag.locator('.n-label').first()).toHaveText(/^Week of Feb 22 · /);
   await expect(nag.locator('.n-app')).toContainText('Nicholas · Feb 28, 7:05 PM');
   await expect(nag.locator('.n-app')).toContainText('DodgerBlueee · Feb 27, 9:12 PM');
+  // The lock screens (1100px and up) date themselves the same way: Nag-bot's Sunday, SquashBot's coming Friday.
+  await nag.locator('.cpn--lock').scrollIntoViewIfNeeded();
+  await expect(nag.locator('.cpl-d')).toHaveText('Sunday 28 February');
+  await show(page, 'squashbot');
+  await page.locator('#squashbot .cpn--lock').scrollIntoViewIfNeeded();
+  await expect(page.locator('#squashbot .cpl-d')).toHaveText('Friday 5 March');
+  await show(page, 'nag-bot');
   await show(page, 'finance-tracker');
   const fin = page.locator('#finance-tracker');
   await expect(fin.locator('.f-scroll')).toContainText('Feb 2027 against typical');
@@ -467,4 +474,20 @@ test('SquashBot dates start from the coming Friday, whatever today is', async ({
   await app.locator('[data-mini="courts"]').first().click();
   await app.locator('.sq-mini [data-mk="tab"]').click();
   await expect(app.locator('.sq-mini')).toContainText('Court 4 · 29 Dec · 8pm–9pm');
+});
+
+test('Phones keep the kind line at 12px on one line, and a landscape phone still plays its preview', async ({ page }) => {
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 700 });
+    await page.goto('/projects');
+    const kinds = await page.locator('.app-card__kind').evaluateAll((ks) => ks.map((k) => [parseFloat(getComputedStyle(k).fontSize), k.scrollWidth - k.clientWidth]));
+    for (const [size, over] of kinds) { expect(size).toBeGreaterThanOrEqual(12); expect(over).toBeLessThanOrEqual(0); }
+  }
+  // 844x390: the demo is taller than the window, so it counts by the share of the window it fills.
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.goto('/projects');
+  const demo = page.locator('#squashbot figure.app-card__demo .app-demo');
+  await demo.evaluate((e) => { const r = e.getBoundingClientRect(); scrollTo(0, scrollY + r.top + r.height / 2 - innerHeight / 2); });
+  await expect(demo).toHaveAttribute('data-playing', '1', { timeout: 15000 });
 });

@@ -665,7 +665,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card h2{font:600 3rem/1.04 Archivo,system-ui,sans-serif;letter-spacing:-.03em;text-wrap:balance}
 .page-projects :is(.app-card__dek,.app-why strong,.app-why p span,.app-card__kind,.app-card__facts,.app-card__foot figcaption,.app-rail b,.app-rail small){font-family:Archivo,system-ui,sans-serif}
 .page-projects .app-card__dek{color:#9da2a9;line-height:1.6;text-wrap:balance}
-.page-projects .app-card__kind{font-size:.75rem;letter-spacing:.14em;margin-bottom:.35rem}
+.page-projects .app-card__kind{font-size:max(var(--text-floor),.75rem);letter-spacing:.14em;margin-bottom:.35rem}
 .page-projects .app-why strong{font-weight:600;font-size:1rem;color:#ecedf0}
 .page-projects .app-why p span{font-weight:400;line-height:1.6;color:#9da2a9;text-wrap:pretty}
 .page-projects .app-card__facts{font-weight:500}
@@ -776,3 +776,6 @@ html .page-projects .portfolio-headline h1{color:#ecedf0}
 @media screen and (max-width:736px){.page-projects .app-card__head .app-card__proof{grid-column:1/-1;margin:.6rem 0 1rem;font-size:max(.95rem,13px)}}
 /* Rail subtitles hold two lines, so the four names line up when one fits on a line (13 Nov 2026 review). */
 .page-projects .app-rail small{min-height:2.6em}
+/* 320px phones: the 12px kind line fits on one line. */
+@media (max-width:359px){.page-projects .app-card__kind{letter-spacing:0}
+.page-projects .app-card__icon{width:46px;height:46px}}

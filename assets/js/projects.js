@@ -1,5 +1,5 @@
 /* Share of a demo on screen; 85% for the carousel to turn. */
-const pjVisible = (d, f = .85) => { const b = d.getBoundingClientRect(); return Math.max(0, Math.min(innerHeight, b.bottom) - Math.max(0,b.top)) / b.height >= f; };
+const pjVisible = (d, f = .85) => { const b = d.getBoundingClientRect(); return Math.max(0, Math.min(innerHeight, b.bottom) - Math.max(0,b.top)) / Math.min(b.height, innerHeight) >= f; };
 /* Each sample app boots within 500px of the viewport. */
 function projectsDemo(selector, init) {
 	const roots = [...document.querySelectorAll(selector)];
