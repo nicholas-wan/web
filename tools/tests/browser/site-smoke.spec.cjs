@@ -133,7 +133,7 @@ test('desktop About copy arrives with the photo, not after it', async ({ page })
     await expect.poll(() => page.evaluate(() => parseFloat(document.querySelector('.intro-swipe').style.getPropertyValue('--p')))).toBeGreaterThan(0.8);
     const frame = await page.evaluate(() => {
       const photo = document.querySelector('.intro-swipe__photo img').getBoundingClientRect();
-      const title = document.querySelector('.intro-swipe__text h3').getBoundingClientRect();
+      const title = document.querySelector('.intro-swipe__text h2').getBoundingClientRect();
       const sheet = document.querySelector('#main .post.featured').getBoundingClientRect();
       return { photoBottom: photo.bottom, titleLeft: title.left, titleRight: title.right, photoRight: photo.right, sheetRight: sheet.right, vh: innerHeight };
     });
@@ -330,3 +330,20 @@ for (const [width, scale, expected] of [[390, 3, 'japan_banner_japan-phone-1200.
     await context.close();
   });
 }
+
+test('phones: return-to-top steps off the footer, and a two-stop route has no View all button', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/skills');
+  const top = page.locator('#return-to-top');
+  await page.evaluate(() => scrollTo(0, 400));
+  await expect(top).toHaveClass(/is-visible/);
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await expect(top).not.toHaveClass(/is-visible/);
+  await page.goto('/travel_2017_seoul');
+  const route = page.locator('.guangzhou-day__route').first();
+  await expect(route.locator('.travel-route-summary')).toBeVisible();
+  await expect(route.locator('.travel-route__more')).toBeHidden();
+  // Longer routes keep theirs.
+  await page.goto('/travel_2023_perth');
+  await expect(page.locator('.guangzhou-day__route .travel-route__more').first()).toBeVisible();
+});

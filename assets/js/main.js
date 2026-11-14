@@ -47,11 +47,10 @@
 	}
 
 	// The scroll-driven chrome shares one frame: all reads, then all writes.
-	var returnToTop = document.getElementById('return-to-top');
+	var returnToTop = document.getElementById('return-to-top'), foot = document.getElementById('footer');
 	var chromeFrame = null;
 	var chromeScrolled = false;
-	// The floating pill (wrapper, or body on home) steps away on downward
-	// reading and returns on upward intent; context and sticky bars opt out.
+	// The floating pill hides on reading down, returns on scrolling up.
 	var toggleScrollY = window.scrollY;
 	function stepAway(y) {
 		var p = navPanelToggle.parentElement;
@@ -70,10 +69,11 @@
 		var y = window.scrollY;
 		// Headerless pages keep the solid pill.
 		var alt = !header || header.getBoundingClientRect().bottom <= window.innerHeight * 0.05;
+		var atFoot = mobileNav.matches && foot && foot.getBoundingClientRect().top < innerHeight - 70;
 
 		navPanelToggle.classList.toggle('alt', alt);
 		if (scrolled) stepAway(y);
-		if (returnToTop) returnToTop.classList.toggle('is-visible', y >= 50);
+		if (returnToTop) returnToTop.classList.toggle('is-visible', y >= 50 && !atFoot);
 	}
 	function queueChrome() {
 		if (chromeFrame === null) chromeFrame = window.requestAnimationFrame(renderChrome);
@@ -223,8 +223,7 @@
 			first.focus();
 		}
 		else {
-			// Safari may skip links in its native Tab order. Advance explicitly
-			// within the modal so that platform preferences cannot release focus.
+			// Safari can skip links in Tab order; keep focus in the sheet.
 			event.preventDefault();
 			focusable[focusable.indexOf(document.activeElement) + (event.shiftKey ? -1 : 1)].focus();
 		}
@@ -244,7 +243,7 @@
 	mobileNav.addEventListener('change', syncNavMode);
 	syncNavMode();
 
-	// Return-to-top scrolls here; renderChrome shows it past 50px.
+	// Return-to-top: past 50px, and on phones off the footer.
 	if (returnToTop) {
 		returnToTop.addEventListener('click', function(event) {
 			event.preventDefault();

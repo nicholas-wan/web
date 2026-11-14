@@ -473,7 +473,7 @@
   text-align: left;
 }
 
-.intro-swipe__text h3,
+.intro-swipe__text h2,
 .intro-swipe__head .intro-swipe__title {
   margin: 0 0 0.9rem;
   /* custom.css sets every h3 to `color: grey !important`. */
@@ -573,13 +573,16 @@
     padding: 0 1rem 1.25rem;
   }
 
-  .intro-swipe__head .intro-swipe__title {
+  /* An h2 since 14 Nov 2026 (it was an h3 under the h1), so it must out-rank the
+     theme's `#main > .post header.major h2` (2.5rem on phones). */
+  #main > .post header.major .intro-swipe__title {
     margin: 0;
     font-size: 1.5rem;
+    line-height: 1.3;
   }
 
   .intro-swipe__text .page-opening-eyebrow,
-  .intro-swipe__text h3 {
+  .intro-swipe__text h2 {
     display: none;
   }
 
@@ -3870,6 +3873,11 @@ body.is-map-fullscreen .travel-atlas__layout {
     display: none;
   }
 
+  /* One or two stops: the summary already names them all (14 Nov 2026 review). */
+  .travel-route-summary ~ .travel-route__more--all {
+    display: none !important;
+  }
+
   .guangzhou-day__route--collapsible .guangzhou-route__more,
   .travel-route-summary ~ .guangzhou-route__more {
     display: inline-flex;
@@ -4627,12 +4635,15 @@ body.is-map-fullscreen .travel-atlas__layout {
 .earlier-work summary strong {
   color: var(--color-ink-900);
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
+/* The serif subtitle read larger than its title at the same 1rem (14 Nov 2026 review). */
 .earlier-work summary small {
   margin-top: 0.2rem;
   color: var(--color-ink-500);
+  font-size: 0.875rem;
 }
 
 .earlier-work[open] summary .icon { transform: rotate(45deg); }
@@ -7430,6 +7441,11 @@ body.lightbox-open {
 @media screen and (max-width: 420px) {
   .tech-stack__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Nine tools in two columns left one alone on the last row (14 Nov 2026 review). */
+  .tech-stack__grid li:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 }
 /* Route bundle: skills-responsive:end */

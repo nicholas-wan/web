@@ -627,6 +627,8 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
         # Every journal's button wears the teal day-strip chip (Nov 2026), including
         # sources that still name only the older guangzhou-route__more class.
         if ($buttonClass -notmatch '\btravel-route__more\b') { $buttonClass = "travel-route__more $buttonClass" }
+        # One or two stops are all in the summary already, so phones hide the button (14 Nov 2026).
+        if ($stops.Count -le 2) { $buttonClass += ' travel-route__more--all' }
         return $match.Groups['open'].Value + "<p class=`"travel-route-summary`">$summary</p>`n    " +
             "<div class=`"$($match.Groups['routeClass'].Value)`" id=`"$id`">$($match.Groups['stops'].Value)</div>$($match.Groups['gap'].Value)" +
             "<button class=`"$buttonClass`" type=`"button`" aria-expanded=`"false`" aria-controls=`"$id`">$label</button>`n  </div>"
