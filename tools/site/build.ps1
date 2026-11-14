@@ -625,7 +625,12 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
         $stops = [regex]::Matches($match.Groups['stops'].Value, '(?s)<span class="[^"]*\bguangzhou-route__stop\b[^"]*">\s*<span>(?<name>.*?)</span>\s*(?:<small>(?<small>.*?)</small>)?')
         if ($stops.Count -eq 0) { throw "A route on $Slug has no stops." }
         $summary = & $place $stops[0]
-        if ($stops.Count -gt 1) { $summary += ' &rarr; ' + (& $place $stops[$stops.Count - 1]) }
+        if ($stops.Count -gt 1) {
+            # A round trip ("Perth -> Perth") names the last stop that differs from the first (15 Nov 2026).
+            $endIndex = $stops.Count - 1
+            while ($endIndex -gt 1 -and (& $place $stops[$endIndex]) -ceq $summary) { $endIndex-- }
+            $summary += ' &rarr; ' + (& $place $stops[$endIndex])
+        }
         $label = if ($stops.Count -eq 1) { 'View all 1 stop' } else { "View all $($stops.Count) stops" }
         $buttonClass = if ($match.Groups['buttonClass'].Success) { $match.Groups['buttonClass'].Value } else { 'travel-route__more guangzhou-route__more' }
         # Every journal's button wears the teal day-strip chip (Nov 2026), including

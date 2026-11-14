@@ -397,6 +397,7 @@
         return stop.offsetTop > firstTop + 2;
       });
       group.classList.toggle('is-desktop-wrapped', wrapped);
+      route.querySelectorAll('i').forEach(function (a) { var n = a.nextElementSibling; a.classList.toggle('is-line-end', !!n && n.offsetTop > a.offsetTop + a.offsetHeight); });
     };
 
     requestAnimationFrame(updateDesktopWrap);

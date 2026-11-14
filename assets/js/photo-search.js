@@ -17,6 +17,7 @@
 	var SEGMENT = new RegExp('[' + CJK + ']|[^\\s!-/:-@[-`{-~\u00b7\u2013\u2014' + CJK + ']+', 'g');
 
 	var status = document.getElementById('photo-search-status');
+	var example = document.getElementById('photo-search-example');
 	var clearButton = form.querySelector('.photo-search__clear');
 	var collapsible = document.querySelectorAll('.travel-atlas__layout, .photo-explore__map-heading, #main > .travel-archive-heading, #main > .travel-grid');
 	var discovery = document.getElementById('photo-explore');
@@ -154,7 +155,7 @@
 			row.forEach(function(best, t) {
 				if (!best[0]) return;
 				score += best[0] * weight[t];
-				why.push(terms[t] + (best[1] === 4 ? ' (related tag)' : best[1] > 1 ? ' (in description)' : ''));
+				why.push(best[1] === 4 ? '\x03' + terms[t] : terms[t] + (best[1] > 1 ? ' (in description)' : ''));
 			});
 			if (why.length) tier[why.length === terms.length && (!subject || photos[i].tags.indexOf(subject.tag) >= 0) ? 0 : 1].push({ photo: photos[i], score: score, why: why });
 		});
@@ -357,6 +358,14 @@
 		return null;
 	}
 
+	// "matches: lake (in description) · related to temple": a related tag reads as
+	// plain words, not "(related tag)" (15 Nov 2026 review). \x03 marks those terms.
+	function whyText(why) {
+		var direct = why.filter(function(term) { return term.charAt(0) !== '\x03'; });
+		var related = why.filter(function(term) { return term.charAt(0) === '\x03'; }).map(function(term) { return term.slice(1); });
+		return [direct.length ? 'matches: ' + direct.join(', ') : '', related.length ? 'related to ' + related.join(', ') : ''].filter(Boolean).join(' \u00b7 ');
+	}
+
 	function card(photo, terms, why) {
 		var caption = photo.caption && photo.caption !== photo.place ? ' \u00b7 ' + highlight(photo.caption, terms) : '';
 		var focal = photo.fx == null && photo.fy == null ? '' : 'object-position:' +
@@ -369,7 +378,7 @@
 			'</span><span class="photo-hit__trip">' + escape(tripLabel(photo.trip)) + '</span>' +
 			'<span class="photo-hit__title"><strong>' + highlight(photo.place, terms) +
 			'</strong>' + caption + '</span>' +
-			(why ? '<span class="photo-hit__why">matches: ' + escape(why.join(', ')) + '</span>' : '') + '</a></li>';
+			(why ? '<span class="photo-hit__why">' + escape(whyText(why)) + '</span>' : '') + '</a></li>';
 	}
 
 	var chips = form.querySelector('.photo-search__suggest');
@@ -441,6 +450,7 @@
 				'<ul class="photo-results__grid">' + hits.map(function(hit) { return card(hit.photo, terms, tier && hit.why); }).join('') + '</ul>';
 		});
 		if (full) sentence.push(plural(full, 'photo matches', 'photos match') + (terms.length > 1 ? ' all terms' : ''));
+		if (!tiers[0].length && total) sentence.push('No exact matches for \u2018' + query + '\u2019');
 		if (total > full) sentence.push(plural(total - full, 'related photo', 'related photos'));
 		if (tripFilter) sentence.push(tripLabel(tripFilter) + ' only');
 		if (!total) {
@@ -473,6 +483,7 @@
 		discovery.hidden = !!query && !failed;
 		var terms = unique(tokens(value));
 		clearButton.hidden = !value;
+		if (example) example.hidden = !!query;
 		syncUrl(query);
 		collapse(!!query && !failed);
 		suggest(value);
