@@ -242,6 +242,12 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                         # widens the column). The old flat 1152px understated 1920px
                         # screens, which then took -1200 for a 1365px banner. Its
                         # <head> preload mirrors this img attribute for attribute.
+                        # Nov 2026 (owner decision): DPR-3 phones (2.5dppx and up)
+                        # say 266px, so they take -800 at about 2.2x instead of
+                        # -1200 (Seoul and Guangzhou, with no -1200, take -800 instead
+                        # of the original); the softening was weighed against phone LCP
+                        # of 1.1-1.3 s instead of 2.6-3.6 s on Slow 4G (README, "Banner
+                        # sizes"). Japan's phone crop <source> keeps 100vw.
                         #
                         # Journal gallery tiles are five-up on desktop and were
                         # measured at 129px (737px viewport), 197px (1024px),
@@ -262,7 +268,7 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                         # 480w previews for the ~264 CSS px horizontal tiles, via a
                         # 160px density-capped slot at DPR <= 3. The lightbox selects
                         # its own fitted source; zoom still uses the original.
-                        $sizes = if ($isJournalBanner) { '(max-width: 736px) 100vw, (max-width: 1024px) calc(100vw - 176px), (max-width: 1680px) 1024px, 1366px' } elseif ($JournalGallery) { $journalTileSizes } else { '(max-width: 736px) 250px, 800px' }
+                        $sizes = if ($isJournalBanner) { '(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 100vw, (max-width: 1024px) calc(100vw - 176px), (max-width: 1680px) 1024px, 1366px' } elseif ($JournalGallery) { $journalTileSizes } else { '(max-width: 736px) 250px, 800px' }
                         $tag = Add-AttributeToImgTag $tag ('sizes="{0}"' -f $sizes)
                     }
                 }
