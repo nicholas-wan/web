@@ -4,8 +4,8 @@ usage: python -I tools/fonts/subset-latin-ext.py [--dist dist]
 
 Run it after a build whenever verify.ps1 reports a latin-ext character that no
 subset covers, then rebuild. It scans the built site the same way verify.ps1
-does (every .html, .js, .json and .css under dist/ except images/, HTML
-entities decoded), collects the characters that fall in Google Fonts'
+does (every .html, .js, .json, .svg and .css under dist/ except images/, HTML
+entities decoded in all but the stylesheets), collects the characters that fall in Google Fonts'
 latin-ext unicode-range but not in its latin one, and then:
 
 - writes assets/fonts/<face>-latin-ext-used.woff2 for every full latin-ext cut
@@ -65,12 +65,13 @@ def used_points(dist):
     needed = parse_range(LATIN_EXT) - parse_range(LATIN)
     found = {}
     for path in sorted(dist.rglob("*")):
-        if not path.is_file() or path.suffix not in {".html", ".js", ".json", ".css"}:
+        if not path.is_file() or path.suffix not in {".html", ".js", ".json", ".css", ".svg"}:
             continue
         if "images" in path.relative_to(dist).parts:
             continue
         text = path.read_text(encoding="utf-8")
-        if path.suffix == ".html":
+        if path.suffix != ".css":
+            # Scripts set entities through innerHTML.
             text = html.unescape(text)
         for ch in set(text):
             if ord(ch) in needed:

@@ -528,17 +528,21 @@ function Add-LatinCharacter([int]$Cp, [string]$Where) {
     }
 }
 # -Include is ignored beside -LiteralPath in Windows PowerShell 5.1, so filter by extension.
-$latinExtScan = Get-ChildItem -LiteralPath $dist -Recurse -File | Where-Object { @('.html', '.js', '.json', '.css') -contains $_.Extension -and $_.FullName.Substring($dist.Length) -notmatch '^\\images\\' }
+$latinExtScan = Get-ChildItem -LiteralPath $dist -Recurse -File | Where-Object { @('.html', '.js', '.json', '.css', '.svg') -contains $_.Extension -and $_.FullName.Substring($dist.Length) -notmatch '^\\images\\' }
 foreach ($scanFile in $latinExtScan) {
-    $scanText = Get-Content -LiteralPath $scanFile.FullName -Raw -Encoding UTF8
-    if ($scanFile.Extension -eq '.html') { $scanText = [System.Net.WebUtility]::HtmlDecode($scanText) }
+    $rawText = Get-Content -LiteralPath $scanFile.FullName -Raw -Encoding UTF8
+    # Scripts set entities through innerHTML (gallery.js, projects.js), so
+    # pages, scripts, data and SVG are all read with their entities decoded.
+    $scanText = if ($scanFile.Extension -eq '.css') { $rawText } else { [System.Net.WebUtility]::HtmlDecode($rawText) }
     $scanWhere = $scanFile.FullName.Substring($dist.Length + 1)
     $latinSeen = New-Object 'System.Collections.Generic.HashSet[int]'
     foreach ($match in [regex]::Matches($scanText, $latinClass)) { if ($latinSeen.Add([int][char]$match.Value)) { Add-LatinCharacter ([int][char]$match.Value) $scanWhere } }
     # Escapes a script, data file or stylesheet sets as text: \u00b7, \u{b7}, \b7.
-    $escapePattern = if ($scanFile.Extension -eq '.css') { '\\([0-9A-Fa-f]{1,6})' } elseif ($scanFile.Extension -ne '.html') { '\\u(?:\{([0-9A-Fa-f]{1,6})\}|([0-9A-Fa-f]{4}))' } else { $null }
+    # A page's escapes are read only inside its inline <script> elements.
+    $escapePattern = if ($scanFile.Extension -eq '.css') { '\\([0-9A-Fa-f]{1,6})' } elseif ($scanFile.Extension -ne '.svg') { '\\u(?:\{([0-9A-Fa-f]{1,6})\}|([0-9A-Fa-f]{4}))' } else { $null }
+    $escapeText = if ($scanFile.Extension -eq '.html') { -join @([regex]::Matches($rawText, '(?is)<script\b[^>]*>(.*?)</script>') | ForEach-Object { $_.Groups[1].Value }) } else { $rawText }
     if ($escapePattern) {
-        foreach ($match in [regex]::Matches($scanText, $escapePattern)) {
+        foreach ($match in [regex]::Matches($escapeText, $escapePattern)) {
             $hex = if ($match.Groups[1].Success) { $match.Groups[1].Value } else { $match.Groups[2].Value }
             $cp = [Convert]::ToInt32($hex, 16)
             if ($cp -le 0xFFFF -and $latinScanPoints.Contains($cp)) { Add-LatinCharacter $cp "$scanWhere (escaped)" }

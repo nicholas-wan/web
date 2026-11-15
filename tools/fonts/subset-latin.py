@@ -7,10 +7,11 @@ Pro 700 and 900: the faces declared with Google Fonts' latin unicode-range in
 assets/css/main.css. Run it after a build whenever verify.ps1 reports a
 character these faces must draw that the subsets lack, then rebuild.
 
-It scans the built site the way verify.ps1 does (every .html, .js, .json and
-.css under dist/ except images/; HTML entities decoded, and \\uXXXX escapes in
-scripts and data and \\XXXX escapes in stylesheets read as the characters
-they stand for). Every character inside the faces' latin range counts, in
+It scans the built site the way verify.ps1 does (every .html, .js, .json, .svg
+and .css under dist/ except images/; HTML entities decoded in all but the
+stylesheets, since scripts set them through innerHTML, and \\uXXXX escapes in
+scripts, data and inline <script> elements and \\XXXX escapes in stylesheets
+read as the characters they stand for). Every character inside the faces' latin range counts, in
 both cases, because text-transform sets titles and labels in capitals. To
 those it adds, always:
 
@@ -85,24 +86,35 @@ def css_range(points):
     return ", ".join(f"U+{s[0]:X}" if len(s) == 1 else f"U+{s[0]:X}-{s[-1]:X}" for s in spans)
 
 
+SCRIPT = re.compile(r"<script\b[^>]*>(.*?)</script>", re.IGNORECASE | re.DOTALL)
+
+
 def scan_text(path):
-    """The file's text plus every character its escapes stand for."""
+    """The file's text plus every character its entities and escapes stand for."""
     text = path.read_text(encoding="utf-8-sig")
-    if path.suffix == ".html":
-        return html.unescape(text)
-    pattern = CSS_ESCAPE if path.suffix == ".css" else JS_ESCAPE
+    if path.suffix == ".css":
+        pattern, escaped, decoded = CSS_ESCAPE, text, text
+    elif path.suffix == ".svg":
+        pattern, escaped, decoded = None, "", html.unescape(text)
+    else:
+        # Scripts set entities through innerHTML, so .js and .json are
+        # entity-decoded too; a page's escapes count only in inline scripts.
+        escaped = "".join(SCRIPT.findall(text)) if path.suffix == ".html" else text
+        pattern, decoded = JS_ESCAPE, html.unescape(text)
+    if pattern is None:
+        return decoded
     extra = []
-    for match in pattern.finditer(text):
+    for match in pattern.finditer(escaped):
         cp = int(next(g for g in match.groups() if g), 16)
         if cp <= 0x10FFFF:
             extra.append(chr(cp))
-    return text + "".join(extra)
+    return decoded + "".join(extra)
 
 
 def used_points(dist, latin):
     found = {}
     for path in sorted(dist.rglob("*")):
-        if not path.is_file() or path.suffix not in {".html", ".js", ".json", ".css"}:
+        if not path.is_file() or path.suffix not in {".html", ".js", ".json", ".css", ".svg"}:
             continue
         if "images" in path.relative_to(dist).parts:
             continue
