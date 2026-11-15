@@ -288,8 +288,8 @@ foreach ($page in $pages) {
         $scriptBytes += (Get-Item -LiteralPath $scriptPath).Length
     }
     # The 80 KB JS ceiling is a real page-weight limit, held at point-of-need and
-    # never bumped on spec -- see the "80 KB per-page JavaScript ceiling" bullet under
-    # "Dead ends" in README.md (the travel page sits essentially at
+    # never bumped on spec -- see the "Keep travel JavaScript deferred" bullet (its
+    # "80 KB initial ceiling") under "Dead ends" in README.md (the travel page sits essentially at
     # it). The warning below flags that headroom in green builds.
     if ($scriptBytes -gt 80KB) { throw "$($page.Name) exceeds the 80 KB raw JavaScript budget." }
     Warn-BudgetHeadroom "$($page.Name) JS" $scriptBytes 80KB

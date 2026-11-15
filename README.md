@@ -565,7 +565,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
   - No large CSS on the travel/atlas route.
   - If needed, bump the budget with a dated rationale comment (like the 40 → 42 note).
 - **Keep travel JavaScript deferred (Oct 2026).** Initial travel bundle loads `travel-discovery.js`, not the atlas; 80 KB initial ceiling; `travel-discovery.js` 7 KB (submit interception and IME state must precede the module); atlas 64 KB, near viewport; search 30 KB, on interaction. Do not restore eager atlas or search scripts.
-- **`.travel-gallery__item--tall` looks unused, isn't.** It pairs with the `guangzhou-gallery__brick--tall` compat class (the only one in markup); SKILL.md mandates the pair; removing it unstyles future journals.
+- **`.travel-gallery__item--tall` looks unused, isn't.** It pairs with the `guangzhou-gallery__brick--tall` compat class (the only one in markup); step 5 of [Travel journals](#travel-journals) mandates the pair; removing it unstyles future journals.
 
 ### Working with these contracts
 
