@@ -4683,6 +4683,9 @@ body.is-map-fullscreen .travel-atlas__layout {
 .page-experience .case-study h2,
 .page-experience .case-study__company-label { text-wrap: balance; }
 .page-experience .case-study__highlights strong:not([data-scramble-row]) { text-wrap: pretty; }
+/* Pretty broke "high-/volume" at the hyphen; this line keeps plain wrapping
+   (its text is pinned whole in verify.ps1, so no no-wrap span). */
+.page-experience #cloud-analytics .case-study__highlights li:first-child strong { text-wrap: wrap; }
 
 .case-study--internship {
   padding: 1.15rem;
@@ -6601,7 +6604,9 @@ a.travel-jump-group__label {
 }
 
 @media screen and (min-width: 601px) and (max-width: 736px) {
-  #main > .travel-pagination { width: calc(100% - 4rem); }
+  /* padding-inline: 0 drops main.css's 2rem `#main > *` pad, so the labels
+     start on the pager's own rule and the gallery edge. */
+  #main > .travel-pagination { width: calc(100% - 4rem); padding-inline: 0; }
 }
 
 .travel-pagination a {
@@ -8836,6 +8841,11 @@ body.page-home #nav {
     left: 1.25rem;
   }
 
+  /* 6px higher, so Today clears the first year pill by about 9px. */
+  .personal-timeline__present {
+    top: calc(0.7rem - 6px);
+  }
+
   .personal-timeline-year {
     margin-bottom: 1.6rem;
   }
@@ -9778,6 +9788,20 @@ body.page-home #nav {
 .photo-results__more {
   display: block;
   margin: 1.5rem auto 0;
+}
+
+/* A leading cross marks Clear search as an action, not another topic chip. */
+.photo-results__clear {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.photo-results__clear::before {
+  content: "\00d7";
+  font-size: 1.25em;
+  font-weight: 400;
+  line-height: 0.8;
 }
 
 .photo-results__more[hidden] {
