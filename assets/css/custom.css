@@ -1410,6 +1410,22 @@ html:has(> body.is-map-fullscreen) {
   color: #28d7c5 !important;
 }
 
+/* The nav's dark-surface ring: the global teal ring is about 2.1:1 on black. */
+#footer a:focus-visible {
+  outline: 2px solid rgba(40, 215, 197, 0.9);
+  outline-offset: 3px;
+}
+
+#return-to-top:focus-visible {
+  outline: 2px solid rgba(40, 215, 197, 0.9);
+  outline-offset: 0;
+}
+
+/* Share the Menu pill's right edge (11px) where the pill shows. */
+@media screen and (max-width: 980px) {
+  #return-to-top { right: 11px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   #return-to-top,
   #return-to-top i {
@@ -5771,9 +5787,10 @@ body:not(.page-home) #wrapper.fade-in::before {
   /* The sheet lays the six pages out as icon tiles, three across
      (8 Nov 2026), in place of a "Navigate" heading over a centred list of
      words. */
+  /* 2rem clears the close button (1.35rem overlapped the top tiles by 9.6px). */
   #navPanel > nav {
     max-width: 30rem;
-    margin: 1.35rem auto 0;
+    margin: 2rem auto 0;
   }
 
   #navPanel .links {
@@ -5783,9 +5800,11 @@ body:not(.page-home) #wrapper.fade-in::before {
     margin: 0.35rem 0 1rem;
   }
 
+  /* padding: 0 drops the theme's left pad, which set the grid off centre. */
   #navPanel .links li,
   #navPanel .links li:first-child {
     margin: 0;
+    padding: 0;
     border: 0;
   }
 
@@ -6673,6 +6692,24 @@ a.travel-jump-group__label {
 
 .site-pager--single .site-pager__link--next {
   grid-column: 2;
+}
+
+/* Below 64rem the pager ran edge to edge; inset it to the footer "Contact"
+   label (4rem a side from 737px, 2rem to 601px). The link's own pad gives the
+   hover tint and arrow room without moving the text. */
+@media screen and (min-width: 601px) {
+  .site-pager__link {
+    --pager-pad: 0.75rem;
+    margin-inline: -0.75rem;
+  }
+}
+
+@media screen and (min-width: 737px) {
+  .site-pager { width: calc(100% - 8rem); }
+}
+
+@media screen and (min-width: 601px) and (max-width: 736px) {
+  .site-pager { width: calc(100% - 4rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {
