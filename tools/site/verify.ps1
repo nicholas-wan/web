@@ -102,7 +102,7 @@ $routeCssOwners = @{
     'travel-map-page.css' = @('travel.html')
     'travel-search.css' = @('travel.html')
     'travel-journal.css' = $journalPageNames
-    'experience-page.css' = @('experience.html', 'projects.html')
+    'experience-page.css' = @('experience.html')
     'projects.css' = @('projects.html')
     'personal-page.css' = @('personal.html')
     'skills-page.css' = @('skills.html')
@@ -504,7 +504,7 @@ if ($iconsCss -notmatch '^/\*!(?:(?!\*/)[\s\S])*Font Awesome Free is licensed un
 if ($sharedCustomCss -match '#main > \.travel-archive-heading \{|\.page-travel-journal header\.major > \.date \{|\.page-travel-journal #header \{|\.japan-journal \.japan-journal__intro \{|\.page-skills \.skills-heading::before \{') { throw 'Generated shared custom.css still contains a route-owned block.' }
 if ($travelMapPageCss -notmatch '\.travel-atlas \{' -or $travelMapPageCss -notmatch '#main > \.travel-archive-heading \{') { throw 'Travel index CSS bundle is missing its atlas or archive block.' }
 if ($travelJournalCss -notmatch '\.page-travel-journal header\.major > \.date \{' -or $travelJournalCss -notmatch '\.page-travel-journal #header \{' -or $travelJournalCss -notmatch '\.japan-journal \.japan-journal__intro \{') { throw 'Travel journal CSS bundle is missing a journal-owned block.' }
-if ($experiencePageCss -notmatch '#main > \.portfolio-headline \{' -or $personalPageCss -notmatch '\.personal-timeline-page > \.personal-timeline \{' -or $skillsPageCss -notmatch '\.page-skills \.skills-heading::before \{') { throw 'A page-specific CSS bundle is missing its route-owned rules.' }
+if ($experiencePageCss -notmatch '#selected-work \{' -or $experiencePageCss -match 'portfolio-headline \{' -or $sharedCustomCss -notmatch '#main > \.portfolio-headline \{' -or $personalPageCss -notmatch '\.personal-timeline-page > \.personal-timeline \{' -or $skillsPageCss -notmatch '\.page-skills \.skills-heading::before \{') { throw 'A page-specific CSS bundle is missing its route-owned rules.' }
 Assert-FileSizeBudget 'assets\js\main.js' 18
 # 14 -> 20: the hunt lens (11 Nov 2026) adds the lens mesh, hunts and touch drift.
 # 20 -> 25: sonar (11 Nov 2026) adds hidden threats that stay found, the lens lean and the find waves.

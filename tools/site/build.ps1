@@ -1284,7 +1284,7 @@ foreach ($page in $pages) {
     if ($tripOrder -contains $slug) { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/travel-journal.css')`" />" }
     if ($slug -eq 'experience') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/experience-page.css')`" /><link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/internship-peek.css')`" />" }
     # Projects speaks the Work page's case-study cards, so it takes Work's bundle and adds its own.
-    if ($slug -eq 'projects') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/experience-page.css')`" /><link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/projects.css')`" />" }
+    if ($slug -eq 'projects') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/projects.css')`" />" }
     if ($slug -eq 'personal') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/personal-page.css')`" />" }
     if ($slug -eq 'skills') { $routeStylesheets += "    <link rel=`"stylesheet`" href=`"$(Get-AssetRef 'assets/css/skills-page.css')`" />" }
     $routeStylesheetMarkup = $routeStylesheets -join "`n"

@@ -4407,24 +4407,8 @@ body.is-map-fullscreen .travel-atlas__layout {
 }
 
 /* Route bundle: experience-base:start */
-/* Single-line page headline replacing the boxed Selected-work banner.
-   #main > out-ranks main.css's ID-weighted `#main > *` spacing. */
-#main > .portfolio-headline {
-  margin: 0;
-  padding: 1.75rem 2rem 0;
-}
-
-.portfolio-headline h1 {
-  margin: 0;
-  color: var(--color-ink-900);
-  font-size: 1.45rem;
-  line-height: 1.2;
-  text-align: left;
-}
-.portfolio-overview {
-  padding: 2rem !important;
-}
-
+/* The headline and overview spacing Work shares with Projects is last in the
+   shared sheet ("Work and Projects opening", end of this file). */
 #selected-work {
   scroll-margin-top: 1.5rem;
 }
@@ -7573,10 +7557,6 @@ body.lightbox-open {
 }
 
 @media screen and (max-width: 736px) {
-  .page-experience .portfolio-overview {
-    padding: 1.15rem !important;
-  }
-
   .page-experience #agentic-ai {
     padding: 1.35rem;
   }
@@ -10895,3 +10875,33 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
   }
 }
 /* Route bundle: journal-polish:end */
+
+/* Work and Projects opening (15 Nov 2026): the single-line headline that
+   replaced the boxed Selected-work banner, and the overview's padding. These
+   were the only rules of experience-page.css that Projects used (1% of it, a
+   render-blocking request), so they moved here. They sit last in the shared
+   sheet so both pages keep the cascade they had at the head of
+   experience-page.css. #main > out-ranks main.css's ID-weighted `#main > *`
+   spacing. */
+#main > .portfolio-headline {
+  margin: 0;
+  padding: 1.75rem 2rem 0;
+}
+
+.portfolio-headline h1 {
+  margin: 0;
+  color: var(--color-ink-900);
+  font-size: 1.45rem;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.portfolio-overview {
+  padding: 2rem !important;
+}
+
+@media screen and (max-width: 736px) {
+  .page-experience .portfolio-overview {
+    padding: 1.15rem !important;
+  }
+}
