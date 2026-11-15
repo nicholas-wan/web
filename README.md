@@ -186,6 +186,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
   - Desktop active tab: build-added empty `.nav-active-mark` after the active link, so it glides.
   - Desktop (≥981px) tab-page titles (Work, Skills, Personal, Travel; owner-approved Oct 2026) share `view-transition-name: page-title`, sized to their text, and glide; the old title is gone by halfway and the new one fades in over the second half, so different words never overlap.
   - `assets/js/page-transitions.js` loads in `<head>` so `pagereveal` binds before first paint.
+  - Speculation Rules prefetch (15 Nov 2026): `build.ps1` puts one inline `<script type="speculationrules">` in every page's head (about 210 bytes of HTML, no per-page JS budget): `moderate` eagerness, so Chromium fetches a site page's HTML on about 200 ms of hover or on pointerdown, and the click is served from that prefetch with the crossfade intact (`deliveryType` `navigational-prefetch`, one document fetch). Paths with a dot (images, assets, `.html`, the manifest), `download` and `target=_blank` links, `mailto:` and other sites are left out. Safari and Firefox ignore it. Prerender was not used: it would run Home's canvas and the Projects demos off screen.
   - Mark and title sit out when they would fly (event pages and the homepage intro: the arriving side only): off-screen on either page (scroll, Back, `#anchor`), House and Pre-Wedding (no header), homepage during the intro fade.
   - Never name `#main` or other large regions (morph shows a blank).
   - Rejected: content drift; Ctrl/⌘K palette.

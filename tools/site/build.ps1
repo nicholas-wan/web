@@ -1311,6 +1311,12 @@ foreach ($page in $pages) {
     if ($bannerPreload) { $preloadMarkup += "`n" + $bannerPreload }
     # Apply approved Travel geometry before first paint, not after its runtime downloads.
     $travelLayoutBootstrap = if ($slug -eq 'travel') { "    <script>document.documentElement.classList.add('travel-timeline','travel-phone-rail');</script>" } else { '' }
+    # Speculation Rules (15 Nov 2026): Chromium fetches a site page's HTML on hover
+    # (about 200 ms before the click) or pointerdown, so the click skips the
+    # document round trip; slow-4G phones paint about 0.1-0.18 s sooner. Pages only:
+    # paths with a dot (images, assets, .html, the manifest), downloads and new tabs
+    # are left out. Inline JSON, so it costs no per-page JavaScript budget.
+    $speculationRules = '    <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/*.*"}},{"not":{"selector_matches":"[download],[target=_blank]"}}]},"eagerness":"moderate"}]}</script>'
     $template = @"
 <!DOCTYPE HTML>
 <html lang="en">
@@ -1337,6 +1343,7 @@ $routeStylesheetMarkup
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
     <link rel="manifest" href="site.webmanifest" />
     <script src="$(Get-AssetRef 'assets/js/page-transitions.js')"></script>
+$speculationRules
 </head>
 <body class="$bodyClass">
 $canvasMarkup
