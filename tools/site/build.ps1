@@ -635,7 +635,7 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
         param($match)
         $id = "journal-route-$($state.Index)"
         $state.Index++
-        $stops = [regex]::Matches($match.Groups['stops'].Value, '(?s)<span class="[^"]*\bguangzhou-route__stop\b[^"]*">\s*<span>(?<name>.*?)</span>\s*(?:<small>(?<small>.*?)</small>)?')
+        $stops = [regex]::Matches($match.Groups['stops'].Value, '(?s)<span class="[^"]*\bguangzhou-route__stop\b[^"]*">\s*<span(?: lang="[^"]+")?>(?<name>.*?)</span>\s*(?:<small(?: lang="[^"]+")?>(?<small>.*?)</small>)?')
         if ($stops.Count -eq 0) { throw "A route on $Slug has no stops." }
         $summary = & $place $stops[0]
         if ($stops.Count -gt 1) {
@@ -1372,9 +1372,9 @@ $navigation
                 <section>
                     <h2>Contact</h2>
                     <ul class="icons alt">
-                        <li><a href="mailto:nicholaswan@live.com.sg" class="icon fa fa-envelope"><span class="label">Email</span></a></li>
-                        <li><a href="https://github.com/nicholas-wan" target="_blank" rel="noopener noreferrer" class="icon fa-github"><span class="label">GitHub</span></a></li>
-                        <li><a href="https://www.linkedin.com/in/nicholas-wan/" target="_blank" rel="noopener noreferrer" class="icon fa-linkedin"><span class="label">LinkedIn</span></a></li>
+                        <li><a href="mailto:nicholaswan@live.com.sg" class="icon fa fa-envelope" aria-label="Email"><span class="label">Email</span></a></li>
+                        <li><a href="https://github.com/nicholas-wan" target="_blank" rel="noopener noreferrer" class="icon fa-github" aria-label="GitHub"><span class="label">GitHub</span></a></li>
+                        <li><a href="https://www.linkedin.com/in/nicholas-wan/" target="_blank" rel="noopener noreferrer" class="icon fa-linkedin" aria-label="LinkedIn"><span class="label">LinkedIn</span></a></li>
                     </ul>
                 </section>
             </section>

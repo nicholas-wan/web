@@ -879,7 +879,7 @@
      level change mid-flight). The activeTrip guard drops the deferred card if
      the visitor has reset, closed the overlay, or chosen another trip. */
   var tripEntryTimer = 0;
-  var selectTripAndEnter = function (tripKey) {
+  var selectTripAndEnter = function (tripKey, key) {
     var stops = stopsForTrip(tripKey);
     // Record the pre-entry view before the fit begins so a later outside click
     // can glide back to it. setActiveTrip's own close clears returnView, so
@@ -895,6 +895,8 @@
       if (activeTrip !== tripKey) return;
       var firstStopLink = linkForPoint(stops[0]);
       if (firstStopLink) showPointDetails(stops[0], firstStopLink);
+      // Enter or Space hid the pin that had focus; carry it to the card.
+      if (key && !detailCard.hidden) detailCardClose.focus();
     }, reducedMotionQuery.matches ? 0 : 560);
   };
 
@@ -928,10 +930,8 @@
     detailCardImage.alt = point[1] + ' journal photograph';
     loadSectionImage(point).then(function (image) {
       if (imageRequest !== detailImageRequest || selectedDetail !== link) return;
-      /* Clear the loading state on failure too. Without an error path a 404 —
-         which the journal-page fallback can produce on any host that does not
-         rewrite the extensionless URLs — left the card stuck at opacity 0.24
-         with no way back. */
+      /* Clear the loading state on failure too: a 404 (hosts that do not
+         rewrite extensionless URLs) left the card stuck at opacity 0.24. */
       var settleImage = function () {
         detailCard.classList.remove('is-image-loading');
         detailCardImage.onload = null;
@@ -1056,10 +1056,8 @@
     setActiveTrip('', false);
     closePointDetails(false, true);
     setActiveRegion('');
-    /* lastFocused is normally the teaser button, but the teaser is display:none
-       above 520px — so leaving the phone breakpoint mid-session (a rotation)
-       made this a silent no-op and focus fell to <body> once the close button
-       was hidden. Only restore focus to something still rendered. */
+    /* lastFocused is usually the teaser, display:none above 520px: after a
+       rotation focus fell to <body>. Restore only to something rendered. */
     if (canReceiveFocus(lastFocused)) {
       lastFocused.focus();
     } else if (map && typeof map.focus === 'function') {
@@ -1173,7 +1171,7 @@
       var tripKey = marker.getAttribute('data-map-trip');
       if (!TRIPS[tripKey]) return;
       event.preventDefault();
-      selectTripAndEnter(tripKey);
+      selectTripAndEnter(tripKey, event.key);
     };
     marker.addEventListener('pointerup', enterMarkerTrip);
     marker.addEventListener('keydown', function (event) {

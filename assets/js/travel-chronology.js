@@ -99,8 +99,8 @@
   };
   const stopAll = () => { stopGuide(); entries.forEach(stop); };
   section.addEventListener('tour-pause', () => { stopAll(); schedule(500); });
-  // Pointer focus can remain on an icon after the mouse leaves. Only keyboard
-  // focus should keep the tour paused once hover has ended.
+  // Pointer focus can stay on an icon after the mouse leaves; only keyboard
+  // focus keeps the tour paused once hover ends.
   const canGuide = () => inView && !section.hidden && !document.hidden && !reduced.matches && !hovered && !keyboardPaused && !section.classList.contains('tour-paused');
   const play = (entry, automatic = false) => {
     entries.forEach(item => clearTimeout(item.intent));
@@ -225,7 +225,7 @@
  const links=[...track.querySelectorAll('.chronology-trip')];
  // Fit all ten stops within one view; dates carry time, spacing carries order.
  const scroller=timeline.querySelector('.chronology-scroll');
- // Year marks start each year's run on the line, so the alternating lanes still read in order.
+ // Year marks start each year's run, so the alternating lanes still read in order.
  const years=links.map((link,i)=>{const year=link.dataset.start.slice(0,4);if(i&&links[i-1].dataset.start.startsWith(year))return null;const mark=document.createElement('span');mark.className='chronology-year';mark.setAttribute('aria-hidden','true');mark.textContent=year;track.append(mark);return mark;});
  let previousWidth=0;
  function fit(){
@@ -318,8 +318,8 @@
  if(!scenes.length||!window.HTMLDialogElement)return;
  const loupe=document.createElement('button');loupe.type='button';loupe.className='scene-loupe';
  loupe.innerHTML='<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="6.8" cy="6.8" r="4.4"/><path d="m10.1 10.1 3.6 3.6"/></svg>';
- const viewer=document.createElement('dialog');viewer.className='scene-viewer';
- viewer.innerHTML='<button class="scene-viewer__close" type="button" aria-label="Close">&times;</button><div class="scene-viewer__art"></div><p class="scene-viewer__meta"><strong></strong><span></span><a>Read journal &rarr;</a></p>';
+ const viewer=document.createElement('dialog');viewer.className='scene-viewer';viewer.setAttribute('aria-labelledby','sv-name');
+ viewer.innerHTML='<button class="scene-viewer__close" type="button" aria-label="Close">&times;</button><div class="scene-viewer__art"></div><p class="scene-viewer__meta"><strong id="sv-name"></strong><span></span><a>Read journal &rarr;</a></p>';
  document.body.append(viewer);
  const box=viewer.children[1],[name,date,link]=viewer.children[2].children,phone=matchMedia('(max-width:736px)');
  let scene=null,hide,loop;

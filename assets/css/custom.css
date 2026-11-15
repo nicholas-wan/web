@@ -6374,6 +6374,16 @@ a.travel-jump-group__label {
   color: #fff;
 }
 
+/* The rail and its chip strip clip overflow, which cut 2-6px off the outside
+   ring; ring inside the edge instead (white on the filled teal chip). */
+.travel-section-nav a:focus-visible {
+  outline-offset: -3px;
+}
+
+.travel-section-nav a.is-active:focus-visible {
+  outline-color: #fff;
+}
+
 /* On phones and tablets the rail remains a continuation of the dark journal
    opening after it sticks. Keeping one surface avoids a white toolbar flashing
    against the black header while the menu control is being re-homed. */
@@ -6803,7 +6813,8 @@ a:focus-visible,
 button:focus-visible,
 summary:focus-visible,
 [role="button"]:focus-visible {
-  outline: 3px solid rgba(18, 138, 134, 0.55);
+  /* Solid: the 0.55 tint was 2.1:1 on white (WCAG 1.4.11 asks 3:1); this is 4.3:1. */
+  outline: 3px solid #128a86;
   outline-offset: 3px;
 }
 
@@ -6909,8 +6920,24 @@ ul.icons li a.icon:hover::before,
 
 .journal-lightbox-trigger[role="button"]:focus-visible,
 .masonry .content[role="button"]:focus-visible {
-  outline: 3px solid rgba(18, 138, 134, 0.72);
+  outline: 3px solid #128a86;
   outline-offset: 3px;
+}
+
+/* A tile fills its clipping .brick, so an outside ring never showed, and the
+   photo paints over an inset outline: draw the ring on a layer above it. */
+.masonry .content[role="button"]:focus-visible {
+  outline-offset: -3px;
+}
+
+.masonry .content[role="button"]:focus-visible::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border: 3px solid #128a86;
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
 }
 
 /* Without this, mobile browsers hold every tap ~300ms on these controls waiting
@@ -8087,7 +8114,7 @@ body.lightbox-open {
 }
 
 .personal-event-card:focus-visible {
-  outline: 3px solid color-mix(in srgb, var(--timeline-accent) 42%, transparent) !important;
+  outline: 3px solid var(--timeline-accent) !important;
   outline-offset: 3px;
 }
 
@@ -9434,6 +9461,11 @@ body.page-home #nav {
 .photo-search__input::-webkit-search-decoration {
   -webkit-appearance: none;
   display: none;
+}
+
+/* The theme's #909498 placeholder was 3.05:1 on white; ink-500 is 4.7:1. */
+.photo-search__input::placeholder {
+  color: var(--color-ink-500) !important;
 }
 
 .photo-search__input:focus {

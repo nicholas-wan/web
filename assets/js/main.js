@@ -26,7 +26,7 @@
 		revealPage();
 	}
 
-	// Build the mobile navigation sheet.
+	// Mobile sheet; its toggle leads the Tab order.
 	var navPanelToggle = document.createElement('a');
 	navPanelToggle.href = '#navPanel';
 	navPanelToggle.id = 'navPanelToggle';
@@ -34,7 +34,7 @@
 	navPanelToggle.setAttribute('aria-controls', 'navPanel');
 	navPanelToggle.setAttribute('aria-expanded', 'false');
 	navPanelToggle.textContent = 'Menu';
-	wrapper.appendChild(navPanelToggle);
+	nav.after(navPanelToggle);
 
 	var mobileContextBar = document.querySelector('.mobile-context-bar');
 	if (mobileContextBar) {
@@ -42,7 +42,7 @@
 		navPanelToggle.classList.add('alt');
 	}
 	else if (body.classList.contains('page-home')) {
-		body.appendChild(navPanelToggle);
+		body.prepend(navPanelToggle);
 		navPanelToggle.classList.add('alt');
 	}
 
