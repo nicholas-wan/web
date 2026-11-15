@@ -7,8 +7,25 @@ test.describe.configure({ mode: 'parallel' });
 
 async function settled(page) {
   await expect(page.locator('.travel-map__canvas')).toHaveAttribute('data-map-detail', /^(region|area|stop)$/);
-  // Covers the map's fly-to, fade and debounced label measurement.
-  await page.waitForTimeout(700);
+  // Covers the map's fly-to, fade and debounced label measurement: wait until the
+  // map has stopped interacting and no label, list entry or card has moved or
+  // faded for 250 ms (at least 300 ms in all), instead of a fixed 700 ms.
+  await page.evaluate(() => new Promise(resolve => {
+    const viewport = document.querySelector('.travel-map__viewport');
+    const snapshot = () => (viewport.classList.contains('is-map-interacting') ? 'busy|' : '') + [...document.querySelectorAll('.travel-map__detail-label, .travel-map__place, .travel-map__label-list a, [data-map-detail-card]')].map(el => {
+      const box = el.getBoundingClientRect();
+      return `${el.className} ${box.left} ${box.top} ${box.width} ${box.height} ${getComputedStyle(el).opacity} ${el.hidden}`;
+    }).join('|');
+    const start = performance.now();
+    let last = snapshot(), since = start;
+    const tick = () => {
+      const now = performance.now(), current = snapshot();
+      if (current !== last) { last = current; since = now; }
+      if (!current.startsWith('busy|') && now - since >= 250 && now - start >= 300) resolve();
+      else requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }));
   expect((await page.evaluate(audit)).errors).toEqual([]);
 }
 
