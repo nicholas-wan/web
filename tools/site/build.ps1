@@ -1329,6 +1329,9 @@ foreach ($page in $pages) {
     # document round trip; slow-4G phones paint about 0.1-0.18 s sooner. Pages only:
     # paths with a dot (images, assets, .html, the manifest), downloads and new tabs
     # are left out. Inline JSON, so it costs no per-page JavaScript budget.
+    # Last in <body>, not in <head>: in the head, WebKit crashed on click-navigating
+    # into Travel (with its parse-time photo-seeds script) and grew a Personal
+    # card by 32px (15 Nov 2026).
     $speculationRules = '    <script type="speculationrules">{"prefetch":[{"where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":"/*.*"}},{"not":{"selector_matches":"[download],[target=_blank]"}}]},"eagerness":"moderate"}]}</script>'
     $template = @"
 <!DOCTYPE HTML>
@@ -1356,7 +1359,6 @@ $routeStylesheetMarkup
     <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png" />
     <link rel="manifest" href="site.webmanifest" />
     <script src="$(Get-AssetRef 'assets/js/page-transitions.js')"></script>
-$speculationRules
 </head>
 <body class="$bodyClass">
 $canvasMarkup
@@ -1380,6 +1382,7 @@ $navigation
     </div>
     <script src="$(Get-AssetRef 'assets/js/main.js')"></script>
 $optionalScripts
+$speculationRules
 </body>
 </html>
 "@

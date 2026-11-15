@@ -361,3 +361,24 @@ test('home has four cards in nav order, and the last finishes its entrance at th
   const tops = await cards.evaluateAll((cs) => cs.map((c) => Math.round(c.getBoundingClientRect().top)));
   expect(new Set(tops).size).toBe(1);
 });
+
+// With the speculation rules in the head, WebKit crashed the page on a link click into
+// Travel (page.goto did not), so this test clicks a real link from another page. The
+// crash showed only with normal motion, not the suite default of reduced (15 Nov 2026).
+test('clicking into Travel from another page keeps the page alive and renders the timeline', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/personal');
+  await page.waitForLoadState('load');
+  await page.waitForTimeout(1000);
+  // A crash would leave later waits hanging until the test timeout, so race it.
+  const crashed = page.waitForEvent('crash', { timeout: 0 }).then(() => 'crashed', () => 'closed');
+  await page.locator('#nav a[href="travel"]').click();
+  const arrived = page.waitForURL(/\/travel$/).then(() => page.waitForLoadState('load')).then(() => 'arrived');
+  arrived.catch(() => {});
+  expect(await Promise.race([crashed, arrived])).toBe('arrived');
+  await expect(page.locator('html')).toHaveClass(/travel-timeline/);
+  await expect(page.locator('.photo-explore__cards > a')).toHaveCount(4);
+  await expect(page.locator('.photo-explore__cards > a').first()).toBeVisible();
+  expect(await page.evaluate(() => document.readyState)).toBe('complete');
+});
