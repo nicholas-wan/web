@@ -105,6 +105,7 @@ python .\tools\images\convert-curated-webp.py
 
 - `make-touch-icons.py` regenerates the home-screen icons from the owner-approved "NW" monogram.
 - Animations ship as an H.264 MP4 plus a static `-poster.webp`. Do not add animated WebP or GIF tiles.
+- `node tools/css/peek-breathe-halo.cjs` writes the Work page chips' breathing-halo keyframes into `custom.css` between the `/* peek-halo:start */` and `/* peek-halo:end */` markers; change the breath there and rerun it, never by hand.
 - `tools/maps/generate-world-map.ps1` rebuilds `images/travel/world-map.svg` at `-Tolerance 0.25`, keeping every feature, sub-pixel islets included.
 - Do not re-encode originals. (The one-off `tools/legacy/` capping and GIF-conversion scripts were removed on 5 Nov 2026; they are in git history.)
 

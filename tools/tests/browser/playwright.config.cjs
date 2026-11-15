@@ -6,7 +6,8 @@ module.exports = defineConfig({
   testDir: '.',
   testMatch: '*.spec.cjs',
   timeout: 120000,
-  workers: 4,
+  // Six locally (146 s to 118 s on this laptop, 15 Nov 2026); four on CI's runner.
+  workers: process.env.CI ? 4 : 6,
   // Every test opens its own page and shares no state, so tests of one file can
   // run on different workers. Serial files left one worker running projects.spec
   // (23 tests, about 90 s in WebKit) after the other three had finished.
