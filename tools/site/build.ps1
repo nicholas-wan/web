@@ -367,6 +367,9 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
 
     $destinationRoot = Join-Path $OutputRoot 'images'
     New-Item -ItemType Directory -Path $destinationRoot -Force | Out-Null
+    if (-not ('SiteBuild.HardLink' -as [type])) {
+        Add-Type -Namespace SiteBuild -Name HardLink -MemberDefinition '[DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] public static extern bool CreateHardLink(string lpFileName, string lpExistingFileName, IntPtr lpSecurityAttributes);'
+    }
     $publishedImageIndex = @{}
     foreach ($publishedFile in Get-ChildItem -LiteralPath $destinationRoot -Recurse -File -ErrorAction SilentlyContinue) {
         $publishedImageIndex[$publishedFile.FullName.ToLowerInvariant()] = $publishedFile
@@ -399,10 +402,14 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
                 $sourceInfo.LastWriteTimeUtc -gt $destinationInfo.LastWriteTimeUtc
         }
         if ($copyRequired) {
-            # .NET calls instead of New-Item/Copy-Item per file; File.Copy keeps
-            # LastWriteTime, which the incremental check above relies on.
+            # A hard link, not a copy: the bytes and LastWriteTime are the source's,
+            # and a new copy of each of ~2,900 images made antivirus scan it again when
+            # verify first read it (about 4 s of a 17 s check, Nov 2026). Delete first:
+            # writing over an existing link would write into the source image.
+            # File.Copy (which keeps LastWriteTime) stays the fallback off this volume.
             [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($destination))
-            [IO.File]::Copy($source, $destination, $true)
+            if ($destinationInfo) { [IO.File]::Delete($destination) }
+            if (-not [SiteBuild.HardLink]::CreateHardLink($destination, $source, [IntPtr]::Zero)) { [IO.File]::Copy($source, $destination, $true) }
             $copied++
         }
     }
