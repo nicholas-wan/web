@@ -1359,7 +1359,8 @@ html:has(> body.is-map-fullscreen) {
 /* Route bundle: gallery-tiles:end */
 
 /* Dark like the Menu pill, with a teal chevron (15 Nov 2026; it was a
-   translucent silver disc). Hover moves the ring to teal, nothing jumps. */
+   translucent silver disc). Its ring is 0.24, not the pill's 0.14, so it
+   still shows on the dark Projects page. Hover moves the ring to teal. */
 #return-to-top {
   position: fixed;
   bottom: 20px;
@@ -1374,7 +1375,7 @@ html:has(> body.is-map-fullscreen) {
   justify-content: center;
   border-radius: 50%;
   background: #11181a;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0.25rem 0.9rem rgba(0, 0, 0, 0.35);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.24), 0 0.25rem 0.9rem rgba(0, 0, 0, 0.35);
   color: #28d7c5;
   text-decoration: none;
   opacity: 0;
@@ -4256,6 +4257,11 @@ body.is-map-fullscreen .travel-atlas__layout {
     background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+/* 18px line icons: at the box's 0.92rem they read light and small. */
+#intro .portfolio-hero__cta-icon::before {
+  font-size: 1.125rem;
+}
+
 #intro .portfolio-hero__cta-label {
   position: relative;
   z-index: 1;
@@ -4385,8 +4391,9 @@ body.is-map-fullscreen .travel-atlas__layout {
     padding-right: 2.5rem;
   }
 
+  /* Centred on the title's x-height (the line icon sat 9px high). */
   .homepage .homepage-link__icon {
-    top: 1rem;
+    top: 1.58rem;
     transform:
       translateY(calc((1 - var(--ip, 1)) * 0.4rem))
       scale(calc(0.92 + var(--ip, 1) * 0.08));
@@ -6744,14 +6751,19 @@ ul.icons li a.icon:hover::before,
 }
 
 /* Footer contact icons: the bar's line drawings (.nav-social__icon paths),
-   as masks so no page's HTML grows, in the Menu pill's 1px ring, teal on
+   as masks so no page's HTML grows, 22px at the nav's 1.8 stroke, in the
+   hero discs' 1px 0.3 ring (0.14 read as disabled on black), teal on
    hover (15 Nov 2026; they were filled glyphs in 2px rings). */
-#footer .icon.fa-envelope::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zM3 7l9 6 9-6'/%3E%3C/svg%3E"); }
-#footer .icon.fa-github::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21'/%3E%3C/svg%3E"); }
-#footer .icon.fa-linkedin::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 1 0-4 0M3 7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z'/%3E%3C/svg%3E"); }
+#footer .icon.fa-envelope::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zM3 7l9 6 9-6'/%3E%3C/svg%3E"); }
+#footer .icon.fa-github::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21'/%3E%3C/svg%3E"); }
+#footer .icon.fa-linkedin::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 1 0-4 0M3 7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z'/%3E%3C/svg%3E"); }
 
 #footer ul.icons.alt li .icon {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+#footer ul.icons li .icon::before {
+  font-size: 1.375rem;
 }
 
 #footer ul.icons.alt li a.icon:hover {
