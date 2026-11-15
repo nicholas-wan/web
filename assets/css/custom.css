@@ -1222,8 +1222,15 @@ html:has(> body.is-map-fullscreen) {
   transition: opacity var(--motion-slow) ease-in-out,
     transform var(--motion-slow) var(--ease-standard),
     filter var(--motion-slow) ease-in-out;
-  backface-visibility: hidden; /* Remove Image flickering on hover */
   object-fit: cover;
+}
+/* Remove image flickering on hover (Mar 2020). Hover devices only: it makes
+   every image its own compositor layer, 134 on USA & Canada, and phones
+   spent most of each scroll frame on them (Nov 2026). */
+@media (hover: hover) {
+  .masonry .brick img {
+    backface-visibility: hidden;
+  }
 }
 
 /* Masonry on tablets */
