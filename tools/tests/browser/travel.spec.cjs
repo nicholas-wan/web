@@ -9,19 +9,26 @@ async function settled(page) {
   await expect(page.locator('.travel-map__canvas')).toHaveAttribute('data-map-detail', /^(region|area|stop)$/);
   // Covers the map's fly-to, fade and debounced label measurement: wait until the
   // map has stopped interacting and no label, list entry or card has moved or
-  // faded for 250 ms (at least 300 ms in all), instead of a fixed 700 ms.
-  await page.evaluate(() => new Promise(resolve => {
+  // faded for 400 ms, instead of a fixed 700 ms. The map's longest timer is
+  // finishFullscreenClose's 220 ms. Gives up after 10 s, naming what still moved.
+  await page.evaluate(() => new Promise((resolve, reject) => {
     const viewport = document.querySelector('.travel-map__viewport');
-    const snapshot = () => (viewport.classList.contains('is-map-interacting') ? 'busy|' : '') + [...document.querySelectorAll('.travel-map__detail-label, .travel-map__place, .travel-map__label-list a, [data-map-detail-card]')].map(el => {
+    if (!viewport) { reject(new Error('settled(): the page has no .travel-map__viewport')); return; }
+    const snapshot = () => [viewport.classList.contains('is-map-interacting') ? 'map viewport still has is-map-interacting' : '', ...[...document.querySelectorAll('.travel-map__detail-label, .travel-map__place, .travel-map__label-list a, [data-map-detail-card]')].map(el => {
       const box = el.getBoundingClientRect();
-      return `${el.className} ${box.left} ${box.top} ${box.width} ${box.height} ${getComputedStyle(el).opacity} ${el.hidden}`;
-    }).join('|');
+      return `${el.className} "${(el.textContent || '').trim().slice(0, 40)}" ${box.left} ${box.top} ${box.width} ${box.height} ${getComputedStyle(el).opacity} ${el.hidden}`;
+    })];
     const start = performance.now();
-    let last = snapshot(), since = start;
+    let last = snapshot(), since = start, changed = 'nothing';
     const tick = () => {
       const now = performance.now(), current = snapshot();
-      if (current !== last) { last = current; since = now; }
-      if (!current.startsWith('busy|') && now - since >= 250 && now - start >= 300) resolve();
+      if (current.join('|') !== last.join('|')) {
+        const index = current.findIndex((entry, i) => entry !== last[i]);
+        changed = current[0] || (index < 0 ? `the number of map elements (${last.length - 1} to ${current.length - 1})` : `${last[index] || '(none)'} -> ${current[index]}`);
+        last = current; since = now;
+      }
+      if (!current[0] && now - since >= 400) resolve();
+      else if (now - start >= 10000) reject(new Error(`settled(): the map did not stay still for 400 ms within 10 s; last change: ${current[0] || changed}`));
       else requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
