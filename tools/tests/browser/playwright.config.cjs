@@ -7,6 +7,10 @@ module.exports = defineConfig({
   testMatch: '*.spec.cjs',
   timeout: 120000,
   workers: 4,
+  // Every test opens its own page and shares no state, so tests of one file can
+  // run on different workers. Serial files left one worker running projects.spec
+  // (23 tests, about 90 s in WebKit) after the other three had finished.
+  fullyParallel: true,
   // CI retries a failed test twice so one timing blip on the shared runner
   // does not fail the deploy; Playwright still reports it as flaky. Local
   // runs stay strict.
