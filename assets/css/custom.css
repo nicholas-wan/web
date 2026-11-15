@@ -1321,49 +1321,48 @@ html:has(> body.is-map-fullscreen) {
 
 /* Route bundle: gallery-tiles:end */
 
+/* Dark like the Menu pill, with a teal chevron (15 Nov 2026; it was a
+   translucent silver disc). Hover moves the ring to teal, nothing jumps. */
 #return-to-top {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: silver;
-    width: 50px;
-    height: 50px;
-    display: block;
-    text-decoration: none;
-    -webkit-border-radius: 35px;
-    -moz-border-radius: 35px;
-    border-radius: 35px;
-	transition: background-color var(--motion-standard) ease,
-      opacity var(--motion-standard) ease;
-	opacity: 0;
-	pointer-events: none;
-	visibility: hidden;
-	z-index:3;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 3;
+  display: flex;
+  width: 3rem;
+  height: 3rem;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #11181a;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0.25rem 0.9rem rgba(0, 0, 0, 0.35);
+  color: #28d7c5;
+  text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: box-shadow 150ms ease, opacity var(--motion-standard) ease;
 }
 
 #return-to-top.is-visible {
-	opacity: 0.6;
-	pointer-events: auto;
-	visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
 }
 
 #return-to-top i {
-    color: black;
-    margin: 0;
-    position: relative;
-    left: 16px;
-    top: 0px;
-    font-size: 19px;
-	transition: color var(--motion-standard) ease,
-      top var(--motion-standard) var(--ease-standard);
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1;
 }
-#return-to-top:hover {
-	background: silver;
-	opacity: 0.85;
-}
-#return-to-top:hover i {
-    color: black;
-    top: -15px;
+
+/* !important beats the site-wide a:hover brand-700, too dark on the disc. */
+#return-to-top:hover,
+#return-to-top:focus-visible {
+  box-shadow: 0 0 0 1px #28d7c5, 0 0.25rem 0.9rem rgba(0, 0, 0, 0.35);
+  color: #28d7c5 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -5586,8 +5585,10 @@ body:not(.page-home) #wrapper.fade-in::before {
   }
 
   /* Dark like the bar, with a teal menu icon (15 Nov 2026 review: the
-     light-grey pill was the brightest off-palette object on every page). */
-  #navPanelToggle {
+     light-grey pill was the brightest off-palette object on every page).
+     .alt too: the theme's scrolled .alt out-ranks a bare id. */
+  #navPanelToggle,
+  #navPanelToggle.alt {
     display: inline-flex;
     border-radius: 999px;
     background: #11181a;
@@ -5595,6 +5596,10 @@ body:not(.page-home) #wrapper.fade-in::before {
     color: #e9f6f5;
     /* The theme sets 0.8rem (11.7px) on phones; keep the 12px phone floor. */
     font-size: max(var(--text-floor), 0.8rem);
+  }
+
+  #navPanelToggle.alt:hover {
+    background: #11181a;
   }
 
   /* The floating pill otherwise sits over card text at reading position.
@@ -5927,24 +5932,6 @@ body:not(.page-home) #wrapper.fade-in::before {
     padding: 0 1rem;
   }
 
-  /* The name sits left in the same row as the Menu pill (15 Nov 2026),
-     where the boxed house used to sit centred. */
-  #header:has(> .site-name) {
-    align-items: flex-start;
-    justify-content: flex-start;
-    padding: 0.75rem 1rem 1rem 1.15rem;
-  }
-
-  #header .logo.site-name {
-    gap: 0.5rem;
-    padding: 0;
-    border: 0 !important;
-    color: #ffffff;
-    font: 700 1.05rem/1 var(--font-display);
-    letter-spacing: 0;
-    text-transform: none;
-  }
-
   .portfolio-overview {
     padding: 1rem !important;
   }
@@ -5989,6 +5976,33 @@ body:not(.page-home) #wrapper.fade-in::before {
     font-size: 1.35rem;
   }
 
+}
+
+/* The name sits left in the same row as the Menu pill (15 Nov 2026),
+   where the boxed house used to sit centred; tablets too, not the theme's
+   14rem box. The gutter lines it up with the page text on phones and the
+   white sheet's edge on tablets. */
+@media screen and (max-width: 980px) {
+  #header:has(> .site-name) {
+    height: 4.75rem;
+    min-height: 4.75rem;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0.75rem 1rem 1rem var(--opening-gutter);
+  }
+
+  #header .logo.site-name {
+    display: inline-flex;
+    min-height: 3rem;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    border: 0 !important;
+    color: #ffffff;
+    font: 700 1.05rem/1 var(--font-display);
+    letter-spacing: 0;
+    text-transform: none;
+  }
 }
 
 /* Earlier-work selectors carry .page-experience so they out-rank the
@@ -6674,6 +6688,25 @@ ul.icons li a.icon:hover::before,
 #footer h2 {
   font-size: max(var(--text-floor), 0.8rem);
   letter-spacing: var(--eyebrow-tracking);
+}
+
+/* Footer contact icons: the bar's line drawings (.nav-social__icon paths),
+   as masks so no page's HTML grows, in the Menu pill's 1px ring, teal on
+   hover (15 Nov 2026; they were filled glyphs in 2px rings). */
+#footer .icon.fa-envelope::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zM3 7l9 6 9-6'/%3E%3C/svg%3E"); }
+#footer .icon.fa-github::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21'/%3E%3C/svg%3E"); }
+#footer .icon.fa-linkedin::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 1 0-4 0M3 7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z'/%3E%3C/svg%3E"); }
+
+#footer ul.icons.alt li .icon {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+#footer ul.icons.alt li a.icon:hover {
+  box-shadow: inset 0 0 0 1px #28d7c5;
+}
+
+#footer ul.icons li a.icon:hover::before {
+  color: #28d7c5;
 }
 
 /* Route bundle: gallery-bricks:start */
@@ -9809,8 +9842,8 @@ html .travel-atlas__header > div > p { margin:.65rem 0 0; max-width:55rem; color
    much space"): the same serif title, larger, then one rhythm on every page:
    44px above the label on every page, label to title 0.7rem, title to lede 0.75rem,
    heading to content 2.25rem. No rules or lines; Projects' line under its
-   heading gives way to the same space. Phones take 1.85rem titles (they were
-   1.5rem) in the phone block below. */
+   heading gives way to the same space. Phones and tablets take 1.85rem titles
+   (they were 1.5rem) in the block below. */
 html .page-experience .portfolio-headline h1,
 html .page-skills #main > .post header.major.skills-heading h2,
 html .personal-timeline__intro h1,
@@ -9971,6 +10004,8 @@ html .page-experience .case-study--internship .case-study__tags li {
  html .page-skills #main > .post,
  html .personal-timeline-page > .personal-timeline,
  html #main > .travel-atlas { padding-top:1.5rem !important; }
+}
+@media(max-width:980px) {
  html .page-experience .portfolio-headline h1,
  html .page-skills #main > .post header.major.skills-heading h2,
  html .personal-timeline__intro h1,

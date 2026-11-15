@@ -190,7 +190,7 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
   await chip(league).click();
   await expect(chip(league)).toHaveAttribute('aria-expanded','false');
   await expect(toTop).toHaveCSS('pointer-events','auto');
-  await expect(toTop).toHaveCSS('opacity','0.6');
+  await expect(toTop).toHaveCSS('opacity','1');
  }
 });
 
