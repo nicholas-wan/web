@@ -299,6 +299,11 @@
   text-align: left;
 }
 
+/* Outside WebKit only (16 Nov 2026): Safari re-wraps whole paragraphs, leaving ragged lines on phones. */
+@supports not (hanging-punctuation: first) {
+  .toolkit-card__detail > p { text-wrap: pretty; }
+}
+
 .tech-stack {
   margin-top: 0.5rem;
   padding: 1.5rem;
@@ -3593,6 +3598,11 @@ body.is-map-fullscreen .travel-atlas__layout {
   text-align: left;
 }
 
+/* Outside WebKit only (16 Nov 2026): Safari re-wraps whole paragraphs, leaving ragged lines on phones. */
+@supports not (hanging-punctuation: first) {
+  .guangzhou-day__note { text-wrap: pretty; }
+}
+
 /* Australia keeps its older markup: a bare intro paragraph and no lede.
    Give the paragraph the day-note treatment and the header the gap every
    other journal has below its banner (Oct 2026). */
@@ -4680,9 +4690,13 @@ body.is-map-fullscreen .travel-atlas__layout {
 /* No single word left on a heading or label line. */
 .page-experience .case-study h2,
 .page-experience .case-study__company-label { text-wrap: balance; }
-/* No text-wrap: pretty on highlights, Skills details, Personal card text or
-   journal notes: WebKit re-wraps the whole paragraph, leaving 27-34% gaps at
-   390px (15 Nov 2026). */
+/* Outside WebKit only (16 Nov 2026): Safari re-wraps whole paragraphs, leaving ragged lines on phones. */
+@supports not (hanging-punctuation: first) {
+  .page-experience .case-study__highlights strong:not([data-scramble-row]) { text-wrap: pretty; }
+  /* Pretty broke "high-/volume" at the hyphen; this line keeps plain wrapping
+     (its text is pinned whole in verify.ps1, so no no-wrap span). */
+  .page-experience #cloud-analytics .case-study__highlights li:first-child strong { text-wrap: wrap; }
+}
 
 .case-study--internship {
   padding: 1.15rem;
@@ -8390,6 +8404,10 @@ body.lightbox-open {
   line-height: 1.2;
 }
 
+/* Outside WebKit only (16 Nov 2026): Safari re-wraps whole paragraphs, leaving ragged lines on phones. */
+@supports not (hanging-punctuation: first) {
+  .personal-event-card__body > span:not([class]) { text-wrap: pretty; }
+}
 
 .personal-event-card__body > span:not(.personal-event-card__meta):not(.personal-event-card__open) {
   color: var(--color-ink-500);
