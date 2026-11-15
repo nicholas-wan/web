@@ -5198,21 +5198,90 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
 }
 
 /* Route bundle: experience-base:end */
-/* Quieter, more compact desktop section navigation. */
+/* Desktop bar (15 Nov 2026, owner: "i do like removing the home icon and
+   making the header", from the lab/nav-polish mockups after Linear, Vercel
+   and Cursor). The name and mark lead the bar and are the way home, so the
+   boxed house above it is gone; the bar is slim, glassy and stays at the top
+   of the tab pages. Tabs are muted and brighten on hover; the current one is
+   white with a teal line glowing upward from the bar's foot. */
 @media screen and (min-width: 981px) {
   #nav {
-    height: 3.25rem;
-    margin-top: -3.25rem;
+    height: 3.5rem;
+    margin-top: -3.5rem;
     padding-right: 1rem;
-    background: rgba(7, 19, 21, 0.36);
-    line-height: 3.25rem;
+    align-items: center;
+    overflow: visible;
+    background: rgba(3, 7, 8, 0.78);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+    line-height: 3.5rem;
   }
 
-  /* Each tab leads with an icon for what the page holds (8 Nov 2026), so
-     the bar reads at a glance rather than as six words; sentence-case 700
-     labels, as in the phone sheet, read faster than tracked capitals. */
+  /* Pages whose header is the name (tab pages and 404; not journals, whose
+     masthead and trip toolbar stay, nor event pages, which have no header):
+     no box above the bar, and the bar stays with the reader. */
+  #header:has(> .site-name) {
+    display: none;
+  }
+
+  #header:has(> .site-name) + #nav {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    margin-top: 0;
+  }
+
+  html:has(#header > .site-name) {
+    scroll-padding-top: 3.5rem;
+  }
+
+  #nav a {
+    border-bottom: 0;
+  }
+
+  /* Last in the markup, so in the phone sheet (main.js moves every child
+     of #nav there) it follows the tiles, hidden; first in the bar. */
+  #nav .nav-brand {
+    display: inline-flex;
+    position: relative;
+    flex: none;
+    order: -1;
+    align-items: center;
+    gap: 0.55rem;
+    height: 100%;
+    margin-right: 0.75rem;
+    padding: 0 1.25rem 0 1.15rem;
+    color: #ffffff;
+    font: 700 0.98rem/1 var(--font-display);
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+  }
+
+  #nav .nav-brand:hover {
+    color: #ffffff !important;
+  }
+
+  /* A hairline between the name and the tabs. */
+  #nav .nav-brand::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: -0.375rem;
+    width: 1px;
+    height: 1.25rem;
+    margin-top: -0.625rem;
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  #nav .nav-brand:focus-visible {
+    outline: 2px solid rgba(40, 215, 197, 0.9);
+    outline-offset: -4px;
+  }
+
   #nav ul.links {
-    letter-spacing: 0.015em;
+    align-self: stretch;
+    letter-spacing: 0.005em;
     text-transform: none;
   }
 
@@ -5220,29 +5289,31 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0 1.15rem;
-    font-size: 0.84rem;
-    font-weight: 700;
-    letter-spacing: 0.015em;
+    padding: 0 0.95rem;
+    color: rgba(233, 246, 245, 0.66) !important;
+    font-size: 0.86rem;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    transition: color var(--motion-fast) ease;
   }
 
   #nav .nav-icon {
-    width: 1.15rem;
-    height: 1.15rem;
-    color: var(--color-brand-200);
+    width: 1.05rem;
+    height: 1.05rem;
+    color: rgba(152, 201, 198, 0.7);
     stroke-width: 1.8;
     transition: color var(--motion-fast) ease;
   }
 
-  /* Hover (0.07 fill, a softer teal icon) shows, yet stays weaker than the
-     current tab (0.11 fill, bright teal icon, teal underline), so the two
-     never read as one selected block (8 Nov 2026: 0.04 hardly showed). */
+  /* Hover brightens the label and warms the icon, weaker than the current
+     tab, which also carries the teal line. */
   #nav ul.links li a:hover {
-    background-color: rgba(255, 255, 255, 0.07);
+    background: none;
+    color: #ffffff !important;
   }
 
   #nav ul.links li a:hover .nav-icon {
-    color: rgba(40, 215, 197, 0.7);
+    color: rgba(40, 215, 197, 0.85);
   }
 
   #nav ul.links li.active .nav-icon {
@@ -5258,7 +5329,8 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
 
   /* The active-tab highlight is its own element: the build adds an empty
      .nav-active-mark after the active link, so a page change can glide it
-     from the old tab to the new one (see "Page changes" below). */
+     from the old tab to the new one (see "Page changes" below). Its glow
+     points up only, so it never bleeds onto the white sheet. */
   #nav ul.links li.active {
     position: relative;
     background: none;
@@ -5272,9 +5344,11 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
   #nav .nav-active-mark {
     display: block;
     position: absolute;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.11);
-    box-shadow: inset 0 -2px 0 rgba(40, 215, 197, 0.72);
+    inset: auto 0.95rem 0 0.95rem;
+    height: 2px;
+    border-radius: 2px 2px 0 0;
+    background: #28d7c5;
+    box-shadow: 0 -2px 8px rgba(40, 215, 197, 0.35);
     pointer-events: none;
     view-transition-name: nav-active-mark;
   }
@@ -5284,10 +5358,81 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     color: #ffffff !important;
   }
 
-  #nav ul.icons a {
-    min-width: 3rem;
-    min-height: 3rem;
+  #nav ul.icons {
+    display: flex;
+    align-self: stretch;
+    align-items: center;
   }
+
+  #nav ul.icons li {
+    display: flex;
+    align-items: center;
+  }
+
+  #nav ul.icons a {
+    min-width: 2.75rem;
+    min-height: 3rem;
+    color: rgba(233, 246, 245, 0.6) !important;
+  }
+
+  #nav ul.icons a:hover {
+    color: #ffffff !important;
+  }
+}
+
+/* The name and mark (bar on desktop, header row on phones). The mark echoes
+   the homepage canvas: three nodes, one link and node lit teal. */
+.site-mark {
+  flex: none;
+  color: #e9f6f5;
+}
+
+.site-mark path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.site-mark__links {
+  stroke: currentColor;
+  stroke-width: 1.6;
+  opacity: 0.55;
+}
+
+.site-mark__lit {
+  stroke: #28d7c5;
+  stroke-width: 1.8;
+}
+
+.site-mark circle {
+  fill: currentColor;
+}
+
+.site-mark circle.site-mark__lit-node {
+  fill: #28d7c5;
+}
+
+/* Below 981px the bar is hidden and its name with it; the header row
+   carries the name there, and the sheet keeps .nav-brand hidden. */
+.nav-brand {
+  display: none;
+}
+
+/* Social links are line drawings, like the tabs (they were filled glyphs). */
+.icon.nav-social::before {
+  content: none !important;
+  display: none !important;
+}
+
+.nav-social__icon {
+  flex: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 /* Home and the social icons sit on the dark bar, where the site-wide ring
@@ -5440,12 +5585,14 @@ body:not(.page-home) #wrapper.fade-in::before {
     transform: none;
   }
 
+  /* Dark like the bar, with a teal menu icon (15 Nov 2026 review: the
+     light-grey pill was the brightest off-palette object on every page). */
   #navPanelToggle {
     display: inline-flex;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow: 0 0.18rem 0.8rem rgba(3, 14, 30, 0.2);
-    color: #212931;
+    background: #11181a;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.14), 0 0.25rem 0.9rem rgba(0, 0, 0, 0.35);
+    color: #e9f6f5;
     /* The theme sets 0.8rem (11.7px) on phones; keep the 12px phone floor. */
     font-size: max(var(--text-floor), 0.8rem);
   }
@@ -5458,6 +5605,10 @@ body:not(.page-home) #wrapper.fade-in::before {
      sticky nav re-home the toggle as a static, always-visible control. */
   :is(#wrapper, body) > #navPanelToggle {
     transition: transform 0.25s ease, opacity 0.25s ease;
+  }
+
+  :is(#wrapper, body) > #navPanelToggle::before {
+    color: #28d7c5;
   }
 
   :is(#wrapper, body) > #navPanelToggle.is-scrolled-away {
@@ -5774,6 +5925,24 @@ body:not(.page-home) #wrapper.fade-in::before {
     align-items: center;
     font-size: 1rem;
     padding: 0 1rem;
+  }
+
+  /* The name sits left in the same row as the Menu pill (15 Nov 2026),
+     where the boxed house used to sit centred. */
+  #header:has(> .site-name) {
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0.75rem 1rem 1rem 1.15rem;
+  }
+
+  #header .logo.site-name {
+    gap: 0.5rem;
+    padding: 0;
+    border: 0 !important;
+    color: #ffffff;
+    font: 700 1.05rem/1 var(--font-display);
+    letter-spacing: 0;
+    text-transform: none;
   }
 
   .portfolio-overview {
@@ -8386,7 +8555,7 @@ body.page-home #nav {
    pages), so the About scene settles under it (game.js centres it below). */
 @media screen and (min-width: 981px) {
   body.page-home #intro {
-    min-height: calc(100vh - 3.25rem);
+    min-height: calc(100vh - 3.5rem);
   }
 
   body.page-home #nav {
@@ -9635,6 +9804,43 @@ html .page-opening-eyebrow { display:block; margin:0 0 .5rem; color:var(--color-
 html .page-skills .skills-heading p,
 html .personal-timeline__intro p,
 html .travel-atlas__header > div > p { margin:.65rem 0 0; max-width:55rem; color:var(--color-ink-500); font:300 max(var(--text-floor), .9rem)/1.65 var(--font-body); text-align:left; }
+/* Page headings, "More air" (15 Nov 2026, owner: "ok push" after the
+   lab/nav-polish heading options; tightened after "vercel doesnt have so
+   much space"): the same serif title, larger, then one rhythm on every page:
+   44px above the label on every page, label to title 0.7rem, title to lede 0.75rem,
+   heading to content 2.25rem. No rules or lines; Projects' line under its
+   heading gives way to the same space. Phones take 1.85rem titles (they were
+   1.5rem) in the phone block below. */
+html .page-experience .portfolio-headline h1,
+html .page-skills #main > .post header.major.skills-heading h2,
+html .personal-timeline__intro h1,
+html .travel-atlas__header h1 { text-wrap:balance; }
+@media screen and (min-width: 981px) {
+  html .page-experience #main > .portfolio-headline,
+  html .page-skills #main > .post,
+  html .personal-timeline-page > .personal-timeline,
+  html #main > .travel-atlas { padding-top:2.75rem !important; }
+  html .page-experience #main > .portfolio-headline { padding-bottom:0 !important; margin-bottom:0 !important; }
+  html .page-experience:not(.page-projects) .portfolio-overview { padding-top:2.25rem !important; }
+  html .page-skills #main > .post header.major.skills-heading,
+  html .personal-timeline__intro,
+  html #main > .travel-atlas .travel-atlas__header { margin-bottom:2.25rem !important; }
+  html .travel-atlas__header > div:first-child { margin-bottom:1.75rem !important; }
+  html .page-projects .app-rail { border-top-color:transparent !important; }
+  html .page-projects .page-opening-eyebrow { color:#5fe0d2 !important; }
+  html .page-skills .skills-heading::before,
+  html .travel-atlas__eyebrow,
+  html .page-opening-eyebrow { margin-bottom:.7rem !important; }
+  html .page-experience .portfolio-headline h1,
+  html .page-skills #main > .post header.major.skills-heading h2,
+  html .personal-timeline__intro h1,
+  html .travel-atlas__header h1 { font-size:clamp(2.4rem, 3vw, 2.9rem) !important; line-height:1.1 !important; letter-spacing:-.022em; }
+  html .page-skills .skills-heading p,
+  html .personal-timeline__intro p,
+  html .travel-atlas__header > div > p,
+  html .page-projects .projects-intro { margin-top:.75rem !important; max-width:44rem; font-size:1.1rem !important; line-height:1.6 !important; color:#56656b; text-wrap:pretty; }
+  html .page-projects .projects-intro { color:rgba(233, 246, 245, .68) !important; }
+}
 /* Route bundle: experience-internships:start */
 /* Internship entries, owner-approved 18 Oct 2026. Keep descriptions and tags
    together so company metadata cannot stretch the gap between them. */
@@ -9768,7 +9974,7 @@ html .page-experience .case-study--internship .case-study__tags li {
  html .page-experience .portfolio-headline h1,
  html .page-skills #main > .post header.major.skills-heading h2,
  html .personal-timeline__intro h1,
- html .travel-atlas__header h1 { font-size:1.5rem !important; }
+ html .travel-atlas__header h1 { font-size:1.85rem !important; line-height:1.2 !important; }
 }
 
 html .page-skills #main > .post { border-top:0; }
