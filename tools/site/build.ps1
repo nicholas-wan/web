@@ -412,10 +412,29 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
             # and a new copy of each of ~2,900 images made antivirus scan it again when
             # verify first read it (about 4 s of a 17 s check, Nov 2026). Delete first:
             # writing over an existing link would write into the source image.
-            # File.Copy (which keeps LastWriteTime) stays the fallback off this volume.
+            # File.Copy (which keeps LastWriteTime) stays the fallback off this volume
+            # or whenever the link path fails. A stale destination is never a link to
+            # this source (it would match its length and time), so clearing its
+            # read-only flag, which Delete needs, leaves the source alone.
             [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($destination))
-            if ($destinationInfo) { [IO.File]::Delete($destination) }
-            if (-not [SiteBuild.HardLink]::CreateHardLink($destination, $source, [IntPtr]::Zero)) { [IO.File]::Copy($source, $destination, $true) }
+            $linked = $false
+            try {
+                if ($destinationInfo -and [IO.File]::Exists($destination)) {
+                    $attributes = [IO.File]::GetAttributes($destination)
+                    if ($attributes -band [IO.FileAttributes]::ReadOnly) { [IO.File]::SetAttributes($destination, $attributes -band -bnot [IO.FileAttributes]::ReadOnly) }
+                    [IO.File]::Delete($destination)
+                }
+                $linked = [SiteBuild.HardLink]::CreateHardLink($destination, $source, [IntPtr]::Zero)
+            } catch { $linked = $false }
+            if (-not $linked) {
+                # Delete again rather than copy over: a leftover link would carry the
+                # copy into whatever file it shares. A delete that still fails throws.
+                if ([IO.File]::Exists($destination)) {
+                    [IO.File]::SetAttributes($destination, [IO.FileAttributes]::Normal)
+                    [IO.File]::Delete($destination)
+                }
+                [IO.File]::Copy($source, $destination)
+            }
             $copied++
         }
     }
