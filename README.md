@@ -94,6 +94,7 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 - `.github/workflows/pages.yml` checks out `master`, runs `tools/site.ps1 check` under Windows PowerShell 5.1 and deploys `dist/`. The Pages source must remain **GitHub Actions**; the custom domain lives in Pages settings, which `CNAME` does not replace.
 - Before upload, CI runs the search and lightbox Node suites, then the Playwright suites in `tools/tests/browser` (Chromium geometry, WebKit smoke) against `dist/`. A failure blocks deployment and uploads screenshots and traces.
 - Local run after `site.ps1 check`: `cd tools/tests/browser`, `npm ci`, `npx playwright install chromium webkit`, `npm test`. Interactive audits may reuse the read-only `geometry.cjs`.
+- File times follow content (15 Nov 2026): Pages builds each ETag from the file's mtime and size, and the build writes every file anew, so every deploy (often several a day) changed every ETag and a visitor back after the 10-minute `max-age` re-downloaded everything (Germany journal on slow 4G: 694 KB, LCP 3.96 s, against 6 KB and 0.59 s on the 304 path). The last step before upload sets each `dist/` file's mtime from its SHA-256 (2001-2009 dates; about 1 s for 3,000 files), identical across clean builds; `upload-pages-artifact@v4` tars with GNU tar, which keeps mtimes. After a deploy, check an unchanged file kept its ETag: `curl -sI https://nicholaswan.me/images/projects/squashbot-poster.webp | grep -i etag` before and after the next deploy.
 
 ### Asset tooling
 
