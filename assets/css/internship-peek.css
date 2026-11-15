@@ -62,7 +62,7 @@
   text-transform: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: box-shadow var(--motion-fast) ease, transform var(--motion-fast) ease;
+  transition: box-shadow var(--motion-fast) ease, transform var(--motion-fast) ease, color var(--motion-fast) ease;
 }
 .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-peek__chip::after {
   content: "";
@@ -691,7 +691,7 @@
   line-height: 1.35;
 }
 .page-experience #agentic-ai .internship-demo-hint strong { color: #28d7c5; font-weight: 700; }
-.page-experience #agentic-ai .internship-demo-hint + .internship-demo-peek { margin-top: 0.22rem; }
+.page-experience #agentic-ai .internship-demo-hint + .internship-demo-peek { margin-top: 0.7rem; }
 @media screen and (max-width: 736px), screen and (hover: none) {
   .page-experience #agentic-ai .internship-demo-hint .anomaly-peek__hint-hover { display: none; }
   .page-experience #agentic-ai .internship-demo-hint .anomaly-peek__hint-touch { display: inline; }

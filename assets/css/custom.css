@@ -4653,6 +4653,11 @@ body.is-map-fullscreen .travel-atlas__layout {
   line-height: 1.4;
 }
 
+/* No single word left on a line; the scrambled row keeps its own wrap. */
+.page-experience .case-study h2,
+.page-experience .case-study__company-label { text-wrap: balance; }
+.page-experience .case-study__highlights strong:not([data-scramble-row]) { text-wrap: pretty; }
+
 .case-study--internship {
   padding: 1.15rem;
   background: var(--color-surface-subtle);
@@ -4716,6 +4721,12 @@ body.is-map-fullscreen .travel-atlas__layout {
   border: 1px solid #dde5e7;
   border-radius: 0.65rem;
   background: #f8faf9;
+  transition: border-color var(--motion-standard) ease;
+}
+
+/* The box's edge warms on hover like the cards inside it. */
+@media (hover: hover) {
+  #main > .earlier-work:has(> summary:hover) { border-color: rgba(18, 138, 134, 0.38); }
 }
 
 .earlier-work summary {
@@ -4724,9 +4735,14 @@ body.is-map-fullscreen .travel-atlas__layout {
   justify-content: space-between;
   gap: 1rem;
   padding: 1.3rem 1.5rem;
+  /* Rounds the focus ring to the box's corners. */
+  border-radius: calc(0.65rem - 1px);
   cursor: pointer;
   list-style: none;
 }
+
+/* The theme's 1.65 leading left 21px between title and subtitle. */
+.earlier-work summary > span:first-child { line-height: 1.35; }
 
 .earlier-work summary::-webkit-details-marker { display: none; }
 
@@ -4868,7 +4884,7 @@ body.is-map-fullscreen .travel-atlas__layout {
    a muted "hover/tap a chart" so it reads as something to do. */
 .page-experience #cloud-analytics .anomaly-peek__hint {
   flex-basis: 100%;
-  margin: 0.25rem 0 0;
+  margin: 0.25rem 0 0.2rem;
   color: #68727e;
   font-family: var(--font-display);
   font-size: max(var(--text-floor), 0.8rem);
@@ -4901,7 +4917,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   text-transform: none;
   white-space: nowrap;
   cursor: pointer;
-  transition: box-shadow var(--motion-fast) ease, transform var(--motion-fast) ease;
+  transition: box-shadow var(--motion-fast) ease, transform var(--motion-fast) ease, color var(--motion-fast) ease;
 }
 .page-experience #cloud-analytics .anomaly-peek__chip[aria-expanded="true"] {
   box-shadow: inset 0 0 0 1px var(--color-brand-600), 0 4px 12px rgba(12, 102, 99, 0.14);
@@ -5194,7 +5210,7 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     align-items: stretch;
     gap: 0.45rem;
   }
-  .page-experience #cloud-analytics .anomaly-peek__hint { grid-column: 1 / -1; margin: 0.15rem 0 0; }
+  .page-experience #cloud-analytics .anomaly-peek__hint { grid-column: 1 / -1; margin: 0.15rem 0 0.25rem; }
   .page-experience #cloud-analytics .anomaly-peek__chip::after { display: none; }
   .page-experience #cloud-analytics .anomaly-peek__chip {
     flex-direction: column;
