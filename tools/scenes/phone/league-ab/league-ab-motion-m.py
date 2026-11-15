@@ -144,7 +144,7 @@ TITLE_Y, TOP, BASE, XLAB = 196.0, 204.0, 291.0, 305.0
 SX, SY = (X1 - X0) / 168, (BASE - TOP) / 90   # the plot, scaled from the desktop's 168 x 90
 STEPS = [  # caption, note lines, the figure's vertical centre it sits beside
     ("Randomise", ["Each user", "sees A or B", "at random."], None),
-    ("Measure", ["B’s match rate", "is higher, and", "it’s significant."], None),
+    ("Measure", ["B's match rate", "is higher, and", "it's significant."], None),
 ]
 
 

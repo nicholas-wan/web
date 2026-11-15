@@ -52,7 +52,7 @@ TX, TY = W / 2 - S * sum(ART_X) / 2, TOP_PAD - S * ART_TOP
 CAP_Y = S * ART_BOTTOM + TY + GAP + CAP_ASC
 STEPS = [  # caption, centre x (the existing captions'), note lines (phone wording)
     ("Randomise", 92, ["Each user sees", "A or B at random."]),
-    ("Measure", 255, ["B’s match rate is higher,", "and it’s significant."]),
+    ("Measure", 255, ["B's match rate is higher,", "and it's significant."]),
 ]
 # The label's closing words, with the verdict the Measure note now states.
 OLD_END, NEW_END = "until they stand apart, with B's higher.", "until they stand apart: B's match rate is higher, and the difference is statistically significant."

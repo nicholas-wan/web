@@ -65,7 +65,7 @@ STOP_PHRASES = [
     ("bubble tram", "train"),
     ("fishing boat", "cruise"),
     ("cantonese opera", "cantonese food"),
-    ("their apartment", "hotel"),
+    ("yingxian's apartment", "hotel"),
     ("menlo park", "park"),
     ("green island", "island"),
     ("niagara falls", "waterfall"),
