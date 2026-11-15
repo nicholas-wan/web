@@ -894,13 +894,14 @@ if ($japan -notmatch 'sizes="\(max-width: 736px\) 100vw, \(max-width: 1024px\) c
 # their own measured slots in the source HTML (Oct 2026): tiles are 331px at 1440
 # and 441px at 1920 (20vw, the journal precedent: 1x stays on -480 with no upscale and
 # 2x on -800 rather than the originals), 273px at 1024 (27vw), two-up ~305px at 800 (40vw) and
-# single-column 561px at 737 (76vw); the timeline image column is 275px up to
-# 1680 and 366px at the 16pt root. Phones get the truthful 85/90vw up to DPR 2.5
+# single-column 561px at 737 (76vw); the timeline image column is 215-234px up to
+# 1680 and 312px at the 16pt root (re-measured 15 Nov 2026 after the steady-cards
+# redesign; 275/366px sent -800 to 2x laptops, 1001 KB against 439 KB). Phones get the truthful 85/90vw up to DPR 2.5
 # and a 266px cap above it so a DPR-3 phone keeps the -800 tier instead of the
 # 1067-1600px originals. The old 250px/800px default sent 1600px house WebPs and
 # 800w files to 313px phone cards and full originals to 2x desktops.
 $tileSizes = '(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 90vw, (max-width: 767px) 76vw, (max-width: 1023px) 40vw, (max-width: 1279px) 27vw, 20vw'
-$personalCardSizes = '(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 85vw, (max-width: 1680px) 275px, 366px'
+$personalCardSizes = '(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 85vw, (max-width: 1680px) 234px, 312px'
 # Nov 2026: four-up tiles are 224px to 1365px, 244px to 1680px and 325px above;
 # the slot claims 240px in the middle band so 2x laptops take -480 (2.0x), not -800.
 # Two-up sparse days (328px tiles) keep 20vw.
