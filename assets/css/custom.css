@@ -297,7 +297,6 @@
   font-size: 0.88rem;
   line-height: 1.6;
   text-align: left;
-  text-wrap: pretty;
 }
 
 .tech-stack {
@@ -3592,7 +3591,6 @@ body.is-map-fullscreen .travel-atlas__layout {
   color: var(--color-ink-600);
   line-height: 1.75;
   text-align: left;
-  text-wrap: pretty;
 }
 
 /* Australia keeps its older markup: a bare intro paragraph and no lede.
@@ -4679,13 +4677,12 @@ body.is-map-fullscreen .travel-atlas__layout {
   line-height: 1.4;
 }
 
-/* No single word left on a line; the scrambled row keeps its own wrap. */
+/* No single word left on a heading or label line. */
 .page-experience .case-study h2,
 .page-experience .case-study__company-label { text-wrap: balance; }
-.page-experience .case-study__highlights strong:not([data-scramble-row]) { text-wrap: pretty; }
-/* Pretty broke "high-/volume" at the hyphen; this line keeps plain wrapping
-   (its text is pinned whole in verify.ps1, so no no-wrap span). */
-.page-experience #cloud-analytics .case-study__highlights li:first-child strong { text-wrap: wrap; }
+/* No text-wrap: pretty on highlights, Skills details, Personal card text or
+   journal notes: WebKit re-wraps the whole paragraph, leaving 27-34% gaps at
+   390px (15 Nov 2026). */
 
 .case-study--internship {
   padding: 1.15rem;
@@ -4879,7 +4876,7 @@ body.is-map-fullscreen .travel-atlas__layout {
 
 .earlier-work__grid a {
   display: inline-flex;
-  min-height: 3rem;
+  min-height: max(44px, 3rem);
   align-items: center;
   color: var(--color-brand-700);
   font-family: var(--font-display);
@@ -5954,7 +5951,8 @@ body:not(.page-home) #wrapper.fade-in::before {
 
   .mobile-context-bar__back {
     display: inline-flex;
-    min-height: 3rem;
+    /* 3rem is 40px where the root shrinks (320-360px). */
+    min-height: max(44px, 3rem);
     align-items: center;
     border: 0 !important;
     color: var(--color-ink-800) !important;
@@ -6858,14 +6856,17 @@ ul.icons li a.icon:hover::before,
 
 /* Footer contact icons: the bar's line drawings (.nav-social__icon paths),
    as masks so no page's HTML grows, 22px at the nav's 1.8 stroke, in the
-   hero discs' 1px 0.3 ring (0.14 read as disabled on black), teal on
-   hover (15 Nov 2026; they were filled glyphs in 2px rings). */
+   a 1px 0.4 ring (0.14 read as disabled on black; the hero discs' 0.3 was
+   2.6:1, under 1.4.11's 3:1), teal on hover (15 Nov 2026; they were filled
+   glyphs in 2px rings). */
 #footer .icon.fa-envelope::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zM3 7l9 6 9-6'/%3E%3C/svg%3E"); }
 #footer .icon.fa-github::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21'/%3E%3C/svg%3E"); }
 #footer .icon.fa-linkedin::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 1 0-4 0M3 7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z'/%3E%3C/svg%3E"); }
 
 #footer ul.icons.alt li .icon {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+  /* The 22px glyph's line box set a lower baseline: 45px items, not 44. */
+  vertical-align: top;
 }
 
 #footer ul.icons li .icon::before {
@@ -6958,8 +6959,7 @@ ul.icons li a.icon:hover::before,
 @media screen and (max-width: 980px) {
   #intro .portfolio-hero__cta,
   #intro .portfolio-hero__cta:hover,
-  #intro .portfolio-hero__cta:focus-visible,
-  .earlier-work__grid a {
+  #intro .portfolio-hero__cta:focus-visible {
     min-height: 3rem;
   }
 
@@ -8390,7 +8390,6 @@ body.lightbox-open {
   line-height: 1.2;
 }
 
-.personal-event-card__body > span:not([class]) { text-wrap: pretty; }
 
 .personal-event-card__body > span:not(.personal-event-card__meta):not(.personal-event-card__open) {
   color: var(--color-ink-500);
