@@ -101,6 +101,11 @@
   margin: 0;
 }
 
+/* Text in a row starts at one height, whatever the logo's size. */
+@media screen and (min-width: 981px) {
+  .page-skills .education-details { align-self: start; }
+}
+
 .education-program {
   min-height: 1.35em;
   color: var(--color-ink-800);
@@ -292,6 +297,7 @@
   font-size: 0.88rem;
   line-height: 1.6;
   text-align: left;
+  text-wrap: pretty;
 }
 
 .tech-stack {
@@ -1231,6 +1237,11 @@ html:has(> body.is-map-fullscreen) {
   .masonry .brick img {
     backface-visibility: hidden;
   }
+}
+
+/* Column gutters match the row gutters. */
+.masonry {
+  column-gap: 1.25rem;
 }
 
 /* Masonry on tablets */
@@ -5916,10 +5927,11 @@ body:not(.page-home) #wrapper.fade-in::before {
     height: 3.5rem;
     align-items: center;
     justify-content: space-between;
-    padding: 0 0.35rem 0 0.9rem;
+    /* Back link on the gallery's 2rem edge; the menu icon's right edge too. */
+    padding: 0 calc(2rem - 1.05rem) 0 2rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    background: rgba(255, 255, 255, 0.97);
-    box-shadow: 0 0.25rem 0.75rem rgba(3, 14, 30, 0.08);
+    background: #fff;
+    box-shadow: none;
   }
 
   .mobile-context-bar__back {
@@ -5953,6 +5965,11 @@ body:not(.page-home) #wrapper.fade-in::before {
     margin: 0;
     font-size: 1rem;
   }
+}
+
+/* Tablets: the gallery sits 6rem in (the sheet's 2rem plus 4rem). */
+@media screen and (min-width: 737px) and (max-width: 980px) {
+  .mobile-context-bar { padding: 0 calc(6rem - 1.05rem) 0 6rem; }
 }
 
 /* Route bundle: event-context-bar:end */
@@ -7875,6 +7892,8 @@ body.lightbox-open {
   font-size: max(var(--text-floor), 0.68rem);
   font-weight: 700;
   letter-spacing: 0.08em;
+  /* The 12px floor with the theme's leading made Today taller than the year pills. */
+  line-height: 1.2;
   text-transform: uppercase;
   transform: translateX(-50%);
 }
@@ -8055,6 +8074,13 @@ body.lightbox-open {
   object-fit: cover;
   object-position: var(--focus-x, 50%) var(--focus-y, 50%);
   transition: transform var(--motion-slow) var(--ease-standard);
+}
+
+/* Keeps the photographer's mark (top left of house_1) out of the frame at
+   every tile shape; the slot itself does not change. */
+.personal-event-card[href="house"] .personal-event-card__image img {
+  scale: 1.12;
+  transform-origin: 50% 100%;
 }
 
 .personal-event-card__image--slideshow {
@@ -8294,6 +8320,8 @@ body.lightbox-open {
   font-weight: 700;
   line-height: 1.2;
 }
+
+.personal-event-card__body > span:not([class]) { text-wrap: pretty; }
 
 .personal-event-card__body > span:not(.personal-event-card__meta):not(.personal-event-card__open) {
   color: var(--color-ink-500);
@@ -9017,8 +9045,9 @@ body.page-home #nav {
     text-align: left;
   }
 
+  /* 1.15rem matches the Tech stack heading's gap to its tiles. */
   .page-skills .education-heading {
-    margin: 2rem 0 0.6rem !important;
+    margin: 2rem 0 1.15rem !important;
   }
 
   .page-skills .education-heading h2,
@@ -9183,7 +9212,7 @@ body.page-home #nav {
   }
 
   .page-skills #main > .post header.major.education-heading {
-    margin: 2rem 0 0.6rem !important;
+    margin: 2rem 0 1.15rem !important;
   }
 
   .page-skills #main > .post header.major.skills-heading {
@@ -9957,6 +9986,12 @@ html .page-experience .portfolio-headline h1,
 html .page-skills #main > .post header.major.skills-heading h2,
 html .personal-timeline__intro h1,
 html .travel-atlas__header h1 { text-wrap:balance; }
+html .page-projects .page-opening-eyebrow { color:#5fe0d2 !important; }
+/* Projects is dark: the GitHub mark stays white on hover (the site-wide
+   a:hover teal dimmed it) and the focus ring is the light teal (the global
+   ring is 2.15:1 here). The demos' own rings out-rank this one. */
+html .page-projects a.app-card__repo:hover { color:#fff !important; }
+html .page-projects :is(a, button):focus-visible { outline-color:#5fe0d2; }
 @media screen and (min-width: 981px) {
   html .page-experience #main > .portfolio-headline,
   html .page-skills #main > .post,
@@ -9969,7 +10004,8 @@ html .travel-atlas__header h1 { text-wrap:balance; }
   html #main > .travel-atlas .travel-atlas__header { margin-bottom:2.25rem !important; }
   html .travel-atlas__header > div:first-child { margin-bottom:1.75rem !important; }
   html .page-projects .app-rail { border-top-color:transparent !important; }
-  html .page-projects .page-opening-eyebrow { color:#5fe0d2 !important; }
+  html .page-projects .portfolio-overview { padding-top:2.25rem !important; }
+  html .page-projects .app-rail { margin-top:0; padding-top:0; }
   html .page-skills .skills-heading::before,
   html .travel-atlas__eyebrow,
   html .page-opening-eyebrow { margin-bottom:.7rem !important; }

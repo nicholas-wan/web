@@ -691,7 +691,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card__kind{letter-spacing:.08em;white-space:nowrap}
 .page-projects .app-card__icon{width:52px;height:52px}}
 @media screen and (max-width:980px){.page-projects .app-stage{--halo:calc(216px*var(--pf,.88)) calc(352px*var(--pf,.88))}
-.page-projects .app-stage::before{inset:-4% 0}}
+.page-projects .app-stage::before{inset:-9% 0}}
 @media (min-width:981px){.page-projects .app-card__foot{flex-direction:column;align-items:flex-start;gap:0;height:auto;padding:.5rem 1rem 0}
 .page-projects .app-card__foot figcaption{max-width:none}
 .page-projects .app-demo__reset{height:36px!important;min-height:36px;margin:0 0 0 -.85rem}}
