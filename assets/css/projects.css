@@ -29,7 +29,6 @@
 .page-projects .app-card__repo svg{width:22px;height:22px;fill:currentColor}
 .page-projects .app-card__repo--private{color:var(--pj-muted)}
 .page-projects .app-card__repo--private svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.page-projects .app-card__dek{margin-top:.55rem!important;font:400 1rem/1.6 Merriweather,Georgia,serif}
 .page-projects .app-why{display:grid;gap:.75rem;margin:1.15rem 0 0!important;padding:1.1rem 0 0;list-style:none;border-top:1px solid var(--pj-rule)}
 .page-projects .app-why li{display:grid;grid-template-columns:22px minmax(0,1fr);align-items:start;gap:.75rem;margin:0;padding:0}
 .page-projects .app-why__icon{display:inline-flex;width:22px;height:22px;margin-top:-1px}
@@ -379,7 +378,6 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .app-demo--packing .pk-bar{overflow:visible}
 .app-demo--packing .pk-bar::after{content:"";position:absolute;top:50%;left:clamp(8px,var(--fill),calc(100% - 8px));width:16px;height:16px;translate:-50% -50%;border-radius:50%;background:var(--ground) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M16 10h4a2 2 0 0 1 0 4h-4l-4 7h-3l2 -7h-4l-2 2h-3l2 -4l-2 -4h3l2 2h4l-2 -7h3z' fill='%230F6E6B'/%3E%3C/svg%3E") center/12px no-repeat;transition:left .52s var(--ease),opacity .28s}
 .app-demo--packing .pk-bar:is([aria-valuenow="100"],[aria-valuenow="0"])::after{opacity:0}
-.app-demo--packing .pk-h1{font-size:20px;font-weight:600;letter-spacing:-.01em;white-space:nowrap}
 .app-demo--packing .pk-nights{display:flex;align-items:center;height:30px;padding:0 3px;border:1px solid var(--seam-2);border-radius:99px;background:var(--panel)}
 .app-demo--packing .pk-nights button{width:25px;height:25px;border-radius:50%}
 .app-demo--packing :is(.pk-nights,.pk-qty) svg{width:14px}
@@ -663,8 +661,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card__pc{stroke:var(--app)}
 .page-projects .app-why__icon{color:var(--app)}
 .page-projects .app-card h2{font:600 3rem/1.04 Archivo,system-ui,sans-serif;letter-spacing:-.03em;text-wrap:balance}
-.page-projects :is(.app-card__dek,.app-why strong,.app-why p span,.app-card__kind,.app-card__facts,.app-card__foot figcaption,.app-rail b,.app-rail small){font-family:Archivo,system-ui,sans-serif}
-.page-projects .app-card__dek{color:#9da2a9;line-height:1.6;text-wrap:balance}
+.page-projects :is(.app-why strong,.app-why p span,.app-card__kind,.app-card__facts,.app-card__foot figcaption,.app-rail b,.app-rail small){font-family:Archivo,system-ui,sans-serif}
 .page-projects .app-card__kind{font-size:max(var(--text-floor),.75rem);letter-spacing:.14em;margin-bottom:.35rem}
 .page-projects .app-why strong{font-weight:600;font-size:1rem;color:#ecedf0}
 .page-projects .app-why p span{font-weight:400;line-height:1.6;color:#9da2a9;text-wrap:pretty}
@@ -722,7 +719,6 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card .app-more{margin-bottom:5rem}
 @media (min-width:981px){.page-projects .app-more h3{font-size:2.25rem!important}}
 .page-projects :is(.app-why p span,.app-more p,.app-card__foot figcaption){text-wrap:balance}
-.page-projects .app-card__dek{font-size:max(1.25rem,18px)}
 .page-projects .app-why p span{font-size:max(.95rem,15px)}
 .page-projects .app-card__facts{font-size:max(.875rem,14px);letter-spacing:.01em}
 .app-demo--nag .nag{--bg:#fff;--bar:#f7f7f7;--acc:#2481cc;--hint:#8e8e93;--line:#0000001c;--btn:#2481cc;background:linear-gradient(170deg,#f6e8d4,#efd8bd 55%,#e9caa8);color:#000}

@@ -27,14 +27,10 @@ i.fab {
   font-style: normal;
 }
 
-.fa-home::before { --fa-icon: url("../icons/fontawesome/solid/house.svg"); }
-.fa-user::before { --fa-icon: url("../icons/fontawesome/solid/user.svg"); }
 .fa-plus::before { --fa-icon: url("../icons/fontawesome/solid/plus.svg"); }
-.fa-plane::before { --fa-icon: url("../icons/fontawesome/solid/plane.svg"); }
 .fa-chevron-up::before { --fa-icon: url("../icons/fontawesome/solid/chevron-up.svg"); }
 .fa-envelope::before { --fa-icon: url("../icons/fontawesome/solid/envelope.svg"); }
 .fa-briefcase::before { --fa-icon: url("../icons/fontawesome/solid/briefcase.svg"); }
-.fa-graduation-cap::before { --fa-icon: url("../icons/fontawesome/solid/graduation-cap.svg"); }
 .fa-bolt::before { --fa-icon: url("../icons/fontawesome/solid/bolt.svg"); }
 .fa-code::before { --fa-icon: url("../icons/fontawesome/solid/code.svg"); }
 .fa-shield::before { --fa-icon: url("../icons/fontawesome/solid/shield.svg"); }

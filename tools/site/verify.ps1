@@ -439,9 +439,9 @@ Assert-FileSizeBudget 'assets\js\projects-companions.js' 12
 # Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
 Assert-FileSizeBudget 'assets\css\gallery.css' 15
 Assert-FileSizeBudget 'assets\css\icons.css' 4
-if ($iconsCss -match '@font-face|fontawesome-webfont' -or [regex]::Matches($iconsCss, '\.\bfa-[a-z0-9-]+::before').Count -ne 22) { throw 'The minimal icon stylesheet must map exactly the selected self-hosted page icons without a webfont.' }
+if ($iconsCss -match '@font-face|fontawesome-webfont' -or [regex]::Matches($iconsCss, '\.\bfa-[a-z0-9-]+::before').Count -ne 18) { throw 'The minimal icon stylesheet must map exactly the selected self-hosted page icons without a webfont.' }
 $publishedIconSvgs = @(Get-ChildItem -LiteralPath (Join-Path $dist 'assets\icons\fontawesome') -Filter '*.svg' -File -Recurse)
-if ($publishedIconSvgs.Count -ne 26 -or ($publishedIconSvgs | Measure-Object Length -Sum).Sum -gt 24KB) { throw 'The self-hosted Font Awesome SVG subset is missing icons or exceeds its 24 KB budget.' }
+if ($publishedIconSvgs.Count -ne 22 -or ($publishedIconSvgs | Measure-Object Length -Sum).Sum -gt 24KB) { throw 'The self-hosted Font Awesome SVG subset is missing icons or exceeds its 24 KB budget.' }
 if (Get-ChildItem -LiteralPath (Join-Path $dist 'assets\fonts') -Filter 'fontawesome*' -File) { throw 'The retired Font Awesome webfont is still published.' }
 # The Merriweather files are static single-weight instances of the upstream
 # variable font; a regression back to the ~95KB variable files doubles the
