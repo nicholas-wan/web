@@ -13,7 +13,7 @@ function projectsDemo(selector, init) {
 const MO = 'Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'.split(' '), WD = 'Sun Mon Tue Wed Thu Fri Sat'.split(' ');
 const pjStill = matchMedia('(prefers-reduced-motion: reduce)'), pjFocus = el => el && el.focus({ preventScroll: true });
 const pjReady = f => document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', f) : f();
-/* SquashBot demo in the bot's words (squashbot/src). "Now" is the coming Friday, 9:41am. */
+/* SquashBot demo in its own words (src). "Now" is the coming Friday, 9:41am. */
 (() => {
 'use strict';
 const U = 'DodgerBlueee';
@@ -415,7 +415,7 @@ pjReady(boot);
 })();
 
 
-/* Nag-bot demo. Wording from nag-bot's src/ and its Mini App (public/app). */
+/* Nag-bot demo, worded as its src/ and Mini App (public/app). */
 (() => {
 /* Now is the latest Sunday, 7:45 PM. */
 const dd = d => { const t = new Date; t.setDate(t.getDate() - t.getDay() + d); return MO[t.getMonth()] + ' ' + t.getDate(); };
@@ -658,7 +658,7 @@ pjReady(init);
 })();
 
 
-/* Finance tracker demo: its phone tabs (finance_tracker app/index.html), its words. Data invented. */
+/* Finance demo: the app's phone tabs (app/index.html) and words; data invented. */
 (() => {
 const NW = [177760, 179160, 180480, 179640, 182320, 184120, 185560, 184480, 187480, 191900, 192520, 194480];
 /* Statements run to E, the end of last month. */
@@ -899,7 +899,7 @@ pjReady(boot);
 })();
 
 
-/* Travel Packing demo: items and rules from data/seed.json; quantities by the app's computeQty. */
+/* Packing demo: items and rules from data/seed.json, quantities as computeQty. */
 (() => {
 
 const CATS = [
@@ -970,6 +970,7 @@ function init(root) {
 		const left = all.filter(i => i.ess && !i.packed).length, bar = $('.pk-bar'), note = $('.pk-note');
 		const nightsLabel=count(S[S.key].nights, 'night').replace(/^\d+/, '<b>$&</b>');
 		if ($('.pk-nlabel').innerHTML !== nightsLabel) $('.pk-nlabel').innerHTML=nightsLabel;
+		$('.pk-wet').textContent = S.normal.nights > 1 ? `rain on 2 of ${S.normal.nights + 1} days` : 'rain every day';
 		$('.pk-plabel').innerHTML = `<b>${n}</b> of ${all.length} packed`;
 		bar.style.setProperty('--fill', pct + '%');
 		bar.setAttribute('aria-valuenow', pct);
@@ -1086,7 +1087,7 @@ pjReady(start);
 })();
 
 
-/* Desktop shows one project at a time; the rail's thumbnails (from each demo) switch them. */
+/* Desktop: one project at a time; the rail's demo thumbnails switch them. */
 (() => {
 const rail = document.querySelector('.app-rail');
 if (!rail) return;
@@ -1122,7 +1123,7 @@ function cue() {
 }
 vids.forEach(v => v.addEventListener('ended', () => { if (hover < 0) { turn++; cue(); } }));
 tabs.forEach((t, n) => { t.addEventListener('pointerenter', () => { hover = n; cue(); }); t.addEventListener('pointerleave', () => { hover = -1; cue(); }); });
-// It turns by itself while 85% of the phone shows and the pointer is off phone and rail; a click or key ends it.
+// Turns itself while 85% of the phone shows, pointer off phone and rail; a click or key ends it.
 function hold() { rail.classList.toggle('is-hold', !!over || !pjVisible(cards[cur].querySelector('.app-demo'))); }
 const quit = () => { auto = 0; rail.classList.remove('is-auto'); cue(); };
 rail.addEventListener('animationend', e => { if (!auto || e.animationName !== 'pj-fill') return; const n = (cur + 1) % 4, d = cards[n].querySelector('.app-demo'); if (!d.dataset.user) delete d.dataset.seen; show(n); });
@@ -1139,7 +1140,7 @@ addEventListener('scroll', () => document.body.classList.toggle('pj-under', !wid
 start();
 })();
 
-/* One guided preview at a time, after 500 ms settled at 70% visible, playing on to 40%; a tap or key hands over to the reader. */
+/* One guided preview at a time: 500 ms settled at 70% visible, on to 40%; a tap or key hands over. */
 (() => {
 const demos = [...document.querySelectorAll('.app-demo')];
 const motion = pjStill;

@@ -1,9 +1,9 @@
 /* Travel Packing's laptop on the Projects page (owner, 9 Nov 2026: "i also like the mockup style you did of adding
-   the desktop version"). projects.js loads this on screens 1100px and up only, outside the page's 80 KB ceiling.
-   The laptop shows the demo's sample list as the app lays it out on a wider screen, and follows the phone's ticks,
+   the desktop version"). projects.js loads it at 1100px and up only, outside the page's 80 KB ceiling.
+   It shows the demo's sample list as the app lays it out wide, and follows the phone's ticks,
    nights, list and Start over. Like the real app, Hide packed and Last call belong to the device that set them, so
-   the laptop always shows the whole list. Rows the phone hides are inferred exactly: Hide packed hides only packed
-   items, and Last call hides an essential only once it is packed. A row that just changed fades from the accent. */
+   the laptop shows the whole list. Rows the phone hides are inferred: Hide packed hides only packed
+   items, Last call an essential only once packed. A row that just changed fades from the accent. */
 (() => {
 const fig = document.querySelector('.pkl'), app = fig && fig.querySelector('.pkl-app'), phone = document.querySelector('#travel-packing .pk');
 if (!app || !phone) return;
@@ -149,7 +149,7 @@ function draw() {
 <div class="pkl-ptop"><div><i>Passenger</i><b>Nicholas Wan</b></div><div><i>Trip</i><b>${key === 'normal' ? 'Normal trip' : 'Extended trip'}</b></div></div>
 <div class="pkl-proute"><div><b class="pkl-pcode">SIN</b><i>Singapore</i></div><span class="pkl-pline"><u></u>${use('plane')}<u></u></span><div class="to"><b class="pkl-pcode">${to}</b><i>${city}</i></div></div>
 <div class="pkl-pfields"><div><i>Date</i><span class="pkl-chip">${day(days)}</span></div><div><i>Nights</i><span class="pkl-pill">− <b>${L.nights}</b> nights +</span></div><div><i>Return</i><b>${day(days + L.nights)}</b></div><div><i>Boarding</i><b>Opens ${day(days - 1)}</b></div></div></div>
-<div class="pkl-pstub"><div class="pkl-pband"><span>${to}</span></div><div class="pkl-psay"><b>${days} days to go</b>${key === 'normal' ? 'Chengdu 8–16 °C · rain on 2 of 5 days' : 'Last call opens the day before'}</div>${n === all.length ? '<span class="pkl-pseal">Packed</span>' : ''}
+<div class="pkl-pstub"><div class="pkl-pband"><span>${to}</span></div><div class="pkl-psay"><b>${days} days to go</b>${key === 'normal' ? 'Chengdu 8–16 °C · ' + (L.nights > 1 ? `rain on 2 of ${L.nights + 1} days` : 'rain every day') : 'Last call opens the day before'}</div>${n === all.length ? '<span class="pkl-pseal">Packed</span>' : ''}
 <div class="pkl-pfine"><div><i>Route</i><b>SIN${use('plane')}${to}</b></div><div><i>Date</i><b>${day(days)}</b></div><div><i>Nights</i><b>${L.nights}</b></div><div><i>Return</i><b>${day(days + L.nights)}</b></div></div></div></div>
 <div class="pkl-bar"><span><b>${n}</b> of ${all.length} packed</span><em><u style="width:${n / all.length * 100}%"></u></em><span class="pkl-sp"></span><span class="pkl-btn">Hide packed</span><span class="pkl-btn">Last call · ${left ? left + ' left' : 'Clear'}</span></div>
 <div class="pkl-cols">${CATS.map(cube).join('')}</div>`;

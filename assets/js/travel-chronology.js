@@ -296,18 +296,18 @@
 
 })();
 
-/* Scene artwork (8 Nov 2026): the build ships the ten SVGs as one cached file. Fetch it once a scene
-   is on screen or the page has loaded, so it never shares the first screen's link, and fill the
-   fixed-size desktop slots (no layout shift); scenes-ready hands each one to the phone rail. */
+/* Scene artwork (8 Nov 2026): the build ships the ten SVGs as one cached file, fetched once a scene
+   is on screen or the page has loaded, into the fixed desktop slots (no layout shift);
+   scenes-ready hands each one to the phone rail. */
 (()=>{
  const source=document.querySelector('.journal-chronology[data-scenes]');if(!source)return;let pending;
- const load=()=>{if(pending)return;pending=fetch(source.dataset.scenes).then(r=>{if(!r.ok)throw r;return r.text();}).then(text=>{
+ const load=()=>{if(pending)return;pending=(self.scenes||fetch(source.dataset.scenes)).then(r=>{if(!r.ok)throw r;return r.text();}).then(text=>{
   const t=document.createElement('template');t.innerHTML=text;const svgs=[...t.content.firstElementChild.children];
   source.querySelectorAll('.chronology-trip .authored-scene').forEach((art,i)=>svgs[i]&&art.append(svgs[i]));observer.disconnect();source.dispatchEvent(new Event('scenes-ready'));
- },()=>{pending=null;});};
- // A failed fetch retries on the next scene that comes on screen.
+ },()=>{pending=self.scenes=null;});};
+ // A failed fetch retries on the next scene on screen.
  const observer=new IntersectionObserver(items=>items.some(i=>i.isIntersecting)&&load());document.querySelectorAll('.authored-scene').forEach(a=>observer.observe(a));
- // Wider screens preloaded the file with the CSS (build.ps1); phones wait for load.
+ // Wider screens start the fetch in the head (build.ps1); phones wait for load.
  if(document.readyState==='complete'||matchMedia('(min-width:737px)').matches)load();else addEventListener('load',load);
 })();
 

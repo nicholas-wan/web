@@ -1,7 +1,8 @@
 (function () {
   var journalAnimations = Array.prototype.slice.call(document.querySelectorAll('video.journal-animation'));
   var reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  var isJournal = document.body.classList.contains('page-travel-journal');
+  // Event pages (House, Pre-wedding) fit a large source to the window too.
+  var isJournal = document.body.matches('.page-travel-journal,.page-event');
   /* Phones flick through several screens a second, so they start photos and
      posters about two screens ahead; desktop keeps its margins (Nov 2026). */
   var onPhone = window.matchMedia('(max-width: 736px)').matches;
@@ -159,12 +160,10 @@
     });
   }
 
-  /* Arrowing through the lightbox used to stall on any photo whose tile had
-     not loaded yet: with no currentSrc to reuse, the viewer fell back to the
-     full original (250-600 KB) and waited for it. Instead, warm the tiles on
-     either side of the shown photo so their responsive file is already in
-     cache. Cold journals start with their smallest preview; other galleries
-     use rendered width times device pixels to choose from the srcset. */
+  /* Arrowing used to stall on a photo whose tile had not loaded (no
+     currentSrc, so the 250-600 KB original). Warm the tiles either side so
+     their responsive file is cached. Cold journals and event pages start with
+     their smallest preview; other galleries pick by width times pixels. */
   var responsiveCandidate = function (media, targetWidth) {
     var fallback = media.getAttribute('src');
     var srcset = media.getAttribute('srcset');

@@ -499,7 +499,7 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .page-projects .pk-scroll{top:78px;padding-bottom:48px;-webkit-mask-image:linear-gradient(#000 calc(100% - 25px),transparent);mask-image:linear-gradient(#000 calc(100% - 25px),transparent)}
 @media (max-width: 480px){.page-projects .app-stage{height:536px;padding:0;align-items:center}
 .page-projects .app-phone{transform:scale(.88)}
-.page-projects .app-card__foot{gap:.35rem}
+.page-projects .app-card__foot{gap:.65rem}
 .page-projects .app-card__foot figcaption{font-size:14px}
 .page-projects .app-demo__reset{font-size:13px!important}
 }

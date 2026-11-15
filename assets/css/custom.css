@@ -10299,6 +10299,8 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes portal-right{0%,100%{transform:translate(7px,-2px) rotate(10deg)}45%,65%{transform:translate(17px,-4px) rotate(18deg)}}
 @keyframes portal-front{0%,100%{transform:translate(0,4px)}45%,65%{transform:translate(0,6px)}}
 .travel-atlas__layout,#travel-archive-title{scroll-margin-top:2rem}
+/* Desktop's bar is sticky and 56px tall; 2rem left the heading under it. */
+@media(min-width:981px){.travel-atlas__layout,#travel-archive-title{scroll-margin-top:calc(56px + 1.5rem)}}
 /* The opening shortcut owns the animated invitation; the lower phone teaser rests. */
 .travel-map-teaser.is-previewing,.travel-map-teaser.is-previewing *{animation:none!important}
 @media(min-width:737px){.travel-atlas__header{align-items:flex-start}.travel-portals{margin-top:0;margin-bottom:0}}

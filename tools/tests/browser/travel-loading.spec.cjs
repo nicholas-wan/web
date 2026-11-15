@@ -105,7 +105,7 @@ test('no JavaScript retains ten visible journal covers',async({browser})=>{
 });
 
 // Scene artwork ships as one cached file (8 Nov 2026): phones fetch it after load and the rail
-// borrows each single SVG; wider screens use the head preload, so the file is fetched once.
+// borrows each single SVG; wider screens reuse the head's fetch, so the file is fetched once.
 test('scene artwork waits for load on phones and fills each visible slot once',async({page})=>{
  const requests=[];page.on('request',r=>{if(r.url().includes('travel-scenes.svg'))requests.push(r.url());});
  await page.setViewportSize({width:390,height:844});await page.goto('/travel');
@@ -117,9 +117,8 @@ test('scene artwork waits for load on phones and fills each visible slot once',a
  await expect(page.locator('.journal-chronology .authored-scene > svg')).toHaveCount(10);
  await expect(page.locator('.mobile-journal-list .authored-scene > svg')).toHaveCount(0);
 });
-test('wider screens fetch the preloaded scene artwork once',async({page,browserName})=>{
- // WebKit requests the file a second time instead of reusing the head preload (seen 9 Nov 2026; not yet investigated).
- test.skip(browserName==='webkit','WebKit does not reuse the scene preload');
+test('wider screens fetch the scene artwork once',async({page})=>{
+ // WebKit never matched the old as=fetch preload and fetched twice; the head's fetch is reused (15 Nov 2026).
  const requests=[];page.on('request',r=>{if(r.url().includes('travel-scenes.svg'))requests.push(r.url());});
  await page.setViewportSize({width:1280,height:900});await page.goto('/travel');
  await expect(page.locator('.journal-chronology .authored-scene > svg')).toHaveCount(10);

@@ -28,9 +28,12 @@
 			opacity: 1;
 		}
 
-/* The Work page's anomaly peek needs its script: without JavaScript its
-   chips would be buttons that do nothing. */
-.anomaly-peek {
+/* The Work page's peeks need their script: without JavaScript their
+   chips would be buttons that do nothing, under a hint to use them. */
+.anomaly-peek,
+.internship-demo-peeks,
+.internship-demo-peek,
+.internship-demo-hint {
 	display: none !important;
 }
 
