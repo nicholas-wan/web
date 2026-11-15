@@ -11,6 +11,16 @@ function Get-ContentVersion([string]$Content) {
     return -join ($hash[0..3] | ForEach-Object { $_.ToString('x2') })
 }
 
+# Every text source the build reads comes through here as LF. A checkout can
+# hold a file as CRLF even though git stores LF (the shared Windows checkout had
+# projects.css that way, Nov 2026), and without this the CRLF bytes reached the
+# published files: local size budgets read 713 bytes of headroom where CI read 1,489.
+function Read-SourceText([string]$Path) {
+    $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+    if ($null -eq $text) { return '' }
+    return $text.Replace("`r`n", "`n")
+}
+
 # SHA-256 of a file as upper-case hex, like Get-FileHash but without the
 # cmdlet's per-call cost (802 discovery thumbnails in build and verify, Nov 2026).
 function Get-FileSha256([string]$Path) {

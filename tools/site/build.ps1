@@ -17,11 +17,11 @@ if ((Split-Path -Parent $out) -ne $root -or (Split-Path -Leaf $out) -notmatch '^
 Add-Type -AssemblyName System.Drawing
 $navigationPartialPath = Join-Path $root "partials\site-navigation.html"
 if (-not (Test-Path -LiteralPath $navigationPartialPath)) { throw "Missing shared navigation partial: $navigationPartialPath" }
-$navigationTemplate = Get-Content -LiteralPath $navigationPartialPath -Raw -Encoding UTF8
-$travelMastheadTemplate = Get-Content -LiteralPath (Join-Path $root 'partials\travel-masthead.html') -Raw -Encoding UTF8
+$navigationTemplate = Read-SourceText $navigationPartialPath
+$travelMastheadTemplate = Read-SourceText (Join-Path $root 'partials\travel-masthead.html')
 $travelJournalPartialPath = Join-Path $root "partials\travel-journal.html"
 if (-not (Test-Path -LiteralPath $travelJournalPartialPath)) { throw "Missing shared travel journal partial: $travelJournalPartialPath" }
-$travelJournalTemplate = Get-Content -LiteralPath $travelJournalPartialPath -Raw -Encoding UTF8
+$travelJournalTemplate = Read-SourceText $travelJournalPartialPath
 $imageDimensionCachePath = Join-Path $root '.cache\site-image-dimensions.json'
 $imageDimensionCache = @{}
 $imageDimensionCacheDirty = $false
@@ -424,7 +424,7 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
 
 $journalManifestPath = Join-Path $root "journals\manifest.json"
 if (-not (Test-Path -LiteralPath $journalManifestPath)) { throw "Missing travel journal manifest: $journalManifestPath" }
-$journalManifestData = Get-Content -LiteralPath $journalManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+$journalManifestData = Read-SourceText $journalManifestPath | ConvertFrom-Json
 $journalManifest = @($journalManifestData | Sort-Object order)
 if ($journalManifest.Count -eq 0) { throw "Travel journal manifest is empty." }
 $tripOrder = @($journalManifest | ForEach-Object { $_.slug })
@@ -714,12 +714,12 @@ if (Test-Path -LiteralPath $webpSource) {
 # either, because it asserted the same stale number the build emitted.
 # Get-ContentVersion and Remove-CssComments live in common.ps1.
 function Get-FileContentVersion([string]$Path) {
-    return Get-ContentVersion (Get-Content -LiteralPath $Path -Raw -Encoding UTF8)
+    return Get-ContentVersion (Read-SourceText $Path)
 }
 
 # Computed here, ahead of page generation, because the pages must reference the
 # exact bytes that get written later. The write-out below reuses these values.
-$customCssSource = Get-Content -LiteralPath (Join-Path $root 'assets\css\custom.css') -Raw -Encoding UTF8
+$customCssSource = Read-SourceText (Join-Path $root 'assets\css\custom.css')
 $cssSegments = @(
     [pscustomobject]@{ Bundle = 'travel-navigation.css'; Name = 'travel-navigation' },
     [pscustomobject]@{ Bundle = 'travel-map-page.css'; Name = 'travel-map' },
@@ -787,10 +787,10 @@ foreach ($bundle in $routeCssParts.Keys) {
 }
 $runtimeCssText = @{}
 foreach ($file in @('icons.css', 'main.css', 'noscript.css', 'internship-peek.css', 'projects.css')) {
-    $runtimeCssText[$file] = Remove-CssComments (Get-Content -LiteralPath (Join-Path $root "assets\css\$file") -Raw -Encoding UTF8)
+    $runtimeCssText[$file] = Remove-CssComments (Read-SourceText (Join-Path $root "assets\css\$file"))
 }
 
-$mainJsSource = Get-Content -LiteralPath (Join-Path $root 'assets\js\main.js') -Raw -Encoding UTF8
+$mainJsSource = Read-SourceText (Join-Path $root 'assets\js\main.js')
 $canvasStartMarker = '/*Canvas*/'
 $canvasEndMarker = '/*Canvas end*/'
 $canvasStart = $mainJsSource.IndexOf($canvasStartMarker)
@@ -967,13 +967,13 @@ function Get-JournalPhotoEntries([string]$Markup, $Journal, [hashtable]$PhotoTag
     return $entries
 }
 
-$tagVocabulary = Get-Content -LiteralPath (Join-Path $root 'journals\tag-vocabulary.json') -Raw -Encoding UTF8 | ConvertFrom-Json
-$photoTagsData = Get-Content -LiteralPath (Join-Path $root 'journals\photo-tags.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$tagVocabulary = Read-SourceText (Join-Path $root 'journals\tag-vocabulary.json') | ConvertFrom-Json
+$photoTagsData = Read-SourceText (Join-Path $root 'journals\photo-tags.json') | ConvertFrom-Json
 $photoTags = @{}
 foreach ($property in $photoTagsData.PSObject.Properties) { $photoTags[$property.Name] = @($property.Value) }
 $photoEntries = [System.Collections.Generic.List[object]]::new()
 foreach ($journal in $journalManifest) {
-    $journalFragment = Get-Content -LiteralPath (Join-Path $root $journal.source) -Raw -Encoding UTF8
+    $journalFragment = Read-SourceText (Join-Path $root $journal.source)
     foreach ($entry in (Get-JournalPhotoEntries $journalFragment $journal $photoTags)) { $photoEntries.Add($entry) }
 }
 $photoTagCounts = @{}
@@ -1006,7 +1006,7 @@ foreach ($entry in $photoEntries) {
 # Discovery is stricter: only manually reviewed image/topic/crop pairs qualify.
 # Assign before iterating: Windows PowerShell 5.1 emits a root JSON array as a
 # single pipeline object; wrapping the pipeline in @() nests the whole list.
-$exploreReviews = Get-Content -LiteralPath (Join-Path $root 'journals\explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$exploreReviews = Read-SourceText (Join-Path $root 'journals\explore-covers.json') | ConvertFrom-Json
 $exploreCoverPhotos = [System.Collections.Generic.List[object]]::new()
 $exploreIds = @{}
 # Index photo ids once (case-sensitive, like the old -ceq scan) rather than
@@ -1067,7 +1067,7 @@ $assetVersions['assets/data/photo-index.json'] = Get-ContentVersion $photoIndexJ
 # scene SVGs (about 60 KB of the page's 75 KB gzipped) ship as one cached file that
 # travel-chronology.js fetches into the empty fixed-size slots, so the phone's first
 # screen no longer shares the slow link with artwork that sits below the fold.
-$travelChronologyHtml = (Get-Content -LiteralPath (Join-Path $root 'partials/travel-chronology.html') -Raw -Encoding UTF8).Trim()
+$travelChronologyHtml = (Read-SourceText (Join-Path $root 'partials/travel-chronology.html')).Trim()
 $travelSceneSvgs = New-Object System.Collections.Generic.List[string]
 $travelChronologyHtml = [regex]::Replace($travelChronologyHtml, '(<span aria-hidden="true" class="authored-scene[^"]*"[^>]*>)(<svg\b[\s\S]*?</svg>)(?=</span>)', {
     param($m)
@@ -1082,7 +1082,7 @@ $assetVersions['assets/data/travel-scenes.svg'] = Get-ContentVersion $travelScen
 
 # Small, inert postcard seeds make discovery available without fetching the
 # full index. The browser only attaches four thumbnails; the rest stay inert.
-$exploreThemes = Get-Content -LiteralPath (Join-Path $root 'journals\explore-themes.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$exploreThemes = Read-SourceText (Join-Path $root 'journals\explore-themes.json') | ConvertFrom-Json
 $exploreUsedPhotos = @{}
 $exploreTripCounts = @{}
 $exploreFallback = [System.Collections.Generic.List[string]]::new()
@@ -1131,7 +1131,7 @@ foreach ($journal in $journalManifest) {
 }
 
 foreach ($page in $pages) {
-    $html = Get-Content -LiteralPath $page.FullName -Raw -Encoding UTF8
+    $html = Read-SourceText $page.FullName
     $slug = if ($page.IsJournalFragment) { $page.Journal.slug } else { [IO.Path]::GetFileNameWithoutExtension($page.Name) }
     if ($page.IsJournalFragment) {
         $title = $page.Journal.title
@@ -1167,7 +1167,7 @@ foreach ($page in $pages) {
         $main = $main.Replace('data-script="assets/js/projects-companions.js"', "data-script=`"$(Get-AssetRef 'assets/js/projects-companions.js')`"")
     }
     if ($slug -eq 'travel') {
-        $main = $main.Replace('<!-- TRAVEL_SHORTCUTS -->', (Get-Content -LiteralPath (Join-Path $root 'partials/travel-shortcuts.html') -Raw -Encoding UTF8).Trim())
+        $main = $main.Replace('<!-- TRAVEL_SHORTCUTS -->', (Read-SourceText (Join-Path $root 'partials/travel-shortcuts.html')).Trim())
         $main = $main.Replace('<!-- TRAVEL_CHRONOLOGY -->', $travelChronologyHtml.Replace('data-scenes="assets/data/travel-scenes.svg"', "data-scenes=`"$(Get-AssetRef 'assets/data/travel-scenes.svg')`""))
         # The photo search script is not a <script src> on the travel page: that
         # page sits at its 80 KB JavaScript ceiling, and the search is only
@@ -1177,7 +1177,7 @@ foreach ($page in $pages) {
         $main = $main.Replace('data-search-index="assets/data/photo-index.json"', "data-search-index=`"$(Get-AssetRef 'assets/data/photo-index.json')`"")
         $main = $main.Replace('data-map-script="assets/js/travel-map.js"', "data-map-script=`"$(Get-AssetRef 'assets/js/travel-map.js')`"")
         $main = $main.Replace('<!-- PHOTO_EXPLORE_SEEDS -->', ($exploreCards -join "`n"))
-        $main = $main.Replace('<!-- TRAVEL_SEED_BOOTSTRAP -->', '<script>' + (Get-Content -LiteralPath (Join-Path $root 'assets/js/travel-seeds.js') -Raw -Encoding UTF8).Trim() + '</script>')
+        $main = $main.Replace('<!-- TRAVEL_SEED_BOOTSTRAP -->', '<script>' + (Read-SourceText (Join-Path $root 'assets/js/travel-seeds.js')).Trim() + '</script>')
         $main = $main.Replace('<!-- PHOTO_EXPLORE_FALLBACK -->', (($exploreFallback | Select-Object -First 4) -join "`n"))
     }
     if ($journalBySlug.ContainsKey($slug)) {
@@ -1412,7 +1412,7 @@ foreach ($bundle in $routeCssBundles.Keys) {
 Write-Utf8 (Join-Path $out 'assets\js\main.js') $sharedMainJs
 Write-Utf8 (Join-Path $out 'assets\js\canvas-background.js') $canvasJs
 foreach ($file in $runtimeJs) {
-    Copy-Item -LiteralPath (Join-Path $root "assets\js\$file") -Destination (Join-Path $out "assets\js\$file") -Force
+    Write-Utf8 (Join-Path $out "assets\js\$file") (Read-SourceText (Join-Path $root "assets\js\$file"))
 }
 New-Item -ItemType Directory -Path (Join-Path $out "assets\data") -Force | Out-Null
 Write-Utf8 (Join-Path $out 'assets\data\photo-index.json') $photoIndexJson
@@ -1420,11 +1420,11 @@ Write-Utf8 (Join-Path $out 'assets\data\travel-scenes.svg') $travelScenesSvg
 Sync-Directory (Join-Path $root "assets\fonts") (Join-Path $out "assets\fonts")
 Sync-Directory (Join-Path $root "assets\icons") (Join-Path $out "assets\icons")
 # Copied before the image scan so the manifest's icon references get published.
-Copy-Item -LiteralPath (Join-Path $root "site.webmanifest") -Destination (Join-Path $out "site.webmanifest")
+Write-Utf8 (Join-Path $out "site.webmanifest") (Read-SourceText (Join-Path $root "site.webmanifest"))
 Copy-ReferencedImages $out (Join-Path $root "images") $(if (Test-Path -LiteralPath $webpSource) { $webpSource } else { $null }) $sourceImageIndex
-Copy-Item -LiteralPath (Join-Path $root "CNAME") -Destination (Join-Path $out "CNAME")
-Copy-Item -LiteralPath (Join-Path $root "robots.txt") -Destination (Join-Path $out "robots.txt")
-Copy-Item -LiteralPath (Join-Path $root "sitemap.xml") -Destination (Join-Path $out "sitemap.xml")
+Write-Utf8 (Join-Path $out "CNAME") (Read-SourceText (Join-Path $root "CNAME"))
+Write-Utf8 (Join-Path $out "robots.txt") (Read-SourceText (Join-Path $root "robots.txt"))
+Write-Utf8 (Join-Path $out "sitemap.xml") (Read-SourceText (Join-Path $root "sitemap.xml"))
 # Chromium requests /favicon.ico on every page regardless of the declared PNG icon.
 Copy-Item -LiteralPath (Join-Path $root "favicon.ico") -Destination (Join-Path $out "favicon.ico")
 

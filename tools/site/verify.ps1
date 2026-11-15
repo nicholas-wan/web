@@ -53,6 +53,14 @@ function Assert-FileSizeBudget([string]$RelativePath, [int]$MaximumKB) {
 }
 
 if (-not (Test-Path -LiteralPath $dist)) { throw "Missing dist directory. Run tools/site.ps1 build first." }
+
+# The build reads every text source as LF (Read-SourceText), so a CRLF checkout
+# no longer changes what ships, but the file still differs from what git stores.
+# A warning, not a failure: the working tree is the owner's to renormalise.
+if (Get-Command git -ErrorAction SilentlyContinue) {
+    $crSources = @(git -C $root ls-files --eol | Where-Object { $_ -match '^\S+\s+w/(crlf|mixed)\s+attr/text\b' } | ForEach-Object { ($_ -split "`t", 2)[1] })
+    if ($crSources.Count) { Write-Warning ("Tracked text sources hold CR line endings in this checkout (git stores LF): " + ($crSources -join ', ') + '. Convert them to LF; the build output is unaffected.') }
+}
 if (-not (Test-Path -LiteralPath $journalManifestPath) -or -not (Test-Path -LiteralPath $journalPartialPath) -or -not (Test-Path -LiteralPath $journalStarterPath)) { throw "Travel journal manifest, shared partial, or starter is missing." }
 $journalManifestData = Get-Content -LiteralPath $journalManifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
 $journalManifest = @($journalManifestData | Sort-Object order)
