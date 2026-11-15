@@ -961,9 +961,14 @@
   --line-travel: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7l6-3 6 3 6-3v13l-6 3-6-3-6 3V7M9 4v13M15 7v13'/%3E%3C/svg%3E");
 }
 
-.notfound .homepage-link:nth-child(1)::before { --homepage-card-icon: url("../icons/fontawesome/solid/house.svg"); }
-.notfound .homepage-link:nth-child(2)::before { --homepage-card-icon: url("../icons/fontawesome/solid/briefcase.svg"); }
-.notfound .homepage-link:nth-child(3)::before { --homepage-card-icon: url("../icons/fontawesome/solid/plane.svg"); }
+.line-icon--work::before { --fa-icon: var(--line-work); }
+.line-icon--projects::before { --fa-icon: var(--line-projects); }
+.line-icon--skills::before { --fa-icon: var(--line-skills); }
+.line-icon--personal::before { --fa-icon: var(--line-personal); }
+
+.notfound .homepage-link:nth-child(1)::before { --homepage-card-icon: var(--line-about); }
+.notfound .homepage-link:nth-child(2)::before { --homepage-card-icon: var(--line-work); }
+.notfound .homepage-link:nth-child(3)::before { --homepage-card-icon: var(--line-travel); }
 
 /* Scroll reveal */
 [data-reveal] {
