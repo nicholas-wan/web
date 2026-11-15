@@ -19,7 +19,7 @@ function Get-DistAssetRef([string]$RelativePath) {
 # Recomputing hashes from dist made the standalone verify task self-consistent
 # with a STALE dist: markup and asset drift together, so a forgotten rebuild
 # passed. For the byte-copied runtime assets, source is the truth verify can
-# check against — dist differing from source means dist predates the change.
+# check against -- dist differing from source means dist predates the change.
 function Assert-DistMatchesSource([string]$RelativePath) {
     $distPath = Join-Path $dist ($RelativePath -replace '/', '\')
     $sourcePath = Join-Path $root ($RelativePath -replace '/', '\')
@@ -53,6 +53,20 @@ function Assert-FileSizeBudget([string]$RelativePath, [int]$MaximumKB) {
 }
 
 if (-not (Test-Path -LiteralPath $dist)) { throw "Missing dist directory. Run tools/site.ps1 build first." }
+
+# PowerShell sources stay ASCII. They have no BOM, so Windows PowerShell 5.1 reads
+# them in the ANSI codepage and any other character turns to mojibake (a pinned
+# middle dot failed the check that way, 31 Oct 2026). Write such characters by
+# code point instead: [char]0xB7.
+$latin1 = [Text.Encoding]::GetEncoding(28591)
+foreach ($psSource in @((Join-Path $root 'tools\site.ps1')) + @(Get-ChildItem -LiteralPath (Join-Path $root 'tools\site') -Filter '*.ps1' -File | ForEach-Object { $_.FullName })) {
+    $psText = [IO.File]::ReadAllText($psSource, $latin1)
+    $nonAscii = [regex]::Match($psText, '[^\x00-\x7F]')
+    if ($nonAscii.Success) {
+        $psLine = $psText.Substring(0, $nonAscii.Index).Split("`n").Count
+        throw "$($psSource.Substring($root.Length + 1)) line $psLine holds a non-ASCII byte. Keep PowerShell sources ASCII; write other characters as [char]0x.."
+    }
+}
 
 # The build reads every text source as LF (Read-SourceText), so a CRLF checkout
 # no longer changes what ships, but the file still differs from what git stores.
@@ -274,7 +288,7 @@ foreach ($page in $pages) {
         $scriptBytes += (Get-Item -LiteralPath $scriptPath).Length
     }
     # The 80 KB JS ceiling is a real page-weight limit, held at point-of-need and
-    # never bumped on spec — see the "80 KB per-page JavaScript ceiling" bullet under
+    # never bumped on spec -- see the "80 KB per-page JavaScript ceiling" bullet under
     # "Dead ends" in README.md (the travel page sits essentially at
     # it). The warning below flags that headroom in green builds.
     if ($scriptBytes -gt 80KB) { throw "$($page.Name) exceeds the 80 KB raw JavaScript budget." }
@@ -1209,7 +1223,7 @@ if ([regex]::Matches($skillsHtml, 'class="toolkit-card toolkit-card--').Count -n
 if ($skillsHtml -match 'toolkit-card[^>]*tabindex' -or $skillsHtml -match 'toolkit-card__detail"[^>]*aria-hidden') { throw "Toolkit cards must not hardcode ARIA/focus state; details are plain visible content." }
 if ($mainJs -match 'toolkit-card' -or $customCss -match 'toolkit-card--js|toolkit-card__toggle|toolkit-card__eyebrow|toolkit-card__hint|toolkit-tags|tool-logo|toolkit-card\.is-expanded' -or $customCss -match '\.toolkit-card:hover \.toolkit-card__detail') { throw "The Skills disclosure code path was removed (Oct 2026); no toolkit JS, collapse CSS or hover expansion may return." }
 if ($customCss -notmatch '(?s)\.page-skills \.skills-grid\s*\{[^}]*grid-template-columns:\s*repeat\(4' -or $customCss -notmatch '(?s)\.page-skills \.toolkit-card__title\s*\{[^}]*font-family:\s*var\(--font-display\)[^}]*font-weight:\s*900' -or $customCss -notmatch '(?s)\.page-skills \.toolkit-card__detail > p\s*\{[^}]*font-family:\s*"Raleway"[^}]*font-weight:\s*400') { throw "Desktop skills must use four compact static cards with education-weight titles and lighter three-line descriptions always visible." }
-# Oct 2026: one quiet heading voice on Skills at every width — Skills, Education and
+# Oct 2026: one quiet heading voice on Skills at every width -- Skills, Education and
 # the Tech stack title all use the body serif at 1.5rem/700, left-aligned, no caps.
 if ($customCss -notmatch '(?s)@media screen and \(max-width: 980px\).*?\.page-skills \.skills-heading h2,\s*\.page-skills \.education-heading h2\s*\{[^}]*font-family:\s*var\(--font-body\)[^}]*font-size:\s*1\.5rem !important[^}]*font-weight:\s*700[^}]*text-transform:\s*none' -or $customCss -notmatch '(?s)\.page-skills \.tech-stack__heading h2\s*\{[^}]*font-family:\s*var\(--font-body\)[^}]*font-size:\s*1\.5rem[^}]*font-weight:\s*700[^}]*text-align:\s*left[^}]*text-transform:\s*none') { throw "Skills, Education and Tech stack headings must share the quiet heading style at every width." }
 if ($skillsHtml -notmatch 'id="tech-stack-title">Tech stack</h2>' -or [regex]::Matches($skillsHtml, '<li><i class="fa[bs] fa-').Count -ne 9 -or $skillsHtml -notmatch [regex]::Escape((Get-DistAssetRef 'assets/css/icons.css')) -or $skillsHtml -match 'font-awesome/|fontawesome\.com|Tools I work with' -or $skillsHtml -notmatch '>Agentic AI</strong>' -or $skillsHtml -notmatch '>Microsoft 365</strong>') { throw "Skills page must include nine consistent self-hosted technology icons without a secondary heading." }

@@ -183,7 +183,7 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                 # The markup still names the .jpg, but the original was removed once a
                 # webp replacement existed (see $webpMap). Without this fallback the
                 # build finds no file, so those images ship with no intrinsic
-                # width/height and no srcset — the house gallery lost both that way.
+                # width/height and no srcset -- the house gallery lost both that way.
                 $path = Join-Path $webpRootPath ([IO.Path]::ChangeExtension($bare, '.webp'))
             }
         }
