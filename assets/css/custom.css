@@ -10187,19 +10187,6 @@ html .page-skills #main > .post { border-top:0; }
 .authored-scene.is-active .cl-wing{animation:cl-wing var(--polish-duration) ease-in-out both}
 @keyframes cl-gull{0%{transform:translate(17px,9px);opacity:1}24%{transform:translate(52px,7.5px)}50%{transform:translate(91px,8px)}76%{transform:translate(132px,9.5px);opacity:1}76.1%{transform:translate(132px,9.5px);opacity:0}76.2%{transform:translate(-12px,9.5px);opacity:0}76.3%{transform:translate(-12px,9.5px);opacity:1}100%{transform:translate(17px,9px);opacity:1}}
 @keyframes cl-wing{0%,5%,22%,40%,100%{transform:scaleY(1)}13%,31%{transform:scaleY(-.3)}50%,68%{transform:scaleY(.9)}}
-.cl-tower-light,.cl-led{opacity:0}
-/* Guangzhou (15 Nov 2026): the tower's LEDs light in sequence. A soft glow with a bright front climbs the tower twice a pass
-   and the lattice lights behind it in pale teal and then pale pink, lighter than the body (a copy of the diagonals revealed from the base by stroke-dashoffset, so the
-   colour lives in the lines and the drawing keeps its detail); each colour holds, then fades over 0.6s. The old pass, a
-   soft 22-unit wash at 45%, only tinted the pale tower at tile size and slid back down as it faded. */
-.authored-scene.is-active .cl-tower-light{animation:cl-band var(--polish-duration) linear both}
-.authored-scene.is-active .cl-tower-light-b{animation-name:cl-band-b}
-.authored-scene.is-active .cl-led-a{animation:cl-led-a var(--polish-duration) linear both}
-.authored-scene.is-active .cl-led-b{animation:cl-led-b var(--polish-duration) linear both}
-@keyframes cl-band{0%,11.9%{opacity:0;transform:translateY(0)}12%{opacity:1;transform:translateY(0);animation-timing-function:cubic-bezier(.4,0,.6,1)}38%{opacity:1;transform:translateY(-52px);animation-timing-function:linear}40%,100%{opacity:0;transform:translateY(-58px)}}
-@keyframes cl-band-b{0%,59.9%{opacity:0;transform:translateY(0)}60%{opacity:1;transform:translateY(0);animation-timing-function:cubic-bezier(.4,0,.6,1)}86%{opacity:1;transform:translateY(-52px);animation-timing-function:linear}88%,100%{opacity:0;transform:translateY(-58px)}}
-@keyframes cl-led-a{0%,11.9%{opacity:0;stroke-dashoffset:52}12%{opacity:1;stroke-dashoffset:52;animation-timing-function:cubic-bezier(.4,0,.6,1)}38%{opacity:1;stroke-dashoffset:0}50%{opacity:1;stroke-dashoffset:0;animation-timing-function:ease-in-out}60%{opacity:0;stroke-dashoffset:0}60.1%,100%{opacity:0;stroke-dashoffset:52}}
-@keyframes cl-led-b{0%,59.9%{opacity:0;stroke-dashoffset:52}60%{opacity:1;stroke-dashoffset:52;animation-timing-function:cubic-bezier(.4,0,.6,1)}86%{opacity:1;stroke-dashoffset:0}90%{opacity:1;stroke-dashoffset:0;animation-timing-function:ease-in-out}100%{opacity:0;stroke-dashoffset:0}}
 
 
 
@@ -10686,14 +10673,19 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .mm-dusk-stars circle{fill:#fffbe8;opacity:.7}
 
 
-.mm-led{fill:#db9bcf;opacity:.12}
+/* Guangzhou (15 Nov 2026): hold and step. The whole tower's LEDs hold a colour and change together in 0.7s, pink, teal,
+   violet and back, one change about every 2s (0.74s, 2.79s, 4.84s), so a reader sees the tower change rather than drift;
+   the river echoes each colour. The lattice stays drawn over the overlay's 0.36. The live cycle drifted between
+   faint tints (0.12 to 0.34) and the light pass only tinted the pale tower at tile size. A climbing-glow version, which
+   lost a blind check to live, is kept on the travel-guangzhou-climb branch. */
+.mm-led{fill:#e99ac6;opacity:.36}
 .mm-river path{stroke:#dcb8d9;stroke-width:.9;stroke-linecap:round;opacity:0}
 .authored-scene.is-active .mm-led{animation:mm-led var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .mm-river path{animation:mm-river var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .mm-river path+path{animation-name:mm-river-b}
-@keyframes mm-led{0%,100%{opacity:.12;fill:#db9bcf}28%{opacity:.34;fill:#a98df0}52%{opacity:.3;fill:#62c9d9}64%{opacity:.32;fill:#b9a6ee}76%{opacity:.3;fill:#f29ac4}}
-@keyframes mm-river{0%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}20%{opacity:.85}50%{transform:translateX(.8px);stroke:#9ad7e2}80%{opacity:.85;stroke:#ec8fb5}}
-@keyframes mm-river-b{0%,6%,100%{opacity:0;transform:translateX(0);stroke:#ec8fb5}26%{opacity:.85}56%{transform:translateX(-.8px);stroke:#9a79e8}86%{opacity:.85;stroke:#ec8fb5}}
+@keyframes mm-led{0%,12%,89%,100%{fill:#e99ac6}23%,45%{fill:#7cc2de}56%,78%{fill:#a991ec}}
+@keyframes mm-river{0%,100%{opacity:0;transform:translateX(0);stroke:#e99ac6}12%{opacity:0;stroke:#e99ac6}23%,45%{opacity:.85;stroke:#7cc2de}34%{transform:translateX(.8px)}56%,78%{opacity:.85;stroke:#a991ec}89%{opacity:.85;stroke:#e99ac6}}
+@keyframes mm-river-b{0%,100%{opacity:0;transform:translateX(0);stroke:#e99ac6}12%{opacity:0;stroke:#e99ac6}23%,45%{opacity:.85;stroke:#7cc2de}67%{transform:translateX(-.8px)}56%,78%{opacity:.85;stroke:#a991ec}89%{opacity:.85;stroke:#e99ac6}}
 @media(max-width:736px){
  /* Tiles 150px from 390px wide, 140px from 361px, 118px at 360px and below (9 Nov 2026). */
  .travel-timeline.travel-phone-rail .mobile-journal-row{grid-template-columns:150px minmax(0,1fr);column-gap:10px}
