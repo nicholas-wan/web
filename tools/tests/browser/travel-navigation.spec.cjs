@@ -96,7 +96,8 @@ for (const width of [737, 768, 844, 981, 1366, 1920]) {
     for (const scene of scenes) {
       if(width>=1366){expect(scene.width).toBeCloseTo(152,0);expect(scene.height).toBeCloseTo(101,0);}
       else if(width>=981){expect(scene.width).toBeGreaterThanOrEqual(136);expect(scene.width).toBeLessThanOrEqual(152);expect(scene.height).toBeCloseTo(Math.round(scene.width*2/3),0);}
-      else {expect(scene.width).toBeGreaterThanOrEqual(100);expect(scene.width).toBeLessThanOrEqual(136);expect(scene.height).toBeCloseTo(Math.round(scene.width*2/3),0);}
+      // 99 at 737px since the /5.8 fit (15 Nov 2026) left room between neighbouring scenes.
+      else {expect(scene.width).toBeGreaterThanOrEqual(99);expect(scene.width).toBeLessThanOrEqual(136);expect(scene.height).toBeCloseTo(Math.round(scene.width*2/3),0);}
       expect(scene.fits).toBe(true);
       expect(scene.gap).toBeGreaterThanOrEqual(5);
     }
