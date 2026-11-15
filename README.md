@@ -639,6 +639,19 @@ python -I tools/fonts/subset-figtree.py <path-to-Figtree[wght].ttf>
 - `verify.ps1` caps each at 8 KB so the variable font never ships. `internship-peek.js` requests all three on load, because phone cards stay `display: none` until tapped.
 - The chips' boxes and keyframes, the title highlight and the badge were measured from Figtree's layout; if the listing text or its font changes, re-measure them (each chip must land exactly on its row word; the peek spec checks it).
 
+### Archivo (Projects)
+
+`assets/fonts/archivo-latin.woff2` is the Archivo variable font (wdth 62-125, wght 100-900, SIL OFL) cut to the characters Projects sets, declared in `projects.css` for the card titles, reasons, rail and Packing demo (15 Nov 2026: 90,104 to 54,436 bytes, renders pixel-identical):
+
+```powershell
+python -I tools/fonts/subset-archivo.py <path-to-archivo-latin.woff2>
+```
+
+- Source: Google Fonts' latin subset of Archivo (gstatic v25), see `assets/fonts/archivo-SOURCES.md`; not tracked.
+- The set is printable ASCII (every month and weekday name, digit and sign the demos' calendar dates can print) plus the non-ASCII characters in the Projects sources that Archivo has (`U+00A0 00A3 00B0 00B7 00D7 00E9 00F7 2013 2014 2018 2019 201C 201D 2022 2026 2039 203A 2192 2212`); the arrows and emoji in the demos were never in Archivo and fall back as before. New Archivo text outside that set needs the character added and the script rerun.
+- Keep both axes: the Packing boarding pass sets `font-stretch` 85% and 110%, which Chrome applies to the variable `wdth` axis although the `@font-face` names no stretch range, so a width-pinned cut (24-32 KB) renders differently.
+- `verify.ps1` caps it at 56 KB so the full file never ships again.
+
 ### League peek lettering
 
 The League phone's lettering is live text (outlines filled like shapes looked soft at this size; owner: "the league font doesnt look as clear", "dont hand draw. it has to be high quality") in glyph-only subsets of the nearest free matches, about 6.6 KB in all, declared in `internship-peek.css`:

@@ -439,6 +439,9 @@ foreach ($figtreeCut in @('figtree-400-ascii', 'figtree-500-ascii', 'figtree-700
 foreach ($leagueCut in @('playfair-900-italic-league', 'librebaskerville-400-league', 'librebaskerville-400-italic-league', 'figtree-400-bullet')) {
     Assert-FileSizeBudget "assets\fonts\$leagueCut.woff2" 6
 }
+# Projects' Archivo is the variable font cut to the characters the page sets
+# (tools/fonts/subset-archivo.py, README.md "Fonts"); the 88 KB latin file must never ship.
+Assert-FileSizeBudget 'assets\fonts\archivo-latin.woff2' 56
 $mainCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\main.css') -Raw -Encoding UTF8
 # Nov 2026: the latin-ext faces hold only the latin-ext letters the site sets
 # (pinyin tones, Japanese long vowels; README.md, "Fonts"). The full ~37 KB
