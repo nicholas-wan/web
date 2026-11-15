@@ -445,13 +445,18 @@ if ($publishedIconSvgs.Count -ne 22 -or ($publishedIconSvgs | Measure-Object Len
 if (Get-ChildItem -LiteralPath (Join-Path $dist 'assets\fonts') -Filter 'fontawesome*' -File) { throw 'The retired Font Awesome webfont is still published.' }
 # The Merriweather files are static single-weight instances of the upstream
 # variable font; a regression back to the ~95KB variable files doubles the
-# body-font payload on every page.
+# body-font payload on every page. Since 15 Nov 2026 they, Raleway and both
+# Source Sans cuts are also cut to the characters the site sets
+# (tools/fonts/subset-latin.py); the budgets sit below the full latin files
+# (43-48, 22, 15 and 14 KB) so those never ship again.
 foreach ($merriweatherCut in @('merriweather-300-latin', 'merriweather-700-latin', 'merriweather-300-italic-latin', 'merriweather-700-italic-latin')) {
-    Assert-FileSizeBudget "assets\fonts\$merriweatherCut.woff2" 48
+    Assert-FileSizeBudget "assets\fonts\$merriweatherCut.woff2" 37
 }
+Assert-FileSizeBudget 'assets\fonts\raleway-400-latin.woff2' 20
+Assert-FileSizeBudget 'assets\fonts\source-sans-pro-900-latin.woff2' 13
 # Source Sans Pro 700 is a static latin instance of the ~170 KB Source Sans 3
 # variable font (README.md, "Fonts"); the variable file must never ship.
-Assert-FileSizeBudget 'assets\fonts\source-sans-pro-700-latin.woff2' 20
+Assert-FileSizeBudget 'assets\fonts\source-sans-pro-700-latin.woff2' 14
 # The Shopee peek's Figtree cuts are static, ASCII-only instances of the
 # ~62 KB variable font (README.md, "Fonts"); the variable file must never ship.
 foreach ($figtreeCut in @('figtree-400-ascii', 'figtree-500-ascii', 'figtree-700-ascii')) {
@@ -495,11 +500,50 @@ $latinExtOnly.ExceptWith((ConvertFrom-UnicodeRange 'U+0-FF,U+131,U+152-153,U+2BB
 $latinExtUsed = New-Object 'System.Collections.Generic.HashSet[int]'
 $latinExtUncovered = @()
 $latinExtClass = '[{0}-{1}{2}-{3}{4}-{5}{6}{7}-{8}{9}-{10}]' -f [char]0x100, [char]0x2FF, [char]0x1D00, [char]0x1EFF, [char]0x20A0, [char]0x20C0, [char]0x2113, [char]0x2C60, [char]0x2C7F, [char]0xA720, [char]0xA7FF
+# 15 Nov 2026: the latin faces (Merriweather 300/700 and both italics, Raleway
+# 400, Source Sans Pro 700 and 900) hold ASCII, U+00A0, the combining marks,
+# General Punctuation and only the other latin characters the site sets
+# (tools/fonts/subset-latin.py, README.md "Fonts"). A missing character would
+# silently render in Georgia or Arial, so every character of Google's latin
+# range in the built pages, scripts or data (escapes read too, both cases)
+# must be in the faces' shared unicode-range, which the script writes.
+$latinCuts = @('merriweather-300-latin', 'merriweather-700-latin', 'merriweather-300-italic-latin', 'merriweather-700-italic-latin', 'raleway-400-latin', 'source-sans-pro-700-latin', 'source-sans-pro-900-latin')
+$latinRanges = @([regex]::Matches($mainCss, 'src:\s*url\("\.\./fonts/(?:' + ($latinCuts -join '|') + ')\.woff2"\)\s*format\("woff2"\);\s*unicode-range:\s*([^;]+);') | ForEach-Object { ($_.Groups[1].Value -replace '\s+', '') })
+if ($latinRanges.Count -ne $latinCuts.Count -or @($latinRanges | Sort-Object -Unique).Count -ne 1) { throw "main.css must declare all $($latinCuts.Count) latin faces with one shared unicode-range; rerun tools/fonts/subset-latin.py." }
+$latinCovered = ConvertFrom-UnicodeRange $latinRanges[0]
+$latinRange = ConvertFrom-UnicodeRange 'U+0-FF,U+131,U+152-153,U+2BB-2BC,U+2C6,U+2DA,U+2DC,U+304,U+308,U+329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD'
+$latinAlways = ConvertFrom-UnicodeRange 'U+0-7F,U+A0,U+300-36F,U+2000-206F'
+foreach ($cp in $latinAlways) { if ($latinRange.Contains($cp) -and -not $latinCovered.Contains($cp)) { throw ('The latin faces'' unicode-range lacks U+{0:X4}, which they always keep; rerun tools/fonts/subset-latin.py.' -f $cp) } }
+$latinScanPoints = New-Object 'System.Collections.Generic.HashSet[int]'
+$latinScanPoints.UnionWith($latinRange)
+$latinScanPoints.ExceptWith($latinAlways)
+$latinClass = '[' + (-join @($latinScanPoints | Sort-Object | ForEach-Object { [char]$_ })) + ']'
+$latinUsed = New-Object 'System.Collections.Generic.HashSet[int]'
+$latinUncovered = @()
+function Add-LatinCharacter([int]$Cp, [string]$Where) {
+    $char = [char]$Cp
+    foreach ($variant in @($Cp, [int][char]::ToUpperInvariant($char), [int][char]::ToLowerInvariant($char))) {
+        if (-not $latinScanPoints.Contains($variant) -or -not $script:latinUsed.Add($variant)) { continue }
+        if (-not $latinCovered.Contains($variant)) { $script:latinUncovered += ('U+{0:X4} ({1}) in {2}' -f $variant, [char]$variant, $Where) }
+    }
+}
 # -Include is ignored beside -LiteralPath in Windows PowerShell 5.1, so filter by extension.
 $latinExtScan = Get-ChildItem -LiteralPath $dist -Recurse -File | Where-Object { @('.html', '.js', '.json', '.css') -contains $_.Extension -and $_.FullName.Substring($dist.Length) -notmatch '^\\images\\' }
 foreach ($scanFile in $latinExtScan) {
     $scanText = Get-Content -LiteralPath $scanFile.FullName -Raw -Encoding UTF8
     if ($scanFile.Extension -eq '.html') { $scanText = [System.Net.WebUtility]::HtmlDecode($scanText) }
+    $scanWhere = $scanFile.FullName.Substring($dist.Length + 1)
+    $latinSeen = New-Object 'System.Collections.Generic.HashSet[int]'
+    foreach ($match in [regex]::Matches($scanText, $latinClass)) { if ($latinSeen.Add([int][char]$match.Value)) { Add-LatinCharacter ([int][char]$match.Value) $scanWhere } }
+    # Escapes a script, data file or stylesheet sets as text: \u00b7, \u{b7}, \b7.
+    $escapePattern = if ($scanFile.Extension -eq '.css') { '\\([0-9A-Fa-f]{1,6})' } elseif ($scanFile.Extension -ne '.html') { '\\u(?:\{([0-9A-Fa-f]{1,6})\}|([0-9A-Fa-f]{4}))' } else { $null }
+    if ($escapePattern) {
+        foreach ($match in [regex]::Matches($scanText, $escapePattern)) {
+            $hex = if ($match.Groups[1].Success) { $match.Groups[1].Value } else { $match.Groups[2].Value }
+            $cp = [Convert]::ToInt32($hex, 16)
+            if ($cp -le 0xFFFF -and $latinScanPoints.Contains($cp)) { Add-LatinCharacter $cp "$scanWhere (escaped)" }
+        }
+    }
     foreach ($match in [regex]::Matches($scanText, $latinExtClass)) {
         # text-transform renders the other case too ("Nagoya-jo" with a
         # macron is set in capitals on the Japan page).
@@ -513,6 +557,9 @@ foreach ($scanFile in $latinExtScan) {
 if ($latinExtUncovered.Count) { throw "Latin-ext characters outside the font subsets: $($latinExtUncovered -join '; '). Run python -I tools/fonts/subset-latin-ext.py, then rebuild." }
 $latinExtStale = @($latinExtCovered | Where-Object { -not $latinExtUsed.Contains($_) })
 if ($latinExtStale.Count) { Write-Warning ("The latin-ext subsets still carry characters the site no longer uses: " + (($latinExtStale | ForEach-Object { 'U+{0:X4}' -f $_ }) -join ', ') + '. Rerun tools/fonts/subset-latin-ext.py to drop them.') }
+if ($latinUncovered.Count) { throw "Characters the latin fonts must draw but their subsets lack: $($latinUncovered -join '; '). Run python -I tools/fonts/subset-latin.py, then rebuild." }
+$latinStale = @($latinCovered | Where-Object { $latinScanPoints.Contains($_) -and -not $latinUsed.Contains($_) })
+if ($latinStale.Count) { Write-Warning ("The latin font subsets still carry characters the site no longer uses: " + (($latinStale | ForEach-Object { 'U+{0:X4}' -f $_ }) -join ', ') + '. Rerun tools/fonts/subset-latin.py to drop them.') }
 # Nov 2026: photo-led pages no longer preload Merriweather, so their first
 # screen paints in the fallback; plain Georgia rewrapped Silicon Valley's lede.
 if ($sharedCustomCss -notmatch '--font-body:\s*"Merriweather", "Merriweather Fallback", Georgia, serif;' -or $mainCss -notmatch '(?s)@font-face\s*\{[^}]*font-family:\s*"Merriweather Fallback";[^}]*font-weight:\s*100 500;[^}]*src:\s*local\("Georgia"\);[^}]*size-adjust:\s*10[5-6](?:\.\d)?%') { throw 'The body stack must name the size-adjusted "Merriweather Fallback" face (Nov 2026 swap reflow fix).' }

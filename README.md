@@ -604,16 +604,29 @@ pyftsubset tools/fonts/josephsophia.otf --unicodes="U+0020,U+0061,U+0063,U+0067,
 
 ### Source Sans Pro 700
 
-`assets/fonts/source-sans-pro-700-latin.woff2` is a static 700 instance of Source Sans 3 VF, matching the 900 cut's "latin" range and features:
+`tools/fonts/latin/source-sans-pro-700-latin.woff2` is a static 700 instance of Source Sans 3 VF, matching the 900 cut's "latin" range and features; `subset-latin.py` (below) cuts it to the shipped `assets/fonts/` file:
 
 ```powershell
-python -I tools/fonts/subset-source-sans.py <path-to-SourceSans3VF-Upright> --weight 700 --output assets/fonts/source-sans-pro-700-latin.woff2
+python -I tools/fonts/subset-source-sans.py <path-to-SourceSans3VF-Upright> --weight 700 --output tools/fonts/latin/source-sans-pro-700-latin.woff2
 ```
 
 - Source: <https://github.com/adobe-fonts/source-sans/releases> (`VAR/SourceSans3VF-Upright.ttf`); not tracked.
-- `verify.ps1` caps it at 20 KB so the variable font never ships.
+- `verify.ps1` caps the shipped cut at 14 KB so neither the variable font nor the full latin instance ships.
 - Keep its `main.css` overrides when regenerating: `ascent-override: 98.4%; descent-override: 27.3%; line-gap-override: 0%`.
 - `main.css` declares a size-adjusted Arial fallback so cold loads do not reflow headings.
+
+### Latin subsets
+
+Since 15 Nov 2026 the latin faces (Merriweather 300/700 and both italics, Raleway 400, Source Sans Pro 700 and 900) are cut to the characters the site sets: 237,452 to 168,468 bytes for the seven, a journal's fonts 94 to 70 KB on a phone and 139 to 101 KB on a desktop, Home and Travel 117 to 83 KB, Work 163 to 115 KB. Text renders identically: the same platform font for every glyph on all 19 pages at 1440 and 390, and 0 differing pixels on Home, Work, Skills, Guangzhou, Chengdu and Japan at both widths in Chromium and WebKit.
+
+```powershell
+python -I tools/fonts/subset-latin.py
+```
+
+- The full files are kept, unpublished, in `tools/fonts/latin/` as the source (`SOURCES.md` there says where each came from). Outlines, hinting, metrics and features are copied unchanged.
+- The set is always all of ASCII (U+0000-007F), U+00A0, the combining marks U+0300-036F (dropping them broke the pinyin on Guangzhou) and General Punctuation U+2000-206F, plus every other character of Google's latin range that a built `.html`, `.js`, `.json` or `.css` contains (HTML entities and `·`-style escapes read, both cases because of `text-transform`). The script also sets the seven faces' `unicode-range` in `main.css` to Google's latin range narrowed to that set.
+- `verify.ps1` fails when a built page or data file contains a character of that range missing from the faces' `unicode-range`, naming the character and the file: a new word with a new letter (ñ, ø) would otherwise render that letter in Georgia or Arial. Build, run the script, rebuild. It caps the cuts at 37 KB (Merriweather), 20 KB (Raleway), 14 KB (Source Sans 700) and 13 KB (900), below the full files.
+- Text typed into Travel's search box can still hold a letter the site never sets; that letter falls back, as any letter outside the latin range always did.
 
 ### Latin-ext subsets
 

@@ -2,7 +2,10 @@
 variable font.
 
     python -I tools/fonts/subset-source-sans.py <SourceSans3 VF .ttf/.woff2> \
-        --weight 700 --output assets/fonts/source-sans-pro-700-latin.woff2
+        --weight 700 --output tools/fonts/latin/source-sans-pro-700-latin.woff2
+
+That full latin instance is the source tools/fonts/subset-latin.py cuts to
+the characters the site sets, writing assets/fonts/source-sans-pro-700-latin.woff2.
 
 The output mirrors the shipped `source-sans-pro-900-latin.woff2` (a Google
 Fonts latin cut of Source Sans Pro 2.045): same unicode range, same OpenType
