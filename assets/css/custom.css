@@ -1798,6 +1798,11 @@ html:has(> body.is-map-fullscreen) {
   pointer-events: none;
 }
 
+/* At 0.08 the other trips' labels still overlapped as ghost text. */
+.travel-map__canvas.is-trip-selected .travel-map__detail:not(.is-trip-active) .travel-map__detail-label {
+  visibility: hidden;
+}
+
 /* Region is the level the desktop atlas opens on, so it needs the same muting
    as area and stop. Without it a selected trip left every unrelated marker
    fully opaque and clickable while the route line ran across them, and the
@@ -2236,6 +2241,10 @@ html:has(> body.is-map-fullscreen) {
   transition: opacity 180ms ease, transform 180ms ease;
 }
 
+.travel-map__detail-card p {
+  text-align: left;
+}
+
 .travel-map__detail-card[hidden] {
   display: none;
 }
@@ -2397,7 +2406,8 @@ html:has(> body.is-map-fullscreen) {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.06);
   box-shadow: none;
-  color: rgba(255, 255, 255, 0.9);
+  /* !important: the theme's button colour (#212931) otherwise wins. */
+  color: rgba(255, 255, 255, 0.9) !important;
   cursor: pointer;
   font-size: 1rem;
   line-height: 1;
@@ -2432,7 +2442,8 @@ body.is-map-fullscreen {
    dialog's close control. */
 body.is-map-fullscreen #header,
 body.is-map-fullscreen #navPanelToggle,
-body.is-map-fullscreen #return-to-top {
+body.is-map-fullscreen #return-to-top,
+body.is-map-fullscreen #footer {
   visibility: hidden;
 }
 
@@ -3237,6 +3248,11 @@ body.is-map-fullscreen .travel-atlas__layout {
   box-shadow: 0 0.9rem 2rem rgba(0, 0, 0, 0.14);
 }
 
+/* main.css's grid borders (#main > .posts > article) out-rank the card's own:
+   photos and titles sat at alternating heights and the teal edge never showed. */
+#main > .posts.travel-grid > article.travel-card { border-width: 1px; }
+#main > .posts.travel-grid > article.travel-card:is(:hover, :focus-within) { border-color: rgba(18, 138, 134, 0.38); }
+
 .travel-grid .travel-card header {
   grid-row: 2;
   padding: 1rem 1rem 0.3rem;
@@ -3344,7 +3360,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   #main > .travel-grid { padding: 0.85rem 1rem 1rem !important; }
   #main > .travel-archive-heading {
     gap: 0.1rem;
-    margin: 1.5rem 1rem 0;
+    margin: 1.5rem var(--opening-gutter) 0;
     padding: 0.9rem 0 0.75rem !important;
   }
   .travel-grid .travel-card { grid-template-rows: auto 1fr; }
@@ -9534,7 +9550,11 @@ body.page-home #nav {
 }
 
 .photo-search__chip:hover,
-.photo-search__chip:focus-visible {
+.photo-search__chip:focus-visible,
+.photo-results__more:hover,
+.photo-results__more:focus-visible,
+.photo-results__clear:hover,
+.photo-results__clear:focus-visible {
   border-color: var(--color-brand-200);
   background: var(--color-brand-100);
   box-shadow: none;
@@ -9715,12 +9735,23 @@ body.page-home #nav {
   color: var(--color-brand-700);
 }
 
+/* Styled as the search chips (15 Nov 2026): the theme's black capsule set
+   them in 9.9px caps. */
 .photo-results__more,
 .photo-results__clear {
-  height: 2.25rem;
-  padding: 0 1.1rem;
-  font-size: max(var(--text-floor), 0.62rem);
-  line-height: 2.25rem;
+  height: auto;
+  min-height: 2rem;
+  padding: 0 0.8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  box-shadow: none;
+  background: var(--color-surface);
+  color: var(--color-ink-700) !important;
+  font-size: max(var(--text-floor), 0.74rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-transform: none;
 }
 
 .photo-results__more {
@@ -9785,8 +9816,7 @@ body.page-home #nav {
 
   .photo-results__more,
   .photo-results__clear {
-    height: 3rem;
-    line-height: 3rem;
+    min-height: 3rem;
   }
 
   /* Active query: scroll the journal legend as one edge-bleeding,
@@ -9846,7 +9876,7 @@ body.page-home #nav {
   letter-spacing: 0.075em;
 }
 
-.photo-explore__heading .photo-explore__button { flex: 0 0 auto; white-space: nowrap; }
+.photo-explore__heading .photo-explore__button { flex: 0 0 auto; margin-right: -0.8rem; white-space: nowrap; }
 
 .photo-explore__hint { margin: -0.25rem 0 1rem; font-size: max(var(--text-floor), 0.85rem); }
 
@@ -10474,7 +10504,9 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 .travel-timeline .compact-journals:not(.journals-expanded) .travel-card>p{display:block;grid-column:2;grid-row:2;padding:4px 24px 16px;font-size:13px}
 .journal-preview-controls[hidden]{display:none!important}
 @media(min-width:737px){
- .travel-timeline #main>.journal-chronology{background:#f3f7f3;border:1px solid #dce7de!important;border-bottom:0!important;margin:0 40px!important;border-radius:10px 10px 0 0;padding:16px 12px 0!important}
+ /* The panel takes the page's 2rem edge (was 40px), so the heading's rule no longer overhangs it; the panel's own border replaces the rule. */
+ .travel-timeline #main>.travel-archive-heading{border-bottom:0}
+ .travel-timeline #main>.journal-chronology{background:#f3f7f3;border:1px solid #dce7de!important;border-bottom:0!important;margin:0 2rem!important;border-radius:10px 10px 0 0;padding:16px 12px 0!important}
  .journal-preview-help{font:12px/1.5 var(--font-body)!important;margin:0 12px 4px!important;color:#42685b!important}
  .travel-timeline .chronology-detail{display:none}
  /* Leave room for the lower labels and their keyboard-focus outline inside the scrollport. */
@@ -10483,12 +10515,12 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
  .travel-timeline .chronology-trip{top:calc(var(--timeline-line) - 8px)}
  .travel-timeline .chronology-name{top:calc(-1 * var(--timeline-icon-height) - 53px)}
  .travel-timeline .chronology-pulse{top:calc(var(--timeline-line) - 3px)}
- .travel-timeline #main>.journal-preview-controls{margin:0 40px 24px;padding:8px 24px 12px!important;justify-content:flex-end;background:#f3f7f3;border:1px solid #dce7de;border-top:0;border-radius:0 0 10px 10px}
+ .travel-timeline #main>.journal-preview-controls{margin:0 2rem 24px;padding:8px 24px 12px!important;justify-content:flex-end;background:#f3f7f3;border:1px solid #dce7de;border-top:0;border-radius:0 0 10px 10px}
  .travel-timeline .journal-preview-controls label{display:none}
  .travel-timeline .journal-preview-controls button{border:0;box-shadow:none;text-transform:none;letter-spacing:0;height:32px;line-height:30px;min-height:32px;padding:0;font-size:12px}
  /* All previews contribute to one shared row height; only the selected card is visible.
     This also reserves room for longer text at narrower desktop widths. */
- .travel-timeline #main>.compact-journals:not(.journals-expanded){display:grid!important;grid-template-columns:minmax(0,1fr);gap:0;width:auto!important;margin:0 40px;padding:16px 24px 0!important;background:#f3f7f3;border:1px solid #dce7de;border-top:0;border-bottom:0;border-radius:0;overflow-anchor:none}
+ .travel-timeline #main>.compact-journals:not(.journals-expanded){display:grid!important;grid-template-columns:minmax(0,1fr);gap:0;width:auto!important;margin:0 2rem;padding:16px 24px 0!important;background:#f3f7f3;border:1px solid #dce7de;border-top:0;border-bottom:0;border-radius:0;overflow-anchor:none}
  .travel-timeline .compact-journals:not(.journals-expanded)>.travel-card{display:grid!important;grid-area:1/1;grid-template-rows:auto auto;min-height:160px;width:100%!important;max-width:900px;margin:0 auto!important;transform:none;overflow-anchor:none}
  .travel-timeline .compact-journals:not(.journals-expanded)>.travel-card:not(.preview-selected){pointer-events:none}
  .travel-timeline .compact-journals:not(.journals-expanded)>.travel-card.preview-selected{margin:0 auto!important}
@@ -10574,9 +10606,9 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 .travel-timeline .photo-explore__caption{padding:7px 12px;gap:2px}
 .travel-timeline .photo-explore{margin-top:8px!important;margin-bottom:8px!important}
 @media(min-width:981px){
- .travel-timeline .travel-atlas__header{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.15fr);column-gap:24px;row-gap:18px!important;align-items:center}
+ .travel-timeline .travel-atlas__header{display:grid;grid-template-columns:minmax(280px,.85fr) minmax(0,1.15fr);column-gap:24px;row-gap:18px!important;align-items:start}
  .travel-timeline .travel-atlas__header>div{grid-column:1/-1}
- .travel-timeline .travel-atlas__header>.photo-search{grid-column:1;grid-row:2;min-width:0;width:100%;align-self:center}
+ .travel-timeline .travel-atlas__header>.photo-search{grid-column:1;grid-row:2;min-width:0;width:100%;align-self:start}
  .travel-timeline .travel-atlas__header>.travel-portals{grid-column:2;grid-row:2;max-width:none;width:100%;margin:0}
  .travel-timeline .travel-portals .travel-portal{flex-direction:row;align-items:center;gap:10px;padding:8px 14px;min-height:94px}
  .travel-timeline .portal-art{width:120px;height:76px;flex:0 0 120px}
@@ -10603,7 +10635,7 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 .mobile-journal-list{display:none}
 @media(max-width:736px){
  .travel-timeline #main>.journal-chronology,.travel-timeline #main>.journal-preview-controls,.travel-timeline #main>.compact-journals,.travel-timeline #main>.compact-journals:not(.journals-expanded){display:none!important}
- .travel-timeline #main>.mobile-journal-list{display:flex;flex-direction:column;padding:16px 14px!important;border:0}
+ .travel-timeline #main>.mobile-journal-list{display:flex;flex-direction:column;padding:16px var(--opening-gutter)!important;border:0}
  .mobile-journal-list[hidden]{display:none!important}
  .mobile-journal-card{position:relative;min-width:0;margin:0;padding:0;border:0;box-shadow:none;background:transparent;opacity:1;transform:none}
  .mobile-journal-card header{margin:0;padding:0}.mobile-journal-card h2{font:700 18px/1.25 var(--font-body);text-transform:none;letter-spacing:0;margin:6px 0}
@@ -10671,6 +10703,7 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
  .travel-timeline.travel-phone-rail .mobile-journal-card>a.image,.travel-timeline.travel-phone-rail .mobile-journal-card>.travel-card__image{height:150px;aspect-ratio:auto;margin:0 0 10px!important}
  .travel-timeline.travel-phone-rail .mobile-journal-card img{height:150px!important;aspect-ratio:auto;object-position:var(--thumb-focus,var(--focus,50% 50%))}
  .travel-timeline.travel-phone-rail .mobile-journal-card>p{-webkit-line-clamp:2;line-height:1.45!important}
+ .travel-timeline .mobile-journal-card>p{text-wrap:balance}
  .travel-timeline.travel-phone-rail .mobile-journal-row:last-child::before{height:100px}
 }
 
@@ -10874,6 +10907,10 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .travel-timeline .journal-chronology .chronology-name{padding-top:0;margin-top:3px;border-radius:10px}
 @media(prefers-reduced-motion:reduce){.travel-timeline .journal-chronology .authored-scene::before,.travel-timeline .journal-chronology .mm-dusk-tile{transition:none}}
 .travel-timeline .travel-archive-heading .journal-show-all{border:0;box-shadow:none;padding:0 8px;min-height:44px;line-height:44px;text-transform:none;letter-spacing:0;font-size:max(var(--text-floor),.85rem);font-weight:700;color:var(--color-brand-700)!important}
+/* Its text ends on the heading's right edge, as "Another mix" does, with the same wash and ring. */
+.travel-timeline .travel-archive-heading .journal-show-all{margin-right:-8px;border-radius:var(--radius-control)}
+.travel-timeline .travel-archive-heading .journal-show-all:hover,.travel-timeline .travel-archive-heading .journal-show-all:focus-visible{background:var(--color-brand-wash)}
+.travel-timeline .travel-archive-heading .journal-show-all:focus-visible{outline:2px solid var(--color-brand-600);outline-offset:3px}
 @media(max-width:736px){.travel-timeline .journal-show-all{display:none}}
 /* Travel polish (7 Nov 2026). Section headings on the page share one style: "Travel journals"
    was 1.4x "Browse photos" and "Explore by destination", its "Show all" was black 900 beside the
