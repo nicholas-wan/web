@@ -1069,7 +1069,8 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 25;
+  /* Under the lightbox (20), which it drew over at 25. */
+  z-index: 19;
   height: 4px;
   background: rgba(0, 0, 0, 0.07);
   pointer-events: none;
@@ -3495,6 +3496,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   color: var(--color-ink-900);
   font-size: clamp(1.55rem, 3vw, 1.8rem);
   text-align: left;
+  text-wrap: balance;
 }
 
 .guangzhou-day__route {
@@ -3569,21 +3571,17 @@ body.is-map-fullscreen .travel-atlas__layout {
     overflow: hidden;
   }
 
+  /* Size, border and type come from the shared .travel-route__more chip. */
   .guangzhou-day__route--collapsible.is-desktop-wrapped .guangzhou-route__more {
     display: inline-flex;
-    min-height: 2.15rem;
     align-items: center;
     justify-content: center;
     margin-top: 0.55rem;
-    padding: 0.4rem 0.7rem;
-    border: 1px solid color-mix(in srgb, var(--color-brand-600) 30%, #fff);
     border-radius: 999px;
     background: #fff;
     color: var(--color-brand-700);
     font-family: var(--font-display);
-    font-size: max(11px, 0.7rem);
     font-weight: 700;
-    letter-spacing: 0.08em;
   }
 }
 
@@ -3594,6 +3592,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   color: var(--color-ink-600);
   line-height: 1.75;
   text-align: left;
+  text-wrap: pretty;
 }
 
 /* Australia keeps its older markup: a bare intro paragraph and no lede.
@@ -6432,6 +6431,11 @@ a.travel-jump-group__label {
     background: linear-gradient(90deg, rgba(25, 30, 35, 0), rgba(25, 30, 35, 0.98) 82%);
   }
 
+  /* main.css's `#main > *` 2px pale top line showed over the dark rail. */
+  #main > .travel-section-nav {
+    border-top: 0;
+  }
+
   .page-travel-journal #wrapper > #navPanelToggle {
     opacity: 0;
     pointer-events: none;
@@ -6589,6 +6593,15 @@ a.travel-jump-group__label {
 #main > .travel-pagination {
   margin: 3rem auto 0;
   border-top: 1px solid var(--color-border-soft);
+}
+
+/* Inset to the text column below 64rem, as the tab pages' pager is. */
+@media screen and (min-width: 737px) {
+  #main > .travel-pagination { width: calc(100% - 8rem); }
+}
+
+@media screen and (min-width: 601px) and (max-width: 736px) {
+  #main > .travel-pagination { width: calc(100% - 4rem); }
 }
 
 .travel-pagination a {
@@ -7049,6 +7062,14 @@ body.lightbox-open {
   color: #fff;
   font-size: 0.9rem;
   line-height: 1.5;
+}
+
+/* The caption hugs its text instead of a 1200px bar under a portrait photo. */
+@media screen and (min-width: 737px) {
+  .lightbox__caption {
+    align-self: center;
+    max-width: 100%;
+  }
 }
 
 .lightbox__context {
