@@ -4214,10 +4214,18 @@ body.is-map-fullscreen .travel-atlas__layout {
   border: 0 !important;
 }
 
+/* Hero type in three levels (17 Nov 2026): the name in display caps, the
+   claim as a sentence in the bio's serif, the role as a small teal label.
+   Spacing is set by each block's top margin, not a gap. */
 #intro {
   justify-content: center;
-  gap: 1rem;
   padding-bottom: 4rem;
+}
+
+#intro h1 {
+  margin: 0;
+  letter-spacing: 0.06em;
+  padding-left: 0.06em;
 }
 
 #intro .portfolio-hero__summary {
@@ -4230,7 +4238,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   display: flex;
   justify-content: center;
   gap: 0.75rem;
-  margin: 0.75rem 0 0;
+  margin: 2.1rem 0 0;
 }
 
 #intro .portfolio-hero__actions li {
@@ -6042,19 +6050,19 @@ body:not(.page-home) #wrapper.fade-in::before {
 @media screen and (max-width: 736px) {
   #intro {
     min-height: 82vh;
-    gap: 0.75rem;
     padding: 4rem 1.25rem 2rem;
   }
 
   #intro h1 {
     max-width: 100%;
     margin: 0;
-    font-size: clamp(2rem, 10vw, 2.65rem);
+    padding-left: 0.05em;
+    font-size: clamp(2.15rem, 10.6vw, 2.8rem);
+    letter-spacing: 0.05em;
     line-height: 1.05;
   }
 
   #intro .portfolio-hero__summary {
-    max-width: 20rem;
     font-size: 1rem;
     line-height: 1.55;
   }
@@ -6063,6 +6071,7 @@ body:not(.page-home) #wrapper.fade-in::before {
     display: grid !important;
     width: min(100%, 19rem);
     gap: 0.6rem;
+    margin-top: 1.75rem;
   }
 
   #intro .portfolio-hero__actions .button {
@@ -9019,33 +9028,39 @@ body.page-home #nav {
      scramble's noise frames (which vary a few px per word) zero slack —
      they wrap inside the overlay and the centered line marches left and
      right. A fixed box wider than the text absorbs the variance. */
-  width: min(44rem, calc(100vw - 3rem));
+  width: min(48rem, calc(100vw - 3rem));
   grid-template-columns: 1fr;
-  gap: 0.55rem;
-  margin: 0;
+  gap: 0;
+  margin: 1.5rem 0 0;
   font-style: normal;
   text-align: center;
   text-transform: none;
 }
 
+/* The claim is a sentence in the bio's reading serif. It breaks after
+   "products" on every width: a newline in the source, kept by pre-line
+   (the scramble keeps it too), so each clause holds its own line. */
 #intro .portfolio-hero__scramble-row {
   position: relative;
   display: block;
-  color: rgba(255, 255, 255, 0.92);
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 900;
-  letter-spacing: 0.025em;
-  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-body);
+  font-size: clamp(1.45rem, 2.2vw, 1.75rem);
+  font-weight: 300;
+  letter-spacing: -0.005em;
+  line-height: 1.45;
+  white-space: pre-line;
 }
 
+/* The role: a small teal label, the one accent in the hero type. */
 .portfolio-hero__scramble-support {
   display: block;
-  color: rgba(255, 255, 255, 0.62);
+  margin-top: 1.15rem;
+  color: rgba(40, 215, 197, 0.82);
   font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 400;
-  letter-spacing: 0.075em;
+  font-size: max(var(--text-floor), 0.74rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
   line-height: 1.5;
   text-transform: uppercase;
 }
@@ -9065,16 +9080,20 @@ body.page-home #nav {
 @media screen and (max-width: 736px) {
   #intro .portfolio-hero__summary {
     width: calc(100vw - 2.5rem);
+    margin-top: 1rem;
   }
 
+  /* Sized so the longer clause, "for real-world security operations.",
+     still fits one line at 360. */
   #intro .portfolio-hero__scramble-row {
-    font-size: clamp(0.84rem, 3.7vw, 0.96rem);
+    font-size: clamp(1.12rem, 5.2vw, 1.4rem);
     line-height: 1.5;
   }
 
   .portfolio-hero__scramble-support {
-    font-size: max(var(--text-floor), clamp(0.6rem, 2.5vw, 0.7rem));
-    letter-spacing: 0.045em;
+    margin-top: 0.95rem;
+    font-size: max(var(--text-floor), 0.7rem);
+    letter-spacing: 0.12em;
   }
 }
 
