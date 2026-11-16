@@ -539,6 +539,12 @@
   line-height: 1.75;
 }
 
+/* The site's body-text wrap rule on the bio at every width (17 Nov 2026):
+   pretty outside Safari's engine, so no line ends on a lone word. */
+@supports not (hanging-punctuation: first) {
+  .intro-swipe .intro-swipe__text .aboutblock { text-wrap: pretty; }
+}
+
 .intro-swipe.is-static {
   height: auto;
 }
