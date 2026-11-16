@@ -8465,6 +8465,18 @@ body.lightbox-open {
   font-weight: 700;
 }
 
+/* A card whose caption only restated its title has none (17 Nov 2026: Pre-Wedding Photoshoot).
+   Meta, title and link read as one evenly spaced group: the title loses the margin that spaced
+   the caption, and the link sits the meta-to-title step below it. On desktop the photo still
+   sets the card's height and the text stays centred, so the card keeps its size. */
+.personal-event-card--title-only .personal-event-card__body > strong {
+  margin-bottom: 0;
+}
+
+.personal-event-card--title-only .personal-event-card__open {
+  padding-top: 0.65rem;
+}
+
 .personal-event-card__instagram {
   display: inline-flex;
   align-items: center;
@@ -8974,6 +8986,11 @@ body.page-home #nav {
   .personal-event-card__meta,
   .personal-event-card__open {
     font-size: 0.9rem;
+  }
+
+  /* The short text block under the photo ends with the same breathing room as its top. */
+  .personal-event-card--title-only .personal-event-card__body {
+    padding-bottom: 1.05rem;
   }
 
   .personal-timeline.is-enhanced .personal-timeline-event--left .personal-event-card,
