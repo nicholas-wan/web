@@ -3598,6 +3598,33 @@ body.is-map-fullscreen .travel-atlas__layout {
   text-align: left;
 }
 
+/* Chinese and Japanese text (16 Nov 2026): lang="zh-Hans" sent Chromium on
+   Windows to SimSun and lang="ja" to a light Yu Gothic, so each element keeps
+   its own Latin face and then names sans CJK faces: YaHei as before for
+   Chinese, a Japanese sans for Japan. Route summaries in the same box follow
+   their stops; Japan's mixed captions follow its tagged ones. */
+.guangzhou-route__stop > :lang(zh-Hans),
+.guangzhou-day__route > .travel-route-summary:has(~ .guangzhou-route :lang(zh-Hans)) {
+  font-family: Merriweather, "Merriweather Fallback", Georgia, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+}
+
+.page-travel-journal .content-details > :lang(zh-Hans) {
+  font-family: Raleway, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif !important;
+}
+
+/* Medium first: at the stops' 700 it is the nearest Windows match to YaHei's weight. */
+.guangzhou-route__stop > :lang(ja) {
+  font-family: Merriweather, "Merriweather Fallback", Georgia, "Hiragino Sans", "Yu Gothic Medium", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans JP", sans-serif;
+}
+
+.guangzhou-day__route > .travel-route-summary:has(~ .guangzhou-route :lang(ja)) {
+  font-family: Merriweather, "Merriweather Fallback", Georgia, "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans JP", sans-serif;
+}
+
+.page-travel-journal .japan-journal .content-details > * {
+  font-family: Raleway, "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans JP", sans-serif !important;
+}
+
 /* Outside WebKit only (16 Nov 2026): Safari re-wraps whole paragraphs, leaving ragged lines on phones. */
 @supports not (hanging-punctuation: first) {
   .guangzhou-day__note { text-wrap: pretty; }
@@ -6387,13 +6414,15 @@ a.travel-jump-group__label {
 }
 
 /* The rail and its chip strip clip overflow, which cut 2-6px off the outside
-   ring; ring inside the edge instead (white on the filled teal chip). */
+   ring; ring inside the edge instead. On the white desktop rail the filled
+   chip takes a near-black teal ring (3.5:1 on the chip); the dark phone and
+   tablet rail use white (below). */
 .travel-section-nav a:focus-visible {
   outline-offset: -3px;
 }
 
 .travel-section-nav a.is-active:focus-visible {
-  outline-color: #fff;
+  outline-color: #04201f;
 }
 
 /* On phones and tablets the rail remains a continuation of the dark journal
@@ -6573,6 +6602,10 @@ a.travel-jump-group__label {
     border-color: var(--color-brand-600);
     background: var(--color-brand-600);
     color: #fff;
+  }
+
+  .travel-section-nav a.is-active:focus-visible {
+    outline-color: #fff;
   }
 
   .travel-section-nav .travel-jump-group + .travel-jump-group {
@@ -10317,8 +10350,8 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes portal-right{0%,100%{transform:translate(7px,-2px) rotate(10deg)}45%,65%{transform:translate(17px,-4px) rotate(18deg)}}
 @keyframes portal-front{0%,100%{transform:translate(0,4px)}45%,65%{transform:translate(0,6px)}}
 .travel-atlas__layout,#travel-archive-title{scroll-margin-top:2rem}
-/* Desktop's bar is sticky and 56px tall; 2rem left the heading under it. */
-@media(min-width:981px){.travel-atlas__layout,#travel-archive-title{scroll-margin-top:calc(56px + 1.5rem)}}
+/* Desktop's sticky bar is 3.5rem (56px at 1440, 75px at 1920); 2rem left the heading under it. */
+@media(min-width:981px){.travel-atlas__layout,#travel-archive-title{scroll-margin-top:calc(3.5rem + 1.5rem)}}
 /* The opening shortcut owns the animated invitation; the lower phone teaser rests. */
 .travel-map-teaser.is-previewing,.travel-map-teaser.is-previewing *{animation:none!important}
 @media(min-width:737px){.travel-atlas__header{align-items:flex-start}.travel-portals{margin-top:0;margin-bottom:0}}

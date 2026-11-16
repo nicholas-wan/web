@@ -1,5 +1,4 @@
-/* Small previews; activate existing navigation immediately, without moving
-   overflow-clipped ancestors or loading the atlas just to paint the shortcut. */
+/* Previews; navigate at once, never moving clipped ancestors or loading the atlas. */
 (function () {
   'use strict';
   var nav = document.querySelector('.travel-portals');
@@ -7,7 +6,7 @@
   var reduced = matchMedia('(prefers-reduced-motion: reduce)');
   var onScreen = false;
   var seen = new WeakSet();
-  // Touch screens have no hover replay, so the two previews replay together while visible.
+  // Touch: both previews replay together while visible.
   var touch = matchMedia('(hover: none)');
   var timer = 0;
   function syncPause() { nav.classList.toggle('is-paused', document.hidden || !onScreen); loop(); }
@@ -55,7 +54,8 @@
         if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
         target.focus({ preventScroll: true });
         var margin = parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
-        window.scrollTo({ top: window.scrollY + target.getBoundingClientRect().top - margin, behavior: reduced.matches ? 'instant' : 'smooth' });
+        var edge = mapLink && target.previousElementSibling || target; // map: its heading
+        window.scrollTo({ top: window.scrollY + edge.getBoundingClientRect().top - margin, behavior: reduced.matches ? 'instant' : 'smooth' });
       });
     });
   });

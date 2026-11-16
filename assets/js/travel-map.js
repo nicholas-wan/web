@@ -890,6 +890,7 @@
     setActiveTrip(tripKey, true);
     if (!stops.length) return;
     returnView = entryView;
+    if (key) viewport.focus({ preventScroll: true });
     window.clearTimeout(tripEntryTimer);
     tripEntryTimer = window.setTimeout(function () {
       if (activeTrip !== tripKey) return;

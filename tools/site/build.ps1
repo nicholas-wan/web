@@ -1323,8 +1323,9 @@ foreach ($page in $pages) {
     # Wider screens show the timeline at the first screen's edge, so they fetch its scenes
     # beside the CSS, as when they were inline; phones fetch them later (travel-chronology.js).
     # An inline fetch the script reuses, not a preload: WebKit never matched the as=fetch
-    # preload to the script's fetch and downloaded the file twice (15 Nov 2026).
-    if ($slug -eq 'travel') { $routeStylesheetMarkup += "`n    <script>matchMedia('(min-width: 737px)').matches&&(self.scenes=fetch('$(Get-AssetRef 'assets/data/travel-scenes.svg')',{priority:'low'}))</script>" }
+    # preload to the script's fetch and downloaded the file twice (15 Nov 2026). The catch is a side branch: the
+    # stored promise still rejects for the script, but an early failure is not reported as unhandled.
+    if ($slug -eq 'travel') { $routeStylesheetMarkup += "`n    <script>matchMedia('(min-width: 737px)').matches&&(self.scenes=fetch('$(Get-AssetRef 'assets/data/travel-scenes.svg')',{priority:'low'})).catch(()=>{})</script>" }
     # The professional pages opt out of a share-preview image (owner decision,
     # Jul 2026): scrapers show a text-only card rather than the travel default.
     # Projects has its own picture of the four demos instead (owner, 14 Nov 2026: "Yes, add it").
