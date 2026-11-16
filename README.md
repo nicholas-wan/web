@@ -488,12 +488,12 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - `?q=` via `history.replaceState` (no entries; removed when empty), read on load.
 - Hits link to `<trip slug>#photo=<id>` (opens the lightbox).
 - Ranking:
-  - Normalise: lowercase, strip accents/punctuation, one token per CJK character.
+  - Normalise: lowercase, strip accents/punctuation (then recompose, so Hangul stays whole syllables), one token per CJK character.
   - Best field score per term: exact tag 3; tag prefix 2; place/caption exact/prefix 2; alt/section title 1; trip label/year 1.
   - Damerau–Levenshtein 1 (terms ≥5 letters) = field prefix − 0.5, only if the term has no exact/prefix hit in the index.
   - Hidden-field best match (alt, section title, trip) counts half, once, in `termScore`, not the weight tables.
   - Rarity weight `log(1 + N / df)`, `df` = photos matching the term.
-  - Full matches lead. For an exact known subject tag (or synonym), only photos tagged with that subject enter the full tier; contextual matches remain related. When full matches exist, related photos appear only after Show related photos; otherwise related matches appear immediately. Query edits reset this disclosure.
+  - Full matches lead. For an exact known subject tag (or synonym), only photos tagged with that subject enter the full tier; contextual matches remain related. A query names a tag when its terms equal a key's own terms, so a Chinese or Japanese synonym (one term per character) names its place too. Place tags carry native-script synonyms (17 Nov 2026; `成都`, `张家界`, `広島`/`广岛`, `東京`/`东京`, `서울` and the rest of the Japan and China stops): for such a CJK query, photos of that place also match through its synonyms, and related photos must contain every character, so `成都` no longer surfaces Kyoto through `都`. Latin queries keep the plain fallback (a broader tag's synonym, as drinks: bubble tea, would pull in every photo of that tag). `photo-search.test.cjs` checks every native-script synonym returns exactly its place's photos. When full matches exist, related photos appear only after Show related photos; otherwise related matches appear immediately. Query edits reset this disclosure.
   - Per tier, one run per trip: trips by best hit (newest on tie); inside by terms matched, score, journal order.
 - Related tiles only: muted `matches: panda` line, query order, `(in description)` for hidden-field matches; a related-tag hit reads `related to submarine` (it was `submarine (related tag)`, which read like debug text; 15 Nov 2026 review). With no exact match the status says so first (`No exact matches for 'submarine volcano' · 33 related photos`), and the `Try red pandas, Kyoto, or coffee.` example hides while a query is showing.
 - Mark highlights before HTML-escaping (no `<mark>` in `&#38;`).

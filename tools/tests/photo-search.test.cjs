@@ -158,6 +158,24 @@ test('diacritics, CJK, photo links and numeric highlights retain their meaning',
   assert.equal(api.tripLabel('travel_2023_usacanada'), 'USA & Canada · 2023');
 });
 
+// 17 Nov 2026: 成都 found Kyoto cafes, because CJK search is one term per character and 都 is in
+// Kyoto's captions. Every native-script place name in the vocabulary now returns only its place.
+test('Chinese, Japanese and Korean place names return only that place', () => {
+  const api = setup();
+  const vocabulary = JSON.parse(fs.readFileSync(path.join(root, 'journals/tag-vocabulary.json'), 'utf8'));
+  const names = Object.entries(vocabulary).flatMap(([tag, entry]) =>
+    (entry.synonyms || []).filter(name => /[぀-ヿ一-鿿가-힯]/.test(name)).map(name => [tag, name]));
+  assert.ok(names.length >= 40, String(names.length));
+  for (const [tag, name] of names) {
+    const [full, related] = api.search(api.tokens(name));
+    const count = index.tags.find(t => t.tag === tag).count;
+    assert.equal(full.length, count, `${name} should find all ${count} ${tag} photos`);
+    assert.ok(full.every(hit => hit.photo.tags.includes(tag)), `${name}: ${full.filter(hit => !hit.photo.tags.includes(tag)).map(hit => hit.photo.id)}`);
+    // Related photos, behind Show related photos, must still contain the whole name.
+    assert.ok(related.every(hit => hit.why.length === api.tokens(name).length), `${name}: ${related.map(hit => hit.photo.id)}`);
+  }
+});
+
 test('corrupt saved searches cannot stop initialization', () => {
   for (const value of ['{}', '42', '"panda"', 'null', '[null,2,"panda"]', '{']) {
     const api = setup({ 'photo-search-recent': value });
