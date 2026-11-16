@@ -194,7 +194,7 @@ test('phone internship peeks open inline, swap on one tap, and keep the thumbnai
  }
 });
 
-test('agentic AI chart: a hover previews it like the internship charts, it plays one ~16 s hunt in three narrative steps and replays, reduced motion holds the final frame, and phones get the stacked drawing',async({page})=>{
+test('agentic AI chart: a click docks it in its card on desktop, it plays one ~16 s hunt in three narrative steps and replays, reduced motion holds the final frame, and phones get the stacked drawing',async({page})=>{
  const scene=root=>card(root).locator('svg.ag-scene:not(.ag-scene--m)');
  const phoneScene=root=>card(root).locator('svg.ag-scene--m');
  const shown=loc=>loc.evaluate(e=>+getComputedStyle(e).opacity);
@@ -203,11 +203,13 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  await page.goto('/experience');
  const root=peek(page,'agentic');
  await expect(chip(root)).toHaveText('Hunt from a report');
- // Desktop: a hover previews it, floating below its chip like the other internship charts.
+ // Desktop: a click opens it inside the card, in the page's flow (17 Nov 2026); a hover does not.
  await root.dispatchEvent('mouseenter');
+ await expect(card(root)).not.toHaveClass(/is-open/);
+ await chip(root).click();
  await expect(card(root)).toHaveClass(/is-open/);
  await expect(card(root)).toHaveClass(/is-still/);
- await expect(card(root)).toHaveCSS('position','absolute');
+ await expect(card(root)).toHaveCSS('position','relative');
  await expect(scene(root)).toBeVisible();
  await expect(phoneScene(root)).toBeHidden();
  // Reduced motion holds the final frame: all three steps, the human and the second search's find shown; nothing
@@ -238,12 +240,12 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  const forbidden=/prime[- ]?th|SysUpdate|Evidence found|SPL crafter|Post-query|Splunk|root-level|days to hours|\bdays\b|\d+ hits|tokens?\b/i;
  expect(words).not.toMatch(forbidden);
  expect(label).not.toMatch(forbidden);
- // The card is wider than the other charts (46rem: three steps side by side) and the drawing fills it.
- const c=await card(root).boundingBox(),d=await scene(root).boundingBox();
+ // The card takes the text column's full width (990px at 1366: the floating 46rem card drew its sentences at 12px) and the drawing fills it.
+ const c=await card(root).boundingBox(),d=await scene(root).boundingBox(),col=await page.locator('#agentic-ai').evaluate(a=>{const s=getComputedStyle(a);return a.clientWidth-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight);});
  expect(Math.abs(c.width-d.width)).toBeLessThan(2);
- expect(c.width).toBeGreaterThan(560);
- expect(c.width).toBeLessThan(760);
- await root.dispatchEvent('mouseleave');
+ expect(Math.abs(c.width-col)).toBeLessThan(2);
+ expect(c.width).toBeGreaterThan(960);
+ await chip(root).click();
  await expect(card(root)).not.toHaveClass(/is-open/);
  // Playing: one hunt told as cause and effect, replayed by the shared loop once the final frame has held; no button, no story panel.
  await page.emulateMedia({reducedMotion:'no-preference'});
@@ -325,41 +327,110 @@ test('agentic AI chart: a hover previews it like the internship charts, it plays
  for(const o of await phoneScene(root).locator('.ag-tv').evaluateAll(es=>es.map(e=>+getComputedStyle(e).opacity)))expect(o).toBe(0);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
 });
-// 10 Nov 2026 (owner: "fix", then "add the polish ones also", after a review that measured each of these on recordings).
-test('agentic AI chart: a hover opens it in view, a click dims the page behind it, a short phone shows all of it, reduced motion keeps its edge on the card, and it pauses off screen',async({page})=>{
- const root=peek(page,'agentic'), c=card(root), scene=c.locator('svg.ag-scene--m');
- // Desktop: as the chip first scrolls into view it sits low on the screen, with no room for the card below it. A hover
- // never scrolls, so the card opened under the fold (1 to 24% of it on screen at four laptop sizes); it now opens above.
- await page.setViewportSize({width:1366,height:657});
+// 17 Nov 2026 (owner: "do all", hunt-inline on lab/open-decisions): on a screen with a mouse the chart opens inside the
+// dark card, in the flow, pushing the next case study down; nothing dims, and it stays open beside the hover charts.
+test('agentic AI chart docks on desktop: a click unfolds it in the flow without a scroll jump, the chip, its close button or Escape folds it, other charts leave it open, and it replays',async({page})=>{
+ const root=peek(page,'agentic'), c=card(root), next=page.locator('#cloud-analytics');
+ await page.setViewportSize({width:1440,height:900});
  await page.emulateMedia({reducedMotion:'no-preference'});
  await page.goto('/experience');
- await chip(root).evaluate(e=>scrollBy(0,e.getBoundingClientRect().bottom-(innerHeight-60)));
+ const docTop=loc=>loc.evaluate(e=>e.getBoundingClientRect().top+scrollY);
+ // The chip low on the screen, as a reader meets it. Hovering it opens nothing and moves nothing.
+ await chip(root).evaluate(e=>scrollBy(0,e.getBoundingClientRect().bottom-(innerHeight-80)));
  await page.waitForTimeout(150);
- const y=await page.evaluate(()=>scrollY);
+ const y0=await page.evaluate(()=>scrollY), n0=await docTop(next);
  await chip(root).hover();
- await expect(c).toHaveClass(/is-above/);
- await page.waitForTimeout(600);
- const b=await c.boundingBox();
- expect(b.y).toBeGreaterThanOrEqual(0);
- expect(b.y+b.height).toBeLessThanOrEqual(657);
- expect(await page.evaluate(()=>scrollY)).toBe(y);
- // A hover's preview dims the page a little (the card lands on the job's own words) and the call to action it covers
- // goes; a click pins it and the page dims fully behind it, until it closes.
- await expect.poll(()=>c.evaluate(e=>getComputedStyle(e,'::before').opacity)).toBe('0.6');
- await expect(page.locator('#agentic-ai .internship-demo-hint')).toBeHidden();
+ await page.waitForTimeout(400);
+ await expect(c).not.toHaveClass(/is-open/);
+ expect(await page.evaluate(()=>scrollY)).toBe(y0);
+ // A click: the card unfolds in the flow and the next case study moves down by its height, in steps no frame reverses;
+ // the page eases only as far as the card's foot needs, keeping the chip on screen under the bar.
+ await page.evaluate(()=>{window.__f=[];const n=document.querySelector('#cloud-analytics'),t0=performance.now();const f=()=>{window.__f.push([scrollY,n.getBoundingClientRect().top+scrollY]);if(performance.now()-t0<1300)requestAnimationFrame(f);};requestAnimationFrame(f);});
  await chip(root).click();
- await expect(c).toHaveClass(/is-spot/);
- await expect.poll(()=>c.evaluate(e=>getComputedStyle(e,'::before').opacity)).toBe('1');
- await page.keyboard.press('Escape');
- await expect(c).not.toHaveClass(/is-spot/);
- await page.mouse.move(0,0);
- // With room below it still opens below its chip.
- await chip(root).evaluate(e=>scrollBy(0,e.getBoundingClientRect().top-120));
- await page.waitForTimeout(150);
- await chip(root).hover();
+ await expect(c).toHaveClass(/is-playing/);
+ await page.waitForTimeout(1400);
+ const f=await page.evaluate(()=>window.__f);
+ for(let i=1;i<f.length;i++){expect(f[i][0]).toBeGreaterThanOrEqual(f[i-1][0]-0.5);expect(f[i][1]).toBeGreaterThanOrEqual(f[i-1][1]-0.5);}
+ const cb=await c.boundingBox(), kb=await chip(root).boundingBox();
+ expect(Math.abs((await docTop(next))-n0-cb.height-(cb.y-kb.y-kb.height))).toBeLessThan(4);
+ expect(cb.y+cb.height).toBeLessThanOrEqual(900);
+ expect(kb.y).toBeGreaterThanOrEqual(80);
+ await expect(c).toHaveCSS('position','relative');
+ await expect(chip(root)).toHaveAttribute('aria-expanded','true');
+ // Nothing dims, and the call to action steps back while it is open.
+ expect(await c.evaluate(e=>getComputedStyle(e,'::before').content)).toBe('none');
+ await expect(page.locator('#agentic-ai .internship-demo-hint')).toHaveCSS('opacity','0');
+ // A hover chart further down opens as usual and leaves the docked one open; an anomaly chart too, and Escape closes
+ // that one first.
+ const shopee=chip(peek(page,'shopee'));
+ await shopee.scrollIntoViewIfNeeded();
+ await page.mouse.move(5,5);   // (a glide locks hovers until the mouse itself moves)
+ await shopee.hover();
+ await expect(card(peek(page,'shopee'))).toHaveClass(/is-open/);
  await expect(c).toHaveClass(/is-open/);
- await expect(c).not.toHaveClass(/is-above/);
- await page.mouse.move(0,0);
+ const site=page.locator('[data-peek="site"]');
+ await site.scrollIntoViewIfNeeded();
+ await site.click();
+ await expect(site).toHaveAttribute('aria-expanded','true');
+ await page.keyboard.press('Escape');
+ await expect(site).toHaveAttribute('aria-expanded','false');
+ await expect(c).toHaveClass(/is-open/);
+ // Escape again, from well past the chip: the chart folds and the page eases back to the chip.
+ await page.keyboard.press('Escape');
+ await expect(c).not.toHaveClass(/is-open/);
+ await expect.poll(async()=>(await chip(root).boundingBox()).y).toBeGreaterThan(60);
+ // A second click on the chip folds it; so does the round close button, which hands focus back to the chip.
+ await chip(root).click();
+ await expect(c).toHaveClass(/is-open/);
+ await chip(root).click();
+ await expect(c).not.toHaveClass(/is-open/);
+ await expect(chip(root)).toHaveAttribute('aria-expanded','false');
+ await chip(root).click();
+ await page.waitForTimeout(1200);
+ const x=c.locator('.ag-close');
+ await expect(x).toBeVisible();
+ const xb=await x.boundingBox();
+ expect(xb.x+xb.width).toBeLessThan(cb.x+cb.width);
+ expect(xb.y-cb.y).toBeLessThan(40);
+ await x.click();
+ await expect(c).not.toHaveClass(/is-open/);
+ await expect(chip(root)).toBeFocused();
+ // Across 737px the docked card and the phone card are different layouts: an open one closes.
+ await chip(root).click();
+ await expect(c).toHaveClass(/is-open/);
+ await page.setViewportSize({width:700,height:900});
+ await expect(c).not.toHaveClass(/is-open/);
+ await page.setViewportSize({width:1440,height:900});
+ // It replays like the other charts: the run, a 3 s hold, the rewind, and again.
+ await chip(root).click();
+ await expect(c).toHaveClass(/is-playing/);
+ await expect(c).toHaveClass(/is-fading/,{timeout:25000});
+ await expect(c).not.toHaveClass(/is-fading/,{timeout:3000});
+ await expect(c).toHaveClass(/is-playing/);
+ await expect(c).toHaveClass(/is-open/);
+});
+// Phones and touch keep the shipped inline card: a tap opens it, with no close button, the hint above the chip.
+test('agentic AI chart: phones and touch tablets keep the inline card, with no close button',async({browser})=>{
+ for(const [width,height] of [[390,844],[768,1024]]){
+  const ctx=await browser.newContext({baseURL:test.info().project.use.baseURL,viewport:{width,height},isMobile:true,hasTouch:true,reducedMotion:'reduce'});
+  const page=await ctx.newPage();
+  await page.goto('/experience');
+  const root=peek(page,'agentic'), c=card(root);
+  await chip(root).tap();
+  await expect(c).toHaveClass(/is-open/);
+  await expect(c.locator('.ag-close')).toBeHidden();
+  if(width<737)await expect(c).toHaveClass(/is-spot/);
+  else expect(await c.evaluate(e=>Math.round(e.getBoundingClientRect().width))).toBe(await page.locator('#agentic-ai').evaluate(a=>Math.min(736,Math.round(a.clientWidth-parseFloat(getComputedStyle(a).paddingLeft)-parseFloat(getComputedStyle(a).paddingRight)))));
+  const h=await page.locator('#agentic-ai .internship-demo-hint').boundingBox(),k=await chip(root).boundingBox();
+  expect(h.y+h.height).toBeLessThan(k.y);
+  await chip(root).tap();
+  await expect(c).not.toHaveClass(/is-open/);
+  await ctx.close();
+ }
+});
+// 10 Nov 2026 (owner: "fix", then "add the polish ones also", after a review that measured each of these on recordings).
+test('agentic AI chart: a short phone shows all of it, reduced motion keeps its edge on the card, and it pauses off screen',async({page})=>{
+ const root=peek(page,'agentic'), c=card(root), scene=c.locator('svg.ag-scene--m');
  // A short phone (375x548, an iPhone SE): the drawing narrows to fit the screen, so the lead card and the analyst are
  // on it (they sat 68px under the fold), and it never narrows below 85% of the card.
  await page.setViewportSize({width:375,height:548});
@@ -432,8 +503,10 @@ test('internship rows invite a hover (or a tap on phones), and the first chip of
  const hints=page.locator('.case-study--internship .internship-demo-hint');
  await expect(hints).toHaveCount(2);
  await expect(hints.first()).toHaveText('Hover the chart to see it in action',{useInnerText:true});
- // The agentic chart invites a hover like the internship rows.
- await expect(page.locator('#agentic-ai .internship-demo-hint')).toHaveText('Hover the chart to see it in action',{useInnerText:true});
+ // The agentic chart opens from a click on a screen with a mouse (it pushes the page down, so a hover never opens it),
+ // and its call to action sits beside the chip; on phones it sits above the chip, as on every other row.
+ await expect(page.locator('#agentic-ai .internship-demo-hint')).toHaveText('Click the chart to see it in action',{useInnerText:true});
+ {const h=await page.locator('#agentic-ai .internship-demo-hint').boundingBox(),c=await chip(peek(page,'agentic')).boundingBox();expect(h.x).toBeGreaterThan(c.x+c.width);expect(Math.abs((h.y+h.height/2)-(c.y+c.height/2))).toBeLessThan(3);}
  const first=chip(peek(page,'shopee'));
  await first.scrollIntoViewIfNeeded();
  await expect(first).toHaveClass(/is-breathing/);
@@ -447,6 +520,7 @@ test('internship rows invite a hover (or a tap on phones), and the first chip of
  await page.reload();
  await expect(hints.nth(1)).toHaveText('Tap a chart to see it in action',{useInnerText:true});
  await expect(page.locator('#agentic-ai .internship-demo-hint')).toHaveText('Tap the chart to see it in action',{useInnerText:true});
+ {const h=await page.locator('#agentic-ai .internship-demo-hint').boundingBox(),c=await chip(peek(page,'agentic')).boundingBox();expect(h.y+h.height).toBeLessThan(c.y);expect(Math.abs(h.x-c.x)).toBeLessThan(1);}
 });
 
 test('smart zoom: a click near the bottom eases the whole card into view, keeps the chip on screen, and hover never scrolls',async({page})=>{
