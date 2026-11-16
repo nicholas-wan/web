@@ -6413,18 +6413,6 @@ a.travel-jump-group__label {
   color: #fff;
 }
 
-/* The rail and its chip strip clip overflow, which cut 2-6px off the outside
-   ring; ring inside the edge instead. On the white desktop rail the filled
-   chip takes a near-black teal ring (3.5:1 on the chip); the dark phone and
-   tablet rail use white (below). */
-.travel-section-nav a:focus-visible {
-  outline-offset: -3px;
-}
-
-.travel-section-nav a.is-active:focus-visible {
-  outline-color: #04201f;
-}
-
 /* On phones and tablets the rail remains a continuation of the dark journal
    opening after it sticks. Keeping one surface avoids a white toolbar flashing
    against the black header while the menu control is being re-homed. */
@@ -6602,10 +6590,6 @@ a.travel-jump-group__label {
     border-color: var(--color-brand-600);
     background: var(--color-brand-600);
     color: #fff;
-  }
-
-  .travel-section-nav a.is-active:focus-visible {
-    outline-color: #fff;
   }
 
   .travel-section-nav .travel-jump-group + .travel-jump-group {
@@ -6858,8 +6842,7 @@ a:focus-visible,
 button:focus-visible,
 summary:focus-visible,
 [role="button"]:focus-visible {
-  /* Solid: the 0.55 tint was 2.1:1 on white (WCAG 1.4.11 asks 3:1); this is 4.3:1. */
-  outline: 3px solid #128a86;
+  outline: 3px solid rgba(18, 138, 134, 0.55);
   outline-offset: 3px;
 }
 
@@ -6968,24 +6951,8 @@ ul.icons li a.icon:hover::before,
 
 .journal-lightbox-trigger[role="button"]:focus-visible,
 .masonry .content[role="button"]:focus-visible {
-  outline: 3px solid #128a86;
+  outline: 3px solid rgba(18, 138, 134, 0.72);
   outline-offset: 3px;
-}
-
-/* A tile fills its clipping .brick, so an outside ring never showed, and the
-   photo paints over an inset outline: draw the ring on a layer above it. */
-.masonry .content[role="button"]:focus-visible {
-  outline-offset: -3px;
-}
-
-.masonry .content[role="button"]:focus-visible::after {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  border: 3px solid #128a86;
-  border-radius: inherit;
-  content: "";
-  pointer-events: none;
 }
 
 /* Without this, mobile browsers hold every tap ~300ms on these controls waiting
@@ -8161,7 +8128,7 @@ body.lightbox-open {
 }
 
 .personal-event-card:focus-visible {
-  outline: 3px solid var(--timeline-accent) !important;
+  outline: 3px solid color-mix(in srgb, var(--timeline-accent) 42%, transparent) !important;
   outline-offset: 3px;
 }
 
