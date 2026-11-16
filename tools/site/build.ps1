@@ -18,6 +18,7 @@ Add-Type -AssemblyName System.Drawing
 $navigationPartialPath = Join-Path $root "partials\site-navigation.html"
 if (-not (Test-Path -LiteralPath $navigationPartialPath)) { throw "Missing shared navigation partial: $navigationPartialPath" }
 $navigationTemplate = Read-SourceText $navigationPartialPath
+$footerTemplate = (Read-SourceText (Join-Path $root 'partials\site-footer.html')).TrimEnd()
 $travelMastheadTemplate = Read-SourceText (Join-Path $root 'partials\travel-masthead.html')
 $travelJournalPartialPath = Join-Path $root "partials\travel-journal.html"
 if (-not (Test-Path -LiteralPath $travelJournalPartialPath)) { throw "Missing shared travel journal partial: $travelJournalPartialPath" }
@@ -1282,6 +1283,13 @@ foreach ($page in $pages) {
         $navigation = $markedNavigation
     }
     $navigation = [regex]::Replace($navigation, '\sdata-page="[^"]+"', '')
+    # The footer band's tab row (phones and tablets) marks the same tab the
+    # same way, so its full-ink current tab needs no script (17 Nov 2026).
+    $footer = $footerTemplate
+    if ($footer.Contains($activeMarker)) {
+        $footer = $footer.Replace($activeMarker, 'aria-current="' + $currentValue + '"')
+    }
+    $footer = [regex]::Replace($footer, '\sdata-page="[^"]+"', '')
     if ($tripOrder -contains $slug) {
         $navigation = [regex]::Replace($navigation, '(?s)^\s*<header id="header">.*?</header>\s*', $travelMastheadTemplate + "`n")
     }
@@ -1389,18 +1397,7 @@ $introLine
     <div id="wrapper" class="fade-in">
 $navigation
         $main
-        <footer id="footer">
-            <section class="split contact">
-                <section>
-                    <h2>Contact</h2>
-                    <ul class="icons alt">
-                        <li><a href="mailto:nicholaswan@live.com.sg" class="icon fa fa-envelope" aria-label="Email"><span class="label">Email</span></a></li>
-                        <li><a href="https://github.com/nicholas-wan" target="_blank" rel="noopener noreferrer" class="icon fa-github" aria-label="GitHub"><span class="label">GitHub</span></a></li>
-                        <li><a href="https://www.linkedin.com/in/nicholas-wan/" target="_blank" rel="noopener noreferrer" class="icon fa-linkedin" aria-label="LinkedIn"><span class="label">LinkedIn</span></a></li>
-                    </ul>
-                </section>
-            </section>
-        </footer>
+$footer
     </div>
     <script src="$(Get-AssetRef 'assets/js/main.js')"></script>
 $optionalScripts

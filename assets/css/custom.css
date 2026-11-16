@@ -539,6 +539,12 @@
   line-height: 1.75;
 }
 
+/* The site's body-text wrap rule on the bio at every width (17 Nov 2026):
+   pretty outside Safari's engine, so no line ends on a lone word. */
+@supports not (hanging-punctuation: first) {
+  .intro-swipe .intro-swipe__text .aboutblock { text-wrap: pretty; }
+}
+
 .intro-swipe.is-static {
   height: auto;
 }
@@ -1426,10 +1432,10 @@ html:has(> body.is-map-fullscreen) {
   color: #28d7c5 !important;
 }
 
-/* The nav's dark-surface ring: the global teal ring is about 2.1:1 on black. */
+/* The footer band's ring, in its own teal (light on Projects). */
 #footer a:focus-visible {
-  outline: 2px solid rgba(40, 215, 197, 0.9);
-  outline-offset: 3px;
+  outline: 2px solid var(--fb-lit);
+  outline-offset: 2px;
 }
 
 #return-to-top:focus-visible {
@@ -4214,10 +4220,18 @@ body.is-map-fullscreen .travel-atlas__layout {
   border: 0 !important;
 }
 
+/* Hero type in three levels (17 Nov 2026): the name in display caps, the
+   claim as a sentence in the bio's serif, the role as a small teal label.
+   Spacing is set by each block's top margin, not a gap. */
 #intro {
   justify-content: center;
-  gap: 1rem;
   padding-bottom: 4rem;
+}
+
+#intro h1 {
+  margin: 0;
+  letter-spacing: 0.06em;
+  padding-left: 0.06em;
 }
 
 #intro .portfolio-hero__summary {
@@ -4230,7 +4244,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   display: flex;
   justify-content: center;
   gap: 0.75rem;
-  margin: 0.75rem 0 0;
+  margin: 2.1rem 0 0;
 }
 
 #intro .portfolio-hero__actions li {
@@ -5680,8 +5694,7 @@ body:not(.page-home) #wrapper.fade-in::before {
 #navPanel .close,
 #navPanel .links a,
 #navPanel .icons a,
-#nav .icons a,
-#footer .icons a {
+#nav .icons a {
   display: inline-flex;
   min-width: 3rem;
   min-height: 3rem;
@@ -5711,7 +5724,7 @@ body:not(.page-home) #wrapper.fade-in::before {
     max-width: 100%;
     box-sizing: border-box;
     justify-content: center;
-    border-radius: 0;
+    border-radius: var(--radius-control);
     background: rgba(255, 255, 255, 0.055);
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.22);
   }
@@ -6042,19 +6055,19 @@ body:not(.page-home) #wrapper.fade-in::before {
 @media screen and (max-width: 736px) {
   #intro {
     min-height: 82vh;
-    gap: 0.75rem;
     padding: 4rem 1.25rem 2rem;
   }
 
   #intro h1 {
     max-width: 100%;
     margin: 0;
-    font-size: clamp(2rem, 10vw, 2.65rem);
+    padding-left: 0.05em;
+    font-size: clamp(2.15rem, 10.6vw, 2.8rem);
+    letter-spacing: 0.05em;
     line-height: 1.05;
   }
 
   #intro .portfolio-hero__summary {
-    max-width: 20rem;
     font-size: 1rem;
     line-height: 1.55;
   }
@@ -6063,6 +6076,7 @@ body:not(.page-home) #wrapper.fade-in::before {
     display: grid !important;
     width: min(100%, 19rem);
     gap: 0.6rem;
+    margin-top: 1.75rem;
   }
 
   #intro .portfolio-hero__actions .button {
@@ -6862,53 +6876,234 @@ button:hover,
   box-shadow: inset 0 0 0 2px var(--color-brand-600);
 }
 
-#nav a:hover,
-#footer a:hover {
+#nav a:hover {
   color: var(--color-brand-200) !important;
 }
 
 ul.icons.alt li a.icon:hover,
-#nav ul.icons.alt li a.icon:hover,
-#footer ul.icons.alt li a.icon:hover {
+#nav ul.icons.alt li a.icon:hover {
   box-shadow: inset 0 0 0 2px var(--color-brand-200);
 }
 
 ul.icons li a.icon:hover::before,
-#nav ul.icons li a.icon:hover::before,
-#footer ul.icons li a.icon:hover::before {
+#nav ul.icons li a.icon:hover::before {
   color: var(--color-brand-200);
 }
 
-#footer h2 {
-  font-size: max(var(--text-floor), 0.8rem);
+/* Footer: a quiet closing band on the page's own surface (17 Nov 2026, owner:
+   "do all", `footer-band` in lab/open-decisions; it was a black "Contact" strip
+   with ringed icons). White on the white pages, #111214 on Projects
+   (projects.css), with a hairline above. From 981px one row: mark and name
+   left, place and three unringed line icons right; the bar above already
+   lists the six tabs. Tablets and phones bring the tabs back, since there they
+   sit behind Menu; the build marks the current one (aria-current), set in full
+   ink. Borrowed from Vercel's footer (same surface, hairline, small muted type,
+   unringed icons) and Anthropic's bottom row (small mark, quiet icons, place). */
+#footer {
+  display: block;
+  margin: 0 auto 3rem;
+  padding: 0;
+  background: #fff;
+  color: var(--color-ink-500);
+  cursor: auto;
+  font-family: var(--font-display);
+
+  --fb-ink: var(--color-ink-900);
+  --fb-soft: #5c6b71;
+  --fb-faint: #7d898d;
+  --fb-rule: var(--color-border-soft);
+  --fb-hover: var(--color-brand-700);
+  --fb-lit: #128a86;
+  --fb-wash: rgba(18, 138, 134, 0.07);
+}
+
+#footer .footer-band__inner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    "brand . tabs"
+    "meta  . social";
+  align-items: center;
+  row-gap: 10px;
+  padding: 34px 2rem 30px;
+  border-top: 1px solid var(--fb-rule);
+}
+
+#footer .footer-band__inner a {
+  border-bottom: 0;
+  text-decoration: none;
+}
+
+/* !important beats the site-wide a:hover teal: the name stays ink, and on
+   Projects the hover is the light teal the dark surface needs. */
+#footer .footer-band__inner a:hover {
+  background: var(--fb-wash);
+  color: var(--fb-hover) !important;
+}
+
+#footer .footer-band__brand {
+  grid-area: brand;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  justify-self: start;
+  min-height: 2.75rem;
+  margin-left: -0.1rem;
+  color: var(--fb-ink);
+  font: 700 0.98rem/1 var(--font-display);
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+}
+
+#footer .footer-band__inner .footer-band__brand:hover {
+  background: none;
+  color: var(--fb-ink) !important;
+}
+
+#footer .footer-band__brand .site-mark { color: var(--fb-ink); }
+#footer .footer-band__brand .site-mark__lit { stroke: var(--fb-lit); }
+#footer .footer-band__brand .site-mark circle.site-mark__lit-node { fill: var(--fb-lit); }
+
+#footer .footer-band__tabs {
+  grid-area: tabs;
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 0.15rem;
+  margin-right: -0.6rem;
+}
+
+#footer .footer-band__tabs a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.6rem;
+  border-radius: var(--radius-control);
+  color: var(--fb-soft);
+  font: 600 max(var(--text-floor), 0.84rem)/1 var(--font-display);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  transition: color var(--motion-fast) ease, background-color var(--motion-fast) ease;
+}
+
+#footer .footer-band__tabs a[aria-current] {
+  color: var(--fb-ink);
+}
+
+#footer .footer-band__social {
+  grid-area: social;
+  display: flex;
+  justify-self: end;
+  gap: 0.15rem;
+  margin: 0 -0.55rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+#footer .footer-band__social li {
+  margin: 0;
+  padding: 0;
+}
+
+#footer .footer-band__social a {
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-control);
+  color: var(--fb-soft);
+  transition: color var(--motion-fast) ease, background-color var(--motion-fast) ease;
+}
+
+/* The bar's line drawings (.nav-social__icon paths) at a 1.7 stroke, as masks
+   so every page's HTML stays small (Projects sits at its HTML budget). */
+#footer .footer-band__social a::before {
+  content: "";
+  width: 1.15rem;
+  height: 1.15rem;
+  background: currentColor;
+  -webkit-mask: var(--fb-icon) center / contain no-repeat;
+  mask: var(--fb-icon) center / contain no-repeat;
+}
+
+#footer .footer-band__social a[href^="mailto:"] { --fb-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zM3 7l9 6 9-6'/%3E%3C/svg%3E"); }
+#footer .footer-band__social a[href*="github"] { --fb-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21'/%3E%3C/svg%3E"); }
+#footer .footer-band__social a[href*="linkedin"] { --fb-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 1 0-4 0M3 7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z'/%3E%3C/svg%3E"); }
+
+#footer .footer-band__meta {
+  grid-area: meta;
+  margin: 0;
+  color: var(--fb-faint);
+  font: 600 0.8rem/1 var(--font-display);
   letter-spacing: var(--eyebrow-tracking);
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-/* Footer contact icons: the bar's line drawings (.nav-social__icon paths),
-   as masks so no page's HTML grows, 22px at the nav's 1.8 stroke, in the
-   a 1px 0.4 ring (0.14 read as disabled on black; the hero discs' 0.3 was
-   2.6:1, under 1.4.11's 3:1), teal on hover (15 Nov 2026; they were filled
-   glyphs in 2px rings). */
-#footer .icon.fa-envelope::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zM3 7l9 6 9-6'/%3E%3C/svg%3E"); }
-#footer .icon.fa-github::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21'/%3E%3C/svg%3E"); }
-#footer .icon.fa-linkedin::before { --fa-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 11v5M8 8v.01M12 16v-5M16 16v-3a2 2 0 1 0-4 0M3 7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4z'/%3E%3C/svg%3E"); }
-
-#footer ul.icons.alt li .icon {
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-  /* The 22px glyph's line box set a lower baseline: 45px items, not 44. */
-  vertical-align: top;
+/* Rows in px from 737px, so the band stays near 110-160px where the root
+   size grows (21px at 1920). */
+@media screen and (min-width: 737px) {
+  #footer .footer-band__brand,
+  #footer .footer-band__tabs a { min-height: 44px; }
+  #footer .footer-band__social a { width: 44px; height: 44px; }
 }
 
-#footer ul.icons li .icon::before {
-  font-size: 1.375rem;
+@media screen and (min-width: 981px) {
+  #footer .footer-band__tabs { display: none; }
+
+  #footer .footer-band__inner {
+    grid-template-columns: auto 1fr auto auto;
+    grid-template-areas: "brand . meta social";
+    column-gap: 1.5rem;
+  }
 }
 
-#footer ul.icons.alt li a.icon:hover {
-  box-shadow: inset 0 0 0 1px #28d7c5;
+@media screen and (max-width: 980px) {
+  #footer .footer-band__meta { font-size: 0.9rem; }
 }
 
-#footer ul.icons li a.icon:hover::before {
-  color: #28d7c5;
+/* Phones: name and icons, then the six tabs on one row, then the place. */
+@media screen and (max-width: 736px) {
+  #footer .footer-band__inner {
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      "brand social"
+      "tabs  tabs"
+      "meta  meta";
+    row-gap: 0.35rem;
+    padding: 1.4rem 2rem calc(1.6rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  #footer .footer-band__tabs {
+    justify-self: stretch;
+    justify-content: space-between;
+    gap: 0;
+    margin: 0 -0.5rem;
+  }
+
+  #footer .footer-band__tabs a {
+    padding: 0 0.5rem;
+    font-size: max(var(--text-floor), clamp(0.8rem, 3.5vw, 0.9rem));
+  }
+
+  #footer .footer-band__meta { padding-top: 0.55rem; }
+}
+
+/* Phones have no side gutters, so the band runs to the bottom; wider screens
+   keep the 3rem of black under the sheet, so the page reads as a closed card. */
+@media screen and (max-width: 480px) {
+  #footer { margin-bottom: 0; }
+}
+
+@media screen and (max-width: 374px) {
+  #footer .footer-band__tabs { margin: 0 -0.36rem; }
+  #footer .footer-band__tabs a { padding: 0 0.36rem; letter-spacing: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #footer .footer-band__tabs a,
+  #footer .footer-band__social a { transition: none; }
 }
 
 /* Route bundle: gallery-bricks:start */
@@ -9019,33 +9214,39 @@ body.page-home #nav {
      scramble's noise frames (which vary a few px per word) zero slack —
      they wrap inside the overlay and the centered line marches left and
      right. A fixed box wider than the text absorbs the variance. */
-  width: min(44rem, calc(100vw - 3rem));
+  width: min(48rem, calc(100vw - 3rem));
   grid-template-columns: 1fr;
-  gap: 0.55rem;
-  margin: 0;
+  gap: 0;
+  margin: 1.5rem 0 0;
   font-style: normal;
   text-align: center;
   text-transform: none;
 }
 
+/* The claim is a sentence in the bio's reading serif. It breaks after
+   "products" on every width: a newline in the source, kept by pre-line
+   (the scramble keeps it too), so each clause holds its own line. */
 #intro .portfolio-hero__scramble-row {
   position: relative;
   display: block;
-  color: rgba(255, 255, 255, 0.92);
-  font-family: var(--font-display);
-  font-size: 1rem;
-  font-weight: 900;
-  letter-spacing: 0.025em;
-  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.9);
+  font-family: var(--font-body);
+  font-size: clamp(1.45rem, 2.2vw, 1.75rem);
+  font-weight: 300;
+  letter-spacing: -0.005em;
+  line-height: 1.45;
+  white-space: pre-line;
 }
 
+/* The role: a small teal label, the one accent in the hero type. */
 .portfolio-hero__scramble-support {
   display: block;
-  color: rgba(255, 255, 255, 0.62);
+  margin-top: 1.15rem;
+  color: rgba(40, 215, 197, 0.82);
   font-family: var(--font-display);
-  font-size: 0.72rem;
-  font-weight: 400;
-  letter-spacing: 0.075em;
+  font-size: max(var(--text-floor), 0.74rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
   line-height: 1.5;
   text-transform: uppercase;
 }
@@ -9065,16 +9266,20 @@ body.page-home #nav {
 @media screen and (max-width: 736px) {
   #intro .portfolio-hero__summary {
     width: calc(100vw - 2.5rem);
+    margin-top: 1rem;
   }
 
+  /* Sized so the longer clause, "for real-world security operations.",
+     still fits one line at 360. */
   #intro .portfolio-hero__scramble-row {
-    font-size: clamp(0.84rem, 3.7vw, 0.96rem);
+    font-size: clamp(1.12rem, 5.2vw, 1.4rem);
     line-height: 1.5;
   }
 
   .portfolio-hero__scramble-support {
-    font-size: max(var(--text-floor), clamp(0.6rem, 2.5vw, 0.7rem));
-    letter-spacing: 0.045em;
+    margin-top: 0.95rem;
+    font-size: max(var(--text-floor), 0.7rem);
+    letter-spacing: 0.12em;
   }
 }
 
