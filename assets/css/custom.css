@@ -3630,26 +3630,11 @@ body.is-map-fullscreen .travel-atlas__layout {
   .guangzhou-day__note { text-wrap: pretty; }
 }
 
-/* Australia keeps its older markup: a bare intro paragraph and no lede.
-   Give the paragraph the day-note treatment and the header the gap every
-   other journal has below its banner (Oct 2026). */
+/* Australia has no lede, and its days use the template's sections but carry no date (none
+   supplied; 17 Nov 2026). Its header keeps the reference journals' gap under the banner:
+   48px on desktop, about 30px on phones (Japan 29, Germany 31). */
 .australia-journal header.major {
-  margin-bottom: 2.5rem;
-}
-
-/* Its bare day headings take the other journals' day-heading style. */
-.australia-journal .col-12 > h2 {
-  margin: 0 0 0.8rem;
-  color: var(--color-ink-900);
-  font-size: clamp(1.55rem, 3vw, 1.8rem);
-}
-
-.australia-journal .col-12 > p {
-  max-width: 70ch;
-  margin-bottom: 1.4rem;
-  color: var(--color-ink-600);
-  line-height: 1.75;
-  text-align: left;
+  margin-bottom: 1rem;
 }
 
 .guangzhou-day .masonry {
@@ -3819,10 +3804,6 @@ body.is-map-fullscreen .travel-atlas__layout {
   --focus-y: 22%;
 }
 
-.australia-journal .guangzhou-day__route {
-  margin-top: 0.15rem;
-}
-
 .guangzhou-journal .content-details {
   line-height: 1.35 !important;
 }
@@ -3840,8 +3821,8 @@ body.is-map-fullscreen .travel-atlas__layout {
 }
 
 @media screen and (max-width: 600px) {
-  #main.australia-journal > article {
-    padding-bottom: 2.5rem;
+  .australia-journal header.major {
+    margin-bottom: 1.9rem;
   }
 
   .australia-journal .travel-journal__hero-image {
@@ -3997,8 +3978,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   /* Narrow columns: the theme's justified <p> leaves rivers (Oct 2026). */
   .travel-route-summary,
   .guangzhou-day__note,
-  .travel-journal__note,
-  .australia-journal .col-12 > p {
+  .travel-journal__note {
     text-align: left;
   }
 
