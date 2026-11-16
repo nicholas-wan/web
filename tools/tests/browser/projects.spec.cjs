@@ -392,6 +392,43 @@ test('Phones and tablets name the app beside Start over, with the hint below; de
   await expect(page.locator('#squashbot .app-card__foot figcaption')).toBeVisible();
 });
 
+test('More features draws larger pictures, keeps a phone on every card, and pages with arrows where the row scrolls', async ({ page }) => {
+  for (const [width, height, pages] of [[390, 844, 3], [1024, 768, 2], [1440, 900, 0]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/projects');
+    const more = page.locator('#squashbot .app-more'), nav = more.locator('.mf-nav'), cards = more.locator('li');
+    await expect(cards).toHaveCount(3);
+    const img = await cards.first().locator('img').boundingBox();
+    if (!pages) {
+      // Three across inside the column, each picture filling its card.
+      await expect(nav).toBeHidden();
+      expect(img.width).toBeGreaterThan(320);
+      expect(img.width).toBeLessThanOrEqual(400);
+      continue;
+    }
+    if (width < 981) {
+      // The picture stays smaller than the demo phone, and the next card peeks.
+      expect(img.width).toBeLessThanOrEqual(290);
+      expect((await cards.nth(1).boundingBox()).x).toBeLessThan(width);
+    }
+    await more.scrollIntoViewIfNeeded();
+    await expect(nav).toBeVisible();
+    const count = nav.locator('span'), [prev, next] = [nav.getByRole('button', { name: 'Previous features' }), nav.getByRole('button', { name: 'Next features' })];
+    await expect(count).toHaveText(`1 / ${pages}`);
+    await expect(prev).toBeDisabled();
+    // The counter and arrows sit on the heading's centre line.
+    const h = await more.locator('h3').boundingBox(), n = await next.boundingBox();
+    expect(Math.abs(h.y + h.height / 2 - (n.y + n.height / 2))).toBeLessThan(3);
+    await next.click();
+    await expect(count).toHaveText(`2 / ${pages}`);
+    await expect(prev).toBeEnabled();
+    if (pages === 2) await expect(next).toBeDisabled();
+    await prev.click();
+    await expect(count).toHaveText(`1 / ${pages}`);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+});
+
 test('On touch screens a demo list scrolls only after the demo is tapped', async ({ browser }) => {
   const context = await browser.newContext({ viewport: { width: 393, height: 659 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce' });
   const page = await context.newPage();

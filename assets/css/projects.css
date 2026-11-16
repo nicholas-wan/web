@@ -706,12 +706,26 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-demo__reset{height:36px!important;min-height:36px;margin:0 0 0 -.85rem}}
 .page-projects,.page-projects #wrapper{background:#111214}
 .page-projects .app-more{margin-top:5rem}
-.page-projects .app-more h3{margin:0 0 1.6rem;font:600 2.8rem/1.15 Archivo,system-ui,sans-serif!important;letter-spacing:-.03em!important;text-transform:none!important;text-align:left;color:#ecedf0!important}
+.page-projects .app-more h3{margin:0;font:600 2.25rem/1.15 Archivo,system-ui,sans-serif!important;letter-spacing:-.03em!important;text-transform:none!important;text-align:left;color:#ecedf0!important}
 .page-projects .app-more ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:0!important;padding:0;list-style:none}
-.page-projects .app-more li{display:flex;flex-direction:column;margin:0;padding:24px 24px 0;border:1px solid #2d2f34;border-radius:24px;background:#1b1c1f;overflow:hidden}
-.page-projects .app-more p{margin:0 0 1.4rem;font:400 .95rem/1.6 Archivo,system-ui,sans-serif;color:#9da2a9;text-align:left;text-wrap:pretty}
+.page-projects .app-more li{display:flex;flex-direction:column;margin:0;padding:24px 6px 0;border:1px solid #2d2f34;border-radius:24px;background:#1b1c1f;overflow:hidden}
+.page-projects .app-more p{margin:0 0 1.4rem;padding:0 18px;font:400 .95rem/1.6 Archivo,system-ui,sans-serif;color:#9da2a9;text-align:left}
 .page-projects .app-more strong{display:block;margin-bottom:6px;font:600 1.5rem/1.15 Archivo,system-ui,sans-serif;letter-spacing:-.02em;color:#ecedf0;text-wrap:balance}
-.page-projects .app-more img{display:block;width:min(100%,280px);height:auto;margin:auto auto 0}
+.page-projects .app-more img{display:block;width:100%;max-width:400px;height:auto;margin:auto auto 0}
+/* More features pictures you can read (owner, 17 Nov 2026, more-features-large), a phone on every card: from 1280px
+   three cards fill the column (pictures about 337px at 1366-1440, 400 at most); narrower, the row scrolls sideways,
+   400px cards on small laptops and 84%-wide ones on phones and tablets with the picture capped at 290px, so it stays
+   smaller than the demo phone and the next card peeks. projects.js adds a page counter and arrows to the heading. */
+.page-projects .mf-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.6rem}
+.page-projects .mf-nav:not([hidden]){display:flex;flex:none;align-items:center;gap:6px}
+.page-projects .mf-nav span{min-width:3.2em;margin-right:4px;font:500 14px/1 Archivo,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#8d939c;text-align:right}
+.page-projects .mf-nav button{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid #2d2f34;border-radius:50%;background:#1b1c1f;box-shadow:none;color:#ecedf0!important;line-height:1}
+.page-projects .mf-nav button:hover{border-color:#4a4e55;background:#232428}
+.page-projects .mf-nav button:disabled{opacity:.35}
+.page-projects .mf-nav svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:1279px){.page-projects .app-more ul{display:flex;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain}
+.page-projects .app-more li{flex:0 0 400px;scroll-snap-align:start;padding:24px 14px 0}
+.page-projects .app-more p{margin-bottom:1.1rem;padding:0 10px}}
 @media (min-width:981px){.page-projects :is(.app-card__intro,.app-card__body){max-width:36rem}
 .page-projects .app-card h2{font-size:2.4rem}
 .page-projects .app-more{grid-area:f}}
@@ -722,12 +736,15 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card{column-gap:1.75rem}
 .page-projects .app-card h2{font-size:2rem}
 .page-projects .app-card__foot figcaption{text-wrap:balance}}
-@media screen and (max-width:980px){.page-projects .app-more ul{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:1rem;scrollbar-width:none;margin:0 -1rem!important;padding:0 1rem}
-.page-projects .app-more li{flex:0 0 84%;scroll-snap-align:start} .page-projects .app-more strong{font-size:1.3rem}
+@media screen and (max-width:980px){.page-projects .app-more ul{scroll-snap-type:x mandatory;scroll-padding-inline:1rem;margin:0 -1rem!important;padding:0 1rem;gap:12px}
+.page-projects .app-more li{flex-basis:min(84%,320px);padding:20px 6px 0}
+.page-projects .app-more p{padding:0 14px}
+.page-projects .app-more img{max-width:290px}
+.page-projects .mf-bar{margin-bottom:1.1rem}
+.page-projects .app-more strong{font-size:1.3rem}
 .page-projects .app-more h3{font-size:2rem!important}
 .page-projects .app-card+.app-card{margin-top:-4rem;padding-top:3rem}}
 .page-projects .app-card .app-more{margin-bottom:5rem}
-@media (min-width:981px){.page-projects .app-more h3{font-size:2.25rem!important}}
 .page-projects :is(.app-why p span,.app-more p){text-wrap:balance}
 .page-projects .app-why p span{font-size:max(.95rem,15px)}
 .page-projects .app-card__facts{font-size:max(.875rem,14px);letter-spacing:.01em}

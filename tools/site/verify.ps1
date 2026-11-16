@@ -471,7 +471,8 @@ Assert-FileSizeBudget 'assets\css\skills-page.css' 19
 # 76 -> 77 (9 Nov 2026): the demo pass's PACKED stamp and plane marker.
 Assert-FileSizeBudget 'assets\css\projects.css' 77
 # 69 -> 70 (9 Nov 2026): the loader for Travel Packing's laptop; the page stays under 80 KB.
-Assert-FileSizeBudget 'assets\js\projects.js' 70
+# 70 -> 71 (17 Nov 2026): the More features page counter and arrows (owner-approved that day); the page stays under its 80 KB code ceiling.
+Assert-FileSizeBudget 'assets\js\projects.js' 71
 # projects-laptop.js is injected on wide screens by projects.js (Travel Packing's laptop, 9 Nov 2026),
 # so it is outside the per-page <script src> ceiling and carries its own budget, styles and the
 # demo's sample items included.

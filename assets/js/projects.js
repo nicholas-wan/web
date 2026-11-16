@@ -1182,3 +1182,21 @@ demos.forEach(d => {
 });
 schedule();
 })();
+
+/* More features: a page counter and arrows beside the heading while the row scrolls sideways (under 1280px; owner,
+   17 Nov 2026, more-features-large). A page is the cards wholly in view, and an arrow moves one page. */
+document.querySelectorAll('.app-more').forEach(s => {
+	const ul = s.querySelector('ul'), bar = document.createElement('div'), b = (d, l) => `<button type="button" aria-label="${l} features"><svg viewBox="0 0 16 16"><path d="${d}"/></svg></button>`;
+	bar.className = 'mf-bar'; s.prepend(bar); bar.append(s.querySelector('h3'));
+	bar.insertAdjacentHTML('beforeend', `<div class="mf-nav" hidden><span></span>${b('M10 3 5 8l5 5', 'Previous')}${b('M6 3l5 5-5 5', 'Next')}</div>`);
+	const nav = bar.lastChild, [count, prev, next] = nav.children, [c0, c1] = ul.children;
+	const step = () => c1.offsetLeft - c0.offsetLeft, per = () => Math.max(1, Math.floor((ul.clientWidth + 2) / step()));
+	const sync = () => {
+		const x = ul.scrollLeft, end = ul.scrollWidth - ul.clientWidth - 2, k = per(), pages = Math.ceil(ul.children.length / k);
+		if (nav.hidden = end < 0) return;
+		count.textContent = `${x > end ? pages : Math.min(pages, Math.round(x / k / step()) + 1)} / ${pages}`;
+		prev.disabled = x < 2; next.disabled = x > end;
+	};
+	ul.addEventListener('scroll', sync); new ResizeObserver(sync).observe(ul);
+	nav.addEventListener('click', e => { const t = e.target.closest('button'); if (t) ul.scrollBy({ left: (t === next ? 1 : -1) * per() * step(), behavior: pjStill.matches ? 'auto' : 'smooth' }); });
+});
