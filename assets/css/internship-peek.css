@@ -202,16 +202,6 @@
   pointer-events: none;
   transition: opacity 200ms ease, transform 220ms var(--ease-standard), visibility 0s linear 220ms;
 }
-/* No room below and room above (internship-peek.js, data-spotlight cards): the
-   card floats above its chip and grows up out of it. A hover never scrolls, so
-   below the chip it opened under the fold (10 Nov 2026: 1 to 24% of it on
-   screen on a first hover at four laptop sizes). */
-.page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-card.is-above {
-  top: auto;
-  bottom: calc(100% + 8px);
-  transform: translateY(6px) scale(0.92);
-  transform-origin: var(--grow-x, 50%) 100%;
-}
 .page-experience :is(.case-study--internship, #agentic-ai) .internship-demo-card.is-open {
   visibility: visible;
   opacity: 1;
@@ -675,24 +665,33 @@
 /* league-ab-motion:end */
 
 /* The Agentic AI glance chart (README "Agentic AI glance chart"; 31 Oct 2026, one
-   moment of the hunt in place of the agent console): the same chip-and-card peek
-   as the internships on the dark #agentic-ai card, "Hunt from a report", opening a
-   28rem card whose drawing brings its own dark surface, so the card is a bare frame
-   around it (the generated agentic-glance block below). */
+   moment of the hunt in place of the agent console): the internships' chip and card
+   on the dark #agentic-ai card, "Hunt from a report", whose drawing brings its own
+   dark surface, so the card is a bare frame around it (the generated agentic-glance
+   block below). The call to action shares the chip's row: beside it on a screen with
+   a mouse, above it (as on every other chart row) on phones and touch. */
 .page-experience #agentic-ai .internship-demo-peek { grid-column: 1 / -1; margin-top: 1.4rem; }
+.page-experience #agentic-ai .ag-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  align-self: stretch;
+  gap: 0.7rem 1.1rem;
+}
 /* The call to action and breathing chip every other chart row has (review,
    26 Oct 2026), in the card's dark tokens. */
 .page-experience #agentic-ai .internship-demo-hint {
-  grid-column: 1 / -1;
-  margin: 1.4rem 0 0;
+  margin: 0;
   color: #9db4b3;
   font-family: var(--font-display);
   font-size: max(var(--text-floor), 0.8rem);
   line-height: 1.35;
+  transition: opacity 200ms ease;
 }
 .page-experience #agentic-ai .internship-demo-hint strong { color: #28d7c5; font-weight: 700; }
-.page-experience #agentic-ai .internship-demo-hint + .internship-demo-peek { margin-top: 0.7rem; }
+.page-experience #agentic-ai .ag-close { display: none; }
 @media screen and (max-width: 736px), screen and (hover: none) {
+  .page-experience #agentic-ai .internship-demo-hint { order: -1; flex-basis: 100%; }
   .page-experience #agentic-ai .internship-demo-hint .anomaly-peek__hint-hover { display: none; }
   .page-experience #agentic-ai .internship-demo-hint .anomaly-peek__hint-touch { display: inline; }
 }
@@ -717,17 +716,78 @@
 }
 .page-experience #agentic-ai .internship-demo-peek__chip:focus-visible { outline-color: #28d7c5; }
 .page-experience #agentic-ai .internship-demo-peek__mini { background: #071315; box-shadow: inset 0 0 0 1px #24464b; }
-/* Wider than the other charts (owner, 31 Oct 2026: "you can take up more space"): three steps read side by side. */
+/* Phones and touch tablets open it inline, 46rem at most (wider than the other charts' 28rem: three steps side by side). */
 .page-experience #agentic-ai .internship-demo-card {
   width: min(46rem, 100%);
   padding: 0;
   border: 0;
   border-radius: 12px;
   background: #071315;   /* the chart's own surface (the Work article's, so a phone shows no second box), so the replay's fade never shows the light page through it */
-  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+  box-shadow: none;
 }
-@media screen and (max-width: 736px), screen and (hover: none) {
-  .page-experience #agentic-ai .internship-demo-card { box-shadow: none; }
+/* A screen with a mouse (17 Nov 2026, owner: "do all", from hunt-inline on lab/open-decisions): a click opens the chart
+   inside the card across the text column (990px at 1440, its step sentences about 16px where the 46rem floating card
+   drew them at 12px), pushing the content below down instead of floating over the next case study; nothing dims.
+   internship-peek.js (data-dock) unfolds its height over 500ms on the emphasized curve as it fades in, and folds it from
+   the chip, the close button or Escape. Hover only lifts the chip (a chart that pushed the page on hover would make it
+   jumpy), so the call to action says "Click". The frame is the card's outline (generated block) on 14px corners. */
+@media screen and (min-width: 737px) and (hover: hover) {
+  /* The chevron says "opens here": down while closed, up while open; the call to action steps back while it is open. */
+  .page-experience #agentic-ai .internship-demo-peek__chip::after { transform: translateY(-2px) rotate(135deg); }
+  .page-experience #agentic-ai .internship-demo-peek__chip:hover::after { transform: rotate(135deg); }
+  .page-experience #agentic-ai .internship-demo-peek__chip[aria-expanded="true"] { transform: none; }
+  .page-experience #agentic-ai .internship-demo-peek__chip[aria-expanded="true"]::after { opacity: 1; transform: translateY(1px) rotate(-45deg); }
+  .page-experience #agentic-ai .internship-demo-peek__chip[aria-expanded="true"] + .internship-demo-hint { opacity: 0; }
+  .page-experience #agentic-ai .internship-demo-card {
+    position: relative;
+    top: auto;
+    left: auto;
+    z-index: auto;
+    display: none;
+    align-self: stretch;
+    width: 100%;
+    margin-top: 1.1rem;
+    border-radius: 14px;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.03), 0 24px 48px -32px rgba(0, 0, 0, 0.9);
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    transition: none;
+    container-type: inline-size;
+  }
+  .page-experience #agentic-ai .internship-demo-card.is-open { display: block; animation: ag-dock-in 500ms cubic-bezier(0.2, 0, 0, 1) both; }
+  .page-experience #agentic-ai .internship-demo-card__plot { overflow: hidden; border-radius: inherit; }
+  /* Close: a quiet round button centred on the drawing's header line (y 19 of its 640 units), top right. */
+  .page-experience #agentic-ai .ag-close {
+    --x-size: clamp(22px, 2.7cqw, 28px);
+    position: absolute;
+    top: calc(2.97cqw - var(--x-size) / 2);
+    right: calc(2.5cqw - var(--x-size) / 2 + 0.2rem);
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: var(--x-size);
+    height: var(--x-size);
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(14, 32, 36, 0.85);
+    box-shadow: inset 0 0 0 1px #24464b;
+    color: #8ba7a6 !important;   /* (the theme sets button colour with !important, as the chip's rules show) */
+    line-height: 1;
+    letter-spacing: 0;
+    cursor: pointer;
+    transition: color 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+  }
+  .page-experience #agentic-ai .ag-close:hover { color: #b8f2eb !important; background: #0e2024; box-shadow: inset 0 0 0 1px #28d7c5; }
+  .page-experience #agentic-ai .ag-close:focus-visible { outline: 2px solid #28d7c5; outline-offset: 2px; }
+  .page-experience #agentic-ai .ag-close svg { display: block; width: 62%; height: 62%; }
+}
+@keyframes ag-dock-in { from { opacity: 0; } 45% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .page-experience #agentic-ai .internship-demo-card.is-open { animation: none; }
+  .page-experience #agentic-ai .internship-demo-hint { transition: none; }
 }
 /* Phones: the chart runs to the card's edges, past the article's 1.35rem padding (owner, 8 Nov 2026, on an iPhone 16:
    "is the animation too small? Should it take up slightly more of the screen to be readable?"). Inside the article it
@@ -788,33 +848,6 @@
    that its words are too small, so it scrolls). 55.04 is the drawing's 360 / 654.1. */
 @media screen and (max-width: 736px) and (orientation: portrait) {
   .page-experience .internship-demo-card[data-spotlight] > .internship-demo-card__plot > svg.ag-scene--m { width: max(85%, min(100%, 55.04vh)); width: max(85%, min(100%, 55.04svh)); margin-inline: auto; }
-}
-/* Desktop: once a click has pinned the card and the page has framed it, the page dims behind it, the phone's veil a
-   little lighter (10 Nov 2026: a pinned card hung over the next job's card with word fragments either side). It lifts
-   as on phones: when the card scrolls away, closes or the pointer presses elsewhere. */
-@media screen and (min-width: 737px) and (hover: hover) {
-  .page-experience .internship-demo-card[data-spotlight]::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    border-radius: inherit;
-    box-shadow: 0 0 0 200vmax rgba(3, 10, 11, 0.5);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 200ms ease;
-  }
-  /* (a hover's preview dims the page a little, .3 in all, after a beat: the card lands on words, the job's own when it
-     opens above its chip, and without a veil a blind review read their cut-off ends beside it as broken) */
-  .page-experience .internship-demo-card[data-spotlight].is-open::before { opacity: 0.6; transition: opacity 400ms ease 150ms; }
-  .page-experience .internship-demo-card[data-spotlight].is-spot::before { opacity: 1; transition: opacity 600ms ease; }
-  /* (above its chip the card covers the call to action but for a sliver: it goes while the card is there) */
-  .page-experience .internship-demo-hint:has(+ .internship-demo-peek .internship-demo-card.is-above.is-open) { visibility: hidden; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .page-experience .internship-demo-card[data-spotlight]::before,
-  .page-experience .internship-demo-card[data-spotlight].is-open::before,
-  .page-experience .internship-demo-card[data-spotlight].is-spot::before { transition: none; }
 }
 @keyframes spot-in {
   35% { box-shadow: inset 0 0 0 2px rgb(40, 215, 197), inset 0 0 32px 2px rgba(40, 215, 197, 0.3), 0 0 32px 6px rgba(40, 215, 197, 0.55); }

@@ -5,7 +5,10 @@
    while the page scrolls until a chip or Escape closes it. Scenes replay
    every 10s on screen (longer if needed to hold the final frame for 3s),
    fading before each restart (a card's data-fade sets how long, in ms, for a
-   scene that rewinds rather than fades); reduced motion holds the final frame. */
+   scene that rewinds rather than fades); reduced motion holds the final frame.
+   A data-dock peek (the agentic chart) on a screen with a mouse instead opens
+   in the page's flow from a click, outside the hover slot, and folds from its
+   chip, its close button or Escape; phones and touch treat it like the rest. */
 (() => {
   const roots = [...document.querySelectorAll('.internship-demo-peek')];
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -17,7 +20,8 @@
   const warmFonts = () => { if (document.fonts) ['400 11px Figtree', '500 11px Figtree', '700 11px Figtree', 'italic 900 8px "League Mark"', '8px "League Serif"', 'italic 8px "League Serif"'].forEach(f => document.fonts.load(f)); };
   if (document.readyState === 'complete') warmFonts();
   else addEventListener('load', warmFonts, { once: true });
-  let active = null, pinned = null, hovered = null, leaveTimer = null, pointer = { x: -1, y: -1 };
+  let active = null, pinned = null, hovered = null, leaveTimer = null, pointer = { x: -1, y: -1 }, dock = null;
+  const isDock = r => 'dock' in r.dataset && !touch.matches;
 
   const card = r => r.querySelector('.internship-demo-card');
   const chip = r => r.querySelector('button');
@@ -40,7 +44,7 @@
   });
   // All breathing chips share one phase.
   const breathe = () => breathers.forEach(r => {
-    const b = chip(r), on = shown.has(r) && !(active && active.closest('.case-study') === r.closest('.case-study'));
+    const b = chip(r), row = r.closest('.case-study'), on = shown.has(r) && ![active, dock].some(o => o && o.closest('.case-study') === row);
     if (on !== b.classList.contains('is-breathing')) b.style.animationDelay = on ? `${-(performance.now() % 2600)}ms` : '';
     b.classList.toggle('is-breathing', on);
   });
@@ -59,7 +63,7 @@
     if (motion.matches) return;
     card(r).classList.add('is-fading');
     clearTimeout(r.fade);
-    r.fade = setTimeout(() => { if (active === r) play(r); }, fadeOf(card(r)));
+    r.fade = setTimeout(() => { if (active === r || dock === r) play(r); }, fadeOf(card(r)));
   }
   // Smart zoom (owner, 25 Oct 2026), shared with anomaly-peek.js as
   // window.peekZoom. grow(): a card grows out of its chip (--grow-x); an inline
@@ -189,9 +193,6 @@
     const c = card(r);
     if (r.grow) { r.grow.cancel(); r.grow = null; }
     c.inert = false;
-    // No room below, room above: a data-spotlight card opens above its chip.
-    const b = chip(r).getBoundingClientRect(), h = c.offsetHeight + 8;
-    c.classList.toggle('is-above', !touch.matches && 'spotlight' in c.dataset && innerHeight - b.bottom < h && b.top > h);
     c.classList.add('is-open');
     const g = zoom.grow(c, chip(r), touch.matches, swapFrom);
     r.finalHeight = g.h;
@@ -204,7 +205,6 @@
   // Phones: a tap makes a data-spotlight card a screen tall (fill), its top
   // framed at the top. The page dims while it is on screen, lifting for good
   // (spent) as it scrolls away or on a tap outside; is-top hides the Menu pill.
-  // Desktop: the page dims behind it once a click has pinned and framed it.
   const phone = matchMedia('(max-width: 736px)');
   let lit = null, litRaf = 0, LIT = ['scroll', 'resize'];
   const litCheck = () => {
@@ -267,22 +267,76 @@
     }, GRACE);
   }
 
+  // Docked: the card unfolds below its chip (its margin with it, so its final
+  // top is measured first) and the page eases only as far as its foot needs,
+  // never taking the chip above 88px. A fold from past the chip brings it back.
+  function dockOpen(r) {
+    const c = card(r);
+    if (active) { pinned = null; close(active); }
+    if (r.grow) r.grow.cancel();
+    document.documentElement.style.overflowAnchor = '';
+    clearTimeout(r.settle);
+    c.inert = false;
+    c.classList.add('is-open');
+    const top = zoom.top(c), g = zoom.grow(c, chip(r), true, 0);
+    r.grow = g.a;
+    dock = r;
+    chip(r).setAttribute('aria-expanded', 'true');
+    breathe();
+    play(r);
+    loop(r);
+    requestAnimationFrame(() => {
+      if (dock !== r) return;
+      const vv = window.visualViewport, vh = vv ? vv.height : innerHeight;
+      const by = Math.min(top + g.h + 24 - vh, chip(r).getBoundingClientRect().top - 88);
+      if (by > 8) zoom.frame([[by + vh / 2 - 1, by + vh / 2 + 1]]);
+    });
+  }
+  function dockClose(r) {
+    zoom.stop();
+    const c = card(r), de = document.documentElement.style, back = chip(r).getBoundingClientRect().top < 72;
+    const gone = c.getBoundingClientRect().bottom < 0;
+    chip(r).setAttribute('aria-expanded', 'false');
+    if (r.grow) r.grow.cancel();
+    // (no scroll anchoring while it folds, which read the glide as a scroll
+    // and stopped it; next frame, or the Escape that closed it stops it too.
+    // A card wholly above the screen goes at once, the page held by anchoring.)
+    if (back && !gone) de.overflowAnchor = 'none';
+    requestAnimationFrame(() => {
+      const t = chip(r).getBoundingClientRect().top;
+      if (back && dock !== r) zoom.frame([[t - 121 + innerHeight / 2, t - 119 + innerHeight / 2]]);
+    });
+    r.grow = zoom.shut(c, false, !gone, late => {
+      de.overflowAnchor = '';
+      if (late && dock === r) return;
+      c.classList.remove('is-open', 'is-playing', 'is-still', 'is-fading');
+      c.style.overflow = c.style.animation = '';
+    });
+    c.inert = true;
+    clearInterval(r.loop);
+    clearTimeout(r.fade);
+    dock = null;
+    breathe();
+  }
+
   roots.forEach(r => {
-    const b = chip(r);
-    r.addEventListener('mouseenter', () => { if (zoom.lock) return; hovered = r; if (!touch.matches) open(r); });
-    r.addEventListener('mouseleave', () => { if (hovered === r) hovered = null; if (!touch.matches) scheduleLeave(); });
+    const b = chip(r), x = card(r).querySelector('.ag-close');
+    if (x) x.addEventListener('click', () => { if (dock === r) { dockClose(r); b.focus({ preventScroll: true }); } });
+    r.addEventListener('mouseenter', () => { if (zoom.lock || isDock(r)) return; hovered = r; if (!touch.matches) open(r); });
+    r.addEventListener('mouseleave', () => { if (isDock(r)) return; if (hovered === r) hovered = null; if (!touch.matches) scheduleLeave(); });
     b.addEventListener('focus', () => {
-      if (touch.matches) return;
+      if (touch.matches || isDock(r)) return;
       // Keyboard focus moves on for good: another chip's pin is dropped, so
       // it cannot pop back open later from a stray hover.
       if (pinned && pinned !== r) pinned = null;
       open(r);
     });
     b.addEventListener('click', () => {
-      if (pinned === r) { pinned = null; close(r); }
+      if (isDock(r)) dock === r ? dockClose(r) : dockOpen(r);
+      else if (pinned === r) { pinned = null; close(r); }
       else { pinned = r; fill(card(r)); open(r); requestAnimationFrame(() => { if (active === r) { reveal(r); spotlight(r); } }); }
     });
-    r.addEventListener('focusout', e => { if (!r.contains(e.relatedTarget) && pinned !== r) close(r); });
+    r.addEventListener('focusout', e => { if (!isDock(r) && !r.contains(e.relatedTarget) && pinned !== r) close(r); });
   });
   document.addEventListener('mousemove', e => {
     pointer = { x: e.clientX, y: e.clientY };
@@ -290,7 +344,9 @@
     if (inside(card(active), e.clientX, e.clientY)) { clearTimeout(leaveTimer); leaveTimer = null; }
     else if (!leaveTimer) scheduleLeave();
   });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') { pinned = null; if (active) close(active); } });
+  // Escape closes a floating card first (an anomaly one too: this runs before
+  // anomaly-peek.js's handler), then a docked one.
+  addEventListener('keydown', e => { if (e.key === 'Escape') { pinned = null; if (active) close(active); else if (dock && !document.querySelector('[data-peek][aria-expanded="true"]')) dockClose(dock); } }, true);
   // Outside presses close a floating (desktop) card. Inline cards (phones,
   // touch) close only from a chip or Escape: a finger's press outside may be
   // the start of a scroll, and closing then collapsed the card mid-read.
@@ -301,7 +357,10 @@
     pinned = null;
     close(active);
   });
-  motion.addEventListener('change', () => { if (active) { play(active); loop(active); } });
+  motion.addEventListener('change', () => [active, dock].forEach(r => { if (r) { play(r); loop(r); } }));
+  // Across 737px (or a mouse arriving) a docked card and its phone form are
+  // different layouts: whichever is open closes.
+  touch.addEventListener('change', () => { if (dock) dockClose(dock); if (active && 'dock' in active.dataset) { pinned = null; close(active); } });
   // A floating card closes once its chip is well off screen (it watches the
   // chip: a peek in a shared row has no box). Inline cards stay open while the
   // page scrolls (owner: phone charts must not close on scrolling).
