@@ -354,7 +354,8 @@ test('Desktop opens with the whole phone beside the intro, and switching apps mo
 
 test('Phones draw the demo as large as the handset allows and keep it with its caption', async ({ page }) => {
   // [viewport, smallest demo width expected]: a small phone keeps 0.88, taller ones grow with the screen.
-  for (const [width, height, least, most] of [[375, 553, 263, 265], [393, 659, 288, 300], [430, 746, 330, 345]]) {
+  // 393x659 is height-limited: the caption row that names the app (17 Nov 2026) costs about 7px of demo there.
+  for (const [width, height, least, most] of [[375, 553, 263, 265], [393, 659, 281, 300], [430, 746, 330, 345]]) {
     await page.setViewportSize({ width, height });
     await page.goto('/projects');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
@@ -367,6 +368,28 @@ test('Phones draw the demo as large as the handset allows and keep it with its c
       expect(foot.y + foot.height).toBeLessThan((await page.locator(`#${id} .app-phone`).boundingBox()).y + 2);
     }
   }
+});
+
+test('Phones and tablets name the app beside Start over, with the hint below; desktop shows the hint alone', async ({ page }) => {
+  for (const width of [360, 390, 768]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/projects');
+    for (const [id, name, kind] of [['squashbot', 'SquashBot', 'Telegram bot'], ['nag-bot', 'Nag-bot', 'Telegram bot'], ['finance-tracker', 'Finance tracker', 'Self-hosted'], ['travel-packing', 'Travel Packing', 'Self-hosted']]) {
+      const foot = page.locator(`#${id} .app-card__foot`);
+      await expect(foot.locator('.pj-id b')).toHaveText(name);
+      await expect(foot.locator('.pj-id small')).toHaveText(kind);
+      const who = await foot.locator('.pj-id').boundingBox(), reset = await foot.locator('.app-demo__reset').boundingBox(), hint = await foot.locator('figcaption').boundingBox();
+      // Start over ends the name's line, clear of it; the hint starts below both.
+      expect(reset.x).toBeGreaterThan(who.x + who.width);
+      expect(reset.y).toBeLessThan(who.y + who.height);
+      expect(hint.y).toBeGreaterThanOrEqual(Math.max(who.y + who.height, reset.y + reset.height) - 12);
+      expect(reset.x + reset.width).toBeLessThanOrEqual(width);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.locator('#squashbot .pj-id')).toBeHidden();
+  await expect(page.locator('#squashbot .app-card__foot figcaption')).toBeVisible();
 });
 
 test('On touch screens a demo list scrolls only after the demo is tapped', async ({ browser }) => {

@@ -11,9 +11,17 @@
 .page-projects .app-stage{display:flex;justify-content:center;padding:1.8rem 1rem;border-radius:18px}
 .page-projects .app-phone{flex:none;width:318px;padding:9px;box-sizing:border-box;border-radius:42px}
 .page-projects .app-demo{position:relative;width:300px;height:560px;overflow:hidden;border-radius:33px;isolation:isolate;text-align:left}
-.page-projects .app-card__foot{display:flex;justify-content:space-between;gap:1rem;box-sizing:border-box;height:48px;padding:.2rem 0 0}
-.page-projects .app-card__foot figcaption{font:700 .8rem/1.35 "Source Sans Pro",sans-serif;letter-spacing:.01em}
-.page-projects .app-demo__reset{display:inline-flex;flex:none;align-items:center;gap:.35rem;height:44px!important;min-height:44px;margin:0 -.85rem 0 0;padding:0 .85rem!important;border:0;border-radius:999px;background:transparent!important;box-shadow:none!important;font:600 .875rem/1 Archivo,system-ui,sans-serif!important;letter-spacing:.02em!important;text-transform:none!important;cursor:pointer}
+/* Phones and tablets (owner, 17 Nov 2026, projects-name-pinned): the caption row leads with the app's icon, name and kind,
+   Start over at the right end of that line and the hint below, so the name travels with its demo. Static markup, so
+   nothing moves after load; the kind wraps under the name where both do not fit. Desktop keeps the hint alone. */
+.page-projects .app-card__foot{display:grid;grid:"id r" "cap cap"/minmax(0,1fr) auto;align-items:center;gap:.2rem .75rem;box-sizing:border-box;padding:.2rem 0 0}
+.page-projects .app-card__foot figcaption{grid-area:cap;max-width:none;line-height:1.35;letter-spacing:.01em}
+.page-projects .pj-id{grid-area:id;display:flex;align-items:center;gap:9px;min-width:0}
+.page-projects .pj-id img{flex:none;width:24px;height:24px;border-radius:22%;box-shadow:0 0 0 1px #ffffff1a}
+.page-projects .pj-id>span{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.55rem;min-width:0}
+.page-projects .pj-id b{font:600 16px/1.2 Archivo,system-ui,sans-serif;letter-spacing:-.01em;color:#ecedf0;white-space:nowrap}
+.page-projects .pj-id small{font:500 12px/1.3 Archivo,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--app);white-space:nowrap}
+.page-projects .app-demo__reset{display:inline-flex;flex:none;align-items:center;gap:.35rem;height:44px!important;min-height:44px;margin:0 -.5rem 0 0;padding:0 .85rem!important;border:0;border-radius:999px;background:transparent!important;box-shadow:none!important;font:600 .875rem/1 Archivo,system-ui,sans-serif!important;letter-spacing:.02em!important;text-transform:none!important;cursor:pointer}
 @media screen and (max-width: 980px){.page-projects .app-grid{grid-template-columns:minmax(0,1fr);gap:2.8rem}
 }
 @media screen and (max-width: 736px){.page-projects .app-stage{padding:1.3rem .5rem;border-radius:14px}
@@ -499,15 +507,13 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .page-projects .pk-scroll{top:78px;padding-bottom:48px;-webkit-mask-image:linear-gradient(#000 calc(100% - 25px),transparent);mask-image:linear-gradient(#000 calc(100% - 25px),transparent)}
 @media (max-width: 480px){.page-projects .app-stage{height:536px;padding:0;align-items:center}
 .page-projects .app-phone{transform:scale(.88)}
-.page-projects .app-card__foot{gap:.65rem}
-.page-projects .app-card__foot figcaption{font-size:14px}
 .page-projects .app-demo__reset{font-size:13px!important}
 }
 /* Phones: the demo fits the handset's width and its small viewport's height (.88 where that maths is missing), with room for the caption.
    --pw and --ph are registered lengths so both sides of each atan2() are px: older engines got mixed units wrong. */
 @property --pw{syntax:"<length>";inherits:false;initial-value:0px}
 @property --ph{syntax:"<length>";inherits:false;initial-value:0px}
-@supports (width:calc(1svh*tan(atan2(1px,1px)))){@media (max-width:480px){.page-projects .app-stage{--pw:calc(100vw - 32px);--ph:calc(100svh - 96px);--pf:clamp(.88,min(tan(atan2(var(--pw),318px)),tan(atan2(var(--ph),578px))),1.2);height:calc(578px*var(--pf) + 27px)}
+@supports (width:calc(1svh*tan(atan2(1px,1px)))){@media (max-width:480px){.page-projects .app-stage{--pw:calc(100vw - 32px);--ph:calc(100svh - 110px);--pf:clamp(.88,min(tan(atan2(var(--pw),318px)),tan(atan2(var(--ph),578px))),1.2);height:calc(578px*var(--pf) + 27px)}
 .page-projects .app-phone{transform:scale(var(--pf))}}}
 /* Touch: a swipe on a demo scrolls the page until the demo has been tapped. */
 @media (pointer:coarse){.page-projects .app-demo:not([data-user]) :is(.sq-chat,.n-chat,.f-scroll,.pk-scroll){overflow:hidden}}
@@ -541,7 +547,7 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .page-projects .f-finger.is-down{transform:translate(var(--finger-x,0px),var(--finger-y,0px)) scale(.82)}
 .page-projects .f-finger.is-drag{transition-property:opacity}
 @media (max-width:480px){.page-projects .app-card__demo{display:flex;flex-direction:column}
-.page-projects .app-card__foot{order:-1;padding:0 0 .4rem}
+.page-projects .app-card__foot{order:-1;padding:0 0 .5rem}
 }
 .page-projects .app-demo{content-visibility:auto;contain-intrinsic-size:300px 560px}
 .page-projects .app-card__demo{position:relative}
@@ -574,9 +580,7 @@ to{box-shadow:0 0 0 12px transparent}
 }
 .page-projects .n-plus{opacity:.45}
 .page-projects :is(.sq-toast,.n-toast){background:#0d1117f5;box-shadow:0 6px 18px #0007}
-@media (max-width:736px){.page-projects .app-card__foot{justify-content:flex-start}
-.page-projects .app-demo__reset{margin:0 0 0 -.5rem}
-.page-projects .app-grid{margin-top:1.2rem;padding-top:1.4rem}
+@media (max-width:736px){.page-projects .app-grid{margin-top:1.2rem;padding-top:1.4rem}
 }
 .page-projects .f-sheet{box-sizing:border-box;align-content:start}
 .page-projects .sq-hl .sq-bub{animation:sq-hl 1.4s ease-out .3s 2}
@@ -674,7 +678,6 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-why p span{font-weight:400;line-height:1.6;color:#9da2a9;text-wrap:pretty}
 .page-projects .app-card__facts{font-weight:500}
 .page-projects .app-card__head{justify-content:flex-start;gap:.35rem}
-.page-projects .app-card__foot{align-items:baseline}
 .page-projects .app-card__foot figcaption{font-weight:400;font-size:max(.875rem,14px);color:#9aa0a8;text-wrap:balance}
 .page-projects .app-card__repo{color:#c6cad0}
 .page-projects a.app-card__repo:hover,.page-projects a.app-card__repo:focus-visible{background:#ffffff14;color:#fff}
@@ -686,7 +689,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card h2{grid-column:2;align-self:start}
 .page-projects .app-card__head .app-card__repo{grid-column:3;grid-row:2;justify-self:start;margin:0 0 0 -.6rem}
 .page-projects .app-card__icon{grid-row:1/3;grid-column:1;width:60px;height:60px;border-radius:22%;box-shadow:0 0 0 1px #ffffff1a,0 8px 20px -10px #000}
-.page-projects #squashbot .app-card__icon,.page-projects #nag-bot .app-card__icon{border-radius:50%}
+.page-projects :is(#squashbot,#nag-bot) :is(.app-card__icon,.pj-id img){border-radius:50%}
 .page-projects .app-rail__tab{border-color:#ffffff12!important;background:none!important}
 .page-projects .app-rail__tab:hover{border-color:#3b4047!important}
 .page-projects .app-rail__tab[aria-selected=true]{border-color:var(--app)!important;background:color-mix(in srgb,var(--app) 10%,transparent)!important;box-shadow:inset 0 0 0 1px var(--app)!important}
@@ -697,8 +700,9 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card__icon{width:52px;height:52px}}
 @media screen and (max-width:980px){.page-projects .app-stage{--halo:calc(216px*var(--pf,.88)) calc(352px*var(--pf,.88))}
 .page-projects .app-stage::before{inset:-9% 0}}
-@media (min-width:981px){.page-projects .app-card__foot{flex-direction:column;align-items:flex-start;gap:0;height:auto;padding:.6rem 1rem 0 0}
-.page-projects .app-card__foot figcaption{max-width:none;text-wrap:nowrap}
+@media (min-width:981px){.page-projects .app-card__foot{display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:.6rem 1rem 0 0}
+.page-projects .pj-id{display:none}
+.page-projects .app-card__foot figcaption{text-wrap:nowrap}
 .page-projects .app-demo__reset{height:36px!important;min-height:36px;margin:0 0 0 -.85rem}}
 .page-projects,.page-projects #wrapper{background:#111214}
 .page-projects .app-more{margin-top:5rem}

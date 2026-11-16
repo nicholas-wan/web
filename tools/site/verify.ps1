@@ -1146,7 +1146,8 @@ if ([regex]::Matches($experience, 'data-scramble-list').Count -ne 2 -or [regex]:
 if ($experience -match 'og:image' -or $experience -match 'twitter:card') { throw "The experience page opts out of a share-preview image." }
 if ((Get-Content -LiteralPath (Join-Path $dist 'skills.html') -Raw -Encoding UTF8) -match 'og:image|twitter:card') { throw "The skills page opts out of a share-preview image." }
 # 40 -> 46 (9 Nov 2026): a More features row of three cards on each app.
-Assert-FileSizeBudget 'projects.html' 46
+# 46 -> 47 (17 Nov 2026): each demo's caption row names its app (icon, name, kind), owner-approved; static so nothing moves after load.
+Assert-FileSizeBudget 'projects.html' 47
 $projectsCss = Get-Content -LiteralPath (Join-Path $dist 'assets/css/projects.css') -Raw -Encoding UTF8
 $flatProjectsCss = [regex]::Replace($projectsCss, '(?s)@keyframes\s+[\w-]+\s*\{(?:[^{}]|\{[^{}]*\})*\}', '')
 # @supports wraps the phones' fitted demo scale (10 Nov 2026); like @media it is a conditional group, not selector nesting.
