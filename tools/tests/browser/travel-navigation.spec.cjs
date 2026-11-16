@@ -156,6 +156,16 @@ test.describe('destination scene interactions', () => {
 
   test('visible timeline tours each destination rightward, rests, and repeats', async ({ page }) => {
     await page.clock.install();
+    // The pulse is a real-time WAAPI animation the test clock cannot hold. Start
+    // it paused, so a busy machine cannot let its 650ms end before it is read.
+    await page.addInitScript(() => {
+      const animate = Element.prototype.animate;
+      Element.prototype.animate = function (...args) {
+        const animation = animate.apply(this, args);
+        if (this.classList.contains('chronology-pulse')) animation.pause();
+        return animation;
+      };
+    });
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('/travel');
     await page.mouse.move(0, 0);
@@ -164,7 +174,9 @@ test.describe('destination scene interactions', () => {
     const active = page.locator('.journal-chronology .authored-scene.is-active');
     const pulse = page.locator('.chronology-pulse');
     await expect(scenes.first()).toHaveClass(/is-active/);
-    await page.clock.pauseAt(new Date(Date.now() + 50));
+    // Pause from the page's own clock, far enough ahead that a slow round trip
+    // cannot ask it to pause in the past.
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 400));
     const durations = await scenes.evaluateAll(es => es.map(e => Number(e.dataset.duration)));
     for (let index = 0; index < durations.length; index++) {
       await expect(scenes.nth(index)).toHaveClass(/is-active/);
