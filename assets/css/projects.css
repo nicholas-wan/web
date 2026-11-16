@@ -608,20 +608,28 @@ to{box-shadow:0 0 0 12px transparent}
 .app-demo--finance .f-gap i::before{content:"";display:block;width:var(--w);height:100%;border-radius:inherit;background:var(--br)}
 .f-hint.f-bad{color:var(--r)}
 .page-projects .app-rail{display:none}
-@media (min-width:981px){.page-projects .app-grid{display:block;margin:0;padding:0;border:0;--ps:.9}
+/* Desktop opens with the product beside the claim (owner, 17 Nov 2026, projects-first-a): #main is two
+   columns, the heading, intro and a vertical rail on the left (custom.css places the heading), the chosen
+   card on the right from the top of the page, so the whole phone is in the first screen. */
+@media (min-width:981px){.page-projects #main{--lead:18.5rem;--gap:3rem;display:grid;grid:auto auto 1fr auto/calc(2rem + var(--lead)) minmax(0,1fr);column-gap:var(--gap);align-items:start}
+.page-projects .portfolio-overview{display:contents}
+.page-projects .site-pager{grid-area:4/1/5/-1}
+.page-projects .app-grid{grid-area:1/2/4;display:block;margin:2rem 2rem 0 0;padding:0;border:0;--ps:.88}
 .page-projects .app-card[hidden]{display:none}
-.page-projects .app-card{display:grid;grid:1fr auto auto 1fr/calc(318px*var(--ps) + 2rem) minmax(0,36rem);grid-template-areas:"d ." "d i" "d b" "d .";gap:0 3.2rem;justify-content:center}
+.page-projects .app-card{display:grid;grid:0fr auto 1fr auto/calc(318px*var(--ps) + 1rem) minmax(0,1fr);grid-template-areas:"d ." "d i" "d b" "f f";gap:0 2.25rem}
 .page-projects .app-card__intro{grid-area:i}
 .page-projects .app-card__demo{grid-area:d}
 .page-projects .app-card__body{grid-area:b}
 .page-projects .app-card__body .app-why{margin-top:.2rem!important;padding-top:0;border-top:0}
-.page-projects .app-stage{padding:1rem}
+.page-projects .app-stage{justify-content:flex-start;padding:0 1rem 0 0}
 .page-projects .app-phone{transform:scale(var(--ps));transform-origin:0 0;margin:0 calc(318px*var(--ps) - 318px) calc(578px*var(--ps) - 578px) 0}
-.page-projects .app-rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin:2.2rem 0 2rem;padding-top:2rem;border-top:1px solid var(--pj-line)}
-.page-projects .app-rail__tab{display:flex!important;align-items:center;gap:.8rem;height:auto!important;padding:.5rem .8rem .5rem .5rem!important;border:1px solid var(--pj-line)!important;border-radius:14px;background:none!important;box-shadow:none!important;color:inherit!important;font:inherit!important;letter-spacing:0!important;line-height:1.3!important;text-align:left;text-transform:none!important;white-space:normal!important;cursor:pointer}
-.page-projects .app-rail video{flex:none;width:54px;height:100px;border-radius:8px;background:#17212b;object-fit:cover}
-.page-projects .app-rail b{display:block;font:700 1rem/1.25 "Source Sans Pro",sans-serif;color:var(--pj-ink)}
-.page-projects .app-rail small{display:block;margin-top:.15rem;font:400 .875rem/1.3 "Source Sans Pro",sans-serif;color:var(--pj-muted)}}
+.page-projects .app-rail{grid-area:2/1;display:flex;flex-direction:column;gap:.5rem;margin:1.75rem 0 0 2rem}
+.page-projects .app-rail__tab{display:flex!important;align-items:center;gap:.85rem;height:auto!important;padding:.4rem .7rem .4rem .4rem!important;border:1px solid var(--pj-line)!important;border-radius:14px;background:none!important;box-shadow:none!important;color:inherit!important;font:inherit!important;letter-spacing:0!important;line-height:1.3!important;text-align:left;text-transform:none!important;white-space:normal!important;cursor:pointer}
+.page-projects .app-rail video{flex:none;width:44px;height:82px;border-radius:7px;background:#17212b;object-fit:cover}
+.page-projects .app-rail b{display:block;font:600 .98rem/1.25 Archivo,system-ui,sans-serif;color:var(--pj-ink)}
+.page-projects .app-rail small{display:block;margin-top:.15rem;font:400 .875rem/1.3 Archivo,system-ui,sans-serif;color:var(--pj-muted);text-wrap:balance}
+.page-projects .app-card__head .app-card__proof{white-space:nowrap}
+.page-projects .app-more{margin-left:calc(-1*(var(--lead) + var(--gap)))}}
 .app-demo--finance .f-ok{display:flex;align-items:center;gap:6px;margin:2px 0 -4px;color:var(--g);font-size:12.5px;line-height:1.3}
 .app-demo--finance .f-ok .f-ic{width:15px;height:15px;stroke-width:2.6}
 .app-demo--finance button.f-tr{width:100%}
@@ -633,7 +641,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .sq-gav{gap:3px;background:radial-gradient(circle at 34% 30%,#4a4d52,#111214 70%)}
 .page-projects .sq-gav i{width:5px;height:5px;border-radius:50%;background:#f5c542}
 .page-projects .app-rail__tab{position:relative}
-.page-projects .app-rail.is-auto [aria-selected=true]::after{content:"";position:absolute;right:14px;bottom:6px;left:14px;height:2px;border-radius:1px;transform-origin:0;animation:pj-fill var(--dwell) linear forwards}
+.page-projects .app-rail.is-auto [aria-selected=true]::after{content:"";position:absolute;right:14px;bottom:4px;left:14px;height:2px;border-radius:1px;transform-origin:0;animation:pj-fill var(--dwell) linear forwards}
 .page-projects .app-rail.is-hold [aria-selected=true]::after{animation-play-state:paused}
 @keyframes pj-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media (min-width:981px) and (prefers-reduced-motion:no-preference){.page-projects .is-turn~.app-grid .app-card{animation:pj-in .3s}
@@ -641,8 +649,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-grid .app-card.is-out{position:absolute;inset:0 0 auto;animation:pj-out .3s forwards;pointer-events:none}}
 @keyframes pj-in{from{opacity:0}}
 @keyframes pj-out{to{opacity:0}}
-@media (min-width:981px){.page-projects .app-grid{--ps:.88}
-.page-projects .app-card .app-demo{height:640px;contain-intrinsic-size:300px 640px}
+@media (min-width:981px){.page-projects .app-card .app-demo{height:640px;contain-intrinsic-size:300px 640px}
 .page-projects .app-card .app-phone{margin-bottom:calc(658px*var(--ps) - 658px)}}
 .page-projects{--pj-ink:#ecedf0;--pj-body:#a9aeb6;--pj-muted:#8d939c;--pj-line:#25282d;--pj-rule:#25282d;--pj-stage:#1b1d20}
 .page-projects #main{background:#111214}
@@ -661,7 +668,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card__pc{stroke:var(--app)}
 .page-projects .app-why__icon{color:var(--app)}
 .page-projects .app-card h2{font:600 3rem/1.04 Archivo,system-ui,sans-serif;letter-spacing:-.03em;text-wrap:balance}
-.page-projects :is(.app-why strong,.app-why p span,.app-card__kind,.app-card__facts,.app-card__foot figcaption,.app-rail b,.app-rail small){font-family:Archivo,system-ui,sans-serif}
+.page-projects :is(.app-why strong,.app-why p span,.app-card__kind,.app-card__facts,.app-card__foot figcaption){font-family:Archivo,system-ui,sans-serif}
 .page-projects .app-card__kind{font-size:max(var(--text-floor),.75rem);letter-spacing:.14em;margin-bottom:.35rem}
 .page-projects .app-why strong{font-weight:600;font-size:1rem;color:#ecedf0}
 .page-projects .app-why p span{font-weight:400;line-height:1.6;color:#9da2a9;text-wrap:pretty}
@@ -669,8 +676,6 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card__head{justify-content:flex-start;gap:.35rem}
 .page-projects .app-card__foot{align-items:baseline}
 .page-projects .app-card__foot figcaption{font-weight:400;font-size:max(.875rem,14px);color:#9aa0a8;text-wrap:balance}
-.page-projects .app-rail b{font-weight:600}
-.page-projects .app-rail small{color:#8d939c;text-wrap:balance}
 .page-projects .app-card__repo{color:#c6cad0}
 .page-projects a.app-card__repo:hover,.page-projects a.app-card__repo:focus-visible{background:#ffffff14;color:#fff}
 .page-projects .app-demo__reset{color:#ecedf0!important}
@@ -692,8 +697,8 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card__icon{width:52px;height:52px}}
 @media screen and (max-width:980px){.page-projects .app-stage{--halo:calc(216px*var(--pf,.88)) calc(352px*var(--pf,.88))}
 .page-projects .app-stage::before{inset:-9% 0}}
-@media (min-width:981px){.page-projects .app-card__foot{flex-direction:column;align-items:flex-start;gap:0;height:auto;padding:.5rem 1rem 0}
-.page-projects .app-card__foot figcaption{max-width:none}
+@media (min-width:981px){.page-projects .app-card__foot{flex-direction:column;align-items:flex-start;gap:0;height:auto;padding:.6rem 1rem 0 0}
+.page-projects .app-card__foot figcaption{max-width:none;text-wrap:nowrap}
 .page-projects .app-demo__reset{height:36px!important;min-height:36px;margin:0 0 0 -.85rem}}
 .page-projects,.page-projects #wrapper{background:#111214}
 .page-projects .app-more{margin-top:5rem}
@@ -703,22 +708,23 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-more p{margin:0 0 1.4rem;font:400 .95rem/1.6 Archivo,system-ui,sans-serif;color:#9da2a9;text-align:left;text-wrap:pretty}
 .page-projects .app-more strong{display:block;margin-bottom:6px;font:600 1.5rem/1.15 Archivo,system-ui,sans-serif;letter-spacing:-.02em;color:#ecedf0;text-wrap:balance}
 .page-projects .app-more img{display:block;width:min(100%,280px);height:auto;margin:auto auto 0}
-@media (min-width:981px){.page-projects .app-card{grid-template-columns:minmax(0,1fr) calc(318px*var(--ps) + 2rem) minmax(0,36rem) minmax(0,1fr);grid-template-rows:0fr auto auto 1fr auto;grid-template-areas:". d . ." ". d i ." ". d b ." ". d . ." "f f f f";justify-content:stretch;column-gap:4rem}
-.page-projects :is(.app-card__intro,.app-card__body){max-width:36rem}
-.page-projects .app-stage{justify-content:flex-start;padding-left:0}
-.page-projects .app-card__foot{padding-left:0}
-.page-projects .app-more{grid-area:f}}
-@media (min-width:981px) and (max-width:1180px){.page-projects .app-rail{gap:.5rem}
+@media (min-width:981px){.page-projects :is(.app-card__intro,.app-card__body){max-width:36rem}
 .page-projects .app-card h2{font-size:2.4rem}
-.page-projects .app-rail__tab{gap:.6rem!important;padding-right:.5rem!important}
-.page-projects .app-rail video{width:46px;height:86px}}
+.page-projects .app-more{grid-area:f}}
+/* Small laptops: a narrower left column, the rail shows names only, and the demo hint may wrap. */
+@media (min-width:981px) and (max-width:1179px){.page-projects #main{--lead:14.5rem;--gap:2.25rem}
+.page-projects .app-rail small{display:none}
+.page-projects .app-rail video{width:34px;height:63px}
+.page-projects .app-card{column-gap:1.75rem}
+.page-projects .app-card h2{font-size:2rem}
+.page-projects .app-card__foot figcaption{text-wrap:balance}}
 @media screen and (max-width:980px){.page-projects .app-more ul{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:1rem;scrollbar-width:none;margin:0 -1rem!important;padding:0 1rem}
 .page-projects .app-more li{flex:0 0 84%;scroll-snap-align:start} .page-projects .app-more strong{font-size:1.3rem}
 .page-projects .app-more h3{font-size:2rem!important}
 .page-projects .app-card+.app-card{margin-top:-4rem;padding-top:3rem}}
 .page-projects .app-card .app-more{margin-bottom:5rem}
 @media (min-width:981px){.page-projects .app-more h3{font-size:2.25rem!important}}
-.page-projects :is(.app-why p span,.app-more p,.app-card__foot figcaption){text-wrap:balance}
+.page-projects :is(.app-why p span,.app-more p){text-wrap:balance}
 .page-projects .app-why p span{font-size:max(.95rem,15px)}
 .page-projects .app-card__facts{font-size:max(.875rem,14px);letter-spacing:.01em}
 .app-demo--nag .nag{--bg:#fff;--bar:#f7f7f7;--acc:#2481cc;--hint:#8e8e93;--line:#0000001c;--btn:#2481cc;background:linear-gradient(170deg,#f6e8d4,#efd8bd 55%,#e9caa8);color:#000}
@@ -770,8 +776,6 @@ html .page-projects .portfolio-headline h1{color:#ecedf0}
 .page-projects .app-card__proof b{font-size:1.1rem;font-weight:650;letter-spacing:-.01em;color:var(--pj-ink)}
 .page-projects .app-card__proof i{font-style:normal;margin:0 .6rem;color:#3a3e45}
 @media screen and (max-width:736px){.page-projects .app-card__head .app-card__proof{grid-column:1/-1;margin:.6rem 0 1rem;font-size:max(.95rem,13px)}}
-/* Rail subtitles hold two lines, so the four names line up when one fits on a line (13 Nov 2026 review). */
-.page-projects .app-rail small{min-height:2.6em}
 /* 320px phones: the 12px kind line fits on one line. */
 @media (max-width:359px){.page-projects .app-card__kind{letter-spacing:0}
 .page-projects .app-card__icon{width:46px;height:46px}}

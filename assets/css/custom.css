@@ -10117,7 +10117,7 @@ html .page-projects .page-opening-eyebrow { color:#5fe0d2 !important; }
 html .page-projects a.app-card__repo:hover { color:#fff !important; }
 html .page-projects :is(a, button):focus-visible { outline-color:#5fe0d2; }
 @media screen and (min-width: 981px) {
-  html .page-experience #main > .portfolio-headline,
+  html .page-experience:not(.page-projects) #main > .portfolio-headline,
   html .page-skills #main > .post,
   html .personal-timeline-page > .personal-timeline,
   html #main > .travel-atlas { padding-top:2.75rem !important; }
@@ -10127,9 +10127,10 @@ html .page-projects :is(a, button):focus-visible { outline-color:#5fe0d2; }
   html .personal-timeline__intro,
   html #main > .travel-atlas .travel-atlas__header { margin-bottom:2.25rem !important; }
   html .travel-atlas__header > div:first-child { margin-bottom:1.75rem !important; }
-  html .page-projects .app-rail { border-top-color:transparent !important; }
-  html .page-projects .portfolio-overview { padding-top:2.25rem !important; }
-  html .page-projects .app-rail { margin-top:0; padding-top:0; }
+  /* Projects opens with the product beside the claim (owner, 17 Nov 2026, projects-first-a): the heading,
+     intro and rail are the left column, the chosen card the right (projects.css), and the eyebrow shares
+     the phone's top line. */
+  html .page-projects #main > .portfolio-headline { grid-area:1/1; padding:2rem 0 0 2rem; }
   html .page-skills .skills-heading::before,
   html .travel-atlas__eyebrow,
   html .page-opening-eyebrow { margin-bottom:.7rem !important; }
@@ -10139,9 +10140,8 @@ html .page-projects :is(a, button):focus-visible { outline-color:#5fe0d2; }
   html .travel-atlas__header h1 { font-size:clamp(2.4rem, 3vw, 2.9rem) !important; line-height:1.1 !important; letter-spacing:-.022em; }
   html .page-skills .skills-heading p,
   html .personal-timeline__intro p,
-  html .travel-atlas__header > div > p,
-  html .page-projects .projects-intro { margin-top:.75rem !important; max-width:44rem; font-size:1.1rem !important; line-height:1.6 !important; color:#56656b; text-wrap:pretty; }
-  html .page-projects .projects-intro { color:rgba(233, 246, 245, .68) !important; }
+  html .travel-atlas__header > div > p { margin-top:.75rem !important; max-width:44rem; font-size:1.1rem !important; line-height:1.6 !important; color:#56656b; text-wrap:pretty; }
+  html .page-projects .projects-intro { margin-top:.75rem !important; font-size:1.02rem !important; line-height:1.65 !important; color:rgba(233, 246, 245, .68) !important; text-wrap:pretty; }
 }
 /* Route bundle: experience-internships:start */
 /* Internship entries, owner-approved 18 Oct 2026. Keep descriptions and tags

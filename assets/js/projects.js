@@ -1131,7 +1131,7 @@ rail.addEventListener('animationend', e => { if (!auto || e.animationName !== 'p
 [rail, ...cards].forEach(c => ['pointerup', 'keydown', 'focusin'].forEach(t => c.addEventListener(t, quit)));
 addEventListener('scroll', hold);
 rail.addEventListener('click', e => { const t = e.target.closest('[role=tab]'); if (t) { quit(); show(tabs.indexOf(t)); } });
-rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowLeft: 3, Home: 4 - cur, End: 3 - cur || 4 }[e.key]; if (d) { e.preventDefault(); quit(); show((cur + d) % 4, 1); } });
+rail.addEventListener('keydown', e => { const d = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: 3, ArrowUp: 3, Home: 4 - cur, End: 3 - cur || 4 }[e.key]; if (d) { e.preventDefault(); quit(); show((cur + d) % 4, 1); } });
 addEventListener('hashchange', () => { const i = at(); if (i >= 0 && cards[i].hidden) { quit(); show(i); cards[i].scrollIntoView(); } });
 const start = () => { auto = wide.matches && !still.matches ? 1 : 0; rail.classList.toggle('is-auto', !!auto); show(cur); };
 [wide, still].forEach(m => m.addEventListener('change', start));

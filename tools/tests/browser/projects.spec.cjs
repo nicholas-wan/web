@@ -324,6 +324,34 @@ test('Desktop shows one project at a time and the rail switches with clicks and 
   await expect(page.locator('.app-card:visible')).toHaveCount(4);
 });
 
+test('Desktop opens with the whole phone beside the intro, and switching apps moves nothing', async ({ page }) => {
+  for (const [width, height] of [[1366, 768], [1440, 900], [1024, 768]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/projects');
+    const where = () => page.evaluate(() => [...document.querySelectorAll('.app-rail, .app-card:not([hidden]) :is(.app-phone, h2, .app-card__foot)')].map(e => { const r = e.getBoundingClientRect(); return [e.tagName, Math.round(r.x), Math.round(r.y)]; }));
+    const first = await where();
+    const phone = await page.locator('#squashbot .app-phone').boundingBox();
+    const rail = await page.locator('.app-rail').boundingBox();
+    // The phone keeps its 280px drawing, sits right of the rail and is whole in the first screen.
+    expect(Math.round(phone.width)).toBe(280);
+    expect(phone.x).toBeGreaterThan(rail.x + rail.width);
+    expect(phone.y).toBeGreaterThanOrEqual(0);
+    expect(phone.y + phone.height).toBeLessThanOrEqual(height);
+    await page.locator('.app-rail [aria-controls="finance-tracker"]').click();
+    expect(await where()).toEqual(first);
+    // The rail is a vertical list, so Down and Up move along it as Right and Left do.
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#travel-packing')).toBeVisible();
+    expect(await where()).toEqual(first);
+    await page.keyboard.press('ArrowUp');
+    await expect(page.locator('#finance-tracker')).toBeVisible();
+    await page.evaluate(() => { location.hash = '#nag-bot'; });
+    await expect(page.locator('#nag-bot')).toBeVisible();
+    await page.evaluate(() => scrollTo(0, 0));
+    expect(await where()).toEqual(first);
+  }
+});
+
 test('Phones draw the demo as large as the handset allows and keep it with its caption', async ({ page }) => {
   // [viewport, smallest demo width expected]: a small phone keeps 0.88, taller ones grow with the screen.
   for (const [width, height, least, most] of [[375, 553, 263, 265], [393, 659, 288, 300], [430, 746, 330, 345]]) {
