@@ -324,9 +324,38 @@ test('Desktop shows one project at a time and the rail switches with clicks and 
   await expect(page.locator('.app-card:visible')).toHaveCount(4);
 });
 
+test('Desktop opens with the whole phone beside the intro, and switching apps moves nothing', async ({ page }) => {
+  for (const [width, height] of [[1366, 768], [1440, 900], [1024, 768]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/projects');
+    const where = () => page.evaluate(() => [...document.querySelectorAll('.app-rail, .app-card:not([hidden]) :is(.app-phone, h2, .app-card__foot)')].map(e => { const r = e.getBoundingClientRect(); return [e.tagName, Math.round(r.x), Math.round(r.y)]; }));
+    const first = await where();
+    const phone = await page.locator('#squashbot .app-phone').boundingBox();
+    const rail = await page.locator('.app-rail').boundingBox();
+    // The phone keeps its 280px drawing, sits right of the rail and is whole in the first screen.
+    expect(Math.round(phone.width)).toBe(280);
+    expect(phone.x).toBeGreaterThan(rail.x + rail.width);
+    expect(phone.y).toBeGreaterThanOrEqual(0);
+    expect(phone.y + phone.height).toBeLessThanOrEqual(height);
+    await page.locator('.app-rail [aria-controls="finance-tracker"]').click();
+    expect(await where()).toEqual(first);
+    // The rail is a vertical list, so Down and Up move along it as Right and Left do.
+    await page.keyboard.press('ArrowDown');
+    await expect(page.locator('#travel-packing')).toBeVisible();
+    expect(await where()).toEqual(first);
+    await page.keyboard.press('ArrowUp');
+    await expect(page.locator('#finance-tracker')).toBeVisible();
+    await page.evaluate(() => { location.hash = '#nag-bot'; });
+    await expect(page.locator('#nag-bot')).toBeVisible();
+    await page.evaluate(() => scrollTo(0, 0));
+    expect(await where()).toEqual(first);
+  }
+});
+
 test('Phones draw the demo as large as the handset allows and keep it with its caption', async ({ page }) => {
   // [viewport, smallest demo width expected]: a small phone keeps 0.88, taller ones grow with the screen.
-  for (const [width, height, least, most] of [[375, 553, 263, 265], [393, 659, 288, 300], [430, 746, 330, 345]]) {
+  // 393x659 is height-limited: the caption row that names the app (17 Nov 2026) costs about 7px of demo there.
+  for (const [width, height, least, most] of [[375, 553, 263, 265], [393, 659, 281, 300], [430, 746, 330, 345]]) {
     await page.setViewportSize({ width, height });
     await page.goto('/projects');
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
@@ -339,6 +368,65 @@ test('Phones draw the demo as large as the handset allows and keep it with its c
       expect(foot.y + foot.height).toBeLessThan((await page.locator(`#${id} .app-phone`).boundingBox()).y + 2);
     }
   }
+});
+
+test('Phones and tablets name the app beside Start over, with the hint below; desktop shows the hint alone', async ({ page }) => {
+  for (const width of [360, 390, 768]) {
+    await page.setViewportSize({ width, height: 800 });
+    await page.goto('/projects');
+    for (const [id, name, kind] of [['squashbot', 'SquashBot', 'Telegram bot'], ['nag-bot', 'Nag-bot', 'Telegram bot'], ['finance-tracker', 'Finance tracker', 'Self-hosted'], ['travel-packing', 'Travel Packing', 'Self-hosted']]) {
+      const foot = page.locator(`#${id} .app-card__foot`);
+      await expect(foot.locator('.pj-id b')).toHaveText(name);
+      await expect(foot.locator('.pj-id small')).toHaveText(kind);
+      const who = await foot.locator('.pj-id').boundingBox(), reset = await foot.locator('.app-demo__reset').boundingBox(), hint = await foot.locator('figcaption').boundingBox();
+      // Start over ends the name's line, clear of it; the hint starts below both.
+      expect(reset.x).toBeGreaterThan(who.x + who.width);
+      expect(reset.y).toBeLessThan(who.y + who.height);
+      expect(hint.y).toBeGreaterThanOrEqual(Math.max(who.y + who.height, reset.y + reset.height) - 12);
+      expect(reset.x + reset.width).toBeLessThanOrEqual(width);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.locator('#squashbot .pj-id')).toBeHidden();
+  await expect(page.locator('#squashbot .app-card__foot figcaption')).toBeVisible();
+});
+
+test('More features draws larger pictures, keeps a phone on every card, and pages with arrows where the row scrolls', async ({ page }) => {
+  for (const [width, height, pages] of [[390, 844, 3], [1024, 768, 2], [1440, 900, 0]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/projects');
+    const more = page.locator('#squashbot .app-more'), nav = more.locator('.mf-nav'), cards = more.locator('li');
+    await expect(cards).toHaveCount(3);
+    const img = await cards.first().locator('img').boundingBox();
+    if (!pages) {
+      // Three across inside the column, each picture filling its card.
+      await expect(nav).toBeHidden();
+      expect(img.width).toBeGreaterThan(320);
+      expect(img.width).toBeLessThanOrEqual(400);
+      continue;
+    }
+    if (width < 981) {
+      // The picture stays smaller than the demo phone, and the next card peeks.
+      expect(img.width).toBeLessThanOrEqual(290);
+      expect((await cards.nth(1).boundingBox()).x).toBeLessThan(width);
+    }
+    await more.scrollIntoViewIfNeeded();
+    await expect(nav).toBeVisible();
+    const count = nav.locator('span'), [prev, next] = [nav.getByRole('button', { name: 'Previous features' }), nav.getByRole('button', { name: 'Next features' })];
+    await expect(count).toHaveText(`1 / ${pages}`);
+    await expect(prev).toBeDisabled();
+    // The counter and arrows sit on the heading's centre line.
+    const h = await more.locator('h3').boundingBox(), n = await next.boundingBox();
+    expect(Math.abs(h.y + h.height / 2 - (n.y + n.height / 2))).toBeLessThan(3);
+    await next.click();
+    await expect(count).toHaveText(`2 / ${pages}`);
+    await expect(prev).toBeEnabled();
+    if (pages === 2) await expect(next).toBeDisabled();
+    await prev.click();
+    await expect(count).toHaveText(`1 / ${pages}`);
+  }
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
 });
 
 test('On touch screens a demo list scrolls only after the demo is tapped', async ({ browser }) => {

@@ -5,7 +5,9 @@
    - Finance: where the work happens (owner, 9 Nov 2026, on a laptop that only repeated the phone: "What value does it
      show?"). Statements are downloaded and checked on the PC, and the phone reads a copy, so no bank login leaves it.
    - Nag-bot and SquashBot: another member's lock screen, where each new message in the chat arrives as a Telegram
-     notification, newest on top. The pinned board is edited in place, so it never notifies. */
+     notification, newest on top. The pinned board is edited in place, so it never notifies. Since 17 Nov 2026 the
+     lock screen is drawn at 70% with a quieter glow, so it reads as the second device beside the demo phone (at 1366
+     and 1440 wide its bottom meets the phone's). */
 (() => {
 const $ = (s, r = document) => r.querySelector(s);
 const figs = { finance: $('.cpn[data-for=finance]'), nag: $('.cpn[data-for=nag]'), squash: $('.cpn[data-for=squash]') };
@@ -13,7 +15,7 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 .page-projects .cpn{margin:2rem 0 0!important;padding:0;box-sizing:border-box}
 .page-projects .cpn figcaption{margin:.55rem 0 0;font:400 .875rem/1.35 Archivo,system-ui,sans-serif;color:#9aa0a8;text-align:left}
 .page-projects .cpn--flow{margin-top:2rem!important}
-.page-projects .cpf-flow{display:flex;gap:36px;max-width:516px;margin:0!important;padding:0;list-style:none}
+.page-projects .cpf-flow{display:flex;gap:28px;max-width:516px;margin:0!important;padding:0;list-style:none}
 .page-projects .cpf-flow li{flex:1;min-width:0;display:grid;gap:10px;justify-items:center;margin:0;padding:0}
 .page-projects .cpf-flow li:nth-child(2){--i:1}
 .page-projects .cpf-flow li:nth-child(3){--i:2}
@@ -22,9 +24,9 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 .page-projects .cpf-pc{color:var(--app);border-color:color-mix(in srgb,var(--app) 38%,transparent);box-shadow:0 10px 30px -14px color-mix(in srgb,var(--app) 45%,transparent)}
 .page-projects .cpf-dot{fill:currentColor;stroke:none;transform-box:fill-box;transform-origin:center;filter:drop-shadow(0 0 3px currentColor)}
 .page-projects .cpf-line{stroke-dasharray:1}
-.page-projects .cpf-flow li+li .cpf-t::before{content:"";position:absolute;top:50%;left:-37px;width:36px;height:1px;background:#ffffff2e;transform-origin:0}
-.page-projects .cpf-flow li+li .cpf-t::after{content:"";position:absolute;top:calc(50% - 1.5px);left:-37px;width:4px;height:4px;border-radius:50%;background:var(--app);opacity:0}
-.page-projects .cpf-flow>li>span:last-child{font:400 14px/1.3 Archivo,system-ui,sans-serif;color:#8e8e93;white-space:nowrap}
+.page-projects .cpf-flow li+li .cpf-t::before{content:"";position:absolute;top:50%;left:-29px;width:28px;height:1px;background:#ffffff2e;transform-origin:0}
+.page-projects .cpf-flow li+li .cpf-t::after{content:"";position:absolute;top:calc(50% - 1.5px);left:-29px;width:4px;height:4px;border-radius:50%;background:var(--app);opacity:0}
+.page-projects .cpf-flow>li>span:last-child{font:400 14px/1.3 Archivo,system-ui,sans-serif;color:#8e8e93;text-align:center;text-wrap:balance}
 .page-projects .cpf-flow:not(.is-run) .cpf-t{opacity:0}
 .page-projects .cpf-flow.is-run .cpf-t{animation:cpf-up .45s cubic-bezier(.22,1,.36,1) calc(var(--i,0) * 120ms) both}
 .page-projects .cpf-flow.is-run li+li .cpf-t::before{animation:cpf-line .25s ease-out calc(var(--i) * 120ms + 280ms) both}
@@ -40,7 +42,7 @@ document.head.append(Object.assign(document.createElement('style'), { textConten
 @media (prefers-reduced-motion: reduce){.page-projects .cpf-flow *,.page-projects .cpf-flow *::before,.page-projects .cpf-flow *::after{animation:none!important}.page-projects .cpf-flow:not(.is-run) .cpf-t{opacity:1}.page-projects .cpf-flow .cpf-line{stroke-dashoffset:0!important}}
 .page-projects .cpn--lock{display:block}
 .page-projects .cpn--lock figcaption{max-width:20rem;margin:1rem 0 0}
-.page-projects .cpl{flex:none;width:226px;height:410px;padding:7px;box-sizing:border-box;border-radius:34px;background:#050607;box-shadow:inset 0 0 0 1px #3b4047,0 24px 50px -24px color-mix(in srgb,var(--app) 60%,transparent)}
+.page-projects .cpl{zoom:.7;flex:none;width:226px;height:410px;padding:7px;box-sizing:border-box;border-radius:34px;background:#050607;box-shadow:inset 0 0 0 1px #3b4047,0 24px 50px -24px color-mix(in srgb,var(--app) 28%,transparent)}
 .page-projects .cpl-s{position:relative;height:100%;overflow:hidden;border-radius:28px;background:var(--wall);color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;text-align:center}
 .page-projects .cpl-s::before{content:"";position:absolute;top:8px;left:50%;width:62px;height:18px;margin-left:-31px;border-radius:10px;background:#000}
 .page-projects .cpl-s p{margin:0;text-align:center!important;color:#fff!important}

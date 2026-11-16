@@ -28,7 +28,9 @@ for (const width of [320, 375, 1366]) {
     }
     for (let i = 1; i < titles.length; i++) {
       expect(Math.abs(titles[i].x - titles[0].x), openings[i][0] + ' title left edge').toBeLessThanOrEqual(1);
-      expect(Math.abs(titles[i].y - titles[0].y), openings[i][0] + ' title top edge').toBeLessThanOrEqual(1);
+      // Desktop Projects opens beside its demo phone (17 Nov 2026): its label sits 2rem down, not 2.75rem, to share the phone's top line.
+      const lift = openings[i][0] === '/projects' && width > 980 ? 12 : 0;
+      expect(Math.abs(titles[i].y + lift - titles[0].y), openings[i][0] + ' title top edge').toBeLessThanOrEqual(1);
       // Projects is the one dark page (owner, 9 Nov 2026), so only its title colour differs.
       const [want, got] = openings[i][0] === '/projects'
         ? [{ ...titles[0].typography, color: 'rgb(236, 237, 240)' }, titles[i].typography] : [titles[0].typography, titles[i].typography];

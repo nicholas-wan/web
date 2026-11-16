@@ -11,9 +11,17 @@
 .page-projects .app-stage{display:flex;justify-content:center;padding:1.8rem 1rem;border-radius:18px}
 .page-projects .app-phone{flex:none;width:318px;padding:9px;box-sizing:border-box;border-radius:42px}
 .page-projects .app-demo{position:relative;width:300px;height:560px;overflow:hidden;border-radius:33px;isolation:isolate;text-align:left}
-.page-projects .app-card__foot{display:flex;justify-content:space-between;gap:1rem;box-sizing:border-box;height:48px;padding:.2rem 0 0}
-.page-projects .app-card__foot figcaption{font:700 .8rem/1.35 "Source Sans Pro",sans-serif;letter-spacing:.01em}
-.page-projects .app-demo__reset{display:inline-flex;flex:none;align-items:center;gap:.35rem;height:44px!important;min-height:44px;margin:0 -.85rem 0 0;padding:0 .85rem!important;border:0;border-radius:999px;background:transparent!important;box-shadow:none!important;font:600 .875rem/1 Archivo,system-ui,sans-serif!important;letter-spacing:.02em!important;text-transform:none!important;cursor:pointer}
+/* Phones and tablets (owner, 17 Nov 2026, projects-name-pinned): the caption row leads with the app's icon, name and kind,
+   Start over at the right end of that line and the hint below, so the name travels with its demo. Static markup, so
+   nothing moves after load; the kind wraps under the name where both do not fit. Desktop keeps the hint alone. */
+.page-projects .app-card__foot{display:grid;grid:"id r" "cap cap"/minmax(0,1fr) auto;align-items:center;gap:.2rem .75rem;box-sizing:border-box;padding:.2rem 0 0}
+.page-projects .app-card__foot figcaption{grid-area:cap;max-width:none;line-height:1.35;letter-spacing:.01em}
+.page-projects .pj-id{grid-area:id;display:flex;align-items:center;gap:9px;min-width:0}
+.page-projects .pj-id img{flex:none;width:24px;height:24px;border-radius:22%;box-shadow:0 0 0 1px #ffffff1a}
+.page-projects .pj-id>span{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.55rem;min-width:0}
+.page-projects .pj-id b{font:600 16px/1.2 Archivo,system-ui,sans-serif;letter-spacing:-.01em;color:#ecedf0;white-space:nowrap}
+.page-projects .pj-id small{font:500 12px/1.3 Archivo,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--app);white-space:nowrap}
+.page-projects .app-demo__reset{display:inline-flex;flex:none;align-items:center;gap:.35rem;height:44px!important;min-height:44px;margin:0 -.5rem 0 0;padding:0 .85rem!important;border:0;border-radius:999px;background:transparent!important;box-shadow:none!important;font:600 .875rem/1 Archivo,system-ui,sans-serif!important;letter-spacing:.02em!important;text-transform:none!important;cursor:pointer}
 @media screen and (max-width: 980px){.page-projects .app-grid{grid-template-columns:minmax(0,1fr);gap:2.8rem}
 }
 @media screen and (max-width: 736px){.page-projects .app-stage{padding:1.3rem .5rem;border-radius:14px}
@@ -499,15 +507,13 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .page-projects .pk-scroll{top:78px;padding-bottom:48px;-webkit-mask-image:linear-gradient(#000 calc(100% - 25px),transparent);mask-image:linear-gradient(#000 calc(100% - 25px),transparent)}
 @media (max-width: 480px){.page-projects .app-stage{height:536px;padding:0;align-items:center}
 .page-projects .app-phone{transform:scale(.88)}
-.page-projects .app-card__foot{gap:.65rem}
-.page-projects .app-card__foot figcaption{font-size:14px}
 .page-projects .app-demo__reset{font-size:13px!important}
 }
 /* Phones: the demo fits the handset's width and its small viewport's height (.88 where that maths is missing), with room for the caption.
    --pw and --ph are registered lengths so both sides of each atan2() are px: older engines got mixed units wrong. */
 @property --pw{syntax:"<length>";inherits:false;initial-value:0px}
 @property --ph{syntax:"<length>";inherits:false;initial-value:0px}
-@supports (width:calc(1svh*tan(atan2(1px,1px)))){@media (max-width:480px){.page-projects .app-stage{--pw:calc(100vw - 32px);--ph:calc(100svh - 96px);--pf:clamp(.88,min(tan(atan2(var(--pw),318px)),tan(atan2(var(--ph),578px))),1.2);height:calc(578px*var(--pf) + 27px)}
+@supports (width:calc(1svh*tan(atan2(1px,1px)))){@media (max-width:480px){.page-projects .app-stage{--pw:calc(100vw - 32px);--ph:calc(100svh - 110px);--pf:clamp(.88,min(tan(atan2(var(--pw),318px)),tan(atan2(var(--ph),578px))),1.2);height:calc(578px*var(--pf) + 27px)}
 .page-projects .app-phone{transform:scale(var(--pf))}}}
 /* Touch: a swipe on a demo scrolls the page until the demo has been tapped. */
 @media (pointer:coarse){.page-projects .app-demo:not([data-user]) :is(.sq-chat,.n-chat,.f-scroll,.pk-scroll){overflow:hidden}}
@@ -541,7 +547,7 @@ to{box-shadow:0 0 0 9px #6ab2f200}
 .page-projects .f-finger.is-down{transform:translate(var(--finger-x,0px),var(--finger-y,0px)) scale(.82)}
 .page-projects .f-finger.is-drag{transition-property:opacity}
 @media (max-width:480px){.page-projects .app-card__demo{display:flex;flex-direction:column}
-.page-projects .app-card__foot{order:-1;padding:0 0 .4rem}
+.page-projects .app-card__foot{order:-1;padding:0 0 .5rem}
 }
 .page-projects .app-demo{content-visibility:auto;contain-intrinsic-size:300px 560px}
 .page-projects .app-card__demo{position:relative}
@@ -574,9 +580,7 @@ to{box-shadow:0 0 0 12px transparent}
 }
 .page-projects .n-plus{opacity:.45}
 .page-projects :is(.sq-toast,.n-toast){background:#0d1117f5;box-shadow:0 6px 18px #0007}
-@media (max-width:736px){.page-projects .app-card__foot{justify-content:flex-start}
-.page-projects .app-demo__reset{margin:0 0 0 -.5rem}
-.page-projects .app-grid{margin-top:1.2rem;padding-top:1.4rem}
+@media (max-width:736px){.page-projects .app-grid{margin-top:1.2rem;padding-top:1.4rem}
 }
 .page-projects .f-sheet{box-sizing:border-box;align-content:start}
 .page-projects .sq-hl .sq-bub{animation:sq-hl 1.4s ease-out .3s 2}
@@ -608,20 +612,28 @@ to{box-shadow:0 0 0 12px transparent}
 .app-demo--finance .f-gap i::before{content:"";display:block;width:var(--w);height:100%;border-radius:inherit;background:var(--br)}
 .f-hint.f-bad{color:var(--r)}
 .page-projects .app-rail{display:none}
-@media (min-width:981px){.page-projects .app-grid{display:block;margin:0;padding:0;border:0;--ps:.9}
+/* Desktop opens with the product beside the claim (owner, 17 Nov 2026, projects-first-a): #main is two
+   columns, the heading, intro and a vertical rail on the left (custom.css places the heading), the chosen
+   card on the right from the top of the page, so the whole phone is in the first screen. */
+@media (min-width:981px){.page-projects #main{--lead:18.5rem;--gap:3rem;display:grid;grid:auto auto 1fr auto/calc(2rem + var(--lead)) minmax(0,1fr);column-gap:var(--gap);align-items:start}
+.page-projects .portfolio-overview{display:contents}
+.page-projects .site-pager{grid-area:4/1/5/-1}
+.page-projects .app-grid{grid-area:1/2/4;display:block;margin:2rem 2rem 0 0;padding:0;border:0;--ps:.88}
 .page-projects .app-card[hidden]{display:none}
-.page-projects .app-card{display:grid;grid:1fr auto auto 1fr/calc(318px*var(--ps) + 2rem) minmax(0,36rem);grid-template-areas:"d ." "d i" "d b" "d .";gap:0 3.2rem;justify-content:center}
+.page-projects .app-card{display:grid;grid:0fr auto 1fr auto/calc(318px*var(--ps) + 1rem) minmax(0,1fr);grid-template-areas:"d ." "d i" "d b" "f f";gap:0 2.25rem}
 .page-projects .app-card__intro{grid-area:i}
 .page-projects .app-card__demo{grid-area:d}
 .page-projects .app-card__body{grid-area:b}
 .page-projects .app-card__body .app-why{margin-top:.2rem!important;padding-top:0;border-top:0}
-.page-projects .app-stage{padding:1rem}
+.page-projects .app-stage{justify-content:flex-start;padding:0 1rem 0 0}
 .page-projects .app-phone{transform:scale(var(--ps));transform-origin:0 0;margin:0 calc(318px*var(--ps) - 318px) calc(578px*var(--ps) - 578px) 0}
-.page-projects .app-rail{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin:2.2rem 0 2rem;padding-top:2rem;border-top:1px solid var(--pj-line)}
-.page-projects .app-rail__tab{display:flex!important;align-items:center;gap:.8rem;height:auto!important;padding:.5rem .8rem .5rem .5rem!important;border:1px solid var(--pj-line)!important;border-radius:14px;background:none!important;box-shadow:none!important;color:inherit!important;font:inherit!important;letter-spacing:0!important;line-height:1.3!important;text-align:left;text-transform:none!important;white-space:normal!important;cursor:pointer}
-.page-projects .app-rail video{flex:none;width:54px;height:100px;border-radius:8px;background:#17212b;object-fit:cover}
-.page-projects .app-rail b{display:block;font:700 1rem/1.25 "Source Sans Pro",sans-serif;color:var(--pj-ink)}
-.page-projects .app-rail small{display:block;margin-top:.15rem;font:400 .875rem/1.3 "Source Sans Pro",sans-serif;color:var(--pj-muted)}}
+.page-projects .app-rail{grid-area:2/1;display:flex;flex-direction:column;gap:.5rem;margin:1.75rem 0 0 2rem}
+.page-projects .app-rail__tab{display:flex!important;align-items:center;gap:.85rem;height:auto!important;padding:.4rem .7rem .4rem .4rem!important;border:1px solid var(--pj-line)!important;border-radius:14px;background:none!important;box-shadow:none!important;color:inherit!important;font:inherit!important;letter-spacing:0!important;line-height:1.3!important;text-align:left;text-transform:none!important;white-space:normal!important;cursor:pointer}
+.page-projects .app-rail video{flex:none;width:44px;height:82px;border-radius:7px;background:#17212b;object-fit:cover}
+.page-projects .app-rail b{display:block;font:600 .98rem/1.25 Archivo,system-ui,sans-serif;color:var(--pj-ink)}
+.page-projects .app-rail small{display:block;margin-top:.15rem;font:400 .875rem/1.3 Archivo,system-ui,sans-serif;color:var(--pj-muted);text-wrap:balance}
+.page-projects .app-card__head .app-card__proof{white-space:nowrap}
+.page-projects .app-more{margin-left:calc(-1*(var(--lead) + var(--gap)))}}
 .app-demo--finance .f-ok{display:flex;align-items:center;gap:6px;margin:2px 0 -4px;color:var(--g);font-size:12.5px;line-height:1.3}
 .app-demo--finance .f-ok .f-ic{width:15px;height:15px;stroke-width:2.6}
 .app-demo--finance button.f-tr{width:100%}
@@ -633,7 +645,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .sq-gav{gap:3px;background:radial-gradient(circle at 34% 30%,#4a4d52,#111214 70%)}
 .page-projects .sq-gav i{width:5px;height:5px;border-radius:50%;background:#f5c542}
 .page-projects .app-rail__tab{position:relative}
-.page-projects .app-rail.is-auto [aria-selected=true]::after{content:"";position:absolute;right:14px;bottom:6px;left:14px;height:2px;border-radius:1px;transform-origin:0;animation:pj-fill var(--dwell) linear forwards}
+.page-projects .app-rail.is-auto [aria-selected=true]::after{content:"";position:absolute;right:14px;bottom:4px;left:14px;height:2px;border-radius:1px;transform-origin:0;animation:pj-fill var(--dwell) linear forwards}
 .page-projects .app-rail.is-hold [aria-selected=true]::after{animation-play-state:paused}
 @keyframes pj-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
 @media (min-width:981px) and (prefers-reduced-motion:no-preference){.page-projects .is-turn~.app-grid .app-card{animation:pj-in .3s}
@@ -641,8 +653,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-grid .app-card.is-out{position:absolute;inset:0 0 auto;animation:pj-out .3s forwards;pointer-events:none}}
 @keyframes pj-in{from{opacity:0}}
 @keyframes pj-out{to{opacity:0}}
-@media (min-width:981px){.page-projects .app-grid{--ps:.88}
-.page-projects .app-card .app-demo{height:640px;contain-intrinsic-size:300px 640px}
+@media (min-width:981px){.page-projects .app-card .app-demo{height:640px;contain-intrinsic-size:300px 640px}
 .page-projects .app-card .app-phone{margin-bottom:calc(658px*var(--ps) - 658px)}}
 .page-projects{--pj-ink:#ecedf0;--pj-body:#a9aeb6;--pj-muted:#8d939c;--pj-line:#25282d;--pj-rule:#25282d;--pj-stage:#1b1d20}
 .page-projects #main{background:#111214}
@@ -661,16 +672,13 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card__pc{stroke:var(--app)}
 .page-projects .app-why__icon{color:var(--app)}
 .page-projects .app-card h2{font:600 3rem/1.04 Archivo,system-ui,sans-serif;letter-spacing:-.03em;text-wrap:balance}
-.page-projects :is(.app-why strong,.app-why p span,.app-card__kind,.app-card__facts,.app-card__foot figcaption,.app-rail b,.app-rail small){font-family:Archivo,system-ui,sans-serif}
+.page-projects :is(.app-why strong,.app-why p span,.app-card__kind,.app-card__facts,.app-card__foot figcaption){font-family:Archivo,system-ui,sans-serif}
 .page-projects .app-card__kind{font-size:max(var(--text-floor),.75rem);letter-spacing:.14em;margin-bottom:.35rem}
 .page-projects .app-why strong{font-weight:600;font-size:1rem;color:#ecedf0}
 .page-projects .app-why p span{font-weight:400;line-height:1.6;color:#9da2a9;text-wrap:pretty}
 .page-projects .app-card__facts{font-weight:500}
 .page-projects .app-card__head{justify-content:flex-start;gap:.35rem}
-.page-projects .app-card__foot{align-items:baseline}
 .page-projects .app-card__foot figcaption{font-weight:400;font-size:max(.875rem,14px);color:#9aa0a8;text-wrap:balance}
-.page-projects .app-rail b{font-weight:600}
-.page-projects .app-rail small{color:#8d939c;text-wrap:balance}
 .page-projects .app-card__repo{color:#c6cad0}
 .page-projects a.app-card__repo:hover,.page-projects a.app-card__repo:focus-visible{background:#ffffff14;color:#fff}
 .page-projects .app-demo__reset{color:#ecedf0!important}
@@ -681,7 +689,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card h2{grid-column:2;align-self:start}
 .page-projects .app-card__head .app-card__repo{grid-column:3;grid-row:2;justify-self:start;margin:0 0 0 -.6rem}
 .page-projects .app-card__icon{grid-row:1/3;grid-column:1;width:60px;height:60px;border-radius:22%;box-shadow:0 0 0 1px #ffffff1a,0 8px 20px -10px #000}
-.page-projects #squashbot .app-card__icon,.page-projects #nag-bot .app-card__icon{border-radius:50%}
+.page-projects :is(#squashbot,#nag-bot) :is(.app-card__icon,.pj-id img){border-radius:50%}
 .page-projects .app-rail__tab{border-color:#ffffff12!important;background:none!important}
 .page-projects .app-rail__tab:hover{border-color:#3b4047!important}
 .page-projects .app-rail__tab[aria-selected=true]{border-color:var(--app)!important;background:color-mix(in srgb,var(--app) 10%,transparent)!important;box-shadow:inset 0 0 0 1px var(--app)!important}
@@ -692,34 +700,53 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card__icon{width:52px;height:52px}}
 @media screen and (max-width:980px){.page-projects .app-stage{--halo:calc(216px*var(--pf,.88)) calc(352px*var(--pf,.88))}
 .page-projects .app-stage::before{inset:-9% 0}}
-@media (min-width:981px){.page-projects .app-card__foot{flex-direction:column;align-items:flex-start;gap:0;height:auto;padding:.5rem 1rem 0}
-.page-projects .app-card__foot figcaption{max-width:none}
+@media (min-width:981px){.page-projects .app-card__foot{display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:.6rem 1rem 0 0}
+.page-projects .pj-id{display:none}
+.page-projects .app-card__foot figcaption{text-wrap:nowrap}
 .page-projects .app-demo__reset{height:36px!important;min-height:36px;margin:0 0 0 -.85rem}}
 .page-projects,.page-projects #wrapper{background:#111214}
 .page-projects #footer{background:#111214;--fb-ink:#ecedf0;--fb-soft:#a3a9b1;--fb-faint:#7b818a;--fb-rule:#25282d;--fb-hover:#5fe0d2;--fb-lit:#28d7c5;--fb-wash:#ffffff0d}
 .page-projects .app-more{margin-top:5rem}
-.page-projects .app-more h3{margin:0 0 1.6rem;font:600 2.8rem/1.15 Archivo,system-ui,sans-serif!important;letter-spacing:-.03em!important;text-transform:none!important;text-align:left;color:#ecedf0!important}
+.page-projects .app-more h3{margin:0;font:600 2.25rem/1.15 Archivo,system-ui,sans-serif!important;letter-spacing:-.03em!important;text-transform:none!important;text-align:left;color:#ecedf0!important}
 .page-projects .app-more ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:0!important;padding:0;list-style:none}
-.page-projects .app-more li{display:flex;flex-direction:column;margin:0;padding:24px 24px 0;border:1px solid #2d2f34;border-radius:24px;background:#1b1c1f;overflow:hidden}
-.page-projects .app-more p{margin:0 0 1.4rem;font:400 .95rem/1.6 Archivo,system-ui,sans-serif;color:#9da2a9;text-align:left;text-wrap:pretty}
+.page-projects .app-more li{display:flex;flex-direction:column;margin:0;padding:24px 6px 0;border:1px solid #2d2f34;border-radius:24px;background:#1b1c1f;overflow:hidden}
+.page-projects .app-more p{margin:0 0 1.4rem;padding:0 18px;font:400 .95rem/1.6 Archivo,system-ui,sans-serif;color:#9da2a9;text-align:left}
 .page-projects .app-more strong{display:block;margin-bottom:6px;font:600 1.5rem/1.15 Archivo,system-ui,sans-serif;letter-spacing:-.02em;color:#ecedf0;text-wrap:balance}
-.page-projects .app-more img{display:block;width:min(100%,280px);height:auto;margin:auto auto 0}
-@media (min-width:981px){.page-projects .app-card{grid-template-columns:minmax(0,1fr) calc(318px*var(--ps) + 2rem) minmax(0,36rem) minmax(0,1fr);grid-template-rows:0fr auto auto 1fr auto;grid-template-areas:". d . ." ". d i ." ". d b ." ". d . ." "f f f f";justify-content:stretch;column-gap:4rem}
-.page-projects :is(.app-card__intro,.app-card__body){max-width:36rem}
-.page-projects .app-stage{justify-content:flex-start;padding-left:0}
-.page-projects .app-card__foot{padding-left:0}
-.page-projects .app-more{grid-area:f}}
-@media (min-width:981px) and (max-width:1180px){.page-projects .app-rail{gap:.5rem}
+.page-projects .app-more img{display:block;width:100%;max-width:400px;height:auto;margin:auto auto 0}
+/* More features pictures you can read (owner, 17 Nov 2026, more-features-large), a phone on every card: from 1280px
+   three cards fill the column (pictures about 337px at 1366-1440, 400 at most); narrower, the row scrolls sideways,
+   400px cards on small laptops and 84%-wide ones on phones and tablets with the picture capped at 290px, so it stays
+   smaller than the demo phone and the next card peeks. projects.js adds a page counter and arrows to the heading. */
+.page-projects .mf-bar{display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:1.6rem}
+.page-projects .mf-nav:not([hidden]){display:flex;flex:none;align-items:center;gap:6px}
+.page-projects .mf-nav span{min-width:3.2em;margin-right:4px;font:500 14px/1 Archivo,system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#8d939c;text-align:right}
+.page-projects .mf-nav button{display:grid;place-items:center;width:40px;height:40px;padding:0;border:1px solid #2d2f34;border-radius:50%;background:#1b1c1f;box-shadow:none;color:#ecedf0!important;line-height:1}
+.page-projects .mf-nav button:hover{border-color:#4a4e55;background:#232428}
+.page-projects .mf-nav button:disabled{opacity:.35}
+.page-projects .mf-nav svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@media (max-width:1279px){.page-projects .app-more ul{display:flex;overflow-x:auto;scrollbar-width:none;overscroll-behavior-x:contain}
+.page-projects .app-more li{flex:0 0 400px;scroll-snap-align:start;padding:24px 14px 0}
+.page-projects .app-more p{margin-bottom:1.1rem;padding:0 10px}}
+@media (min-width:981px){.page-projects :is(.app-card__intro,.app-card__body){max-width:36rem}
 .page-projects .app-card h2{font-size:2.4rem}
-.page-projects .app-rail__tab{gap:.6rem!important;padding-right:.5rem!important}
-.page-projects .app-rail video{width:46px;height:86px}}
-@media screen and (max-width:980px){.page-projects .app-more ul{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding-inline:1rem;scrollbar-width:none;margin:0 -1rem!important;padding:0 1rem}
-.page-projects .app-more li{flex:0 0 84%;scroll-snap-align:start} .page-projects .app-more strong{font-size:1.3rem}
+.page-projects .app-more{grid-area:f}}
+/* Small laptops: a narrower left column, the rail shows names only, and the demo hint may wrap. */
+@media (min-width:981px) and (max-width:1179px){.page-projects #main{--lead:14.5rem;--gap:2.25rem}
+.page-projects .app-rail small{display:none}
+.page-projects .app-rail video{width:34px;height:63px}
+.page-projects .app-card{column-gap:1.75rem}
+.page-projects .app-card h2{font-size:2rem}
+.page-projects .app-card__foot figcaption{text-wrap:balance}}
+@media screen and (max-width:980px){.page-projects .app-more ul{scroll-snap-type:x mandatory;scroll-padding-inline:1rem;margin:0 -1rem!important;padding:0 1rem;gap:12px}
+.page-projects .app-more li{flex-basis:min(84%,320px);padding:20px 6px 0}
+.page-projects .app-more p{padding:0 14px}
+.page-projects .app-more img{max-width:290px}
+.page-projects .mf-bar{margin-bottom:1.1rem}
+.page-projects .app-more strong{font-size:1.3rem}
 .page-projects .app-more h3{font-size:2rem!important}
 .page-projects .app-card+.app-card{margin-top:-4rem;padding-top:3rem}}
 .page-projects .app-card .app-more{margin-bottom:5rem}
-@media (min-width:981px){.page-projects .app-more h3{font-size:2.25rem!important}}
-.page-projects :is(.app-why p span,.app-more p,.app-card__foot figcaption){text-wrap:balance}
+.page-projects :is(.app-why p span,.app-more p){text-wrap:balance}
 .page-projects .app-why p span{font-size:max(.95rem,15px)}
 .page-projects .app-card__facts{font-size:max(.875rem,14px);letter-spacing:.01em}
 .app-demo--nag .nag{--bg:#fff;--bar:#f7f7f7;--acc:#2481cc;--hint:#8e8e93;--line:#0000001c;--btn:#2481cc;background:linear-gradient(170deg,#f6e8d4,#efd8bd 55%,#e9caa8);color:#000}
@@ -771,8 +798,6 @@ html .page-projects .portfolio-headline h1{color:#ecedf0}
 .page-projects .app-card__proof b{font-size:1.1rem;font-weight:650;letter-spacing:-.01em;color:var(--pj-ink)}
 .page-projects .app-card__proof i{font-style:normal;margin:0 .6rem;color:#3a3e45}
 @media screen and (max-width:736px){.page-projects .app-card__head .app-card__proof{grid-column:1/-1;margin:.6rem 0 1rem;font-size:max(.95rem,13px)}}
-/* Rail subtitles hold two lines, so the four names line up when one fits on a line (13 Nov 2026 review). */
-.page-projects .app-rail small{min-height:2.6em}
 /* 320px phones: the 12px kind line fits on one line. */
 @media (max-width:359px){.page-projects .app-card__kind{letter-spacing:0}
 .page-projects .app-card__icon{width:46px;height:46px}}
