@@ -3636,26 +3636,11 @@ body.is-map-fullscreen .travel-atlas__layout {
   .guangzhou-day__note { text-wrap: pretty; }
 }
 
-/* Australia keeps its older markup: a bare intro paragraph and no lede.
-   Give the paragraph the day-note treatment and the header the gap every
-   other journal has below its banner (Oct 2026). */
+/* Australia has no lede, and its days use the template's sections but carry no date (none
+   supplied; 17 Nov 2026). Its header keeps the reference journals' gap under the banner:
+   48px on desktop, about 30px on phones (Japan 29, Germany 31). */
 .australia-journal header.major {
-  margin-bottom: 2.5rem;
-}
-
-/* Its bare day headings take the other journals' day-heading style. */
-.australia-journal .col-12 > h2 {
-  margin: 0 0 0.8rem;
-  color: var(--color-ink-900);
-  font-size: clamp(1.55rem, 3vw, 1.8rem);
-}
-
-.australia-journal .col-12 > p {
-  max-width: 70ch;
-  margin-bottom: 1.4rem;
-  color: var(--color-ink-600);
-  line-height: 1.75;
-  text-align: left;
+  margin-bottom: 1rem;
 }
 
 .guangzhou-day .masonry {
@@ -3825,10 +3810,6 @@ body.is-map-fullscreen .travel-atlas__layout {
   --focus-y: 22%;
 }
 
-.australia-journal .guangzhou-day__route {
-  margin-top: 0.15rem;
-}
-
 .guangzhou-journal .content-details {
   line-height: 1.35 !important;
 }
@@ -3846,8 +3827,8 @@ body.is-map-fullscreen .travel-atlas__layout {
 }
 
 @media screen and (max-width: 600px) {
-  #main.australia-journal > article {
-    padding-bottom: 2.5rem;
+  .australia-journal header.major {
+    margin-bottom: 1.9rem;
   }
 
   .australia-journal .travel-journal__hero-image {
@@ -4003,8 +3984,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   /* Narrow columns: the theme's justified <p> leaves rivers (Oct 2026). */
   .travel-route-summary,
   .guangzhou-day__note,
-  .travel-journal__note,
-  .australia-journal .col-12 > p {
+  .travel-journal__note {
     text-align: left;
   }
 
@@ -6201,60 +6181,139 @@ body:not(.page-home) #wrapper.fade-in::before {
 /* Route bundle: journal-nav:start */
 /* Travel journal navigation. travel-nav.js publishes the toolbar's measured
    height as --travel-nav-offset so native anchor jumps clear the single-row
-   rail precisely; the rem values are no-JS fallbacks. */
-.page-travel-journal #header {
-  display: flex;
-  height: 7rem;
-  min-height: 7rem;
-  justify-content: center;
-  padding: 1rem;
-}
-
+   rail precisely; the rem values are no-JS fallbacks.
+   Journals have no header above the bar (17 Nov 2026): the boxed Travel journals masthead went,
+   and a quiet breadcrumb leads the sticky strip instead (Apple's local nav). */
 .page-travel-journal #nav { margin-top: 0; }
 
-/* Phone first screen (Oct 2026): the 7rem masthead held a 3rem pill in 4rem of
-   black; keep the 3rem tap height and shrink the band so the banner lands
-   higher. The floating return-to-top covered gallery tiles, as on Personal. */
+/* The floating return-to-top covered gallery tiles, as on Personal. */
 @media screen and (max-width: 736px) {
-  .page-travel-journal #header {
-    height: auto;
-    min-height: 0;
-    padding: 0.4rem 1rem;
-  }
-
   body.page-travel-journal #return-to-top {
     display: none !important;
   }
 }
 
-#header .journal-return {
+/* "Travel / Japan": Travel is grey and links to /travel, the slash is faint, the trip name is the
+   current page in bold ink. */
+.journal-crumb {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  font: 600 max(var(--text-floor), 0.875rem)/1.2 var(--font-display);
+  letter-spacing: 0.01em;
+}
+
+/* The one link in the strip that is not a chip. */
+.travel-section-nav .journal-crumb a.journal-crumb__up {
   display: inline-flex;
   align-items: center;
-  gap: 0.65rem;
-  min-height: 3rem;
-  padding: 0.6rem 1.2rem;
-  border-width: 1px !important;
-  font-size: 1rem;
+  min-height: 2.35rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--color-ink-600);
+  font: inherit;
+  text-decoration: none;
+  transition: color var(--motion-standard) ease;
+}
+
+.travel-section-nav .journal-crumb a.journal-crumb__up:hover { color: var(--color-brand-700); }
+
+.journal-crumb__sep {
+  margin: 0 0.45em;
+  color: var(--color-ink-500);
+  opacity: 0.55;
+  font-weight: 400;
+}
+
+.journal-crumb__here {
+  color: var(--color-ink-900);
   font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: 0.035em;
-  text-transform: none;
-  transition: color var(--motion-standard) ease, border-color var(--motion-standard) ease;
 }
 
-.journal-return svg {
-  flex: 0 0 1.35rem;
-  width: 1.35rem;
-  height: 1.35rem;
+/* Desktop: the crumb stays pinned at the left of the white rail while the chips scroll under it,
+   behind a hairline and a short fade. The fade shows only once the strip has scrolled
+   (travel-nav.js sets .is-scrolled above 2px); at rest it bleached the active chip's left end. */
+@media screen and (min-width: 981px) {
+  .journal-crumb {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    margin-right: 0.35rem;
+    padding: 0 1rem 0 0.15rem;
+    background: #fff;
+  }
+
+  .journal-crumb::before {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 1px;
+    height: 1.1rem;
+    background: rgba(0, 0, 0, 0.14);
+    content: "";
+    transform: translateY(-50%);
+  }
+
+  .journal-crumb::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    width: 4rem;
+    background: linear-gradient(90deg, #fff 45%, rgba(255, 255, 255, 0.8) 65%, rgba(255, 255, 255, 0));
+    content: "";
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .travel-jump-groups.is-scrolled .journal-crumb::after { opacity: 1; }
 }
 
-#header .journal-return:focus-visible {
-  outline: 2px solid #62d6c4;
-  outline-offset: 5px;
+/* Phones and tablets: only "Travel", the first item of the dark strip after the menu button,
+   behind a hairline; it scrolls away as the strip follows the section being read. The journal's
+   own title sits right under the rail, so the name would repeat it. */
+@media screen and (max-width: 980px) {
+  .journal-crumb {
+    position: relative;
+    margin-right: 0.15rem;
+    padding: 0 0.85rem 0 0.25rem;
+    font-size: max(var(--text-floor), 0.82rem);
+  }
+
+  .journal-crumb::before {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    width: 1px;
+    height: 1.35rem;
+    background: rgba(255, 255, 255, 0.2);
+    content: "";
+    transform: translateY(-50%);
+  }
+
+  .travel-section-nav .journal-crumb a.journal-crumb__up,
+  .travel-section-nav.is-stuck .journal-crumb a.journal-crumb__up {
+    min-height: 3rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: rgba(255, 255, 255, 0.68);
+  }
+
+  .travel-section-nav .journal-crumb a.journal-crumb__up:hover { color: #fff; }
+
+  .journal-crumb__sep,
+  .journal-crumb__here { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #header .journal-return { transition: none; }
+  .travel-section-nav .journal-crumb a.journal-crumb__up { transition: none; }
 }
 
 [id^="trip-section-"] {
@@ -6283,15 +6342,6 @@ body:not(.page-home) #wrapper.fade-in::before {
   box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.08);
 }
 
-.travel-section-nav > strong {
-  flex: 0 0 auto;
-  color: var(--color-ink-800);
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .travel-jump-groups {
   display: flex;
   min-width: 0;
@@ -6313,8 +6363,10 @@ body:not(.page-home) #wrapper.fade-in::before {
   display: none;
 }
 
+/* Both strip arrows sit together at the right end, clear of the pinned crumb. */
 .travel-strip-arrow {
   flex: 0 0 2.5rem;
+  order: 1;
   width: 2.5rem;
   height: 2.5rem;
   padding: 0;
@@ -6324,6 +6376,7 @@ body:not(.page-home) #wrapper.fade-in::before {
   line-height: 1;
   font-size: 1rem;
 }
+.travel-strip-arrow:last-child { margin-left: -0.6rem; }
 .travel-strip-arrow:disabled { opacity: 0.3; }
 .travel-strip-arrow[hidden] { display: none; }
 @media screen and (max-width: 980px) {
@@ -6393,14 +6446,6 @@ a.travel-jump-group__label {
 .travel-jump-group + .travel-jump-group {
   padding-left: 0.75rem;
   border-left: 1px solid rgba(0, 0, 0, 0.12);
-}
-
-.travel-section-nav strong {
-  flex: 0 0 auto;
-  color: var(--color-ink-800);
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
 .travel-section-nav > div {
@@ -6536,10 +6581,6 @@ a.travel-jump-group__label {
   }
 
   .travel-section-nav::-webkit-scrollbar {
-    display: none;
-  }
-
-  .travel-section-nav > strong {
     display: none;
   }
 
@@ -8619,6 +8660,18 @@ body.lightbox-open {
   font-weight: 700;
 }
 
+/* A card whose caption only restated its title has none (17 Nov 2026: Pre-Wedding Photoshoot).
+   Meta, title and link read as one evenly spaced group: the title loses the margin that spaced
+   the caption, and the link sits the meta-to-title step below it. On desktop the photo still
+   sets the card's height and the text stays centred, so the card keeps its size. */
+.personal-event-card--title-only .personal-event-card__body > strong {
+  margin-bottom: 0;
+}
+
+.personal-event-card--title-only .personal-event-card__open {
+  padding-top: 0.65rem;
+}
+
 .personal-event-card__instagram {
   display: inline-flex;
   align-items: center;
@@ -9128,6 +9181,11 @@ body.page-home #nav {
   .personal-event-card__meta,
   .personal-event-card__open {
     font-size: 0.9rem;
+  }
+
+  /* The short text block under the photo ends with the same breathing room as its top. */
+  .personal-event-card--title-only .personal-event-card__body {
+    padding-bottom: 1.05rem;
   }
 
   .personal-timeline.is-enhanced .personal-timeline-event--left .personal-event-card,
@@ -11290,23 +11348,17 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
   word-break: keep-all;
 }
 
-/* Day strip: "Trip sections" was the site's only tracked serif label; it takes the eyebrow
-   token. Desktop chips cut mid-word at the strip edge get the right-edge fade phones have. */
-.travel-section-nav > strong {
-  color: var(--color-brand-700);
-  font-family: var(--font-display);
-  font-size: var(--eyebrow-size);
-  font-weight: 700;
-  letter-spacing: var(--eyebrow-tracking);
-}
-
+/* Day strip: desktop chips cut mid-word at the strip edge get the right-edge fade phones have. */
 @media screen and (min-width: 737px) {
   .travel-jump-groups {
     -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
     mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
   }
+}
 
-  /* Once scrolled, the left edge fades too instead of cutting a chip (Nov 2026). */
+/* Once scrolled, the left edge fades too instead of cutting a chip (Nov 2026). From 981px the
+   pinned breadcrumb is the strip's left edge, with its own fade, so only the right edge fades. */
+@media screen and (min-width: 737px) and (max-width: 980px) {
   .travel-jump-groups.is-scrolled {
     -webkit-mask-image: linear-gradient(90deg, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);
     mask-image: linear-gradient(90deg, transparent, #000 2.5rem, #000 calc(100% - 2.5rem), transparent);

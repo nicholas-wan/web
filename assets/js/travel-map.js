@@ -944,9 +944,6 @@
       detailCardImage.alt = image.alt;
     });
     detailCardLink.href = point[2];
-    detailCardLink.firstChild.nodeValue = point[0] === 'stop'
-      ? 'Open this journal stop '
-      : 'Open this journal section ';
     detailCardLink.setAttribute('aria-label', 'Open ' + point[1] + ' in the ' + trip.title + ' journal');
     var showsOnLeft = parseFloat(link.style.left) > 50;
     detailCard.classList.toggle('is-left', showsOnLeft);

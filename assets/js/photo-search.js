@@ -32,7 +32,7 @@
 
 	function fold(value) {
 		return String(value).toLowerCase().normalize('NFD')
-			.replace(/[\u0300-\u036f]/g, '').replace(/['\u2019]/g, '');
+			.replace(/[\u0300-\u036f]/g, '').replace(/['\u2019]/g, '').normalize('NFC');
 	}
 
 	function tokens(value) {
@@ -90,6 +90,8 @@
 		tags.forEach(function(tag) {
 			tag.keys = [fold(tag.tag)].concat((tag.synonyms || []).map(fold));
 			expanded[tag.tag] = tag.keys.slice(1).join(' ');
+			// A query names a tag when its terms match a key's own terms (CJK keys are one term per character).
+			tag.terms = tag.keys.map(function(key) { return tokens(key).join(' '); });
 		});
 		photos = data.photos.map(function(photo, order) {
 			photo.variants = +(data.variants || '').charAt(order);
@@ -134,10 +136,20 @@
 
 	function search(terms) {
 		var tier = [[], []];
-		var subject = tags.find(function(tag) { return tag.keys.indexOf(terms.join(' ')) >= 0; });
+		var subject = tags.find(function(tag) { return tag.terms.indexOf(terms.join(' ')) >= 0; });
+		// A CJK place name is one term per character: a photo sharing only some of them is noise.
+		var whole = subject && new RegExp('^[' + CJK + ']+$').test(terms.join(''));
 		fuzzyTerms = [];
+		// Photos with the named place also match through its synonyms, so a CJK name is not lost to
+		// one of its characters having caption hits elsewhere (Chengdu's du in Kyoto, Nov 2026).
+		// Latin queries keep the plain fallback: a broader tag's synonym (drinks: bubble tea) would
+		// otherwise pull in every photo of that broader tag.
 		var rows = photos.map(function(photo) {
-			return terms.map(function(term) { return termScore(photo, term); });
+			var own = whole && photo.tags.indexOf(subject.tag) >= 0;
+			return terms.map(function(term) {
+				var best = termScore(photo, term);
+				return own && !best[0] ? termScore(photo, term, false, true) : best;
+			});
 		});
 		// Fuzzy matches only stand in for a term with no exact or prefix hit at all.
 		terms.forEach(function(term, t) {
@@ -157,7 +169,7 @@
 				score += best[0] * weight[t];
 				why.push(best[1] === 4 ? '\x03' + terms[t] : terms[t] + (best[1] > 1 ? ' (in description)' : ''));
 			});
-			if (why.length) tier[why.length === terms.length && (!subject || photos[i].tags.indexOf(subject.tag) >= 0) ? 0 : 1].push({ photo: photos[i], score: score, why: why });
+			if (why.length && !(whole && why.length < terms.length)) tier[why.length === terms.length && (!subject || photos[i].tags.indexOf(subject.tag) >= 0) ? 0 : 1].push({ photo: photos[i], score: score, why: why });
 		});
 		return tier.map(rank);
 	}

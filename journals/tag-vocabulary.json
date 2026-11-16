@@ -34,7 +34,10 @@
   "amanohashidate": {
     "facet": "place",
     "parent": "kansai",
-    "synonyms": []
+    "synonyms": [
+      "天橋立",
+      "天桥立"
+    ]
   },
   "amphibian": {
     "facet": "animal",
@@ -142,7 +145,8 @@
     "parent": "guangzhou",
     "synonyms": [
       "baiyun",
-      "moxing summit"
+      "moxing summit",
+      "白云山"
     ]
   },
   "bakery": {
@@ -424,7 +428,8 @@
     "synonyms": [
       "taikoo li",
       "tianfu airport",
-      "dongmen wharf"
+      "dongmen wharf",
+      "成都"
     ]
   },
   "chicken": {
@@ -437,7 +442,9 @@
   "china": {
     "facet": "place",
     "parent": "asia",
-    "synonyms": []
+    "synonyms": [
+      "中国"
+    ]
   },
   "chuncheon": {
     "facet": "place",
@@ -649,7 +656,9 @@
   "dongshankou": {
     "facet": "place",
     "parent": "guangzhou",
-    "synonyms": []
+    "synonyms": [
+      "东山口"
+    ]
   },
   "drinks": {
     "facet": "food",
@@ -685,7 +694,8 @@
     "synonyms": [
       "south bridge",
       "panda base",
-      "red panda forest"
+      "red panda forest",
+      "都江堰"
     ]
   },
   "dusk": {
@@ -955,7 +965,8 @@
     "facet": "place",
     "parent": "china",
     "synonyms": [
-      "canton"
+      "canton",
+      "广州"
     ]
   },
   "gwacheon": {
@@ -969,7 +980,8 @@
     "synonyms": [
       "owakudani",
       "lake ashi",
-      "hakone shrine"
+      "hakone shrine",
+      "箱根"
     ]
   },
   "halloween": {
@@ -1013,7 +1025,10 @@
   "hiroshima": {
     "facet": "place",
     "parent": "japan",
-    "synonyms": []
+    "synonyms": [
+      "広島",
+      "广岛"
+    ]
   },
   "home": {
     "facet": "subject",
@@ -1060,7 +1075,9 @@
   "hunan": {
     "facet": "place",
     "parent": "china",
-    "synonyms": []
+    "synonyms": [
+      "湖南"
+    ]
   },
   "hutt lagoon": {
     "facet": "place",
@@ -1086,7 +1103,9 @@
   "ikebukuro": {
     "facet": "place",
     "parent": "tokyo",
-    "synonyms": []
+    "synonyms": [
+      "池袋"
+    ]
   },
   "illuminations": {
     "facet": "subject",
@@ -1100,7 +1119,8 @@
     "facet": "place",
     "parent": "kansai",
     "synonyms": [
-      "ine fishing village"
+      "ine fishing village",
+      "伊根"
     ]
   },
   "interior": {
@@ -1120,13 +1140,16 @@
   "japan": {
     "facet": "place",
     "parent": "asia",
-    "synonyms": []
+    "synonyms": [
+      "日本"
+    ]
   },
   "japanese alps": {
     "facet": "place",
     "parent": "japan",
     "synonyms": [
-      "hida"
+      "hida",
+      "日本アルプス"
     ]
   },
   "jellyfish": {
@@ -1156,7 +1179,9 @@
   "kamikochi": {
     "facet": "place",
     "parent": "japanese alps",
-    "synonyms": []
+    "synonyms": [
+      "上高地"
+    ]
   },
   "kangaroo": {
     "facet": "animal",
@@ -1165,14 +1190,18 @@
   "kansai": {
     "facet": "place",
     "parent": "japan",
-    "synonyms": []
+    "synonyms": [
+      "関西",
+      "关西"
+    ]
   },
   "kawaguchiko": {
     "facet": "place",
     "parent": "mount fuji",
     "synonyms": [
       "lake kawaguchiko",
-      "lake kawaguchi"
+      "lake kawaguchi",
+      "河口湖"
     ]
   },
   "kiama": {
@@ -1206,7 +1235,8 @@
     "facet": "place",
     "parent": "kansai",
     "synonyms": [
-      "kiyomizu-dera"
+      "kiyomizu-dera",
+      "京都"
     ]
   },
   "lake": {
@@ -1351,7 +1381,9 @@
     "facet": "place",
     "parent": "hiroshima",
     "synonyms": [
-      "itsukushima"
+      "itsukushima",
+      "宮島",
+      "宫岛"
     ]
   },
   "monkey": {
@@ -1383,7 +1415,8 @@
       "mt fuji",
       "fujisan",
       "arakurayama",
-      "chureito"
+      "chureito",
+      "富士山"
     ]
   },
   "mount titlis": {
@@ -1416,7 +1449,9 @@
   "nagoya": {
     "facet": "place",
     "parent": "japan",
-    "synonyms": []
+    "synonyms": [
+      "名古屋"
+    ]
   },
   "nami island": {
     "facet": "place",
@@ -1430,7 +1465,8 @@
     "parent": "kansai",
     "synonyms": [
       "todaiji",
-      "todai-ji"
+      "todai-ji",
+      "奈良"
     ]
   },
   "netherlands": {
@@ -1574,7 +1610,8 @@
       "dotonbori",
       "shinsaibashi",
       "shinsekai",
-      "tsutenkaku"
+      "tsutenkaku",
+      "大阪"
     ]
   },
   "otter": {
@@ -1591,7 +1628,8 @@
     "facet": "place",
     "parent": "guangzhou",
     "synonyms": [
-      "chimelong"
+      "chimelong",
+      "番禺"
     ]
   },
   "paris": {
@@ -1909,14 +1947,16 @@
     "synonyms": [
       "namsan",
       "namsan tower",
-      "n seoul tower"
+      "n seoul tower",
+      "서울"
     ]
   },
   "shamian island": {
     "facet": "place",
     "parent": "guangzhou",
     "synonyms": [
-      "shamian"
+      "shamian",
+      "沙面"
     ]
   },
   "shark": {
@@ -1933,7 +1973,9 @@
     "facet": "place",
     "parent": "japanese alps",
     "synonyms": [
-      "shirakawa"
+      "shirakawa",
+      "白川郷",
+      "白川乡"
     ]
   },
   "shopping": {
@@ -1969,12 +2011,16 @@
   "shuzenji": {
     "facet": "place",
     "parent": "japan",
-    "synonyms": []
+    "synonyms": [
+      "修善寺"
+    ]
   },
   "sichuan": {
     "facet": "place",
     "parent": "china",
-    "synonyms": []
+    "synonyms": [
+      "四川"
+    ]
   },
   "sign": {
     "facet": "subject",
@@ -2189,7 +2235,8 @@
     "facet": "place",
     "parent": "japanese alps",
     "synonyms": [
-      "hida takayama"
+      "hida takayama",
+      "高山"
     ]
   },
   "tea": {
@@ -2227,7 +2274,9 @@
   "tianhe": {
     "facet": "place",
     "parent": "guangzhou",
-    "synonyms": []
+    "synonyms": [
+      "天河"
+    ]
   },
   "tiger": {
     "facet": "animal",
@@ -2243,7 +2292,10 @@
   "tokyo": {
     "facet": "place",
     "parent": "japan",
-    "synonyms": []
+    "synonyms": [
+      "東京",
+      "东京"
+    ]
   },
   "toronto": {
     "facet": "place",
@@ -2300,13 +2352,16 @@
   "ueno": {
     "facet": "place",
     "parent": "tokyo",
-    "synonyms": []
+    "synonyms": [
+      "上野"
+    ]
   },
   "uji": {
     "facet": "place",
     "parent": "kansai",
     "synonyms": [
-      "byodo-in"
+      "byodo-in",
+      "宇治"
     ]
   },
   "university": {
@@ -2470,13 +2525,16 @@
     "facet": "place",
     "parent": "guangzhou",
     "synonyms": [
-      "shangxiajiu"
+      "shangxiajiu",
+      "西关"
     ]
   },
   "yongqingfang": {
     "facet": "place",
     "parent": "guangzhou",
-    "synonyms": []
+    "synonyms": [
+      "永庆坊"
+    ]
   },
   "yongsan": {
     "facet": "place",
@@ -2495,7 +2553,8 @@
     "parent": "guangzhou",
     "synonyms": [
       "yuexiu park",
-      "zhenhai tower"
+      "zhenhai tower",
+      "越秀"
     ]
   },
   "yx": {
@@ -2529,7 +2588,8 @@
       "tianmen cave",
       "ten-mile gallery",
       "72 wonder tower",
-      "seventy-two wonder tower"
+      "seventy-two wonder tower",
+      "张家界"
     ]
   },
   "zoo": {

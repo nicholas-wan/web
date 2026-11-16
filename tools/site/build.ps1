@@ -19,7 +19,6 @@ $navigationPartialPath = Join-Path $root "partials\site-navigation.html"
 if (-not (Test-Path -LiteralPath $navigationPartialPath)) { throw "Missing shared navigation partial: $navigationPartialPath" }
 $navigationTemplate = Read-SourceText $navigationPartialPath
 $footerTemplate = (Read-SourceText (Join-Path $root 'partials\site-footer.html')).TrimEnd()
-$travelMastheadTemplate = Read-SourceText (Join-Path $root 'partials\travel-masthead.html')
 $travelJournalPartialPath = Join-Path $root "partials\travel-journal.html"
 if (-not (Test-Path -LiteralPath $travelJournalPartialPath)) { throw "Missing shared travel journal partial: $travelJournalPartialPath" }
 $travelJournalTemplate = Read-SourceText $travelJournalPartialPath
@@ -558,7 +557,11 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
     $next = if ($currentIndex -lt ($tripOrder.Count - 1)) { $tripOrder[$currentIndex + 1] } else { $null }
     $previousLink = if ($previous) { '<a class="travel-pagination__previous" href="' + $previous + '"><span>Previous journal</span><strong>&#8592; ' + $tripLabels[$previous] + '</strong></a>' } else { '' }
     $nextLink = if ($next) { '<a class="travel-pagination__next" href="' + $next + '"><span>Next journal</span><strong>' + $tripLabels[$next] + ' &#8594;</strong></a>' } else { '' }
-    $navigation = '<nav class="travel-section-nav" aria-label="Trip sections"><strong>Trip sections</strong><div class="travel-jump-groups">' + ($jumpGroups -join '') + '</div></nav>'
+    # The breadcrumb leads the strip (17 Nov 2026; it replaced the boxed Travel journals masthead
+    # and the "Trip sections" label): "Travel / Japan" pinned at the left on desktop, only the
+    # "Travel" link on phones and tablets, where the journal's title sits right under the rail.
+    $crumb = '<p class="journal-crumb"><a class="journal-crumb__up" href="travel">Travel</a><span class="journal-crumb__sep" aria-hidden="true">/</span><span class="journal-crumb__here" aria-current="page">' + [System.Net.WebUtility]::HtmlEncode($tripLabels[$Slug]) + '</span></p>'
+    $navigation = '<nav class="travel-section-nav" aria-label="Trip sections"><div class="travel-jump-groups">' + $crumb + ($jumpGroups -join '') + '</div></nav>'
     $pagination = '<nav class="travel-pagination" aria-label="Trip navigation">' + $previousLink + $nextLink + '</nav>'
     $mainMatch = [regex]::Match($updated, '(?is)^\s*<div id="main"(?<attributes>[^>]*)>(?<content>.*)</div>\s*(?:<!--.*?-->\s*)*$')
     if (-not $mainMatch.Success) { throw "Could not render $Slug through the shared travel journal template." }
@@ -1291,7 +1294,8 @@ foreach ($page in $pages) {
     }
     $footer = [regex]::Replace($footer, '\sdata-page="[^"]+"', '')
     if ($tripOrder -contains $slug) {
-        $navigation = [regex]::Replace($navigation, '(?s)^\s*<header id="header">.*?</header>\s*', $travelMastheadTemplate + "`n")
+        # Journals have no header above the bar: the strip's breadcrumb links back to Travel.
+        $navigation = [regex]::Replace($navigation, '(?s)^\s*<header id="header">.*?</header>\s*', '')
     }
     if ($eventPages -contains $slug) {
         $navigation = [regex]::Replace($navigation, '(?s)^\s*<header id="header">.*?</header>\s*', '')
