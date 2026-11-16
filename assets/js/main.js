@@ -69,7 +69,7 @@
 		var y = window.scrollY;
 		// Headerless pages keep the solid pill.
 		var alt = !header || header.getBoundingClientRect().bottom <= window.innerHeight * 0.05;
-		var atFoot = mobileNav.matches && foot && foot.getBoundingClientRect().top < innerHeight - 70;
+		var atFoot = foot && foot.getBoundingClientRect().top < innerHeight - 70;
 
 		navPanelToggle.classList.toggle('alt', alt);
 		if (scrolled) stepAway(y);
@@ -243,7 +243,7 @@
 	mobileNav.addEventListener('change', syncNavMode);
 	syncNavMode();
 
-	// Return-to-top: past 50px, and on phones off the footer.
+	// Return-to-top: past 50px, and off the footer.
 	if (returnToTop) {
 		returnToTop.addEventListener('click', function(event) {
 			event.preventDefault();

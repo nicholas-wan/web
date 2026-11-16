@@ -238,6 +238,11 @@ foreach ($page in $pages) {
     # holds an icon and a label, and the active link carries aria-current.
     if ($page.Name -ne '404.html' -and [regex]::Matches($sharedNav.Value, '<li class="active"><a\b[^>]*\baria-current="(?:page|true)"[^>]*>(?:(?!</a>).)*</a><span class="nav-active-mark" aria-hidden="true"></span></li>').Count -ne 1) { throw "$($page.Name) must carry exactly one nav-active-mark and aria-current inside its active tab." }
     if ([regex]::Matches($sharedNav.Value, '<li\b[^>]*><a\b[^>]*><svg class="nav-icon"[^>]*aria-hidden="true"').Count -ne 6) { throw "$($page.Name) must give every primary tab its hidden icon." }
+    # Footer band (17 Nov 2026): six tabs, the current section's marked by the
+    # build (no script), and no retired Contact strip.
+    $footerTabs = [regex]::Match($scan, '(?s)<footer id="footer">\s*<div class="footer-band__inner">.*?<nav class="footer-band__tabs"[^>]*>(.*?)</nav>')
+    if (-not $footerTabs.Success -or [regex]::Matches($footerTabs.Groups[1].Value, '<a\b').Count -ne 6 -or $scan -match 'class="split contact"') { throw "$($page.Name) must end with the footer band and its six tabs." }
+    if ($page.Name -ne '404.html' -and [regex]::Matches($footerTabs.Groups[1].Value, '<a aria-current="(?:page|true)"').Count -ne 1) { throw "$($page.Name) must mark exactly one current tab in the footer band." }
     $pageHeadEnd = $scan.IndexOf('</head>')
     $transitionsScript = $scan.IndexOf('assets/js/page-transitions.js')
     if ($transitionsScript -lt 0 -or $pageHeadEnd -lt 0 -or $transitionsScript -gt $pageHeadEnd) { throw "$($page.Name) must load page-transitions.js in its <head>." }

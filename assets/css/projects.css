@@ -696,6 +696,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card__foot figcaption{max-width:none}
 .page-projects .app-demo__reset{height:36px!important;min-height:36px;margin:0 0 0 -.85rem}}
 .page-projects,.page-projects #wrapper{background:#111214}
+.page-projects #footer{background:#111214;--fb-ink:#ecedf0;--fb-soft:#a3a9b1;--fb-faint:#7b818a;--fb-rule:#25282d;--fb-hover:#5fe0d2;--fb-lit:#28d7c5;--fb-wash:#ffffff0d}
 .page-projects .app-more{margin-top:5rem}
 .page-projects .app-more h3{margin:0 0 1.6rem;font:600 2.8rem/1.15 Archivo,system-ui,sans-serif!important;letter-spacing:-.03em!important;text-transform:none!important;text-align:left;color:#ecedf0!important}
 .page-projects .app-more ul{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:0!important;padding:0;list-style:none}

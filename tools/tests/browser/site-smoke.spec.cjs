@@ -331,7 +331,7 @@ for (const [width, scale, expected] of [[390, 3, 'japan_banner_japan-phone-1200.
   });
 }
 
-test('phones: return-to-top steps off the footer, and a two-stop route has no View all button', async ({ page }) => {
+test('return-to-top steps off the footer band, whose tabs show below 981px with the current one marked, and a two-stop route has no View all button', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/skills');
   const top = page.locator('#return-to-top');
@@ -339,6 +339,19 @@ test('phones: return-to-top steps off the footer, and a two-stop route has no Vi
   await expect(top).toHaveClass(/is-visible/);
   await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
   await expect(top).not.toHaveClass(/is-visible/);
+  const tabs = page.locator('#footer .footer-band__tabs');
+  await expect(tabs).toBeVisible();
+  await expect(tabs.locator('a[aria-current="page"]')).toHaveText('Skills');
+  // Desktop: the bar already lists the tabs, and the button leaves the band's icons alone.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(tabs).toBeHidden();
+  // Skills ends within 400px of the top at 1440, so use the long Work page.
+  await page.goto('/experience');
+  await page.evaluate(() => scrollTo(0, 400));
+  await expect(top).toHaveClass(/is-visible/);
+  await page.evaluate(() => scrollTo(0, document.documentElement.scrollHeight));
+  await expect(top).not.toHaveClass(/is-visible/);
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/travel_2017_seoul');
   const route = page.locator('.guangzhou-day__route').first();
   await expect(route.locator('.travel-route-summary')).toBeVisible();
