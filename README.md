@@ -258,7 +258,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Reduced motion scrolls plainly. Never reintroduce CSS mandatory snap (unslowable, fights the About swipe).
 - Hero: name, scrambling headline, support line, selected-work CTA, Projects CTA (`View projects`, the nav's `</>`).
   - Desktop: each circle sits in a fixed 3rem slot and opens outwards, the first to the left with its icon on the right, the second to the right. Never let one push the other: a pill that shoved its neighbour slid it out from under a pointer moving across.
-  - 980px and below: two labelled pills, side by side on tablets, stacked on phones.
+  - 980px and below: two labelled pills, side by side on tablets, stacked on phones, with the controls' `--radius-control` corners (17 Nov 2026, `hero-pills`; they were square).
   - Headline: `I build agentic AI products for real-world security operations.`
   - Support: `Product direction · DSTA`
   - Type levels (17 Nov 2026, owner: "do all", from `hero-b` in `lab/open-decisions`): the name stays the hero (5rem desktop, `clamp(2.15rem, 10.6vw, 2.8rem)` on phones, tracked 0.06em, 0.05em on phones); the headline is a subtitle in the bio's serif, Merriweather 300 at `clamp(1.45rem, 2.2vw, 1.75rem)` (28px at 1440; `clamp(1.12rem, 5.2vw, 1.4rem)` on phones, so "for real-world security operations." fits one line at 360), 0.9 white; the support line is a small teal label (`rgba(40, 215, 197, 0.82)`, 700, 0.16em). The headline breaks after "products" on every width: a newline in the scramble source shown with `white-space: pre-line`, which the scramble keeps (`verify.ps1` pins both). Spacing is top margins, not a gap: name, 1.5rem, headline, 1.15rem, support, 2.1rem, buttons (phones 1rem, 0.95rem, 1.75rem).
