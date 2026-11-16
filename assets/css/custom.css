@@ -10102,7 +10102,7 @@ html .travel-atlas__header > div > p { margin:.65rem 0 0; max-width:55rem; color
 /* Page headings, "More air" (15 Nov 2026, owner: "ok push" after the
    lab/nav-polish heading options; tightened after "vercel doesnt have so
    much space"): the same serif title, larger, then one rhythm on every page:
-   44px above the label on every page, label to title 0.7rem, title to lede 0.75rem,
+   44px above the label on every page (desktop Projects: 2rem, beside its phone), label to title 0.7rem, title to lede 0.75rem,
    heading to content 2.25rem. No rules or lines; Projects' line under its
    heading gives way to the same space. Phones and tablets take 1.85rem titles
    (they were 1.5rem) in the block below. */
