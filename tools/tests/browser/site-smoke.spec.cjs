@@ -195,6 +195,8 @@ test('desktop hero gate glides to the settled About frame, with the bar on both 
 
 // 10 Nov 2026 (owner: "the index page is kind of weird now"): the phone About cluster is centred in
 // its one-viewport scene; bottom-anchored, all the spare height was one blank band above "About me".
+// Since 17 Nov 2026 the scene ends --cut sooner and centres from --cut lower, so the cluster still sits
+// in the middle of the first viewport and only the space under the bio shrinks.
 test('phone About is centred in its scene with a 3:4 photo', async ({ browser }) => {
   for (const [width, height] of [[390, 844], [390, 664], [320, 568]]) {
     const context = await browser.newContext({ viewport: { width, height }, hasTouch: true, isMobile: true, reducedMotion: 'no-preference' });
@@ -209,8 +211,13 @@ test('phone About is centred in its scene with a 3:4 photo', async ({ browser })
       const head = document.querySelector('.intro-swipe__head').getBoundingClientRect();
       const copy = document.querySelector('.intro-swipe__text').getBoundingClientRect();
       const photo = document.querySelector('.intro-swipe__photo img').getBoundingClientRect();
-      return { above: head.top - scene.top, below: scene.bottom - copy.bottom, ratio: photo.width / photo.height, left: photo.left, right: photo.right, vw: innerWidth };
+      const cut = parseFloat(getComputedStyle(document.querySelector('.intro-swipe__stage')).paddingTop);
+      return { cut, height: scene.height, vh: innerHeight, middle: (head.top + copy.bottom) / 2 - scene.top, above: head.top - scene.top - cut, below: scene.bottom - copy.bottom, ratio: photo.width / photo.height, left: photo.left, right: photo.right, vw: innerWidth };
     });
+    expect(frame.cut).toBeGreaterThanOrEqual(0);
+    expect(Math.abs(frame.height - (frame.vh - frame.cut))).toBeLessThan(1);
+    // The cluster's middle is the first viewport's, as when the scene was a whole viewport.
+    expect(Math.abs(frame.middle - frame.vh / 2)).toBeLessThan(2);
     expect(frame.above).toBeGreaterThanOrEqual(0);
     expect(frame.below).toBeGreaterThanOrEqual(0);
     expect(Math.abs(frame.above - frame.below)).toBeLessThan(4);
@@ -361,18 +368,49 @@ test('return-to-top steps off the footer band, whose tabs show below 981px with 
   await expect(page.locator('.guangzhou-day__route .travel-route__more').first()).toBeVisible();
 });
 
-test('home has four cards in nav order, and the last finishes its entrance at the page end on a tall phone', async ({ page }) => {
+// 17 Nov 2026 (owner: "Build B"): the four links are an unboxed index that arrives as one block,
+// with no per-card scroll entrance; one row from 981px.
+test('home has four links in nav order, arriving as one block', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.setViewportSize({ width: 430, height: 932 });
   await page.goto('/');
+  await page.waitForLoadState('load');
   const cards = page.locator('.homepage .homepage-link');
   await expect(cards.locator('.homepage-link__label')).toHaveText(['Selected work', 'Projects', 'Skills', 'Personal']);
   await expect(cards.nth(1)).toHaveAttribute('href', 'projects');
-  await page.evaluate(async () => { for (let y = 0; y <= document.documentElement.scrollHeight; y += 80) { scrollTo(0, y); await new Promise((r) => setTimeout(r, 30)); } });
-  await expect.poll(() => cards.last().evaluate((c) => +getComputedStyle(c).opacity)).toBe(1);
+  await expect(cards.locator('.homepage-link__icon .icon')).toHaveCount(4);
+  // Still in the hero: every link is already whole and in place, none waiting below.
+  expect(await cards.evaluateAll((cs) => cs.map((c) => [getComputedStyle(c).opacity, getComputedStyle(c).transform, c.hasAttribute('data-scrub')]))).toEqual(Array(4).fill(['1', 'none', false]));
   await page.setViewportSize({ width: 1440, height: 900 });
   const tops = await cards.evaluateAll((cs) => cs.map((c) => Math.round(c.getBoundingClientRect().top)));
   expect(new Set(tops).size).toBe(1);
+});
+
+// 17 Nov 2026: the links' type is capped, so it no longer grows with the base-size step above
+// 1680px (titles were 23.9px at 1920), and the phone scene leaves about 51px under the bio
+// (103px at 390x844 when the scene was a whole viewport).
+test('home links keep capped type, and phones leave a short gap under the bio', async ({ browser }) => {
+  for (const [width, height, title, desc] of [[1920, 1080, 18, 14.5], [1440, 900, 16.32, 13.44], [390, 844, 15, 12.61]]) {
+    const phone = width < 737;
+    const context = await browser.newContext({ viewport: { width, height }, isMobile: phone, hasTouch: phone, reducedMotion: 'no-preference' });
+    const page = await context.newPage();
+    await page.goto(BASE + '/index');
+    await page.waitForLoadState('load');
+    const size = await page.evaluate(() => [...document.querySelectorAll('.homepage .homepage-link__label, .homepage .homepage-link__desc')].map((el) => parseFloat(getComputedStyle(el).fontSize)));
+    for (let i = 0; i < size.length; i += 2) {
+      expect(Math.abs(size[i] - title)).toBeLessThan(0.05);
+      expect(Math.abs(size[i + 1] - desc)).toBeLessThan(0.05);
+    }
+    if (phone) {
+      const top = await page.evaluate(() => document.querySelector('.intro-swipe').getBoundingClientRect().top + scrollY);
+      await page.evaluate((y) => window.scrollTo(0, Math.ceil(y)), top);
+      await expect.poll(() => page.evaluate(() => document.querySelector('.intro-swipe').style.getPropertyValue('--photo-p'))).toMatch(/^(1.0000|0.99)/);
+      const gap = await page.evaluate(() => document.querySelector('.homepage-links').getBoundingClientRect().top - document.querySelector('.intro-swipe__text .aboutblock').getBoundingClientRect().bottom);
+      expect(gap).toBeGreaterThan(44);
+      expect(gap).toBeLessThan(58);
+    }
+    await context.close();
+  }
 });
 
 // With the speculation rules in the head, WebKit crashed the page on a link click into
