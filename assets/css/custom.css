@@ -564,8 +564,17 @@
 /* Mobile uses one viewport: the photo and text sweep in while the scene enters,
    then the following cards move immediately with the next scroll. */
 @media screen and (max-width: 736px) {
+  /* The scene was one viewport tall with its copy centred, which left 60 to
+     140px of blank sheet between the bio and the links (103px at 390x844).
+     Since 17 Nov 2026 it ends --cut sooner and its centring starts --cut
+     lower, so the heading, photo and bio sit exactly where they did at every
+     scroll position and only the space under the bio shrinks (51px at
+     390x844). --cut estimates the spare from the photo's 39svh width (52svh
+     tall) and about 205px of heading and bio; it is 0 on short phones, so
+     nothing can overlap. */
   .intro-swipe {
-    height: 100svh;
+    --cut: max(0px, 24svh - 150px);
+    height: auto;
     margin-bottom: 0;
   }
 
@@ -577,6 +586,10 @@
   .intro-swipe__stage {
     position: relative;
     top: auto;
+    box-sizing: border-box;
+    height: auto;
+    min-height: calc(100svh - var(--cut));
+    padding-top: var(--cut);
     justify-content: center;
     /* Out to the sheet's edges by the 1rem the head and row pad back in, so
        the opening, photo and copy share the cards' left edge and the photo's
@@ -643,8 +656,8 @@
     text-align: left;
   }
 
-  .intro-swipe.is-static {
-    height: auto;
+  .intro-swipe.is-static .intro-swipe__stage {
+    min-height: 0;
   }
 }
 
@@ -800,7 +813,8 @@
   letter-spacing: 0.01em;
 }
 
-.homepage-link::before {
+/* The 404 cards' icons are masks; Home's are real elements (.homepage-link__icon). */
+.notfound .homepage-link::before {
   position: absolute;
   top: 1.1rem;
   right: 1.2rem;
@@ -815,73 +829,9 @@
   transition: transform var(--motion-standard) var(--ease-standard);
 }
 
-.homepage-link:hover::before,
-.homepage-link:focus-visible::before {
+.notfound .homepage-link:hover::before,
+.notfound .homepage-link:focus-visible::before {
   transform: scale(1.18) rotate(-6deg);
-}
-
-/* Homepage cards use real icon elements so their motion can be tied to the
-   same reversible scroll progress as the card entrance. */
-.homepage .homepage-link::before {
-  content: none;
-}
-
-.homepage-link__icon {
-  position: absolute;
-  top: 0.9rem;
-  right: 1rem;
-  z-index: 1;
-  display: grid;
-  width: 2.75rem;
-  height: 2.75rem;
-  place-items: center;
-  color: var(--color-brand-600);
-  opacity: var(--ip, 1);
-  pointer-events: none;
-  transform-origin: center;
-  will-change: transform, opacity;
-  transition: opacity var(--motion-fast) linear,
-    transform var(--motion-standard) var(--ease-standard);
-}
-
-.homepage-link__icon::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border: 1px solid rgba(18, 138, 134, 0.24);
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(47, 215, 207, 0.22), rgba(18, 138, 134, 0.05) 65%, transparent 67%);
-  box-shadow: 0 0 1.1rem rgba(18, 138, 134, 0.3);
-  opacity: calc(0.14 + var(--pulse, 0) * 0.72);
-  transform: scale(calc(0.72 + var(--ip, 1) * 0.28 + var(--pulse, 0) * 0.18));
-  transition: opacity var(--motion-fast) linear, transform var(--motion-fast) ease;
-}
-
-.homepage-link__icon > .icon {
-  position: relative;
-  z-index: 1;
-  font-size: 1.65rem;
-  line-height: 1;
-  transition: transform var(--motion-fast) ease;
-}
-
-.homepage-link__icon--experience {
-  transform:
-    translateY(calc((1 - var(--ip, 1)) * 1.35rem))
-    rotate(calc((1 - var(--ip, 1)) * -10deg))
-    scale(calc(0.72 + var(--ip, 1) * 0.28));
-}
-
-.homepage-link__icon--education {
-  transform:
-    translateY(calc((1 - var(--ip, 1)) * -1.55rem))
-    rotate(calc((1 - var(--ip, 1)) * 14deg))
-    scale(calc(0.72 + var(--ip, 1) * 0.28));
-}
-
-.homepage-link:hover .homepage-link__icon > .icon,
-.homepage-link:focus-visible .homepage-link__icon > .icon {
-  transform: scale(1.12) rotate(-5deg);
 }
 
 .homepage-link__desc {
@@ -1000,29 +950,6 @@
   transform: none;
 }
 
-/* Homepage cards: scroll-scrubbed entrance driven by --cp (0 offstage
-   below, 1 settled). Default 1 keeps the settled layout for no-JS; the
-   standard transition (shared with hover) lets the cards trail the scroll
-   with a soft ease. */
-.homepage-link[data-scrub] {
-  opacity: var(--cp, 1);
-  transform: translateY(calc((1 - var(--cp, 1)) * 48px));
-  transition: border-color var(--motion-standard) ease,
-    transform var(--motion-standard) var(--ease-standard),
-    box-shadow var(--motion-standard) ease,
-    opacity var(--motion-standard) linear;
-}
-
-.homepage-link[data-scrub]::after {
-  background: linear-gradient(90deg, var(--color-brand-600), #2fd7cf) top left / calc(var(--ip, 0) * 100%) 2px no-repeat;
-  opacity: calc(var(--pulse, 0) * 0.82);
-}
-
-.homepage-link[data-scrub]:hover::after,
-.homepage-link[data-scrub]:focus-visible::after {
-  opacity: 1;
-}
-
 /* Confetti / burst overlay */
 .fx-canvas {
   position: fixed;
@@ -1105,13 +1032,6 @@
   }
   .homepage-link {
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
-  }
-  .homepage-link__icon,
-  .homepage-link__icon::before,
-  .homepage-link__icon > .icon {
-    opacity: 1;
-    transform: none;
-    transition: none;
   }
 }
 
@@ -4396,91 +4316,146 @@ body.is-map-fullscreen .travel-atlas__layout {
   padding: 0.8rem 1.25rem;
 }
 
-.homepage-link__icon--personal {
-  transform:
-    translateY(calc((1 - var(--ip, 1)) * 1.35rem))
-    rotate(calc((1 - var(--ip, 1)) * 8deg))
-    scale(calc(0.72 + var(--ip, 1) * 0.28));
-}
-
-/* Keep the homepage choices quiet and scannable after the animated intro. */
+/* Home's four links (Selected work, Projects, Skills, Personal; four since
+   14 Nov 2026, owner: "Add as a fourth card") are an index, not boxes (17 Nov
+   2026, owner: "Build B"): four columns between two hairlines, split by
+   vertical hairlines (Linear's feature columns), the line icon before the
+   title, an arrow after it, then the description. Tablets are two by two
+   inside the same rules; phones are hairline-separated rows (leerob.com's
+   list). Type is capped, so it no longer grows with the base-size step above
+   1680px. The rows share their rules, so there is no per-card scroll
+   entrance: the block arrives as one, and hover is the only motion. */
 .homepage .homepage-links {
-  gap: 0.75rem;
+  gap: 0;
   margin: 1.5rem 0 1rem;
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .homepage .homepage-link {
-  min-height: 8rem;
-  /* Top-aligned so the three titles share a baseline whatever their copy length. */
-  justify-content: flex-start;
-  gap: 0.35rem;
-  padding: 1.15rem 3.75rem 1.15rem 1.25rem;
-  background: #ffffff;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "icon title"
+    "desc desc";
+  align-content: start;
+  align-items: center;
+  column-gap: 0.5rem;
+  row-gap: 0.45rem;
+  min-height: 0;
+  padding: clamp(16px, 1.15rem, 24px) clamp(16px, 1.15rem, 22px) clamp(18px, 1.25rem, 26px);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
+  overflow: visible;
   transform-style: flat;
 }
 
-.homepage .homepage-link::after,
-.homepage .homepage-link__icon::before {
+.homepage .homepage-link + .homepage-link {
+  border-left: 1px solid var(--color-border);
+}
+
+.homepage .homepage-link::after {
   display: none;
 }
 
 .homepage .homepage-link:hover,
 .homepage .homepage-link:focus-visible {
-  transform: translateY(-2px);
+  background: var(--color-brand-faint);
+  transform: none;
 }
 
-.homepage .homepage-link__icon {
-  top: 50%;
-  right: 1.15rem;
-  width: 2rem;
-  height: 2rem;
-  opacity: calc(0.65 + var(--ip, 1) * 0.25);
-  transform:
-    translateY(calc(-50% + (1 - var(--ip, 1)) * 0.4rem))
-    scale(calc(0.92 + var(--ip, 1) * 0.08));
+.homepage-link__icon {
+  grid-area: icon;
+  display: block;
+  color: var(--color-brand-600);
+  line-height: 0;
+  pointer-events: none;
 }
 
-.homepage .homepage-link__icon > .icon {
-  font-size: 1.35rem;
+.homepage-link__icon > .icon {
+  font-size: clamp(16px, 1.08rem, 20px);
+  line-height: 1;
+}
+
+.homepage .homepage-link__label {
+  grid-area: title;
+  align-self: baseline;
+  font-size: clamp(15px, 1.02rem, 18px);
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+/* The arrow follows the title, so it reads as the link's own end. */
+.homepage .homepage-link__label::after {
+  content: "\2192";
+  display: inline-block;
+  margin-left: 0.4em;
+  color: var(--color-ink-500);
+  font-family: var(--font-display);
+  font-weight: 600;
+  transition: transform var(--motion-standard) var(--ease-standard), color var(--motion-fast) ease;
+}
+
+.homepage .homepage-link:hover .homepage-link__label,
+.homepage .homepage-link:focus-visible .homepage-link__label {
+  color: var(--color-brand-700);
+}
+
+.homepage .homepage-link:hover .homepage-link__label::after,
+.homepage .homepage-link:focus-visible .homepage-link__label::after {
+  color: var(--color-brand-600);
+  transform: translateX(4px);
 }
 
 .homepage .homepage-link__desc {
-  max-width: 15rem;
-  color: #68727e;
-  font-size: max(var(--text-floor), 0.86rem);
-  line-height: 1.45;
+  grid-area: desc;
+  color: var(--color-ink-500);
+  font-size: clamp(12.5px, 0.84rem, 14.5px);
+  line-height: 1.55;
 }
 
-/* Four cards since 14 Nov 2026 (owner: "Add as a fourth card"): Selected work,
-   Projects, Skills, Personal. Wide screens keep one row, the cards' height
-   unchanged, with each icon beside its title so the narrower copy has the full
-   width; tablets use two rows of two; phones stack them. */
 @media screen and (min-width: 981px) {
   .homepage .homepage-links {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
-
-  .homepage .homepage-link {
-    padding-right: 1.25rem;
-  }
-
-  .homepage .homepage-link__label {
-    padding-right: 2.5rem;
-  }
-
-  /* Centred on the title's x-height (the line icon sat 9px high). */
-  .homepage .homepage-link__icon {
-    top: 1.58rem;
-    transform:
-      translateY(calc((1 - var(--ip, 1)) * 0.4rem))
-      scale(calc(0.92 + var(--ip, 1) * 0.08));
-  }
 }
 
+/* Tablets: two by two, with the middle hairline across. */
 @media screen and (min-width: 601px) and (max-width: 980px) {
   .homepage .homepage-links {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .homepage .homepage-link:nth-child(3) {
+    border-left: 0;
+  }
+
+  .homepage .homepage-link:nth-child(n + 3) {
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+/* Phones: rows; the description sits under the title and runs to the edge. */
+@media screen and (max-width: 600px) {
+  .homepage .homepage-link {
+    grid-template-areas:
+      "icon title"
+      ". desc";
+    column-gap: 0.6rem;
+    row-gap: 0.2rem;
+    padding: 0.85rem 0.15rem 0.9rem;
+  }
+
+  .homepage .homepage-link + .homepage-link {
+    border-left: 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .homepage .homepage-link__desc {
+    font-size: max(12.5px, 0.86rem);
+    line-height: 1.5;
   }
 }
 
@@ -6164,8 +6139,7 @@ body:not(.page-home) #wrapper.fade-in::before {
 @media (prefers-reduced-motion: reduce) {
   .page-experience .earlier-work__grid article,
   .page-experience .earlier-project-card__image img,
-  .page-experience .earlier-work summary .icon,
-  .homepage-link__icon--personal {
+  .page-experience .earlier-work summary .icon {
     transition: none;
     transform: none;
   }

@@ -47,7 +47,6 @@
     initIntroFade();
     initIntroSwipe();
     initHeroSnap();
-    initCardScrub();
     initHeroBurst();
     initKonami();
     // The staged hero entrance has played; later views this visit start at rest.
@@ -105,7 +104,7 @@
       else { section.style.removeProperty('--photo-p'); }
       /* Desktop pins the stage where the photo and the cards under it sit
          centred as one cluster, so the scene settles with no dead band between
-         them. Offsets are layout values, so the cards' scrub cannot skew it.
+         them. Offsets are layout values, so no transform can skew it.
          Where the nav docks (981px and up), the cluster centres in the space
          under it, so the settled frame keeps the bar. */
       if (window.innerWidth > 736 && links) {
@@ -387,62 +386,6 @@
       if (lastY > 1) { jumped = true; armSettle(true); }
     }
     window.addEventListener('pageshow', function () { setTimeout(settleRestored, 120); });
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* 2b. Homepage cards: scroll-scrubbed entrance                        */
-  /* ------------------------------------------------------------------ */
-  function initCardScrub() {
-    var cards = document.querySelectorAll('.homepage .homepage-links .homepage-link');
-    if (!cards.length || reduce) { return; }
-    var LIFT = 48;
-    var last = [];
-    for (var i = 0; i < cards.length; i++) {
-      cards[i].setAttribute('data-scrub', '');
-      cards[i].style.setProperty('--cp', '0');
-      cards[i].style.setProperty('--ip', '0');
-      cards[i].style.setProperty('--pulse', '0');
-      last.push(0);
-    }
-
-    function read() {
-      var vh = window.innerHeight || document.documentElement.clientHeight;
-      // Read every card before writing any, so a write cannot force a layout.
-      var rects = Array.prototype.map.call(cards, function (card) { return card.getBoundingClientRect(); });
-      // Scroll still left below; the page may end before a low card has risen.
-      var left = Math.max(0, document.documentElement.scrollHeight - vh - window.scrollY);
-      return function () { write(vh, rects, left); };
-    }
-    function write(vh, rects, left) {
-      for (var i = 0; i < cards.length; i++) {
-        var r = rects[i];
-        // Rects include the scrub translate; undo it so progress reads the
-        // layout position and the loop stays stable.
-        var top = r.top - (1 - last[i]) * LIFT;
-        // 0 as the card's top crosses the viewport bottom, 1 once it has
-        // risen 35% of the viewport; each card trails the one before it.
-        // Desktop cards rest about 20% up when the About scene settles, so
-        // they finish inside that rise instead of stopping half-faded.
-        var wide = window.innerWidth > 736;
-        var rise = vh * (wide ? 0.14 : 0.35), lag = i * (wide ? 0.12 : 0.15);
-        var p = (vh - top) / rise - lag;
-        // Four cards on a tall phone: the last could stop part-faded at the
-        // page's end (14 Nov 2026), so a card that cannot finish there is
-        // scaled to land exactly at the end. Cards that finish are unchanged.
-        var end = (vh - top + left) / rise - lag;
-        if (end > 0 && end < 1) p /= end;
-        p = Math.min(1, Math.max(0, p));
-        last[i] = p;
-        var iconP = Math.min(1, Math.max(0, (p - 0.2) / 0.68));
-        var pulse = Math.max(0, 1 - Math.abs(iconP - 0.82) / 0.18);
-        cards[i].style.setProperty('--cp', p.toFixed(4));
-        cards[i].style.setProperty('--ip', iconP.toFixed(4));
-        cards[i].style.setProperty('--pulse', pulse.toFixed(4));
-      }
-    }
-
-    addFrameJob(read);
-    read()();
   }
 
   /* ------------------------------------------------------------------ */
