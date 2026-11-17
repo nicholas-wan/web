@@ -485,7 +485,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Hidden atlas: zero height, full width, never `display: none` (`travel-map.js` measures it on resize/breakpoint).
 - A query closes an open phone overlay via `[data-map-close]` (runs teardown, focus restore).
 - `photo-search.js` is never a static `<script src>`.
-- The 7 KB bootstrap `travel-discovery.js` picks four inert build-generated postcard seeds per visit, excluding the last batch (sessionStorage); only attached thumbnails load, visible ones eagerly.
+- The 7 KB bootstrap `travel-discovery.js` picks four inert build-generated postcard seeds per visit, excluding the last batch (sessionStorage); only attached thumbnails load, visible ones eagerly. On phones (736px and below) `travel-seeds.js` makes all four eager without measuring (17 Nov 2026): the box read forced a mid-parse layout, so the photos were requested only after it, about 150ms late; the lower pair is within lazy loading's reach on any phone, so the bytes are unchanged. 390px DPR 3 phone at 4x CPU, cold, gzip, local HTTP/2, the same postcards in both arms, median of 7: Fast 4G LCP 980 to 796 ms (ranges 924-1076 and 760-852), Slow 4G 2448 to 2196 ms (ranges overlap); first paint and blocking time unchanged; on Slow 4G `travel-chronology.js` (below the fold) arrives about 170ms later, as the photos take that bandwidth sooner.
 - Module and index load on search, a discovery action or `?q=`; bootstrap queues the first action and owns `/`.
 - Load failure: Try again, keep the pending action/query, announce "Photo search is unavailable right now.", keep map and archive.
 - No JavaScript: four fallback postcards link to journal sections.

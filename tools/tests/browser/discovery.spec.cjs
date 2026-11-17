@@ -120,6 +120,22 @@ test('visible postcards are eager and high-density previews select larger images
   await context.close();
 });
 
+test('phone postcards request their photos during parsing, before any layout', async ({ page }) => {
+  // 17 Nov 2026: all four are eager on phones without a box read, so the photos start before the first layout.
+  await page.setViewportSize({ width: 360, height: 640 });
+  await page.addInitScript(() => {
+    window.seedLayouts = 0;
+    const read = Element.prototype.getBoundingClientRect;
+    Element.prototype.getBoundingClientRect = function () { const s = document.currentScript; if (s && !s.src && this.closest('.photo-explore__cards')) window.seedLayouts++; return read.call(this); };
+  });
+  await page.goto('/travel');
+  const images = page.locator('.photo-explore__cards img');
+  await expect(images).toHaveCount(4);
+  expect(await images.evaluateAll(es => es.map(e => e.loading))).toEqual(['eager', 'eager', 'eager', 'eager']);
+  expect(await page.evaluate(() => window.seedLayouts)).toBe(0);
+  await expect.poll(() => images.evaluateAll(es => es.every(e => e.complete && e.naturalWidth > 0))).toBe(true);
+});
+
 test('atlas waits for approach and replays a cold phone activation', async ({ page }) => {
   // Four postcards bring the atlas higher; keep it outside its preload range.
   await page.setViewportSize({ width: 390, height: 600 });
