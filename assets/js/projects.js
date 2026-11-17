@@ -1118,7 +1118,7 @@ const vids = tabs.map(t => t.querySelector('video'));
 let turn = 0, hover = -1, auto = 0, over = 0;
 function cue() {
 	const run = wide.matches && !still.matches, k = hover >= 0 ? hover : auto ? (cur + 1) % 4 : [0, 1, 2, 3].filter(n => n !== cur)[turn % 3];
-	vids.forEach((v, n) => { tabs[n].classList.toggle('is-live', run && n === k && n !== cur); if (n !== k || !run) v.pause(); });
+	vids.forEach((v, n) => { if (n !== k || !run) v.pause(); });
 	if (run && k !== cur) { if (hover < 0) vids[k].currentTime = 0; vids[k].play().catch(() => {}); }
 }
 vids.forEach(v => v.addEventListener('ended', () => { if (hover < 0) { turn++; cue(); } }));

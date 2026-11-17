@@ -352,6 +352,58 @@ test('Desktop opens with the whole phone beside the intro, and switching apps mo
   }
 });
 
+test('Desktop rail is one unboxed track: rows never move and only the chosen row stands out', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  const look = () => page.evaluate(() => [...document.querySelectorAll('.app-rail [role=tab]')].map(t => {
+    const s = getComputedStyle(t), b = getComputedStyle(t.querySelector('b')), v = getComputedStyle(t.querySelector('video')), line = getComputedStyle(t, '::before'), fill = getComputedStyle(t, '::after');
+    const box = e => { const r = e.getBoundingClientRect(); return [r.x, r.y, r.width, r.height].map(Math.round); };
+    return { rows: [box(t), box(t.querySelector('video')), box(t.querySelector('b'))], on: t.getAttribute('aria-selected') === 'true', live: t.classList.contains('is-live'),
+      box: [s.borderTopWidth, s.backgroundColor, s.boxShadow], name: [b.color, b.fontWeight], thumb: [v.opacity, v.boxShadow, v.outlineStyle, v.filter],
+      line: [line.width, line.backgroundColor], fill: [fill.width, fill.backgroundColor, fill.animationName], accent: s.getPropertyValue('--app').trim() };
+  }));
+  const rgb = hex => `rgb(${hex.match(/\w\w/g).map(h => parseInt(h, 16)).join(', ')})`;
+  for (const [width, height] of [[1366, 768], [1440, 900]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/projects');
+    await page.mouse.move(width - 5, height - 5);
+    // While the carousel runs, the chosen stretch is a faint accent track with a full-accent fill on it, and the
+    // thumbnail playing as "up next" looks like every other unchosen one: no ring, no extra opacity.
+    let rows = await look();
+    expect(rows[0].on).toBe(true);
+    expect(rows[0].line[0]).toBe('3px');
+    expect(rows[0].line[1]).not.toBe(rgb(rows[0].accent));
+    expect(rows[0].fill).toEqual(['3px', rgb(rows[0].accent), 'pj-fill']);
+    expect(rows.some(r => r.live)).toBe(false);
+    for (const r of rows.slice(2)) expect(r.thumb).toEqual(rows[1].thumb);
+    const first = rows.map(r => r.rows);
+    for (const id of ['nag-bot', 'finance-tracker', 'travel-packing', 'squashbot']) {
+      await page.locator(`.app-rail [aria-controls="${id}"]`).click();
+      await page.mouse.move(width - 5, height - 5);
+      rows = await look();
+      // Nothing moves when the selection changes.
+      expect(rows.map(r => r.rows)).toEqual(first);
+      for (const r of rows) {
+        // No boxes: no border, fill or ring on any row.
+        expect(r.box).toEqual(['0px', 'rgba(0, 0, 0, 0)', 'none']);
+        if (r.on) {
+          expect(r.name).toEqual(['rgb(255, 255, 255)', '650']);
+          expect(r.thumb[0]).toBe('1');
+          expect(r.line).toEqual(['3px', rgb(r.accent)]);
+        } else {
+          expect(r.name).toEqual(['rgb(143, 147, 153)', '500']);
+          expect(r.thumb).toEqual(['0.6', 'none', 'none', 'none']);
+          expect(r.line[0]).toBe('1px');
+        }
+      }
+    }
+    // Hover lifts only the name.
+    await page.locator('.app-rail [aria-controls="nag-bot"]').hover();
+    rows = await look();
+    expect(rows[1].name).toEqual(['rgb(202, 205, 210)', '500']);
+    expect(rows[1].thumb[0]).toBe('0.6');
+  }
+});
+
 test('Phones draw the demo as large as the handset allows and keep it with its caption', async ({ page }) => {
   // [viewport, smallest demo width expected]: a small phone keeps 0.88, taller ones grow with the screen.
   // 393x659 is height-limited: the caption row that names the app (17 Nov 2026) costs about 7px of demo there.

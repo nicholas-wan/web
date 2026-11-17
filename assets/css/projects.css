@@ -627,11 +627,22 @@ to{box-shadow:0 0 0 12px transparent}
 .page-projects .app-card__body .app-why{margin-top:.2rem!important;padding-top:0;border-top:0}
 .page-projects .app-stage{justify-content:flex-start;padding:0 1rem 0 0}
 .page-projects .app-phone{transform:scale(var(--ps));transform-origin:0 0;margin:0 calc(318px*var(--ps) - 318px) calc(578px*var(--ps) - 578px) 0}
-.page-projects .app-rail{grid-area:2/1;display:flex;flex-direction:column;gap:.5rem;margin:1.75rem 0 0 2rem}
-.page-projects .app-rail__tab{display:flex!important;align-items:center;gap:.85rem;height:auto!important;padding:.4rem .7rem .4rem .4rem!important;border:1px solid var(--pj-line)!important;border-radius:14px;background:none!important;box-shadow:none!important;color:inherit!important;font:inherit!important;letter-spacing:0!important;line-height:1.3!important;text-align:left;text-transform:none!important;white-space:normal!important;cursor:pointer}
-.page-projects .app-rail video{flex:none;width:44px;height:82px;border-radius:7px;background:#17212b;object-fit:cover}
-.page-projects .app-rail b{display:block;font:600 .98rem/1.25 Archivo,system-ui,sans-serif;color:var(--pj-ink)}
-.page-projects .app-rail small{display:block;margin-top:.15rem;font:400 .875rem/1.3 Archivo,system-ui,sans-serif;color:var(--pj-muted);text-wrap:balance}
+/* The rail is unboxed on one hairline track (owner, 17 Nov 2026, projects-rail-a): the chosen app's stretch is a 3px
+   accent line, a 35% track while the carousel runs that fills top to bottom over its dwell; unchosen thumbnails at 60%. */
+.page-projects .app-rail{grid-area:2/1;display:flex;flex-direction:column;margin:1.5rem 0 0 2rem}
+.page-projects .app-rail__tab{position:relative;display:flex!important;align-items:center;gap:.85rem;height:auto!important;padding:.5rem 0 .5rem .9rem!important;border:0!important;border-radius:0;background:none!important;box-shadow:none!important;color:inherit!important;font:inherit!important;letter-spacing:0!important;line-height:1.3!important;text-align:left;text-transform:none!important;white-space:normal!important;cursor:pointer}
+.page-projects .app-rail__tab::before,.page-projects .app-rail.is-auto [aria-selected=true]::after{content:"";position:absolute;inset:0 auto 0 0;width:1px;background:#ffffff17}
+.page-projects .app-rail [aria-selected=true]::before{width:3px;background:var(--app)}
+.page-projects .app-rail.is-auto [aria-selected=true]::before{background:color-mix(in srgb,var(--app) 35%,#0000)}
+.page-projects .app-rail.is-auto [aria-selected=true]::after{width:3px;background:var(--app);transform-origin:0 0;animation:pj-fill var(--dwell) linear forwards}
+.page-projects .app-rail.is-hold [aria-selected=true]::after{animation-play-state:paused}
+.page-projects .app-rail video{flex:none;width:44px;height:82px;border-radius:7px;background:#17212b;object-fit:cover;opacity:.6}
+.page-projects .app-rail b{display:block;font:500 .98rem/1.25 Archivo,system-ui,sans-serif;color:#8f9399}
+.page-projects .app-rail small{display:block;margin-top:.15rem;font:400 .875rem/1.3 Archivo,system-ui,sans-serif;color:#6a6f77;text-wrap:balance}
+.page-projects .app-rail__tab:hover b{color:#cacdd2}
+.page-projects .app-rail [aria-selected=true] b{font-weight:650;color:#fff}
+.page-projects .app-rail [aria-selected=true] small{color:#a9aeb6}
+.page-projects .app-rail [aria-selected=true] video{opacity:1}
 .page-projects .app-card__head .app-card__proof{white-space:nowrap}
 .page-projects .app-more{margin-left:calc(-1*(var(--lead) + var(--gap)))}}
 .app-demo--finance .f-ok{display:flex;align-items:center;gap:6px;margin:2px 0 -4px;color:var(--g);font-size:12.5px;line-height:1.3}
@@ -644,10 +655,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .sq{background:url(../../images/projects/squash-wallpaper.svg) 50% 100%/cover,var(--bg)}
 .page-projects .sq-gav{gap:3px;background:radial-gradient(circle at 34% 30%,#4a4d52,#111214 70%)}
 .page-projects .sq-gav i{width:5px;height:5px;border-radius:50%;background:#f5c542}
-.page-projects .app-rail__tab{position:relative}
-.page-projects .app-rail.is-auto [aria-selected=true]::after{content:"";position:absolute;right:14px;bottom:4px;left:14px;height:2px;border-radius:1px;transform-origin:0;animation:pj-fill var(--dwell) linear forwards}
-.page-projects .app-rail.is-hold [aria-selected=true]::after{animation-play-state:paused}
-@keyframes pj-fill{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes pj-fill{from{transform:scaleY(0)}}
 @media (min-width:981px) and (prefers-reduced-motion:no-preference){.page-projects .is-turn~.app-grid .app-card{animation:pj-in .3s}
 .page-projects .app-grid{position:relative}
 .page-projects .app-grid .app-card.is-out{position:absolute;inset:0 0 auto;animation:pj-out .3s forwards;pointer-events:none}}
@@ -690,11 +698,6 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .page-projects .app-card__head .app-card__repo{grid-column:3;grid-row:2;justify-self:start;margin:0 0 0 -.6rem}
 .page-projects .app-card__icon{grid-row:1/3;grid-column:1;width:60px;height:60px;border-radius:22%;box-shadow:0 0 0 1px #ffffff1a,0 8px 20px -10px #000}
 .page-projects :is(#squashbot,#nag-bot) :is(.app-card__icon,.pj-id img){border-radius:50%}
-.page-projects .app-rail__tab{border-color:#ffffff12!important;background:none!important}
-.page-projects .app-rail__tab:hover{border-color:#3b4047!important}
-.page-projects .app-rail__tab[aria-selected=true]{border-color:var(--app)!important;background:color-mix(in srgb,var(--app) 10%,transparent)!important;box-shadow:inset 0 0 0 1px var(--app)!important}
-.page-projects .app-rail.is-auto [aria-selected=true]::after{background:var(--app)}
-.page-projects .app-rail__tab.is-live video{box-shadow:0 0 0 2px var(--app)}
 @media screen and (max-width:736px){.page-projects .app-card h2{font-size:2.4rem}
 .page-projects .app-card__kind{letter-spacing:.08em;white-space:nowrap}
 .page-projects .app-card__icon{width:52px;height:52px}}
