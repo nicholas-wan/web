@@ -13,13 +13,16 @@
   var cardGrid = document.querySelector('.photo-explore__cards');
   // Phones cap the slot at 160px, like journal tiles, so DPR-3 screens take the 480w file, not 800w.
   // On phones the slot is that cap (travel-discovery.js refines it once laid out), so skip the read: mid-parse it forced a layout (Oct 2026).
-  var slot = matchMedia('(max-width: 736px)').matches ? 160 : parseFloat(getComputedStyle(cardGrid).gridTemplateColumns) - 2;
+  var phone = matchMedia('(max-width: 736px)').matches;
+  var slot = phone ? 160 : parseFloat(getComputedStyle(cardGrid).gridTemplateColumns) - 2;
   cards.forEach(function (a) { a.querySelector('img').sizes = Math.max(1, slot) + 'px'; });
   cardGrid.replaceChildren.apply(cardGrid, cards);
   // Only attached, initially visible images are eager; template images stay inert.
+  // Phones take all four without measuring: the box read forced a mid-parse layout
+  // (150-200ms at 4x CPU, 17 Nov 2026), and the lower pair sits within lazy loading's reach anyway.
   cards.forEach(function (a) {
-    var img = a.querySelector('img'), box = img.getBoundingClientRect();
-    if (box.top < innerHeight && box.bottom > 0) img.loading = 'eager';
+    var img = a.querySelector('img'), box = phone ? null : img.getBoundingClientRect();
+    if (phone || box.top < innerHeight && box.bottom > 0) img.loading = 'eager';
   });
   try { sessionStorage.setItem(key, JSON.stringify(cards.map(function (a) { return a.dataset.tag; }))); } catch (e) {}
 }());
