@@ -1,5 +1,9 @@
 const { test, expect } = require('@playwright/test');
 
+// The card ignores clicks for 350 ms after it opens (the second click of a double click), so a
+// test clicking inside it waits that out first.
+const settle = page => page.waitForTimeout(400);
+
 // Route stops open their photos only on journals that opt in, with exact title matching
 // (18 Nov 2026: substring matching gave older journals' stops every photo of their day).
 
@@ -30,6 +34,7 @@ test('Chengdu stops own exactly their photos, count within the place and offer t
   const day6 = page.locator('#trip-section-6 ~ .guangzhou-day__route');
   await day6.locator('.travel-route__more').click();
   await day6.getByRole('button', { name: 'Open the place card for Tianmen Cave (2 photos)' }).click();
+  await settle(page);
   await page.locator('.place-card').getByRole('button', { name: 'View 2 photos', exact: true }).last().click();
   const context = page.locator('.lightbox__context');
   await expect(context).toHaveText(/1 of 2 · Day 6$/);
@@ -68,6 +73,7 @@ const openStop = async (page, day, name) => {
   if (await more.isVisible()) await more.click();
   const stop = route.locator('.has-card', { hasText: name });
   await stop.click();
+  await settle(page);
   return stop;
 };
 
@@ -128,10 +134,12 @@ test('Escape, the backdrop, the close button and Back close the place card and k
 
   await stop.click();
   await expect(card).toHaveClass(/is-visible/);
+  await settle(page);
   await page.mouse.click(8, 450);
   await expect(card).not.toHaveClass(/is-visible/);
 
   await stop.click();
+  await settle(page);
   await card.getByRole('button', { name: 'Close place card' }).click();
   await expect(card).not.toHaveClass(/is-visible/);
 
@@ -277,4 +285,85 @@ test('one or two photos fill the card at a real picture shape from the 800w file
     }
     await page.keyboard.press('Escape');
   }
+});
+
+// Fix round 3 (18 Nov 2026 review): the second click of a double click, or a second quick tap,
+// landed on the card that had just opened and closed it or opened the lightbox.
+test('a double click or two quick taps on a stop leave its card open', async ({ browser, page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  const stop = page.locator('#trip-section-6 ~ .guangzhou-day__route .has-card', { hasText: 'Tianmen Cave' });
+  await stop.scrollIntoViewIfNeeded();
+  await expect.poll(() => page.evaluate(() => typeof window.travelPlaceCard)).toBe('function');
+  await stop.dblclick();
+  await settle(page);
+  await expect(page.locator('.place-card')).toHaveClass(/is-visible/);
+  await expect(page.locator('.lightbox')).not.toHaveClass(/is-visible/);
+  // Past the guard the card's own controls work as before.
+  await page.locator('.place-card__close').click();
+  await expect(page.locator('.place-card')).not.toHaveClass(/is-visible/);
+
+  const context = await browser.newContext({ baseURL: test.info().project.use.baseURL,
+    viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+  const phone = await context.newPage();
+  await phone.goto('/travel_2026_chengdu_zhangjiajie');
+  const route = phone.locator('#trip-section-6 ~ .guangzhou-day__route');
+  await route.locator('.travel-route__more').scrollIntoViewIfNeeded();
+  await route.locator('.travel-route__more').tap();
+  await expect.poll(() => phone.evaluate(() => typeof window.travelPlaceCard)).toBe('function');
+  const box = await route.locator('.has-card', { hasText: 'Tianmen Cave' }).boundingBox();
+  await phone.touchscreen.tap(box.x + 40, box.y + 10);
+  await phone.waitForTimeout(60);
+  await phone.touchscreen.tap(box.x + 40, box.y + 10);
+  await phone.waitForTimeout(400);
+  await expect(phone.locator('.place-card')).toHaveClass(/is-visible/);
+  await expect(phone.locator('.lightbox')).not.toHaveClass(/is-visible/);
+  await context.close();
+});
+
+test('"+N" sits on a dark layer over the fourth thumbnail', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  // Any stop with five or more photos, whatever it is called.
+  const stop = page.getByRole('button', { name: /\((?:[5-9]|\d\d) photos\)$/, includeHidden: true }).first();
+  await page.locator('.guangzhou-day__route').filter({ has: stop }).locator('.travel-route__more').click();
+  await stop.click();
+  await expect(page.locator('.place-card')).toHaveClass(/is-visible/);
+  const more = page.locator('.place-card__more');
+  await expect(more).toHaveText(/^\+\d+$/);
+  const layer = await more.evaluate(node => {
+    const css = getComputedStyle(node);
+    const rgba = css.backgroundColor.match(/[\d.]+/g).map(Number);
+    const box = node.getBoundingClientRect();
+    return { alpha: rgba[3], darkest: Math.max(rgba[0], rgba[1], rgba[2]), color: css.color, onTop: document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2) === node };
+  });
+  expect(layer.alpha).toBeGreaterThanOrEqual(0.4);
+  expect(layer.darkest).toBeLessThan(40);
+  expect(layer.color).toBe('rgb(255, 255, 255)');
+  expect(layer.onTop).toBe(true);
+});
+
+// Fix round 3 (18 Nov 2026 review): a folded phone route was a wall of small grey lines. Folded,
+// it is the summary and View all; the total and Klook lines come with the stops, and the numbered
+// list replaces the summary. Desktop routes keep every line.
+test('folded phone routes show only the summary and View all; expanded ones drop the summary', async ({ page }) => {
+  const shown = route => route.evaluate(node => [...node.children].filter(child => child.getClientRects().length)
+    .map(child => child.classList[0] || child.tagName.toLowerCase()));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  const day2 = page.locator('#trip-section-2 ~ .guangzhou-day__route');
+  const folded = ['strong', 'travel-route-summary', 'travel-route__more'];
+  // Day 2 has a day total and Klook lines.
+  const tours = await day2.locator('.travel-route__tour').count();
+  expect(tours).toBeGreaterThan(0);
+  const lines = ['travel-route', 'travel-route__total'].concat(Array(tours).fill('travel-route__tour'));
+  expect(await shown(day2)).toEqual(folded);
+  await day2.locator('.travel-route__more').click();
+  expect(await shown(day2)).toEqual(['strong'].concat(lines, 'travel-route__more'));
+  await day2.locator('.travel-route__more').click();
+  expect(await shown(day2)).toEqual(folded);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  expect(await shown(day2)).toEqual(['strong'].concat(lines));
 });

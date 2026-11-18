@@ -540,8 +540,12 @@
     if (afterClose) afterClose();
     afterClose = null;
   };
+  /* Counts show() calls, so a card tap still waiting for place-card.js can tell that the lightbox
+     opened meanwhile, even if it has closed again since. */
+  var shows = 0;
   var show = function (index) {
     ++imageRequest;
+    ++shows;
     var opening = !overlay.classList.contains('is-visible');
     /* A swipe-down close leaves the figure where it was dropped during the fade. */
     if (opening) resetDismiss();
@@ -1052,7 +1056,7 @@
     if (next && next.heading === group.heading) {
       placeButton('lightbox__place-next', 'Next stop: ' + next.name, function () { show(galleryMedia.indexOf(next.own[0])); }).textContent = 'Next: ' + next.name + ' →';
     }
-    else placeButton('lightbox__place-next lightbox__place-back', 'Back to the route', close).textContent = 'Back to route';
+    else placeButton('lightbox__place-next', 'Back to the route', close).textContent = 'Back to route';
   };
   /* Place card (18 Nov 2026, mockup 6): a stop with photos or a price opens a card first, a
      bottom sheet on phones and a centred card on desktop, with its photos, price, hours and
@@ -1075,19 +1079,20 @@
   }, { rootMargin: '600px 0px' }) : null;
   var cardTap = null;
   var cardScript = null;
-  /* Only the latest tap waiting for the script runs, and only while it is fresh and nothing else
-     has opened meanwhile: a late card over the lightbox broke its one history entry. A failed
-     load resets, so the next tap retries, and the waiting tap opens the stop's photos. */
+  /* Only the latest tap waiting for the script runs, and only while it is fresh and the lightbox
+     has not opened meanwhile (even if it has closed again): a late card over the lightbox broke
+     its one history entry. A failed load resets, so the next tap retries, and the waiting tap
+     opens the stop's photos. */
   var cardArrived = function () {
     var tap = cardTap;
     cardTap = null;
-    if (!tap || Date.now() - tap.at > 3000 || overlay.classList.contains('is-visible')) return;
+    if (!tap || Date.now() - tap.at > 3000 || tap.shows !== shows) return;
     if (cardApi) cardApi.open(tap.place);
     else if (tap.place.own.length) openPhotos(tap.place);
   };
   var loadCard = function (place) {
     if (cardApi) return place && cardApi.open(place);
-    if (place) cardTap = { place: place, at: Date.now() };
+    if (place) cardTap = { place: place, at: Date.now(), shows: shows };
     if (cardScript) return;
     var article = document.querySelector('.travel-journal__content[data-place-card]');
     if (!article) return;
@@ -1113,8 +1118,8 @@
   };
   var openPhotos = function (place) { lastTrigger = place.stop; show(galleryMedia.indexOf(place.own[0])); };
   /* Where focus goes back to from a place or its photos (also place-card.js's hook): the stop,
-     or, when a folded phone route hides it (opened from a map pin), the route's View all button,
-     else the route box itself. Anything else that opened the lightbox gets focus back as is. */
+     or, when a folded phone route hides it, the route's View all button, else the route box
+     itself. Anything else that opened the lightbox gets focus back as is. */
   var focusTarget = function (place) {
     var stop = place.stop || place;
     var route = stop.closest('.guangzhou-day__route');
@@ -1132,8 +1137,10 @@
   if (isJournal && document.querySelector('.travel-journal__content[data-route-photos]')) document.querySelectorAll('.guangzhou-route__stop').forEach(function (stop) {
     var heading = null;
     journalHeadings.forEach(function (candidate) { if (candidate.compareDocumentPosition(stop) & 4) heading = candidate; });
+    /* A malformed stop with no name is skipped, so it cannot stop the rest of this file. */
     var name = stop.querySelector('span');
-    var keys = [name && name.textContent].concat((stop.getAttribute('data-photos') || '').split('|')).map(placeKey).filter(Boolean);
+    if (!name) return;
+    var keys = [name.textContent].concat((stop.getAttribute('data-photos') || '').split('|')).map(placeKey).filter(Boolean);
     var own = galleryMedia.filter(function (media, index) {
       return mediaSections[index] === heading && keys.indexOf(mediaTitles[index]) >= 0;
     });
@@ -1141,11 +1148,15 @@
     if (own.length && placeOf[galleryMedia.indexOf(own[0])]) own = [];
     var price = stop.querySelector('.travel-route__price');
     if (!own.length && !price) return;
-    var subtitle = stop.querySelector('small:not(.travel-route__price)');
+    /* The Chinese name (Amap's keyword) only from a subtitle marked zh; any other subtitle is
+       shown on the card as plain text. */
+    var zh = stop.querySelector('small[lang^="zh"]');
+    var subtitle = zh || stop.querySelector('small:not(.travel-route__price)');
     var place = {
       stop: stop,
       name: name.textContent.trim(),
-      zh: subtitle && subtitle.textContent.trim(),
+      zh: zh && zh.textContent.trim(),
+      sub: subtitle && subtitle.textContent.trim(),
       price: price && price.textContent.trim(),
       hours: stop.getAttribute('data-hours'),
       day: (/^Day\s+\d+/i.exec(heading ? heading.textContent.trim() : '') || [''])[0],
@@ -1219,7 +1230,9 @@
       controls.appendChild(button);
       return button;
     });
-    shell.insertBefore(controls, gallery);
+    /* A single photo needs no counter or arrows (1 / 1 beside two dead buttons). A place tab that
+       leaves one photo keeps the row, so switching tabs never moves the gallery. */
+    if (tiles.length > 1) shell.insertBefore(controls, gallery);
     var measure = function () {
       var left = gallery.getBoundingClientRect().left;
       var nearest = 0;
@@ -1318,6 +1331,13 @@
           gallery.setAttribute('aria-label', tiles.length + ' photos');
           gallery.scrollLeft = 0;
           apply(measure());
+          /* Phones scroll the place tabs: bring the chosen one wholly into view, clear of the fade
+             at All's edge (2rem) and of the screen edge. Never scrollIntoView (iPhone Safari). */
+          if (!index || row.scrollWidth <= row.clientWidth) return;
+          var port = row.getBoundingClientRect();
+          var box = chip.getBoundingClientRect();
+          var by = Math.min(0, box.left - port.left - 32) || Math.max(0, box.right - port.right + 16);
+          if (by) row.scrollBy({ left: by, behavior: reducedMotion.matches ? 'instant' : 'smooth' });
         });
         (index ? row : filter).appendChild(chip);
       });

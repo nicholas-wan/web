@@ -109,3 +109,54 @@ test('at 320px All stays in view once the place chips scroll, and every chip is 
   await expect(shell.locator('.brick:visible')).toHaveCount(11);
   await context.close();
 });
+
+// Fix round 3 (18 Nov 2026 review): a chosen tab could sit half off-screen (Day 6's Tianmen Cave).
+test('a chosen place tab scrolls wholly into view, clear of the fade at All', async ({ browser }) => {
+  for (const [width, height] of [[390, 844], [320, 640]]) {
+    const context = await browser.newContext({ baseURL: test.info().project.use.baseURL,
+      viewport: { width, height }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+    const page = await context.newPage();
+    await page.goto('/travel_2026_chengdu_zhangjiajie');
+    const shell = day6(page);
+    await shell.locator('.journal-place-filter').scrollIntoViewIfNeeded();
+    const row = shell.locator('.journal-place-filter__places');
+    const chips = row.locator('button');
+    const count = await chips.count();
+    // Left to right, then back to the first place.
+    for (const at of [...Array(count).keys(), 0]) {
+      await chips.nth(at).tap();
+      await expect(chips.nth(at)).toHaveAttribute('aria-pressed', 'true');
+      const fit = await chips.nth(at).evaluate(chip => {
+        const port = chip.parentNode.getBoundingClientRect();
+        const box = chip.getBoundingClientRect();
+        // Once scrolled, the row fades over its first 2rem.
+        const clear = port.left + (chip.parentNode.scrollLeft > 2 ? 30 : 0);
+        return { left: box.left >= clear - 1, right: box.right <= Math.min(port.right, innerWidth) + 1 };
+      });
+      expect(fit, width + 'px tab ' + at).toEqual({ left: true, right: true });
+    }
+    await context.close();
+  }
+});
+
+// Fix round 3: a gallery of one photo showed "1 / 1" beside two dead arrows.
+test('phone galleries of a single photo have no counter or arrows; a one-photo place tab keeps them', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  const shells = await page.locator('.journal-gallery-shell').evaluateAll(nodes => nodes.map(node => ({
+    tiles: node.querySelectorAll('.brick').length,
+    controls: node.querySelectorAll('.journal-gallery-controls').length
+  })));
+  expect(shells.some(shell => shell.tiles === 1)).toBe(true);
+  for (const shell of shells) expect(shell.controls).toBe(shell.tiles > 1 ? 1 : 0);
+  await expect(page.locator('#trip-section-1 ~ .journal-gallery-shell .journal-gallery-controls')).toHaveCount(0);
+
+  // Filtering down to one photo keeps the row, so the gallery does not jump between tabs.
+  const shell = day6(page);
+  await shell.scrollIntoViewIfNeeded();
+  const single = shell.locator('.journal-place-filter__places button').filter({ has: page.locator('span', { hasText: /^1$/ }) }).first();
+  await single.click();
+  await expect(shell.locator('.brick:visible')).toHaveCount(1);
+  await expect(shell.locator('.journal-gallery-count')).toHaveText('1 / 1');
+  await expect(shell.locator('.journal-gallery-controls')).toBeVisible();
+});

@@ -50,6 +50,14 @@
 		.guangzhou-route__more {
 			display: none !important;
 		}
+
+		.guangzhou-day__route > .travel-route__total {
+			display: block !important;
+		}
+
+		.guangzhou-day__route > .travel-route__tour {
+			display: flex !important;
+		}
 	}
 
 /* Travel timeline: scene artwork arrives by script (travel-scenes.svg, 8 Nov 2026), so without
