@@ -693,47 +693,27 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
 # journals that opt in with data-route-photos, counted here from the source, never in the browser.
 # Days: day sections with a heading. Stops: route stops, a stop repeated within one day counted
 # once (its photos stay with the first, too); the same place on two days counts on each. Photos:
-# gallery tiles, animations included. Fees: each counted stop's first yen amount in its guide
-# price, skipping prices marked optional and those with no amount ("Free", "in park ticket"),
-# rounded to the nearest 10 yen; a journal with no amounts leaves that part out. It follows the
-# banner rather than the lede: above it, the phone banner fell to about 250px from the top,
-# past the README's ~220px. "in fees", not "tickets": the sum holds one-way rides and shoe covers
-# too, and "in tickets and rides" wrapped the line at 390px (fix round, 18 Nov 2026).
+# gallery tiles, animations included. No money: a sum of ticket prices without flights, stays and
+# food read as the trip's cost (owner, 18 Nov 2026: "misleading to put"); day totals stay, each
+# saying what it counts. It follows the banner rather than the lede: above it, the phone banner
+# fell to about 250px from the top, past the README's ~220px.
 function Add-TripStats([string]$Markup, [string]$Slug) {
     if ($tripOrder -notcontains $Slug -or $Markup -notmatch '<article class="travel-journal__content\b[^"]*"[^>]*\sdata-route-photos\b') { return $Markup }
-    $yen = [string][char]0x00A5
-    $days = 0; $stops = 0; $tickets = 0; $priced = $false; $paid = 0
+    $days = 0; $stops = 0
     foreach ($day in [regex]::Matches($Markup, '(?s)<section class="travel-journal__day(?=[\s"])[^"]*"[^>]*>(?<body>.*?)</section>')) {
         $body = $day.Groups['body'].Value
         if ($body -notmatch '<h2\b') { continue }
         $days++
         $seen = New-Object 'System.Collections.Generic.HashSet[string]'
-        foreach ($stop in [regex]::Matches($body, '(?s)<span class="(?:[^"]*\s)?(?:travel|guangzhou)-route__stop(?=[\s"])[^"]*"[^>]*>\s*<span\b[^>]*>(?<name>.*?)</span>(?<rest>(?:<span[^>]*></span>|(?!</span>).)*)</span>')) {
+        foreach ($stop in [regex]::Matches($body, '(?s)<span class="(?:[^"]*\s)?(?:travel|guangzhou)-route__stop(?=[\s"])[^"]*"[^>]*>\s*<span\b[^>]*>(?<name>.*?)</span>')) {
             $name = [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($stop.Groups['name'].Value, '<[^>]+>', '') -replace '\s+', ' ').Trim()).ToLowerInvariant()
-            if (-not $seen.Add($name)) { continue }
-            $stops++
-            $price = [regex]::Match($stop.Groups['rest'].Value, '(?s)<small class="travel-route__price">(?<text>.*?)</small>')
-            if (-not $price.Success) { continue }
-            $text = [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($price.Groups['text'].Value, '<[^>]+>', '')))
-            if ($text -match '(?i)\boptional\b') { continue }
-            # A Klook price (owner, 18 Nov 2026) is what we paid, in Singapore dollars.
-            $sgd = [regex]::Match($text, 'S\$\s*(\d[\d,]*)')
-            if ($sgd.Success) { $paid += [int]($sgd.Groups[1].Value -replace ',', ''); continue }
-            $amount = [regex]::Match($text, [regex]::Escape($yen) + '\s*(\d[\d,]*)')
-            if (-not $amount.Success) { continue }
-            $tickets += [int]($amount.Groups[1].Value -replace ',', '')
-            $priced = $true
+            if ($seen.Add($name)) { $stops++ }
         }
     }
     $photos = [regex]::Matches($Markup, 'class="(?:[^"]*\s)?travel-gallery__item(?=[\s"])').Count
     $stats = New-Object 'System.Collections.Generic.List[string]'
     foreach ($part in @(@($days, 'day'), @($stops, 'stop'), @($photos, 'photo'))) {
         if ($part[0] -gt 0) { $stats.Add("<b>$($part[0])</b> $($part[1])" + $(if ($part[0] -eq 1) { '' } else { 's' })) }
-    }
-    if ($priced) {
-        $rounded = [int]([math]::Round($tickets / 10.0, [MidpointRounding]::AwayFromZero) * 10)
-        $sgdPart = if ($paid -gt 0) { ' + S$' + $paid } else { '' }
-        $stats.Add('<b>&asymp; &yen;' + $rounded.ToString('#,0', [Globalization.CultureInfo]::InvariantCulture) + $sgdPart + '</b> a person')
     }
     if ($stats.Count -eq 0) { return $Markup }
     # Each stat after the first carries its middle dot in the list's left gutter, which the line
