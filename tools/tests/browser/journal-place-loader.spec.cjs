@@ -85,8 +85,7 @@ test('phones load the card as a folded route comes near, before any tap', async 
   await context.close();
 });
 
-test('closing the card or its photos, opened from a map pin, returns focus to the stop', async ({ browser }) => {
-  // Phones show a day map only in the expanded route (review fix), so a pin's stop is always on screen.
+test('closing the card or its photos returns focus to the stop', async ({ browser }) => {
   const context = await browser.newContext({ baseURL: test.info().project.use.baseURL,
     viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
   const page = await context.newPage();
@@ -94,10 +93,9 @@ test('closing the card or its photos, opened from a map pin, returns focus to th
   const day6 = route(page, 6);
   const more = day6.locator('.travel-route__more');
   const stop = day6.locator('.guangzhou-route__stop').nth(2);
-  const pin = day6.locator('[data-route-pin="2"]');
   await more.scrollIntoViewIfNeeded();
   await more.click();
-  await pin.click();
+  await stop.click();
   const card = page.locator('.place-card');
   await expect(card).toHaveClass(/is-visible/);
   await card.locator('.place-card__view').click();
@@ -107,12 +105,12 @@ test('closing the card or its photos, opened from a map pin, returns focus to th
   await expect(viewer).not.toHaveClass(/is-visible/);
   await expect(stop).toBeFocused();
 
-  // With the card unavailable, the pin opens the photos directly; closing lands the same way.
+  // With the card unavailable, the stop opens the photos directly; closing lands the same way.
   await page.route(cardScript, routed => routed.abort());
   await page.reload();
   await more.scrollIntoViewIfNeeded();
   await more.click();
-  await pin.click();
+  await stop.click();
   await expect(viewer).toHaveClass(/is-visible/);
   await page.keyboard.press('Escape');
   await expect(stop).toBeFocused();
