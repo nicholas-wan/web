@@ -11253,29 +11253,43 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 }
 /* Redrawn timeline scenes (20 Oct 2026): Golden Gate cars, Canton Tower second tram cabin. */
 .depth-canton .dl-tram.dl-tram-b{offset-distance:50%}.depth-canton .dl-tram-rear.dl-tram-rear-b{visibility:hidden}.depth-canton .dl-tram-front.dl-tram-front-b{visibility:visible}.depth-canton.is-active .dl-tram.dl-tram-b{animation:dl-tram-b var(--polish-duration,6200ms) linear both}.depth-canton.is-active .dl-tram-rear.dl-tram-rear-b{animation:dl-tram-rear-b var(--polish-duration,6200ms) steps(1,end) both}.depth-canton.is-active .dl-tram-front.dl-tram-front-b{animation:dl-tram-front-b var(--polish-duration,6200ms) steps(1,end) both}@keyframes dl-tram-b{0%{offset-distance:50%}49.999%{offset-distance:100%}50%{offset-distance:0%}100%{offset-distance:50%}}@keyframes dl-tram-rear-b{0%{visibility:hidden}50%,100%{visibility:visible}}@keyframes dl-tram-front-b{0%{visibility:visible}50%,100%{visibility:hidden}}@media(prefers-reduced-motion:reduce){.depth-canton .dl-tram.dl-tram-b{animation:none!important;offset-distance:50%}.depth-canton .dl-tram-rear.dl-tram-rear-b{animation:none!important;visibility:hidden}.depth-canton .dl-tram-front.dl-tram-front-b{animation:none!important;visibility:visible}}
-/* Chengdu (18 Nov 2026, owner's pick from lab/chengdu-polish, replacing the 17 Nov island): Heaven's Gate from the plaza
-   below the 999 steps, after his own photo, at golden hour: warm lit rock and cool shadow, the gate with an amber left wall
-   and hazy ridges in it, the stair through the forest to the stone terrace and plaza, the forest as stacked treelines. Motion:
-   the low sun warms the summits (.tg-warm, up by 28%, held, eased back to nothing) while a pair of swifts dives down the V
-   into the gate and the next pair glides in to the first one's start, so the last frame equals the first. Generator:
-   lab/chengdu-polish/fa/gen.cjs (classes renamed tfa- to tg-). */
-.authored-scene.tg-scene .tg-bird{transform-box:view-box;transform-origin:0 0;offset-path:path('M84 -9C81.7 -6.7 73.4 1.3 70 5C66.6 8.7 65 10.2 63.6 13C62.2 15.8 62 19 61.6 22C61.2 25 61.4 28 61.3 31C61.2 34 61.1 38.5 61 40');offset-rotate:0deg;offset-anchor:0px 0px}
-.authored-scene.tg-scene .tg-bs,.authored-scene.tg-scene .tg-fl{transform-box:view-box;transform-origin:0 0}
-.authored-scene.tg-scene .tg-b1{offset-distance:34.51%}
+/* Chengdu (18 Nov 2026, owner's picks from lab/chengdu-polish): Heaven's Gate from the plaza below the 999 steps, after his
+   own photo, measured against it (RC), at golden hour: grey limestone with peach light on the rims and summits, the gate cut
+   into the cliff and filled with bright sky, the stair to the stone terrace and the plaza, the forest as stacked treelines.
+   Motion (RD): the summits warm (.tg-warm, up by 28%, held, eased back), a pair of swifts dives into the gate and a third
+   follows, two small swifts circle in the V, and a thin band of valley haze drifts behind the plaza; the last frame equals
+   the first. Generator: lab/chengdu-polish/rd/gen.cjs (classes renamed trd- to tg-). */
+.authored-scene.tg-scene .tg-bird{transform-box:view-box;transform-origin:0 0;offset-rotate:0deg;offset-anchor:0px 0px}
+.authored-scene.tg-scene .tg-bs,.authored-scene.tg-scene .tg-fl,.authored-scene.tg-scene .tg-fm,.authored-scene.tg-scene .tg-mist{transform-box:view-box;transform-origin:0 0}
+.authored-scene.tg-scene .tg-b1,.authored-scene.tg-scene .tg-b2{offset-path:path('M94 -6C91 -4.7 81.3 0 76 2C70.7 4 65.6 4.4 62 6C58.4 7.6 55.6 9.4 54.6 11.4C53.6 13.4 54.5 16.5 56 18C57.5 19.5 62.4 18.8 63.6 20.4C64.8 22 63.7 25.2 63.4 27.6C63.1 30 62 32.2 61.6 35C61.2 37.8 60.9 42.8 60.8 44.4')}
+.authored-scene.tg-scene .tg-b1{offset-distance:52.35%}
 .authored-scene.tg-scene .tg-b2{offset-distance:0%;opacity:0}
+.authored-scene.tg-scene .tg-b3{offset-path:path('M22 -6C24.7 -4.8 32.7 -0.8 38 1C43.3 2.8 49.2 3.6 54 5C58.8 6.4 64.4 7.6 67 9.4C69.6 11.2 70 13.6 69.6 15.6C69.2 17.6 65.7 19.3 64.4 21.6C63.1 23.9 62.2 25.7 61.6 29.6C61 33.5 61.1 42.3 61 44.8');offset-distance:0%;opacity:0}
+.authored-scene.tg-scene .tg-b4{offset-path:path('M58 12.4C58 8.6 72 8.4 72 12.2C72 15.8 58 16.2 58 12.4Z');offset-distance:0%}
+.authored-scene.tg-scene .tg-b5{offset-path:path('M73 4.6C73 1.6 53 1.4 53 4.4C53 7.4 73 7.6 73 4.6Z');offset-distance:0%}
+.authored-scene.tg-scene .tg-warm{opacity:0}
 @media (prefers-reduced-motion:no-preference){
 .authored-scene.tg-scene.is-active .tg-b1{animation:tg-m1 var(--scene-duration,6400ms) both}
-.authored-scene.tg-scene.is-active .tg-b1 .tg-bs{animation:tg-s1 var(--scene-duration,6400ms) both}
+.authored-scene.tg-scene.is-active .tg-b1 .tg-bs,.authored-scene.tg-scene.is-active .tg-b3 .tg-bs{animation:tg-s1 var(--scene-duration,6400ms) both}
+.authored-scene.tg-scene.is-active .tg-b3 .tg-bs{animation-name:tg-s3}
 .authored-scene.tg-scene.is-active .tg-b2{animation:tg-m2 var(--scene-duration,6400ms) both}
+.authored-scene.tg-scene.is-active .tg-b3{animation:tg-m3 var(--scene-duration,6400ms) both}
+.authored-scene.tg-scene.is-active .tg-b4,.authored-scene.tg-scene.is-active .tg-b5{animation:tg-c var(--scene-duration,6400ms) linear both}
 .authored-scene.tg-scene.is-active .tg-fl{animation:tg-f var(--scene-duration,6400ms) linear both}
+.authored-scene.tg-scene.is-active .tg-fm{animation:tg-g var(--scene-duration,6400ms) linear both}
+.authored-scene.tg-scene.is-active .tg-warm{animation:tg-w var(--scene-duration,6400ms) both}
+.authored-scene.tg-scene.is-active .tg-mist{animation:tg-d var(--scene-duration,6400ms) linear both}
 }
-@keyframes tg-m1{0%{offset-distance:34.51%;animation-timing-function:cubic-bezier(.4,0.14,.6,1)}36%{offset-distance:100%}100%{offset-distance:100%}}
-@keyframes tg-s1{0%{transform:scale(1);opacity:1;animation-timing-function:cubic-bezier(.4,0,.6,1)}29%{opacity:1}36%{transform:scale(.45);opacity:0}100%{transform:scale(.45);opacity:0}}
-@keyframes tg-f{0%,6%,13%,20%,27%,52%,60%,68%,76%,84%,100%{transform:scale(1)}3%,10%,17%,24%,56%,64%,72%,80%{transform:scale(1,.3)}}
-@keyframes tg-m2{0%,44%{offset-distance:0%;opacity:0}44.1%{opacity:1;offset-distance:0%;animation-timing-function:linear}100%{offset-distance:34.51%;opacity:1}}
-.authored-scene.tg-scene .tg-warm{opacity:0}
-@media (prefers-reduced-motion:no-preference){.authored-scene.tg-scene.is-active .tg-warm{animation:tg-w var(--scene-duration,6400ms) both}}
+@keyframes tg-m1{0%{offset-distance:52.35%;animation-timing-function:cubic-bezier(.3,.25,.6,1)}36%{offset-distance:100%}100%{offset-distance:100%}}
+@keyframes tg-s1{0%,29%{transform:scale(1);opacity:1;animation-timing-function:cubic-bezier(.4,0,.6,1)}36%,100%{transform:scale(.45);opacity:0}}
+@keyframes tg-s3{0%,73%{transform:scale(1);opacity:1;animation-timing-function:cubic-bezier(.4,0,.6,1)}80%,100%{transform:scale(.45);opacity:0}}
+@keyframes tg-m2{0%,46%{offset-distance:0%;opacity:0}46.1%{opacity:1;offset-distance:0%;animation-timing-function:cubic-bezier(.2,0,.5,1)}100%{offset-distance:52.35%;opacity:1}}
+@keyframes tg-m3{0%,42%{offset-distance:0%;opacity:0}42.1%{opacity:1;offset-distance:0%;animation-timing-function:cubic-bezier(.35,0,.6,1)}80%,100%{offset-distance:100%;opacity:1}}
+@keyframes tg-c{to{offset-distance:100%}}
+@keyframes tg-f{0%,6%,12%,18%,24%,31%,48%,54%,60%,66%,72%,90%,96%,100%{transform:scale(1)}3%,9%,15%,21%,51%,57%,63%,69%,93%{transform:scale(1,.25)}}
+@keyframes tg-g{0%,8%,16%,36%,44%,52%,70%,78%,100%{transform:scale(1)}4%,12%,40%,48%,74%{transform:scale(1,.3)}}
 @keyframes tg-w{0%{opacity:0;animation-timing-function:cubic-bezier(.35,0,.3,1)}28%{opacity:.85}58%{opacity:.85;animation-timing-function:cubic-bezier(.45,0,.4,1)}100%{opacity:0}}
+@keyframes tg-d{to{transform:translateX(30px)}}
 /* Journal card crops (20 Oct 2026): a fixed 4:3 photo box (213x160) keeps half or more of each portrait cover, framed by the
    per-cover focal point in the markup (--focus; --thumb-focus for the wider neighbour thumbnails). Show all uses the same
    focal points. Phones keep their centred crop. */
@@ -11395,7 +11409,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="7"]::before{background:linear-gradient(#2c5e9f,#4f82bf 40%,#93b5da 70%,#d8e4ee)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#6a9ecb,#a6c6df 40%,#e4eaec 68%,#f5eedf)}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#72adcb,#a8ccde 40%,#d9e8ee 68%,#f5eedf)}
 }
 @media(max-width:389px){
  .travel-timeline.travel-phone-rail .mobile-journal-row{grid-template-columns:140px minmax(0,1fr)}
@@ -11432,7 +11446,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .travel-timeline .journal-chronology .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="7"]::before{background:linear-gradient(#2c5e9f,#4f82bf 40%,#93b5da 70%,#d8e4ee)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
-.travel-timeline .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#6a9ecb,#a6c6df 40%,#e4eaec 68%,#f5eedf)}
+.travel-timeline .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#72adcb,#a8ccde 40%,#d9e8ee 68%,#f5eedf)}
 /* Each sky follows that trip's real light (20 Oct 2026). Paris is the one night tile, so its navy stays at full strength at rest. */
 .travel-timeline .journal-chronology .authored-scene[data-scene="2"]::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="2"]::before{opacity:1}
 .travel-timeline .journal-chronology .mm-dusk-tile{display:inline;opacity:.5;transition:opacity .5s ease}
