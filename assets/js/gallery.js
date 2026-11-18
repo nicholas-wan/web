@@ -1181,10 +1181,11 @@
     name.setAttribute('data-count', own.length);
     stop.classList.add('has-photos');
   });
-  /* Day map pins (build.ps1 Add-RouteMaps) open their stop's photos, as tapping the stop does. */
+  /* Day map pins and edge markers (build.ps1 Add-RouteMaps) open their stop's place card, as
+     tapping the stop does: any stop with photos or a price (has-card). */
   document.querySelectorAll('[data-route-pin]').forEach(function (pin) {
     var stop = pin.closest('.guangzhou-day__route').querySelectorAll('.guangzhou-route__stop')[pin.getAttribute('data-route-pin')];
-    if (!stop || !stop.classList.contains('has-photos')) return;
+    if (!stop || !stop.classList.contains('has-card')) return;
     pin.classList.add('is-linked');
     pin.addEventListener('click', function () { stop.click(); });
   });

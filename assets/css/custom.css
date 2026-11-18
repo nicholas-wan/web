@@ -3561,14 +3561,17 @@ header.major > .travel-journal__stats {
   display: none;
 }
 
-/* Day maps (18 Nov 2026; Add-RouteMaps in build.ps1): an inline SVG under the Route label,
-   shown folded or not, full width on phones and a small panel on desktop. No tiles. */
+/* Day maps (18 Nov 2026; Add-RouteMaps in build.ps1): an inline SVG of the day's main cluster,
+   with edge markers for stops off it and a "Not mapped" line for stops with no point. Phones
+   show it only in the expanded route, tablets above the stops, 900px and up right of them. */
 .travel-route-map {
+  margin-top: 0.55rem;
+}
+
+.travel-route-map__svg {
   display: block;
   width: 100%;
-  max-width: 24rem;
   height: auto;
-  margin-top: 0.55rem;
   border-radius: 6px;
   background: #eef3f1;
   font-family: var(--font-display);
@@ -3598,12 +3601,51 @@ header.major > .travel-journal__stats {
   text-anchor: middle;
 }
 
+/* Invisible tap targets, up to 44px on a 390px phone. */
+.travel-route-map .travel-route-map__hit {
+  fill: transparent;
+  stroke: none;
+}
+
+.travel-route-map__off path {
+  fill: #11807d;
+  stroke: none;
+}
+
+.travel-route-map__off circle {
+  fill: #fff;
+  stroke: #11807d;
+}
+
+.travel-route-map__off text {
+  fill: #0c6663;
+}
+
+.travel-route-map .travel-route-map__label,
+.travel-route-map__scale text {
+  fill: var(--color-ink-600);
+  font-size: 10px;
+  text-anchor: start;
+}
+
+.travel-route-map .travel-route-map__label.is-end {
+  text-anchor: end;
+}
+
+.travel-route-map .travel-route-map__label.is-middle {
+  text-anchor: middle;
+}
+
 .travel-route-map .is-linked {
   cursor: pointer;
 }
 
-.travel-route-map .is-linked:hover circle {
+.travel-route-map .is-linked:hover circle:not(.travel-route-map__hit) {
   fill: #0c6663;
+}
+
+.travel-route-map .travel-route-map__off.is-linked:hover circle:not(.travel-route-map__hit) {
+  fill: #e3f0ee;
 }
 
 .travel-route-map__scale path {
@@ -3611,9 +3653,26 @@ header.major > .travel-journal__stats {
   stroke-width: 1.5;
 }
 
-.travel-route-map__scale text {
-  fill: var(--color-ink-600);
-  text-anchor: start;
+.travel-route-map__note {
+  margin: 0.35rem 0 0;
+  color: var(--color-ink-600);
+  font-size: max(var(--text-floor), 0.72rem);
+  line-height: 1.45;
+  text-align: left;
+}
+
+.travel-route-map__num {
+  display: inline-grid;
+  width: 1.1rem;
+  height: 1.1rem;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: 0.05em;
 }
 
 @media screen and (min-width: 601px) {
@@ -3633,6 +3692,67 @@ header.major > .travel-journal__stats {
     color: var(--color-brand-700);
     font-family: var(--font-display);
     font-weight: 700;
+  }
+
+  /* A route with a day map: each stop numbered with the pin's teal disc so the two can be
+     matched; the map sits above the stops on tablets and right of them from 900px. */
+  .has-route-map > .travel-route-map {
+    max-width: 20rem;
+  }
+
+  .has-route-map > .guangzhou-route {
+    counter-reset: route-stop;
+  }
+
+  .has-route-map .guangzhou-route__stop {
+    position: relative;
+    padding-left: 1.5rem;
+    counter-increment: route-stop;
+  }
+
+  .has-route-map .guangzhou-route__stop::before {
+    content: counter(route-stop);
+    position: absolute;
+    top: 0.1rem;
+    left: 0;
+    display: grid;
+    width: 1.15rem;
+    height: 1.15rem;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-brand-600);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .guangzhou-day__route.has-route-map {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 18.5rem;
+    grid-template-rows: auto auto auto auto 1fr;
+    align-items: start;
+    justify-items: start;
+    column-gap: 1.75rem;
+  }
+
+  .has-route-map > * {
+    grid-column: 1;
+  }
+
+  .has-route-map > .guangzhou-route {
+    justify-self: stretch;
+  }
+
+  .has-route-map > .travel-route-map {
+    grid-column: 2;
+    grid-row: 1 / 6;
+    width: 100%;
+    max-width: none;
+    margin-top: 0.15rem;
   }
 }
 
@@ -4032,6 +4152,12 @@ header.major > .travel-journal__stats {
   /* Routes arrive folded from the build (Add-RouteSummaries), so the full list never paints and
      then collapses (Perth CLS, Oct 2026). noscript.css shows it again without JavaScript. */
   .guangzhou-day__route:not(.is-expanded) > .travel-route-summary ~ .guangzhou-route {
+    display: none;
+  }
+
+  /* Day maps only in the expanded route: in the folded box the map doubled its height and
+     pushed the photos down (18 Nov 2026 review). */
+  .guangzhou-day__route:not(.is-expanded) > .travel-route-map {
     display: none;
   }
 
