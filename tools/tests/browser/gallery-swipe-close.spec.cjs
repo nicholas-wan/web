@@ -20,14 +20,18 @@ const openPhone = async (browser, reducedMotion = 'reduce') => {
   // Moves through `points` (offsets from the start), pausing `pause` ms between moves;
   // `hold` runs before release. A number pair (dx, dy, steps) is a straight line.
   const line = (dx, dy, steps) => Array.from({ length: steps }, (_, i) => [dx * (i + 1) / steps, dy * (i + 1) / steps]);
-  const drag = async (points, pause, hold) => {
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: start.x, y: start.y }] });
-    for (const [dx, dy] of points) {
-      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: start.x + dx, y: start.y + dy }] });
+  // `stepMs` stamps each event that many milliseconds after the last, so a flick's speed is the
+  // test's to set rather than the CI runner's (a slow runner once read a flick as a slow drag).
+  const drag = async (points, pause, hold, stepMs) => {
+    const t0 = Date.now() / 1000;
+    const at = i => (stepMs ? { timestamp: t0 + i * stepMs / 1000 } : {});
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: start.x, y: start.y }], ...at(0) });
+    for (const [i, [dx, dy]] of points.entries()) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: start.x + dx, y: start.y + dy }], ...at(i + 1) });
       if (pause) await page.waitForTimeout(pause);
     }
     if (hold) await hold();
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [], ...at(points.length + 1) });
   };
   return { context, page, trigger, before, drag, line, start };
 };
@@ -73,7 +77,8 @@ test('a short slow drag springs back; a quick flick closes', async ({ browser })
   // Upward drags do nothing.
   await drag(line(0, -300, 10), 20);
   await expect(page.locator('.lightbox')).toHaveAttribute('aria-hidden', 'false');
-  await drag(line(0, 110, 3), 0);
+  // A quick flick: 110px in about 50ms.
+  await drag(line(0, 110, 3), 0, null, 16);
   await expect(page.locator('.lightbox')).toHaveAttribute('aria-hidden', 'true');
   await context.close();
 });
