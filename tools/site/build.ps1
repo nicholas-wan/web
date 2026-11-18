@@ -686,11 +686,12 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
 # journals that opt in with data-route-photos, counted here from the source, never in the browser.
 # Days: day sections with a heading. Stops: route stops, a stop repeated within one day counted
 # once (its photos stay with the first, too); the same place on two days counts on each. Photos:
-# gallery tiles, animations included. Tickets: each counted stop's first yen amount in its guide
+# gallery tiles, animations included. Fees: each counted stop's first yen amount in its guide
 # price, skipping prices marked optional and those with no amount ("Free", "in park ticket"),
 # rounded to the nearest 10 yen; a journal with no amounts leaves that part out. It follows the
 # banner rather than the lede: above it, the phone banner fell to about 250px from the top,
-# past the README's ~220px.
+# past the README's ~220px. "in fees", not "tickets": the sum holds one-way rides and shoe covers
+# too, and "in tickets and rides" wrapped the line at 390px (fix round, 18 Nov 2026).
 function Add-TripStats([string]$Markup, [string]$Slug) {
     if ($tripOrder -notcontains $Slug -or $Markup -notmatch '<article class="travel-journal__content\b[^"]*"[^>]*\sdata-route-photos\b') { return $Markup }
     $yen = [string][char]0x00A5
@@ -721,7 +722,7 @@ function Add-TripStats([string]$Markup, [string]$Slug) {
     }
     if ($priced) {
         $rounded = [int]([math]::Round($tickets / 10.0, [MidpointRounding]::AwayFromZero) * 10)
-        $stats.Add('<b>&asymp; &yen;' + $rounded.ToString('#,0', [Globalization.CultureInfo]::InvariantCulture) + '</b> tickets a person')
+        $stats.Add('<b>&asymp; &yen;' + $rounded.ToString('#,0', [Globalization.CultureInfo]::InvariantCulture) + '</b> in fees a person')
     }
     if ($stats.Count -eq 0) { return $Markup }
     # Each stat after the first carries its middle dot in the list's left gutter, which the line

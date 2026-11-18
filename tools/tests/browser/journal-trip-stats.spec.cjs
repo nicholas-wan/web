@@ -12,7 +12,7 @@ test('Chengdu shows the trip at a glance under its banner, and no other journal 
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   const stats = page.locator('.travel-journal__stats');
   await expect(stats).toHaveCount(1);
-  expect((await stats.textContent()).replace(/\s+/g, ' ').trim()).toBe('7 days · 29 stops · 55 photos · ≈ ¥1,040 tickets a person');
+  expect((await stats.textContent()).replace(/\s+/g, ' ').trim()).toBe('7 days · 29 stops · 55 photos · ≈ ¥1,040 in fees a person');
   await expect(stats.locator('b')).toHaveText(['7', '29', '55', '≈ ¥1,040']);
   const geometry = await page.evaluate(() => {
     const box = selector => document.querySelector(selector).getBoundingClientRect();

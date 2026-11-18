@@ -20,7 +20,12 @@ test('Chengdu stops own exactly their photos, count within the place and offer t
   expect(labels).toHaveLength(20);
   expect(labels).toContain('Open the place card for Taikoo Li (4 photos)');
   expect(labels).toContain('Open the place card for Tianmen Cave (2 photos)');
-  expect(labels).toContain('Open the place card for Chengdu (2 photos)');
+  // The airport stops are named for the airport (fix round, 18 Nov 2026), so its photos match by
+  // name; Day 1 has no airport photo, Day 4 two and Day 7 one.
+  expect(labels).toContain('Open the place card for Tianfu Airport (2 photos)');
+  expect(labels).toContain('Open the place card for Tianfu Airport (1 photo)');
+  await expect(page.locator('.guangzhou-route__stop', { hasText: 'Tianfu Airport' })).toHaveCount(3);
+  await expect(page.locator('.guangzhou-route__stop[data-photos="Tianfu Airport"]')).toHaveCount(0);
 
   const day6 = page.locator('#trip-section-6 ~ .guangzhou-day__route');
   await day6.locator('.travel-route__more').click();
@@ -76,7 +81,8 @@ test('a stop with photos opens its place card, which hands its history entry to 
   await expect(card).toHaveClass(/is-visible/);
   await expect(sheet.locator('.place-card__meta')).toHaveText('天门洞 · Day 6 · stop 3');
   await expect(sheet.locator('.place-card__photos img')).toHaveCount(2);
-  await expect(sheet.locator('.place-card__more')).toHaveText('2 photos');
+  // Every photo is showing, so no "N photos" tile repeats the View button.
+  await expect(sheet.locator('.place-card__more')).toHaveCount(0);
   await expect(sheet.locator('dt')).toHaveText(['Price']);
   await expect(sheet.locator('dd')).toHaveText(['¥32 escalator, optional']);
   await expect(sheet.locator('.place-card__close')).toBeFocused();
@@ -111,6 +117,9 @@ test('Escape, the backdrop, the close button and Back close the place card and k
   const stop = await openStop(page, 4, '72 Wonder Tower');
   await expect(card.locator('dt')).toHaveText(['Price', 'Hours']);
   await expect(card.locator('.place-card__photos img')).toHaveCount(4);
+  await expect(card.locator('.place-card__more')).toHaveCount(0);
+  // Only the 4:30 pm day/night split is solid across sources; one session a line, times unbroken.
+  expect(await card.locator('dd').nth(1).evaluate(dd => dd.innerHTML)).toBe('Day ticket until 4:30&nbsp;pm<br>Night ticket from 4:30&nbsp;pm');
   await page.keyboard.press('Escape');
   await expect(card).not.toHaveClass(/is-visible/);
   await expect(stop).toBeFocused();
@@ -151,4 +160,99 @@ test('a priced stop without photos opens a card with no photos or View button', 
   await expect(card.getByRole('link')).toHaveText(['Amap', 'Google Maps']);
   // Stops with neither photos nor a price stay plain text.
   await expect(page.locator('.guangzhou-route__stop', { hasText: 'Zhangjiajie Airport' }).first()).not.toHaveAttribute('role', 'button');
+});
+
+// Fix round (18 Nov 2026, owner: "make sure it looks compact and tidy, especially on mobile").
+test('the phone sheet stays compact: one row of photos, "+N" only past four, buttons one height', async ({ page }) => {
+  for (const [width, height] of [[390, 844], [320, 640]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto('/travel_2026_chengdu_zhangjiajie');
+    await openStop(page, 4, '72 Wonder Tower');
+    const sheet = page.locator('.place-card__sheet');
+    await expect(page.locator('.place-card')).toHaveClass(/is-visible/);
+    const box = await sheet.boundingBox();
+    expect(box.height, width + 'px sheet').toBeLessThanOrEqual(height * 0.6);
+    const thumbs = await sheet.locator('.place-card__photos img').evaluateAll(images => images.map(image => image.getBoundingClientRect().top));
+    expect(new Set(thumbs).size, 'one row').toBe(1);
+    const buttons = await sheet.locator('.place-card__actions > *').evaluateAll(items => items.map(item => {
+      const rect = item.getBoundingClientRect();
+      return [Math.round(rect.height), Math.round(rect.top)];
+    }));
+    expect(buttons).toEqual([[44, buttons[0][1]], [44, buttons[0][1]], [44, buttons[0][1]]]);
+    const hours = await sheet.locator('dd').nth(1).evaluate(dd => dd.getBoundingClientRect().height / parseFloat(getComputedStyle(dd).lineHeight));
+    expect(Math.round(hours), width + 'px hours lines').toBe(2);
+    await page.keyboard.press('Escape');
+  }
+
+  // Seven photos: four thumbnails, the last marked +3.
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  await openStop(page, 2, 'Red Panda Forest');
+  const strip = page.locator('.place-card__photos');
+  await expect(strip).toHaveAttribute('aria-label', 'View 7 photos');
+  await expect(strip.locator('img')).toHaveCount(4);
+  await expect(strip.locator('.place-card__more')).toHaveText('+3');
+  const [last, more] = await page.evaluate(() => ['.place-card__photos img:last-of-type', '.place-card__more'].map(selector => {
+    const rect = document.querySelector(selector).getBoundingClientRect();
+    return [Math.round(rect.left), Math.round(rect.top), Math.round(rect.width), Math.round(rect.height)];
+  }));
+  expect(more).toEqual(last);
+});
+
+test('a cancelled drag springs the sheet back, and a sheet left mid-drag reopens clean', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, reducedMotion: 'reduce' });
+  const page = await context.newPage();
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  const stop = await openStop(page, 6, 'Tianmen Cave');
+  const sheet = page.locator('.place-card__sheet');
+  await expect(page.locator('.place-card')).toHaveClass(/is-visible/);
+  const touch = (type, y) => sheet.evaluate((node, [type, y]) => {
+    const point = new Touch({ identifier: 1, target: node, clientX: 200, clientY: y });
+    node.dispatchEvent(new TouchEvent(type, { bubbles: true, touches: type === 'touchmove' || type === 'touchstart' ? [point] : [], changedTouches: [point] }));
+  }, [type, y]);
+  const inline = () => sheet.evaluate(node => [node.style.transform, node.style.transition]);
+  await touch('touchstart', 600);
+  await touch('touchmove', 680);
+  expect(await inline()).toEqual(['translateY(80px)', 'none']);
+  await touch('touchcancel', 680);
+  expect(await inline()).toEqual(['', '']);
+  await expect(page.locator('.place-card')).toHaveClass(/is-visible/);
+
+  // Closed with Escape mid-drag: the next open starts from no inline transform or transition.
+  await touch('touchstart', 600);
+  await touch('touchmove', 650);
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.place-card')).not.toHaveClass(/is-visible/);
+  await stop.click();
+  await expect(page.locator('.place-card')).toHaveClass(/is-visible/);
+  expect(await inline()).toEqual(['', '']);
+  await context.close();
+});
+
+// WebKit's default Tab skips links, so a trap that waits for the last link let focus out.
+const tabStaysInside = async (page, engine) => {
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  await openStop(page, 4, '72 Wonder Tower');
+  const sheet = page.locator('.place-card__sheet');
+  await expect(page.locator('.place-card')).toHaveClass(/is-visible/);
+  const focused = () => page.evaluate(() => {
+    const node = document.activeElement;
+    return node.closest('.place-card__sheet') ? node.getAttribute('aria-label') || node.textContent.trim() : 'outside: ' + node.tagName;
+  });
+  const forward = [];
+  for (let i = 0; i < 6; i++) { await page.keyboard.press('Tab'); forward.push(await focused()); }
+  expect(forward, engine).toEqual(['View 4 photos', 'View 4 photos', 'Amap', 'Google Maps', 'Close place card', 'View 4 photos']);
+  const back = [];
+  for (let i = 0; i < 6; i++) { await page.keyboard.press('Shift+Tab'); back.push(await focused()); }
+  expect(back, engine).toEqual(['Close place card', 'Google Maps', 'Amap', 'View 4 photos', 'View 4 photos', 'Close place card']);
+  await expect(sheet).toBeVisible();
+};
+
+test('Tab and Shift+Tab stay inside the place card in Chromium and WebKit', async ({ page, browserName }) => {
+  await tabStaysInside(page, browserName);
+  if (browserName !== 'chromium') return;
+  const { webkit } = require('@playwright/test');
+  const browser = await webkit.launch();
+  const context = await browser.newContext({ baseURL: new URL(page.url()).origin, reducedMotion: 'reduce' });
+  try { await tabStaysInside(await context.newPage(), 'webkit'); }
+  finally { await browser.close(); }
 });
