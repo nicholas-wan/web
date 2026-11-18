@@ -79,12 +79,13 @@ test('a stop with photos opens its place card, which hands its history entry to 
   const card = page.locator('.place-card');
   const sheet = card.getByRole('dialog', { name: 'Tianmen Cave' });
   await expect(card).toHaveClass(/is-visible/);
-  await expect(sheet.locator('.place-card__meta')).toHaveText('天门洞 · Day 6 · stop 3');
+  await expect(sheet.locator('.place-card__eyebrow')).toHaveText('Day 6 · Stop 3');
+  await expect(sheet.locator('.place-card__meta')).toHaveText('天门洞');
   await expect(sheet.locator('.place-card__photos img')).toHaveCount(2);
   // Every photo is showing, so no "N photos" tile repeats the View button.
   await expect(sheet.locator('.place-card__more')).toHaveCount(0);
   await expect(sheet.locator('dt')).toHaveText(['Price']);
-  await expect(sheet.locator('dd')).toHaveText(['¥32 escalator, optional']);
+  await expect(sheet.locator('dd')).toHaveText(['¥42 escalator, optional']);
   await expect(sheet.locator('.place-card__close')).toBeFocused();
   const amap = sheet.getByRole('link', { name: 'Amap' });
   const google = sheet.getByRole('link', { name: 'Google Maps' });
@@ -157,13 +158,13 @@ test('a priced stop without photos opens a card with no photos or View button', 
   await expect(card.locator('.place-card__title')).toHaveText('Bailong Elevator');
   await expect(card.locator('.place-card__photos, .place-card__view')).toHaveCount(0);
   await expect(card.locator('dd')).toHaveText(['¥65 one way']);
-  await expect(card.getByRole('link')).toHaveText(['Amap', 'Google Maps']);
+  await expect(card.getByRole('link')).toHaveText(['Google Maps', 'Amap']);
   // Stops with neither photos nor a price stay plain text.
   await expect(page.locator('.guangzhou-route__stop', { hasText: 'Zhangjiajie Airport' }).first()).not.toHaveAttribute('role', 'button');
 });
 
 // Fix round (18 Nov 2026, owner: "make sure it looks compact and tidy, especially on mobile").
-test('the phone sheet stays compact: one row of photos, "+N" only past four, buttons one height', async ({ page }) => {
+test('the phone sheet stays compact: one row of photos, "+N" only past four, one primary button and quiet map links', async ({ page }) => {
   for (const [width, height] of [[390, 844], [320, 640]]) {
     await page.setViewportSize({ width, height });
     await page.goto('/travel_2026_chengdu_zhangjiajie');
@@ -174,11 +175,13 @@ test('the phone sheet stays compact: one row of photos, "+N" only past four, but
     expect(box.height, width + 'px sheet').toBeLessThanOrEqual(height * 0.6);
     const thumbs = await sheet.locator('.place-card__photos img').evaluateAll(images => images.map(image => image.getBoundingClientRect().top));
     expect(new Set(thumbs).size, 'one row').toBe(1);
-    const buttons = await sheet.locator('.place-card__actions > *').evaluateAll(items => items.map(item => {
-      const rect = item.getBoundingClientRect();
-      return [Math.round(rect.height), Math.round(rect.top)];
-    }));
-    expect(buttons).toEqual([[44, buttons[0][1]], [44, buttons[0][1]], [44, buttons[0][1]]]);
+    // One full-width primary action; the map apps are two soft buttons side by side, 44px tall.
+    const view = await sheet.locator('.place-card__view').boundingBox();
+    expect(Math.round(view.height)).toBe(44);
+    expect(view.width).toBeGreaterThan(box.width * 0.85);
+    const links = await sheet.locator('.place-card__map').evaluateAll(items => items.map(item => Math.round(item.getBoundingClientRect().height)));
+    expect(links.length).toBe(2);
+    expect(links).toEqual([44, 44]);
     const hours = await sheet.locator('dd').nth(1).evaluate(dd => dd.getBoundingClientRect().height / parseFloat(getComputedStyle(dd).lineHeight));
     expect(Math.round(hours), width + 'px hours lines').toBe(2);
     await page.keyboard.press('Escape');
@@ -240,10 +243,10 @@ const tabStaysInside = async (page, engine) => {
   });
   const forward = [];
   for (let i = 0; i < 6; i++) { await page.keyboard.press('Tab'); forward.push(await focused()); }
-  expect(forward, engine).toEqual(['View 4 photos', 'View 4 photos', 'Amap', 'Google Maps', 'Close place card', 'View 4 photos']);
+  expect(forward, engine).toEqual(['View 4 photos', 'View 4 photos', 'Google Maps', 'Amap', 'Close place card', 'View 4 photos']);
   const back = [];
   for (let i = 0; i < 6; i++) { await page.keyboard.press('Shift+Tab'); back.push(await focused()); }
-  expect(back, engine).toEqual(['Close place card', 'Google Maps', 'Amap', 'View 4 photos', 'View 4 photos', 'Close place card']);
+  expect(back, engine).toEqual(['Close place card', 'Amap', 'Google Maps', 'View 4 photos', 'View 4 photos', 'Close place card']);
   await expect(sheet).toBeVisible();
 };
 

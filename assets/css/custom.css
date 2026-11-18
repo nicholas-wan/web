@@ -11491,31 +11491,44 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
 }
 .place-card.is-visible .place-card__sheet { transform: none; }
 .place-card__handle { display: none; }
+/* Close: a soft round grey button, as map apps' sheets have, not a bare glyph. */
 .place-card .place-card__close {
   position: absolute;
-  top: 0.65rem;
-  right: 0.65rem;
-  width: 2.5rem;
-  height: 2.5rem;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: 2rem;
+  min-width: 0;
+  height: 2rem;
+  min-height: 0;
   padding: 0;
   border-radius: 50%;
+  background: #eef2f1;
   box-shadow: none;
   color: var(--color-ink-600) !important;
-  font: 400 1.6rem/2.5rem var(--font-display);
+  font: 400 1.25rem/2rem var(--font-display);
+}
+.place-card .place-card__close::after { position: absolute; inset: -6px; content: ""; }
+/* Where it sits in the trip, in the site's teal date-label style. */
+.place-card__eyebrow {
+  margin: 0 2.75rem 0.3rem 0;
+  color: var(--color-brand-700);
+  font: 700 0.68rem/1.4 var(--font-display);
+  letter-spacing: 0.1em;
+  text-align: left;
+  text-transform: uppercase;
 }
 .place-card__title {
-  margin: 0 2.5rem 0 0;
+  margin: 0 2.75rem 0 0;
   color: var(--color-ink-900);
-  font: 700 1.2rem/1.3 var(--font-body);
+  font: 700 1.25rem/1.3 var(--font-body);
   text-align: left;
 }
 .place-card__meta {
-  margin: 0.2rem 0 0;
+  margin: 0.15rem 0 0;
   color: var(--color-ink-600);
-  font: 300 0.85rem/1.5 var(--font-body);
+  font: 400 0.88rem/1.5 Merriweather, "Merriweather Fallback", Georgia, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   text-align: left;
 }
-.place-card__meta > :lang(zh-Hans) { font-family: Merriweather, "Merriweather Fallback", Georgia, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
 /* One row of up to four thumbnails, no taller than 7.5rem; a fifth photo or more puts "+N" on
    the last one (fix round, 18 Nov 2026: the "N photos" tile took a slot and repeated View). */
 .place-card .place-card__photos {
@@ -11572,31 +11585,60 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
   font: 300 0.88rem/1.5rem var(--font-body);
   font-variant-numeric: tabular-nums;
 }
-/* One height for all three, sized to their words; they share out the row's spare width. */
-.place-card__actions { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1rem; }
-.place-card .place-card__view,
-.place-card .place-card__map {
+/* One full-width primary action; the map apps follow as a quiet line of text links with a small
+   external-link arrow, not two more pills competing with it. */
+.place-card__actions { margin-top: 1.1rem; }
+.place-card .place-card__view {
   display: flex;
-  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  height: 2.5rem;
+  width: 100%;
+  height: 2.75rem;
   margin: 0;
-  padding: 0 0.8rem;
+  padding: 0 1rem;
   border: 0;
-  border-radius: 999px;
-  font: 700 0.85rem/1 var(--font-display);
+  border-radius: 0.6rem;
+  background: var(--color-brand-600);
+  box-shadow: none;
+  color: #fff !important;
+  font: 700 0.92rem/1 var(--font-display);
   letter-spacing: 0;
-  text-align: center;
-  text-decoration: none;
   text-transform: none;
+}
+/* The map apps (owner, 18 Nov 2026: bare text links "look so ugly"): two equal soft buttons
+   under the primary action, each with a small map pin, red for Google Maps and blue for Amap,
+   as Apple Maps and Airbnb pair a primary action with quiet secondary ones. The pins are
+   drawn here; no logo is fetched. */
+.place-card__maps { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0.5rem 0 0; }
+.place-card .place-card__map {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: #eef2f1;
+  color: var(--color-ink-900);
+  font: 700 0.88rem/1 var(--font-display);
+  text-decoration: none;
   white-space: nowrap;
 }
-.place-card .place-card__view { background: var(--color-brand-600); box-shadow: none; color: #fff !important; }
-.place-card .place-card__map { box-shadow: inset 0 0 0 1px rgba(17, 128, 125, 0.6); color: var(--color-brand-700) !important; }
+.place-card .place-card__map::before {
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  background: var(--pin, #ea4335);
+  content: "";
+  -webkit-mask: var(--pin-shape) center / contain no-repeat;
+  mask: var(--pin-shape) center / contain no-repeat;
+}
+.place-card { --pin-shape: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M8 1a5 5 0 0 1 5 5c0 3.6-5 9-5 9S3 9.6 3 6a5 5 0 0 1 5-5zm0 3a2 2 0 1 0 0 4 2 2 0 0 0 0-4z'/%3E%3C/svg%3E"); }
+.place-card .place-card__map--amap { --pin: #1a73e8; }
 @media (hover: hover) {
-  .place-card .place-card__close:hover, .place-card .place-card__map:hover { background: var(--color-brand-100); }
+  .place-card .place-card__close:hover { background: #e2e9e8; }
+  .place-card .place-card__map:hover { background: #e2e9e8; }
   .place-card .place-card__view:hover { background: var(--color-brand-700); }
 }
 @media screen and (max-width: 736px) {
@@ -11611,10 +11653,11 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
     transform: translateY(100%);
   }
   .place-card__handle { display: block; width: 2.5rem; height: 5px; margin: 0 auto 0.6rem; border-radius: 3px; background: #cfd8da; }
-  .place-card .place-card__close { top: 0.65rem; right: 0.4rem; }
-  .place-card__title { font-size: 1.1rem; }
+  .place-card .place-card__close { top: 0.85rem; right: 0.85rem; }
+  .place-card__title { font-size: 1.15rem; }
   .place-card__photos img { max-height: 6.5rem; }
-  .place-card .place-card__view, .place-card .place-card__map { height: 44px; min-height: 44px; padding: 0 0.6rem; }
+  .place-card .place-card__view { height: 44px; min-height: 44px; }
+  .place-card .place-card__map { height: 44px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .place-card, .place-card__sheet { transition: none; }
@@ -11708,40 +11751,42 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
   }
 }
 
-/* Place chips over a day's photos (gallery.js, 18 Nov 2026): the "View all N stops" chip, teal
-   when chosen. Hidden tiles leave the grid. Phones keep All put and scroll the place chips
-   beside it, without snapping, fading them at its edge once scrolled, and extend each
-   chip's hit area to 44px, as View all does (18 Nov 2026 review). */
-.journal-place-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+/* Place filter over a day's photos (gallery.js, 18 Nov 2026): a slim row of text tabs, not
+   pills (owner: "too many sub pills ... can the within day ones be a bit more sleek?"): grey
+   names with small counts, the chosen one teal with a 2px underline. Hidden tiles leave the
+   grid. Phones keep All put and scroll the places beside it, without snapping, fading them at
+   its edge once scrolled; each tab is a real 44px target there. */
+.journal-place-filter { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: 0 1.1rem; margin-bottom: 0.6rem; }
 .journal-place-filter__places { display: contents; }
 .page-travel-journal .journal-place-filter__chip {
   display: inline-block;
   height: auto;
-  min-height: 2.4rem;
-  padding: 0.45rem 1rem;
-  border: 1px solid rgba(17, 128, 125, 0.6);
-  border-radius: 999px;
-  background: #fff;
+  min-height: 0;
+  padding: 0.3rem 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
   box-shadow: none;
-  color: var(--color-brand-700) !important;
-  font: 700 max(var(--text-floor, 0px), 0.85rem)/1.2 var(--font-display);
+  color: var(--color-ink-600) !important;
+  font: 700 max(var(--text-floor, 0px), 0.8rem)/1.2 var(--font-display);
   letter-spacing: 0;
   text-transform: none;
+  white-space: nowrap;
 }
-.page-travel-journal .journal-place-filter__chip:hover { border-color: var(--color-brand-600); background: #f1f7f6; }
-.page-travel-journal .journal-place-filter__chip[aria-pressed="true"] { border-color: var(--color-brand-600); background: var(--color-brand-600); color: #fff !important; }
-.journal-place-filter__chip span { opacity: 0.75; }
+.page-travel-journal .journal-place-filter__chip:hover { background: none; color: var(--color-brand-700) !important; }
+.page-travel-journal .journal-place-filter__chip[aria-pressed="true"] { background: none; color: var(--color-brand-700) !important; text-decoration: underline 2px var(--color-brand-600); text-underline-offset: 0.45em; }
+.journal-place-filter__chip span { display: inline-block; margin-left: 0.15rem; font-weight: 400; opacity: 0.7; }
 .page-travel-journal .masonry .brick[hidden] { display: none; }
 
 @media screen and (max-width: 600px) {
-  .journal-place-filter { flex-wrap: nowrap; gap: 0; margin: 0 -1.1rem 0.75rem 0; }
+  .journal-place-filter { flex-wrap: nowrap; gap: 0 1rem; margin: -0.3rem -1.1rem 0.2rem 0; }
   .journal-place-filter__places {
     display: flex;
     flex: 1;
-    gap: 0.5rem;
+    gap: 1rem;
     min-width: 0;
-    margin: -6px 0;
-    padding: 6px 1.1rem 6px 0.5rem;
+    margin: 0;
+    padding: 0 1.1rem 0 0.5rem;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -11749,8 +11794,8 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
     -webkit-mask-image: linear-gradient(90deg, transparent 0.3rem, #000 2rem);
     mask-image: linear-gradient(90deg, transparent 0.3rem, #000 2rem);
   }
-  .page-travel-journal .journal-place-filter__chip { position: relative; flex: none; }
-  .journal-place-filter__chip::after { position: absolute; inset: calc(50% - 22px) 0; content: ""; }
+  /* A real 44px target; the underline sits just under the words. */
+  .page-travel-journal .journal-place-filter__chip { flex: none; min-height: 44px; padding: 0; }
 }
 /* A packaged tour (18 Nov 2026, owner): the price actually paid per person, from the booking, on the days
    it covered, after the official total; a small Klook mark, quiet like the total. */

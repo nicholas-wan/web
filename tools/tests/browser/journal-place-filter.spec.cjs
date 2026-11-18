@@ -92,7 +92,7 @@ test('at 320px All stays in view once the place chips scroll, and every chip is 
   expect(hit.left).toBeGreaterThanOrEqual(8);
   expect(hit.right).toBeLessThan(320);
   expect(hit.own).toBe(true);
-  // Compact chips, 44px targets: a tap just above or below a chip still lands on it.
+  // Slim text tabs that are real 44px targets on phones: a tap 21px above or below the middle lands on the tab.
   const targets = await shell.locator('.journal-place-filter button').evaluateAll(chips => chips.map(chip => {
     const box = chip.getBoundingClientRect();
     const port = chip.parentNode.getBoundingClientRect();
@@ -102,7 +102,7 @@ test('at 320px All stays in view once the place chips scroll, and every chip is 
   }));
   expect(targets.filter(target => target.visible).length).toBeGreaterThan(1);
   for (const target of targets.filter(target => target.visible)) {
-    expect(target.height).toBeLessThan(40);
+    expect(target.height).toBeGreaterThanOrEqual(44);
     expect(target.reach).toBe(true);
   }
   await all.tap();
