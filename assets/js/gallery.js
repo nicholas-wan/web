@@ -535,7 +535,7 @@
     overlay.classList.remove('is-visible');
     overlay.setAttribute('aria-hidden', 'true');
     unlockBackgroundScroll();
-    if (historyEntry) { historyEntry = false; history.back(); }
+    if (historyEntry) { historyEntry = false; pendingBack = true; history.back(); }
     if (lastTrigger) { lastTrigger.focus({ preventScroll: true }); lastTrigger = null; }
     if (afterClose) afterClose();
     afterClose = null;
@@ -617,11 +617,11 @@
       caption.insertAdjacentHTML('beforeend', '<span class="sr-only"> ·</span>');
       var context = document.createElement('span');
       context.className = 'lightbox__context';
-      context.textContent = ' ' + (day ? day[0] : heading.textContent.trim().replace(/^#\d+\s*-\s*/, '')) +
-        ' · ' + (sectionMedia.indexOf(source) + 1) + ' of ' + sectionMedia.length;
+      var dayLabel = day ? day[0] : heading.textContent.trim().replace(/^#\d+\s*-\s*/, '');
+      context.textContent = ' ' + dayLabel + ' · ' + (sectionMedia.indexOf(source) + 1) + ' of ' + sectionMedia.length;
       /* A photo of a route stop counts within that place instead (18 Nov 2026). */
       var group = placeOf[current];
-      if (group) context.textContent = ' ' + (group.own.indexOf(source) + 1) + ' of ' + group.own.length + ' at ' + group.name + ' · ' + (day ? day[0] : '');
+      if (group) context.textContent = ' ' + (group.own.indexOf(source) + 1) + ' of ' + group.own.length + ' at ' + group.name + ' · ' + dayLabel;
       caption.appendChild(context);
     }
     renderPlace(placeOf[current], source);
@@ -632,7 +632,10 @@
     if (isJournal) fitUpgrade();
     if (opening) {
       /* Before the lock, so the entry keeps the reader's scroll position. */
-      if (!historyEntry) { history.pushState(history.state, ''); historyEntry = true; }
+      /* Only for an open the reader made: Chromium skips entries pushed without a gesture
+         (the #photo= auto-open), so Back would leave the page anyway. */
+      var gesture = !navigator.userActivation || navigator.userActivation.isActive;
+      if (!historyEntry && gesture) { history.pushState(history.state, ''); historyEntry = true; }
       lockBackgroundScroll();
       closeButton.focus();
     }
@@ -641,7 +644,11 @@
      visitor's back swipe left the journal). Opening adds one same-URL entry;
      Back pops it and closes, and closing any other way steps back over it. */
   var historyEntry = false;
+  /* The popstate of our own history.back() can land after a quick reopen has pushed a
+     new entry; it must not close that viewer. */
+  var pendingBack = false;
   window.addEventListener('popstate', function () {
+    if (pendingBack) { pendingBack = false; return; }
     if (!historyEntry) return;
     historyEntry = false;
     if (overlay.classList.contains('is-visible')) close();
@@ -907,10 +914,11 @@
     trigger.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); lastTrigger = trigger; show(index); } });
   });
 
-  /* Route stops open their photos (18 Nov 2026, a visitor's request). A stop
-     owns the photos of its day whose title names it or its subtitle, either
-     way round ("Taikoo Li" takes "LEGO store, Taikoo Li"), or the title in
-     its data-photos. Stops without photos stay plain text. */
+  /* Route stops open their photos (18 Nov 2026, a visitor's request), on journals that opt in
+     with data-route-photos on their article. A stop owns the photos of its day whose caption
+     title equals its name or one of the |-separated titles in its data-photos. Exact on
+     purpose: older journals title photos with the city (Toronto, Hiroshima), and substring
+     matching gave every stop every photo of its day. Stops without photos stay plain text. */
   /* The place's own photos as a strip under the caption, and at its last photo a
      way on: the next stop of the day with photos, or back to the route. The
      viewer never closes by itself. */
@@ -929,6 +937,11 @@
     return button;
   };
   var renderPlace = function (group, source) {
+    var hadFocus = placeBar.contains(document.activeElement);
+    buildPlace(group, source);
+    if (hadFocus) (placeBar.querySelector('.is-current, .lightbox__place-next') || closeButton).focus();
+  };
+  var buildPlace = function (group, source) {
     placeBar.textContent = '';
     placeBar.hidden = !group;
     if (!group) return;
@@ -952,16 +965,16 @@
     var title = media.closest('.content') && media.closest('.content').querySelector('.content-title');
     return placeKey(title && title.textContent);
   });
-  if (isJournal) document.querySelectorAll('.guangzhou-route__stop').forEach(function (stop) {
+  if (isJournal && document.querySelector('.travel-journal__content[data-route-photos]')) document.querySelectorAll('.guangzhou-route__stop').forEach(function (stop) {
     var heading = null;
     journalHeadings.forEach(function (candidate) { if (candidate.compareDocumentPosition(stop) & 4) heading = candidate; });
     var name = stop.querySelector('span');
-    var keys = [name && name.textContent, stop.querySelector('small') && stop.querySelector('small').textContent, stop.getAttribute('data-photos')].map(placeKey).filter(Boolean);
+    var keys = [name && name.textContent].concat((stop.getAttribute('data-photos') || '').split('|')).map(placeKey).filter(Boolean);
     var own = galleryMedia.filter(function (media, index) {
-      var title = mediaTitles[index];
-      return mediaSections[index] === heading && title && keys.some(function (key) { return title.indexOf(key) >= 0 || key.indexOf(title) >= 0; });
+      return mediaSections[index] === heading && keys.indexOf(mediaTitles[index]) >= 0;
     });
-    if (!own.length) return;
+    /* A stop repeated on one day (a round trip) keeps its photos with the first. */
+    if (!own.length || placeOf[galleryMedia.indexOf(own[0])]) return;
     var first = own[0];
     var group = { name: name.textContent.trim(), own: own, heading: heading };
     placeGroups.push(group);
