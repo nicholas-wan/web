@@ -453,7 +453,8 @@ if ($chronologySource -notmatch 'pending=\(self\.scenes\|\|fetch\(source\.datase
 
 # 30 -> 31: journal lede leading and the Australia hero gap and intro treatment (Oct 2026).
 # 31 -> 32 (24 Oct 2026): routes folded at build time, and deep links keep each day's date in view.
-Assert-FileSizeBudget 'assets\css\travel-journal.css' 32
+# 32 -> 37 (18 Nov 2026): the route stops' place card, a bottom sheet on phones and a centred card on desktop.
+Assert-FileSizeBudget 'assets\css\travel-journal.css' 37
 # Photo search styles live in their own route bundle because travel-map-page.css
 # sits within a few hundred bytes of its cap (Oct 2026).
 # 10 -> 11: partial-match reason line, Oct 2026.
