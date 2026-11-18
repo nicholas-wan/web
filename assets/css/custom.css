@@ -11254,11 +11254,12 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 /* Redrawn timeline scenes (20 Oct 2026): Golden Gate cars, Canton Tower second tram cabin. */
 .depth-canton .dl-tram.dl-tram-b{offset-distance:50%}.depth-canton .dl-tram-rear.dl-tram-rear-b{visibility:hidden}.depth-canton .dl-tram-front.dl-tram-front-b{visibility:visible}.depth-canton.is-active .dl-tram.dl-tram-b{animation:dl-tram-b var(--polish-duration,6200ms) linear both}.depth-canton.is-active .dl-tram-rear.dl-tram-rear-b{animation:dl-tram-rear-b var(--polish-duration,6200ms) steps(1,end) both}.depth-canton.is-active .dl-tram-front.dl-tram-front-b{animation:dl-tram-front-b var(--polish-duration,6200ms) steps(1,end) both}@keyframes dl-tram-b{0%{offset-distance:50%}49.999%{offset-distance:100%}50%{offset-distance:0%}100%{offset-distance:50%}}@keyframes dl-tram-rear-b{0%{visibility:hidden}50%,100%{visibility:visible}}@keyframes dl-tram-front-b{0%{visibility:visible}50%,100%{visibility:hidden}}@media(prefers-reduced-motion:reduce){.depth-canton .dl-tram.dl-tram-b{animation:none!important;offset-distance:50%}.depth-canton .dl-tram-rear.dl-tram-rear-b{animation:none!important;visibility:hidden}.depth-canton .dl-tram-front.dl-tram-front-b{animation:none!important;visibility:visible}}
 /* Chengdu (18 Nov 2026, owner's picks from lab/chengdu-polish): Heaven's Gate from the plaza below the 999 steps, after his
-   own photo, measured against it (RC), at golden hour: grey limestone with peach light on the rims and summits, the gate cut
-   into the cliff and filled with bright sky, the stair to the stone terrace and the plaza, the forest as stacked treelines.
-   Motion (RD): the summits warm (.tg-warm, up by 28%, held, eased back), a pair of swifts dives into the gate and a third
-   follows, two small swifts circle in the V, and a thin band of valley haze drifts behind the plaza; the last frame equals
-   the first. Generator: lab/chengdu-polish/rd/gen.cjs (classes renamed trd- to tg-). */
+   own photo, measured against it (RC), at golden hour: grey limestone with peach light on the rims and summits, curving ledges
+   with green tufts, a dark vault above the gate cut into the cliff and filled with bright sky, the walkway on the right cliff,
+   the stepped stair to the stone terrace and the plaza, the forest as stacked treelines. Motion (RD): the summits warm
+   (.tg-warm, up by 28%, held, eased back), a pair of swifts dives into the gate and a third follows, two small swifts circle
+   in the V, and a thin band of valley haze drifts behind the plaza; the last frame equals the first. Generator:
+   lab/chengdu-polish/rd/gen.cjs (classes renamed trd- to tg-). */
 .authored-scene.tg-scene .tg-bird{transform-box:view-box;transform-origin:0 0;offset-rotate:0deg;offset-anchor:0px 0px}
 .authored-scene.tg-scene .tg-bs,.authored-scene.tg-scene .tg-fl,.authored-scene.tg-scene .tg-fm,.authored-scene.tg-scene .tg-mist{transform-box:view-box;transform-origin:0 0}
 .authored-scene.tg-scene .tg-b1,.authored-scene.tg-scene .tg-b2{offset-path:path('M94 -6C91 -4.7 81.3 0 76 2C70.7 4 65.6 4.4 62 6C58.4 7.6 55.6 9.4 54.6 11.4C53.6 13.4 54.5 16.5 56 18C57.5 19.5 62.4 18.8 63.6 20.4C64.8 22 63.7 25.2 63.4 27.6C63.1 30 62 32.2 61.6 35C61.2 37.8 60.9 42.8 60.8 44.4')}
