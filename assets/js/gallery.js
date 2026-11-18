@@ -1209,6 +1209,13 @@
     name.setAttribute('data-count', own.length);
     stop.classList.add('has-photos');
   });
+  /* Day map pins (build.ps1 Add-RouteMaps) open their stop's photos, as tapping the stop does. */
+  document.querySelectorAll('[data-route-pin]').forEach(function (pin) {
+    var stop = pin.closest('.guangzhou-day__route').querySelectorAll('.guangzhou-route__stop')[pin.getAttribute('data-route-pin')];
+    if (!stop || !stop.classList.contains('has-photos')) return;
+    pin.classList.add('is-linked');
+    pin.addEventListener('click', function () { stop.click(); });
+  });
 
   /* Keep native swiping, with persistent progress and explicit phone controls. */
   var galleryRefreshers = [];

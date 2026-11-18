@@ -453,7 +453,7 @@ if ($chronologySource -notmatch 'pending=\(self\.scenes\|\|fetch\(source\.datase
 
 # 30 -> 31: journal lede leading and the Australia hero gap and intro treatment (Oct 2026).
 # 31 -> 32 (24 Oct 2026): routes folded at build time, and deep links keep each day's date in view.
-# 32 -> 40 (18 Nov 2026): the route stops' place card (bottom sheet on phones, centred card on desktop), place chips that filter a day's photos, and the trip-at-a-glance line (Add-TripStats).
+# 32 -> 40 (18 Nov 2026): the route stops' place card (bottom sheet on phones, centred card on desktop), place chips that filter a day's photos, the trip-at-a-glance line (Add-TripStats) and the inline day maps (Add-RouteMaps).
 Assert-FileSizeBudget 'assets\css\travel-journal.css' 40
 # Photo search styles live in their own route bundle because travel-map-page.css
 # sits within a few hundred bytes of its cap (Oct 2026).
@@ -1005,6 +1005,11 @@ foreach ($journalName in $journalPageNames) {
     if ($journalMarkup -notmatch '<body class="is-preload page-travel-journal">') { throw "$journalName is missing the shared mobile travel-navigation scope." }
     if ($journalMarkup -notmatch '<li class="active"><a aria-current="true" href="travel"><svg class="nav-icon"[^>]*>.*?</svg><span>Travel</span></a>') { throw "$journalName must highlight Travel in the global navigation." }
     if ($journalMarkup -notmatch 'class="[^"]*journal-banner[^"]*"') { throw "$journalName is missing its explicit high-resolution journal banner marker." }
+    # Day maps (18 Nov 2026): only opted-in journals, each a small inline SVG under its Route label.
+    $routeMaps = [regex]::Matches($journalMarkup, '(?s)<strong>Route</strong>\s*<svg class="travel-route-map" viewBox="0 0 300 160" role="img" aria-label="[^"]+">.*?</svg><p class="travel-route-summary">')
+    $expectedMaps = if ($journalName -eq 'travel_2026_chengdu_zhangjiajie.html') { 6 } else { 0 }
+    if ($routeMaps.Count -ne $expectedMaps -or [regex]::Matches($journalMarkup, '<svg class="travel-route-map"').Count -ne $expectedMaps) { throw "$journalName must carry $expectedMaps day maps, each under its Route label." }
+    foreach ($routeMap in $routeMaps) { if ($routeMap.Length -gt 2560 -or $routeMap.Value -match '<image\b|href=|https?:') { throw "$journalName has a day map over 2.5 KB or one that loads something." } }
     if ($journalMarkup -notmatch '<main id="main"[^>]*data-journal-template="v2"' -or [regex]::Matches($journalMarkup, 'class="travel-section-nav').Count -ne 1 -or [regex]::Matches($journalMarkup, 'class="travel-pagination"').Count -ne 1 -or $journalMarkup -notmatch [regex]::Escape((Get-DistAssetRef 'assets/css/travel-journal.css')) -or $journalMarkup -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/travel-nav.js')) -or $journalMarkup -match '{{[A-Z_]+}}') { throw "$journalName is not rendered exactly once through the shared travel journal template and scroll guard." }
 }
 if ($guangzhou -notmatch '<main id="main" class="[^"]*travel-journal[^"]*travel-journal--compact[^"]*guangzhou-journal' -or $guangzhou -notmatch 'class="travel-journal__content"' -or $guangzhou -match '<!DOCTYPE HTML>.*<!DOCTYPE HTML>') { throw "Guangzhou must prove the content-only compact journal build path without nesting a legacy document shell." }

@@ -692,7 +692,7 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
 # banner rather than the lede: above it, the phone banner fell to about 250px from the top,
 # past the README's ~220px.
 function Add-TripStats([string]$Markup, [string]$Slug) {
-    if ($tripOrder -notcontains $Slug -or $Markup -notmatch '<article class="travel-journal__content"[^>]*\sdata-route-photos\b') { return $Markup }
+    if ($tripOrder -notcontains $Slug -or $Markup -notmatch '<article class="travel-journal__content\b[^"]*"[^>]*\sdata-route-photos\b') { return $Markup }
     $yen = [string][char]0x00A5
     $days = 0; $stops = 0; $tickets = 0; $priced = $false
     foreach ($day in [regex]::Matches($Markup, '(?s)<section class="travel-journal__day(?=[\s"])[^"]*"[^>]*>(?<body>.*?)</section>')) {
@@ -736,6 +736,152 @@ function Add-TripStats([string]$Markup, [string]$Slug) {
     # has-trip-stats lets the line's lower hairline take the place of the first day's divider.
     $Markup = $Markup.Insert($banner.Index + $banner.Length, $line)
     return ([regex]'<article class="travel-journal__content"').Replace($Markup, '<article class="travel-journal__content has-trip-stats"', 1)
+}
+
+# Day maps (18 Nov 2026): journals that opt in with data-route-photos get a small inline SVG map
+# in each route box, under the Route label: numbered pins in stop order, a dashed line between
+# them and a scale bar, on a plain background (no tiles, no requests). Points come from
+# journals/route-coordinates.json (WGS84), keyed by slug, section number and stop name. Stops more
+# than 150 km from the day's median (flights, Singapore) stay off the map; a day with fewer than
+# two mapped stops gets none. Equirectangular with a cos(latitude) correction, fitted with padding
+# into a fixed 300x160 box. Pins that would overlap are nudged apart, with a leader to the true
+# point. gallery.js makes a pin open its stop's photos (data-route-pin is the stop's index).
+$routeCoordinatesPath = Join-Path $root 'journals\route-coordinates.json'
+$routeCoordinates = if (Test-Path -LiteralPath $routeCoordinatesPath) { Read-SourceText $routeCoordinatesPath | ConvertFrom-Json } else { $null }
+
+function Format-MapNumber([double]$Value) {
+    return $Value.ToString('0.#', [Globalization.CultureInfo]::InvariantCulture)
+}
+
+function Get-RouteMapSvg($Stops, $Points) {
+    $width = 300.0; $height = 160.0; $radius = 9.5
+    # Keep one cluster: drop points more than 150 km from the median latitude and longitude.
+    $lats = New-Object 'System.Collections.Generic.List[double]'
+    $lngs = New-Object 'System.Collections.Generic.List[double]'
+    foreach ($point in $Points) { $lats.Add($point.Lat); $lngs.Add($point.Lng) }
+    $lats.Sort(); $lngs.Sort()
+    $middle = [int][Math]::Floor($lats.Count / 2)
+    $medianLat = if ($lats.Count % 2) { $lats[$middle] } else { ($lats[$middle - 1] + $lats[$middle]) / 2 }
+    $medianLng = if ($lngs.Count % 2) { $lngs[$middle] } else { ($lngs[$middle - 1] + $lngs[$middle]) / 2 }
+    $kept = @()
+    foreach ($point in $Points) {
+        $dx = ($point.Lng - $medianLng) * [Math]::Cos($medianLat * [Math]::PI / 180) * 111.32
+        $dy = ($point.Lat - $medianLat) * 110.57
+        if ([Math]::Sqrt($dx * $dx + $dy * $dy) -le 150) { $kept += $point }
+    }
+    if ($kept.Count -lt 2) { return '' }
+
+    $minLat = 90.0; $maxLat = -90.0; $minLng = 180.0; $maxLng = -180.0
+    foreach ($point in $kept) {
+        if ($point.Lat -lt $minLat) { $minLat = $point.Lat }; if ($point.Lat -gt $maxLat) { $maxLat = $point.Lat }
+        if ($point.Lng -lt $minLng) { $minLng = $point.Lng }; if ($point.Lng -gt $maxLng) { $maxLng = $point.Lng }
+    }
+    $kmPerLng = [Math]::Cos((($minLat + $maxLat) / 2) * [Math]::PI / 180) * 111.32
+    $spanX = [Math]::Max(($maxLng - $minLng) * $kmPerLng, 0.5)
+    $spanY = [Math]::Max(($maxLat - $minLat) * 110.57, 0.5)
+    $scale = [Math]::Min(($width - 48) / $spanX, ($height - 44) / $spanY)
+    $originX = ($width - $spanX * $scale) / 2
+    $originY = ($height - $spanY * $scale) / 2
+    foreach ($point in $kept) {
+        $point.X = $originX + ($point.Lng - $minLng) * $kmPerLng * $scale
+        $point.Y = $originY + ($maxLat - $point.Lat) * 110.57 * $scale
+        $point.PinX = $point.X; $point.PinY = $point.Y
+    }
+
+    # Nudge overlapping pins apart (a few points, so a plain relaxation is enough).
+    $gap = 2 * $radius + 2
+    for ($pass = 0; $pass -lt 60; $pass++) {
+        $moved = $false
+        for ($i = 0; $i -lt $kept.Count; $i++) {
+            for ($j = $i + 1; $j -lt $kept.Count; $j++) {
+                $a = $kept[$i]; $b = $kept[$j]
+                $dx = $b.PinX - $a.PinX; $dy = $b.PinY - $a.PinY
+                $distance = [Math]::Sqrt($dx * $dx + $dy * $dy)
+                if ($distance -ge $gap) { continue }
+                if ($distance -lt 0.01) { $angle = 0.7 + $j; $dx = [Math]::Cos($angle); $dy = [Math]::Sin($angle); $distance = 1 }
+                $push = ($gap - $distance) / 2 + 0.1
+                $a.PinX -= $dx / $distance * $push; $a.PinY -= $dy / $distance * $push
+                $b.PinX += $dx / $distance * $push; $b.PinY += $dy / $distance * $push
+                $moved = $true
+            }
+        }
+        foreach ($point in $kept) {
+            $point.PinX = [Math]::Min([Math]::Max($point.PinX, $radius + 3), $width - $radius - 3)
+            $point.PinY = [Math]::Min([Math]::Max($point.PinY, $radius + 3), $height - $radius - 3)
+        }
+        if (-not $moved) { break }
+    }
+
+    # Scale bar: the largest round distance up to about 70px, in the emptiest corner.
+    $barKm = 0.1
+    foreach ($candidate in @(0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100)) { if ($candidate * $scale -le 70) { $barKm = $candidate } }
+    $barLength = $barKm * $scale
+    $barLabel = if ($barKm -lt 1) { "$([int]($barKm * 1000)) m" } else { "$barKm km" }
+    $boxWidth = $barLength + 6 + 7 * $barLabel.Length
+    $best = $null; $bestScore = [int]::MaxValue
+    foreach ($corner in @(@(8, ($height - 22)), @(($width - 8 - $boxWidth), ($height - 22)), @(8, 6), @(($width - 8 - $boxWidth), 6))) {
+        $score = 0
+        foreach ($point in $kept) {
+            if ($point.PinX + $radius -gt $corner[0] - 2 -and $point.PinX - $radius -lt $corner[0] + $boxWidth + 2 -and $point.PinY + $radius -gt $corner[1] - 2 -and $point.PinY - $radius -lt $corner[1] + 18) { $score += 10 }
+            if ($point.X -gt $corner[0] -and $point.X -lt $corner[0] + $boxWidth -and $point.Y -gt $corner[1] -and $point.Y -lt $corner[1] + 16) { $score++ }
+        }
+        if ($score -lt $bestScore) { $best = $corner; $bestScore = $score }
+    }
+    $barX = $best[0]; $barY = $best[1] + 14
+
+    $line = New-Object System.Text.StringBuilder
+    $marks = New-Object System.Text.StringBuilder
+    $pins = New-Object System.Text.StringBuilder
+    $labels = @()
+    foreach ($point in $kept) {
+        [void]$line.Append($(if ($line.Length) { 'L' } else { 'M' })).Append((Format-MapNumber $point.X)).Append(' ').Append((Format-MapNumber $point.Y))
+        $dx = $point.PinX - $point.X; $dy = $point.PinY - $point.Y
+        # A leader only where the pin no longer covers its true point.
+        if ([Math]::Sqrt($dx * $dx + $dy * $dy) -gt $radius + 1) {
+            [void]$marks.Append('<path class="travel-route-map__leader" d="M' + (Format-MapNumber $point.X) + ' ' + (Format-MapNumber $point.Y) + 'L' + (Format-MapNumber $point.PinX) + ' ' + (Format-MapNumber $point.PinY) + '"/><circle class="travel-route-map__dot" cx="' + (Format-MapNumber $point.X) + '" cy="' + (Format-MapNumber $point.Y) + '" r="3"/>')
+        }
+        $number = $point.Index + 1
+        [void]$pins.Append('<g data-route-pin="' + $point.Index + '"><circle cx="' + (Format-MapNumber $point.PinX) + '" cy="' + (Format-MapNumber $point.PinY) + '" r="' + $radius + '"/><text x="' + (Format-MapNumber $point.PinX) + '" y="' + (Format-MapNumber ($point.PinY + 4.2)) + '">' + $number + '</text></g>')
+        $labels += "$number " + $Stops[$point.Index]
+    }
+    $scaleBar = '<g class="travel-route-map__scale"><path d="M' + (Format-MapNumber $barX) + ' ' + (Format-MapNumber ($barY - 4)) + 'v4h' + (Format-MapNumber $barLength) + 'v-4"/><text x="' + (Format-MapNumber ($barX + $barLength + 5)) + '" y="' + (Format-MapNumber ($barY + 1)) + '">' + $barLabel + '</text></g>'
+    return '<svg class="travel-route-map" viewBox="0 0 300 160" role="img" aria-label="Map of the day&#8217;s stops: ' + ($labels -join ', ') + '"><path class="travel-route-map__line" d="' + $line.ToString() + '"/>' + $marks.ToString() + $pins.ToString() + $scaleBar + '</svg>'
+}
+
+function Add-RouteMaps([string]$Markup, [string]$Slug) {
+    if ($null -eq $routeCoordinates -or $Markup -notmatch '<article class="travel-journal__content\b[^"]*"[^>]*\bdata-route-photos\b') { return $Markup }
+    $journalPoints = $routeCoordinates.PSObject.Properties[$Slug]
+    if ($null -eq $journalPoints) { return $Markup }
+    $headings = [regex]::Matches($Markup, '<h2 id="trip-section-(\d+)"')
+    $routes = [regex]::Matches($Markup, '(?s)(?<open><div class="[^"]*\bguangzhou-day__route\b[^"]*">\s*<strong>[^<]*</strong>\s*)<p class="travel-route-summary">.*?</p>\s*<div class="[^"]*\bguangzhou-route\b[^"]*" id="journal-route-\d+">(?<stops>(?:(?!</div>).)*?)</div>')
+    $result = New-Object System.Text.StringBuilder
+    $cursor = 0
+    foreach ($route in $routes) {
+        $section = ''
+        foreach ($heading in $headings) { if ($heading.Index -lt $route.Index) { $section = $heading.Groups[1].Value } else { break } }
+        $dayPoints = if ($section) { $journalPoints.Value.PSObject.Properties[$section] } else { $null }
+        if ($null -eq $dayPoints) { continue }
+        $stopMatches = [regex]::Matches($route.Groups['stops'].Value, '(?s)<span class="[^"]*\bguangzhou-route__stop\b[^"]*"[^>]*>\s*<span(?: lang="[^"]+")?>(?<name>.*?)</span>')
+        $names = @()
+        $points = @()
+        for ($i = 0; $i -lt $stopMatches.Count; $i++) {
+            $name = ([regex]::Replace($stopMatches[$i].Groups['name'].Value, '<[^>]+>', '')).Trim()
+            $names += $name
+            $coordinate = $dayPoints.Value.PSObject.Properties[[System.Net.WebUtility]::HtmlDecode($name)]
+            if ($null -ne $coordinate) {
+                $points += @{ Index = $i; Lat = [double]$coordinate.Value[0]; Lng = [double]$coordinate.Value[1]; X = 0.0; Y = 0.0; PinX = 0.0; PinY = 0.0 }
+            }
+        }
+        if ($points.Count -lt 2) { continue }
+        $svg = Get-RouteMapSvg $names $points
+        if (-not $svg) { continue }
+        $insertAt = $route.Groups['open'].Index + $route.Groups['open'].Length
+        [void]$result.Append($Markup, $cursor, $insertAt - $cursor).Append($svg)
+        $cursor = $insertAt
+    }
+    if ($cursor -eq 0) { return $Markup }
+    [void]$result.Append($Markup, $cursor, $Markup.Length - $cursor)
+    return $result.ToString()
 }
 
 function Convert-MainLandmark([string]$Markup) {
@@ -1296,6 +1442,7 @@ foreach ($page in $pages) {
     $main = Add-GalleryAltText $main $slug
     $main = Add-TripStats $main $slug
     $main = Add-RouteSummaries $main $slug
+    $main = Add-RouteMaps $main $slug
     if ($slug -eq 'travel') {
         # Native lazy loading may fetch every rail photo on slow connections.
         # Keep responsive sources inert until the visible presentation approaches.
