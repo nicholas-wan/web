@@ -55,6 +55,17 @@ test('a long drag down closes the viewer onto the same page and scroll', async (
 
 test('a short slow drag springs back; a quick flick closes', async ({ browser }) => {
   const { context, page, drag, line } = await openPhone(browser);
+  // The controls and caption leave as soon as the drag reads as a dismiss, not partway down
+  // (18 Nov 2026 review: the half-clear caption smeared over the page behind).
+  const chrome = ['.lightbox__close', '.lightbox__next', '.lightbox__caption'];
+  const opacities = () => page.evaluate(selectors => selectors.map(selector => getComputedStyle(document.querySelector(selector)).opacity), chrome);
+  const resting = await opacities();
+  expect(resting.every(value => parseFloat(value) > 0.5)).toBe(true);
+  await drag(line(0, 40, 4), 40, async () => {
+    await expect.poll(opacities).toEqual(['0', '0', '0']);
+  });
+  await expect(page.locator('.lightbox')).toHaveAttribute('aria-hidden', 'false');
+  await expect.poll(opacities).toEqual(resting);
   await drag(line(0, 120, 12), 40);
   await expect(page.locator('.lightbox')).toHaveAttribute('aria-hidden', 'false');
   expect(await page.locator('.lightbox__figure').evaluate(element => element.style.transform)).toBe('');
