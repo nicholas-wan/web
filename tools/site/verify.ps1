@@ -457,7 +457,7 @@ if ($chronologySource -notmatch 'pending=\(self\.scenes\|\|fetch\(source\.datase
 # 40 -> 43 (18 Nov 2026, review fixes): day maps beside the stops on desktop, edge markers and the "Not mapped" line; the card's compact phone sheet; photo-count tags and the chips' fixed All. Every journal pays for these though only route-photo journals use them; splitting them into their own sheet is the next step if this grows.
 # 43 -> 44 (18 Nov 2026, owner): the Klook tour line with its inline mark on Chengdu Days 5-6.
 # 44 -> 41 (18 Nov 2026, owner): the day maps were removed ("extremely ugly"); the place card, chips, trip line and Klook line remain.
-# 41 -> 42 (18 Nov 2026, owner): the place card's professional layout (eyebrow, one primary action, map links with an arrow), the place filter as text tabs, and the Klook ticket lines.
+# 41 -> 42 (18 Nov 2026, owner): the place card's professional layout (eyebrow, one primary action, two map buttons with drawn pins), the place filter as text tabs, and the Klook ticket lines.
 Assert-FileSizeBudget 'assets\css\travel-journal.css' 42
 # Photo search styles live in their own route bundle because travel-map-page.css
 # sits within a few hundred bytes of its cap (Oct 2026).

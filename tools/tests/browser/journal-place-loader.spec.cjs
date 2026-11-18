@@ -70,6 +70,31 @@ test('a card still loading never opens over a lightbox opened meanwhile, nor aft
   await expect.poll(() => page.evaluate(() => typeof window.travelPlaceCard)).toBe('function');
   await page.waitForTimeout(300);
   await expect(page.locator('.place-card.is-visible')).toHaveCount(0);
+  // The dropped tap leaves nothing stuck: the next tap opens its card at once.
+  await route(page, 6).locator('.has-card', { hasText: 'Tianmen Cave' }).click();
+  await expect(page.locator('.place-card')).toHaveClass(/is-visible/);
+  await expect(page.locator('.place-card__title')).toHaveText('Tianmen Cave');
+});
+
+test('a card still loading never opens after a lightbox was opened and closed meanwhile', async ({ page }) => {
+  // Fix round, 18 Nov 2026 review: checking only whether the lightbox was showing let the late
+  // card open once it had closed again.
+  await page.setViewportSize({ width: 1440, height: 900 });
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
+  await page.route(cardScript, async routed => { await held; await routed.continue(); });
+  await page.goto(journal, { waitUntil: 'domcontentloaded' });
+  await route(page, 6).locator('.has-card', { hasText: 'Tianmen Cave' }).click();
+  const viewer = page.locator('.lightbox');
+  await page.locator('#trip-section-6 ~ .journal-gallery-shell .content').first().click();
+  await expect(viewer).toHaveClass(/is-visible/);
+  await page.keyboard.press('Escape');
+  await expect(viewer).not.toHaveClass(/is-visible/);
+  release();
+  await expect.poll(() => page.evaluate(() => typeof window.travelPlaceCard)).toBe('function');
+  await page.waitForTimeout(300);
+  await expect(page.locator('.place-card.is-visible')).toHaveCount(0);
+  await expect(viewer).not.toHaveClass(/is-visible/);
 });
 
 test('phones load the card as a folded route comes near, before any tap', async ({ browser }) => {
@@ -98,6 +123,8 @@ test('closing the card or its photos returns focus to the stop', async ({ browse
   await stop.click();
   const card = page.locator('.place-card');
   await expect(card).toHaveClass(/is-visible/);
+  // The card ignores clicks for 350 ms after it opens (a double click's second click).
+  await page.waitForTimeout(400);
   await card.locator('.place-card__view').click();
   const viewer = page.locator('.lightbox');
   await expect(viewer).toHaveClass(/is-visible/);

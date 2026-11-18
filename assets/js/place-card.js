@@ -4,16 +4,17 @@
    lightbox; this file gets them through the hooks it passes in. */
 window.travelPlaceCard = function (hooks) {
   var escapeText = function (text) { return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
-  /* "10 am" and "4:30 pm" never break across lines. */
   /* One or two photos fill the card's width, so they take the 800w file. */
   var largeOf = function (media) {
     var wide = /(\S+)\s+800w/.exec(media.getAttribute('srcset') || '');
     return wide ? wide[1] : hooks.stillOf(media);
   };
+  /* "10 am" and "4:30 pm" never break across lines. */
   var factText = function (text) { return escapeText(text).replace(/(\d) ([ap]m)\b/g, '$1&nbsp;$2'); };
   var card = null;
   var cardPlace = null;
   var cardDown = null;
+  var openedAt = 0;
   var cardOpen = function () { return card && card.classList.contains('is-visible'); };
   var hideCard = function () {
     card.classList.remove('is-visible');
@@ -24,8 +25,8 @@ window.travelPlaceCard = function (hooks) {
     if (!cardOpen()) return;
     hideCard();
     if (!fromHistory) hooks.releaseEntry();
-    /* gallery.js may name a better target, such as the folded route's "View all" button. */
-    (hooks.focusTarget ? hooks.focusTarget(cardPlace) : cardPlace.stop).focus({ preventScroll: true });
+    /* The stop, or a better target such as the folded route's "View all" button. */
+    hooks.focusTarget(cardPlace).focus({ preventScroll: true });
   };
   var buildCard = function () {
     card = document.createElement('div');
@@ -37,6 +38,8 @@ window.travelPlaceCard = function (hooks) {
        the entry: the lightbox finds it and pushes none of its own. */
     card.addEventListener('pointerdown', function (event) { cardDown = event.target; });
     card.addEventListener('click', function (event) {
+      /* The second click of a double click or tap lands on the card just opened: ignore it. */
+      if (event.detail && Date.now() - openedAt < 350) return;
       var action = event.target.closest('[data-card]');
       if ((action && action.getAttribute('data-card') === 'close') || (event.target === card && cardDown === card)) closeCard();
       else if (action) { hideCard(); hooks.openPhotos(cardPlace); }
@@ -82,10 +85,6 @@ window.travelPlaceCard = function (hooks) {
     var own = place.own;
     var photos = hooks.photoCount(own.length);
     var shown = own.slice(0, 4);
-    var facts = [['Hours', place.hours]].filter(function (fact) { return fact[1]; }).map(function (fact) {
-      /* Hours may list sessions split by "|", one a line. */
-      return '<dt>' + fact[0] + '</dt><dd>' + fact[1].split('|').map(factText).join('<br>') + '</dd>';
-    }).join('');
     var map = function (url, query, label, extra) {
       return '<a class="place-card__map' + extra + '" href="' + url + encodeURIComponent(query) + '" target="_blank" rel="noopener">' + label + '</a>';
     };
@@ -96,14 +95,16 @@ window.travelPlaceCard = function (hooks) {
       '<button class="place-card__close" type="button" data-card="close" aria-label="Close place card">&times;</button>' +
       '<p class="place-card__eyebrow">' + (place.day ? place.day + ' &middot; ' : '') + 'Stop ' + place.at + '</p>' +
       '<p class="place-card__title" id="place-card-title">' + escapeText(place.name) + '</p>' +
-      /* The price ends the Chinese name's line at the right, as the route list writes it. */
-      (place.zh || place.price ? '<p class="place-card__meta">' + (place.zh ? '<span lang="zh-Hans">' + escapeText(place.zh) + '</span>' : '<span></span>') +
+      /* The price ends the Chinese name's line at the right, as the route list writes it. Only a
+         Chinese subtitle is marked zh-Hans. */
+      (place.sub || place.price ? '<p class="place-card__meta"><span' + (place.zh ? ' lang="zh-Hans">' : '>') + escapeText(place.sub || '') + '</span>' +
         (place.price ? '<span class="place-card__price">' + factText(place.price) + '</span>' : '') + '</p>' : '') +
       (own.length ? '<button class="place-card__photos' + (shown.length === 1 ? ' is-single' : shown.length === 2 ? ' is-pair' : '') +
         '" type="button" data-card="view" aria-label="View ' + photos + '" style="--cells: ' + shown.length + '">' + shown.map(function (media) {
           return '<img alt="" decoding="async" src="' + escapeText(shown.length > 2 ? hooks.stillOf(media) : largeOf(media)) + '">';
         }).join('') + (own.length > shown.length ? '<span class="place-card__more">+' + (own.length - shown.length) + '</span>' : '') + '</button>' : '') +
-      (facts ? '<dl class="place-card__facts">' + facts + '</dl>' : '') +
+      /* Hours may list sessions split by "|", one a line. */
+      (place.hours ? '<dl class="place-card__facts"><dt>Hours</dt><dd>' + place.hours.split('|').map(factText).join('<br>') + '</dd></dl>' : '') +
       '<div class="place-card__actions">' + (own.length ? '<button class="place-card__view" type="button" data-card="view">View ' + photos + '</button>' : '') +
       '<div class="place-card__maps">' +
       map('https://www.google.com/maps/search/?api=1&query=', place.zh ? place.name + ', ' + place.zh : place.name, 'Google Maps', '') +
@@ -117,6 +118,7 @@ window.travelPlaceCard = function (hooks) {
     document.documentElement.classList.add('place-card-open');
     /* As the lightbox does: one same-URL entry, only for an open the reader made. */
     hooks.claimEntry();
+    openedAt = Date.now();
     sheet.querySelector('.place-card__close').focus({ preventScroll: true });
   };
   return { open: openCard, closeFromHistory: function () { closeCard(true); } };

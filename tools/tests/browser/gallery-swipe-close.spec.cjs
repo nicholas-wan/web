@@ -74,8 +74,11 @@ test('a short slow drag springs back; a quick flick closes', async ({ browser })
   await expect(page.locator('.lightbox')).toHaveAttribute('aria-hidden', 'false');
   expect(await page.locator('.lightbox__figure').evaluate(element => element.style.transform)).toBe('');
   expect(await page.locator('.lightbox').evaluate(element => element.style.backgroundColor)).toBe('');
-  // Upward drags do nothing.
-  await drag(line(0, -300, 10), 20);
+  // Upward drags do nothing: the figure never follows the finger, even while it is held.
+  await drag(line(0, -300, 10), 20, async () => {
+    expect(await page.locator('.lightbox__figure').evaluate(element => element.style.transform)).toBe('');
+    expect(await page.locator('.lightbox').evaluate(element => element.style.backgroundColor)).toBe('');
+  });
   await expect(page.locator('.lightbox')).toHaveAttribute('aria-hidden', 'false');
   // A quick flick: 110px in about 50ms.
   await drag(line(0, 110, 3), 0, null, 16);

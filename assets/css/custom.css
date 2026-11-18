@@ -7554,22 +7554,14 @@ body.lightbox-open {
   }
 }
 
-/* Route stops with photos open them (gallery.js, 18 Nov 2026): the name reads as a link with
-   its photo count; phones add the first photo as a thumbnail, the count as a badge on it. The
-   count is a square tag with a stacked-photos glyph, so it never reads as a stop number (the
-   numbered dots and the day maps' teal pins); 18 Nov 2026 review. */
-.page-travel-journal .has-photos { cursor: pointer; }
-.page-travel-journal .has-photos > span:first-child {
-  color: var(--color-brand-700);
-  text-decoration: underline dotted color-mix(in srgb, var(--color-brand-600) 55%, transparent);
-  text-underline-offset: 0.22em;
-}
-.page-travel-journal .has-photos:hover > span:first-child { text-decoration-style: solid; }
+/* Route stops with photos (gallery.js, 18 Nov 2026): phones add the first photo as a thumbnail
+   at the end of the row. Their teal link style is the place card's .has-card rule
+   (travel-journal.css), since every stop with photos opens a card. */
 .page-travel-journal .travel-route__thumb { display: none; }
 
 /* Guide prices (18 Nov 2026, after a survey of japan-guide, Wikivoyage, Lonely Planet, Time Out
    and Rick Steves): never louder than the place. The price ends the subtitle line in its grey
-   and weight; one total with the date sits at the foot of the box, shown while folded too. */
+   and weight; one total with the date sits at the foot of the box. */
 .page-travel-journal .guangzhou-route__stop:has(> .travel-route__price) {
   display: inline-grid;
   grid-template-columns: auto 1fr;
@@ -7588,6 +7580,11 @@ body.lightbox-open {
 }
 
 @media screen and (max-width: 600px) {
+  /* Folded, a phone route is its summary and View all button: the day total and Klook lines
+     come with the stops (fix round, 18 Nov 2026: a wall of small grey lines), unless there is no
+     button to unfold it. Expanded, the numbered list replaces the summary. */
+  .page-travel-journal .guangzhou-day__route:not(.is-expanded):not(:has(> .travel-route__more--all)) > :is(.travel-route__total, .travel-route__tour),
+  .page-travel-journal .guangzhou-day__route.is-expanded > .travel-route-summary { display: none; }
   .page-travel-journal .guangzhou-route__stop:has(> .travel-route__price) { display: grid; }
   .page-travel-journal .guangzhou-route__stop.has-photos { min-height: 3.6rem; padding-right: 3.75rem; }
   .page-travel-journal .travel-route__thumb {
@@ -11425,16 +11422,16 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 /* Journal polish (7 Nov 2026). Last in travel-journal.css so it follows the journal rules it
    adjusts. */
 
-/* Place card (place-card.js, loaded by gallery.js, 18 Nov 2026, mockup 6): a stop with photos or a price opens it; a
-   price-only stop reads as the same teal dotted link. A centred card on desktop, a bottom sheet
-   on phones. The theme's buttons are uppercase 3rem slabs with an !important ink colour. */
+/* Place card (place-card.js, loaded by gallery.js, 18 Nov 2026, mockup 6): a stop with photos or
+   a price opens it, and its name reads as a teal dotted link. A centred card on desktop, a bottom
+   sheet on phones. The theme's buttons are uppercase 3rem slabs with an !important ink colour. */
 .page-travel-journal .has-card { cursor: pointer; }
-.page-travel-journal .has-card:not(.has-photos) > span:first-child {
+.page-travel-journal .has-card > span:first-child {
   color: var(--color-brand-700);
   text-decoration: underline dotted color-mix(in srgb, var(--color-brand-600) 55%, transparent);
   text-underline-offset: 0.22em;
 }
-.page-travel-journal .has-card:not(.has-photos):hover > span:first-child { text-decoration-style: solid; }
+.page-travel-journal .has-card:hover > span:first-child { text-decoration-style: solid; }
 html.place-card-open { overflow: hidden; overscroll-behavior: none; }
 .place-card {
   position: fixed;
@@ -11525,7 +11522,6 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
   line-height: normal;
   white-space: normal;
 }
-.place-card [hidden] { display: none; }
 .place-card__photos img {
   display: block;
   width: 100%;
@@ -11570,8 +11566,7 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
   font: 300 0.88rem/1.5rem var(--font-body);
   font-variant-numeric: tabular-nums;
 }
-/* One full-width primary action; the map apps follow as a quiet line of text links with a small
-   external-link arrow, not two more pills competing with it. */
+/* One full-width primary action, then the two map buttons below. */
 .place-card__actions { margin-top: 1.1rem; }
 .place-card .place-card__view {
   display: flex;
