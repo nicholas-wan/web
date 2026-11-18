@@ -10,7 +10,7 @@ test('Chengdu Day 6 filters its photos by place on phones', async ({ page }) => 
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   const shell = day6(page);
   const chips = shell.locator('.journal-place-filter button');
-  await expect(chips).toHaveText(['All 11', 'Zhangjiajie Glass Bridge 1', 'Tianmen Cableway 1', 'Tianmen Cave 2', 'Skywalk 2']);
+  await expect(chips).toHaveText(['All 11', 'Grand Canyon Glass Bridge 1', 'Tianmen Mountain 4', 'Tianmen Cave 2', 'Glass Skywalk 2', 'Dayong Bridge Park 2']);
   await expect(chips.first()).toHaveAttribute('aria-pressed', 'true');
   const tiles = shell.locator('.brick:visible');
   const counter = shell.locator('.journal-gallery-count');

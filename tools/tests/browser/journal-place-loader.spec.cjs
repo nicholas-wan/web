@@ -159,8 +159,8 @@ test('the viewer names the place only when the caption does not, and its way on 
 
   await open('Tianmen Cave', 1);
   await expect(context).toHaveText(/2 of 2 · Day 6$/);
-  const next = page.getByRole('button', { name: 'Next stop: Skywalk' });
-  await expect(next).toHaveText('Next: Skywalk →');
+  const next = page.getByRole('button', { name: 'Next stop: Glass Skywalk' });
+  await expect(next).toHaveText('Next: Glass Skywalk →');
   const style = await next.evaluate(node => {
     const css = getComputedStyle(node);
     return { background: css.backgroundColor, border: css.borderTopWidth, borderColor: css.borderTopColor, color: css.color, height: node.offsetHeight };
