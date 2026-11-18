@@ -216,7 +216,7 @@
       '<button class="lightbox__zoom-in" type="button" aria-label="Zoom in">&plus;</button>' +
     '</div>' +
     '<button class="lightbox__previous" type="button" aria-label="Previous media">&#8592;</button>' +
-    '<figure class="lightbox__figure"><div class="lightbox__viewport"><img class="lightbox__image" alt="" draggable="false"><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video></div><figcaption id="lightbox-caption" class="lightbox__caption" aria-live="polite" aria-atomic="true"></figcaption></figure>' +
+    '<figure class="lightbox__figure"><div class="lightbox__viewport"><img class="lightbox__image" alt="" draggable="false"><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video></div><figcaption id="lightbox-caption" class="lightbox__caption" aria-live="polite" aria-atomic="true"></figcaption><div class="lightbox__place" hidden></div></figure>' +
     '<button class="lightbox__next" type="button" aria-label="Next media">&#8594;</button>';
   document.body.appendChild(overlay);
 
@@ -227,6 +227,7 @@
   viewerImage.decoding = 'async';
   var viewerVideo = overlay.querySelector('.lightbox__video');
   var caption = overlay.querySelector('.lightbox__caption');
+  var placeBar = overlay.querySelector('.lightbox__place');
   var tools = overlay.querySelector('.lightbox__tools');
   var rotateButton = overlay.querySelector('.lightbox__rotate');
   var infoButton = overlay.querySelector('.lightbox__info');
@@ -618,8 +619,12 @@
       context.className = 'lightbox__context';
       context.textContent = ' ' + (day ? day[0] : heading.textContent.trim().replace(/^#\d+\s*-\s*/, '')) +
         ' · ' + (sectionMedia.indexOf(source) + 1) + ' of ' + sectionMedia.length;
+      /* A photo of a route stop counts within that place instead (18 Nov 2026). */
+      var group = placeOf[current];
+      if (group) context.textContent = ' ' + (group.own.indexOf(source) + 1) + ' of ' + group.own.length + ' at ' + group.name + ' · ' + (day ? day[0] : '');
       caption.appendChild(context);
     }
+    renderPlace(placeOf[current], source);
     syncMediaTools();
     warmNeighbours(current);
     overlay.setAttribute('aria-hidden', 'false');
@@ -876,6 +881,14 @@
     if (now - lastImageTap < 320) setZoom(zoomLevel > 1 ? 1 : 2);
     lastImageTap = now;
   });
+  /* WebKit can fire resize before the portrait query flips (seen 18 Nov 2026 once the place
+     strip changed the layout), leaving the landscape view on: the query's own change re-checks. */
+  phonePortrait.addEventListener('change', function () {
+    if (!overlay.classList.contains('is-visible')) return;
+    syncMediaTools();
+    calculateFitScale();
+    renderMediaTransform();
+  });
   window.addEventListener('resize', function () {
     if (!overlay.classList.contains('is-visible')) return;
     syncMediaTools();
@@ -898,6 +911,42 @@
      owns the photos of its day whose title names it or its subtitle, either
      way round ("Taikoo Li" takes "LEGO store, Taikoo Li"), or the title in
      its data-photos. Stops without photos stay plain text. */
+  /* The place's own photos as a strip under the caption, and at its last photo a
+     way on: the next stop of the day with photos, or back to the route. The
+     viewer never closes by itself. */
+  var placeGroups = [];
+  var placeOf = [];
+  var stillOf = function (media) {
+    return media.tagName === 'VIDEO' ? media.getAttribute('data-poster') || media.getAttribute('poster') : (media.getAttribute('srcset') || '').split(' ')[0] || media.getAttribute('src');
+  };
+  var placeButton = function (className, label, action) {
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = className;
+    button.setAttribute('aria-label', label);
+    button.addEventListener('click', action);
+    placeBar.appendChild(button);
+    return button;
+  };
+  var renderPlace = function (group, source) {
+    placeBar.textContent = '';
+    placeBar.hidden = !group;
+    if (!group) return;
+    var at = group.own.indexOf(source);
+    if (group.own.length > 1) group.own.forEach(function (media, index) {
+      var thumb = placeButton('lightbox__place-thumb' + (index === at ? ' is-current' : ''), 'Photo ' + (index + 1) + ' of ' + group.own.length + ' at ' + group.name, function () { show(galleryMedia.indexOf(media)); });
+      var still = document.createElement('img');
+      still.alt = '';
+      still.src = stillOf(media);
+      thumb.appendChild(still);
+    });
+    if (at !== group.own.length - 1) return;
+    var next = placeGroups[placeGroups.indexOf(group) + 1];
+    if (next && next.heading === group.heading) {
+      placeButton('lightbox__place-next', 'Next stop: ' + next.name, function () { show(galleryMedia.indexOf(next.own[0])); }).textContent = 'Next: ' + next.name + ' →';
+    }
+    else placeButton('lightbox__place-next lightbox__place-back', 'Back to the route', close).textContent = 'Back to route';
+  };
   var placeKey = function (text) { return (text || '').toLowerCase().replace(/[^a-z0-9぀-鿿가-힯]+/g, ''); };
   var mediaTitles = galleryMedia.map(function (media) {
     var title = media.closest('.content') && media.closest('.content').querySelector('.content-title');
@@ -914,14 +963,22 @@
     });
     if (!own.length) return;
     var first = own[0];
+    var group = { name: name.textContent.trim(), own: own, heading: heading };
+    placeGroups.push(group);
+    own.forEach(function (media) { var index = galleryMedia.indexOf(media); if (!placeOf[index]) placeOf[index] = group; });
     var thumb = document.createElement('img');
-    var still = first.tagName === 'VIDEO' ? first.getAttribute('data-poster') || first.getAttribute('poster') : (first.getAttribute('srcset') || '').split(' ')[0] || first.getAttribute('src');
     thumb.className = 'travel-route__thumb';
     thumb.alt = '';
     thumb.loading = 'lazy';
     thumb.decoding = 'async';
-    thumb.src = still;
+    thumb.src = stillOf(first);
     stop.appendChild(thumb);
+    var count = document.createElement('span');
+    count.className = 'travel-route__count';
+    count.setAttribute('aria-hidden', 'true');
+    count.textContent = own.length;
+    stop.appendChild(count);
+    name.setAttribute('data-count', own.length);
     stop.classList.add('has-photos');
     stop.setAttribute('role', 'button');
     stop.setAttribute('tabindex', '0');

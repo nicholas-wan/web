@@ -654,7 +654,7 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
         $small = ([regex]::Replace($stop.Groups['small'].Value, '<[^>]+>', '')).Trim()
         if ($small) { return "$name &middot; $small" } else { return $name }
     }
-    $result = [regex]::Replace($Markup, '(?s)(?<open><div class="[^"]*\bguangzhou-day__route\b[^"]*">\s*<strong>[^<]*</strong>\s*)<div class="(?<routeClass>[^"]*\bguangzhou-route\b[^"]*)">(?<stops>(?:(?!</div>).)*?)</div>(?<gap>\s*)(?:<button class="(?<buttonClass>[^"]*\bguangzhou-route__more\b[^"]*)"[^>]*>.*?</button>\s*)?</div>', {
+    $result = [regex]::Replace($Markup, '(?s)(?<open><div class="[^"]*\bguangzhou-day__route\b[^"]*">\s*<strong>[^<]*</strong>\s*)<div class="(?<routeClass>[^"]*\bguangzhou-route\b[^"]*)">(?<stops>(?:(?!</div>).)*?)</div>(?<gap>\s*)(?<total><p class="travel-route__total">[^<]*</p>\s*)?(?:<button class="(?<buttonClass>[^"]*\bguangzhou-route__more\b[^"]*)"[^>]*>.*?</button>\s*)?</div>', {
         param($match)
         $id = "journal-route-$($state.Index)"
         $state.Index++
@@ -675,7 +675,7 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
         # One or two stops are all in the summary already, so phones hide the button (14 Nov 2026).
         if ($stops.Count -le 2) { $buttonClass += ' travel-route__more--all' }
         return $match.Groups['open'].Value + "<p class=`"travel-route-summary`">$summary</p>`n    " +
-            "<div class=`"$($match.Groups['routeClass'].Value)`" id=`"$id`">$($match.Groups['stops'].Value)</div>$($match.Groups['gap'].Value)" +
+            "<div class=`"$($match.Groups['routeClass'].Value)`" id=`"$id`">$($match.Groups['stops'].Value)</div>$($match.Groups['gap'].Value)$($match.Groups['total'].Value)" +
             "<button class=`"$buttonClass`" type=`"button`" aria-expanded=`"false`" aria-controls=`"$id`">$label</button>`n  </div>"
     })
     if ($state.Index -ne $groups) { throw "Folded $($state.Index) of $groups routes on $Slug; check the route markup." }
