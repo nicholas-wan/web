@@ -654,7 +654,7 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
         $small = ([regex]::Replace($stop.Groups['small'].Value, '<[^>]+>', '')).Trim()
         if ($small) { return "$name &middot; $small" } else { return $name }
     }
-    $result = [regex]::Replace($Markup, '(?s)(?<open><div class="[^"]*\bguangzhou-day__route\b[^"]*">\s*<strong>[^<]*</strong>\s*)<div class="(?<routeClass>[^"]*\bguangzhou-route\b[^"]*)">(?<stops>(?:(?!</div>).)*?)</div>(?<gap>\s*)(?<total><p class="travel-route__total">[^<]*</p>\s*)?(?:<button class="(?<buttonClass>[^"]*\bguangzhou-route__more\b[^"]*)"[^>]*>.*?</button>\s*)?</div>', {
+    $result = [regex]::Replace($Markup, '(?s)(?<open><div class="[^"]*\bguangzhou-day__route\b[^"]*">\s*<strong>[^<]*</strong>\s*)<div class="(?<routeClass>[^"]*\bguangzhou-route\b[^"]*)">(?<stops>(?:(?!</div>).)*?)</div>(?<gap>\s*)(?<total>(?:<p class="travel-route__(?:total|tour)">(?:(?!</p>).)*</p>\s*)*)(?:<button class="(?<buttonClass>[^"]*\bguangzhou-route__more\b[^"]*)"[^>]*>.*?</button>\s*)?</div>', {
         param($match)
         $id = "journal-route-$($state.Index)"
         $state.Index++

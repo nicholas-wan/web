@@ -29,3 +29,15 @@ test('Chengdu shows the trip at a glance under its banner, and no other journal 
     await expect(page.locator('.travel-journal__stats'), slug).toHaveCount(0);
   }
 });
+
+test('Chengdu Days 5 and 6 note the Klook tour price after the official total, and no other day does', async ({ page }) => {
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  const tours = page.locator('.travel-route__tour');
+  await expect(tours).toHaveCount(2);
+  for (const day of [5, 6]) {
+    const tour = page.locator(`#trip-section-${day} ~ .guangzhou-day__route .travel-route__tour`);
+    await expect(tour).toHaveText('Klook 2-day tour: we paid S$207 a person');
+    await expect(tour.locator('.travel-route__klook')).toBeVisible();
+    expect(await tour.evaluate(el => el.previousElementSibling.className)).toBe('travel-route__total');
+  }
+});

@@ -11933,6 +11933,11 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
   .page-travel-journal .journal-place-filter__chip { position: relative; flex: none; }
   .journal-place-filter__chip::after { position: absolute; inset: calc(50% - 22px) 0; content: ""; }
 }
+/* A packaged tour (18 Nov 2026, owner): the price actually paid per person, from the booking, on the days
+   it covered, after the official total; a small Klook mark, quiet like the total. */
+.page-travel-journal .travel-route__tour { display: flex; align-items: center; gap: 0.4rem; margin: 0.3rem 0 0; color: var(--color-ink-700); font-size: max(var(--text-floor, 0px), 0.78rem); line-height: 1.4; text-align: left; font-variant-numeric: tabular-nums; }
+.page-travel-journal .travel-route__klook { flex: none; width: 0.95rem; height: 0.95rem; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%23ff5b00'/%3E%3Cpath d='M5.5 3.5v9M5.5 9.2 10.8 4.2M7.6 7.5l3.6 5' stroke='%23fff' stroke-width='1.9' stroke-linecap='round' fill='none'/%3E%3C/svg%3E") center / contain no-repeat; }
+
 /* Route bundle: journal-polish:end */
 
 /* Work and Projects opening (15 Nov 2026): the single-line headline that
