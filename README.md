@@ -226,6 +226,7 @@ Fragile behaviour the markup does not reveal. Read [`AGENTS.md`](AGENTS.md) firs
 - Wide stills in portrait: optional landscape toggle; caption leaves layout but stays accessible; Info shows it upright in a temporary panel without resizing.
 - Zoom buttons, double-tap, pinch, pan: one bounded 1–3× transform.
 - Fitted: swipe and arrow keys page one circular sequence. Zoomed: one-finger drag pans; arrows pan a fifth of the viewport.
+- Swipe down to close (18 Nov 2026, `lab/journal-ux-mockups` page 3): touch only, fitted scale, not in the landscape view. A one-finger drag whose first move past the 10px slop is mostly downward (1.25× its sideways part) carries the figure with the finger, shrinking it slightly and fading the backdrop and controls, all as inline styles (no gallery.css). Release past a third of the viewport height, or a flick (≥48px at over 0.5 px/ms), closes through `close()`, so the history step and scroll position hold; a shorter drag springs back, instantly under reduced motion. A sideways or upward first move stays a plain swipe; mouse and pen drags never close. Every lightbox.
 - Tap/click on empty space beside media (letterbox included) closes; drag releases, caption-panel drags and media taps do not.
 - A zoom limit disabling the focused button moves focus to the other.
 - Video tap-to-pause stays distinct; no still tools on video.

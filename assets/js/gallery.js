@@ -543,6 +543,8 @@
   var show = function (index) {
     ++imageRequest;
     var opening = !overlay.classList.contains('is-visible');
+    /* A swipe-down close leaves the figure where it was dropped during the fade. */
+    if (opening) resetDismiss();
     navigationDirection = opening || index > current ? 1 : -1;
     current = (index + galleryMedia.length) % galleryMedia.length;
     var source = galleryMedia[current];
@@ -685,7 +687,53 @@
     }
     return null;
   };
+  /* Swipe down to close (18 Nov 2026, mockup 3). At the fitted scale, a one-finger
+     drag whose first movement past the slop is mostly downward carries the figure
+     and fades the backdrop and controls, so the page shows through. Release past
+     a third of the screen, or a downward flick, closes through close(); anything
+     shorter springs back. Upward drags stay plain swipes, and the landscape view
+     is left out: there the reader holds the phone sideways and screen-vertical is
+     their horizontal. Inline styles only, so gallery.css carries nothing. */
+  var figure = overlay.querySelector('.lightbox__figure');
+  var dismissFaded = Array.prototype.filter.call(overlay.children, function (child) { return child !== figure; });
+  var swipeAxisLocked = false;
+  var dismissTimer = 0;
+  var flickY = 0;
+  var flickTime = 0;
+  var lastY = 0;
+  var lastTime = 0;
+  var paintDismiss = function (deltaX, deltaY) {
+    var progress = Math.min(1, Math.max(0, deltaY) / window.innerHeight);
+    figure.style.transform = 'translate3d(' + deltaX + 'px,' + (deltaY > 0 ? deltaY : deltaY / 4) + 'px,0) scale(' + Math.max(0.75, 1 - progress * 0.4) + ')';
+    overlay.style.backgroundColor = 'rgba(8, 10, 14, ' + (0.98 * Math.max(0, 1 - progress * 2)).toFixed(3) + ')';
+    dismissFaded.forEach(function (element) { element.style.opacity = Math.max(0, 1 - progress * 4); });
+  };
+  var resetDismiss = function () {
+    clearTimeout(dismissTimer);
+    figure.style.transform = figure.style.transition = '';
+    overlay.style.backgroundColor = overlay.style.transition = '';
+    dismissFaded.forEach(function (element) { element.style.opacity = ''; });
+  };
+  var endDismiss = function (closing) {
+    gestureMode = null;
+    var still = reducedMotion.matches;
+    if (closing) {
+      /* The figure stays where it was dropped while the overlay's own fade runs. */
+      close();
+    } else {
+      /* The figure's CSS transition carries the spring; the backdrop needs its own. */
+      if (!still) overlay.style.transition = 'opacity var(--motion-standard) ease, background-color var(--motion-standard) ease, visibility 0s linear var(--motion-standard)';
+      figure.style.transform = figure.style.transition = '';
+      overlay.style.backgroundColor = '';
+      dismissFaded.forEach(function (element) { element.style.opacity = ''; });
+    }
+    clearTimeout(dismissTimer);
+    if (still) resetDismiss();
+    else dismissTimer = setTimeout(resetDismiss, 320);
+  };
   var cancelGesture = function () {
+    if (gestureMode === 'dismiss') endDismiss(false);
+    swipeAxisLocked = false;
     swipePointerId = null;
     swipeTouchId = null;
     gestureMode = null;
@@ -713,6 +761,9 @@
   };
 
   overlay.addEventListener('touchstart', function (event) {
+    /* A second finger mid-drag springs the figure back before pinching. */
+    if (gestureMode === 'dismiss') cancelGesture();
+    swipeAxisLocked = false;
     if (!overlay.classList.contains('is-visible') || startsOnControl(event.target)) {
       cancelGesture();
       return;
@@ -749,6 +800,31 @@
       setZoom(pinchStartZoom * touchDistance(event.touches[0], event.touches[1]) / pinchStartDistance);
       return;
     }
+    if (gestureMode === 'swipe' || gestureMode === 'dismiss') {
+      var moved = touchById(event.touches, swipeTouchId);
+      if (!moved) return;
+      var deltaX = moved.clientX - swipeStartX;
+      var deltaY = moved.clientY - swipeStartY;
+      if (gestureMode === 'swipe') {
+        /* Lock the axis on the first movement past the slop. */
+        if (swipeAxisLocked || Math.max(Math.abs(deltaX), Math.abs(deltaY)) < SWIPE_CLICK_SLOP) return;
+        swipeAxisLocked = true;
+        if (zoomLevel > 1 || rotation || deltaY <= Math.abs(deltaX) * SWIPE_AXIS_RATIO) return;
+        gestureMode = 'dismiss';
+        clearTimeout(dismissTimer);
+        figure.style.transition = 'none';
+        overlay.style.transition = '';
+        flickY = lastY = moved.clientY;
+        flickTime = lastTime = event.timeStamp;
+      }
+      if (event.cancelable) event.preventDefault();
+      /* Keep a sample about 100ms old for the release speed. */
+      if (event.timeStamp - flickTime > 100) { flickY = lastY; flickTime = lastTime; }
+      lastY = moved.clientY;
+      lastTime = event.timeStamp;
+      paintDismiss(deltaX, deltaY);
+      return;
+    }
     if (gestureMode !== 'pan') return;
     var touch = touchById(event.touches, swipeTouchId);
     if (!touch) return;
@@ -776,6 +852,17 @@
         cancelGesture();
         renderMediaTransform();
       }
+      return;
+    }
+    if (gestureMode === 'dismiss') {
+      var lifted = touchById(event.changedTouches, swipeTouchId);
+      if (!lifted) return;
+      var dropped = lifted.clientY - swipeStartY;
+      var speed = (lifted.clientY - flickY) / Math.max(16, event.timeStamp - flickTime);
+      ignoreClickUntil = Date.now() + 500;
+      if (event.cancelable) event.preventDefault();
+      endDismiss(dropped > window.innerHeight / 3 || (dropped >= SWIPE_THRESHOLD && speed > 0.5));
+      cancelGesture();
       return;
     }
     if (gestureMode !== 'swipe' || swipeTouchId === null) return;
