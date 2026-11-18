@@ -658,7 +658,7 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
         param($match)
         $id = "journal-route-$($state.Index)"
         $state.Index++
-        $stops = [regex]::Matches($match.Groups['stops'].Value, '(?s)<span class="[^"]*\bguangzhou-route__stop\b[^"]*">\s*<span(?: lang="[^"]+")?>(?<name>.*?)</span>\s*(?:<small(?: lang="[^"]+")?>(?<small>.*?)</small>)?')
+        $stops = [regex]::Matches($match.Groups['stops'].Value, '(?s)<span class="[^"]*\bguangzhou-route__stop\b[^"]*"[^>]*>\s*<span(?: lang="[^"]+")?>(?<name>.*?)</span>\s*(?:<small(?: lang="[^"]+")?>(?<small>.*?)</small>)?')
         if ($stops.Count -eq 0) { throw "A route on $Slug has no stops." }
         $summary = & $place $stops[0]
         if ($stops.Count -gt 1) {

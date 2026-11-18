@@ -534,6 +534,7 @@
     overlay.classList.remove('is-visible');
     overlay.setAttribute('aria-hidden', 'true');
     unlockBackgroundScroll();
+    if (historyEntry) { historyEntry = false; history.back(); }
     if (lastTrigger) { lastTrigger.focus({ preventScroll: true }); lastTrigger = null; }
     if (afterClose) afterClose();
     afterClose = null;
@@ -625,10 +626,21 @@
     overlay.classList.add('is-visible');
     if (isJournal) fitUpgrade();
     if (opening) {
+      /* Before the lock, so the entry keeps the reader's scroll position. */
+      if (!historyEntry) { history.pushState(history.state, ''); historyEntry = true; }
       lockBackgroundScroll();
       closeButton.focus();
     }
   };
+  /* Back closes the lightbox instead of leaving the page (18 Nov 2026: a
+     visitor's back swipe left the journal). Opening adds one same-URL entry;
+     Back pops it and closes, and closing any other way steps back over it. */
+  var historyEntry = false;
+  window.addEventListener('popstate', function () {
+    if (!historyEntry) return;
+    historyEntry = false;
+    if (overlay.classList.contains('is-visible')) close();
+  });
 
   /* At the fitted scale, one-finger horizontal gestures keep circular
      previous/next navigation. Once an image is zoomed, that same gesture pans
@@ -880,6 +892,43 @@
     trigger.setAttribute('aria-label', 'Open media: ' + (media.alt || media.getAttribute('aria-label') || ('journal item ' + (index + 1))));
     trigger.addEventListener('click', function (event) { event.preventDefault(); lastTrigger = trigger; show(index); });
     trigger.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); lastTrigger = trigger; show(index); } });
+  });
+
+  /* Route stops open their photos (18 Nov 2026, a visitor's request). A stop
+     owns the photos of its day whose title names it or its subtitle, either
+     way round ("Taikoo Li" takes "LEGO store, Taikoo Li"), or the title in
+     its data-photos. Stops without photos stay plain text. */
+  var placeKey = function (text) { return (text || '').toLowerCase().replace(/[^a-z0-9぀-鿿가-힯]+/g, ''); };
+  var mediaTitles = galleryMedia.map(function (media) {
+    var title = media.closest('.content') && media.closest('.content').querySelector('.content-title');
+    return placeKey(title && title.textContent);
+  });
+  if (isJournal) document.querySelectorAll('.guangzhou-route__stop').forEach(function (stop) {
+    var heading = null;
+    journalHeadings.forEach(function (candidate) { if (candidate.compareDocumentPosition(stop) & 4) heading = candidate; });
+    var name = stop.querySelector('span');
+    var keys = [name && name.textContent, stop.querySelector('small') && stop.querySelector('small').textContent, stop.getAttribute('data-photos')].map(placeKey).filter(Boolean);
+    var own = galleryMedia.filter(function (media, index) {
+      var title = mediaTitles[index];
+      return mediaSections[index] === heading && title && keys.some(function (key) { return title.indexOf(key) >= 0 || key.indexOf(title) >= 0; });
+    });
+    if (!own.length) return;
+    var first = own[0];
+    var thumb = document.createElement('img');
+    var still = first.tagName === 'VIDEO' ? first.getAttribute('data-poster') || first.getAttribute('poster') : (first.getAttribute('srcset') || '').split(' ')[0] || first.getAttribute('src');
+    thumb.className = 'travel-route__thumb';
+    thumb.alt = '';
+    thumb.loading = 'lazy';
+    thumb.decoding = 'async';
+    thumb.src = still;
+    stop.appendChild(thumb);
+    stop.classList.add('has-photos');
+    stop.setAttribute('role', 'button');
+    stop.setAttribute('tabindex', '0');
+    stop.setAttribute('aria-label', 'View ' + own.length + (own.length === 1 ? ' photo' : ' photos') + ' of ' + name.textContent.trim());
+    var open = function () { lastTrigger = stop; show(galleryMedia.indexOf(first)); };
+    stop.addEventListener('click', open);
+    stop.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
   });
 
   /* Keep native swiping, with persistent progress and explicit phone controls. */
