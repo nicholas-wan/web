@@ -3400,6 +3400,69 @@ body.is-map-fullscreen .travel-atlas__layout {
   object-position: var(--hero-focus-x, 50%) var(--hero-focus-y, 58%);
 }
 
+/* The trip at a glance (18 Nov 2026; Add-TripStats in build.ps1): bold sans numbers, muted serif
+   words, between hairlines the banner's width, under the banner. Its lower hairline stands in for
+   the first day's divider, so the two never stack. The list starts one gap left of the line, and
+   each stat's dot sits in its own gap, so the line clips the dot of a stat that starts a row. */
+header.major > .travel-journal__stats {
+  margin: 1.25rem 0 0;
+  padding: 0.55rem 0;
+  overflow: hidden;
+  border-top: 1px solid var(--color-border-soft);
+  border-bottom: 1px solid var(--color-border-soft);
+  color: var(--color-ink-500);
+  font-size: 0.85rem;
+  font-style: normal;
+  line-height: 1.6;
+}
+
+.has-trip-stats {
+  padding-bottom: 0 !important;
+}
+
+.has-trip-stats > header.major {
+  margin-bottom: 0 !important;
+}
+
+.page-travel-journal #main > .has-trip-stats + .guangzhou-day {
+  border-top: 0;
+  background: none;
+}
+
+.travel-journal__stats-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-left: -1.5em;
+}
+
+/* Phones may wrap it, and only rows that start at the clipped edge lose their leading dot. */
+@media screen and (max-width: 600px) {
+  .travel-journal__stats-list {
+    justify-content: flex-start;
+  }
+}
+
+.travel-journal__stat {
+  position: relative;
+  padding-left: 1.5em;
+  white-space: nowrap;
+}
+
+.travel-journal__stats-dot {
+  position: absolute;
+  left: 0;
+  width: 1.5em;
+  text-align: center;
+}
+
+.travel-journal__stat b {
+  color: var(--color-ink-900);
+  font-family: var(--font-display);
+  font-size: 1.12em;
+  font-weight: 700;
+}
+
 .guangzhou-day {
   margin-top: 3rem;
   padding-top: 2.5rem;
