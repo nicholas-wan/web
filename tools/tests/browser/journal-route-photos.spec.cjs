@@ -17,7 +17,7 @@ test('Chengdu stops own exactly their photos, count within the place and offer t
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   const labels = await page.locator('.has-photos').evaluateAll(stops => stops.map(stop => stop.getAttribute('aria-label')));
-  expect(labels).toHaveLength(20);
+  expect(labels).toHaveLength(25);
   expect(labels).toContain('Open the place card for Taikoo Li (4 photos)');
   expect(labels).toContain('Open the place card for Tianmen Cave (2 photos)');
   // The airport stops are named for the airport (fix round, 18 Nov 2026), so its photos match by
@@ -36,7 +36,7 @@ test('Chengdu stops own exactly their photos, count within the place and offer t
   await expect(page.locator('.lightbox__place-thumb')).toHaveCount(2);
   await page.getByRole('button', { name: 'Next media', exact: true }).click();
   await expect(context).toHaveText(/2 of 2 · Day 6$/);
-  await page.getByRole('button', { name: 'Next stop: Skywalk' }).click();
+  await page.getByRole('button', { name: 'Next stop: Glass Skywalk' }).click();
   await expect(context).toHaveText(/1 of 2 · Day 6$/);
 });
 
@@ -117,7 +117,7 @@ test('Escape, the backdrop, the close button and Back close the place card and k
   const card = page.locator('.place-card');
   const stop = await openStop(page, 4, '72 Wonder Tower');
   await expect(card.locator('dt')).toHaveText(['Hours']);
-  await expect(card.locator('.place-card__price')).toHaveText('¥48 day, ¥88 night');
+  await expect(card.locator('.place-card__price')).toHaveText('¥88 night, ¥48 day');
   await expect(card.locator('.place-card__photos img')).toHaveCount(4);
   await expect(card.locator('.place-card__more')).toHaveCount(0);
   // Only the 4:30 pm day/night split is solid across sources; one session a line, times unbroken.
@@ -191,7 +191,7 @@ test('the phone sheet stays compact: one row of photos, "+N" only past four, one
 
   // Seven photos: four thumbnails, the last marked +3.
   await page.goto('/travel_2026_chengdu_zhangjiajie');
-  await openStop(page, 2, 'Red Panda Forest');
+  await openStop(page, 2, 'Red Panda Forest Park');
   const strip = page.locator('.place-card__photos');
   await expect(strip).toHaveAttribute('aria-label', 'View 7 photos');
   await expect(strip.locator('img')).toHaveCount(4);
