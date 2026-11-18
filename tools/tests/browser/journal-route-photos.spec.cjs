@@ -35,6 +35,8 @@ test('Chengdu stops own exactly their photos, count within the place and offer t
   await day6.locator('.travel-route__more').click();
   await day6.getByRole('button', { name: 'Open the place card for Tianmen Cave (2 photos)' }).click();
   await settle(page);
+  // The strip's 350 ms guard starts when View photos opens the viewer, so time from that click.
+  const viewed = Date.now();
   await page.locator('.place-card').getByRole('button', { name: 'View 2 photos', exact: true }).last().click();
   const context = page.locator('.lightbox__context');
   await expect(context).toHaveText(/1 of 2 · Day 6$/);
@@ -43,11 +45,11 @@ test('Chengdu stops own exactly their photos, count within the place and offer t
   await expect(context).toHaveText(/2 of 2 · Day 6$/);
   // For 350 ms after View photos the strip ignores clicks (a double tap's second tap), then works.
   const nextStop = page.getByRole('button', { name: 'Next stop: Glass Skywalk' });
-  const opened = Date.now();
   await nextStop.click();
-  if (Date.now() - opened < 300) await expect(context).toHaveText(/2 of 2 · Day 6$/);
+  // Only a click that surely landed inside the guard must have been ignored; a slow runner may be past it.
+  if (Date.now() - viewed < 300) await expect(context).toHaveText(/2 of 2 · Day 6$/);
   await page.waitForTimeout(400);
-  await nextStop.click();
+  if (/2 of 2/.test(await context.textContent())) await nextStop.click();
   await expect(context).toHaveText(/1 of 2 · Day 6$/);
 });
 
