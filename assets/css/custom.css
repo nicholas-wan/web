@@ -5408,6 +5408,24 @@ svg.is-drawing .peek-pulse { opacity: 0; animation: none; }
     line-height: 3.5rem;
   }
 
+  /* Full-bleed page (18 Nov 2026, owner: "do frame plain", from
+     lab/open-decisions/research/full-bleed): the bar spans the window and its
+     contents stay on the page grid (mark on the column's text edge). Over the
+     window-wide white the 78% glass turns mid-grey once the page scrolls under
+     it, so tab pages and journals take 90%; Home's solid bar and Projects'
+     dark page keep theirs. */
+  #nav {
+    --gutter: max(2rem, (100% - 72rem) / 2);
+    width: 100%;
+    max-width: none;
+    padding-left: var(--gutter);
+    padding-right: calc(var(--gutter) + 1rem);
+  }
+
+  #nav .nav-brand { padding-left: 2rem; }
+
+  body:not(.page-projects):not(.page-home) #nav { background: rgba(3, 7, 8, 0.9); }
+
   /* Pages whose header is the name (tab pages and 404; not journals, whose
      masthead and trip toolbar stay, nor event pages, which have no header):
      no box above the bar, and the bar stays with the reader. */
@@ -6715,6 +6733,16 @@ a.travel-jump-group__label {
   }
 }
 
+/* Full-bleed page (18 Nov 2026): on the window-wide white the desktop strip's
+   drop shadow stopped at an invisible column edge and read as a smudge, so it
+   is one soft hairline. The dark tablet and phone strip is untouched. */
+@media screen and (min-width: 981px) {
+  .page-travel-journal .travel-section-nav {
+    border-bottom-color: #e3eae8;
+    box-shadow: none;
+  }
+}
+
 /* Route bundle: journal-nav:end */
 .travel-pagination {
   display: flex;
@@ -6978,6 +7006,31 @@ ul.icons li a.icon:hover::before,
   color: var(--color-brand-200);
 }
 
+/* Full-bleed page (18 Nov 2026, owner: "do frame plain"; research and the four
+   variants in lab/open-decisions): #main paints its own surface across the
+   window behind itself, so the white runs edge to edge from under the bar and
+   the column stays where it is, unmarked. A pseudo-element, not a spread
+   shadow, so nothing that overflows #main is clipped; #wrapper's overflow:
+   clip keeps it from scrolling sideways. Black stays only where it is a band
+   of its own: the Home hero and the bar. */
+#main::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -100vmax;
+  right: -100vmax;
+  z-index: -1;
+  background: inherit;
+  pointer-events: none;
+}
+
+/* A page shorter than the window (404) ends on the footer's surface rather
+   than the body's black under it: the root takes that surface, so the body's
+   own black (and Home's hero) is untouched. */
+html:has(> body:not(.page-home)) { background: #fff; }
+html:has(> body.page-projects) { background: #111214; }
+
 /* Footer: a quiet closing band on the page's own surface (17 Nov 2026, owner:
    "do all", `footer-band` in lab/open-decisions; it was a black "Contact" strip
    with ringed icons). White on the white pages, #111214 on Projects
@@ -6988,9 +7041,11 @@ ul.icons li a.icon:hover::before,
    ink. Borrowed from Vercel's footer (same surface, hairline, small muted type,
    unringed icons) and Anthropic's bottom row (small mark, quiet icons, place). */
 #footer {
+  position: relative;
+  z-index: 0;
   display: block;
-  margin: 0 auto 3rem;
-  padding: 0;
+  margin: 0 auto;
+  padding: 0 0 3rem;
   background: #fff;
   color: var(--color-ink-500);
   cursor: auto;
@@ -7014,7 +7069,24 @@ ul.icons li a.icon:hover::before,
   align-items: center;
   row-gap: 10px;
   padding: 34px 2rem 30px;
+}
+
+/* The band paints its surface across the window, as #main does, and the page
+   ends on it (owner, 18 Nov 2026: a column-wide band read as an extra white box
+   on black). Its hairline runs the window's width, as Vercel's footer does: a
+   rule ending at the unmarked column edge would look cut off. Projects keeps
+   its #111214 through inherit. */
+#footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -100vmax;
+  right: -100vmax;
+  z-index: -1;
+  background: inherit;
   border-top: 1px solid var(--fb-rule);
+  pointer-events: none;
 }
 
 #footer .footer-band__inner a {
@@ -7181,7 +7253,7 @@ ul.icons li a.icon:hover::before,
 /* Phones have no side gutters, so the band runs to the bottom; wider screens
    keep the 3rem of black under the sheet, so the page reads as a closed card. */
 @media screen and (max-width: 480px) {
-  #footer { margin-bottom: 0; }
+  #footer { padding-bottom: 0; }
 }
 
 @media screen and (max-width: 374px) {
