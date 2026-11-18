@@ -10795,7 +10795,6 @@ html .page-skills #main > .post { border-top:0; }
 .chronology-label { display: block; max-width: 100px; line-height: 1.3; font-size: 12px; font-weight: 700; color: #283632; }
 .chronology-date { font-size: 11px; font-weight: 400; line-height: 1.25; color: #5e6f65; white-space: normal; text-decoration: none; }
 .chronology-detail { margin: 9px 0 0 !important; min-height: 2.5em; text-align: left !important; }
-.travel-card.is-timeline-selected { outline: 2px solid #347d6c; outline-offset: 3px; }
 @media (max-width: 736px) { #main > .journal-chronology { display: none; } }
 @media (prefers-reduced-motion: reduce) { .journal-chronology.is-revealed .chronology-line { animation: none; } }
 
@@ -11164,7 +11163,6 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
  .mobile-journal-card .image{display:block;margin:0}.mobile-journal-card img{width:100%;height:100%;object-fit:cover;display:block}
 
  .mobile-journal-row .chronology-trip{pointer-events:auto}.mobile-journal-row .chronology-name{pointer-events:auto}.mobile-journal-row .chronology-trip:before{display:none}
- .mobile-selected .mobile-journal-card{outline:2px solid #8bafa0;outline-offset:5px;border-radius:4px}
 
  
 

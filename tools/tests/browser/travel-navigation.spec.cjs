@@ -118,10 +118,10 @@ for (const width of [737, 768, 844, 981, 1366, 1920]) {
       const dates = await card.locator('.date').innerText();
       await expect(timeline.locator('.chronology-detail')).toContainText(name);
       await expect(timeline.locator('.chronology-detail')).toContainText(dates);
+      // A click on the scene, name or date opens the journal (owner, 18 Nov 2026).
       await trip.locator('.chronology-name').click();
-      expect(await card.evaluate(el => el.contains(document.activeElement) && document.activeElement.tagName === 'A')).toBe(true);
-      await expect(page.locator('.travel-card.preview-selected')).toHaveCount(1);
-      expect(await page.locator(`.travel-grid .travel-card__image[href="${href}"]`).evaluate(el => el.closest('.travel-card').classList.contains('preview-selected'))).toBe(true);
+      await expect(page).toHaveURL(new RegExp('/' + href + '$'));
+      await page.goBack();
       await expect(page).toHaveURL(/\/travel(?:#.*)?$/);
       await timeline.scrollIntoViewIfNeeded();
     }
@@ -129,7 +129,7 @@ for (const width of [737, 768, 844, 981, 1366, 1920]) {
   });
 }
 
-test('timeline dates stay unadorned and activate their matching journal', async ({ page }) => {
+test('timeline dates stay unadorned and open their matching journal', async ({ page }) => {
   await page.setViewportSize({ width: 1366, height: 1080 });
   await page.goto('/travel');
   const trip = page.locator('.journal-chronology .chronology-trip').last();
@@ -146,9 +146,23 @@ test('timeline dates stay unadorned and activate their matching journal', async 
   })).toBe(true);
   const href = await trip.getAttribute('href');
   await date.click();
-  await expect(page.locator(`.travel-grid .travel-card__image[href="${href}"]`)).toBeFocused();
-  await expect(page.locator('.travel-card.preview-selected')).toHaveCount(1);
+  await expect(page).toHaveURL(new RegExp('/' + href + '$'));
+});
+
+test('a phone tap on a timeline scene or its name opens the journal', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/travel');
+  const row = page.locator('.mobile-journal-row').first();
+  await row.scrollIntoViewIfNeeded();
+  const trip = row.locator('.chronology-trip');
+  const href = await trip.getAttribute('href');
+  await trip.locator('.chronology-label').click();
+  await expect(page).toHaveURL(new RegExp('/' + href + '$'));
+  await page.goBack();
   await expect(page).toHaveURL(/\/travel(?:#.*)?$/);
+  await row.scrollIntoViewIfNeeded();
+  await row.locator('.authored-scene').click();
+  await expect(page).toHaveURL(new RegExp('/' + href + '$'));
 });
 
 test.describe('destination scene interactions', () => {
@@ -262,17 +276,18 @@ test.describe('destination scene interactions', () => {
     await expect(viewer.locator('svg .da-cologne-lower').first()).toBeAttached();
   });
 
-  test('phones offer the loupe on a tapped scene even with reduced motion', async ({ page }) => {
+  test('phones offer the loupe on the playing scene; it opens the viewer, not the journal', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/travel');
     const row = page.locator('.mobile-journal-row').filter({ has: page.locator('a[href="travel_2023_perth"]') });
     await row.scrollIntoViewIfNeeded();
-    await row.locator('.authored-scene').click();
-    const loupe = row.locator('.scene-loupe');
-    await expect(loupe).toHaveClass(/is-shown/);
+    // Since 18 Nov 2026 a tap on the scene opens the journal, so the loupe rides on the playing scene.
+    const loupe = page.locator('.mobile-journal-row .scene-loupe.is-shown');
+    await expect(loupe).toHaveCount(1, { timeout: 8000 });
     await loupe.click();
     const viewer = page.locator('dialog.scene-viewer');
     await expect(viewer).toHaveJSProperty('open', true);
+    await expect(page).toHaveURL(/\/travel(?:#.*)?$/);
     // The clone carries its own paint servers, so it renders even where the source is hidden.
     expect(await viewer.locator('svg').evaluate(svg => [...svg.querySelectorAll('[id]')].every(el => el.id.startsWith('zoom-')))).toBe(true);
     await viewer.locator('.scene-viewer__close').click();

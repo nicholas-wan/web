@@ -19,7 +19,7 @@
     if (!card) return;
     const name = link.querySelector('.chronology-label').textContent;
     const dates = card.querySelector('.date').textContent.trim();
-    link.setAttribute('aria-label', name + ', ' + dates + ', ' + link.dataset.countries + '; find journal');
+    link.setAttribute('aria-label', name + ', ' + dates + ', ' + link.dataset.countries + '; open journal');
     const describe = () => { detail.textContent = name + ' · ' + dates + ' · ' + link.dataset.countries; };
     link.addEventListener('pointerenter', describe);
     link.addEventListener('focus', () => {
@@ -29,15 +29,6 @@
       const bounds = scroller.getBoundingClientRect();
       if (label.left < bounds.left + 4) scroller.scrollLeft += label.left - bounds.left - 4;
       else if (label.right > bounds.right - 4) scroller.scrollLeft += label.right - bounds.right + 4;
-    });
-    link.addEventListener('click', event => {
-      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0) return;
-      event.preventDefault();
-      describe();
-      grid.querySelectorAll('.is-timeline-selected').forEach(c => c.classList.remove('is-timeline-selected'));
-      card.classList.add('is-timeline-selected');
-      cardLink.focus({ preventScroll: true });
-      window.scrollTo({ top: scrollY + card.getBoundingClientRect().top - 30, behavior: reduced.matches ? 'instant' : 'smooth' });
     });
   });
   const updateControls = () => {
@@ -258,11 +249,11 @@
   select.addEventListener('change',()=>show(cards[Number(select.value)]));
   expand.addEventListener('click',()=>{const open=grid.classList.toggle('journals-expanded');expand.setAttribute('aria-expanded',String(open));expand.textContent=open?'Collapse journals':'Show all 10 journals';});
   let hoverIntent;
-  links.forEach(link=>{const card=cards.find(c=>c.querySelector('.travel-card__image').getAttribute('href')===link.getAttribute('href'));if(!card)return;link.setAttribute('aria-controls',grid.id);link.setAttribute('aria-describedby','journal-preview-help');const cue=document.createElement('span');cue.className='chronology-preview-cue';cue.textContent='Preview ↓';link.querySelector('.chronology-name').append(cue);link.addEventListener('pointerenter',()=>{clearTimeout(hoverIntent);hoverIntent=setTimeout(()=>show(card),250);});link.addEventListener('pointerleave',()=>clearTimeout(hoverIntent));link.addEventListener('focus',()=>{clearTimeout(hoverIntent);show(card);});link.addEventListener('click',e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey||e.button!==0)return;e.preventDefault();e.stopImmediatePropagation();clearTimeout(hoverIntent);show(card);card.querySelector('.travel-card__image').focus({preventScroll:true});card.scrollIntoView({block:'nearest',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});},true);});
+  links.forEach(link=>{const card=cards.find(c=>c.querySelector('.travel-card__image').getAttribute('href')===link.getAttribute('href'));if(!card)return;link.setAttribute('aria-controls',grid.id);link.setAttribute('aria-describedby','journal-preview-help');const cue=document.createElement('span');cue.className='chronology-preview-cue';cue.textContent='Preview ↓';link.querySelector('.chronology-name').append(cue);link.addEventListener('pointerenter',()=>{clearTimeout(hoverIntent);hoverIntent=setTimeout(()=>show(card),250);});link.addEventListener('pointerleave',()=>clearTimeout(hoverIntent));link.addEventListener('focus',()=>{clearTimeout(hoverIntent);show(card);});});
   timeline.addEventListener('timeline-destination',event=>{const card=cards.find(c=>c.querySelector('.travel-card__image').getAttribute('href')===event.detail.href);if(card){clearTimeout(hoverIntent);show(card);}});
   show(cards[0]);
   const archive=document.querySelector('.travel-archive-heading');archive.querySelector('h2').textContent='Travel journals';archive.querySelector('p').replaceWith(expand);expand.className='journal-show-all';archive.querySelector('span').remove();
-  const help=document.createElement('p');help.id='journal-preview-help';help.className='journal-preview-help';help.textContent='Choose a trip to preview its journal.';timeline.prepend(help);
+  const help=document.createElement('p');help.id='journal-preview-help';help.className='journal-preview-help';help.textContent='Hover a trip to preview its journal; click to open it.';timeline.prepend(help);
   const sync=()=>toolbar.hidden=grid.hidden;new MutationObserver(sync).observe(grid,{attributes:true,attributeFilter:['hidden']});sync();
  }
 })();
@@ -288,8 +279,7 @@
  // travel-rail.js decides which scenes play and how (9 Nov 2026).
  function update(){window.travelRail?.update({entries,media,reduced,list});}
  function requestUpdate(){if(frame)return;frame=requestAnimationFrame(()=>{frame=0;update();});}
- entries.forEach(e=>e.icon.addEventListener('click',event=>{if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;event.preventDefault();e.row.classList.add('mobile-selected');entries.filter(x=>x!==e).forEach(x=>x.row.classList.remove('mobile-selected'));update();}));
- const observer=new IntersectionObserver(requestUpdate,{threshold:[0,.5,1]});entries.forEach(e=>observer.observe(e.art));
+  const observer=new IntersectionObserver(requestUpdate,{threshold:[0,.5,1]});entries.forEach(e=>observer.observe(e.art));
  window.addEventListener('scroll',requestUpdate,{passive:true});window.addEventListener('resize',requestUpdate);
  media.addEventListener('change',update);reduced.addEventListener('change',update);document.addEventListener('visibilitychange',update);
  new MutationObserver(()=>{list.hidden=grid.hidden;update();}).observe(grid,{attributes:true,attributeFilter:['hidden']});
