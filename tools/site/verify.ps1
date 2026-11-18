@@ -453,7 +453,10 @@ if ($chronologySource -notmatch 'pending=\(self\.scenes\|\|fetch\(source\.datase
 
 # 30 -> 31: journal lede leading and the Australia hero gap and intro treatment (Oct 2026).
 # 31 -> 32 (24 Oct 2026): routes folded at build time, and deep links keep each day's date in view.
-Assert-FileSizeBudget 'assets\css\travel-journal.css' 32
+# 32 -> 40 (18 Nov 2026): the route stops' place card (bottom sheet on phones, centred card on desktop), place chips that filter a day's photos, the trip-at-a-glance line (Add-TripStats) and the inline day maps (Add-RouteMaps).
+# 40 -> 43 (18 Nov 2026, review fixes): day maps beside the stops on desktop, edge markers and the "Not mapped" line; the card's compact phone sheet; photo-count tags and the chips' fixed All. Every journal pays for these though only route-photo journals use them; splitting them into their own sheet is the next step if this grows.
+# 43 -> 44 (18 Nov 2026, owner): the Klook tour line with its inline mark on Chengdu Days 5-6.
+Assert-FileSizeBudget 'assets\css\travel-journal.css' 44
 # Photo search styles live in their own route bundle because travel-map-page.css
 # sits within a few hundred bytes of its cap (Oct 2026).
 # 10 -> 11: partial-match reason line, Oct 2026.
@@ -485,6 +488,8 @@ Assert-FileSizeBudget 'assets\js\projects.js' 71
 Assert-FileSizeBudget 'assets\js\projects-laptop.js' 18
 # projects-companions.js loads the same way (9 Nov 2026): Finance's laptop and the bots' lock screens.
 Assert-FileSizeBudget 'assets\js\projects-companions.js' 12
+# place-card.js (18 Nov 2026): the route stops' place card, loaded by gallery.js as the first route box with a card stop nears the screen, or on the first tap.
+Assert-FileSizeBudget 'assets\js\place-card.js' 8
 # Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
 Assert-FileSizeBudget 'assets\css\gallery.css' 15
 Assert-FileSizeBudget 'assets\css\icons.css' 4
@@ -1004,6 +1009,12 @@ foreach ($journalName in $journalPageNames) {
     if ($journalMarkup -notmatch '<body class="is-preload page-travel-journal">') { throw "$journalName is missing the shared mobile travel-navigation scope." }
     if ($journalMarkup -notmatch '<li class="active"><a aria-current="true" href="travel"><svg class="nav-icon"[^>]*>.*?</svg><span>Travel</span></a>') { throw "$journalName must highlight Travel in the global navigation." }
     if ($journalMarkup -notmatch 'class="[^"]*journal-banner[^"]*"') { throw "$journalName is missing its explicit high-resolution journal banner marker." }
+    # Day maps (18 Nov 2026): only opted-in journals, each a small inline SVG after its route's
+    # summary in a box marked has-route-map, with at most one "Not mapped" line after it.
+    $routeMaps = [regex]::Matches($journalMarkup, '(?s)<div class="[^"]*\bhas-route-map\b[^"]*"><strong>Route</strong>\s*<p class="travel-route-summary">[^<]*</p><div class="travel-route-map">(?<svg><svg class="travel-route-map__svg" viewBox="0 0 300 130" role="img" aria-label="[^"]+">.*?</svg>)(?:<p class="travel-route-map__note">Not mapped: [^<]*(?:<span class="travel-route-map__num">\d+</span>[^<]*)+</p>)?</div>\s*<div class="[^"]*\bguangzhou-route\b')
+    $expectedMaps = if ($journalName -eq 'travel_2026_chengdu_zhangjiajie.html') { 6 } else { 0 }
+    if ($routeMaps.Count -ne $expectedMaps -or [regex]::Matches($journalMarkup, '<svg class="travel-route-map').Count -ne $expectedMaps) { throw "$journalName must carry $expectedMaps day maps, each under its Route label." }
+    foreach ($routeMap in $routeMaps) { if ($routeMap.Groups['svg'].Length -gt 2560 -or $routeMap.Value -match '<image\b|href=|https?:') { throw "$journalName has a day map over 2.5 KB or one that loads something." } }
     if ($journalMarkup -notmatch '<main id="main"[^>]*data-journal-template="v2"' -or [regex]::Matches($journalMarkup, 'class="travel-section-nav').Count -ne 1 -or [regex]::Matches($journalMarkup, 'class="travel-pagination"').Count -ne 1 -or $journalMarkup -notmatch [regex]::Escape((Get-DistAssetRef 'assets/css/travel-journal.css')) -or $journalMarkup -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/travel-nav.js')) -or $journalMarkup -match '{{[A-Z_]+}}') { throw "$journalName is not rendered exactly once through the shared travel journal template and scroll guard." }
 }
 if ($guangzhou -notmatch '<main id="main" class="[^"]*travel-journal[^"]*travel-journal--compact[^"]*guangzhou-journal' -or $guangzhou -notmatch 'class="travel-journal__content"' -or $guangzhou -match '<!DOCTYPE HTML>.*<!DOCTYPE HTML>') { throw "Guangzhou must prove the content-only compact journal build path without nesting a legacy document shell." }

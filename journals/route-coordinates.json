@@ -1,0 +1,73 @@
+{
+  "_sources": "WGS84 [lat, lng] for the day maps Add-RouteMaps draws in route boxes (18 Nov 2026). Keyed by journal slug, then the day's section number (trip-section-N), then the stop's English name as written in the route. Points come from OpenStreetMap (Nominatim and Overpass; OSM ids in _notes), cross-checked against Wikidata P625 where it has one; never from Amap, Baidu or Tencent, which use GCJ-02 (about 500 m off). Every stop on a listed day needs an entry (the build fails otherwise); null marks one with no published point: the massage shop (no reputable listing) and the River View Homestay (a private address). An optional third value is a short place name drawn beside the pin for context (the town, the mountain); keep them to one or two a day.",
+  "_notes": {
+    "Singapore": "Changi Airport: OSM way 174037464 (its centre); Wikidata Q32159 is 0.9 km away.",
+    "Tianfu Airport (Days 1, 4, 7)": "Tianfu International Airport between T1 and T2: OSM relations 18562220 and 18562218; Wikidata Q11074678 is 0.6 km away.",
+    "Chengdu": "City centre, Tianfu Square: OSM way 1395271422, Wikidata Q10939558.",
+    "Dujiangyan": "Old town by South Bridge: OSM relation 2110257 admin centre.",
+    "South Bridge": "OSM way 641472614.",
+    "Panda Valley": "OSM way 1039351367 (tourism=zoo).",
+    "Red Panda Forest": "Approximate, about 1-2 km: not mapped in OSM or Wikidata. Listed at Huaxi community, Puyang subdistrict, on the Lianhua Lake tourist road (OSM way 857899495), about 10 km north-east of the old town.",
+    "Times Outlets": "OSM relation 19754668, Shuangliu district.",
+    "Dongmen Wharf": "OSM node 9062014951.",
+    "Taikoo Li": "OSM way 430133363; Wikidata Q15933370 is 0.2 km away.",
+    "Zhangjiajie (Day 4)": "Arrival at Hehua International Airport: OSM way 787987141, Wikidata Q1134280.",
+    "Zhangjiajie Airport": "As Zhangjiajie (Day 4).",
+    "72 Wonder Tower": "OSM way 1352953735.",
+    "Dayong Ancient City": "OSM way 1352855435.",
+    "Wulingyuan Gate": "OSM node 1025747294, by the Wulingyuan visitor centre.",
+    "Ten-Mile Gallery": "Midpoint of OSM way 484638629.",
+    "Bailong Elevator": "OSM way 1353121695, Wikidata Q4848477.",
+    "Yuanjiajie": "OSM node 4331753591, Wikidata Q15925953.",
+    "Tianzi Mountain": "Helong Park viewing area: OSM way 1329360467.",
+    "Zhangjiajie Glass Bridge": "OSM way 434849557, Wikidata Q27925184.",
+    "Tianmen Cableway": "Lower station in the city: OSM node 2706468456.",
+    "Tianmen Cave": "OSM node 5521705221; Wikidata Q3861073 is 0.2 km away.",
+    "Skywalk": "East-line glass skywalk: OSM way 573062428."
+  },
+  "travel_2026_chengdu_zhangjiajie": {
+    "1": {
+      "Singapore": [1.3550, 103.9894],
+      "Tianfu Airport": [30.3140, 104.4415],
+      "Dujiangyan": [30.9965, 103.6143],
+      "South Bridge": [30.9991, 103.6140]
+    },
+    "2": {
+      "Panda Valley": [30.9660, 103.5808],
+      "Red Panda Forest": [31.0500, 103.7100],
+      "Chengdu": [30.6598, 104.0633]
+    },
+    "3": {
+      "Times Outlets": [30.6054, 103.9418, "Shuangliu"],
+      "Massage": null,
+      "Dongmen Wharf": [30.6520, 104.0838],
+      "Taikoo Li": [30.6557, 104.0811, "City centre"]
+    },
+    "4": {
+      "Tianfu Airport": [30.3140, 104.4415],
+      "Zhangjiajie": [29.1030, 110.4416],
+      "River View Homestay": null,
+      "72 Wonder Tower": [29.1476, 110.4507],
+      "Dayong Ancient City": [29.1227, 110.4806]
+    },
+    "5": {
+      "Wulingyuan Gate": [29.3543, 110.5307, "Wulingyuan"],
+      "Ten-Mile Gallery": [29.3677, 110.4837],
+      "Bailong Elevator": [29.3512, 110.4612],
+      "Yuanjiajie": [29.3452, 110.4372],
+      "Tianzi Mountain": [29.3838, 110.4898],
+      "Dayong Ancient City": [29.1227, 110.4806]
+    },
+    "6": {
+      "Zhangjiajie Glass Bridge": [29.3991, 110.6980],
+      "Tianmen Cableway": [29.1148, 110.4785, "Zhangjiajie city"],
+      "Tianmen Cave": [29.0514, 110.4827, "Tianmen Mountain"],
+      "Skywalk": [29.0497, 110.4827]
+    },
+    "7": {
+      "Zhangjiajie Airport": [29.1030, 110.4416],
+      "Tianfu Airport": [30.3140, 104.4415],
+      "Singapore": [1.3550, 103.9894]
+    }
+  }
+}

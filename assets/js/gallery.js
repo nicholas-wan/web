@@ -536,13 +536,15 @@
     overlay.setAttribute('aria-hidden', 'true');
     unlockBackgroundScroll();
     if (historyEntry) { historyEntry = false; pendingBack = true; history.back(); }
-    if (lastTrigger) { lastTrigger.focus({ preventScroll: true }); lastTrigger = null; }
+    if (lastTrigger) { focusTarget(lastTrigger).focus({ preventScroll: true }); lastTrigger = null; }
     if (afterClose) afterClose();
     afterClose = null;
   };
   var show = function (index) {
     ++imageRequest;
     var opening = !overlay.classList.contains('is-visible');
+    /* A swipe-down close leaves the figure where it was dropped during the fade. */
+    if (opening) resetDismiss();
     navigationDirection = opening || index > current ? 1 : -1;
     current = (index + galleryMedia.length) % galleryMedia.length;
     var source = galleryMedia[current];
@@ -619,9 +621,10 @@
       context.className = 'lightbox__context';
       var dayLabel = day ? day[0] : heading.textContent.trim().replace(/^#\d+\s*-\s*/, '');
       context.textContent = ' ' + dayLabel + ' · ' + (sectionMedia.indexOf(source) + 1) + ' of ' + sectionMedia.length;
-      /* A photo of a route stop counts within that place instead (18 Nov 2026). */
+      /* A photo of a route stop counts within that place instead (18 Nov 2026), naming the
+         place only when the caption above does not already (`2 of 2 · Day 6`). */
       var group = placeOf[current];
-      if (group) context.textContent = ' ' + (group.own.indexOf(source) + 1) + ' of ' + group.own.length + ' at ' + group.name + ' · ' + dayLabel;
+      if (group) context.textContent = ' ' + (group.own.indexOf(source) + 1) + ' of ' + group.own.length + (placeKey(parts[0]) === placeKey(group.name) ? '' : ' at ' + group.name) + ' · ' + dayLabel;
       caption.appendChild(context);
     }
     renderPlace(placeOf[current], source);
@@ -647,11 +650,14 @@
   /* The popstate of our own history.back() can land after a quick reopen has pushed a
      new entry; it must not close that viewer. */
   var pendingBack = false;
+  /* The place card shares the entry: it hands it to the lightbox, so one Back closes either. */
+  var placeCardBack = null;
   window.addEventListener('popstate', function () {
     if (pendingBack) { pendingBack = false; return; }
     if (!historyEntry) return;
     historyEntry = false;
     if (overlay.classList.contains('is-visible')) close();
+    else if (placeCardBack) placeCardBack();
   });
 
   /* At the fitted scale, one-finger horizontal gestures keep circular
@@ -685,7 +691,54 @@
     }
     return null;
   };
+  /* Swipe down to close (18 Nov 2026, mockup 3). At the fitted scale, a one-finger
+     drag whose first movement past the slop is mostly downward carries the figure
+     and fades the backdrop and controls, so the page shows through. Release past
+     a third of the screen, or a downward flick, closes through close(); anything
+     shorter springs back. Upward drags stay plain swipes, and the landscape view
+     is left out: there the reader holds the phone sideways and screen-vertical is
+     their horizontal. Inline styles only, so gallery.css carries nothing. The controls, caption
+     and place strip go as soon as the drag locks as a dismiss: fading with it, the half-clear
+     caption smeared over the page text behind (18 Nov 2026 review). */
+  var figure = overlay.querySelector('.lightbox__figure');
+  var dismissFaded = Array.prototype.filter.call(overlay.children, function (child) { return child !== figure; }).concat(caption, placeBar);
+  var swipeAxisLocked = false;
+  var dismissTimer = 0;
+  var flickY = 0;
+  var flickTime = 0;
+  var lastY = 0;
+  var lastTime = 0;
+  var paintDismiss = function (deltaX, deltaY) {
+    var progress = Math.min(1, Math.max(0, deltaY) / window.innerHeight);
+    figure.style.transform = 'translate3d(' + deltaX + 'px,' + (deltaY > 0 ? deltaY : deltaY / 4) + 'px,0) scale(' + Math.max(0.75, 1 - progress * 0.4) + ')';
+    overlay.style.backgroundColor = 'rgba(8, 10, 14, ' + (0.98 * Math.max(0, 1 - progress * 2)).toFixed(3) + ')';
+  };
+  var resetDismiss = function () {
+    clearTimeout(dismissTimer);
+    figure.style.transform = figure.style.transition = '';
+    overlay.style.backgroundColor = overlay.style.transition = '';
+    dismissFaded.forEach(function (element) { element.style.opacity = element.style.transition = ''; });
+  };
+  var endDismiss = function (closing) {
+    gestureMode = null;
+    var still = reducedMotion.matches;
+    if (closing) {
+      /* The figure stays where it was dropped while the overlay's own fade runs. */
+      close();
+    } else {
+      /* The figure's CSS transition carries the spring; the backdrop needs its own. */
+      if (!still) overlay.style.transition = 'opacity var(--motion-standard) ease, background-color var(--motion-standard) ease, visibility 0s linear var(--motion-standard)';
+      figure.style.transform = figure.style.transition = '';
+      overlay.style.backgroundColor = '';
+      dismissFaded.forEach(function (element) { element.style.opacity = ''; });
+    }
+    clearTimeout(dismissTimer);
+    if (still) resetDismiss();
+    else dismissTimer = setTimeout(resetDismiss, 320);
+  };
   var cancelGesture = function () {
+    if (gestureMode === 'dismiss') endDismiss(false);
+    swipeAxisLocked = false;
     swipePointerId = null;
     swipeTouchId = null;
     gestureMode = null;
@@ -713,6 +766,9 @@
   };
 
   overlay.addEventListener('touchstart', function (event) {
+    /* A second finger mid-drag springs the figure back before pinching. */
+    if (gestureMode === 'dismiss') cancelGesture();
+    swipeAxisLocked = false;
     if (!overlay.classList.contains('is-visible') || startsOnControl(event.target)) {
       cancelGesture();
       return;
@@ -749,6 +805,32 @@
       setZoom(pinchStartZoom * touchDistance(event.touches[0], event.touches[1]) / pinchStartDistance);
       return;
     }
+    if (gestureMode === 'swipe' || gestureMode === 'dismiss') {
+      var moved = touchById(event.touches, swipeTouchId);
+      if (!moved) return;
+      var deltaX = moved.clientX - swipeStartX;
+      var deltaY = moved.clientY - swipeStartY;
+      if (gestureMode === 'swipe') {
+        /* Lock the axis on the first movement past the slop. */
+        if (swipeAxisLocked || Math.max(Math.abs(deltaX), Math.abs(deltaY)) < SWIPE_CLICK_SLOP) return;
+        swipeAxisLocked = true;
+        if (zoomLevel > 1 || rotation || deltaY <= Math.abs(deltaX) * SWIPE_AXIS_RATIO) return;
+        gestureMode = 'dismiss';
+        clearTimeout(dismissTimer);
+        figure.style.transition = 'none';
+        overlay.style.transition = '';
+        dismissFaded.forEach(function (element) { element.style.transition = 'opacity 120ms'; element.style.opacity = 0; });
+        flickY = lastY = moved.clientY;
+        flickTime = lastTime = event.timeStamp;
+      }
+      if (event.cancelable) event.preventDefault();
+      /* Keep a sample about 100ms old for the release speed. */
+      if (event.timeStamp - flickTime > 100) { flickY = lastY; flickTime = lastTime; }
+      lastY = moved.clientY;
+      lastTime = event.timeStamp;
+      paintDismiss(deltaX, deltaY);
+      return;
+    }
     if (gestureMode !== 'pan') return;
     var touch = touchById(event.touches, swipeTouchId);
     if (!touch) return;
@@ -776,6 +858,17 @@
         cancelGesture();
         renderMediaTransform();
       }
+      return;
+    }
+    if (gestureMode === 'dismiss') {
+      var lifted = touchById(event.changedTouches, swipeTouchId);
+      if (!lifted) return;
+      var dropped = lifted.clientY - swipeStartY;
+      var speed = (lifted.clientY - flickY) / Math.max(16, event.timeStamp - flickTime);
+      ignoreClickUntil = Date.now() + 500;
+      if (event.cancelable) event.preventDefault();
+      endDismiss(dropped > window.innerHeight / 3 || (dropped >= SWIPE_THRESHOLD && speed > 0.5));
+      cancelGesture();
       return;
     }
     if (gestureMode !== 'swipe' || swipeTouchId === null) return;
@@ -918,7 +1011,8 @@
      with data-route-photos on their article. A stop owns the photos of its day whose caption
      title equals its name or one of the |-separated titles in its data-photos. Exact on
      purpose: older journals title photos with the city (Toronto, Hiroshima), and substring
-     matching gave every stop every photo of its day. Stops without photos stay plain text. */
+     matching gave every stop every photo of its day. A stop with photos or a price opens its
+     place card (below); the others stay plain text. */
   /* The place's own photos as a strip under the caption, and at its last photo a
      way on: the next stop of the day with photos, or back to the route. The
      viewer never closes by itself. */
@@ -960,6 +1054,76 @@
     }
     else placeButton('lightbox__place-next lightbox__place-back', 'Back to the route', close).textContent = 'Back to route';
   };
+  /* Place card (18 Nov 2026, mockup 6): a stop with photos or a price opens a card first, a
+     bottom sheet on phones and a centred card on desktop, with its photos, price, hours and
+     map links. It takes the lightbox's one history entry and, on View photos, hands that entry
+     on, so one Back closes whichever is showing and returns to the route. */
+  var photoCount = function (count) { return count + (count === 1 ? ' photo' : ' photos'); };
+  /* The card itself lives in place-card.js (18 Nov 2026), outside the page's 80 KB ceiling: it
+     loads as the first route box with a card stop nears the screen (the box, not its stops, which
+     a folded phone route hides), or on the first tap, from the versioned URL the build writes
+     into the article's data-place-card. These hooks keep the lightbox's one history entry in
+     this file. */
+  var cardApi = null;
+  var cardWatch = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
+    if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
+    cardWatch.disconnect();
+    cardWatch = null;
+    /* Never ahead of the page's own load: a card route near the top held the load event. */
+    if (document.readyState === 'complete') loadCard();
+    else window.addEventListener('load', function () { loadCard(); }, { once: true });
+  }, { rootMargin: '600px 0px' }) : null;
+  var cardTap = null;
+  var cardScript = null;
+  /* Only the latest tap waiting for the script runs, and only while it is fresh and nothing else
+     has opened meanwhile: a late card over the lightbox broke its one history entry. A failed
+     load resets, so the next tap retries, and the waiting tap opens the stop's photos. */
+  var cardArrived = function () {
+    var tap = cardTap;
+    cardTap = null;
+    if (!tap || Date.now() - tap.at > 3000 || overlay.classList.contains('is-visible')) return;
+    if (cardApi) cardApi.open(tap.place);
+    else if (tap.place.own.length) openPhotos(tap.place);
+  };
+  var loadCard = function (place) {
+    if (cardApi) return place && cardApi.open(place);
+    if (place) cardTap = { place: place, at: Date.now() };
+    if (cardScript) return;
+    var article = document.querySelector('.travel-journal__content[data-place-card]');
+    if (!article) return;
+    cardScript = document.createElement('script');
+    cardScript.src = article.getAttribute('data-place-card');
+    cardScript.onerror = function () { cardScript.remove(); cardScript = null; cardArrived(); };
+    cardScript.onload = function () {
+      cardApi = window.travelPlaceCard({
+        stillOf: stillOf,
+        photoCount: photoCount,
+        openPhotos: openPhotos,
+        focusTarget: focusTarget,
+        claimEntry: function () {
+          var gesture = !navigator.userActivation || navigator.userActivation.isActive;
+          if (!historyEntry && gesture) { history.pushState(history.state, ''); historyEntry = true; }
+        },
+        releaseEntry: function () { if (historyEntry) { historyEntry = false; pendingBack = true; history.back(); } }
+      });
+      placeCardBack = cardApi.closeFromHistory;
+      cardArrived();
+    };
+    document.head.appendChild(cardScript);
+  };
+  var openPhotos = function (place) { lastTrigger = place.stop; show(galleryMedia.indexOf(place.own[0])); };
+  /* Where focus goes back to from a place or its photos (also place-card.js's hook): the stop,
+     or, when a folded phone route hides it (opened from a map pin), the route's View all button,
+     else the route box itself. Anything else that opened the lightbox gets focus back as is. */
+  var focusTarget = function (place) {
+    var stop = place.stop || place;
+    var route = stop.closest('.guangzhou-day__route');
+    if (!route || stop.getClientRects().length) return stop;
+    var more = route.querySelector('.travel-route__more');
+    if (more && more.getClientRects().length) return more;
+    route.tabIndex = -1;
+    return route;
+  };
   var placeKey = function (text) { return (text || '').toLowerCase().replace(/[^a-z0-9぀-鿿가-힯]+/g, ''); };
   var mediaTitles = galleryMedia.map(function (media) {
     var title = media.closest('.content') && media.closest('.content').querySelector('.content-title');
@@ -974,9 +1138,32 @@
       return mediaSections[index] === heading && keys.indexOf(mediaTitles[index]) >= 0;
     });
     /* A stop repeated on one day (a round trip) keeps its photos with the first. */
-    if (!own.length || placeOf[galleryMedia.indexOf(own[0])]) return;
+    if (own.length && placeOf[galleryMedia.indexOf(own[0])]) own = [];
+    var price = stop.querySelector('.travel-route__price');
+    if (!own.length && !price) return;
+    var subtitle = stop.querySelector('small:not(.travel-route__price)');
+    var place = {
+      stop: stop,
+      name: name.textContent.trim(),
+      zh: subtitle && subtitle.textContent.trim(),
+      price: price && price.textContent.trim(),
+      hours: stop.getAttribute('data-hours'),
+      day: (/^Day\s+\d+/i.exec(heading ? heading.textContent.trim() : '') || [''])[0],
+      at: Array.prototype.indexOf.call(stop.parentNode.querySelectorAll('.guangzhou-route__stop'), stop) + 1,
+      own: own
+    };
+    stop.classList.add('has-card');
+    if (cardWatch) cardWatch.observe(stop.closest('.guangzhou-day__route') || stop);
+    stop.setAttribute('role', 'button');
+    stop.setAttribute('tabindex', '0');
+    stop.setAttribute('aria-haspopup', 'dialog');
+    stop.setAttribute('aria-label', 'Open the place card for ' + place.name + (own.length ? ' (' + photoCount(own.length) + ')' : ''));
+    var open = function () { loadCard(place); };
+    stop.addEventListener('click', open);
+    stop.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
+    if (!own.length) return;
     var first = own[0];
-    var group = { name: name.textContent.trim(), own: own, heading: heading };
+    var group = { name: place.name, own: own, heading: heading };
     placeGroups.push(group);
     own.forEach(function (media) { var index = galleryMedia.indexOf(media); if (!placeOf[index]) placeOf[index] = group; });
     var thumb = document.createElement('img');
@@ -993,12 +1180,14 @@
     stop.appendChild(count);
     name.setAttribute('data-count', own.length);
     stop.classList.add('has-photos');
-    stop.setAttribute('role', 'button');
-    stop.setAttribute('tabindex', '0');
-    stop.setAttribute('aria-label', 'View ' + own.length + (own.length === 1 ? ' photo' : ' photos') + ' of ' + name.textContent.trim());
-    var open = function () { lastTrigger = stop; show(galleryMedia.indexOf(first)); };
-    stop.addEventListener('click', open);
-    stop.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
+  });
+  /* Day map pins and edge markers (build.ps1 Add-RouteMaps) open their stop's place card, as
+     tapping the stop does: any stop with photos or a price (has-card). */
+  document.querySelectorAll('[data-route-pin]').forEach(function (pin) {
+    var stop = pin.closest('.guangzhou-day__route').querySelectorAll('.guangzhou-route__stop')[pin.getAttribute('data-route-pin')];
+    if (!stop || !stop.classList.contains('has-card')) return;
+    pin.classList.add('is-linked');
+    pin.addEventListener('click', function () { stop.click(); });
   });
 
   /* Keep native swiping, with persistent progress and explicit phone controls. */
@@ -1111,6 +1300,46 @@
       var state = measure();
       return function () { apply(state); };
     });
+
+    /* Place chips (18 Nov 2026, mockup 5 in lab/journal-ux-mockups): a day whose photos belong
+       to two or more route stops gets All, then one chip per stop in route order. A chip hides
+       the other tiles, so the phone counter and arrows count only what is left; the lightbox
+       keeps the whole journal. The place chips sit in their own row after All, which phones
+       scroll while All stays put (at 320px a scrolled row hid it; 18 Nov 2026 review). */
+    var places = placeGroups.map(function (group) {
+      return { name: group.name, tiles: group.own.filter(function (media) { return gallery.contains(media); }).map(function (media) { return media.closest('.brick'); }) };
+    }).filter(function (place) { return place.tiles.length; });
+    if (places.length > 1) {
+      var allTiles = tiles;
+      var filter = document.createElement('div');
+      filter.className = 'journal-place-filter';
+      filter.setAttribute('role', 'group');
+      filter.setAttribute('aria-label', 'Show photos by place');
+      var row = document.createElement('div');
+      row.className = 'journal-place-filter__places';
+      [{ name: 'All', tiles: allTiles }].concat(places).forEach(function (place, index) {
+        var chip = document.createElement('button');
+        var count = document.createElement('span');
+        chip.type = 'button';
+        chip.className = 'journal-place-filter__chip';
+        chip.setAttribute('aria-pressed', String(!index));
+        chip.textContent = place.name + ' ';
+        count.textContent = place.tiles.length;
+        chip.appendChild(count);
+        chip.addEventListener('click', function () {
+          filter.querySelectorAll('button').forEach(function (other) { other.setAttribute('aria-pressed', String(other === chip)); });
+          tiles = place.tiles;
+          allTiles.forEach(function (tile) { tile.hidden = tiles.indexOf(tile) < 0; });
+          gallery.setAttribute('aria-label', tiles.length + ' photos');
+          gallery.scrollLeft = 0;
+          apply(measure());
+        });
+        (index ? row : filter).appendChild(chip);
+      });
+      filter.appendChild(row);
+      row.addEventListener('scroll', function () { row.classList.toggle('is-scrolled', row.scrollLeft > 2); }, { passive: true });
+      shell.insertBefore(filter, controls);
+    }
   });
   var refreshGalleries = function () {
     galleryRefreshers.map(function (measure) { return measure(); }).forEach(function (apply) { apply(); });

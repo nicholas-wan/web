@@ -3400,6 +3400,72 @@ body.is-map-fullscreen .travel-atlas__layout {
   object-position: var(--hero-focus-x, 50%) var(--hero-focus-y, 58%);
 }
 
+/* The trip at a glance (18 Nov 2026; Add-TripStats in build.ps1): bold sans numbers, muted serif
+   words, between hairlines the banner's width, under the banner. Its lower hairline stands in for
+   the first day's divider, so the two never stack. The list starts one gap left of the line, and
+   each stat's dot sits in its own gap, so the line clips the dot of a stat that starts a row. */
+header.major > .travel-journal__stats {
+  margin: 1.25rem 0 0;
+  padding: 0.55rem 0;
+  overflow: hidden;
+  border-top: 1px solid var(--color-border-soft);
+  border-bottom: 1px solid var(--color-border-soft);
+  color: var(--color-ink-500);
+  font-size: 0.85rem;
+  font-style: normal;
+  line-height: 1.6;
+}
+
+.has-trip-stats {
+  padding-bottom: 0 !important;
+}
+
+.has-trip-stats > header.major {
+  margin-bottom: 0 !important;
+}
+
+.page-travel-journal #main > .has-trip-stats + .guangzhou-day {
+  border-top: 0;
+  background: none;
+}
+
+.travel-journal__stats-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-left: -1.5em;
+}
+
+/* Phones may wrap it, and only rows that start at the clipped edge lose their leading dot. */
+@media screen and (max-width: 600px) {
+  .travel-journal__stats-list {
+    justify-content: flex-start;
+  }
+}
+
+.travel-journal__stat {
+  position: relative;
+  padding-left: 1.5em;
+  white-space: nowrap;
+}
+
+.travel-journal__stats-dot {
+  position: absolute;
+  left: 0;
+  width: 1.5em;
+  text-align: center;
+}
+
+.travel-journal__stat b {
+  color: var(--color-ink-900);
+  font-family: var(--font-display);
+  font-size: 1.12em;
+  font-weight: 700;
+  /* Keeps the row's line box the words' own, so the dot (set at its top) sits on their baseline
+     like the route summary's, not 2px high. */
+  line-height: 1;
+}
+
 .guangzhou-day {
   margin-top: 3rem;
   padding-top: 2.5rem;
@@ -3495,6 +3561,120 @@ body.is-map-fullscreen .travel-atlas__layout {
   display: none;
 }
 
+/* Day maps (18 Nov 2026; Add-RouteMaps in build.ps1): an inline SVG of the day's main cluster,
+   with edge markers for stops off it and a "Not mapped" line for stops with no point. Phones
+   show it only in the expanded route, tablets above the stops, 900px and up right of them. */
+.travel-route-map {
+  margin-top: 0.55rem;
+}
+
+.travel-route-map__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  background: #eef3f1;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.travel-route-map path {
+  fill: none;
+  stroke: #0c6663;
+}
+
+.travel-route-map__line {
+  stroke: #11807d;
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+
+.travel-route-map circle {
+  fill: #11807d;
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.travel-route-map text {
+  fill: #fff;
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+/* Invisible tap targets, up to 44px on a 390px phone. */
+.travel-route-map .travel-route-map__hit {
+  fill: transparent;
+  stroke: none;
+}
+
+.travel-route-map__off path {
+  fill: #11807d;
+  stroke: none;
+}
+
+.travel-route-map__off circle {
+  fill: #fff;
+  stroke: #11807d;
+}
+
+.travel-route-map__off text {
+  fill: #0c6663;
+}
+
+.travel-route-map .travel-route-map__label,
+.travel-route-map__scale text {
+  fill: var(--color-ink-600);
+  font-size: 10px;
+  text-anchor: start;
+}
+
+.travel-route-map .travel-route-map__label.is-end {
+  text-anchor: end;
+}
+
+.travel-route-map .travel-route-map__label.is-middle {
+  text-anchor: middle;
+}
+
+.travel-route-map .is-linked {
+  cursor: pointer;
+}
+
+.travel-route-map .is-linked:hover circle:not(.travel-route-map__hit) {
+  fill: #0c6663;
+}
+
+.travel-route-map .travel-route-map__off.is-linked:hover circle:not(.travel-route-map__hit) {
+  fill: #e3f0ee;
+}
+
+.travel-route-map__scale path {
+  stroke: var(--color-ink-600);
+  stroke-width: 1.5;
+}
+
+.travel-route-map__note {
+  margin: 0.35rem 0 0;
+  color: var(--color-ink-600);
+  font-size: max(var(--text-floor), 0.72rem);
+  line-height: 1.45;
+  text-align: left;
+}
+
+.travel-route-map__num {
+  display: inline-grid;
+  width: 1.1rem;
+  height: 1.1rem;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: 0.05em;
+}
+
 @media screen and (min-width: 601px) {
   .guangzhou-day__route--collapsible.is-desktop-wrapped.is-truncated:not(.is-expanded) .guangzhou-route {
     max-height: 2.45rem;
@@ -3512,6 +3692,67 @@ body.is-map-fullscreen .travel-atlas__layout {
     color: var(--color-brand-700);
     font-family: var(--font-display);
     font-weight: 700;
+  }
+
+  /* A route with a day map: each stop numbered with the pin's teal disc so the two can be
+     matched; the map sits above the stops on tablets and right of them from 900px. */
+  .has-route-map > .travel-route-map {
+    max-width: 20rem;
+  }
+
+  .has-route-map > .guangzhou-route {
+    counter-reset: route-stop;
+  }
+
+  .has-route-map .guangzhou-route__stop {
+    position: relative;
+    padding-left: 1.5rem;
+    counter-increment: route-stop;
+  }
+
+  .has-route-map .guangzhou-route__stop::before {
+    content: counter(route-stop);
+    position: absolute;
+    top: 0.1rem;
+    left: 0;
+    display: grid;
+    width: 1.15rem;
+    height: 1.15rem;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-brand-600);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 0.62rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+}
+
+@media screen and (min-width: 900px) {
+  .guangzhou-day__route.has-route-map {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 18.5rem;
+    grid-template-rows: auto auto auto auto 1fr;
+    align-items: start;
+    justify-items: start;
+    column-gap: 1.75rem;
+  }
+
+  .has-route-map > * {
+    grid-column: 1;
+  }
+
+  .has-route-map > .guangzhou-route {
+    justify-self: stretch;
+  }
+
+  .has-route-map > .travel-route-map {
+    grid-column: 2;
+    grid-row: 1 / 6;
+    width: 100%;
+    max-width: none;
+    margin-top: 0.15rem;
   }
 }
 
@@ -3911,6 +4152,12 @@ body.is-map-fullscreen .travel-atlas__layout {
   /* Routes arrive folded from the build (Add-RouteSummaries), so the full list never paints and
      then collapses (Perth CLS, Oct 2026). noscript.css shows it again without JavaScript. */
   .guangzhou-day__route:not(.is-expanded) > .travel-route-summary ~ .guangzhou-route {
+    display: none;
+  }
+
+  /* Day maps only in the expanded route: in the folded box the map doubled its height and
+     pushed the photos down (18 Nov 2026 review). */
+  .guangzhou-day__route:not(.is-expanded) > .travel-route-map {
     display: none;
   }
 
@@ -7489,7 +7736,9 @@ body.lightbox-open {
 }
 
 /* Route stops with photos open them (gallery.js, 18 Nov 2026): the name reads as a link with
-   its photo count; phones add the first photo as a thumbnail, the count as a badge on it. */
+   its photo count; phones add the first photo as a thumbnail, the count as a badge on it. The
+   count is a square tag with a stacked-photos glyph, so it never reads as a stop number (the
+   numbered dots and the day maps' teal pins); 18 Nov 2026 review. */
 .page-travel-journal .has-photos { cursor: pointer; }
 .page-travel-journal .has-photos > span:first-child {
   color: var(--color-brand-700);
@@ -7500,14 +7749,12 @@ body.lightbox-open {
 .page-travel-journal .has-photos > span[data-count]::after {
   content: attr(data-count);
   display: inline-block;
-  min-width: 1.15rem;
-  margin-left: 0.35rem;
-  padding: 0 0.32rem;
-  border-radius: 999px;
-  background: var(--color-brand-600);
-  color: #fff;
-  font: 700 0.62rem/1.15rem var(--font-display);
-  text-align: center;
+  margin-left: 0.4rem;
+  padding: 0 0.3rem 0 1.05rem;
+  border-radius: 0.2rem;
+  background: #e8eeed url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23566' stroke-width='1.3'%3E%3Cpath d='M3.5 1.5h7v7M1.5 3.5h7v7h-7z'/%3E%3C/svg%3E") no-repeat 0.3rem 50% / 0.62rem;
+  color: var(--color-ink-600);
+  font: 700 0.62rem/1.1rem var(--font-display);
   vertical-align: 0.12em;
 }
 .page-travel-journal .travel-route__thumb,
@@ -7550,21 +7797,21 @@ body.lightbox-open {
   }
   .page-travel-journal .travel-route__count {
     position: absolute;
-    top: 1.85rem;
-    right: 0.2rem;
+    top: 1.95rem;
+    right: 0.15rem;
     display: block;
-    min-width: 1.15rem;
-    padding: 0 0.32rem;
-    border-radius: 999px;
-    background: rgba(12, 20, 22, 0.78);
+    padding: 0 0.25rem 0 0.9rem;
+    border-radius: 0.2rem;
+    background: rgba(12, 20, 22, 0.72) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23fff' stroke-width='1.4'%3E%3Cpath d='M3.5 1.5h7v7M1.5 3.5h7v7h-7z'/%3E%3C/svg%3E") no-repeat 0.25rem 50% / 0.55rem;
     color: #fff;
-    font: 700 0.62rem/1.15rem var(--font-display);
-    text-align: center;
+    font: 700 0.62rem/0.9rem var(--font-display);
   }
 }
 
 /* A place's photos under the caption, and the way on at its last photo (gallery.js). The
-   lightbox's 3rem circle buttons are set with !important, so the strip overrides them. */
+   lightbox's 3rem circle buttons are set with !important, so the strip overrides them. The way
+   on is an outlined ghost the thumbnails' height: filled white, it out-shone the photo and
+   stacked a second forward control on the arrow (18 Nov 2026 review). */
 .lightbox__place {
   display: flex;
   flex: 0 0 auto;
@@ -7596,18 +7843,13 @@ body.lightbox-open {
 .lightbox .lightbox__place .lightbox__place-thumb.is-current { border-color: #fff !important; opacity: 1; }
 .lightbox .lightbox__place-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .lightbox .lightbox__place .lightbox__place-next {
-  padding: 0 1.05rem !important;
-  border: 1px solid #fff !important;
-  background: #fff !important;
-  color: #0f2a2c !important;
-  font: 700 0.9rem/1 var(--font-display) !important;
+  padding: 0 0.85rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #fff !important;
+  font: 700 0.85rem/1 var(--font-display) !important;
   letter-spacing: 0 !important;
   text-transform: none !important;
-}
-.lightbox .lightbox__place .lightbox__place-back {
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  background: rgba(20, 24, 32, 0.55) !important;
-  color: #fff !important;
 }
 
 /* Route bundle: gallery-lightbox:end */
@@ -11388,6 +11630,177 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 /* Journal polish (7 Nov 2026). Last in travel-journal.css so it follows the journal rules it
    adjusts. */
 
+/* Place card (place-card.js, loaded by gallery.js, 18 Nov 2026, mockup 6): a stop with photos or a price opens it; a
+   price-only stop reads as the same teal dotted link. A centred card on desktop, a bottom sheet
+   on phones. The theme's buttons are uppercase 3rem slabs with an !important ink colour. */
+.page-travel-journal .has-card { cursor: pointer; }
+.page-travel-journal .has-card:not(.has-photos) > span:first-child {
+  color: var(--color-brand-700);
+  text-decoration: underline dotted color-mix(in srgb, var(--color-brand-600) 55%, transparent);
+  text-underline-offset: 0.22em;
+}
+.page-travel-journal .has-card:not(.has-photos):hover > span:first-child { text-decoration-style: solid; }
+html.place-card-open { overflow: hidden; overscroll-behavior: none; }
+.place-card {
+  position: fixed;
+  inset: 0;
+  z-index: 21;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(12, 20, 22, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--motion-standard) ease, visibility 0s linear var(--motion-standard);
+}
+.place-card.is-visible { opacity: 1; visibility: visible; transition-delay: 0s; }
+.place-card__sheet {
+  position: relative;
+  width: min(27rem, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.35rem 1.4rem 1.4rem;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 48px rgba(12, 20, 22, 0.22);
+  color: var(--color-ink-900);
+  text-align: left;
+  transform: translateY(0.5rem) scale(0.98);
+  transition: transform var(--motion-standard) ease;
+}
+.place-card.is-visible .place-card__sheet { transform: none; }
+.place-card__handle { display: none; }
+.place-card .place-card__close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  color: var(--color-ink-600) !important;
+  font: 400 1.6rem/2.5rem var(--font-display);
+}
+.place-card__title {
+  margin: 0 2.5rem 0 0;
+  color: var(--color-ink-900);
+  font: 700 1.2rem/1.3 var(--font-body);
+  text-align: left;
+}
+.place-card__meta {
+  margin: 0.2rem 0 0;
+  color: var(--color-ink-600);
+  font: 300 0.85rem/1.5 var(--font-body);
+  text-align: left;
+}
+.place-card__meta > :lang(zh-Hans) { font-family: Merriweather, "Merriweather Fallback", Georgia, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
+/* One row of up to four thumbnails, no taller than 7.5rem; a fifth photo or more puts "+N" on
+   the last one (fix round, 18 Nov 2026: the "N photos" tile took a slot and repeated View). */
+.place-card .place-card__photos {
+  display: grid;
+  grid-template-columns: repeat(var(--cells, 1), 1fr);
+  gap: 0.35rem;
+  width: 100%;
+  height: auto;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  border-radius: 0.45rem;
+  box-shadow: none;
+  line-height: normal;
+  white-space: normal;
+}
+.place-card [hidden] { display: none; }
+.place-card__photos img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 7.5rem;
+  aspect-ratio: 1;
+  border-radius: 0.45rem;
+  background: #e6eeed;
+  object-fit: cover;
+}
+.place-card__photos img:nth-of-type(4),
+.place-card__more { position: relative; z-index: 1; grid-area: 1 / 4; align-self: stretch; }
+.place-card__more {
+  display: grid;
+  place-items: center;
+  border-radius: 0.45rem;
+  background: rgba(12, 20, 22, 0.5);
+  color: #fff;
+  font: 700 1rem/1 var(--font-display);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.place-card__facts {
+  display: grid;
+  grid-template-columns: 3.75rem 1fr;
+  gap: 0.3rem 0.5rem;
+  margin: 0.9rem 0 0;
+  padding: 0.7rem 0 0;
+  border-top: 1px solid #dfe7e9;
+}
+.place-card__facts dt {
+  margin: 0;
+  color: var(--color-ink-600);
+  font: 700 0.78rem/1.5rem var(--font-display);
+}
+.place-card__facts dd {
+  margin: 0;
+  font: 300 0.88rem/1.5rem var(--font-body);
+  font-variant-numeric: tabular-nums;
+}
+/* One height for all three, sized to their words; they share out the row's spare width. */
+.place-card__actions { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: 1rem; }
+.place-card .place-card__view,
+.place-card .place-card__map {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 2.5rem;
+  margin: 0;
+  padding: 0 0.8rem;
+  border: 0;
+  border-radius: 999px;
+  font: 700 0.85rem/1 var(--font-display);
+  letter-spacing: 0;
+  text-align: center;
+  text-decoration: none;
+  text-transform: none;
+  white-space: nowrap;
+}
+.place-card .place-card__view { background: var(--color-brand-600); box-shadow: none; color: #fff !important; }
+.place-card .place-card__map { box-shadow: inset 0 0 0 1px rgba(17, 128, 125, 0.6); color: var(--color-brand-700) !important; }
+@media (hover: hover) {
+  .place-card .place-card__close:hover, .place-card .place-card__map:hover { background: var(--color-brand-100); }
+  .place-card .place-card__view:hover { background: var(--color-brand-700); }
+}
+@media screen and (max-width: 736px) {
+  .place-card { align-items: flex-end; padding: 0; }
+  .place-card__sheet {
+    width: 100%;
+    max-height: 88vh;
+    max-height: 88dvh;
+    padding: 0.5rem 1rem calc(1rem + env(safe-area-inset-bottom));
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -6px 24px rgba(12, 20, 22, 0.18);
+    transform: translateY(100%);
+  }
+  .place-card__handle { display: block; width: 2.5rem; height: 5px; margin: 0 auto 0.6rem; border-radius: 3px; background: #cfd8da; }
+  .place-card .place-card__close { top: 0.65rem; right: 0.4rem; }
+  .place-card__title { font-size: 1.1rem; }
+  .place-card__photos img { max-height: 6.5rem; }
+  .place-card .place-card__view, .place-card .place-card__map { height: 44px; min-height: 44px; padding: 0 0.6rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .place-card, .place-card__sheet { transition: none; }
+}
+
 /* One phone gutter. Seoul, Silicon Valley, Europe, Perth, USA & Canada, Germany and Chengdu set
    their days in the theme's 2rem (29px) while the hero above uses 1.1rem (16px); Japan, Guangzhou
    and Australia already use 16px with inset 1px dividers, which every journal now shares. */
@@ -11475,6 +11888,56 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
     mask-image: linear-gradient(90deg, transparent, #000 2rem);
   }
 }
+
+/* Place chips over a day's photos (gallery.js, 18 Nov 2026): the "View all N stops" chip, teal
+   when chosen. Hidden tiles leave the grid. Phones keep All put and scroll the place chips
+   beside it, without snapping, fading them at its edge once scrolled, and extend each
+   chip's hit area to 44px, as View all does (18 Nov 2026 review). */
+.journal-place-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.journal-place-filter__places { display: contents; }
+.page-travel-journal .journal-place-filter__chip {
+  display: inline-block;
+  height: auto;
+  min-height: 2.4rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid rgba(17, 128, 125, 0.6);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: none;
+  color: var(--color-brand-700) !important;
+  font: 700 max(var(--text-floor, 0px), 0.85rem)/1.2 var(--font-display);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.page-travel-journal .journal-place-filter__chip:hover { border-color: var(--color-brand-600); background: #f1f7f6; }
+.page-travel-journal .journal-place-filter__chip[aria-pressed="true"] { border-color: var(--color-brand-600); background: var(--color-brand-600); color: #fff !important; }
+.journal-place-filter__chip span { opacity: 0.75; }
+.page-travel-journal .masonry .brick[hidden] { display: none; }
+
+@media screen and (max-width: 600px) {
+  .journal-place-filter { flex-wrap: nowrap; gap: 0; margin: 0 -1.1rem 0.75rem 0; }
+  .journal-place-filter__places {
+    display: flex;
+    flex: 1;
+    gap: 0.5rem;
+    min-width: 0;
+    margin: -6px 0;
+    padding: 6px 1.1rem 6px 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .journal-place-filter__places.is-scrolled {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0.3rem, #000 2rem);
+    mask-image: linear-gradient(90deg, transparent 0.3rem, #000 2rem);
+  }
+  .page-travel-journal .journal-place-filter__chip { position: relative; flex: none; }
+  .journal-place-filter__chip::after { position: absolute; inset: calc(50% - 22px) 0; content: ""; }
+}
+/* A packaged tour (18 Nov 2026, owner): the price actually paid per person, from the booking, on the days
+   it covered, after the official total; a small Klook mark, quiet like the total. */
+.page-travel-journal .travel-route__tour { display: flex; align-items: center; gap: 0.4rem; margin: 0.3rem 0 0; color: var(--color-ink-700); font-size: max(var(--text-floor, 0px), 0.78rem); line-height: 1.4; text-align: left; font-variant-numeric: tabular-nums; }
+.page-travel-journal .travel-route__klook { flex: none; width: 0.95rem; height: 0.95rem; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%23ff5b00'/%3E%3Cpath d='M5.5 3.5v9M5.5 9.2 10.8 4.2M7.6 7.5l3.6 5' stroke='%23fff' stroke-width='1.9' stroke-linecap='round' fill='none'/%3E%3C/svg%3E") center / contain no-repeat; }
+
 /* Route bundle: journal-polish:end */
 
 /* Work and Projects opening (15 Nov 2026): the single-line headline that
