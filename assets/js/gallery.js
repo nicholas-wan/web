@@ -1066,7 +1066,12 @@
      this file. */
   var cardApi = null;
   var cardWatch = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
-    if (entries.some(function (entry) { return entry.isIntersecting; })) { cardWatch.disconnect(); cardWatch = null; loadCard(); }
+    if (!entries.some(function (entry) { return entry.isIntersecting; })) return;
+    cardWatch.disconnect();
+    cardWatch = null;
+    /* Never ahead of the page's own load: a card route near the top held the load event. */
+    if (document.readyState === 'complete') loadCard();
+    else window.addEventListener('load', function () { loadCard(); }, { once: true });
   }, { rootMargin: '600px 0px' }) : null;
   var cardTap = null;
   var cardScript = null;

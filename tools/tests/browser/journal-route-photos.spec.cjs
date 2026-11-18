@@ -32,12 +32,12 @@ test('Chengdu stops own exactly their photos, count within the place and offer t
   await day6.getByRole('button', { name: 'Open the place card for Tianmen Cave (2 photos)' }).click();
   await page.locator('.place-card').getByRole('button', { name: 'View 2 photos', exact: true }).last().click();
   const context = page.locator('.lightbox__context');
-  await expect(context).toHaveText(/1 of 2 at Tianmen Cave · Day 6$/);
+  await expect(context).toHaveText(/1 of 2 · Day 6$/);
   await expect(page.locator('.lightbox__place-thumb')).toHaveCount(2);
   await page.getByRole('button', { name: 'Next media', exact: true }).click();
-  await expect(context).toHaveText(/2 of 2 at Tianmen Cave · Day 6$/);
+  await expect(context).toHaveText(/2 of 2 · Day 6$/);
   await page.getByRole('button', { name: 'Next stop: Skywalk' }).click();
-  await expect(context).toHaveText(/1 of 2 at Skywalk · Day 6$/);
+  await expect(context).toHaveText(/1 of 2 · Day 6$/);
 });
 
 test('Back closes the lightbox, keeps the page and its scroll, and a quick reopen stays open', async ({ page }) => {
@@ -100,7 +100,7 @@ test('a stop with photos opens its place card, which hands its history entry to 
   const viewer = page.locator('.lightbox');
   await expect(viewer).toHaveClass(/is-visible/);
   await expect(card).not.toHaveClass(/is-visible/);
-  await expect(page.locator('.lightbox__context')).toHaveText(/1 of 2 at Tianmen Cave · Day 6$/);
+  await expect(page.locator('.lightbox__context')).toHaveText(/1 of 2 · Day 6$/);
   expect(await page.evaluate(() => history.length)).toBe(length + 1);
 
   await page.goBack();
