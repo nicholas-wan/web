@@ -5,8 +5,7 @@
 window.travelPlaceCard = function (hooks) {
   var escapeText = function (text) { return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
   /* "10 am" and "4:30 pm" never break across lines. */
-  /* One or two photos fill the card's width, so they take the 800w file, not the 480w thumbnail
-     (owner, 18 Nov 2026: a single photo was "really small and looks stretched"). */
+  /* One or two photos fill the card's width, so they take the 800w file. */
   var largeOf = function (media) {
     var wide = /(\S+)\s+800w/.exec(media.getAttribute('srcset') || '');
     return wide ? wide[1] : hooks.stillOf(media);
@@ -83,7 +82,7 @@ window.travelPlaceCard = function (hooks) {
     var own = place.own;
     var photos = hooks.photoCount(own.length);
     var shown = own.slice(0, 4);
-    var facts = [['Price', place.price], ['Hours', place.hours]].filter(function (fact) { return fact[1]; }).map(function (fact) {
+    var facts = [['Hours', place.hours]].filter(function (fact) { return fact[1]; }).map(function (fact) {
       /* Hours may list sessions split by "|", one a line. */
       return '<dt>' + fact[0] + '</dt><dd>' + fact[1].split('|').map(factText).join('<br>') + '</dd>';
     }).join('');
@@ -91,17 +90,15 @@ window.travelPlaceCard = function (hooks) {
       return '<a class="place-card__map' + extra + '" href="' + url + encodeURIComponent(query) + '" target="_blank" rel="noopener">' + label + '</a>';
     };
     var sheet = card.firstChild;
-    /* Layout after Google and Apple Maps' place sheets (owner, 18 Nov 2026: "make it look more
-       professional"): a small teal eyebrow for where it sits in the trip, the name, its Chinese
-       name on a quiet line of its own, the photos, ruled facts, one full-width primary action and
-       the map apps as two soft buttons with a pin each. Amap is named 高德地图, as it is known
-       in China (owner: "nobody knows what Amap means"). One row of up to four thumbnails; more photos
-       than that put "+N" on the last one. */
+    /* Layout after Google and Apple Maps' place sheets; the README's place-card bullet has the
+       owner's decisions. Up to four thumbnails, "+N" on the last when there are more. */
     sheet.innerHTML = '<span class="place-card__handle" aria-hidden="true"></span>' +
       '<button class="place-card__close" type="button" data-card="close" aria-label="Close place card">&times;</button>' +
       '<p class="place-card__eyebrow">' + (place.day ? place.day + ' &middot; ' : '') + 'Stop ' + place.at + '</p>' +
       '<p class="place-card__title" id="place-card-title">' + escapeText(place.name) + '</p>' +
-      (place.zh ? '<p class="place-card__meta" lang="zh-Hans">' + escapeText(place.zh) + '</p>' : '') +
+      /* The price ends the Chinese name's line at the right, as the route list writes it. */
+      (place.zh || place.price ? '<p class="place-card__meta">' + (place.zh ? '<span lang="zh-Hans">' + escapeText(place.zh) + '</span>' : '<span></span>') +
+        (place.price ? '<span class="place-card__price">' + factText(place.price) + '</span>' : '') + '</p>' : '') +
       (own.length ? '<button class="place-card__photos' + (shown.length === 1 ? ' is-single' : shown.length === 2 ? ' is-pair' : '') +
         '" type="button" data-card="view" aria-label="View ' + photos + '" style="--cells: ' + shown.length + '">' + shown.map(function (media) {
           return '<img alt="" decoding="async" src="' + escapeText(shown.length > 2 ? hooks.stillOf(media) : largeOf(media)) + '">';

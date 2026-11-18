@@ -11500,11 +11500,16 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
   text-align: left;
 }
 .place-card__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
   margin: 0.15rem 0 0;
   color: var(--color-ink-600);
   font: 400 0.88rem/1.5 Merriweather, "Merriweather Fallback", Georgia, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
   text-align: left;
 }
+.place-card__price { flex: 0 1 auto; max-width: 60%; font-variant-numeric: tabular-nums; text-align: right; }
 /* One row of up to four thumbnails, no taller than 7.5rem; a fifth photo or more puts "+N" on
    the last one (fix round, 18 Nov 2026: the "N photos" tile took a slot and repeated View). */
 .place-card .place-card__photos {

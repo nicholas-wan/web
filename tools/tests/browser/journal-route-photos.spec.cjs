@@ -80,12 +80,12 @@ test('a stop with photos opens its place card, which hands its history entry to 
   const sheet = card.getByRole('dialog', { name: 'Tianmen Cave' });
   await expect(card).toHaveClass(/is-visible/);
   await expect(sheet.locator('.place-card__eyebrow')).toHaveText('Day 6 · Stop 3');
-  await expect(sheet.locator('.place-card__meta')).toHaveText('天门洞');
+  await expect(sheet.locator('.place-card__meta > [lang]')).toHaveText('天门洞');
   await expect(sheet.locator('.place-card__photos img')).toHaveCount(2);
   // Every photo is showing, so no "N photos" tile repeats the View button.
   await expect(sheet.locator('.place-card__more')).toHaveCount(0);
-  await expect(sheet.locator('dt')).toHaveText(['Price']);
-  await expect(sheet.locator('dd')).toHaveText(['¥42 escalator, optional']);
+  await expect(sheet.locator('.place-card__price')).toHaveText('¥42 escalator, optional');
+  await expect(sheet.locator('dt')).toHaveCount(0);
   await expect(sheet.locator('.place-card__close')).toBeFocused();
   const amap = sheet.getByRole('link', { name: '高德地图' });
   const google = sheet.getByRole('link', { name: 'Google Maps' });
@@ -116,11 +116,12 @@ test('Escape, the backdrop, the close button and Back close the place card and k
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   const card = page.locator('.place-card');
   const stop = await openStop(page, 4, '72 Wonder Tower');
-  await expect(card.locator('dt')).toHaveText(['Price', 'Hours']);
+  await expect(card.locator('dt')).toHaveText(['Hours']);
+  await expect(card.locator('.place-card__price')).toHaveText('¥48 day, ¥88 night');
   await expect(card.locator('.place-card__photos img')).toHaveCount(4);
   await expect(card.locator('.place-card__more')).toHaveCount(0);
   // Only the 4:30 pm day/night split is solid across sources; one session a line, times unbroken.
-  expect(await card.locator('dd').nth(1).evaluate(dd => dd.innerHTML)).toBe('Day ticket until 4:30&nbsp;pm<br>Night ticket from 4:30&nbsp;pm');
+  expect(await card.locator('dd').nth(0).evaluate(dd => dd.innerHTML)).toBe('Day ticket until 4:30&nbsp;pm<br>Night ticket from 4:30&nbsp;pm');
   await page.keyboard.press('Escape');
   await expect(card).not.toHaveClass(/is-visible/);
   await expect(stop).toBeFocused();
@@ -157,7 +158,8 @@ test('a priced stop without photos opens a card with no photos or View button', 
   await expect(card).toHaveClass(/is-visible/);
   await expect(card.locator('.place-card__title')).toHaveText('Bailong Elevator');
   await expect(card.locator('.place-card__photos, .place-card__view')).toHaveCount(0);
-  await expect(card.locator('dd')).toHaveText(['¥65 one way']);
+  await expect(card.locator('.place-card__price')).toHaveText('¥65 one way');
+  await expect(card.locator('dd')).toHaveCount(0);
   await expect(card.getByRole('link')).toHaveText(['Google Maps', '高德地图']);
   // Stops with neither photos nor a price stay plain text.
   await expect(page.locator('.guangzhou-route__stop', { hasText: 'Zhangjiajie Airport' }).first()).not.toHaveAttribute('role', 'button');
@@ -182,7 +184,7 @@ test('the phone sheet stays compact: one row of photos, "+N" only past four, one
     const links = await sheet.locator('.place-card__map').evaluateAll(items => items.map(item => Math.round(item.getBoundingClientRect().height)));
     expect(links.length).toBe(2);
     expect(links).toEqual([44, 44]);
-    const hours = await sheet.locator('dd').nth(1).evaluate(dd => dd.getBoundingClientRect().height / parseFloat(getComputedStyle(dd).lineHeight));
+    const hours = await sheet.locator('dd').nth(0).evaluate(dd => dd.getBoundingClientRect().height / parseFloat(getComputedStyle(dd).lineHeight));
     expect(Math.round(hours), width + 'px hours lines').toBe(2);
     await page.keyboard.press('Escape');
   }
