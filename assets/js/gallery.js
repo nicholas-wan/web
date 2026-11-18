@@ -1173,12 +1173,6 @@
     thumb.decoding = 'async';
     thumb.src = stillOf(first);
     stop.appendChild(thumb);
-    var count = document.createElement('span');
-    count.className = 'travel-route__count';
-    count.setAttribute('aria-hidden', 'true');
-    count.textContent = own.length;
-    stop.appendChild(count);
-    name.setAttribute('data-count', own.length);
     stop.classList.add('has-photos');
   });
   /* Keep native swiping, with persistent progress and explicit phone controls. */

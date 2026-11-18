@@ -87,7 +87,7 @@ test('a stop with photos opens its place card, which hands its history entry to 
   await expect(sheet.locator('dt')).toHaveText(['Price']);
   await expect(sheet.locator('dd')).toHaveText(['¥42 escalator, optional']);
   await expect(sheet.locator('.place-card__close')).toBeFocused();
-  const amap = sheet.getByRole('link', { name: 'Amap' });
+  const amap = sheet.getByRole('link', { name: '高德地图' });
   const google = sheet.getByRole('link', { name: 'Google Maps' });
   await expect(amap).toHaveAttribute('href', 'https://uri.amap.com/search?keyword=' + encodeURIComponent('天门洞'));
   await expect(google).toHaveAttribute('href', 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('Tianmen Cave, 天门洞'));
@@ -158,7 +158,7 @@ test('a priced stop without photos opens a card with no photos or View button', 
   await expect(card.locator('.place-card__title')).toHaveText('Bailong Elevator');
   await expect(card.locator('.place-card__photos, .place-card__view')).toHaveCount(0);
   await expect(card.locator('dd')).toHaveText(['¥65 one way']);
-  await expect(card.getByRole('link')).toHaveText(['Google Maps', 'Amap']);
+  await expect(card.getByRole('link')).toHaveText(['Google Maps', '高德地图']);
   // Stops with neither photos nor a price stay plain text.
   await expect(page.locator('.guangzhou-route__stop', { hasText: 'Zhangjiajie Airport' }).first()).not.toHaveAttribute('role', 'button');
 });
@@ -243,10 +243,10 @@ const tabStaysInside = async (page, engine) => {
   });
   const forward = [];
   for (let i = 0; i < 6; i++) { await page.keyboard.press('Tab'); forward.push(await focused()); }
-  expect(forward, engine).toEqual(['View 4 photos', 'View 4 photos', 'Google Maps', 'Amap', 'Close place card', 'View 4 photos']);
+  expect(forward, engine).toEqual(['View 4 photos', 'View 4 photos', 'Google Maps', '高德地图', 'Close place card', 'View 4 photos']);
   const back = [];
   for (let i = 0; i < 6; i++) { await page.keyboard.press('Shift+Tab'); back.push(await focused()); }
-  expect(back, engine).toEqual(['Close place card', 'Amap', 'Google Maps', 'View 4 photos', 'View 4 photos', 'Close place card']);
+  expect(back, engine).toEqual(['Close place card', '高德地图', 'Google Maps', 'View 4 photos', 'View 4 photos', 'Close place card']);
   await expect(sheet).toBeVisible();
 };
 

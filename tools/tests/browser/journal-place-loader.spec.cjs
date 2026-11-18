@@ -145,31 +145,12 @@ test('the viewer names the place only when the caption does not, and its way on 
   expect(style.height).toBe(await page.locator('.lightbox__place-thumb').first().evaluate(node => node.offsetHeight));
 });
 
-test('photo counts are tags with a photo glyph, never discs like the stop numbers', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto(journal);
-  const day4 = route(page, 4);
-  await day4.locator('.travel-route__more').click();
-  const badge = day4.locator('.has-card', { hasText: '72 Wonder Tower' }).locator('.travel-route__count');
-  await expect(badge).toHaveText('4');
-  await expect(badge).toHaveAttribute('aria-hidden', 'true');
-  const phone = await badge.evaluate(node => {
-    const css = getComputedStyle(node);
-    return { image: css.backgroundImage, radius: parseFloat(css.borderTopLeftRadius), height: node.offsetHeight, width: node.offsetWidth };
-  });
-  expect(phone.image).toContain('svg');
-  expect(phone.radius).toBeLessThan(phone.height / 3);
-  expect(phone.width).toBeGreaterThan(phone.height);
-
-  await page.setViewportSize({ width: 1440, height: 900 });
-  const name = route(page, 6).locator('.has-card', { hasText: 'Tianmen Cave' }).locator('span[data-count]');
-  await expect(name).toHaveAttribute('data-count', '2');
-  const desktop = await name.evaluate(node => {
-    const css = getComputedStyle(node, '::after');
-    return { content: css.content, image: css.backgroundImage, radius: parseFloat(css.borderTopLeftRadius), color: css.backgroundColor };
-  });
-  expect(desktop.content).toBe('"2"');
-  expect(desktop.image).toContain('svg');
-  expect(desktop.radius).toBeLessThan(4);
-  expect(desktop.color).not.toBe('rgb(17, 128, 125)');
+test('route stops carry no photo-count tags: the card and the viewer give the count', async ({ page }) => {
+  // Owner, 18 Nov 2026: the stacked-squares tag read as a copy button, and map and photo sites
+  // show a count only with the photos themselves.
+  for (const [width, height] of [[390, 844], [1440, 900]]) {
+    await page.setViewportSize({ width, height });
+    await page.goto(journal);
+    await expect(page.locator('.travel-route__count, [data-count]')).toHaveCount(0);
+  }
 });

@@ -88,7 +88,8 @@ window.travelPlaceCard = function (hooks) {
     /* Layout after Google and Apple Maps' place sheets (owner, 18 Nov 2026: "make it look more
        professional"): a small teal eyebrow for where it sits in the trip, the name, its Chinese
        name on a quiet line of its own, the photos, ruled facts, one full-width primary action and
-       the map apps as two soft buttons with a pin each. One row of up to four thumbnails; more photos
+       the map apps as two soft buttons with a pin each. Amap is named 高德地图, as it is known
+       in China (owner: "nobody knows what Amap means"). One row of up to four thumbnails; more photos
        than that put "+N" on the last one. */
     sheet.innerHTML = '<span class="place-card__handle" aria-hidden="true"></span>' +
       '<button class="place-card__close" type="button" data-card="close" aria-label="Close place card">&times;</button>' +
@@ -103,7 +104,7 @@ window.travelPlaceCard = function (hooks) {
       '<div class="place-card__actions">' + (own.length ? '<button class="place-card__view" type="button" data-card="view">View ' + photos + '</button>' : '') +
       '<div class="place-card__maps">' +
       map('https://www.google.com/maps/search/?api=1&query=', place.zh ? place.name + ', ' + place.zh : place.name, 'Google Maps', '') +
-      map('https://uri.amap.com/search?keyword=', place.zh || place.name, 'Amap', ' place-card__map--amap') + '</div></div>';
+      map('https://uri.amap.com/search?keyword=', place.zh || place.name, '<span lang="zh-Hans">高德地图</span>', ' place-card__map--amap') + '</div></div>';
     /* A sheet dragged shut, or left mid-drag, opens from the bottom again. */
     sheet.style.transition = '';
     sheet.style.transform = '';
