@@ -1069,12 +1069,9 @@
     trigger.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); lastTrigger = trigger; show(index); } });
   });
 
-  /* Route stops open their photos (18 Nov 2026, a visitor's request), on journals that opt in
-     with data-route-photos on their article. A stop owns the photos of its day whose caption
-     title equals its name or one of the |-separated titles in its data-photos. Exact on
-     purpose: older journals title photos with the city (Toronto, Hiroshima), and substring
-     matching gave every stop every photo of its day. A stop with photos or a price opens its
-     place card (below); the others stay plain text. */
+  /* Route stops open their photos (18 Nov 2026, a visitor's request), on every journal; which
+     photos a stop owns is worked out at placeKey below. A stop with photos or a price opens its
+     place card; the others stay plain text. */
   /* The place's own photos as a strip under the caption, and at its last photo a
      way on: the next stop of the day with photos, or back to the route. The
      viewer never closes by itself. */
@@ -1158,7 +1155,7 @@
     if (cardTap) cardTap.place.stop.classList.remove('is-loading');
     if (place) { cardTap = { place: place, at: Date.now(), shows: shows }; place.stop.classList.add('is-loading'); }
     if (cardScript) return;
-    var article = document.querySelector('.travel-journal__content[data-place-card]');
+    var article = document.querySelector('[data-place-card]');
     if (!article) return;
     cardScript = document.createElement('script');
     cardScript.fetchPriority = 'high';
@@ -1192,37 +1189,51 @@
     route.tabIndex = -1;
     return route;
   };
-  var placeKey = function (text) { return (text || '').toLowerCase().replace(/[^a-z0-9぀-鿿가-힯]+/g, ''); };
-  var mediaTitles = galleryMedia.map(function (media) {
-    var title = media.closest('.content') && media.closest('.content').querySelector('.content-title');
-    return placeKey(title && title.textContent);
-  });
-  if (isJournal && document.querySelector('.travel-journal__content[data-route-photos]')) document.querySelectorAll('.guangzhou-route__stop').forEach(function (stop) {
-    var heading = null;
-    journalHeadings.forEach(function (candidate) { if (candidate.compareDocumentPosition(stop) & 4) heading = candidate; });
-    /* A malformed stop with no name is skipped, so it cannot stop the rest of this file. */
+  /* Every journal, no opt-in (18 Nov 2026, owner: Chengdu's changes on all of them). Names
+     compare without case, spaces, punctuation or accents (Köln, Dōngshānkǒu); NFKD splits Hangul
+     into jamo, which stay too. A stop answers to its name, its subtitle when that is the same name
+     in the other script (Chengdu's Chinese, Japan's English), and the |-separated titles in its
+     data-photos. A malformed stop with no name is skipped, so it cannot stop the rest of this file. */
+  var placeKey = function (text) { return (text || '').normalize('NFKD').toLowerCase().replace(/[^a-z0-9ᄀ-ᇿ぀-鿿]+/g, ''); };
+  var stops = [];
+  if (isJournal) document.querySelectorAll('.guangzhou-route__stop').forEach(function (stop) {
     var name = stop.querySelector('span');
-    if (!name) return;
-    var keys = [name.textContent].concat((stop.getAttribute('data-photos') || '').split('|')).map(placeKey).filter(Boolean);
-    var own = galleryMedia.filter(function (media, index) {
-      return mediaSections[index] === heading && keys.indexOf(mediaTitles[index]) >= 0;
+    var sub = stop.querySelector('small:not(.travel-route__price)');
+    if (name) stops.push({ stop: stop, name: name, sub: sub, heading: journalHeadings.filter(function (h) { return h.compareDocumentPosition(stop) & 4; }).pop(),
+      keys: [name.textContent, sub && /\W/.test(placeKey(sub.textContent)) != /\W/.test(placeKey(name.textContent)) && sub.textContent].concat((stop.dataset.photos || '').split('|')).map(placeKey).filter(Boolean) });
+  });
+  /* A photo belongs to the first stop of its day that its caption text names, else its title:
+     older journals title photos with the city and name the place in the text (Toronto / CN
+     Tower), Chengdu titles them with the place. A caption mixing scripts also answers to each
+     script alone ("Atomic Bomb Dome 原爆ドーム"). Exact on purpose: substring matching gave most
+     stops every photo of their day. First, so a stop repeated on one day keeps its photos. */
+  var ownerOf = galleryMedia.map(function (media, index) {
+    var owner;
+    ['text', 'title'].some(function (field) {
+      var key = placeKey(((media.closest('.content') || media).querySelector('.content-' + field) || {}).textContent);
+      var labels = [key, key.replace(/\W/g, ''), key.replace(/\w/g, '')];
+      return owner = stops.find(function (entry) { return entry.heading == mediaSections[index] && entry.keys.some(function (k) { return labels.includes(k); }); });
     });
-    /* A stop repeated on one day (a round trip) keeps its photos with the first. */
-    if (own.length && placeOf[galleryMedia.indexOf(own[0])]) own = [];
+    return owner;
+  });
+  stops.forEach(function (entry) {
+    var stop = entry.stop;
+    var heading = entry.heading;
+    var own = galleryMedia.filter(function (media, index) { return ownerOf[index] === entry; });
     var price = stop.querySelector('.travel-route__price');
     if (!own.length && !price) return;
-    /* The Chinese name (Amap's keyword) only from a subtitle marked zh; any other subtitle is
-       shown on the card as plain text. */
-    var zh = stop.querySelector('small[lang^="zh"]');
-    var subtitle = zh || stop.querySelector('small:not(.travel-route__price)');
+    /* The Chinese name (Amap's keyword; Amap shows only with one) from the stop's name or
+       subtitle marked zh; the card shows the subtitle, marked zh-Hans only when it is that name. */
+    var zh = stop.querySelector('[lang^="zh"]:not(.travel-route__price)');
     var place = {
       stop: stop,
-      name: name.textContent.trim(),
+      name: entry.name.textContent.trim(),
+      lang: entry.name.lang,
       zh: zh && zh.textContent.trim(),
-      sub: subtitle && subtitle.textContent.trim(),
+      sub: entry.sub && entry.sub.textContent.trim(),
       price: price && price.textContent.trim(),
       klook: !!(price && price.querySelector('.travel-route__klook')),
-      hours: stop.getAttribute('data-hours'),
+      hours: stop.dataset.hours,
       day: (/^Day\s+\d+/i.exec(heading ? heading.textContent.trim() : '') || [''])[0],
       at: Array.prototype.indexOf.call(stop.parentNode.querySelectorAll('.guangzhou-route__stop'), stop) + 1,
       own: own

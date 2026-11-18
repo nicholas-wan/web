@@ -690,29 +690,43 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
 }
 
 # The trip at a glance (18 Nov 2026, journal UX mockups page 7): one quiet line in the hero of
-# journals that opt in with data-route-photos, counted here from the source, never in the browser.
-# Days: day sections with a heading. Stops: route stops, a stop repeated within one day counted
-# once (its photos stay with the first, too); the same place on two days counts on each. Photos:
-# gallery tiles, animations included. No money: a sum of ticket prices without flights, stays and
+# every journal (owner, 18 Nov 2026: Chengdu's changes on all of them), counted here from the
+# source, never in the browser. Days: the hero's own dates, first to last day, so journals in
+# chapters (Japan's cities, Australia's places) count them too; a range in months only (Silicon
+# Valley) counts months. Stops: route stops, a stop repeated within one day counted once (its photos
+# stay with the first, too); the same place on two days counts on each. Photos: gallery tiles,
+# animations included. No money: a sum of ticket prices without flights, stays and
 # food read as the trip's cost (owner, 18 Nov 2026: "misleading to put"); day totals stay, each
 # saying what it counts. It follows the banner rather than the lede: above it, the phone banner
 # fell to about 250px from the top, past the README's ~220px.
 function Add-TripStats([string]$Markup, [string]$Slug) {
-    if ($tripOrder -notcontains $Slug -or $Markup -notmatch '<article class="travel-journal__content\b[^"]*"[^>]*\sdata-route-photos\b') { return $Markup }
-    $days = 0; $stops = 0
-    foreach ($day in [regex]::Matches($Markup, '(?s)<section class="travel-journal__day(?=[\s"])[^"]*"[^>]*>(?<body>.*?)</section>')) {
+    if ($tripOrder -notcontains $Slug) { return $Markup }
+    $days = 0; $months = 0; $stops = 0
+    $culture = [Globalization.CultureInfo]::InvariantCulture
+    $range = [regex]::Match($Markup, '<span class="date">\s*(?<from>(?:\d{1,2} )?[A-Za-z]+ \d{4})\s*&ndash;\s*(?<to>(?:\d{1,2} )?[A-Za-z]+ \d{4})\s*</span>')
+    if ($range.Success -and $range.Groups['from'].Value -match '^\d') {
+        $days = ([datetime]::ParseExact($range.Groups['to'].Value, 'd MMMM yyyy', $culture) - [datetime]::ParseExact($range.Groups['from'].Value, 'd MMMM yyyy', $culture)).Days + 1
+    }
+    elseif ($range.Success) {
+        # A range in months only (Silicon Valley, August 2019 - April 2020) counts months instead.
+        $from = [datetime]::ParseExact($range.Groups['from'].Value, 'MMMM yyyy', $culture)
+        $to = [datetime]::ParseExact($range.Groups['to'].Value, 'MMMM yyyy', $culture)
+        $months = ($to.Year - $from.Year) * 12 + $to.Month - $from.Month + 1
+    }
+    # Older journals (Japan, Guangzhou) carry only the guangzhou-* compatibility classes.
+    foreach ($day in [regex]::Matches($Markup, '(?s)<section class="(?:[^"]*\s)?(?:travel-journal__day|guangzhou-day)(?=[\s"])[^"]*"[^>]*>(?<body>.*?)</section>')) {
         $body = $day.Groups['body'].Value
         if ($body -notmatch '<h2\b') { continue }
-        $days++
         $seen = New-Object 'System.Collections.Generic.HashSet[string]'
         foreach ($stop in [regex]::Matches($body, '(?s)<span class="(?:[^"]*\s)?(?:travel|guangzhou)-route__stop(?=[\s"])[^"]*"[^>]*>\s*<span\b[^>]*>(?<name>.*?)</span>')) {
             $name = [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($stop.Groups['name'].Value, '<[^>]+>', '') -replace '\s+', ' ').Trim()).ToLowerInvariant()
             if ($seen.Add($name)) { $stops++ }
         }
     }
-    $photos = [regex]::Matches($Markup, 'class="(?:[^"]*\s)?travel-gallery__item(?=[\s"])').Count
+    # Tiles are bricks; Australia's banner is one too, so hero images are left out.
+    $photos = [regex]::Matches($Markup, 'class="(?![^"]*hero-image)(?:[^"]*\s)?brick(?=[\s"])').Count
     $stats = New-Object 'System.Collections.Generic.List[string]'
-    foreach ($part in @(@($days, 'day'), @($stops, 'stop'), @($photos, 'photo'))) {
+    foreach ($part in @(@($days, 'day'), @($months, 'month'), @($stops, 'stop'), @($photos, 'photo'))) {
         if ($part[0] -gt 0) { $stats.Add("<b>$($part[0])</b> $($part[1])" + $(if ($part[0] -eq 1) { '' } else { 's' })) }
     }
     if ($stats.Count -eq 0) { return $Markup }
@@ -723,11 +737,15 @@ function Add-TripStats([string]$Markup, [string]$Slug) {
         "<span class=`"travel-journal__stat`">$dot$($stats[$i])</span>"
     }
     $line = "`n    <p class=`"travel-journal__stats`"><span class=`"travel-journal__stats-list`">" + ($items -join ' ') + '</span></p>'
-    $banner = [regex]::Match($Markup, '(?s)<div class="[^"]*\b(?:travel|guangzhou)-journal__hero-image\b[^"]*">.*?</div>')
+    # The banner ends every journal's hero, so the line goes just before the hero's </header>
+    # (Australia's banner nests a div: its first </div> was inside the banner).
+    $banner = [regex]::Match($Markup, '(?s)<div class="[^"]*\b(?:travel|guangzhou)-journal__hero-image\b[^"]*">.*?</header>')
     if (-not $banner.Success) { throw "Add-TripStats found no hero banner on $Slug." }
-    # has-trip-stats lets the line's lower hairline take the place of the first day's divider.
-    $Markup = $Markup.Insert($banner.Index + $banner.Length, $line)
-    return ([regex]'<article class="travel-journal__content"').Replace($Markup, '<article class="travel-journal__content has-trip-stats"', 1)
+    $Markup = $Markup.Insert($banner.Index + $banner.Length - '</header>'.Length, $line)
+    # has-trip-stats lets the line's lower hairline take the place of the first day's divider. It
+    # goes on the hero's article, which on Japan and Australia has no class of its own.
+    $evaluator = [System.Text.RegularExpressions.MatchEvaluator] { param($m) '<article class="' + ($m.Groups[1].Value + ' has-trip-stats').Trim() + '"' }
+    return ([regex]'<article\b(?: class="([^"]*)")?').Replace($Markup, $evaluator, 1)
 }
 
 function Convert-MainLandmark([string]$Markup) {
@@ -1286,8 +1304,9 @@ foreach ($page in $pages) {
     if ($tripOrder -contains $slug) { $main = Set-WideJournalTileSizes $main }
     $main = Add-ImagePerformanceAttributes $main (Join-Path $root "images") $sourceImageIndex ($tripOrder -contains $slug)
     $main = Add-GalleryAltText $main $slug
-    # The place card loads on demand from this versioned URL (gallery.js), outside the 80 KB ceiling.
-    $main = ([regex]'(<article class="travel-journal__content\b[^"]*"[^>]*\sdata-route-photos\b(?:="[^"]*")?)').Replace($main, "`$1 data-place-card=`"$(Get-AssetRef 'assets/js/place-card.js')`"", 1)
+    # The place card loads on demand from this versioned URL (gallery.js), outside the 80 KB ceiling,
+    # written on every journal's hero article, with or without a class (Japan, Australia).
+    if ($tripOrder -contains $slug) { $main = ([regex]'<article\b[^>]*').Replace($main, "`$0 data-place-card=`"$(Get-AssetRef 'assets/js/place-card.js')`"", 1) }
     $main = Add-TripStats $main $slug
     $main = Add-RouteSummaries $main $slug
     if ($slug -eq 'travel') {

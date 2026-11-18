@@ -11653,6 +11653,8 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
    as Apple Maps and Airbnb pair a primary action with quiet secondary ones. The pins are
    drawn here; no logo is fetched. */
 .place-card__maps { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin: 0.5rem 0 0; }
+/* Outside China there is no Amap button, so Google Maps takes the whole row. */
+.place-card .place-card__map:only-child { grid-column: 1 / -1; }
 .place-card .place-card__map {
   display: flex;
   align-items: center;

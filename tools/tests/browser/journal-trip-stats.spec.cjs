@@ -1,13 +1,23 @@
 const { test, expect } = require('@playwright/test');
 
 // The trip at a glance (18 Nov 2026): build.ps1 (Add-TripStats) counts days, stops, photos and
-// guide-price tickets for journals that opt in with data-route-photos, and sets the line under the
-// banner, whose lower hairline stands in for the first day's divider.
+// guide-price tickets for every journal (18 Nov 2026, owner: Chengdu's changes on all of them), and
+// sets the line under the banner, whose lower hairline stands in for the first day's divider. Days
+// come from the hero's dates, so journals in chapters count them too.
 
-const others = ['travel_2017_seoul', 'travel_2019_siliconvalley', 'travel_2022_europe', 'travel_2023_perth',
-  'travel_2023_usacanada', 'travel_2024_australia', 'travel_2024_germany', 'travel_2025_japan', 'travel_2026_guangzhou'];
+const others = {
+  travel_2017_seoul: '9 days · 7 stops · 11 photos',
+  travel_2019_siliconvalley: '9 months · 62 photos',
+  travel_2022_europe: '11 days · 62 stops · 89 photos',
+  travel_2023_perth: '11 days · 60 stops · 120 photos',
+  travel_2023_usacanada: '19 days · 106 stops · 250 photos',
+  travel_2024_australia: '13 days · 57 stops · 86 photos',
+  travel_2024_germany: '23 days · 53 photos',
+  travel_2025_japan: '17 days · 64 stops · 118 photos',
+  travel_2026_guangzhou: '6 days · 36 stops · 55 photos'
+};
 
-test('Chengdu shows the trip at a glance under its banner, and no other journal has one', async ({ page }) => {
+test('Chengdu shows the trip at a glance under its banner, and so does every other journal', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   const stats = page.locator('.travel-journal__stats');
@@ -26,9 +36,17 @@ test('Chengdu shows the trip at a glance under its banner, and no other journal 
   expect(geometry.stats.height).toBeLessThan(48);
   expect(geometry.date.top).toBeGreaterThan(geometry.stats.bottom);
 
-  for (const slug of others) {
+  for (const [slug, line] of Object.entries(others)) {
     await page.goto('/' + slug);
-    await expect(page.locator('.travel-journal__stats'), slug).toHaveCount(0);
+    const other = page.locator('.travel-journal__stats');
+    expect((await other.textContent()).replace(/\s+/g, ' ').trim(), slug).toBe(line);
+    const box = await page.evaluate(() => {
+      const rect = selector => document.querySelector(selector).getBoundingClientRect();
+      return { banner: rect('.journal-banner'), stats: rect('.travel-journal__stats') };
+    });
+    // The line follows the banner, so the banner keeps whatever place it had.
+    expect(box.stats.top, slug).toBeGreaterThan(box.banner.bottom - 1);
+    expect(box.stats.height, slug).toBeLessThan(48);
   }
 });
 

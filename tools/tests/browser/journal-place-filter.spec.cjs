@@ -1,6 +1,6 @@
 const { test, expect } = require('@playwright/test');
 
-// Place chips filter a day's photos (18 Nov 2026), on journals that opt in with data-route-photos.
+// Place chips filter a day's photos (18 Nov 2026), on every journal with routes.
 // The phone counter and arrows follow the visible tiles; desktop grid tiles reflow.
 
 const day6 = page => page.locator('#trip-section-6 ~ .journal-gallery-shell');
@@ -57,12 +57,17 @@ test('desktop filtered tiles reflow from the first grid cell', async ({ page }) 
   expect(boxes[1].left - boxes[0].right).toBeLessThan(20);
 });
 
-test('days with photos at fewer than two places, and journals not opted in, get no chips', async ({ page }) => {
+test('days with photos at fewer than two places, and journals without routes, get no chips', async ({ page }) => {
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   const rows = await page.locator('.journal-place-filter').evaluateAll(filters => filters.map(filter => filter.closest('section').querySelector('h2').id));
   expect(rows).not.toContain('trip-section-1');
   expect(rows).toContain('trip-section-6');
-  for (const slug of ['travel_2025_japan', 'travel_2026_guangzhou']) {
+  // Japan's Hiroshima chapter has photos at five stops, in route order.
+  await page.goto('/travel_2025_japan');
+  const hiroshima = page.locator('section', { has: page.locator('h2', { hasText: 'Hiroshima' }) }).locator('.journal-place-filter button');
+  await expect(hiroshima.first()).toHaveText(/^All\s*\d+$/);
+  await expect(hiroshima.nth(1)).toHaveText(/^原爆ドーム\s*1$/);
+  for (const slug of ['travel_2019_siliconvalley', 'travel_2024_germany']) {
     await page.goto('/' + slug);
     await expect(page.locator('.journal-gallery-shell').first()).toBeAttached();
     await expect(page.locator('.journal-place-filter'), slug).toHaveCount(0);

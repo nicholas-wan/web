@@ -98,7 +98,8 @@ test('photo changes update a polite atomic caption without moving navigation foc
   await next.focus();
   await page.keyboard.press('Enter');
   await expect(caption).not.toHaveText(original);
-  await expect(caption).toContainText('2 of');
+  // Every journal counts within the photo's place when it has one (18 Nov 2026): "1 of 2 at 沙面岛".
+  await expect(caption).toContainText('1 of 2 at 沙面岛');
   await expect(next).toBeFocused();
   await page.getByRole('button', { name: 'Previous media', exact: true }).click();
   await expect(caption).toHaveText(original);

@@ -4,17 +4,69 @@ const { test, expect } = require('@playwright/test');
 // test clicking inside it waits that out first.
 const settle = page => page.waitForTimeout(400);
 
-// Route stops open their photos only on journals that opt in, with exact title matching
-// (18 Nov 2026: substring matching gave older journals' stops every photo of their day).
+// Route stops open their photos on every journal (18 Nov 2026, owner: Chengdu's changes on all of
+// them), by one exact rule in gallery.js: a photo goes to the first stop of its day that its caption
+// text names, else its title (substring matching gave older journals' stops every photo of their day).
 
-const journals = ['travel_2017_seoul', 'travel_2019_siliconvalley', 'travel_2022_europe', 'travel_2023_perth',
-  'travel_2023_usacanada', 'travel_2024_australia', 'travel_2024_germany', 'travel_2025_japan', 'travel_2026_guangzhou'];
+// The route box of the day section whose heading starts with `heading`.
+const routeOf = async (page, heading) => {
+  const id = await page.locator('#main h2[id^="trip-section-"]', { hasText: heading }).first().getAttribute('id');
+  return page.locator('#' + id + ' ~ .guangzhou-day__route');
+};
+const cardFor = async (page, heading, name) => {
+  const route = await routeOf(page, heading);
+  const more = route.locator('.travel-route__more');
+  if (await more.isVisible()) await more.click();
+  await route.locator('.has-card', { hasText: name }).first().click();
+  await settle(page);
+  return page.locator('.place-card .place-card__sheet');
+};
 
-test('journals that have not opted in keep plain route stops', async ({ page }) => {
-  for (const slug of journals) {
+test('every journal with routes gets route photos, by caption text first, then title', async ({ page }) => {
+  for (const [slug, count] of [['travel_2017_seoul', 7], ['travel_2022_europe', 33], ['travel_2023_perth', 38],
+    ['travel_2023_usacanada', 79], ['travel_2024_australia', 32], ['travel_2025_japan', 26], ['travel_2026_guangzhou', 20]]) {
     await page.goto('/' + slug);
-    await expect(page.locator('.has-photos, .has-card'), slug).toHaveCount(0);
+    await expect(page.locator('.has-photos'), slug).toHaveCount(count);
   }
+  // No routes, nothing to open.
+  for (const slug of ['travel_2019_siliconvalley', 'travel_2024_germany']) {
+    await page.goto('/' + slug);
+    await expect(page.locator('.has-card'), slug).toHaveCount(0);
+  }
+  // Perth titles every Day 3 photo "Rottnest Island" and names the bay in the text, so the bay wins.
+  await page.goto('/travel_2023_perth');
+  const day3 = await routeOf(page, 'Day 3');
+  await expect(day3.locator('.has-photos', { hasText: 'Porpoise Bay' })).toHaveAttribute('aria-label', 'Open the place card for Porpoise Bay (4 photos)');
+  await expect(day3.locator('.has-photos', { hasText: 'Rottnest Island' }).first()).toHaveAttribute('aria-label', 'Open the place card for Rottnest Island (5 photos)');
+  // Accents fold: "Cologne // Hohenzollernbrücke".
+  await page.goto('/travel_2022_europe');
+  await expect((await routeOf(page, 'Day 5')).locator('.has-photos', { hasText: 'Hohenzollernbrücke' })).toHaveCount(1);
+});
+
+test('Japan and Guangzhou cards: a caption in two scripts matches either, and 高德地图 only for Chinese places', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/travel_2025_japan');
+  // "Atomic Bomb Dome 原爆ドーム" matches the stop written 原爆ドーム with its English subtitle.
+  let sheet = await cardFor(page, 'Hiroshima', '原爆ドーム');
+  await expect(sheet.locator('.place-card__title')).toHaveText('原爆ドーム');
+  await expect(sheet.locator('.place-card__title')).toHaveAttribute('lang', 'ja');
+  await expect(sheet.locator('.place-card__meta span').first()).toHaveText('Atomic Bomb Dome');
+  await expect(sheet.locator('.place-card__meta span').first()).not.toHaveAttribute('lang', /./);
+  await expect(sheet.getByRole('link', { name: 'Google Maps' })).toHaveAttribute('href', 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent('原爆ドーム, Atomic Bomb Dome'));
+  await expect(sheet.locator('.place-card__map')).toHaveCount(1);
+  // Google Maps takes the whole row without its partner.
+  const widths = await sheet.evaluate(node => [node.querySelector('.place-card__map').getBoundingClientRect().width, node.querySelector('.place-card__view').getBoundingClientRect().width]);
+  expect(Math.abs(widths[0] - widths[1])).toBeLessThan(2);
+  await page.keyboard.press('Escape');
+
+  await page.goto('/travel_2026_guangzhou');
+  // "Dongshankou" matches the pinyin subtitle Dōngshānkǒu, accents folded.
+  sheet = await cardFor(page, 'Day 5', '东山口');
+  await expect(sheet.locator('.place-card__title')).toHaveAttribute('lang', 'zh-Hans');
+  await expect(sheet.locator('.place-card__meta span').first()).toHaveText('Dōngshānkǒu');
+  await expect(sheet.locator('.place-card__meta span').first()).not.toHaveAttribute('lang', /./);
+  await expect(sheet.getByRole('link', { name: '高德地图' })).toHaveAttribute('href', 'https://uri.amap.com/search?keyword=' + encodeURIComponent('东山口'));
+  await expect(sheet.locator('.place-card__view')).toHaveText('View 1 photo');
 });
 
 test('Chengdu stops own exactly their photos, count within the place and offer the next stop', async ({ page }) => {

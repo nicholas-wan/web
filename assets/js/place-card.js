@@ -1,7 +1,6 @@
-/* Route stop place card (18 Nov 2026, journal UX mockup 6), loaded by gallery.js on journals
-   that opt in with data-route-photos: a bottom sheet on phones and a centred card on desktop with
-   the stop's photos, price, hours and map links. gallery.js keeps the history entry and the
-   lightbox; this file gets them through the hooks it passes in. */
+/* Route stop place card (18 Nov 2026, journal UX mockup 6), loaded by gallery.js: a bottom
+   sheet on phones and a centred card on desktop with the stop's photos, price, hours and map
+   links. gallery.js keeps the history entry and the lightbox, passed in as hooks. */
 window.travelPlaceCard = function (hooks) {
   var escapeText = function (text) { return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
   /* One or two photos fill the card's width, so they take the 800w file. */
@@ -96,10 +95,9 @@ window.travelPlaceCard = function (hooks) {
     sheet.innerHTML = '<span class="place-card__handle" aria-hidden="true"></span>' +
       '<button class="place-card__close" type="button" data-card="close" aria-label="Close place card">&times;</button>' +
       '<p class="place-card__eyebrow">' + (place.day ? place.day + ' &middot; ' : '') + 'Stop ' + place.at + '</p>' +
-      '<p class="place-card__title" id="place-card-title">' + escapeText(place.name) + '</p>' +
-      /* The price ends the Chinese name's line at the right, as the route list writes it. Only a
-         Chinese subtitle is marked zh-Hans. */
-      (place.sub || place.price ? '<p class="place-card__meta"><span' + (place.zh ? ' lang="zh-Hans">' : '>') + escapeText(place.sub || '') + '</span>' +
+      '<p class="place-card__title" id="place-card-title"' + (place.lang ? ' lang="' + place.lang + '"' : '') + '>' + escapeText(place.name) + '</p>' +
+      /* The price ends the subtitle's line at the right, as the route list writes it. */
+      (place.sub || place.price ? '<p class="place-card__meta"><span' + (place.zh && place.zh === place.sub ? ' lang="zh-Hans">' : '>') + escapeText(place.sub || '') + '</span>' +
         (place.price ? '<span class="place-card__price">' + (place.klook ? '<span class="travel-route__klook"></span>' : '') + factText(place.price) + '</span>' : '') + '</p>' : '') +
       (own.length ? '<button class="place-card__photos' + (shown.length === 1 ? ' is-single' : shown.length === 2 ? ' is-pair' : '') +
         '" type="button" data-card="view" aria-label="View ' + photos + '" style="--cells: ' + shown.length + '">' + shown.map(function (media, i) {
@@ -109,8 +107,10 @@ window.travelPlaceCard = function (hooks) {
       (place.hours ? '<dl class="place-card__facts"><dt>Hours</dt><dd>' + place.hours.split('|').map(factText).join('<br>') + '</dd></dl>' : '') +
       '<div class="place-card__actions">' + (own.length ? '<button class="place-card__view" type="button" data-card="view">View ' + photos + '</button>' : '') +
       '<div class="place-card__maps">' +
-      map('https://www.google.com/maps/search/?api=1&query=', place.zh ? place.name + ', ' + place.zh : place.name, 'Google Maps', '') +
-      map('https://uri.amap.com/search?keyword=', place.zh || place.name, '<span lang="zh-Hans">高德地图</span>', ' place-card__map--amap') + '</div></div>';
+      /* Google searches the name with its subtitle (Chinese name, or area: Glacier Cave, Mount
+         Titlis); 高德地图 only for a place with a Chinese name, else Google takes the row. */
+      map('https://www.google.com/maps/search/?api=1&query=', place.sub ? place.name + ', ' + place.sub : place.name, 'Google Maps', '') +
+      (place.zh ? map('https://uri.amap.com/search?keyword=', place.zh, '<span lang="zh-Hans">高德地图</span>', ' place-card__map--amap') : '') + '</div></div>';
     /* A sheet dragged shut, or left mid-drag, opens from the bottom again. */
     sheet.style.transition = '';
     sheet.style.transform = '';
