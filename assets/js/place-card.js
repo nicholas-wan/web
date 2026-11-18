@@ -5,6 +5,12 @@
 window.travelPlaceCard = function (hooks) {
   var escapeText = function (text) { return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
   /* "10 am" and "4:30 pm" never break across lines. */
+  /* One or two photos fill the card's width, so they take the 800w file, not the 480w thumbnail
+     (owner, 18 Nov 2026: a single photo was "really small and looks stretched"). */
+  var largeOf = function (media) {
+    var wide = /(\S+)\s+800w/.exec(media.getAttribute('srcset') || '');
+    return wide ? wide[1] : hooks.stillOf(media);
+  };
   var factText = function (text) { return escapeText(text).replace(/(\d) ([ap]m)\b/g, '$1&nbsp;$2'); };
   var card = null;
   var cardPlace = null;
@@ -96,9 +102,9 @@ window.travelPlaceCard = function (hooks) {
       '<p class="place-card__eyebrow">' + (place.day ? place.day + ' &middot; ' : '') + 'Stop ' + place.at + '</p>' +
       '<p class="place-card__title" id="place-card-title">' + escapeText(place.name) + '</p>' +
       (place.zh ? '<p class="place-card__meta" lang="zh-Hans">' + escapeText(place.zh) + '</p>' : '') +
-      (own.length ? '<button class="place-card__photos" type="button" data-card="view" aria-label="View ' + photos +
-        '" style="--cells: ' + shown.length + '">' + shown.map(function (media) {
-          return '<img alt="" decoding="async" src="' + escapeText(hooks.stillOf(media)) + '">';
+      (own.length ? '<button class="place-card__photos' + (shown.length === 1 ? ' is-single' : shown.length === 2 ? ' is-pair' : '') +
+        '" type="button" data-card="view" aria-label="View ' + photos + '" style="--cells: ' + shown.length + '">' + shown.map(function (media) {
+          return '<img alt="" decoding="async" src="' + escapeText(shown.length > 2 ? hooks.stillOf(media) : largeOf(media)) + '">';
         }).join('') + (own.length > shown.length ? '<span class="place-card__more">+' + (own.length - shown.length) + '</span>' : '') + '</button>' : '') +
       (facts ? '<dl class="place-card__facts">' + facts + '</dl>' : '') +
       '<div class="place-card__actions">' + (own.length ? '<button class="place-card__view" type="button" data-card="view">View ' + photos + '</button>' : '') +

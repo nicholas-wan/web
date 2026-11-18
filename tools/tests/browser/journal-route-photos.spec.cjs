@@ -259,3 +259,20 @@ test('Tab and Shift+Tab stay inside the place card in Chromium and WebKit', asyn
   try { await tabStaysInside(await context.newPage(), 'webkit'); }
   finally { await browser.close(); }
 });
+
+test('one or two photos fill the card at a real picture shape from the 800w file', async ({ page }) => {
+  // Owner, 18 Nov 2026: a single photo was a thin, blurry strip ("really small and looks stretched").
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  for (const [day, name, count, ratio] of [[3, 'Dongmen Wharf', 1, 1.5], [4, 'Tianfu Airport', 2, 4 / 3]]) {
+    await openStop(page, day, name);
+    const images = page.locator('.place-card__photos img');
+    await expect(images).toHaveCount(count);
+    for (const image of await images.all()) {
+      await expect(image).toHaveAttribute('src', /-800\.(webp|jpe?g|png)$/);
+      const box = await image.boundingBox();
+      expect(Math.abs(box.width / box.height - ratio)).toBeLessThan(0.05);
+    }
+    await page.keyboard.press('Escape');
+  }
+});

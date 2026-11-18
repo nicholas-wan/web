@@ -11531,6 +11531,10 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
   background: #e6eeed;
   object-fit: cover;
 }
+/* One photo is a proper 3:2 picture across the card, two sit side by side at 4:3; three or four
+   keep the compact row of squares. */
+.place-card .place-card__photos.is-single img { aspect-ratio: 3 / 2; max-height: none; }
+.place-card .place-card__photos.is-pair img { aspect-ratio: 4 / 3; max-height: none; }
 .place-card__photos img:nth-of-type(4),
 .place-card__more { position: relative; z-index: 1; grid-area: 1 / 4; align-self: stretch; }
 .place-card__more {
