@@ -459,7 +459,8 @@ if ($chronologySource -notmatch 'pending=\(self\.scenes\|\|fetch\(source\.datase
 # 44 -> 41 (18 Nov 2026, owner): the day maps were removed ("extremely ugly"); the place card, chips, trip line and Klook line remain.
 # 41 -> 42 (18 Nov 2026, owner): the place card's professional layout (eyebrow, one primary action, two map buttons with drawn pins), the place filter as text tabs, and the Klook ticket lines.
 # 42 -> 43 (18 Nov 2026, owner): the phone round K1, K5 and K7 (one-photo rows, tighter day headings, name-only summaries) and the polish round's card and summary rules.
-Assert-FileSizeBudget 'assets\css\travel-journal.css' 43
+# 43 -> 44 (18 Nov 2026, owner): the Trip.com price mark and the full-bleed page's desktop strip hairline (44,083 bytes).
+Assert-FileSizeBudget 'assets\css\travel-journal.css' 44
 # Photo search styles live in their own route bundle because travel-map-page.css
 # sits within a few hundred bytes of its cap (Oct 2026).
 # 10 -> 11: partial-match reason line, Oct 2026.
