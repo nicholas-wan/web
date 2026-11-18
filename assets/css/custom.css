@@ -11771,6 +11771,8 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
 }
 /* A Klook price carries the mark inline (owner, 18 Nov 2026). */
 .page-travel-journal :is(.travel-route__price, .place-card__price) > .travel-route__klook { display: inline-block; width: 0.9em; height: 0.9em; margin-right: 0.25em; vertical-align: -0.1em; }
+/* The mark never parts from its price under a long pinyin subtitle (Chimelong Safari Park, 18 Nov 2026). */
+.page-travel-journal .travel-route__price:has(> .travel-route__klook) { white-space: nowrap; }
 /* README: phone route summary. */
 .travel-route-summary__stop { display: inline-block; max-width: 100%; }
 .travel-route-summary__sub { display: inline-block; max-width: 100%; }
@@ -11853,6 +11855,8 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
    it covered, after the official total; a small Klook mark, quiet like the total. */
 .page-travel-journal .travel-route__tour { display: flex; align-items: center; gap: 0.4rem; margin: 0.3rem 0 0; color: var(--color-ink-700); font-size: max(var(--text-floor, 0px), 0.78rem); line-height: 1.4; text-align: left; font-variant-numeric: tabular-nums; }
 .page-travel-journal .travel-route__klook { flex: none; width: 0.95rem; height: 0.95rem; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%23ff5b00'/%3E%3Cpath d='M5.5 3.5v9M5.5 9.2 10.8 4.2M7.6 7.5l3.6 5' stroke='%23fff' stroke-width='1.9' stroke-linecap='round' fill='none'/%3E%3C/svg%3E") center / contain no-repeat; }
+/* A Trip.com booking (18 Nov 2026): the same quiet mark in Trip.com blue with a white t, drawn here (no logo file). */
+.page-travel-journal .travel-route__klook--trip { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='4' fill='%23287dfa'/%3E%3Cpath d='M7 3.5v7c0 1.4.7 2 2 2h1.6M4.6 6.4h5.8' stroke='%23fff' stroke-width='1.9' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); }
 
 /* Route bundle: journal-polish:end */
 
