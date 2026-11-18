@@ -508,6 +508,8 @@
   viewerVideo.addEventListener('pause', syncVideoLabel);
   var lockedScrollY = 0;
   var lockedWidth = 0;
+  var landing = null;
+  var inPopstate = false;
   var lockedAnchor = null;
   var lockedTop = 0;
   var lockBackgroundScroll = function () {
@@ -526,11 +528,22 @@
     syncAnimationPreference();
     document.body.style.removeProperty('--lightbox-scroll-offset');
     window.scrollTo(0, lockedScrollY);
-    /* Turned while open: the old offset points elsewhere in the new layout, so put the photo or
-       stop back where it was on screen (polish, 18 Nov 2026). */
-    if (lockedAnchor && window.innerWidth !== lockedWidth && lockedAnchor.getClientRects().length) {
-      window.scrollBy(0, lockedAnchor.getBoundingClientRect().top - lockedTop);
+    /* Opened from a journal tile, closing lands on the tile of the photo last shown, as photo
+       apps do (owner, 18 Nov 2026, mockup K4); it takes focus too. Opened from a route stop, or
+       on the same photo, the reading position holds. Turned while open, the old offset points
+       elsewhere in the new layout, so the photo or stop goes back where it was on screen
+       (polish, 18 Nov 2026). Both run again after Back's own scroll restore (popstate). */
+    var anchor = lockedAnchor;
+    var top = lockedTop;
+    var shown = galleryMedia[current] && galleryMedia[current].closest('.content');
+    landing = null;
+    if (anchor && anchor.closest('.travel-gallery') && shown && shown !== anchor && shown.getClientRects().length) {
+      lastTrigger = shown;
+      landing = function () { shown.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' }); };
+    } else if (anchor && window.innerWidth !== lockedWidth && anchor.getClientRects().length) {
+      landing = function () { window.scrollBy(0, anchor.getBoundingClientRect().top - top); };
     }
+    if (landing) landing();
     lockedAnchor = null;
   };
   var close = function () {
@@ -548,6 +561,7 @@
     overlay.setAttribute('aria-hidden', 'true');
     unlockBackgroundScroll();
     if (historyEntry) { historyEntry = false; pendingBack = true; history.back(); }
+    else if (!inPopstate) landing = null;
     if (lastTrigger) { focusTarget(lastTrigger).focus({ preventScroll: true }); lastTrigger = null; }
     if (afterClose) afterClose();
     afterClose = null;
@@ -669,11 +683,18 @@
   /* The place card shares the entry: it hands it to the lightbox, so one Back closes either. */
   var placeCardBack = null;
   window.addEventListener('popstate', function () {
-    if (pendingBack) { pendingBack = false; return; }
-    if (!historyEntry) return;
-    historyEntry = false;
-    if (overlay.classList.contains('is-visible')) close();
-    else if (placeCardBack) placeCardBack();
+    if (pendingBack) pendingBack = false;
+    else if (historyEntry) {
+      historyEntry = false;
+      inPopstate = true;
+      if (overlay.classList.contains('is-visible')) close();
+      else if (placeCardBack) placeCardBack();
+      inPopstate = false;
+    }
+    /* Back restores the scroll it saved at open just after this event: land once more after it. */
+    var again = landing;
+    landing = null;
+    if (again) requestAnimationFrame(function () { requestAnimationFrame(again); });
   });
 
   /* At the fitted scale, one-finger horizontal gestures keep circular

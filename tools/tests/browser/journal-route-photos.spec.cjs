@@ -373,3 +373,51 @@ test('folded phone routes show only the summary and View all; expanded ones drop
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   expect(await shown(day2)).toEqual(['strong'].concat(lines));
 });
+
+// Phone round, 18 Nov 2026 (owner, mockups K1, K4, K7).
+test('folded summaries name the stops alone, except a CJK name keeps its English', async ({ page }) => {
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  await expect(page.locator('.travel-route-summary').nth(1)).toHaveText('Panda Valley → Summer Island Apartment');
+  await page.goto('/travel_2025_japan');
+  await expect(page.locator('.travel-route-summary').first()).toContainText('Hiroshima Airport');
+});
+
+test('a one-photo day fills the phone row; desktop keeps its quarter tile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  const tile = page.locator('#trip-section-1 ~ .journal-gallery-shell .travel-gallery__item, #trip-section-1 ~ .travel-gallery .travel-gallery__item').first();
+  const row = await tile.evaluate(item => [item.getBoundingClientRect().width, item.parentElement.clientWidth - parseFloat(getComputedStyle(item.parentElement).paddingRight)]);
+  expect(Math.abs(row[0] - row[1])).toBeLessThan(2);
+});
+
+test('closing the viewer lands on the tile of the photo last shown; the same photo keeps the place', async ({ browser }) => {
+  for (const how of ['close', 'back']) {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+    const page = await context.newPage();
+    await page.goto('/travel_2026_chengdu_zhangjiajie');
+    await page.locator('#trip-section-2 ~ .journal-gallery-shell .content').first().click();
+    await expect(page.locator('.lightbox')).toHaveClass(/is-visible/);
+    for (let i = 0; i < 14; i += 1) await page.getByRole('button', { name: 'Next media', exact: true }).click();
+    await expect(page.locator('.lightbox__caption')).toContainText('Bon Appetit');
+    if (how === 'close') await page.getByRole('button', { name: 'Close media viewer' }).click();
+    else await page.goBack();
+    await expect(page.locator('.lightbox')).not.toHaveClass(/is-visible/);
+    await page.waitForTimeout(300);
+    const landed = await page.evaluate(() => { const a = document.activeElement; const r = a.getBoundingClientRect(); return { title: a.querySelector('.content-title') && a.querySelector('.content-title').textContent, top: r.top, bottom: r.bottom }; });
+    expect(landed.title, how).toBe('Bon Appetit');
+    expect(landed.top, how).toBeGreaterThanOrEqual(0);
+    expect(landed.bottom, how).toBeLessThanOrEqual(844);
+    await context.close();
+  }
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  const page = await context.newPage();
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  const tile = page.locator('#trip-section-2 ~ .journal-gallery-shell .content').first();
+  await tile.scrollIntoViewIfNeeded();
+  const before = await page.evaluate(() => window.scrollY);
+  await tile.click();
+  await page.getByRole('button', { name: 'Close media viewer' }).click();
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => window.scrollY)).toBe(before);
+  await context.close();
+});

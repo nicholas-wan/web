@@ -652,7 +652,11 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
         param($stop)
         $name = ([regex]::Replace($stop.Groups['name'].Value, '<[^>]+>', '')).Trim()
         $small = ([regex]::Replace($stop.Groups['small'].Value, '<[^>]+>', '')).Trim()
-        if ($small) { return "$name <span class=`"travel-route-summary__sub`"><span class=`"travel-route-summary__dot`">&middot;</span>$small</span>" } else { return $name }
+        # The folded summary names a stop alone (owner, 18 Nov 2026, mockup K7: "Panda Valley ->
+        # Summer Island Apartment" instead of three wrapped lines); the opened list keeps the
+        # subtitles. A Chinese, Japanese or Korean name keeps its English or pinyin, so Japan and
+        # Guangzhou still read in Latin letters.
+        if ($small -and $name -match '[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]') { return "$name <span class=`"travel-route-summary__sub`"><span class=`"travel-route-summary__dot`">&middot;</span>$small</span>" } else { return $name }
     }
     # Each stop is one inline-block (polish round, 18 Nov 2026): a line no longer ends on a lone
     # dot or arrow; a stop wider than the line still wraps inside itself, and the arrow leads the next.
