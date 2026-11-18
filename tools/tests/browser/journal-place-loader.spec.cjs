@@ -85,15 +85,18 @@ test('phones load the card as a folded route comes near, before any tap', async 
   await context.close();
 });
 
-test('closing from a stop a folded phone route hides returns focus to its View all button', async ({ browser }) => {
+test('closing the card or its photos, opened from a map pin, returns focus to the stop', async ({ browser }) => {
+  // Phones show a day map only in the expanded route (review fix), so a pin's stop is always on screen.
   const context = await browser.newContext({ baseURL: test.info().project.use.baseURL,
     viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
   const page = await context.newPage();
   await page.goto(journal);
   const day6 = route(page, 6);
   const more = day6.locator('.travel-route__more');
+  const stop = day6.locator('.guangzhou-route__stop').nth(2);
   const pin = day6.locator('[data-route-pin="2"]');
-  await pin.scrollIntoViewIfNeeded();
+  await more.scrollIntoViewIfNeeded();
+  await more.click();
   await pin.click();
   const card = page.locator('.place-card');
   await expect(card).toHaveClass(/is-visible/);
@@ -102,17 +105,17 @@ test('closing from a stop a folded phone route hides returns focus to its View a
   await expect(viewer).toHaveClass(/is-visible/);
   await page.getByRole('button', { name: 'Close media viewer' }).click();
   await expect(viewer).not.toHaveClass(/is-visible/);
-  await expect(more).toBeFocused();
-  await expect(more).toBeVisible();
+  await expect(stop).toBeFocused();
 
   // With the card unavailable, the pin opens the photos directly; closing lands the same way.
   await page.route(cardScript, routed => routed.abort());
   await page.reload();
-  await pin.scrollIntoViewIfNeeded();
+  await more.scrollIntoViewIfNeeded();
+  await more.click();
   await pin.click();
   await expect(viewer).toHaveClass(/is-visible/);
   await page.keyboard.press('Escape');
-  await expect(more).toBeFocused();
+  await expect(stop).toBeFocused();
   await context.close();
 });
 

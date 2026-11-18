@@ -78,10 +78,10 @@ test('every stop is a pin, an edge marker or in the "Not mapped" line, and pins 
     expect([...drawn, ...noted].sort((a, b) => a - b), `day ${day}`).toEqual(Array.from({ length: stops }, (_, i) => i + 1));
   }
   // Day 1 zooms to Dujiangyan; Singapore and Tianfu Airport point off the map.
-  expect(await markersOf(routeOf(page, 1))).toEqual([['0', '3,300 km'], ['1', '110 km']]);
+  expect(await markersOf(routeOf(page, 1))).toEqual([['1', '110 km']]);
   // No point for the massage shop or the homestay (a private address): named, never guessed.
   await expect(routeOf(page, 3).locator('.travel-route-map__note')).toHaveText('Not mapped: 2 Massage');
-  await expect(routeOf(page, 4).locator('.travel-route-map__note')).toHaveText('Not mapped: 3 River View Homestay');
+  await expect(routeOf(page, 4).locator('.travel-route-map__note')).toHaveText('Not mapped: 1 Tianfu Airport, 3 River View Homestay');
   // Day 7 is a flight home: no map.
   await expect(routeOf(page, 7).locator('.travel-route-map')).toHaveCount(0);
 
@@ -105,7 +105,7 @@ test('a pin does what its stop does: Tianmen Cave opens its card, then its photo
   await expect(page.locator('.place-card')).toContainText('Tianmen Cave');
   await page.locator('.place-card__view').click();
   await expect(page.locator('.lightbox')).toHaveClass(/is-visible/);
-  await expect(page.locator('.lightbox__context')).toHaveText(/1 of 2 at Tianmen Cave · Day 6$/);
+  await expect(page.locator('.lightbox__context')).toHaveText(/1 of 2 · Day 6$/);
 });
 
 test('desktop puts the map right of the stops and numbers the stops to match the pins', async ({ page }) => {

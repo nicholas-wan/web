@@ -454,8 +454,8 @@ if ($chronologySource -notmatch 'pending=\(self\.scenes\|\|fetch\(source\.datase
 # 30 -> 31: journal lede leading and the Australia hero gap and intro treatment (Oct 2026).
 # 31 -> 32 (24 Oct 2026): routes folded at build time, and deep links keep each day's date in view.
 # 32 -> 40 (18 Nov 2026): the route stops' place card (bottom sheet on phones, centred card on desktop), place chips that filter a day's photos, the trip-at-a-glance line (Add-TripStats) and the inline day maps (Add-RouteMaps).
-# 40 -> 42 (18 Nov 2026): day maps beside the stops on desktop, edge markers, labels and the "Not mapped" line.
-Assert-FileSizeBudget 'assets\css\travel-journal.css' 42
+# 40 -> 43 (18 Nov 2026, review fixes): day maps beside the stops on desktop, edge markers and the "Not mapped" line; the card's compact phone sheet; photo-count tags and the chips' fixed All. Every journal pays for these though only route-photo journals use them; splitting them into their own sheet is the next step if this grows.
+Assert-FileSizeBudget 'assets\css\travel-journal.css' 43
 # Photo search styles live in their own route bundle because travel-map-page.css
 # sits within a few hundred bytes of its cap (Oct 2026).
 # 10 -> 11: partial-match reason line, Oct 2026.

@@ -831,6 +831,8 @@ function Get-RouteMapSvg($Stops, $Points) {
         $side = if ($tx -lt $ty) { if ($ux -gt 0) { 'Right' } else { 'Left' } } else { if ($uy -gt 0) { 'Bottom' } else { 'Top' } }
         $nearest = [double]::MaxValue
         foreach ($pin in $kept) { $nearest = [Math]::Min($nearest, (Get-MapDistanceKm $pin $point)) }
+        # A flight leg (over 150 km: Singapore, Chengdu from Zhangjiajie) gets no marker; "3,300 km" was noise.
+        if ($nearest -gt 150) { continue }
         $bearing = [int]([Math]::Round((([Math]::Atan2($east, $north) * 180 / [Math]::PI) + 360) % 360 / 45)) % 8
         $markers.Add(@{ Point = $point; Ux = $ux; Uy = $uy; X = $width / 2 + $t * $ux; Y = $height / 2 + $t * $uy; Side = $side; Label = (Format-MapDistance $nearest); Direction = $compass[$bearing] })
     }
@@ -1082,6 +1084,16 @@ function Add-RouteMaps([string]$Markup, [string]$Slug) {
         foreach ($property in $dayPoints.Value.PSObject.Properties) {
             if (-not $named.Contains($property.Name)) { throw "Add-RouteMaps: journals/route-coordinates.json names '$($property.Name)' for $Slug section $section, but that day has no such stop." }
         }
+        # A flight leg (no other stop that day within 150 km: Singapore, Chengdu from Zhangjiajie)
+        # joins the "Not mapped" line by name; an edge marker reading "3,300 km" was noise.
+        $near = @()
+        foreach ($point in $points) {
+            $closest = [double]::MaxValue
+            foreach ($other in $points) { if ($other.Index -ne $point.Index) { $closest = [Math]::Min($closest, (Get-MapDistanceKm $point $other)) } }
+            if ($closest -gt 150) { $unmapped += $point.Index } else { $near += $point }
+        }
+        $points = $near
+        $unmapped = @($unmapped | Sort-Object)
         if ($points.Count -lt 2) { continue }
         $svg = Get-RouteMapSvg $names $points
         if (-not $svg) { continue }
