@@ -404,6 +404,9 @@
     };
 
     requestAnimationFrame(updateDesktopWrap);
+    // WebKit fires resize before the media query flips, so a turned phone kept an expanded
+    // route's list hidden at desktop width (full review, 18 Nov 2026).
+    phoneNav.addEventListener('change', function () { syncRoute(); requestAnimationFrame(updateDesktopWrap); });
     button.addEventListener('click', function () {
       group.classList.toggle('is-expanded');
       syncRoute();

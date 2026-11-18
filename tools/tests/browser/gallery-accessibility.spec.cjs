@@ -67,13 +67,17 @@ async function openLandscapeCaption(page) {
   return photo;
 }
 
-test('advancing from Info keeps focus inside the lightbox and restores the trigger on close', async ({ page }) => {
+test('advancing from Info keeps focus inside the lightbox and lands focus on the photo shown at close', async ({ page }) => {
   const photo = await openLandscapeCaption(page);
   await page.keyboard.press('ArrowRight');
   await expect(page.locator('.lightbox__info')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Close media viewer' })).toBeFocused();
+  // Closing lands on the tile of the photo last shown (owner, 18 Nov 2026, mockup K4), here the next one.
+  const shown = (await page.locator('img.lightbox__image').getAttribute('src')).split('/').pop().replace(/-\d+w?\.\w+$|\.\w+$/, '');
   await page.keyboard.press('Escape');
-  await expect(photo).toBeFocused();
+  const focused = await page.evaluate(() => { const img = document.activeElement.querySelector('img'); return img ? (img.currentSrc || img.src).split('/').pop() : ''; });
+  expect(focused.replace(/-\d+w?\.\w+$|\.\w+$/, '')).toBe(shown);
+  await expect(photo).not.toBeFocused();
 });
 
 test('orientation change transfers focus before hiding Info', async ({ page }) => {

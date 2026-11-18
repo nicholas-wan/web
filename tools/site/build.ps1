@@ -1287,7 +1287,7 @@ foreach ($page in $pages) {
     $main = Add-ImagePerformanceAttributes $main (Join-Path $root "images") $sourceImageIndex ($tripOrder -contains $slug)
     $main = Add-GalleryAltText $main $slug
     # The place card loads on demand from this versioned URL (gallery.js), outside the 80 KB ceiling.
-    $main = ([regex]'(<article class="travel-journal__content\b[^"]*"[^>]*\sdata-route-photos\b)').Replace($main, "`$1 data-place-card=`"$(Get-AssetRef 'assets/js/place-card.js')`"", 1)
+    $main = ([regex]'(<article class="travel-journal__content\b[^"]*"[^>]*\sdata-route-photos\b(?:="[^"]*")?)').Replace($main, "`$1 data-place-card=`"$(Get-AssetRef 'assets/js/place-card.js')`"", 1)
     $main = Add-TripStats $main $slug
     $main = Add-RouteSummaries $main $slug
     if ($slug -eq 'travel') {

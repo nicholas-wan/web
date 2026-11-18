@@ -210,10 +210,10 @@
   overlay.setAttribute('aria-hidden', 'true');
   overlay.innerHTML = '<button class="lightbox__close" type="button" aria-label="Close media viewer">&times;</button>' +
     '<div class="lightbox__tools" role="group" aria-label="Image controls">' +
-      '<button class="lightbox__info" type="button" aria-label="Show caption" aria-expanded="false" aria-controls="lightbox-caption" hidden>i</button>' +
       '<button class="lightbox__zoom-out" type="button" aria-label="Zoom out" disabled>&minus;</button>' +
       '<button class="lightbox__zoom-in" type="button" aria-label="Zoom in">&plus;</button>' +
       '<button class="lightbox__rotate" type="button" aria-label="Use landscape view" aria-pressed="false" hidden>&#8635;</button>' +
+      '<button class="lightbox__info" type="button" aria-label="Show caption" aria-expanded="false" aria-controls="lightbox-caption" hidden>i</button>' +
     '</div>' +
     '<button class="lightbox__previous" type="button" aria-label="Previous media">&#8592;</button>' +
     '<figure class="lightbox__figure"><div class="lightbox__viewport"><img class="lightbox__image" alt="" draggable="false"><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video></div><figcaption id="lightbox-caption" class="lightbox__caption" aria-live="polite" aria-atomic="true"></figcaption><div class="lightbox__place" hidden></div></figure>' +
@@ -510,6 +510,18 @@
   var lockedWidth = 0;
   var landing = null;
   var inPopstate = false;
+  var toRoute = null;
+  /* A reopen before our own Back's popstate arrives pushes nothing then: the pending Back would
+     pop that entry instead, leaving the viewer with none, so the next close left the page (full
+     review, 18 Nov 2026). The popstate pushes it once the Back has landed. */
+  var wantEntry = false;
+  var takeEntry = function () {
+    var gesture = !navigator.userActivation || navigator.userActivation.isActive;
+    if (historyEntry || !gesture) return;
+    if (pendingBack) { wantEntry = true; return; }
+    history.pushState(history.state, '');
+    historyEntry = true;
+  };
   var lockedAnchor = null;
   var lockedTop = 0;
   var lockBackgroundScroll = function () {
@@ -536,12 +548,20 @@
     var anchor = lockedAnchor;
     var top = lockedTop;
     var shown = galleryMedia[current] && galleryMedia[current].closest('.content');
+    var route = toRoute;
+    toRoute = null;
     landing = null;
-    if (anchor && anchor.closest('.travel-gallery') && shown && shown !== anchor && shown.getClientRects().length) {
+    /* Back to route lands on the route even when a tile opened the viewer. Any journal gallery
+       counts, bare .masonry ones (Japan, Guangzhou, Australia) too (full review, 18 Nov 2026). */
+    if (route) {
+      lastTrigger = route;
+      landing = function () { focusTarget(route).scrollIntoView({ block: 'center', behavior: 'instant' }); };
+    } else if (anchor && anchor.closest('.page-travel-journal .travel-gallery, .page-travel-journal .masonry') && shown && shown !== anchor && shown.getClientRects().length) {
       lastTrigger = shown;
       landing = function () { shown.scrollIntoView({ block: 'center', inline: 'center', behavior: 'instant' }); };
     } else if (anchor && window.innerWidth !== lockedWidth && anchor.getClientRects().length) {
-      landing = function () { window.scrollBy(0, anchor.getBoundingClientRect().top - top); };
+      /* The old top can sit below a shorter screen: keep the anchor on it. */
+      landing = function () { window.scrollBy(0, anchor.getBoundingClientRect().top - Math.max(0, Math.min(top, window.innerHeight - anchor.offsetHeight - 8))); };
     }
     if (landing) landing();
     lockedAnchor = null;
@@ -560,6 +580,7 @@
     overlay.classList.remove('is-visible');
     overlay.setAttribute('aria-hidden', 'true');
     unlockBackgroundScroll();
+    wantEntry = false;
     if (historyEntry) { historyEntry = false; pendingBack = true; history.back(); }
     else if (!inPopstate) landing = null;
     if (lastTrigger) { focusTarget(lastTrigger).focus({ preventScroll: true }); lastTrigger = null; }
@@ -667,8 +688,7 @@
       /* Before the lock, so the entry keeps the reader's scroll position. */
       /* Only for an open the reader made: Chromium skips entries pushed without a gesture
          (the #photo= auto-open), so Back would leave the page anyway. */
-      var gesture = !navigator.userActivation || navigator.userActivation.isActive;
-      if (!historyEntry && gesture) { history.pushState(history.state, ''); historyEntry = true; }
+      takeEntry();
       lockBackgroundScroll();
       closeButton.focus();
     }
@@ -683,7 +703,10 @@
   /* The place card shares the entry: it hands it to the lightbox, so one Back closes either. */
   var placeCardBack = null;
   window.addEventListener('popstate', function () {
-    if (pendingBack) pendingBack = false;
+    if (pendingBack) {
+      pendingBack = false;
+      if (wantEntry) { wantEntry = false; history.pushState(history.state, ''); historyEntry = true; }
+    }
     else if (historyEntry) {
       historyEntry = false;
       inPopstate = true;
@@ -743,7 +766,7 @@
   var dismissTimer = 0;
   var flickY = 0;
   var flickTime = 0;
-  var lastY = 0;
+  var dragLastY = 0;
   var lastTime = 0;
   var paintDismiss = function (deltaX, deltaY) {
     var progress = Math.min(1, Math.max(0, deltaY) / window.innerHeight);
@@ -859,13 +882,13 @@
         figure.style.transition = 'none';
         overlay.style.transition = '';
         dismissFaded.forEach(function (element) { element.style.transition = 'opacity 120ms'; element.style.opacity = 0; });
-        flickY = lastY = moved.clientY;
+        flickY = dragLastY = moved.clientY;
         flickTime = lastTime = event.timeStamp;
       }
       if (event.cancelable) event.preventDefault();
       /* Keep a sample about 100ms old for the release speed. */
-      if (event.timeStamp - flickTime > 100) { flickY = lastY; flickTime = lastTime; }
-      lastY = moved.clientY;
+      if (event.timeStamp - flickTime > 100) { flickY = dragLastY; flickTime = lastTime; }
+      dragLastY = moved.clientY;
       lastTime = event.timeStamp;
       paintDismiss(deltaX, deltaY);
       return;
@@ -1091,7 +1114,7 @@
     if (next && next.heading === group.heading) {
       placeButton('lightbox__place-next', 'Next stop: ' + next.name, function () { show(galleryMedia.indexOf(next.own[0])); }).textContent = 'Next: ' + next.name + ' →';
     }
-    else placeButton('lightbox__place-next', 'Back to the route', close).textContent = 'Back to route';
+    else placeButton('lightbox__place-next', 'Back to the route', function () { toRoute = group.stop; close(); }).textContent = 'Back to route';
   };
   /* Place card (18 Nov 2026, mockup 6): a stop with photos or a price opens a card first, a
      bottom sheet on phones and a centred card on desktop, with its photos, price, hours and
@@ -1138,7 +1161,7 @@
     var article = document.querySelector('.travel-journal__content[data-place-card]');
     if (!article) return;
     cardScript = document.createElement('script');
-    if (place) cardScript.fetchPriority = 'high';
+    cardScript.fetchPriority = 'high';
     cardScript.src = article.getAttribute('data-place-card');
     cardScript.onerror = function () { cardScript.remove(); cardScript = null; cardArrived(); };
     cardScript.onload = function () {
@@ -1147,11 +1170,8 @@
         photoCount: photoCount,
         openPhotos: openPhotos,
         focusTarget: focusTarget,
-        claimEntry: function () {
-          var gesture = !navigator.userActivation || navigator.userActivation.isActive;
-          if (!historyEntry && gesture) { history.pushState(history.state, ''); historyEntry = true; }
-        },
-        releaseEntry: function () { if (historyEntry) { historyEntry = false; pendingBack = true; history.back(); } }
+        claimEntry: takeEntry,
+        releaseEntry: function () { wantEntry = false; if (historyEntry) { historyEntry = false; pendingBack = true; history.back(); } }
       });
       placeCardBack = cardApi.closeFromHistory;
       cardArrived();
@@ -1218,7 +1238,7 @@
     stop.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
     if (!own.length) return;
     var first = own[0];
-    var group = { name: place.name, own: own, heading: heading };
+    var group = { name: place.name, own: own, heading: heading, stop: stop };
     placeGroups.push(group);
     own.forEach(function (media) { var index = galleryMedia.indexOf(media); if (!placeOf[index]) placeOf[index] = group; });
     var thumb = document.createElement('img');

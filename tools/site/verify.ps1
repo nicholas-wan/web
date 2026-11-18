@@ -494,7 +494,8 @@ Assert-FileSizeBudget 'assets\js\projects-companions.js' 12
 # place-card.js (18 Nov 2026): the route stops' place card, loaded by gallery.js as the first route box with a card stop nears the screen, or on the first tap.
 Assert-FileSizeBudget 'assets\js\place-card.js' 8
 # Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
-Assert-FileSizeBudget 'assets\css\gallery.css' 15
+# 15 -> 16 (18 Nov 2026, owner): the sideways-phone viewer layout (mockup K3), the place strip's reserved row and the route price rules a full review asked for.
+Assert-FileSizeBudget 'assets\css\gallery.css' 16
 Assert-FileSizeBudget 'assets\css\icons.css' 4
 if ($iconsCss -match '@font-face|fontawesome-webfont' -or [regex]::Matches($iconsCss, '\.\bfa-[a-z0-9-]+::before').Count -ne 18) { throw 'The minimal icon stylesheet must map exactly the selected self-hosted page icons without a webfont.' }
 $publishedIconSvgs = @(Get-ChildItem -LiteralPath (Join-Path $dist 'assets\icons\fontawesome') -Filter '*.svg' -File -Recurse)

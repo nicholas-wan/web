@@ -436,3 +436,50 @@ test('a desktop route whose stops all fit one row has no View all button', async
     await expect(route.locator('.travel-route__more'), `Day ${day}`).toBeHidden();
   }
 });
+
+// Full review, 18 Nov 2026.
+test('a reopen before the close\'s own Back lands keeps one entry, so the next Back stays on the journal', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  const page = await context.newPage();
+  await page.goto('about:blank');
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  const tile = page.locator('.travel-gallery .content').nth(3);
+  await tile.scrollIntoViewIfNeeded();
+  await tile.tap();
+  await expect(page.locator('.lightbox')).toHaveClass(/is-visible/);
+  // Close and reopen in one task, inside the tap's user activation, before the Back's popstate.
+  await page.evaluate(() => { document.querySelector('.lightbox__close').click(); document.querySelectorAll('.travel-gallery .content')[3].click(); });
+  await page.waitForTimeout(500);
+  await expect(page.locator('.lightbox')).toHaveClass(/is-visible/);
+  await page.goBack();
+  await expect(page.locator('.lightbox')).not.toHaveClass(/is-visible/);
+  expect(page.url()).toContain('travel_2026_chengdu_zhangjiajie');
+  await context.close();
+});
+
+test('closing lands on the last photo in bare-masonry journals too, and Back to route lands on the route', async ({ browser }) => {
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  const page = await context.newPage();
+  await page.goto('/travel_2025_japan');
+  await page.locator('.masonry .content').nth(2).click();
+  await expect(page.locator('.lightbox')).toHaveClass(/is-visible/);
+  for (let i = 0; i < 9; i += 1) await page.getByRole('button', { name: 'Next media', exact: true }).click();
+  const shownSrc = await page.locator('img.lightbox__image').getAttribute('src');
+  await page.getByRole('button', { name: 'Close media viewer' }).click();
+  await page.waitForTimeout(300);
+  const focused = await page.evaluate(() => { const a = document.activeElement; const r = a.getBoundingClientRect(); return { src: (a.querySelector('img') || {}).currentSrc || '', top: r.top, bottom: r.bottom }; });
+  expect(focused.top).toBeGreaterThanOrEqual(0);
+  expect(focused.bottom).toBeLessThanOrEqual(844);
+  expect(shownSrc.split('/').pop().replace(/-\d+w?\.\w+$|\.\w+$/, '')).toBe(focused.src.split('/').pop().replace(/-\d+w?\.\w+$|\.\w+$/, ''));
+
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  await page.locator('#trip-section-2 ~ .journal-gallery-shell .content').nth(2).click();
+  for (let i = 0; i < 8; i += 1) await page.getByRole('button', { name: 'Next media', exact: true }).click();
+  await expect(page.locator('.lightbox__context')).toContainText('7 of 7');
+  await page.getByRole('button', { name: 'Back to the route' }).click();
+  await page.waitForTimeout(300);
+  const route = await page.locator('#trip-section-2 ~ .guangzhou-day__route').evaluate(r => { const b = r.getBoundingClientRect(); return { top: b.top, bottom: b.bottom }; });
+  expect(route.bottom).toBeGreaterThan(0);
+  expect(route.top).toBeLessThan(844);
+  await context.close();
+});

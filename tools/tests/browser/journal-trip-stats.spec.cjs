@@ -38,7 +38,7 @@ test('Chengdu notes what we paid on Klook: one-attraction tickets inline on thei
   await expect(tours).toHaveCount(1);
   // Owner, 18 Nov 2026: a Klook booking for one attraction replaces its online price, inline with the mark.
   const klookPrices = page.locator('.travel-route__price:has(> .travel-route__klook)');
-  await expect(klookPrices).toHaveText(['S$13', 'S$60 with feeding', 'S$12 night']);
+  await expect(klookPrices).toHaveText(['S$13', 'S$60 with feeding', 'S$12 night']);
   await expect(page.locator('#trip-section-2 ~ .guangzhou-day__route .travel-route__total')).toHaveText('About S$73 a person · what we paid on Klook');
   // The tour covers Days 5 and 6, so it is written once, on Day 5, or readers would add it twice.
   const tour = page.locator('#trip-section-5 ~ .guangzhou-day__route .travel-route__tour');
