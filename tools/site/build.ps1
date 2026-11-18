@@ -702,20 +702,23 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
 function Add-TripStats([string]$Markup, [string]$Slug) {
     if ($tripOrder -notcontains $Slug -or $Markup -notmatch '<article class="travel-journal__content\b[^"]*"[^>]*\sdata-route-photos\b') { return $Markup }
     $yen = [string][char]0x00A5
-    $days = 0; $stops = 0; $tickets = 0; $priced = $false
+    $days = 0; $stops = 0; $tickets = 0; $priced = $false; $paid = 0
     foreach ($day in [regex]::Matches($Markup, '(?s)<section class="travel-journal__day(?=[\s"])[^"]*"[^>]*>(?<body>.*?)</section>')) {
         $body = $day.Groups['body'].Value
         if ($body -notmatch '<h2\b') { continue }
         $days++
         $seen = New-Object 'System.Collections.Generic.HashSet[string]'
-        foreach ($stop in [regex]::Matches($body, '(?s)<span class="(?:[^"]*\s)?(?:travel|guangzhou)-route__stop(?=[\s"])[^"]*"[^>]*>\s*<span\b[^>]*>(?<name>.*?)</span>(?<rest>(?:(?!</span>).)*)</span>')) {
+        foreach ($stop in [regex]::Matches($body, '(?s)<span class="(?:[^"]*\s)?(?:travel|guangzhou)-route__stop(?=[\s"])[^"]*"[^>]*>\s*<span\b[^>]*>(?<name>.*?)</span>(?<rest>(?:<span[^>]*></span>|(?!</span>).)*)</span>')) {
             $name = [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($stop.Groups['name'].Value, '<[^>]+>', '') -replace '\s+', ' ').Trim()).ToLowerInvariant()
             if (-not $seen.Add($name)) { continue }
             $stops++
             $price = [regex]::Match($stop.Groups['rest'].Value, '(?s)<small class="travel-route__price">(?<text>.*?)</small>')
             if (-not $price.Success) { continue }
-            $text = [System.Net.WebUtility]::HtmlDecode($price.Groups['text'].Value)
+            $text = [System.Net.WebUtility]::HtmlDecode(([regex]::Replace($price.Groups['text'].Value, '<[^>]+>', '')))
             if ($text -match '(?i)\boptional\b') { continue }
+            # A Klook price (owner, 18 Nov 2026) is what we paid, in Singapore dollars.
+            $sgd = [regex]::Match($text, 'S\$\s*(\d[\d,]*)')
+            if ($sgd.Success) { $paid += [int]($sgd.Groups[1].Value -replace ',', ''); continue }
             $amount = [regex]::Match($text, [regex]::Escape($yen) + '\s*(\d[\d,]*)')
             if (-not $amount.Success) { continue }
             $tickets += [int]($amount.Groups[1].Value -replace ',', '')
@@ -729,7 +732,8 @@ function Add-TripStats([string]$Markup, [string]$Slug) {
     }
     if ($priced) {
         $rounded = [int]([math]::Round($tickets / 10.0, [MidpointRounding]::AwayFromZero) * 10)
-        $stats.Add('<b>&asymp; &yen;' + $rounded.ToString('#,0', [Globalization.CultureInfo]::InvariantCulture) + '</b> in fees a person')
+        $sgdPart = if ($paid -gt 0) { ' + S$' + $paid } else { '' }
+        $stats.Add('<b>&asymp; &yen;' + $rounded.ToString('#,0', [Globalization.CultureInfo]::InvariantCulture) + $sgdPart + '</b> a person')
     }
     if ($stats.Count -eq 0) { return $Markup }
     # Each stat after the first carries its middle dot in the list's left gutter, which the line

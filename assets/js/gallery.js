@@ -1201,6 +1201,7 @@
       zh: zh && zh.textContent.trim(),
       sub: subtitle && subtitle.textContent.trim(),
       price: price && price.textContent.trim(),
+      klook: !!(price && price.querySelector('.travel-route__klook')),
       hours: stop.getAttribute('data-hours'),
       day: (/^Day\s+\d+/i.exec(heading ? heading.textContent.trim() : '') || [''])[0],
       at: Array.prototype.indexOf.call(stop.parentNode.querySelectorAll('.guangzhou-route__stop'), stop) + 1,

@@ -11752,6 +11752,8 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
 .page-travel-journal .travel-route-summary {
   word-break: keep-all;
 }
+/* A Klook price carries the mark inline (owner, 18 Nov 2026). */
+.page-travel-journal :is(.travel-route__price, .place-card__price) > .travel-route__klook { display: inline-block; width: 0.9em; height: 0.9em; margin-right: 0.25em; vertical-align: -0.1em; }
 /* README: phone route summary. */
 .travel-route-summary__stop { display: inline-block; max-width: 100%; }
 .travel-route-summary__sub { display: inline-block; max-width: 100%; }

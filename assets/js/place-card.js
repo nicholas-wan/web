@@ -100,7 +100,7 @@ window.travelPlaceCard = function (hooks) {
       /* The price ends the Chinese name's line at the right, as the route list writes it. Only a
          Chinese subtitle is marked zh-Hans. */
       (place.sub || place.price ? '<p class="place-card__meta"><span' + (place.zh ? ' lang="zh-Hans">' : '>') + escapeText(place.sub || '') + '</span>' +
-        (place.price ? '<span class="place-card__price">' + factText(place.price) + '</span>' : '') + '</p>' : '') +
+        (place.price ? '<span class="place-card__price">' + (place.klook ? '<span class="travel-route__klook"></span>' : '') + factText(place.price) + '</span>' : '') + '</p>' : '') +
       (own.length ? '<button class="place-card__photos' + (shown.length === 1 ? ' is-single' : shown.length === 2 ? ' is-pair' : '') +
         '" type="button" data-card="view" aria-label="View ' + photos + '" style="--cells: ' + shown.length + '">' + shown.map(function (media, i) {
           return '<img alt="" decoding="async" data-at="' + i + '" src="' + escapeText(shown.length > 2 ? hooks.stillOf(media) : largeOf(media)) + '">';

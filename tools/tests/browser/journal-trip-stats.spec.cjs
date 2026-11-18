@@ -12,8 +12,8 @@ test('Chengdu shows the trip at a glance under its banner, and no other journal 
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   const stats = page.locator('.travel-journal__stats');
   await expect(stats).toHaveCount(1);
-  expect((await stats.textContent()).replace(/\s+/g, ' ').trim()).toBe('7 days · 34 stops · 55 photos · ≈ ¥1,140 in fees a person');
-  await expect(stats.locator('b')).toHaveText(['7', '34', '55', '≈ ¥1,140']);
+  expect((await stats.textContent()).replace(/\s+/g, ' ').trim()).toBe('7 days · 34 stops · 55 photos · ≈ ¥900 + S$85 a person');
+  await expect(stats.locator('b')).toHaveText(['7', '34', '55', '≈ ¥900 + S$85']);
   const geometry = await page.evaluate(() => {
     const box = selector => document.querySelector(selector).getBoundingClientRect();
     return { banner: box('.journal-banner'), stats: box('.travel-journal__stats'), date: box('.guangzhou-day__date') };
@@ -30,12 +30,14 @@ test('Chengdu shows the trip at a glance under its banner, and no other journal 
   }
 });
 
-test('Chengdu notes what we paid on Klook: tickets on Days 2 and 4, the 2-day tour once on Day 5', async ({ page }) => {
+test('Chengdu notes what we paid on Klook: one-attraction tickets inline on their stop, the 2-day tour once on Day 5', async ({ page }) => {
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   const tours = page.locator('.travel-route__tour');
-  await expect(tours).toHaveCount(4);
-  await expect(page.locator('#trip-section-2 ~ .guangzhou-day__route .travel-route__tour')).toHaveText(['Klook Panda Valley ticket: we paid S$13 a person', 'Klook red panda feeding: we paid S$60 a person']);
-  await expect(page.locator('#trip-section-4 ~ .guangzhou-day__route .travel-route__tour')).toHaveText('Klook night ticket: we paid S$12 a person');
+  await expect(tours).toHaveCount(1);
+  // Owner, 18 Nov 2026: a Klook booking for one attraction replaces its online price, inline with the mark.
+  const klookPrices = page.locator('.travel-route__price:has(> .travel-route__klook)');
+  await expect(klookPrices).toHaveText(['S$13', 'S$60 with feeding', 'S$12 night']);
+  await expect(page.locator('#trip-section-2 ~ .guangzhou-day__route .travel-route__total')).toHaveText('About S$73 a person · what we paid on Klook');
   // The tour covers Days 5 and 6, so it is written once, on Day 5, or readers would add it twice.
   const tour = page.locator('#trip-section-5 ~ .guangzhou-day__route .travel-route__tour');
   await expect(tour).toHaveText('Klook tour, Days 5–6, with tickets: S$207 a person');

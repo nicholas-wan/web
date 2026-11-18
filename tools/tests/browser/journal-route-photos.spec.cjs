@@ -129,7 +129,8 @@ test('Escape, the backdrop, the close button and Back close the place card and k
   const card = page.locator('.place-card');
   const stop = await openStop(page, 4, '72 Wonder Tower');
   await expect(card.locator('dt')).toHaveText(['Hours']);
-  await expect(card.locator('.place-card__price')).toHaveText('¥88 night, ¥48 day');
+  await expect(card.locator('.place-card__price')).toHaveText('S$12 night');
+  await expect(card.locator('.place-card__price .travel-route__klook')).toBeVisible();
   await expect(card.locator('.place-card__photos img')).toHaveCount(4);
   await expect(card.locator('.place-card__more')).toHaveCount(0);
   // Only the 4:30 pm day/night split is solid across sources; one session a line, times unbroken.
@@ -357,9 +358,9 @@ test('folded phone routes show only the summary and View all; expanded ones drop
     .map(child => child.classList[0] || child.tagName.toLowerCase()));
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/travel_2026_chengdu_zhangjiajie');
-  const day2 = page.locator('#trip-section-2 ~ .guangzhou-day__route');
+  const day2 = page.locator('#trip-section-5 ~ .guangzhou-day__route');
   const folded = ['strong', 'travel-route-summary', 'travel-route__more'];
-  // Day 2 has a day total and Klook lines.
+  // Day 5 has a day total and the Klook tour line.
   const tours = await day2.locator('.travel-route__tour').count();
   expect(tours).toBeGreaterThan(0);
   const lines = ['travel-route', 'travel-route__total'].concat(Array(tours).fill('travel-route__tour'));
@@ -420,4 +421,16 @@ test('closing the viewer lands on the tile of the photo last shown; the same pho
   await page.waitForTimeout(300);
   expect(await page.evaluate(() => window.scrollY)).toBe(before);
   await context.close();
+});
+
+// 18 Nov 2026 (owner: "visit stops and hide route button seems broken. check day 3"): a stop with no
+// subtitle sits a few pixels lower on desktop and was taken for a second row.
+test('a desktop route whose stops all fit one row has no View all button', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/travel_2026_chengdu_zhangjiajie');
+  for (const day of [3, 7]) {
+    const route = page.locator(`#trip-section-${day} ~ .guangzhou-day__route`);
+    await expect(route, `Day ${day}`).not.toHaveClass(/is-desktop-wrapped/);
+    await expect(route.locator('.travel-route__more'), `Day ${day}`).toBeHidden();
+  }
 });

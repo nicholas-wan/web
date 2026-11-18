@@ -392,9 +392,12 @@
       group.classList.remove('is-desktop-wrapped');
       if (phoneNav.matches) return;
 
-      var firstTop = stops.length ? stops[0].offsetTop : 0;
+      // A stop on a later row starts below the middle of the first one. Comparing tops alone
+      // took a stop with no subtitle, centred a few pixels lower, for a second row (18 Nov
+      // 2026: Chengdu Days 3 and 7 showed View all and Hide route with every stop on view).
+      var firstMiddle = stops.length ? stops[0].offsetTop + stops[0].offsetHeight / 2 : 0;
       var wrapped = Array.prototype.some.call(stops, function (stop) {
-        return stop.offsetTop > firstTop + 2;
+        return stop.offsetTop > firstMiddle;
       });
       group.classList.toggle('is-desktop-wrapped', wrapped);
       route.querySelectorAll('i').forEach(function (a) { var n = a.nextElementSibling; a.classList.toggle('is-line-end', !!n && n.offsetTop > a.offsetTop + a.offsetHeight); });
