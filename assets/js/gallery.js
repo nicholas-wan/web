@@ -649,11 +649,14 @@
   /* The popstate of our own history.back() can land after a quick reopen has pushed a
      new entry; it must not close that viewer. */
   var pendingBack = false;
+  /* The place card shares the entry: it hands it to the lightbox, so one Back closes either. */
+  var placeCardBack = null;
   window.addEventListener('popstate', function () {
     if (pendingBack) { pendingBack = false; return; }
     if (!historyEntry) return;
     historyEntry = false;
     if (overlay.classList.contains('is-visible')) close();
+    else if (placeCardBack) placeCardBack();
   });
 
   /* At the fitted scale, one-finger horizontal gestures keep circular
@@ -1005,7 +1008,8 @@
      with data-route-photos on their article. A stop owns the photos of its day whose caption
      title equals its name or one of the |-separated titles in its data-photos. Exact on
      purpose: older journals title photos with the city (Toronto, Hiroshima), and substring
-     matching gave every stop every photo of its day. Stops without photos stay plain text. */
+     matching gave every stop every photo of its day. A stop with photos or a price opens its
+     place card (below); the others stay plain text. */
   /* The place's own photos as a strip under the caption, and at its last photo a
      way on: the next stop of the day with photos, or back to the route. The
      viewer never closes by itself. */
@@ -1047,6 +1051,108 @@
     }
     else placeButton('lightbox__place-next lightbox__place-back', 'Back to the route', close).textContent = 'Back to route';
   };
+  /* Place card (18 Nov 2026, mockup 6): a stop with photos or a price opens a card first, a
+     bottom sheet on phones and a centred card on desktop, with its photos, price, hours and
+     map links. It takes the lightbox's one history entry and, on View photos, hands that entry
+     on, so one Back closes whichever is showing and returns to the route. */
+  var photoCount = function (count) { return count + (count === 1 ? ' photo' : ' photos'); };
+  var escapeText = function (text) { return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
+  var card = null;
+  var cardPlace = null;
+  var cardDown = null;
+  var cardOpen = function () { return card && card.classList.contains('is-visible'); };
+  var hideCard = function () {
+    card.classList.remove('is-visible');
+    card.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('place-card-open');
+  };
+  var closeCard = function (fromHistory) {
+    if (!cardOpen()) return;
+    hideCard();
+    if (historyEntry && !fromHistory) { historyEntry = false; pendingBack = true; history.back(); }
+    cardPlace.stop.focus({ preventScroll: true });
+  };
+  placeCardBack = function () { closeCard(true); };
+  var buildCard = function () {
+    card = document.createElement('div');
+    card.className = 'place-card';
+    card.innerHTML = '<div class="place-card__sheet" role="dialog" aria-modal="true" aria-labelledby="place-card-title"></div>';
+    document.body.appendChild(card);
+    var sheet = card.firstChild;
+    /* The dimmed page closes it when the press both began and ended there. View photos keeps
+       the entry: the lightbox finds it and pushes none of its own. */
+    card.addEventListener('pointerdown', function (event) { cardDown = event.target; });
+    card.addEventListener('click', function (event) {
+      var action = event.target.closest('[data-card]');
+      if ((action && action.getAttribute('data-card') === 'close') || (event.target === card && cardDown === card)) closeCard();
+      else if (action) { hideCard(); lastTrigger = cardPlace.stop; show(galleryMedia.indexOf(cardPlace.own[0])); }
+      cardDown = null;
+    });
+    /* The sheet drags down: past a fifth of its height it closes, less springs back. */
+    var dragY = null;
+    var dragBy = function (event) { return event.changedTouches[0].clientY - dragY; };
+    sheet.addEventListener('touchstart', function (event) {
+      dragY = event.touches.length === 1 && sheet.scrollTop <= 0 ? event.touches[0].clientY : null;
+    }, { passive: true });
+    sheet.addEventListener('touchmove', function (event) {
+      if (dragY === null) return;
+      sheet.style.transition = 'none';
+      sheet.style.transform = 'translateY(' + Math.max(0, dragBy(event)) + 'px)';
+    }, { passive: true });
+    sheet.addEventListener('touchend', function (event) {
+      if (dragY === null) return;
+      var moved = dragBy(event);
+      dragY = null;
+      sheet.style.transition = '';
+      if (moved > Math.max(64, sheet.offsetHeight / 5)) closeCard();
+      else sheet.style.transform = '';
+    }, { passive: true });
+    document.addEventListener('keydown', function (event) {
+      if (!cardOpen()) return;
+      if (event.key === 'Escape') closeCard();
+      var items = sheet.querySelectorAll('button, a');
+      var edge = items[event.shiftKey ? 0 : items.length - 1];
+      if (event.key === 'Tab' && (document.activeElement === edge || !sheet.contains(document.activeElement))) {
+        event.preventDefault();
+        items[event.shiftKey ? items.length - 1 : 0].focus();
+      }
+    });
+  };
+  var openCard = function (place) {
+    if (!card) buildCard();
+    cardPlace = place;
+    var own = place.own;
+    var photos = photoCount(own.length);
+    var facts = [['Price', place.price], ['Hours', place.hours]].filter(function (fact) { return fact[1]; }).map(function (fact) {
+      return '<dt>' + fact[0] + '</dt><dd>' + escapeText(fact[1]) + '</dd>';
+    }).join('');
+    var map = function (url, query, label) {
+      return '<a class="place-card__map" href="' + url + encodeURIComponent(query) + '" target="_blank" rel="noopener">' + label + '</a>';
+    };
+    var sheet = card.firstChild;
+    sheet.innerHTML = '<span class="place-card__handle" aria-hidden="true"></span>' +
+      '<button class="place-card__close" type="button" data-card="close" aria-label="Close place card">&times;</button>' +
+      '<p class="place-card__title" id="place-card-title">' + escapeText(place.name) + '</p>' +
+      '<p class="place-card__meta">' + (place.zh ? '<span lang="zh-Hans">' + escapeText(place.zh) + '</span> · ' : '') + place.day + ' · stop ' + place.at + '</p>' +
+      (own.length ? '<button class="place-card__photos' + (own.length > 3 ? ' is-mosaic' : '') + '" type="button" data-card="view" aria-label="View ' + photos +
+        '" style="--cells: ' + (Math.min(own.length, 4) + 1) + '">' + own.slice(0, 4).map(function (media) {
+          return '<img alt="" decoding="async" src="' + escapeText(stillOf(media)) + '">';
+        }).join('') + '<span class="place-card__more">' + photos + '</span></button>' : '') +
+      (facts ? '<dl class="place-card__facts">' + facts + '</dl>' : '') +
+      '<div class="place-card__actions">' + (own.length ? '<button class="place-card__view" type="button" data-card="view">View ' + photos + '</button>' : '') +
+      map('https://uri.amap.com/search?keyword=', place.zh || place.name, 'Amap') +
+      map('https://www.google.com/maps/search/?api=1&query=', place.zh ? place.name + ', ' + place.zh : place.name, 'Google Maps') + '</div>';
+    /* A sheet dragged shut faded from where it was let go; it opens from the bottom again. */
+    sheet.style.transform = '';
+    sheet.scrollTop = 0;
+    card.setAttribute('aria-hidden', 'false');
+    card.classList.add('is-visible');
+    document.documentElement.classList.add('place-card-open');
+    /* As the lightbox does: one same-URL entry, only for an open the reader made. */
+    var gesture = !navigator.userActivation || navigator.userActivation.isActive;
+    if (!historyEntry && gesture) { history.pushState(history.state, ''); historyEntry = true; }
+    sheet.querySelector('.place-card__close').focus({ preventScroll: true });
+  };
   var placeKey = function (text) { return (text || '').toLowerCase().replace(/[^a-z0-9぀-鿿가-힯]+/g, ''); };
   var mediaTitles = galleryMedia.map(function (media) {
     var title = media.closest('.content') && media.closest('.content').querySelector('.content-title');
@@ -1061,9 +1167,31 @@
       return mediaSections[index] === heading && keys.indexOf(mediaTitles[index]) >= 0;
     });
     /* A stop repeated on one day (a round trip) keeps its photos with the first. */
-    if (!own.length || placeOf[galleryMedia.indexOf(own[0])]) return;
+    if (own.length && placeOf[galleryMedia.indexOf(own[0])]) own = [];
+    var price = stop.querySelector('.travel-route__price');
+    if (!own.length && !price) return;
+    var subtitle = stop.querySelector('small:not(.travel-route__price)');
+    var place = {
+      stop: stop,
+      name: name.textContent.trim(),
+      zh: subtitle && subtitle.textContent.trim(),
+      price: price && price.textContent.trim(),
+      hours: stop.getAttribute('data-hours'),
+      day: (/^Day\s+\d+/i.exec(heading ? heading.textContent.trim() : '') || [''])[0],
+      at: Array.prototype.indexOf.call(stop.parentNode.querySelectorAll('.guangzhou-route__stop'), stop) + 1,
+      own: own
+    };
+    stop.classList.add('has-card');
+    stop.setAttribute('role', 'button');
+    stop.setAttribute('tabindex', '0');
+    stop.setAttribute('aria-haspopup', 'dialog');
+    stop.setAttribute('aria-label', 'Open the place card for ' + place.name + (own.length ? ' (' + photoCount(own.length) + ')' : ''));
+    var open = function () { openCard(place); };
+    stop.addEventListener('click', open);
+    stop.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
+    if (!own.length) return;
     var first = own[0];
-    var group = { name: name.textContent.trim(), own: own, heading: heading };
+    var group = { name: place.name, own: own, heading: heading };
     placeGroups.push(group);
     own.forEach(function (media) { var index = galleryMedia.indexOf(media); if (!placeOf[index]) placeOf[index] = group; });
     var thumb = document.createElement('img');
@@ -1080,12 +1208,6 @@
     stop.appendChild(count);
     name.setAttribute('data-count', own.length);
     stop.classList.add('has-photos');
-    stop.setAttribute('role', 'button');
-    stop.setAttribute('tabindex', '0');
-    stop.setAttribute('aria-label', 'View ' + own.length + (own.length === 1 ? ' photo' : ' photos') + ' of ' + name.textContent.trim());
-    var open = function () { lastTrigger = stop; show(galleryMedia.indexOf(first)); };
-    stop.addEventListener('click', open);
-    stop.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
   });
 
   /* Keep native swiping, with persistent progress and explicit phone controls. */

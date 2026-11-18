@@ -11451,6 +11451,164 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 /* Journal polish (7 Nov 2026). Last in travel-journal.css so it follows the journal rules it
    adjusts. */
 
+/* Place card (gallery.js, 18 Nov 2026, mockup 6): a stop with photos or a price opens it; a
+   price-only stop reads as the same teal dotted link. A centred card on desktop, a bottom sheet
+   on phones. The theme's buttons are uppercase 3rem slabs with an !important ink colour. */
+.page-travel-journal .has-card { cursor: pointer; }
+.page-travel-journal .has-card:not(.has-photos) > span:first-child {
+  color: var(--color-brand-700);
+  text-decoration: underline dotted color-mix(in srgb, var(--color-brand-600) 55%, transparent);
+  text-underline-offset: 0.22em;
+}
+.page-travel-journal .has-card:not(.has-photos):hover > span:first-child { text-decoration-style: solid; }
+html.place-card-open { overflow: hidden; overscroll-behavior: none; }
+.place-card {
+  position: fixed;
+  inset: 0;
+  z-index: 21;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(12, 20, 22, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity var(--motion-standard) ease, visibility 0s linear var(--motion-standard);
+}
+.place-card.is-visible { opacity: 1; visibility: visible; transition-delay: 0s; }
+.place-card__sheet {
+  position: relative;
+  width: min(27rem, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1.35rem 1.4rem 1.4rem;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 18px 48px rgba(12, 20, 22, 0.22);
+  color: var(--color-ink-900);
+  text-align: left;
+  transform: translateY(0.5rem) scale(0.98);
+  transition: transform var(--motion-standard) ease;
+}
+.place-card.is-visible .place-card__sheet { transform: none; }
+.place-card__handle { display: none; }
+.place-card .place-card__close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border-radius: 50%;
+  box-shadow: none;
+  color: var(--color-ink-600) !important;
+  font: 400 1.6rem/2.5rem var(--font-display);
+}
+.place-card__title {
+  margin: 0 2.5rem 0 0;
+  color: var(--color-ink-900);
+  font: 700 1.2rem/1.3 var(--font-body);
+  text-align: left;
+}
+.place-card__meta {
+  margin: 0.2rem 0 0;
+  color: var(--color-ink-600);
+  font: 300 0.85rem/1.5 var(--font-body);
+  text-align: left;
+}
+.place-card__meta > :lang(zh-Hans) { font-family: Merriweather, "Merriweather Fallback", Georgia, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif; }
+.place-card .place-card__photos {
+  display: grid;
+  grid-template-columns: repeat(var(--cells, 2), 1fr);
+  gap: 0.4rem;
+  width: 100%;
+  height: auto;
+  margin: 1rem 0 0;
+  padding: 0;
+  box-shadow: none;
+  line-height: normal;
+  white-space: normal;
+}
+.place-card [hidden] { display: none; }
+.place-card .place-card__photos.is-mosaic { grid-template-columns: 2fr 1fr 1fr; }
+.place-card__photos img,
+.place-card__more {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 0.45rem;
+  background: #e6eeed;
+  object-fit: cover;
+}
+.place-card__photos.is-mosaic img:first-child { grid-row: span 2; height: 100%; aspect-ratio: auto; }
+.place-card__more {
+  display: grid;
+  place-items: center;
+  background: var(--color-brand-100);
+  color: var(--color-brand-700);
+  font: 700 0.8rem/1.2 var(--font-display);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.place-card__facts {
+  display: grid;
+  grid-template-columns: 4.25rem 1fr;
+  gap: 0.45rem 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0.75rem 0 0;
+  border-top: 1px solid #dfe7e9;
+}
+.place-card__facts dt {
+  margin: 0;
+  color: var(--color-ink-600);
+  font: 700 0.78rem/1.6rem var(--font-display);
+}
+.place-card__facts dd {
+  margin: 0;
+  font: 300 0.88rem/1.6rem var(--font-body);
+  font-variant-numeric: tabular-nums;
+}
+.place-card__actions { display: flex; gap: 0.5rem; margin-top: 1.1rem; }
+.place-card .place-card__view,
+.place-card .place-card__map {
+  flex: 1 1 0;
+  height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: 999px;
+  font: 700 0.85rem/2.75rem var(--font-display);
+  letter-spacing: 0;
+  text-align: center;
+  text-transform: none;
+  white-space: nowrap;
+}
+.place-card .place-card__view { background: var(--color-brand-600); box-shadow: none; color: #fff !important; }
+.place-card .place-card__map { box-shadow: inset 0 0 0 1px rgba(17, 128, 125, 0.6); color: var(--color-brand-700) !important; }
+@media (hover: hover) {
+  .place-card .place-card__close:hover, .place-card .place-card__map:hover { background: var(--color-brand-100); }
+  .place-card .place-card__view:hover { background: var(--color-brand-700); }
+  .place-card__photos:hover .place-card__more { background: #d6eceb; }
+}
+@media screen and (max-width: 736px) {
+  .place-card { align-items: flex-end; padding: 0; }
+  .place-card__sheet {
+    width: 100%;
+    max-height: 88vh;
+    max-height: 88dvh;
+    padding: 0.6rem 1.1rem calc(1.1rem + env(safe-area-inset-bottom));
+    border-radius: 18px 18px 0 0;
+    box-shadow: 0 -6px 24px rgba(12, 20, 22, 0.18);
+    transform: translateY(100%);
+  }
+  .place-card__handle { display: block; width: 2.5rem; height: 5px; margin: 0 auto 0.75rem; border-radius: 3px; background: #cfd8da; }
+  .place-card .place-card__close { top: 0.9rem; right: 0.6rem; }
+  .place-card .place-card__view, .place-card .place-card__map { padding: 0 0.4rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .place-card, .place-card__sheet { transition: none; }
+}
+
 /* One phone gutter. Seoul, Silicon Valley, Europe, Perth, USA & Canada, Germany and Chengdu set
    their days in the theme's 2rem (29px) while the hero above uses 1.1rem (16px); Japan, Guangzhou
    and Australia already use 16px with inset 1px dividers, which every journal now shares. */
