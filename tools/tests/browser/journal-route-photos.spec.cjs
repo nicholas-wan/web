@@ -41,7 +41,13 @@ test('Chengdu stops own exactly their photos, count within the place and offer t
   await expect(page.locator('.lightbox__place-thumb')).toHaveCount(2);
   await page.getByRole('button', { name: 'Next media', exact: true }).click();
   await expect(context).toHaveText(/2 of 2 · Day 6$/);
-  await page.getByRole('button', { name: 'Next stop: Glass Skywalk' }).click();
+  // For 350 ms after View photos the strip ignores clicks (a double tap's second tap), then works.
+  const nextStop = page.getByRole('button', { name: 'Next stop: Glass Skywalk' });
+  const opened = Date.now();
+  await nextStop.click();
+  if (Date.now() - opened < 300) await expect(context).toHaveText(/2 of 2 · Day 6$/);
+  await page.waitForTimeout(400);
+  await nextStop.click();
   await expect(context).toHaveText(/1 of 2 · Day 6$/);
 });
 

@@ -37,7 +37,7 @@ test('a failed load opens the stop\'s photos, a priced stop waits, and the next 
   await expect(page.locator('.place-card__title')).toHaveText('Tianmen Cave');
 });
 
-test('a card still loading never opens over a lightbox opened meanwhile, nor after a long wait', async ({ page }) => {
+test('a card still loading never opens over a lightbox opened meanwhile, nor once its stop has left the screen', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   let release;
   const held = new Promise(resolve => { release = resolve; });
@@ -58,15 +58,19 @@ test('a card still loading never opens over a lightbox opened meanwhile, nor aft
   await expect(viewer).not.toHaveClass(/is-visible/);
   expect(page.url()).toContain('travel_2026_chengdu_zhangjiajie');
 
-  // A tap more than three seconds old is dropped too.
+  // A waiting tap dims its stop, and is dropped once the stop has left the screen (polish, 18 Nov
+  // 2026; it was dropped after three seconds, which lost real taps on slow 3G).
   let late;
   const slow = new Promise(resolve => { late = resolve; });
   await page.unroute(cardScript);
   await page.route(cardScript, async routed => { await slow; await routed.continue(); });
   await page.reload({ waitUntil: 'domcontentloaded' });
-  await route(page, 6).locator('.has-card', { hasText: 'Skywalk' }).click();
-  await page.waitForTimeout(3200);
+  const waiting = route(page, 6).locator('.has-card', { hasText: 'Skywalk' });
+  await waiting.click();
+  await expect(waiting).toHaveClass(/is-loading/);
+  await page.evaluate(() => window.scrollTo(0, 0));
   late();
+  await expect(waiting).not.toHaveClass(/is-loading/);
   await expect.poll(() => page.evaluate(() => typeof window.travelPlaceCard)).toBe('function');
   await page.waitForTimeout(300);
   await expect(page.locator('.place-card.is-visible')).toHaveCount(0);

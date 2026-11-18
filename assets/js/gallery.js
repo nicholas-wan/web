@@ -210,10 +210,10 @@
   overlay.setAttribute('aria-hidden', 'true');
   overlay.innerHTML = '<button class="lightbox__close" type="button" aria-label="Close media viewer">&times;</button>' +
     '<div class="lightbox__tools" role="group" aria-label="Image controls">' +
-      '<button class="lightbox__rotate" type="button" aria-label="Use landscape view" aria-pressed="false" hidden>&#8635;</button>' +
       '<button class="lightbox__info" type="button" aria-label="Show caption" aria-expanded="false" aria-controls="lightbox-caption" hidden>i</button>' +
       '<button class="lightbox__zoom-out" type="button" aria-label="Zoom out" disabled>&minus;</button>' +
       '<button class="lightbox__zoom-in" type="button" aria-label="Zoom in">&plus;</button>' +
+      '<button class="lightbox__rotate" type="button" aria-label="Use landscape view" aria-pressed="false" hidden>&#8635;</button>' +
     '</div>' +
     '<button class="lightbox__previous" type="button" aria-label="Previous media">&#8592;</button>' +
     '<figure class="lightbox__figure"><div class="lightbox__viewport"><img class="lightbox__image" alt="" draggable="false"><video class="lightbox__image lightbox__video" role="button" tabindex="0" aria-label="Pause animation" loop muted playsinline hidden></video></div><figcaption id="lightbox-caption" class="lightbox__caption" aria-live="polite" aria-atomic="true"></figcaption><div class="lightbox__place" hidden></div></figure>' +
@@ -507,8 +507,14 @@
   viewerVideo.addEventListener('play', syncVideoLabel);
   viewerVideo.addEventListener('pause', syncVideoLabel);
   var lockedScrollY = 0;
+  var lockedWidth = 0;
+  var lockedAnchor = null;
+  var lockedTop = 0;
   var lockBackgroundScroll = function () {
     lockedScrollY = window.pageYOffset || document.documentElement.scrollTop || 0;
+    lockedWidth = window.innerWidth;
+    lockedAnchor = lastTrigger;
+    lockedTop = lastTrigger ? lastTrigger.getBoundingClientRect().top : 0;
     document.documentElement.classList.add('lightbox-open');
     document.body.style.setProperty('--lightbox-scroll-offset', '-' + lockedScrollY + 'px');
     document.body.classList.add('lightbox-open');
@@ -520,6 +526,12 @@
     syncAnimationPreference();
     document.body.style.removeProperty('--lightbox-scroll-offset');
     window.scrollTo(0, lockedScrollY);
+    /* Turned while open: the old offset points elsewhere in the new layout, so put the photo or
+       stop back where it was on screen (polish, 18 Nov 2026). */
+    if (lockedAnchor && window.innerWidth !== lockedWidth && lockedAnchor.getClientRects().length) {
+      window.scrollBy(0, lockedAnchor.getBoundingClientRect().top - lockedTop);
+    }
+    lockedAnchor = null;
   };
   var close = function () {
     ++imageRequest;
@@ -773,11 +785,13 @@
     /* A second finger mid-drag springs the figure back before pinching. */
     if (gestureMode === 'dismiss') cancelGesture();
     swipeAxisLocked = false;
-    if (!overlay.classList.contains('is-visible') || startsOnControl(event.target)) {
+    /* Two fingers anywhere zoom the photo, never the page behind (polish, 18 Nov 2026). */
+    var pinchable = !currentIsVideo && event.touches.length === 2;
+    if (!overlay.classList.contains('is-visible') || (!pinchable && startsOnControl(event.target))) {
       cancelGesture();
       return;
     }
-    if (!currentIsVideo && event.touches.length === 2 && viewport.contains(event.target)) {
+    if (pinchable) {
       gestureMode = 'pinch';
       pinchStartDistance = touchDistance(event.touches[0], event.touches[1]) || 1;
       pinchStartZoom = zoomLevel;
@@ -1030,7 +1044,7 @@
     button.type = 'button';
     button.className = className;
     button.setAttribute('aria-label', label);
-    button.addEventListener('click', action);
+    button.addEventListener('click', function () { if (Date.now() >= ignoreClickUntil) action(); });
     placeBar.appendChild(button);
     return button;
   };
@@ -1079,24 +1093,31 @@
   }, { rootMargin: '600px 0px' }) : null;
   var cardTap = null;
   var cardScript = null;
-  /* Only the latest tap waiting for the script runs, and only while it is fresh and the lightbox
-     has not opened meanwhile (even if it has closed again): a late card over the lightbox broke
-     its one history entry. A failed load resets, so the next tap retries, and the waiting tap
-     opens the stop's photos. */
+  /* Only the latest tap waiting for the script runs, and only while its stop is still on screen,
+     it is under eight seconds old and the lightbox has not opened meanwhile (even if it has
+     closed again): a late card over the lightbox broke its one history entry. Three seconds
+     dropped real taps on slow 3G (polish, 18 Nov 2026), so the tap asks for the script at high
+     priority and dims the stop while it waits. A failed load resets, so the next tap retries,
+     and the waiting tap opens the stop's photos. */
   var cardArrived = function () {
     var tap = cardTap;
     cardTap = null;
-    if (!tap || Date.now() - tap.at > 3000 || tap.shows !== shows) return;
+    if (!tap) return;
+    tap.place.stop.classList.remove('is-loading');
+    var box = tap.place.stop.getBoundingClientRect();
+    if (Date.now() - tap.at > 8000 || tap.shows !== shows || box.bottom < 0 || box.top > window.innerHeight) return;
     if (cardApi) cardApi.open(tap.place);
     else if (tap.place.own.length) openPhotos(tap.place);
   };
   var loadCard = function (place) {
     if (cardApi) return place && cardApi.open(place);
-    if (place) cardTap = { place: place, at: Date.now(), shows: shows };
+    if (cardTap) cardTap.place.stop.classList.remove('is-loading');
+    if (place) { cardTap = { place: place, at: Date.now(), shows: shows }; place.stop.classList.add('is-loading'); }
     if (cardScript) return;
     var article = document.querySelector('.travel-journal__content[data-place-card]');
     if (!article) return;
     cardScript = document.createElement('script');
+    if (place) cardScript.fetchPriority = 'high';
     cardScript.src = article.getAttribute('data-place-card');
     cardScript.onerror = function () { cardScript.remove(); cardScript = null; cardArrived(); };
     cardScript.onload = function () {
@@ -1116,7 +1137,8 @@
     };
     document.head.appendChild(cardScript);
   };
-  var openPhotos = function (place) { lastTrigger = place.stop; show(galleryMedia.indexOf(place.own[0])); };
+  /* A second quick tap on View photos would land on the viewer's Next button where it was. */
+  var openPhotos = function (place, at) { lastTrigger = place.stop; show(galleryMedia.indexOf(place.own[at] || place.own[0])); ignoreClickUntil = Date.now() + 350; };
   /* Where focus goes back to from a place or its photos (also place-card.js's hook): the stop,
      or, when a folded phone route hides it, the route's View all button, else the route box
      itself. Anything else that opened the lightbox gets focus back as is. */

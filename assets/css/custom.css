@@ -7298,7 +7298,8 @@ body.lightbox-open {
   background: rgba(8, 10, 14, 0.98);
   opacity: 0;
   pointer-events: none;
-  touch-action: pan-y pinch-zoom;
+  /* The viewer handles every gesture: pinch-zoom here zoomed the page and lost the controls (polish, 18 Nov 2026). */
+  touch-action: none;
   transition: opacity var(--motion-standard) ease,
     visibility 0s linear var(--motion-standard);
   visibility: hidden;
@@ -7569,7 +7570,7 @@ body.lightbox-open {
 }
 .page-travel-journal .guangzhou-route__stop:has(> .travel-route__price) > span:first-child { grid-column: 1 / -1; }
 .page-travel-journal .guangzhou-route__stop > .travel-route__price { font-variant-numeric: tabular-nums; }
-.page-travel-journal .guangzhou-route__stop > .travel-route__price::before { content: "\00a0\00b7\00a0"; }
+.page-travel-journal .guangzhou-route__stop > .travel-route__price::before { margin: 0 0.35em; content: "\00b7"; }
 .page-travel-journal .travel-route__total {
   margin: 0.6rem 0 0;
   color: var(--color-ink-600);
@@ -7589,8 +7590,9 @@ body.lightbox-open {
   .page-travel-journal .guangzhou-route__stop.has-photos { min-height: 3.6rem; padding-right: 3.75rem; }
   .page-travel-journal .travel-route__thumb {
     position: absolute;
-    top: 0;
+    top: 50%;
     right: 0;
+    margin-top: -1.5rem;
     display: block;
     width: 3rem;
     height: 3rem;
@@ -7635,6 +7637,7 @@ body.lightbox-open {
 .lightbox .lightbox__place .lightbox__place-thumb.is-current { border-color: #fff !important; opacity: 1; }
 .lightbox .lightbox__place-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .lightbox .lightbox__place .lightbox__place-next {
+  order: 2;
   padding: 0 0.85rem !important;
   border: 1px solid rgba(255, 255, 255, 0.45) !important;
   background: rgba(255, 255, 255, 0.06) !important;
@@ -7642,6 +7645,13 @@ body.lightbox-open {
   font: 700 0.85rem/1 var(--font-display) !important;
   letter-spacing: 0 !important;
   text-transform: none !important;
+}
+
+/* Phones: the way on takes its own row, kept for every photo of a place with thumbnails, so the
+   caption and strip no longer jump up at its last photo (polish, 18 Nov 2026). */
+@media screen and (max-width: 600px) {
+  .lightbox__place:has(.lightbox__place-thumb)::before { flex-basis: 100%; order: 1; content: ""; }
+  .lightbox__place:has(.lightbox__place-thumb) { min-height: 6.3rem; align-content: flex-start; }
 }
 
 /* Route bundle: gallery-lightbox:end */
@@ -11444,9 +11454,13 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
   background: rgba(12, 20, 22, 0.45);
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition: opacity var(--motion-standard) ease, visibility 0s linear var(--motion-standard);
 }
-.place-card.is-visible { opacity: 1; visibility: visible; transition-delay: 0s; }
+/* Fading out it takes no taps, so a quick tap after closing reaches the stop under it (polish, 18 Nov 2026). */
+.place-card.is-visible { opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s; }
+/* A tap waiting for place-card.js dims the stop's name. */
+.page-travel-journal .has-card.is-loading > span:first-child { opacity: 0.55; }
 .place-card__sheet {
   position: relative;
   width: min(27rem, 100%);
@@ -11469,16 +11483,16 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
   position: absolute;
   top: 0.9rem;
   right: 0.9rem;
-  width: 2rem;
+  width: 2.25rem;
   min-width: 0;
-  height: 2rem;
+  height: 2.25rem;
   min-height: 0;
   padding: 0;
   border-radius: 50%;
   background: #eef2f1;
   box-shadow: none;
   color: var(--color-ink-600) !important;
-  font: 400 1.25rem/2rem var(--font-display);
+  font: 400 1.35rem/2.25rem var(--font-display);
 }
 .place-card .place-card__close::after { position: absolute; inset: -6px; content: ""; }
 /* Where it sits in the trip, in the site's teal date-label style. */
@@ -11536,15 +11550,19 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
    keep the compact row of squares. */
 .place-card .place-card__photos.is-single img { aspect-ratio: 3 / 2; max-height: none; }
 .place-card .place-card__photos.is-pair img { aspect-ratio: 4 / 3; max-height: none; }
+/* A landscape phone keeps the buttons on screen under one or two photos. */
+@media (orientation: landscape) and (max-height: 500px) {
+  .place-card .place-card__photos:is(.is-single, .is-pair) img { max-height: 40dvh; }
+}
 .place-card__photos img:nth-of-type(4),
 .place-card__more { position: relative; z-index: 1; grid-area: 1 / 4; align-self: stretch; }
 .place-card__more {
   display: grid;
   place-items: center;
   border-radius: 0.45rem;
-  background: rgba(12, 20, 22, 0.5);
+  background: rgba(12, 20, 22, 0.6);
   color: #fff;
-  font: 700 1rem/1 var(--font-display);
+  font: 700 1.15rem/1 var(--font-display);
   letter-spacing: 0;
   text-transform: none;
 }
@@ -11705,6 +11723,11 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
 .page-travel-journal .travel-route-summary {
   word-break: keep-all;
 }
+/* A stop moves to the next line whole, so no line ends on a lone dot or arrow (polish, 18 Nov 2026). */
+.travel-route-summary__stop { display: inline-block; max-width: 100%; }
+/* A stop too long for its line breaks before its subtitle, which takes its dot with it. */
+.travel-route-summary__sub { display: inline-block; max-width: 100%; }
+.travel-route-summary__dot { margin: 0 0.35em 0 0.1em; }
 
 /* Day strip: desktop chips cut mid-word at the strip edge get the right-edge fade phones have. */
 @media screen and (min-width: 737px) {
@@ -11769,6 +11792,7 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
     margin: 0;
     padding: 0 1.1rem 0 0.5rem;
     overflow-x: auto;
+    overscroll-behavior-inline: contain;
     scrollbar-width: none;
   }
   .journal-place-filter__places.is-scrolled {

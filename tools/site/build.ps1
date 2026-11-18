@@ -652,8 +652,11 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
         param($stop)
         $name = ([regex]::Replace($stop.Groups['name'].Value, '<[^>]+>', '')).Trim()
         $small = ([regex]::Replace($stop.Groups['small'].Value, '<[^>]+>', '')).Trim()
-        if ($small) { return "$name &middot; $small" } else { return $name }
+        if ($small) { return "$name <span class=`"travel-route-summary__sub`"><span class=`"travel-route-summary__dot`">&middot;</span>$small</span>" } else { return $name }
     }
+    # Each stop is one inline-block (polish round, 18 Nov 2026): a line no longer ends on a lone
+    # dot or arrow; a stop wider than the line still wraps inside itself, and the arrow leads the next.
+    $wrap = { param($text) "<span class=`"travel-route-summary__stop`">$text</span>" }
     $result = [regex]::Replace($Markup, '(?s)(?<open><div class="[^"]*\bguangzhou-day__route\b[^"]*">\s*<strong>[^<]*</strong>\s*)<div class="(?<routeClass>[^"]*\bguangzhou-route\b[^"]*)">(?<stops>(?:(?!</div>).)*?)</div>(?<gap>\s*)(?<total>(?:<p class="travel-route__(?:total|tour)">(?:(?!</p>).)*</p>\s*)*)(?:<button class="(?<buttonClass>[^"]*\bguangzhou-route__more\b[^"]*)"[^>]*>.*?</button>\s*)?</div>', {
         param($match)
         $id = "journal-route-$($state.Index)"
@@ -665,8 +668,8 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
             # A round trip ("Perth -> Perth") names the last stop that differs from the first (15 Nov 2026).
             $endIndex = $stops.Count - 1
             while ($endIndex -gt 1 -and (& $place $stops[$endIndex]) -ceq $summary) { $endIndex-- }
-            $summary += ' &rarr; ' + (& $place $stops[$endIndex])
-        }
+            $summary = (& $wrap $summary) + ' ' + (& $wrap ('&rarr;&nbsp;' + (& $place $stops[$endIndex])))
+        } else { $summary = & $wrap $summary }
         $label = if ($stops.Count -eq 1) { 'View all 1 stop' } else { "View all $($stops.Count) stops" }
         $buttonClass = if ($match.Groups['buttonClass'].Success) { $match.Groups['buttonClass'].Value } else { 'travel-route__more guangzhou-route__more' }
         # Every journal's button wears the teal day-strip chip (Nov 2026), including

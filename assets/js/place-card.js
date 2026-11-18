@@ -42,16 +42,18 @@ window.travelPlaceCard = function (hooks) {
       if (event.detail && Date.now() - openedAt < 350) return;
       var action = event.target.closest('[data-card]');
       if ((action && action.getAttribute('data-card') === 'close') || (event.target === card && cardDown === card)) closeCard();
-      else if (action) { hideCard(); hooks.openPhotos(cardPlace); }
+      else if (action) { var at = event.target.closest('[data-at]'); hideCard(); hooks.openPhotos(cardPlace, at ? +at.getAttribute('data-at') : 0); }
       cardDown = null;
     });
-    /* The sheet drags down: past a fifth of its height it closes, less (or a cancelled touch)
-       springs back. */
+    /* The sheet drags down: past a fifth of its height or on a flick it closes, else (or on a
+       cancelled touch) it springs back. */
     var dragY = null;
+    var dragAt = 0;
     var dragBy = function (event) { return event.changedTouches[0].clientY - dragY; };
     var settle = function () { dragY = null; sheet.style.transition = ''; sheet.style.transform = ''; };
     sheet.addEventListener('touchstart', function (event) {
       dragY = event.touches.length === 1 && sheet.scrollTop <= 0 ? event.touches[0].clientY : null;
+      dragAt = event.timeStamp;
     }, { passive: true });
     sheet.addEventListener('touchmove', function (event) {
       if (dragY === null) return;
@@ -63,7 +65,7 @@ window.travelPlaceCard = function (hooks) {
       var moved = dragBy(event);
       dragY = null;
       sheet.style.transition = '';
-      if (moved > Math.max(64, sheet.offsetHeight / 5)) closeCard();
+      if (moved > Math.max(64, sheet.offsetHeight / 5) || (moved > 48 && moved / (event.timeStamp - dragAt) > 0.5)) closeCard();
       else sheet.style.transform = '';
     }, { passive: true });
     sheet.addEventListener('touchcancel', settle, { passive: true });
@@ -100,9 +102,9 @@ window.travelPlaceCard = function (hooks) {
       (place.sub || place.price ? '<p class="place-card__meta"><span' + (place.zh ? ' lang="zh-Hans">' : '>') + escapeText(place.sub || '') + '</span>' +
         (place.price ? '<span class="place-card__price">' + factText(place.price) + '</span>' : '') + '</p>' : '') +
       (own.length ? '<button class="place-card__photos' + (shown.length === 1 ? ' is-single' : shown.length === 2 ? ' is-pair' : '') +
-        '" type="button" data-card="view" aria-label="View ' + photos + '" style="--cells: ' + shown.length + '">' + shown.map(function (media) {
-          return '<img alt="" decoding="async" src="' + escapeText(shown.length > 2 ? hooks.stillOf(media) : largeOf(media)) + '">';
-        }).join('') + (own.length > shown.length ? '<span class="place-card__more">+' + (own.length - shown.length) + '</span>' : '') + '</button>' : '') +
+        '" type="button" data-card="view" aria-label="View ' + photos + '" style="--cells: ' + shown.length + '">' + shown.map(function (media, i) {
+          return '<img alt="" decoding="async" data-at="' + i + '" src="' + escapeText(shown.length > 2 ? hooks.stillOf(media) : largeOf(media)) + '">';
+        }).join('') + (own.length > shown.length ? '<span class="place-card__more" data-at="' + (shown.length - 1) + '">+' + (own.length - shown.length) + '</span>' : '') + '</button>' : '') +
       /* Hours may list sessions split by "|", one a line. */
       (place.hours ? '<dl class="place-card__facts"><dt>Hours</dt><dd>' + place.hours.split('|').map(factText).join('<br>') + '</dd></dl>' : '') +
       '<div class="place-card__actions">' + (own.length ? '<button class="place-card__view" type="button" data-card="view">View ' + photos + '</button>' : '') +
