@@ -3495,6 +3495,61 @@ body.is-map-fullscreen .travel-atlas__layout {
   display: none;
 }
 
+/* Day maps (18 Nov 2026; Add-RouteMaps in build.ps1): an inline SVG under the Route label,
+   shown folded or not, full width on phones and a small panel on desktop. No tiles. */
+.travel-route-map {
+  display: block;
+  width: 100%;
+  max-width: 24rem;
+  height: auto;
+  margin-top: 0.55rem;
+  border-radius: 6px;
+  background: #eef3f1;
+  font-family: var(--font-display);
+  font-weight: 700;
+}
+
+.travel-route-map path {
+  fill: none;
+  stroke: #0c6663;
+}
+
+.travel-route-map__line {
+  stroke: #11807d;
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+
+.travel-route-map circle {
+  fill: #11807d;
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.travel-route-map text {
+  fill: #fff;
+  font-size: 12px;
+  text-anchor: middle;
+}
+
+.travel-route-map .is-linked {
+  cursor: pointer;
+}
+
+.travel-route-map .is-linked:hover circle {
+  fill: #0c6663;
+}
+
+.travel-route-map__scale path {
+  stroke: var(--color-ink-600);
+  stroke-width: 1.5;
+}
+
+.travel-route-map__scale text {
+  fill: var(--color-ink-600);
+  text-anchor: start;
+}
+
 @media screen and (min-width: 601px) {
   .guangzhou-day__route--collapsible.is-desktop-wrapped.is-truncated:not(.is-expanded) .guangzhou-route {
     max-height: 2.45rem;

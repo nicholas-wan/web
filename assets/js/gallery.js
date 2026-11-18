@@ -1000,6 +1000,13 @@
     stop.addEventListener('click', open);
     stop.addEventListener('keydown', function (event) { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); } });
   });
+  /* Day map pins (build.ps1 Add-RouteMaps) open their stop's photos, as tapping the stop does. */
+  document.querySelectorAll('[data-route-pin]').forEach(function (pin) {
+    var stop = pin.closest('.guangzhou-day__route').querySelectorAll('.guangzhou-route__stop')[pin.getAttribute('data-route-pin')];
+    if (!stop || !stop.classList.contains('has-photos')) return;
+    pin.classList.add('is-linked');
+    pin.addEventListener('click', function () { stop.click(); });
+  });
 
   /* Keep native swiping, with persistent progress and explicit phone controls. */
   var galleryRefreshers = [];
