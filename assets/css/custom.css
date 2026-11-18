@@ -11475,6 +11475,33 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
     mask-image: linear-gradient(90deg, transparent, #000 2rem);
   }
 }
+
+/* Place chips over a day's photos (gallery.js, 18 Nov 2026): the "View all N stops" chip, teal
+   when chosen. Hidden tiles leave the grid; phones scroll the row, without snapping. */
+.journal-place-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.page-travel-journal .journal-place-filter__chip {
+  display: inline-block;
+  height: auto;
+  min-height: 2.4rem;
+  padding: 0.45rem 1rem;
+  border: 1px solid rgba(17, 128, 125, 0.6);
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: none;
+  color: var(--color-brand-700) !important;
+  font: 700 max(var(--text-floor, 0px), 0.85rem)/1.2 var(--font-display);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.page-travel-journal .journal-place-filter__chip:hover { border-color: var(--color-brand-600); background: #f1f7f6; }
+.page-travel-journal .journal-place-filter__chip[aria-pressed="true"] { border-color: var(--color-brand-600); background: var(--color-brand-600); color: #fff !important; }
+.journal-place-filter__chip span { opacity: 0.75; }
+.page-travel-journal .masonry .brick[hidden] { display: none; }
+
+@media screen and (max-width: 600px) {
+  .journal-place-filter { flex-wrap: nowrap; margin: 0 -1.1rem 0.75rem; padding: 0 1.1rem; overflow-x: auto; scrollbar-width: none; }
+  .page-travel-journal .journal-place-filter__chip { flex: none; }
+}
 /* Route bundle: journal-polish:end */
 
 /* Work and Projects opening (15 Nov 2026): the single-line headline that

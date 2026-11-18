@@ -1111,6 +1111,41 @@
       var state = measure();
       return function () { apply(state); };
     });
+
+    /* Place chips (18 Nov 2026, mockup 5 in lab/journal-ux-mockups): a day whose photos belong
+       to two or more route stops gets All, then one chip per stop in route order. A chip hides
+       the other tiles, so the phone counter and arrows count only what is left; the lightbox
+       keeps the whole journal. */
+    var places = placeGroups.map(function (group) {
+      return { name: group.name, tiles: group.own.filter(function (media) { return gallery.contains(media); }).map(function (media) { return media.closest('.brick'); }) };
+    }).filter(function (place) { return place.tiles.length; });
+    if (places.length > 1) {
+      var allTiles = tiles;
+      var filter = document.createElement('div');
+      filter.className = 'journal-place-filter';
+      filter.setAttribute('role', 'group');
+      filter.setAttribute('aria-label', 'Show photos by place');
+      [{ name: 'All', tiles: allTiles }].concat(places).forEach(function (place, index) {
+        var chip = document.createElement('button');
+        var count = document.createElement('span');
+        chip.type = 'button';
+        chip.className = 'journal-place-filter__chip';
+        chip.setAttribute('aria-pressed', String(!index));
+        chip.textContent = place.name + ' ';
+        count.textContent = place.tiles.length;
+        chip.appendChild(count);
+        chip.addEventListener('click', function () {
+          Array.prototype.forEach.call(filter.children, function (other) { other.setAttribute('aria-pressed', String(other === chip)); });
+          tiles = place.tiles;
+          allTiles.forEach(function (tile) { tile.hidden = tiles.indexOf(tile) < 0; });
+          gallery.setAttribute('aria-label', tiles.length + ' photos');
+          gallery.scrollLeft = 0;
+          apply(measure());
+        });
+        filter.appendChild(chip);
+      });
+      shell.insertBefore(filter, controls);
+    }
   });
   var refreshGalleries = function () {
     galleryRefreshers.map(function (measure) { return measure(); }).forEach(function (apply) { apply(); });
