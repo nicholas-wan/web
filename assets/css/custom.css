@@ -7610,7 +7610,9 @@ body.lightbox-open {
 }
 
 /* Route stops with photos open them (gallery.js, 18 Nov 2026): the name reads as a link with
-   its photo count; phones add the first photo as a thumbnail, the count as a badge on it. */
+   its photo count; phones add the first photo as a thumbnail, the count as a badge on it. The
+   count is a square tag with a stacked-photos glyph, so it never reads as a stop number (the
+   numbered dots and the day maps' teal pins); 18 Nov 2026 review. */
 .page-travel-journal .has-photos { cursor: pointer; }
 .page-travel-journal .has-photos > span:first-child {
   color: var(--color-brand-700);
@@ -7621,15 +7623,12 @@ body.lightbox-open {
 .page-travel-journal .has-photos > span[data-count]::after {
   content: attr(data-count);
   display: inline-block;
-  min-width: 1.15rem;
-  margin-left: 0.35rem;
-  padding: 0 0.32rem;
-  /* A quiet grey tag, not a teal disc: next to the day maps' numbered pins a teal disc read as a stop number. */
-  border-radius: 0.3rem;
-  background: #e3ebea;
-  color: var(--color-ink-700);
-  font: 700 0.62rem/1.15rem var(--font-display);
-  text-align: center;
+  margin-left: 0.4rem;
+  padding: 0 0.3rem 0 1.05rem;
+  border-radius: 0.2rem;
+  background: #e8eeed url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23566' stroke-width='1.3'%3E%3Cpath d='M3.5 1.5h7v7M1.5 3.5h7v7h-7z'/%3E%3C/svg%3E") no-repeat 0.3rem 50% / 0.62rem;
+  color: var(--color-ink-600);
+  font: 700 0.62rem/1.1rem var(--font-display);
   vertical-align: 0.12em;
 }
 .page-travel-journal .travel-route__thumb,
@@ -7672,21 +7671,21 @@ body.lightbox-open {
   }
   .page-travel-journal .travel-route__count {
     position: absolute;
-    top: 1.85rem;
-    right: 0.2rem;
+    top: 1.95rem;
+    right: 0.15rem;
     display: block;
-    min-width: 1.15rem;
-    padding: 0 0.32rem;
-    border-radius: 999px;
-    background: rgba(12, 20, 22, 0.78);
+    padding: 0 0.25rem 0 0.9rem;
+    border-radius: 0.2rem;
+    background: rgba(12, 20, 22, 0.72) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' fill='none' stroke='%23fff' stroke-width='1.4'%3E%3Cpath d='M3.5 1.5h7v7M1.5 3.5h7v7h-7z'/%3E%3C/svg%3E") no-repeat 0.25rem 50% / 0.55rem;
     color: #fff;
-    font: 700 0.62rem/1.15rem var(--font-display);
-    text-align: center;
+    font: 700 0.62rem/0.9rem var(--font-display);
   }
 }
 
 /* A place's photos under the caption, and the way on at its last photo (gallery.js). The
-   lightbox's 3rem circle buttons are set with !important, so the strip overrides them. */
+   lightbox's 3rem circle buttons are set with !important, so the strip overrides them. The way
+   on is an outlined ghost the thumbnails' height: filled white, it out-shone the photo and
+   stacked a second forward control on the arrow (18 Nov 2026 review). */
 .lightbox__place {
   display: flex;
   flex: 0 0 auto;
@@ -7718,18 +7717,13 @@ body.lightbox-open {
 .lightbox .lightbox__place .lightbox__place-thumb.is-current { border-color: #fff !important; opacity: 1; }
 .lightbox .lightbox__place-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .lightbox .lightbox__place .lightbox__place-next {
-  padding: 0 1.05rem !important;
-  border: 1px solid #fff !important;
-  background: #fff !important;
-  color: #0f2a2c !important;
-  font: 700 0.9rem/1 var(--font-display) !important;
+  padding: 0 0.85rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #fff !important;
+  font: 700 0.85rem/1 var(--font-display) !important;
   letter-spacing: 0 !important;
   text-transform: none !important;
-}
-.lightbox .lightbox__place .lightbox__place-back {
-  border-color: rgba(255, 255, 255, 0.45) !important;
-  background: rgba(20, 24, 32, 0.55) !important;
-  color: #fff !important;
 }
 
 /* Route bundle: gallery-lightbox:end */
@@ -11770,8 +11764,11 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
 }
 
 /* Place chips over a day's photos (gallery.js, 18 Nov 2026): the "View all N stops" chip, teal
-   when chosen. Hidden tiles leave the grid; phones scroll the row, without snapping. */
+   when chosen. Hidden tiles leave the grid. Phones keep All put and scroll the place chips
+   beside it, without snapping, fading them at its edge once scrolled, and extend each
+   chip's hit area to 44px, as View all does (18 Nov 2026 review). */
 .journal-place-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.journal-place-filter__places { display: contents; }
 .page-travel-journal .journal-place-filter__chip {
   display: inline-block;
   height: auto;
@@ -11792,8 +11789,23 @@ html.place-card-open { overflow: hidden; overscroll-behavior: none; }
 .page-travel-journal .masonry .brick[hidden] { display: none; }
 
 @media screen and (max-width: 600px) {
-  .journal-place-filter { flex-wrap: nowrap; margin: 0 -1.1rem 0.75rem; padding: 0 1.1rem; overflow-x: auto; scrollbar-width: none; }
-  .page-travel-journal .journal-place-filter__chip { flex: none; }
+  .journal-place-filter { flex-wrap: nowrap; gap: 0; margin: 0 -1.1rem 0.75rem 0; }
+  .journal-place-filter__places {
+    display: flex;
+    flex: 1;
+    gap: 0.5rem;
+    min-width: 0;
+    margin: -6px 0;
+    padding: 6px 1.1rem 6px 0.5rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .journal-place-filter__places.is-scrolled {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0.3rem, #000 2rem);
+    mask-image: linear-gradient(90deg, transparent 0.3rem, #000 2rem);
+  }
+  .page-travel-journal .journal-place-filter__chip { position: relative; flex: none; }
+  .journal-place-filter__chip::after { position: absolute; inset: calc(50% - 22px) 0; content: ""; }
 }
 /* Route bundle: journal-polish:end */
 
