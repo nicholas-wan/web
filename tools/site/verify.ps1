@@ -486,6 +486,8 @@ Assert-FileSizeBudget 'assets\js\projects.js' 71
 Assert-FileSizeBudget 'assets\js\projects-laptop.js' 18
 # projects-companions.js loads the same way (9 Nov 2026): Finance's laptop and the bots' lock screens.
 Assert-FileSizeBudget 'assets\js\projects-companions.js' 12
+# place-card.js (18 Nov 2026): the route stops' place card, loaded by gallery.js near the first stop that has one.
+Assert-FileSizeBudget 'assets\js\place-card.js' 8
 # Masonry, lightbox and event context bar, split out of shared custom.css (5 Nov 2026).
 Assert-FileSizeBudget 'assets\css\gallery.css' 15
 Assert-FileSizeBudget 'assets\css\icons.css' 4

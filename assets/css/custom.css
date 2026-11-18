@@ -7621,9 +7621,10 @@ body.lightbox-open {
   min-width: 1.15rem;
   margin-left: 0.35rem;
   padding: 0 0.32rem;
-  border-radius: 999px;
-  background: var(--color-brand-600);
-  color: #fff;
+  /* A quiet grey tag, not a teal disc: next to the day maps' numbered pins a teal disc read as a stop number. */
+  border-radius: 0.3rem;
+  background: #e3ebea;
+  color: var(--color-ink-700);
   font: 700 0.62rem/1.15rem var(--font-display);
   text-align: center;
   vertical-align: 0.12em;

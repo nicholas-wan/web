@@ -34,7 +34,10 @@ test('Chengdu Day 6 map numbers its pins as its stops, and pin 3 opens Tianmen C
   }));
   expect(overlaps).toEqual([]);
 
+  // A pin does what its stop does: the place card, then its photos.
   await map.locator('[data-route-pin="2"]').click();
+  await expect(page.locator('.place-card__meta')).toHaveText('天门洞 · Day 6 · stop 3');
+  await page.locator('.place-card__view').click();
   await expect(page.locator('.lightbox')).toHaveClass(/is-visible/);
   await expect(page.locator('.lightbox__context')).toHaveText(/1 of 2 at Tianmen Cave · Day 6$/);
 
