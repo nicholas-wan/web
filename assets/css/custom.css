@@ -6735,10 +6735,17 @@ a.travel-jump-group__label {
 
 /* Full-bleed page (18 Nov 2026): on the window-wide white the desktop strip's
    drop shadow stopped at an invisible column edge and read as a smudge, so it
-   is one soft hairline. The dark tablet and phone strip is untouched. */
+   is one soft hairline. The dark tablet and phone strip is untouched.
+   Since 19 Nov 2026 (full-bleed review) the hairline runs the window's
+   width, as the footer's does: a hairline ending at x=144 and 1296
+   read as cut off. The strip clips its own overflow, so a pseudo-element
+   cannot reach out; a border image with a sideways outset can (it is the
+   box's own paint), and #wrapper's overflow: clip stops sideways scrolling.
+   Only the line goes wide: nothing outside the column scrolls under it. */
 @media screen and (min-width: 981px) {
   .page-travel-journal .travel-section-nav {
     border-bottom-color: #e3eae8;
+    border-image: linear-gradient(#e3eae8, #e3eae8) 0 0 1 0 / 0 0 1px 0 / 0 100vmax;
     box-shadow: none;
   }
 }
