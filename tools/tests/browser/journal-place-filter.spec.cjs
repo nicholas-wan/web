@@ -62,12 +62,12 @@ test('days with photos at fewer than two places, and journals without routes, ge
   const rows = await page.locator('.journal-place-filter').evaluateAll(filters => filters.map(filter => filter.closest('section').querySelector('h2').id));
   expect(rows).not.toContain('trip-section-1');
   expect(rows).toContain('trip-section-6');
-  // Japan's Hiroshima chapter has photos at five stops, in route order.
+  // Japan's Hiroshima chapter has photos at four stops, in route order (the station went with the
+  // highlights-only trim, 19 Nov 2026).
   await page.goto('/travel_2025_japan');
   const hiroshima = page.locator('section', { has: page.locator('h2', { hasText: 'Hiroshima' }) }).locator('.journal-place-filter button');
   await expect(hiroshima.first()).toHaveText(/^All\s*\d+$/);
-  await expect(hiroshima.nth(1)).toHaveText(/^広島駅\s*1$/);
-  await expect(hiroshima.nth(2)).toHaveText(/^原爆ドーム\s*1$/);
+  await expect(hiroshima.nth(1)).toHaveText(/^原爆ドーム\s*1$/);
   for (const slug of ['travel_2019_siliconvalley', 'travel_2024_germany']) {
     await page.goto('/' + slug);
     await expect(page.locator('.journal-gallery-shell').first()).toBeAttached();

@@ -3989,6 +3989,17 @@ header.major > .travel-journal__stats {
     display: none !important;
   }
 
+  /* ...so a route of one or two stops shows its numbered list instead, which can be tapped for
+     the stops' photos, prices and place cards, and drops the text-only summary (19 Nov 2026:
+     after the highlights-only trim, many days have two stops). travel-nav.js leaves it unhidden. */
+  .guangzhou-day__route:has(> .travel-route__more--all) > .travel-route-summary ~ .guangzhou-route {
+    display: grid;
+  }
+
+  .guangzhou-day__route:has(> .travel-route__more--all) > .travel-route-summary {
+    display: none;
+  }
+
   .guangzhou-day__route--collapsible .guangzhou-route__more,
   .travel-route-summary ~ .guangzhou-route__more {
     display: inline-flex;

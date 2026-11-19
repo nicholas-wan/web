@@ -382,7 +382,8 @@
       var expanded = group.classList.contains('is-expanded');
       button.textContent = expanded ? 'Hide route' : collapsedLabel;
       button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-      route.hidden = phoneNav.matches && !expanded;
+      // One or two stops show their list on phones too (custom.css); only longer routes fold.
+      route.hidden = phoneNav.matches && !expanded && stops.length > 2;
     };
 
     group.classList.add('is-truncated');

@@ -23,8 +23,9 @@ const cardFor = async (page, heading, name) => {
 };
 
 test('every journal with routes gets route photos, by caption text first, then title', async ({ page }) => {
-  for (const [slug, count] of [['travel_2017_seoul', 7], ['travel_2022_europe', 34], ['travel_2023_perth', 38],
-    ['travel_2023_usacanada', 79], ['travel_2024_australia', 34], ['travel_2025_japan', 27], ['travel_2026_guangzhou', 20]]) {
+  // Routes list the trip's highlights only (19 Nov 2026), so fewer stops own photos.
+  for (const [slug, count] of [['travel_2017_seoul', 7], ['travel_2022_europe', 26], ['travel_2023_perth', 29],
+    ['travel_2023_usacanada', 54], ['travel_2024_australia', 30], ['travel_2025_japan', 26], ['travel_2026_guangzhou', 15]]) {
     await page.goto('/' + slug);
     await expect(page.locator('.has-photos'), slug).toHaveCount(count);
   }
@@ -73,15 +74,14 @@ test('Chengdu stops own exactly their photos, count within the place and offer t
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   const labels = await page.locator('.has-photos').evaluateAll(stops => stops.map(stop => stop.getAttribute('aria-label')));
-  expect(labels).toHaveLength(25);
+  expect(labels).toHaveLength(18);
   expect(labels).toContain('Open the place card for Taikoo Li (4 photos)');
   expect(labels).toContain('Open the place card for Tianmen Cave (2 photos)');
-  // The airport stops are named for the airport (fix round, 18 Nov 2026), so its photos match by
-  // name; Day 1 has no airport photo, Day 4 two and Day 7 one.
-  expect(labels).toContain('Open the place card for Tianfu Airport (2 photos)');
-  expect(labels).toContain('Open the place card for Tianfu Airport (1 photo)');
-  await expect(page.locator('.guangzhou-route__stop', { hasText: 'Tianfu Airport' })).toHaveCount(3);
-  await expect(page.locator('.guangzhou-route__stop[data-photos="Tianfu Airport"]')).toHaveCount(0);
+  // Highlights only (19 Nov 2026): no airports, stays, meals or malls on the routes; their
+  // photos stay in the galleries without a stop.
+  for (const gone of ['Tianfu Airport', 'Zhangjiajie Airport', 'Wake in the Morning Guesthouse', 'Massage', 'Times Outlets']) {
+    await expect(page.locator('.guangzhou-route__stop', { hasText: gone }), gone).toHaveCount(0);
+  }
 
   const day6 = page.locator('#trip-section-6 ~ .guangzhou-day__route');
   await day6.locator('.travel-route__more').click();
@@ -231,7 +231,7 @@ test('a priced stop without photos opens a card with no photos or View button', 
   await expect(card.locator('dd')).toHaveCount(0);
   await expect(card.getByRole('link')).toHaveText(['Google Maps', '高德地图']);
   // Stops with neither photos nor a price stay plain text.
-  await expect(page.locator('.guangzhou-route__stop', { hasText: 'Zhangjiajie Airport' }).first()).not.toHaveAttribute('role', 'button');
+  await expect(page.locator('.guangzhou-route__stop', { hasText: 'Dujiangyan' }).first()).not.toHaveAttribute('role', 'button');
 });
 
 // Fix round (18 Nov 2026, owner: "make sure it looks compact and tidy, especially on mobile").
@@ -335,7 +335,7 @@ test('one or two photos fill the card at a real picture shape from the 800w file
   // Owner, 18 Nov 2026: a single photo was a thin, blurry strip ("really small and looks stretched").
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/travel_2026_chengdu_zhangjiajie');
-  for (const [day, name, count, ratio] of [[3, 'Dongmen Wharf', 1, 1.5], [4, 'Tianfu Airport', 2, 4 / 3]]) {
+  for (const [day, name, count, ratio] of [[3, 'Dongmen Wharf', 1, 1.5], [6, 'Tianmen Cave', 2, 4 / 3]]) {
     await openStop(page, day, name);
     const images = page.locator('.place-card__photos img');
     await expect(images).toHaveCount(count);
@@ -387,7 +387,9 @@ test('"+N" sits on a dark layer over the fourth thumbnail', async ({ page }) => 
   await page.goto('/travel_2026_chengdu_zhangjiajie');
   // Any stop with five or more photos, whatever it is called.
   const stop = page.getByRole('button', { name: /\((?:[5-9]|\d\d) photos\)$/, includeHidden: true }).first();
-  await page.locator('.guangzhou-day__route').filter({ has: stop }).locator('.travel-route__more').click();
+  // A route of one or two stops shows its list without View all (19 Nov 2026).
+  const viewAll = page.locator('.guangzhou-day__route').filter({ has: stop }).locator('.travel-route__more');
+  if (await viewAll.isVisible()) await viewAll.click();
   await stop.click();
   await expect(page.locator('.place-card')).toHaveClass(/is-visible/);
   const more = page.locator('.place-card__more');
@@ -432,9 +434,9 @@ test('folded phone routes show only the summary and View all; expanded ones drop
 // Phone round, 18 Nov 2026 (owner, mockups K1, K4, K7).
 test('folded summaries name the stops alone, except a CJK name keeps its English', async ({ page }) => {
   await page.goto('/travel_2026_chengdu_zhangjiajie');
-  await expect(page.locator('.travel-route-summary').nth(1)).toHaveText('Panda Valley → Summer Island Apartment');
+  await expect(page.locator('.travel-route-summary').nth(2)).toHaveText('Chengdu IFS → Taikoo Li');
   await page.goto('/travel_2025_japan');
-  await expect(page.locator('.travel-route-summary').first()).toContainText('Hiroshima Airport');
+  await expect(page.locator('.travel-route-summary').first()).toContainText('Hiroshima Castle');
 });
 
 test('a one-photo day fills the phone row; desktop keeps its quarter tile', async ({ page }) => {
@@ -482,7 +484,7 @@ test('closing the viewer lands on the tile of the photo last shown; the same pho
 test('a desktop route whose stops all fit one row has no View all button', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto('/travel_2026_chengdu_zhangjiajie');
-  for (const day of [3, 7]) {
+  for (const day of [1, 3]) {
     const route = page.locator(`#trip-section-${day} ~ .guangzhou-day__route`);
     await expect(route, `Day ${day}`).not.toHaveClass(/is-desktop-wrapped/);
     await expect(route.locator('.travel-route__more'), `Day ${day}`).toBeHidden();

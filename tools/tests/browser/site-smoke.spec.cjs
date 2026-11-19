@@ -361,7 +361,9 @@ test('return-to-top steps off the footer band, whose tabs show below 981px with 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/travel_2017_seoul');
   const route = page.locator('.guangzhou-day__route').first();
-  await expect(route.locator('.travel-route-summary')).toBeVisible();
+  // A route of one or two stops shows its numbered list, which can be tapped, not the summary (19 Nov 2026).
+  await expect(route.locator('.guangzhou-route')).toBeVisible();
+  await expect(route.locator('.travel-route-summary')).toBeHidden();
   await expect(route.locator('.travel-route__more')).toBeHidden();
   // Longer routes keep theirs.
   await page.goto('/travel_2023_perth');
