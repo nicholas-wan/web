@@ -4176,6 +4176,24 @@ header.major > .travel-journal__stats {
   .guangzhou-journal .content-details p {
     font-size: max(var(--text-floor), 0.67rem);
   }
+
+  /* A gallery whose captions are all one line (a place, no second label) gets
+     a one-line band (19 Nov 2026, owner: "is the bottom box too big? for all
+     travel journals"): the 4rem band is sized for two lines and left ~22px of
+     dark under each single title, a quarter of the card on Chengdu. The text
+     never wraps (ellipsis above), so auto is one line plus the padding, about
+     37px, once the title drops the gap it keeps for a second line. Galleries
+     that mix both keep 4rem, so cards in a row end level. */
+  /* 1px lower than the padding gives: caps with no descenders sat ~1px high. */
+  .guangzhou-journal .masonry:not(:has(.content-details > p)) .content-details {
+    height: auto;
+    padding-top: calc(0.7rem + 1px);
+    padding-bottom: calc(0.75rem - 1px);
+  }
+
+  .guangzhou-journal .masonry:not(:has(.content-details > p)) .content-details h3 {
+    margin-bottom: 0;
+  }
 }
 
 /* Route bundle: journal-guangzhou:end */
