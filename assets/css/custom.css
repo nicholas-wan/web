@@ -4144,20 +4144,34 @@ header.major > .travel-journal__stats {
     display: none;
   }
 
+  /* Phone caption band, option G of lab/caption-bands (19 Nov 2026, owner:
+     "do the recommended"; it was a 4rem band, centred Raleway, place in
+     tracked capitals over the label). Left-aligned in Source Sans: a quiet
+     grey capitals line, then the name in bold white. A gallery with any
+     two-line caption gives every card a 50px band with the name on its bottom
+     line, so names line up across a mixed row; a gallery whose captions are
+     all one line gets a 37px band with the name centred. One-line cards show
+     their title as the name. Text never wraps (ellipsis), and the captions
+     were shortened the same day so none is cut at 264px. */
   .guangzhou-journal .content-details,
   .guangzhou-journal .content:hover .content-details {
     position: static;
-    top: auto;
-    left: auto;
     display: flex;
-    height: 4rem;
+    height: 50px;
     box-sizing: border-box;
     flex-direction: column;
-    justify-content: center;
-    padding: 0.7rem 0.8rem 0.75rem;
+    justify-content: flex-end;
+    padding: 1.5px 12px 7.5px;
     background: #0a1b1f;
+    text-align: left;
     opacity: 1;
     transform: none;
+  }
+
+  .guangzhou-journal .masonry:not(:has(.content-details > p)) .content-details {
+    height: 37px;
+    justify-content: center;
+    padding-bottom: 0;
   }
 
   .guangzhou-journal .content-details h3,
@@ -4167,32 +4181,52 @@ header.major > .travel-journal__stats {
     white-space: nowrap;
   }
 
-  .guangzhou-journal .content-details h3 {
-    margin-bottom: 0.3rem;
-    font-size: max(var(--text-floor), 0.72rem);
+  /* Both lines: the name's look by default (a one-line card's title is the
+     name). The font stack beats the Raleway rules above (Japan's, and the
+     zh-Hans one), keeping their Japanese and Chinese fallbacks. */
+  .page-travel-journal .guangzhou-journal .content-details > :is(h3, p) {
+    margin: 0;
+    color: #fff !important;
+    font-family: var(--font-display), "Hiragino Sans", "Yu Gothic UI", Meiryo, "PingFang SC", "Microsoft YaHei", sans-serif !important;
+    font-weight: 700;
+    line-height: 1.3 !important;
+    letter-spacing: normal;
+    text-align: left;
+  }
+
+  /* The top line over a name: quiet grey capitals. */
+  .page-travel-journal .guangzhou-journal .content-details > h3:not(:only-child) {
+    margin-bottom: 2px;
+    color: rgba(255, 255, 255, 0.58) !important;
+    line-height: 1.2 !important;
     letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  /* Chinese top lines: no capitals tracking, a touch brighter for the thin
+     strokes, and 2px lower, where the Latin capitals' optical line sits. */
+  .page-travel-journal .guangzhou-journal .content-details > h3:not(:only-child):lang(zh) {
+    position: relative;
+    top: 2px;
+    color: #b3bbbd !important;
+    letter-spacing: 0;
+  }
+
+  /* Sizes (verify.ps1 keys the 12px floor on these two selectors). */
+  .guangzhou-journal .content-details h3 {
+    font-size: max(var(--text-floor), 12px);
   }
 
   .guangzhou-journal .content-details p {
-    font-size: max(var(--text-floor), 0.67rem);
+    font-size: max(var(--text-floor), 14.5px);
   }
 
-  /* A gallery whose captions are all one line (a place, no second label) gets
-     a one-line band (19 Nov 2026, owner: "is the bottom box too big? for all
-     travel journals"): the 4rem band is sized for two lines and left ~22px of
-     dark under each single title, a quarter of the card on Chengdu. The text
-     never wraps (ellipsis above), so auto is one line plus the padding, about
-     37px, once the title drops the gap it keeps for a second line. Galleries
-     that mix both keep 4rem, so cards in a row end level. */
-  /* 1px lower than the padding gives: caps with no descenders sat ~1px high. */
-  .guangzhou-journal .masonry:not(:has(.content-details > p)) .content-details {
-    height: auto;
-    padding-top: calc(0.7rem + 1px);
-    padding-bottom: calc(0.75rem - 1px);
+  .guangzhou-journal .content-details > h3:only-child {
+    font-size: max(var(--text-floor), 14.5px);
   }
 
-  .guangzhou-journal .masonry:not(:has(.content-details > p)) .content-details h3 {
-    margin-bottom: 0;
+  .guangzhou-journal .masonry:not(:has(.content-details > p)) .content-details > h3 {
+    font-size: max(var(--text-floor), 14px);
   }
 }
 
