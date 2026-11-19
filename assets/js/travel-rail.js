@@ -17,9 +17,6 @@
  const BURST=[[3,250],[2,150],[1.4,150]];// rate, ms
  const STEADY=new Set(['mm-flag']);// sped up, Perth's flag shows how stiff its wave is
  const ease='cubic-bezier(.3,.6,.3,1)',key=e=>(e.icon.getAttribute('href')||'').replace(/^.*?travel_\d{4}_/,'');
- // Out-and-back pushes layered on the scene, so they start and end on the pose already showing.
- const push=(sel,peak,duration,o={})=>({sel,duration,...o,kf:[{transform:'none'},{transform:peak,offset:.35},{transform:'none'}]});
- const PUSH={japan:[push('.mm-leaf','translate(-14px,-3px)',900,{step:45}),push('.cn-fuji-maple','rotate(2.5deg)',900)]};
  // The Eiffel Tower's hourly sparkle, on every other light (all of them turned the tower white).
  const SPARKLE=[{opacity:0,transform:'scale(1)'},{opacity:1,transform:'scale(1.7)',offset:.2},{opacity:.8,transform:'scale(1.2)',offset:.6}];
  const playing=new Map();let ctx,focus=null,flicking=false,lastY=scrollY,lastT=performance.now(),speed=0,settleTimer,wait;
@@ -31,7 +28,6 @@
   const rate=r=>s.anims.forEach(a=>{if(!STEADY.has(a.animationName))a.playbackRate=r;});let t=delay;
   BURST.forEach(([r,ms])=>{s.bursts.push(setTimeout(()=>rate(r),t));t+=ms;});
   s.bursts.push(setTimeout(()=>{rate(1);schedule(s);},t));// the scene clock ran ahead
-  (PUSH[key(e)]||[]).forEach(p=>e.art.querySelectorAll(p.sel).forEach((el,i)=>{try{s.fx.push(el.animate(p.kf,{duration:p.duration,delay:delay+(p.delay||0)+(p.step||0)*i,easing:ease,composite:'add'}));}catch(x){}}));
   if(key(e)==='europe')e.art.querySelectorAll('.mm-star').forEach((el,i)=>{if(i%2===0)s.fx.push(el.animate(SPARKLE,{duration:900,delay:delay+100+i*2,easing:ease,fill:'backwards'}));});
  }
  // Golden Gate fog drifts across, apart from the scene's own loop, which never rewinds it.
