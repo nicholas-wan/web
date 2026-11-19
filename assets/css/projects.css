@@ -26,7 +26,7 @@
 }
 @media screen and (max-width: 736px){.page-projects .app-stage{padding:1.3rem .5rem;border-radius:14px}
 }
-.page-projects .pj-sprite{position:absolute;width:0;height:0;overflow:hidden}
+#main>.pj-sprite{position:absolute;width:0;height:0;padding:0;border:0;overflow:hidden}
 .page-projects .app-card__body{padding:.75rem 0 0}
 .page-projects .app-card__body>*,.page-projects .app-card__head p{margin:0;text-align:left}
 .page-projects .app-card__kind{display:flex;align-items:center;gap:.45rem;font:700 .7rem/1.3 "Source Sans Pro",sans-serif;text-transform:uppercase}
@@ -788,7 +788,7 @@ body.pj-under #navPanelToggle{visibility:hidden}
 .app-demo--finance .k1{--dot:#fac775}
 html .page-projects .portfolio-headline h1{color:#ecedf0}
 .page-projects .page-opening-eyebrow{color:#8d939c}
-.page-projects .site-pager{background:#111214;border-top-color:#25282d!important}
+.page-projects .site-pager{background:#111214}
 .page-projects .site-pager__link>strong{color:#ecedf0}
 .page-projects .site-pager__link>span{color:#8d939c}
 .page-projects .site-pager__link:hover,.page-projects .site-pager__link:focus-visible{background:#ffffff0d}

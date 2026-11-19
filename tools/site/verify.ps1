@@ -1321,7 +1321,7 @@ foreach ($pagerPage in $primaryPagers.Keys) {
         if ($pagerHtml -notmatch $pagerPattern) { throw "$pagerPage has an incorrect previous or next destination." }
     }
 }
-if ($customCss -notmatch '(?s)\.site-pager\s*\{[^}]*grid-template-columns:\s*repeat\(2' -or $customCss -notmatch '(?s)\.travel-pagination\s*\{[^}]*display:\s*flex[^}]*justify-content:\s*space-between[^}]*border-top:\s*1px solid var\(--color-border-soft\)' -or $customCss -notmatch '(?s)\.travel-pagination a\s*\{[^}]*max-width:\s*25rem[^}]*border:\s*0[^}]*background:\s*transparent[^}]*box-shadow:\s*none') { throw "Shared page and journal navigation must use the unboxed About-page treatment." }
+if ($customCss -notmatch '(?s)\.site-pager\s*\{[^}]*grid-template-columns:\s*repeat\(2' -or $customCss -notmatch '(?s)\.travel-pagination\s*\{[^}]*display:\s*flex[^}]*justify-content:\s*space-between' -or $customCss -notmatch '(?s)#main > \.travel-pagination\s*\{[^}]*border-top:\s*0' -or $customCss -match '(?s)\.site-pager\s*\{[^}]*border-top:\s*1px' -or $customCss -notmatch '(?s)\.travel-pagination a\s*\{[^}]*max-width:\s*25rem[^}]*border:\s*0[^}]*background:\s*transparent[^}]*box-shadow:\s*none') { throw "Shared page and journal navigation must use the unboxed About-page treatment." }
 if ($customCss -notmatch '(?s)@media screen and \(max-width: 600px\).*?\.travel-pagination a\s*\{[^}]*border:\s*0[^}]*background:\s*transparent[^}]*box-shadow:\s*none') { throw "Mobile journal pagination must use the same unboxed link treatment as the rest of the site." }
 $skillsHtml = Get-Content -LiteralPath (Join-Path $dist 'skills.html') -Raw -Encoding UTF8
 if ($skillsHtml -notmatch '<body class="is-preload page-skills">') { throw "Skills layout scope is missing." }

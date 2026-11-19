@@ -6749,9 +6749,6 @@ a.travel-jump-group__label {
   justify-content: space-between;
   gap: 0.75rem;
   padding: 1.25rem 0;
-  /* Repeated on `#main > .travel-pagination` below, which is what actually
-     applies; verify.ps1 keys on this declaration. */
-  border-top: 1px solid var(--color-border-soft);
   background: #fff;
   max-width: 64rem;
 }
@@ -6761,10 +6758,13 @@ a.travel-jump-group__label {
    `margin: 3rem auto 0` and the 1px soft rule never applied. The pager was
    left-aligned in a 1056px main while the content column starts 58.7px in, and
    it had no top margin either. Out-rank it, as the About scene does. Keep the
-   600px override at this weight too or it dies the same way. */
+   600px override at this weight too or it dies the same way.
+   No rule of its own since 19 Nov 2026 (full-bleed bottom, see .site-pager):
+   border-top: 0 also keeps main.css's 2px #eeeeee off it. */
 #main > .travel-pagination {
   margin: 3rem auto 0;
-  border-top: 1px solid var(--color-border-soft);
+  padding-bottom: 2.5rem;
+  border-top: 0;
 }
 
 /* Inset to the text column below 64rem, as the tab pages' pager is. */
@@ -6838,12 +6838,17 @@ a.travel-jump-group__label {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.75rem;
   margin: 0 auto !important;
-  padding: 1.25rem 2rem !important;
-  /* Text sits flush with the 64rem copy column; verify.ps1 keys on the
+  /* 2.5rem below: the footer's hairline comes next, and the pager reads as the
+     page's last row rather than pressed onto that rule. */
+  padding: 1.25rem 2rem 2.5rem !important;
+  /* Text sits flush with the page's content edge; verify.ps1 keys on the
      shorthand above, so the inline padding is zeroed here rather than there. */
   padding-inline: 0 !important;
+  /* No rule of its own (19 Nov 2026, full-bleed review): on the window-wide
+     white its column-wide hairline stopped at an unmarked edge, one band above
+     the footer's window-wide one, and read as two stacked lines, the upper
+     one cut off. The footer's hairline is the page's one closing rule. */
   border: 0 !important;
-  border-top: 1px solid var(--color-border-soft) !important;
   background: #fff;
 }
 
@@ -6948,6 +6953,36 @@ a.travel-jump-group__label {
   .site-pager { width: calc(100% - 4rem); }
 }
 
+/* On each page's own content edges (19 Nov 2026, full-bleed review). The
+   pager sat on a 64rem column (x=208 at 1440) that only journals and event
+   pages use, between the tab pages' content and footer (176) and Home's cards
+   (272): with the sheet's edge gone, those three edges stacked up at the
+   bottom of every page. Tab pages: the sheet less 2rem a side, the footer's
+   inset. Home: its article's 8rem side padding (4rem at 1280px and below,
+   which the 8rem rule above already matches). Event pages keep 64rem. */
+@media screen and (min-width: 737px) {
+  body:not(.page-home):not(.page-event) .site-pager {
+    width: calc(100% - 4rem);
+    max-width: none;
+  }
+}
+
+@media screen and (min-width: 1281px) {
+  .page-home .site-pager {
+    width: calc(100% - 16rem);
+    max-width: none;
+  }
+}
+
+/* Home's cards already end on their own hairline and the article's 3.5rem
+   bottom pad; without the pager's rule, their 2rem bottom margin and its
+   1.25rem top pad left the label ~145px under the cards at 1885px, against
+   ~90px under the last block on the tab pages. */
+@media screen and (min-width: 737px) {
+  #main.homepage .homepage-links { margin-bottom: 0; }
+  .page-home .site-pager { padding-top: 0 !important; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .travel-pagination a,
   .travel-pagination a::after,
@@ -7045,7 +7080,7 @@ html:has(> body.page-projects) { background: #111214; }
   z-index: 0;
   display: block;
   margin: 0 auto;
-  padding: 0 0 3rem;
+  padding: 0 0 1rem;
   background: #fff;
   color: var(--color-ink-500);
   cursor: auto;
@@ -7150,17 +7185,24 @@ html:has(> body.page-projects) { background: #111214; }
   color: var(--fb-ink);
 }
 
+/* The negative right margin is half of (box - glyph), so the last glyph ends
+   on the content's right edge, as the pager's Next arrow does above it (it
+   stopped ~5px short at -0.55rem). Redone in px from 737px with the box. */
 #footer .footer-band__social {
   grid-area: social;
   display: flex;
   justify-self: end;
   gap: 0.15rem;
-  margin: 0 -0.55rem 0 0;
+  margin: 0 calc((1.15rem - 2.75rem) / 2) 0 0;
   padding: 0;
   list-style: none;
 }
 
+/* Flex, so the item is the link's height: as a block the line box made it
+   taller than the 44px link at a 21px root and the icons rode ~4px above the
+   name at 1885px. */
 #footer .footer-band__social li {
+  display: flex;
   margin: 0;
   padding: 0;
 }
@@ -7207,6 +7249,7 @@ html:has(> body.page-projects) { background: #111214; }
   #footer .footer-band__brand,
   #footer .footer-band__tabs a { min-height: 44px; }
   #footer .footer-band__social a { width: 44px; height: 44px; }
+  #footer .footer-band__social { margin-right: calc((1.15rem - 44px) / 2); }
 }
 
 @media screen and (min-width: 981px) {
@@ -7250,8 +7293,10 @@ html:has(> body.page-projects) { background: #111214; }
   #footer .footer-band__meta { padding-top: 0.55rem; }
 }
 
-/* Phones have no side gutters, so the band runs to the bottom; wider screens
-   keep the 3rem of black under the sheet, so the page reads as a closed card. */
+/* Phones end on the row's own padding (and the safe area). Wider screens keep
+   1rem under the row, so it sits a touch above centre in the band: 3rem was
+   the black margin under the old sheet, and as white it left the page's last
+   ~80px empty (19 Nov 2026, full-bleed review). */
 @media screen and (max-width: 480px) {
   #footer { padding-bottom: 0; }
 }
@@ -7771,12 +7816,12 @@ body.lightbox-open {
 
   #main > .travel-pagination {
     margin-top: 2rem;
-    padding: 0.8rem 1rem;
+    padding: 0.8rem 1rem 2.5rem;
   }
 
   .site-pager {
     gap: 0.35rem;
-    padding: 0.8rem 1rem !important;
+    padding: 0.8rem 1rem 2.5rem !important;
   }
 
   .travel-pagination a {
