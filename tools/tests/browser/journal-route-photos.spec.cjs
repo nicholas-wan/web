@@ -23,8 +23,8 @@ const cardFor = async (page, heading, name) => {
 };
 
 test('every journal with routes gets route photos, by caption text first, then title', async ({ page }) => {
-  for (const [slug, count] of [['travel_2017_seoul', 7], ['travel_2022_europe', 33], ['travel_2023_perth', 38],
-    ['travel_2023_usacanada', 79], ['travel_2024_australia', 32], ['travel_2025_japan', 26], ['travel_2026_guangzhou', 20]]) {
+  for (const [slug, count] of [['travel_2017_seoul', 7], ['travel_2022_europe', 34], ['travel_2023_perth', 38],
+    ['travel_2023_usacanada', 79], ['travel_2024_australia', 34], ['travel_2025_japan', 27], ['travel_2026_guangzhou', 20]]) {
     await page.goto('/' + slug);
     await expect(page.locator('.has-photos'), slug).toHaveCount(count);
   }

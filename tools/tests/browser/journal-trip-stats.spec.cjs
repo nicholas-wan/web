@@ -9,7 +9,7 @@ const others = {
   travel_2017_seoul: '9 days · 7 stops · 11 photos',
   travel_2019_siliconvalley: '9 months · 62 photos',
   travel_2022_europe: '11 days · 62 stops · 89 photos',
-  travel_2023_perth: '11 days · 60 stops · 120 photos',
+  travel_2023_perth: '11 days · 61 stops · 120 photos',
   travel_2023_usacanada: '19 days · 106 stops · 250 photos',
   travel_2024_australia: '13 days · 57 stops · 86 photos',
   travel_2024_germany: '23 days · 53 photos',
