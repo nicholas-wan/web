@@ -11454,22 +11454,65 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes tg-g{0%,8%,16%,36%,44%,52%,70%,78%,100%{transform:scale(1)}4%,12%,40%,48%,74%{transform:scale(1,.3)}}
 @keyframes tg-w{0%{opacity:0;animation-timing-function:cubic-bezier(.35,0,.3,1)}28%{opacity:.85}58%{opacity:.85;animation-timing-function:cubic-bezier(.45,0,.4,1)}100%{opacity:0}}
 @keyframes tg-d{to{transform:translateX(30px)}}
-/* Japan (19 Nov 2026, owner's pick from lab/fuji, replacing the maple-framed Fuji: "looks the least like mount fuji"):
-   Mount Fuji over Lake Kawaguchiko, drawn like the rest of the set, with its broken reflection in the Perth boathouse's
-   water technique. One white swan pedal boat moves forward at a steady pedal speed with a slight bob, running off the
-   right edge and back in from the left in the same instant, so it is never shown twice and never reverses; the
-   reflection bands and glints drift slightly. Every animation returns to its first frame. Generator: lab/fuji/b/gen.cjs. */
-.authored-scene.fjb-scene .fjb-b1,.authored-scene.fjb-scene .fjb-bob,.authored-scene.fjb-scene .fjb-bands,.authored-scene.fjb-scene .fjb-glints{transform-box:view-box;transform-origin:0 0}
+/* Japan (19 Nov 2026, owner's pick from lab/fuji): Mount Fuji over Lake Kawaguchiko with one white swan pedal boat.
+   Sunrise (20 Nov 2026, his pick, round 12 of the lab's d4): an 8 s pass from alpenglow to morning and back, checked
+   against a real Kawaguchiko sunrise timelapse. The gradient stop colours animate (each on one eased curve), a soft
+   sunlight front slides down the lit face from the summit (pink, then gold, then white; never on the shaded side), the
+   shadow edge turns as the sun climbs, and the lake mirrors the sky (darker toward the viewer). The tile's ::before is
+   exactly the SVG's frame-0 sky; the SVG sky (.fjb-sky) shows only while the tile plays. Generator: lab/fuji/d4/gen.cjs. */
+.travel-timeline .journal-chronology .authored-scene.fjb-scene .fjb-sky{opacity:0;transition:opacity .5s ease}.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.fjb-scene .fjb-sky{opacity:0;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
+.travel-timeline .journal-chronology .authored-scene.fjb-scene.is-active .fjb-sky,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.fjb-scene.is-active .fjb-sky{opacity:1}
+.authored-scene.fjb-scene .fjb-tm{transform-box:view-box;transform-origin:0 0;transform:translate(57.9px,11.3px) skewX(-3deg) translate(-62.4px,-11.3px)}
+.authored-scene.fjb-scene .fjb-b1,.authored-scene.fjb-scene .fjb-bob,.authored-scene.fjb-scene .fjb-bands,.authored-scene.fjb-scene .fjb-glints,.authored-scene.fjb-scene .fjb-sun{transform-box:view-box;transform-origin:0 0}
 @media (prefers-reduced-motion:no-preference){
-.authored-scene.fjb-scene.is-active .fjb-b1{animation:fjb-m1 var(--scene-duration,6400ms) linear both}
-.authored-scene.fjb-scene.is-active .fjb-bob{animation:fjb-y1 var(--scene-duration,6400ms) ease-in-out both}
-.authored-scene.fjb-scene.is-active .fjb-bands{animation:fjb-bd var(--scene-duration,6400ms) ease-in-out both}
-.authored-scene.fjb-scene.is-active .fjb-glints{animation:fjb-gl var(--scene-duration,6400ms) ease-in-out both}
+.authored-scene.fjb-scene.is-active .fjb-b1{animation:fjb-m1 var(--scene-duration,8000ms) linear both}
+.authored-scene.fjb-scene.is-active .fjb-bob{animation:fjb-y1 var(--scene-duration,8000ms) ease-in-out both}
+.authored-scene.fjb-scene.is-active .fjb-bands{animation:fjb-bd var(--scene-duration,8000ms) ease-in-out both}
+.authored-scene.fjb-scene.is-active .fjb-glints{animation:fjb-gl var(--scene-duration,8000ms) ease-in-out both}
+.authored-scene.fjb-scene.is-active .fjb-an{animation:var(--scene-duration,8000ms) ease-in-out both}
+.authored-scene.fjb-scene.is-active .fjb-sun{animation:fjb-sun var(--scene-duration,8000ms) linear both}
+.authored-scene.fjb-scene.is-active .fjb-sunO{animation:fjb-so var(--scene-duration,8000ms) linear both}
+.authored-scene.fjb-scene.is-active .fjb-sunL{animation:fjb-sl var(--scene-duration,8000ms) linear both}
+.authored-scene.fjb-scene.is-active .fjb-a0{animation-name:fjb-a0}
+.authored-scene.fjb-scene.is-active .fjb-a1{animation-name:fjb-a1}
+.authored-scene.fjb-scene.is-active .fjb-a2{animation-name:fjb-a2}
+.authored-scene.fjb-scene.is-active .fjb-a3{animation-name:fjb-a3}
+.authored-scene.fjb-scene.is-active .fjb-a4{animation-name:fjb-a4}
+.authored-scene.fjb-scene.is-active .fjb-a5{animation-name:fjb-a5}
+.authored-scene.fjb-scene.is-active .fjb-a6{animation-name:fjb-a6}
+.authored-scene.fjb-scene.is-active .fjb-a7{animation-name:fjb-a7}
+.authored-scene.fjb-scene.is-active .fjb-a8{animation-name:fjb-a8}
+.authored-scene.fjb-scene.is-active .fjb-a9{animation-name:fjb-a9}
+.authored-scene.fjb-scene.is-active .fjb-a10{animation-name:fjb-a10}
+.authored-scene.fjb-scene.is-active .fjb-a11{animation-name:fjb-a11}
+.authored-scene.fjb-scene.is-active .fjb-a12{animation-name:fjb-a12}
+.authored-scene.fjb-scene.is-active .fjb-a13{animation-name:fjb-a13}
+.authored-scene.fjb-scene.is-active .fjb-a14{animation-name:fjb-a14}
+.authored-scene.fjb-scene.is-active .fjb-tm{animation-name:fjb-tm}
 }
 @keyframes fjb-y1{0%,33.33%,66.67%,100%{transform:translateY(0)}16.67%,50%,83.33%{transform:translateY(.28px)}}
 @keyframes fjb-bd{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
 @keyframes fjb-gl{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(1.4px);opacity:.75}}
+@keyframes fjb-sun{0%,3.75%{transform:translateY(0);animation-timing-function:cubic-bezier(.42,0,.58,1)}56.25%,97.5%{transform:translateY(78px)}97.51%,100%{transform:translateY(0)}}
+@keyframes fjb-sl{0%,37.5%{opacity:1;animation-timing-function:ease-in-out}53.75%,57.5%{opacity:.15;animation-timing-function:ease-in-out}75%,97.5%{opacity:0}100%{opacity:1}}
+@keyframes fjb-so{0%,32.5%{opacity:1;animation-timing-function:ease-in-out}53.75%,97.5%{opacity:0}100%{opacity:1}}
 @keyframes fjb-m1{0%{transform:translateX(0)}76.22%{transform:translateX(112.2px)}76.23%{transform:translateX(-35px)}100%{transform:translateX(0)}}
+@keyframes fjb-a0{0%,13.95%{stop-color:#c69a9e}50%,57.5%{stop-color:#cdb2b2}100%{stop-color:#c69a9e}}
+@keyframes fjb-a1{0%,20.85%{stop-color:#ba95a0}50.94%,57.5%{stop-color:#bfa5b2}100%{stop-color:#ba95a0}}
+@keyframes fjb-a2{0%,25.84%{stop-color:#a99bb6}51.88%,57.5%{stop-color:#b0a6c2}100%{stop-color:#a99bb6}}
+@keyframes fjb-a3{0%,6.25%{stop-color:#555a8b}53.75%,57.5%{stop-color:#606a95}100%{stop-color:#555a8b}}
+@keyframes fjb-a4{0%,7.6%{stop-color:#525786}53.75%,57.5%{stop-color:#5d6790}100%{stop-color:#525786}}
+@keyframes fjb-a5{0%,8.35%{stop-color:#555d88}53.75%,57.5%{stop-color:#606a91}100%{stop-color:#555d88}}
+@keyframes fjb-a6{0%,9.25%{stop-color:#6c7599}53.75%,57.5%{stop-color:#7683a3}100%{stop-color:#6c7599}}
+@keyframes fjb-a7{0%,9.57%{stop-color:#fff2e9}47.5%,57.5%{stop-color:#fffbf6}100%{stop-color:#fff2e9}}
+@keyframes fjb-a8{0%,13.68%{stop-color:#fbdccd}49.38%,57.5%{stop-color:#fef4e8}100%{stop-color:#fbdccd}}
+@keyframes fjb-a9{0%,20.42%{stop-color:#f2c8bf}53.75%,57.5%{stop-color:#f9ebe1}100%{stop-color:#f2c8bf}}
+@keyframes fjb-a10{0%,6.25%{stop-color:#ddc9d6}53.75%,57.5%{stop-color:#dcdcea}100%{stop-color:#ddc9d6}}
+@keyframes fjb-a11{0%,6.25%{stop-color:#cdb9cb}53.75%,57.5%{stop-color:#cdcfe0}100%{stop-color:#cdb9cb}}
+@keyframes fjb-a12{0%,5%{stop-color:#b2c9e2}53.75%,57.5%{stop-color:#c6d7e8}100%{stop-color:#b2c9e2}}
+@keyframes fjb-a13{0%,5%{stop-color:#d1deeb}53.75%,57.5%{stop-color:#dfe8f0}100%{stop-color:#d1deeb}}
+@keyframes fjb-a14{0%,3.75%{stop-color:#f6ccb4;stop-opacity:.9;animation-timing-function:ease-in-out}25%{stop-color:#f9d6a4;stop-opacity:1;animation-timing-function:ease-in-out}53.75%,57.5%{stop-color:#f8e4c6;stop-opacity:.45;animation-timing-function:ease-in-out}100%{stop-color:#f6ccb4;stop-opacity:.9}}
+@keyframes fjb-tm{0%,5%{transform:translate(57.9px,11.3px) skewX(-3deg) translate(-62.4px,-11.3px)}48.75%,62.5%{transform:translate(62.4px,11.3px) skewX(0deg) translate(-62.4px,-11.3px)}100%{transform:translate(57.9px,11.3px) skewX(-3deg) translate(-62.4px,-11.3px)}}
 /* Journal card crops (20 Oct 2026): a fixed 4:3 photo box (213x160) keeps half or more of each portrait cover, framed by the
    per-cover focal point in the markup (--focus; --thumb-focus for the wider neighbour thumbnails). Show all uses the same
    focal points. Phones keep their centred crop. */
@@ -11583,7 +11626,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#c3d8e6,#e7eff2 60%,#f2f4f1)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="7"]::before{background:linear-gradient(#c2d0db,#d9e2e8 42%,#eaeff1 68%,#f0f3f2)}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(246,204,180,.9),rgba(246,204,180,0)),linear-gradient(#b2c9e2 -5%,#d1deeb 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#72adcb,#a8ccde 40%,#d9e8ee 68%,#f5eedf)}
 }
@@ -11620,7 +11663,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .travel-timeline .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#c3d8e6,#e7eff2 60%,#f2f4f1)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
-.travel-timeline .journal-chronology .authored-scene[data-scene="7"]::before{background:linear-gradient(#c2d0db,#d9e2e8 42%,#eaeff1 68%,#f0f3f2)}
+.travel-timeline .journal-chronology .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(246,204,180,.9),rgba(246,204,180,0)),linear-gradient(#b2c9e2 -5%,#d1deeb 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#72adcb,#a8ccde 40%,#d9e8ee 68%,#f5eedf)}
 /* Each sky follows that trip's real light (20 Oct 2026). Paris is the one night tile, so its navy stays at full strength at rest. */
