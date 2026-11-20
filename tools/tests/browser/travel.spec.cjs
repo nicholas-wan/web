@@ -49,8 +49,8 @@ for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], 
     if (width <= 600) {
       const card = page.locator('.mobile-journal-card').first();
       await expect(card.locator('.actions')).toBeHidden();
-      const target = await card.locator('.travel-card__image').getAttribute('href');
-      await card.locator('.travel-card__image').click();
+      const target = await card.locator('.mobile-journal-read').getAttribute('href');
+      await card.locator('.mobile-journal-read').click();
       await expect(page).toHaveURL(new RegExp(target + '$'));
       await page.goBack();
     }

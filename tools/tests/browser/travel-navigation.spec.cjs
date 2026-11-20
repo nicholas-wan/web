@@ -149,14 +149,16 @@ test('timeline dates stay unadorned and open their matching journal', async ({ p
   await expect(page).toHaveURL(new RegExp('/' + href + '$'));
 });
 
-test('a phone tap on a timeline scene or its name opens the journal', async ({ page }) => {
+test('a phone tap on a cover scene or its name opens the journal', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/travel');
   const row = page.locator('.mobile-journal-row').first();
   await row.scrollIntoViewIfNeeded();
   const trip = row.locator('.chronology-trip');
   const href = await trip.getAttribute('href');
-  await trip.locator('.chronology-label').click();
+  // The name is under the card's stretched Read journal link, so tap where a finger would.
+  const name = await row.locator('.mobile-journal-card h2').boundingBox();
+  await page.mouse.click(name.x + 12, name.y + name.height / 2);
   await expect(page).toHaveURL(new RegExp('/' + href + '$'));
   await page.goBack();
   await expect(page).toHaveURL(/\/travel(?:#.*)?$/);
@@ -276,22 +278,15 @@ test.describe('destination scene interactions', () => {
     await expect(viewer.locator('svg .da-cologne-lower').first()).toBeAttached();
   });
 
-  test('phones offer the loupe on the playing scene; it opens the viewer, not the journal', async ({ page }) => {
+  test('phones show each scene full width with no loupe; the scene on the reading line glows', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/travel');
     const row = page.locator('.mobile-journal-row').filter({ has: page.locator('a[href="travel_2023_perth"]') });
     await row.scrollIntoViewIfNeeded();
-    // Since 18 Nov 2026 a tap on the scene opens the journal, so the loupe rides on the playing scene.
-    const loupe = page.locator('.mobile-journal-row .scene-loupe.is-shown');
-    await expect(loupe).toHaveCount(1, { timeout: 8000 });
-    await loupe.click();
-    const viewer = page.locator('dialog.scene-viewer');
-    await expect(viewer).toHaveJSProperty('open', true);
-    await expect(page).toHaveURL(/\/travel(?:#.*)?$/);
-    // The clone carries its own paint servers, so it renders even where the source is hidden.
-    expect(await viewer.locator('svg').evaluate(svg => [...svg.querySelectorAll('[id]')].every(el => el.id.startsWith('zoom-')))).toBe(true);
-    await viewer.locator('.scene-viewer__close').click();
-    await expect(viewer).toHaveJSProperty('open', false);
+    // Since 20 Nov 2026 the scene is the trip's cover: already large, so the loupe stays hidden on phones.
+    await expect(page.locator('.mobile-journal-row .authored-scene.is-focus')).toHaveCount(1, { timeout: 8000 });
+    await expect(page.locator('.mobile-journal-row .scene-loupe')).toBeHidden();
+    await expect.poll(() => page.locator('.mobile-journal-row .authored-scene.is-focus').evaluate(e => getComputedStyle(e).boxShadow)).toContain('22px');
   });
 
   test('changing reduced-motion preference stops a scene and prevents replay', async ({ page }) => {

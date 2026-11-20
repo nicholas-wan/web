@@ -268,8 +268,11 @@
   const art=icon.querySelector('.authored-scene');art.classList.remove('is-active');
   // One copy of each scene: the phone row borrows the desktop SVG instead of duplicating it.
   const home=trip.querySelector('.authored-scene');art.querySelector('svg')?.remove();
-  const card=original.cloneNode(true);card.className='mobile-journal-card';card.removeAttribute('style');card.removeAttribute('data-reveal');card.querySelectorAll('noscript').forEach(n=>n.remove());card.querySelector('img').sizes='(max-width:736px) 160px, 800px';card.querySelector('.actions')?.remove();card.querySelector('header p')?.remove();
-  const photo=card.querySelector('a.travel-card__image,a.image');if(photo){const cue=document.createElement('span');cue.className='mobile-photo-cta';cue.textContent='Read journal →';photo.setAttribute('aria-label','Read journal — '+trip.querySelector('.chronology-label').textContent);cue.setAttribute('aria-hidden','true');photo.append(cue);}
+  // Phones (20 Nov 2026, owner's pick from lab/travel-phone-rows): the scene is the trip's cover; under it the name,
+  // month, note and a Read journal link. No photo here (a drawing beside a photo confused readers); photos stay in the journal.
+  const card=original.cloneNode(true);card.className='mobile-journal-card';card.removeAttribute('style');card.removeAttribute('data-reveal');card.querySelectorAll('noscript').forEach(n=>n.remove());card.querySelector('.actions')?.remove();card.querySelector('header p')?.remove();
+  card.querySelector('a.travel-card__image,a.image')?.remove();const date=card.querySelector('header .date');if(date)date.textContent=trip.querySelector('.chronology-date').textContent;
+  const read=document.createElement('a');read.className='mobile-journal-read';read.href=trip.getAttribute('href');read.textContent='Read journal →';card.append(read);
   row.append(icon,card);list.append(row);return {row,icon,art,home,index:i,visible:false};
  }).filter(Boolean);grid.before(list);
  const media=matchMedia('(max-width:736px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');let frame;

@@ -11343,27 +11343,26 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
   .travel-timeline.travel-phone-rail .journal-chronology{display:none!important}
   .travel-timeline.travel-phone-rail .mobile-journal-list{display:grid;gap:0;padding:0;min-width:0}
   .travel-timeline.travel-phone-rail .mobile-journal-row{position:relative;display:grid;align-items:start;min-width:0;padding:0 0 28px;margin:0;border:0}
-  .travel-timeline.travel-phone-rail .mobile-journal-row::before{content:"";position:absolute;top:10px;bottom:0;width:1px;background:#d6e1db;pointer-events:none}
-  .travel-timeline.travel-phone-rail .mobile-journal-row:last-child::before{bottom:auto}
   .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{position:relative!important;inset:auto!important;top:auto!important;left:auto!important;display:block!important;height:auto!important;margin:0!important;pointer-events:auto!important;text-align:center;border:0!important;border-radius:0;background:#fff!important;color:#285f54;z-index:1;transform:none!important;text-decoration:none;box-shadow:none}
   .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip::before{display:none!important}
   .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-dot{display:none!important}
-  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-name{position:static!important;inset:auto!important;display:flex!important;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;min-height:0!important;padding:0!important;margin:0;background:#fff;pointer-events:auto!important;transform:none!important}
-  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{display:block;flex:none;margin:0 0 5px!important;transform:none!important}
+  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-name{position:static!important;inset:auto!important;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;min-height:0!important;padding:0!important;margin:0;background:#fff;pointer-events:auto!important;transform:none!important}
+  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{display:block;flex:none;margin:0!important;transform:none!important}
   .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene>svg{display:block}
-  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{display:block;min-height:0;margin:0;padding:0 4px;font-family:inherit;font-size:12px!important;font-weight:700;line-height:1.35;letter-spacing:0;text-transform:none;color:#285247;overflow-wrap:anywhere}
-  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{display:block;margin:0;font-size:12px!important;font-weight:400;line-height:1.4;letter-spacing:0;text-transform:none;color:#5e6f65}
+  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{display:none!important;min-height:0;margin:0;padding:0 4px;font-family:inherit;font-size:12px!important;font-weight:700;line-height:1.35;letter-spacing:0;text-transform:none;color:#285247;overflow-wrap:anywhere}
+  .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{display:none!important;margin:0;font-size:12px!important;font-weight:400;line-height:1.4;letter-spacing:0;text-transform:none;color:#5e6f65}
   .travel-timeline.travel-phone-rail .mobile-journal-row .mobile-journal-card{display:block!important;position:relative;min-width:0;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;transform:none!important;opacity:1!important;text-align:left}
-  .travel-timeline.travel-phone-rail .mobile-journal-card>a.image,
-  .travel-timeline.travel-phone-rail .mobile-journal-card>.travel-card__image,
-  .travel-timeline.travel-phone-rail .mobile-journal-card>a:has(>img){display:block;position:relative;width:100%;margin:0 0 11px!important;padding:0;border:0!important;border-radius:4px;overflow:hidden;aspect-ratio:1.48}
-  .travel-timeline.travel-phone-rail .mobile-journal-card img{display:block;width:100%!important;object-fit:cover;margin:0!important;border-radius:4px}
-  .travel-timeline.travel-phone-rail .mobile-journal-card header{margin:0 0 8px!important;padding:0!important;border:0;background:transparent;text-align:left}
-  .travel-timeline.travel-phone-rail .mobile-journal-card header .date{display:block;margin:0 0 5px!important;font-size:12px!important;line-height:1.35;letter-spacing:0;text-transform:none;color:#5e6f65}
-  .travel-timeline.travel-phone-rail .mobile-journal-card h2{margin:0!important;padding:0;font-family:var(--font-body);font-size:19px!important;font-weight:400!important;line-height:1.2!important;letter-spacing:-.2px!important;text-transform:none!important;color:#243e36;overflow-wrap:anywhere}
+  .travel-timeline.travel-phone-rail .mobile-journal-card header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:10px 0 3px!important;padding:0!important;border:0;background:transparent;text-align:left}
+  .travel-timeline.travel-phone-rail .mobile-journal-card header .date{order:2;display:block;margin:0!important;white-space:nowrap;font-size:12.5px!important;line-height:1.35;letter-spacing:0;text-transform:none;color:#5e6f65}
+  .travel-timeline.travel-phone-rail .mobile-journal-card h2{order:1;margin:0!important;padding:0;font-family:var(--font-body);font-size:18px!important;font-weight:700!important;line-height:1.25!important;letter-spacing:0!important;text-transform:none!important;color:#243e36;overflow-wrap:anywhere}
   .travel-timeline.travel-phone-rail .mobile-journal-card h2 a{display:block;padding:0 0 5px;border:0!important;color:inherit;text-decoration:none}
-  .travel-timeline.travel-phone-rail .mobile-journal-card>p{display:-webkit-box!important;-webkit-box-orient:vertical;overflow:hidden;margin:0!important;font-size:12px!important;text-align:left;color:#69776e}
+  .travel-timeline.travel-phone-rail .mobile-journal-card>p{display:-webkit-box!important;-webkit-box-orient:vertical;overflow:hidden;margin:0!important;font-size:13px!important;text-align:left;color:#69776e}
   .travel-timeline.travel-phone-rail .mobile-journal-card .actions{display:none!important}
+  /* The whole card opens the journal: the scene is its own link, and the Read journal line stretches over the text. */
+  .travel-timeline.travel-phone-rail .mobile-journal-read{display:block;align-self:flex-start;margin-top:4px;font:400 12.5px/1.3 var(--font-body);color:#4f6a5f;text-decoration:none;border:0!important}
+  .travel-timeline.travel-phone-rail .mobile-journal-read::after{content:"";position:absolute;inset:0}
+  /* A full-width scene needs no loupe: it is already large, and a tap opens the journal. */
+  .travel-timeline.travel-phone-rail .mobile-journal-row .scene-loupe{visibility:hidden!important;pointer-events:none!important}
   .travel-timeline.travel-phone-rail .mobile-journal-row a:focus-visible{outline:2px solid #347d6c!important;outline-offset:4px;border-radius:3px}
   .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip:focus-visible .chronology-name{outline:none!important}
 }
@@ -11376,23 +11375,15 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
   .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene,
   .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene *{animation:none!important;transition:none!important}
 }
-/* Refined A: paired images, one set of labels, and a two-line excerpt. */
+/* The phone rows: the scene as each trip's cover (20 Nov 2026), then the name, month and a two-line excerpt. */
 @media(max-width:736px){
  .travel-timeline.travel-phone-rail .mobile-journal-list{margin:8px 0 20px}
- .travel-timeline.travel-phone-rail .mobile-journal-row{padding-bottom:28px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{min-height:0;padding:22px 0 8px!important}
- .travel-timeline.travel-phone-rail .mobile-journal-card header{display:none!important}
- .travel-timeline.travel-phone-rail .mobile-journal-card>a.image,.travel-timeline.travel-phone-rail .mobile-journal-card>.travel-card__image{height:150px;aspect-ratio:auto;margin:0 0 10px!important}
- .travel-timeline.travel-phone-rail .mobile-journal-card img{height:150px!important;aspect-ratio:auto;object-position:var(--thumb-focus,var(--focus,50% 50%))}
+ .travel-timeline.travel-phone-rail .mobile-journal-row{padding-bottom:24px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{min-height:0;padding:0!important}
  .travel-timeline.travel-phone-rail .mobile-journal-card>p{-webkit-line-clamp:2;line-height:1.45!important}
  .travel-timeline .mobile-journal-card>p{text-wrap:balance}
- .travel-timeline.travel-phone-rail .mobile-journal-row:last-child::before{height:100px}
 }
 
-.mobile-photo-cta{display:none}
-@media(max-width:736px){
- .travel-timeline.travel-phone-rail .mobile-photo-cta{display:flex;align-items:flex-end;position:absolute;inset:auto 0 0;height:54px;padding:0 10px 8px;box-sizing:border-box;background:linear-gradient(transparent,rgba(0,0,0,.68) 45%,rgba(0,0,0,.72));color:#fff;font:700 12px/18px var(--font-display);letter-spacing:0;text-transform:none;pointer-events:none}
-}
 
 /* Approved static search invitation: compact desktop, full mobile column. */
 .travel-timeline .photo-search__field{background:#fff;border-color:#88a996}
@@ -11585,17 +11576,16 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes mm-river{0%,100%{opacity:0;transform:translateX(0);stroke:#e99ac6}12%{opacity:0;stroke:#e99ac6}23%,45%{opacity:.85;stroke:#7cc2de}34%{transform:translateX(.8px)}56%,78%{opacity:.85;stroke:#a991ec}89%{opacity:.85;stroke:#e99ac6}}
 @keyframes mm-river-b{0%,100%{opacity:0;transform:translateX(0);stroke:#e99ac6}12%{opacity:0;stroke:#e99ac6}23%,45%{opacity:.85;stroke:#7cc2de}67%{transform:translateX(-.8px)}56%,78%{opacity:.85;stroke:#a991ec}89%{opacity:.85;stroke:#e99ac6}}
 @media(max-width:736px){
- /* Tiles 150px from 390px wide, 140px from 361px, 118px at 360px and below (9 Nov 2026). */
- .travel-timeline.travel-phone-rail .mobile-journal-row{grid-template-columns:150px minmax(0,1fr);column-gap:10px}
- .travel-timeline.travel-phone-rail .mobile-journal-row::before{left:74px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{width:150px!important}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{max-width:150px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{max-width:146px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{--tile:150px;width:var(--tile)!important;height:calc(var(--tile)*.75)!important;min-width:0;overflow:hidden;border-radius:13px}
+ /* Each scene fills the row (20 Nov 2026; tiles were 150px beside a photo): the whole drawing at its native 3:2, so
+    nothing is cropped; the row is a size container, so --tile is its width. Germany drops 6 units for headroom. */
+ .travel-timeline.travel-phone-rail .mobile-journal-row{grid-template-columns:minmax(0,1fr);container-type:inline-size}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{width:100%!important}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{--tile:100cqw;--cw:120!important;--cx:0!important;--cy:0!important;width:var(--tile)!important;height:calc(var(--tile)*80/120)!important;min-width:0;overflow:hidden;border-radius:14px}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="5"]{--cy:-6!important}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene>svg{width:calc(var(--tile)*var(--vw,120)/var(--cw))!important;height:calc(var(--tile)*var(--vh,80)/var(--cw))!important;max-width:none;margin:calc(var(--tile)*(var(--vy,0) - var(--cy))/var(--cw)) 0 0 calc(var(--tile)*(var(--vx,0) - var(--cx))/var(--cw))}
  .mobile-journal-row .mm-dusk-tile{display:inline}
- /* Soft resting skies; the scene that is playing comes up to full colour with a sage ring. */
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{position:relative;background:none!important;transition:box-shadow .4s ease}
+ /* Soft resting skies; the scene that is playing comes up to full colour, and the one on the reading line glows. */
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{position:relative;background:none!important;transition:box-shadow .45s ease}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene::before{content:"";position:absolute;inset:0;opacity:.55;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene>svg{position:relative}
  .mobile-journal-row .mm-dusk-tile{opacity:.55;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
@@ -11604,8 +11594,8 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
     Paris at night held nearer full, as 78% of its navy read slate grey. */
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held .mm-dusk-tile{opacity:.78}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held[data-scene="2"]::before{opacity:.9}
- /* Every scene on screen plays (9 Nov 2026); the ring marks the one on the reading line. */
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-focus{box-shadow:0 0 0 2px #a8c8b6}
+ /* Every scene on screen plays (9 Nov 2026); a soft sage glow marks the one on the reading line (20 Nov 2026, owner). */
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-focus{box-shadow:0 0 0 2px #fff,0 0 0 4px #86bba5,0 0 22px 3px rgba(63,140,110,.42)}
  /* Small movers drawn bigger on the phone tiles so they read on a flick. Each scales its inner
     drawing (or r / stroke-width), never the animated element, so its path is unchanged. */
  .travel-timeline.travel-phone-rail .mobile-journal-row .dl-tram>g{scale:1.8}
@@ -11616,8 +11606,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .mm-flake{r:.55px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .mm-drop{stroke-width:.38px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .cr-liberty-glint{r:7px}
- /* The tile lines up with the top of its journal photo. */
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{padding-top:0!important}
  /* Each phone tile sits on its own soft sky (Fuji overcast, as in fuji1). */
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="0"]::before{background:linear-gradient(#d9dfe6,#eef1f4)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="1"]::before{background:linear-gradient(#bcd2e2,#e8ddc9 62%,#f0ebe0)}
@@ -11629,22 +11617,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(246,204,180,.9),rgba(246,204,180,0)),linear-gradient(#b2c9e2 -5%,#d1deeb 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#72adcb,#a8ccde 40%,#d9e8ee 68%,#f5eedf)}
-}
-@media(max-width:389px){
- .travel-timeline.travel-phone-rail .mobile-journal-row{grid-template-columns:140px minmax(0,1fr)}
- .travel-timeline.travel-phone-rail .mobile-journal-row::before{left:69px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{width:140px!important}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{max-width:140px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{max-width:136px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{--tile:140px}
-}
-@media(max-width:360px){
- .travel-timeline.travel-phone-rail .mobile-journal-row{grid-template-columns:118px minmax(0,1fr);column-gap:8px}
- .travel-timeline.travel-phone-rail .mobile-journal-row::before{left:58px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-trip{width:118px!important}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-label{max-width:118px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .chronology-date{max-width:114px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{--tile:118px}
 }
 @media(prefers-reduced-motion:reduce){
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene::before,.mobile-journal-row .mm-dusk-tile{opacity:1;transition:none}
