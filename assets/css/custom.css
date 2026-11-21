@@ -11367,41 +11367,8 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 /* Chengdu (18 Nov 2026, owner's picks from lab/chengdu-polish): Heaven's Gate from the plaza below the 999 steps, after his
    own photo, measured against it (RC), at golden hour: grey limestone with peach light on the rims and summits, curving ledges
    with green tufts, a dark vault above the gate cut into the cliff and filled with bright sky, the walkway on the right cliff,
-   the stepped stair to the stone terrace and the plaza, the forest as stacked treelines. Motion (RD): the summits warm
-   (.tg-warm, up by 28%, held, eased back), a pair of swifts dives into the gate and a third follows, two small swifts circle
-   in the V, and a thin band of valley haze drifts behind the plaza; the last frame equals the first. Generator:
+   the stepped stair to the stone terrace and the plaza, the forest as stacked treelines. Motion (22 Nov 2026): only thin cloud drifts one way through the opening. Generator:
    lab/chengdu-polish/rd/gen.cjs (classes renamed trd- to tg-). */
-.authored-scene.tg-scene .tg-bird{transform-box:view-box;transform-origin:0 0;offset-rotate:0deg;offset-anchor:0px 0px}
-.authored-scene.tg-scene .tg-bs,.authored-scene.tg-scene .tg-fl,.authored-scene.tg-scene .tg-fm,.authored-scene.tg-scene .tg-mist{transform-box:view-box;transform-origin:0 0}
-.authored-scene.tg-scene .tg-b1,.authored-scene.tg-scene .tg-b2{offset-path:path('M94 -6C91 -4.7 81.3 0 76 2C70.7 4 65.6 4.4 62 6C58.4 7.6 55.6 9.4 54.6 11.4C53.6 13.4 54.5 16.2 57 16.4C60.5 16.6 64 13.6 67 10C70 6.4 72.6 1 75 -9.07')}
-.authored-scene.tg-scene .tg-b1{offset-distance:52.35%}
-.authored-scene.tg-scene .tg-b2{offset-distance:0%;opacity:0}
-.authored-scene.tg-scene .tg-b3{offset-path:path('M22 -6C24.7 -4.8 32.7 -0.8 38 1C43.3 2.8 49.2 3.6 54 5C58.8 6.4 64.4 7.6 67 9.4C70 11.5 74 11 77 7C80 3 83 -3 86 -10');offset-distance:0%;opacity:0}
-.authored-scene.tg-scene .tg-b4{offset-path:path('M58 12.4C58 8.6 72 8.4 72 12.2C72 15.8 58 16.2 58 12.4Z');offset-distance:0%}
-.authored-scene.tg-scene .tg-b5{offset-path:path('M73 4.6C73 1.6 53 1.4 53 4.4C53 7.4 73 7.6 73 4.6Z');offset-distance:0%}
-.authored-scene.tg-scene .tg-warm{opacity:0}
-@media (prefers-reduced-motion:no-preference){
-.authored-scene.tg-scene.is-active .tg-b1{animation:tg-m1 var(--scene-duration,6400ms) both}
-.authored-scene.tg-scene.is-active .tg-b1 .tg-bs,.authored-scene.tg-scene.is-active .tg-b3 .tg-bs{animation:tg-s1 var(--scene-duration,6400ms) both}
-.authored-scene.tg-scene.is-active .tg-b3 .tg-bs{animation-name:tg-s3}
-.authored-scene.tg-scene.is-active .tg-b2{animation:tg-m2 var(--scene-duration,6400ms) both}
-.authored-scene.tg-scene.is-active .tg-b3{animation:tg-m3 var(--scene-duration,6400ms) both}
-.authored-scene.tg-scene.is-active .tg-b4,.authored-scene.tg-scene.is-active .tg-b5{animation:tg-c var(--scene-duration,6400ms) linear both}
-.authored-scene.tg-scene.is-active .tg-fl{animation:tg-f var(--scene-duration,6400ms) linear both}
-.authored-scene.tg-scene.is-active .tg-fm{animation:tg-g var(--scene-duration,6400ms) linear both}
-.authored-scene.tg-scene.is-active .tg-warm{animation:tg-w var(--scene-duration,6400ms) both}
-.authored-scene.tg-scene.is-active .tg-mist{animation:tg-d var(--scene-duration,6400ms) linear both}
-}
-@keyframes tg-m1{0%{offset-distance:52.35%;animation-timing-function:cubic-bezier(.3,.25,.6,1)}36%{offset-distance:100%}100%{offset-distance:100%}}
-@keyframes tg-s1{0%,29%{transform:scale(1);opacity:1;animation-timing-function:cubic-bezier(.4,0,.6,1)}36%,100%{transform:scale(.45);opacity:0}}
-@keyframes tg-s3{0%,73%{transform:scale(1);opacity:1;animation-timing-function:cubic-bezier(.4,0,.6,1)}80%,100%{transform:scale(.45);opacity:0}}
-@keyframes tg-m2{0%,46%{offset-distance:0%;opacity:0}46.1%{opacity:1;offset-distance:0%;animation-timing-function:cubic-bezier(.2,0,.5,1)}100%{offset-distance:52.35%;opacity:1}}
-@keyframes tg-m3{0%,42%{offset-distance:0%;opacity:0}42.1%{opacity:1;offset-distance:0%;animation-timing-function:cubic-bezier(.35,0,.6,1)}80%,100%{offset-distance:100%;opacity:1}}
-@keyframes tg-c{to{offset-distance:100%}}
-@keyframes tg-f{0%,6%,12%,18%,24%,31%,48%,54%,60%,66%,72%,90%,96%,100%{transform:scale(1)}3%,9%,15%,21%,51%,57%,63%,69%,93%{transform:scale(1,.25)}}
-@keyframes tg-g{0%,8%,16%,36%,44%,52%,70%,78%,100%{transform:scale(1)}4%,12%,40%,48%,74%{transform:scale(1,.3)}}
-@keyframes tg-w{0%{opacity:0;animation-timing-function:cubic-bezier(.35,0,.3,1)}28%{opacity:.85}58%{opacity:.85;animation-timing-function:cubic-bezier(.45,0,.4,1)}100%{opacity:0}}
-@keyframes tg-d{to{transform:translateX(30px)}}
 /* Japan (19 Nov 2026, owner's pick from lab/fuji): Mount Fuji over Lake Kawaguchiko with one white swan pedal boat.
    Sunrise (20 Nov 2026, his pick, round 12 of the lab's d4): an 8 s pass from alpenglow to morning and back, checked
    against a real Kawaguchiko sunrise timelapse. The gradient stop colours animate (each on one eased curve), a soft
@@ -11420,7 +11387,9 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes fjb-y1{0%,33.33%,66.67%,100%{transform:translateY(0)}16.67%,50%,83.33%{transform:translateY(.28px)}}
 @keyframes fjb-bd{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
 @keyframes fjb-gl{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(1.4px);opacity:.75}}
-@keyframes fjb-m1{0%{transform:translateX(0)}76.22%{transform:translateX(112.2px)}76.23%{transform:translateX(-35px)}100%{transform:translateX(0)}}
+@keyframes fjb-m1{0%{transform:translateX(0)}69.14%{transform:translateX(93.2px);animation-timing-function:step-end}69.15%{transform:translateX(-41.6px)}to{transform:translateX(0)}}
+.is-active .fj8-t{animation:fj8-t var(--scene-duration) linear both}
+@keyframes fj8-t{52%{opacity:1}69.14%{opacity:0;animation-timing-function:step-end}69.15%{opacity:1}}
 /* Journal card crops (20 Oct 2026): a fixed 4:3 photo box (213x160) keeps half or more of each portrait cover, framed by the
    per-cover focal point in the markup (--focus; --thumb-focus for the wider neighbour thumbnails). Show all uses the same
    focal points. Phones keep their centred crop. */
@@ -11607,7 +11576,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 /* Germany: Cologne Cathedral: lab/travel-mobile/germany-a (generator gen.cjs), 21 Nov 2026. */
 /* additions on top of the live CSS */
 /* Phone crop: was -6, which cut the cathedral's base and the whole plaza off the bottom of the card. */
-.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="5"][data-duration]{--cy:-2.5!important}
+.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="5"][data-duration]{--cy:-1.5!important}
 /* Europe: Eiffel Tower at night: lab/travel-mobile/europe-a (generator gen.cjs), 21 Nov 2026. */
 /* additions on top of the live CSS */
 .travel-timeline .authored-scene[data-scene="2"] svg{filter:contrast(1.05)}
@@ -11685,6 +11654,8 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .cr6-p{opacity:0}
 .authored-scene.is-active .cr6-p{animation:cr6-p calc(var(--scene-duration,6200ms)/3) ease-out calc(var(--scene-duration,6200ms)*var(--f)/-3) infinite!important}
 @keyframes cr6-p{0%,100%{opacity:0}5%{opacity:.3}30%{opacity:0}}
+.cr6-r[clip-path]{opacity:1;transition:none;animation:none!important}
+.cl8-p{opacity:0}.authored-scene.is-active .cl8-p{animation:cr6-p calc(var(--scene-duration)/3) ease-out calc(var(--scene-duration)*var(--f)/-3) infinite!important}
 /* Scenes round 2 (21 Nov 2026, lab/animation-review, blind winners). Heaven's Gate: thin cloud drifts through the opening. Liberty: long lamp reflections shimmer on a wider harbour. */
 .authored-scene.is-active .tg6-c{animation:tg6-c var(--scene-duration) linear both}
 .authored-scene.is-active .tg6-f{animation-name:tg6-f}
@@ -11701,13 +11672,15 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes lb7-b{0%,34%,to{transform:none}12.24%{transform:translateX(calc(var(--a)*1px))}24.48%{transform:translateX(calc(var(--a)*-.55px))}}
 .authored-scene.is-active [class^=pt6-j]{animation:pt6-d var(--scene-duration) cubic-bezier(.45,.05,.55,.95) both}
 .pt6-j0{--a:-6deg;transform-origin:0 .3px}
-.pt6-j1{--a:-34deg}
-.pt6-j2{--a:16deg}
-.pt6-j3{--a:-23deg}
-.pt6-j4{--a:-37deg}
-.pt6-j5{--a:-40deg}
-.pt6-j6{--a:-34deg}
-.pt6-j7{--a:31deg}
+.pt6-j1{--a:-13deg;--t:-26.6deg}
+.pt6-j2{--a:-27deg;--t:-15.9deg}
+.pt6-j3{--a:-29deg;--t:0deg}
+.pt6-j4{--a:-24deg}
+.pt6-j5{--a:-17deg}
+.pt6-j6{--a:-17deg}
+.pt6-j7{--a:69deg}
+.authored-scene.is-active [class^=pt6-j]>path{animation:inherit;animation-name:pt8-w}
+@keyframes pt8-w{0%,44%,92%,to{transform:none}66%,74%{transform:rotate(var(--t))scaleX(1.5)rotate(calc(-1*var(--t)))}}
 .pt6-r{transform-box:fill-box;transform-origin:center}
 .authored-scene.is-active .pt6-r{animation:pt6-r var(--scene-duration) ease-out both}
 @keyframes pt6-d{0%,44%,92%,to{rotate:none}66%,74%{rotate:var(--a)}}
