@@ -11388,8 +11388,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes fjb-bd{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
 @keyframes fjb-gl{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(1.4px);opacity:.75}}
 @keyframes fjb-m1{0%{transform:translateX(0)}69.14%{transform:translateX(93.2px);animation-timing-function:step-end}69.15%{transform:translateX(-41.6px)}to{transform:translateX(0)}}
-.is-active .fj8-t{animation:fj8-t var(--scene-duration) linear both}
-@keyframes fj8-t{52%{opacity:1}69.14%{opacity:0;animation-timing-function:step-end}69.15%{opacity:1}}
 /* Journal card crops (20 Oct 2026): a fixed 4:3 photo box (213x160) keeps half or more of each portrait cover, framed by the
    per-cover focal point in the markup (--focus; --thumb-focus for the wider neighbour thumbnails). Show all uses the same
    focal points. Phones keep their centred crop. */
@@ -11593,15 +11591,16 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene.is-active .sy3-w1{animation:sy3-w1 var(--scene-duration) ease-in-out both}.authored-scene.is-active .sy3-w2{animation:sy3-w2 var(--scene-duration) ease-in-out both}
 @keyframes sy3-w1{0%,50%,100%{opacity:.62}25%,75%{opacity:.3}}
 @keyframes sy3-w2{0%,50%,100%{opacity:.46}25%,75%{opacity:.78}}
+.depth-sydney.is-active :is(.sy3-w1,.sy3-w2){animation-duration:calc(var(--scene-duration)/1.5)!important;animation-iteration-count:1.5}
 /* USA & Canada: Statue of Liberty: lab/travel-review/liberty-a, 21 Nov 2026. */
 .authored-scene[data-scene="4"] .cr-liberty-glint{opacity:1}
 /* Perth: Crawley Edge boathouse: lab/travel-review/perth-a, 21 Nov 2026. */
 .authored-scene.is-active .pt3-go{animation:pt3-go var(--scene-duration,6200ms) linear both}
 .authored-scene.is-active .pt3-lift{animation:pt3-lift var(--scene-duration,6200ms) ease-in-out both;transform-origin:27.3px 31.6px}
-.authored-scene.is-active .pt3-sw{animation:pt3-rock var(--scene-duration,6200ms) ease-in-out both}
+.authored-scene.is-active .pt9-r{animation:pt9-r var(--scene-duration,6200ms) ease-in-out both;transform-origin:1px .4px}
+@keyframes pt9-r{10%{transform:none}19%{transform:rotate(-2.2deg)}29%{transform:translateY(.2px) rotate(1.6deg)}39%{transform:rotate(-.9deg)}49%{transform:rotate(.4deg)}59%{transform:none}}
 @keyframes pt3-go{80%{transform:translateX(var(--x));animation-timing-function:step-end}}
 @keyframes pt3-lift{33%{transform:none}46%,62%{transform:rotate(11deg)}82%{transform:none}}
-@keyframes pt3-rock{8%{transform:none}17%{transform:rotate(-3deg)}26%{transform:translateY(.5px) rotate(2deg)}36%{transform:rotate(-1.5deg)}47%{transform:rotate(.8deg)}60%{transform:none}}
 /* Travel UX review (21 Nov 2026, lab/travel-ux): one section rhythm, matched captions and tiles. */
 .travel-timeline .photo-explore__caption{justify-content:flex-start!important}
 .travel-timeline .photo-explore__caption strong{font-weight:700}
@@ -11670,25 +11669,10 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .lb7-b{--a:1.3}.lb7-b:nth-child(2){--r:.025;--a:2.2}.lb7-b:nth-child(3){--r:.05;--a:3.1}
 @keyframes lb7-s{to{transform:translateX(160px)}}
 @keyframes lb7-b{0%,34%,to{transform:none}12.24%{transform:translateX(calc(var(--a)*1px))}24.48%{transform:translateX(calc(var(--a)*-.55px))}}
-.authored-scene.is-active [class^=pt6-j]{animation:pt6-d var(--scene-duration) cubic-bezier(.45,.05,.55,.95) both}
-.pt6-j0{--a:-6deg;transform-origin:0 .3px}
-.pt6-j1{--a:-13deg;--t:-26.6deg}
-.pt6-j2{--a:-27deg;--t:-15.9deg}
-.pt6-j3{--a:-29deg;--t:0deg}
-.pt6-j4{--a:-24deg}
-.pt6-j5{--a:-17deg}
-.pt6-j6{--a:-17deg}
-.pt6-j7{--a:69deg}
-.authored-scene.is-active [class^=pt6-j]>path{animation:inherit;animation-name:pt8-w}
-@keyframes pt8-w{0%,44%,92%,to{transform:none}66%,74%{transform:rotate(var(--t))scaleX(1.5)rotate(calc(-1*var(--t)))}}
-.pt6-r{transform-box:fill-box;transform-origin:center}
-.authored-scene.is-active .pt6-r{animation:pt6-r var(--scene-duration) ease-out both}
-@keyframes pt6-d{0%,44%,92%,to{rotate:none}66%,74%{rotate:var(--a)}}
-@keyframes pt6-r{0%,65.5%{opacity:0;scale:.2}67.5%{opacity:.95;scale:.4}84%{opacity:.62}97%,to{opacity:0;scale:1.3}}
 /* Scenes round 5 (21 Nov 2026, lab/animation-review, blind winners). Sydney's hull pitches slightly. Liberty's torch lays one broken glitter path on the harbour. The Golden Gate's fog is one long front that advances under the deck, thins while still moving left, and restarts unseen in the bank. */
 .depth-sydney .dl-ferry-hull{rotate:-.45deg;transform-origin:15px 73.3px}
-.depth-sydney.is-active .dl-ferry-hull{animation:sy8-p var(--scene-duration) ease-in-out both}
-@keyframes sy8-p{0%,22.06%,44%,66%,88%,to{rotate:-.45deg}11%,33%,55%,77%,94%{rotate:.45deg}}
+.depth-sydney.is-active .dl-ferry-hull{animation:sy10-p var(--scene-duration) ease-in-out both}
+@keyframes sy10-p{0%,22.06%,44.12%,to{rotate:-.45deg}8.8%{rotate:-1.05deg}30.5%{rotate:-1.3deg}51.5%{rotate:-.95deg}63%{rotate:-.3deg}71%{rotate:-1.2deg}83%{rotate:-.35deg}90%{rotate:-1deg}}
 .authored-scene.is-active .lb8-a{animation:lb8-a var(--scene-duration) ease-in-out both}
 .authored-scene.is-active .lb8-a+.lb8-a{animation-direction:reverse}
 @keyframes lb8-a{0%,20%,42%,65%,to{opacity:1}8%,33%,52%,79%{opacity:.38}}
