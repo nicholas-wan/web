@@ -13,7 +13,7 @@
 						<section class="travel-atlas" aria-labelledby="travel-atlas-title">
 							<header class="travel-atlas__header">
 								<div>
-									<span class="travel-atlas__eyebrow">Travel journals</span>
+									<span class="travel-atlas__eyebrow">Travel</span>
 									<h1 id="travel-atlas-title">Wander through the journals.</h1>
 									<p>Places, meals, and little moments from the road.</p>
 								</div>
@@ -36,14 +36,6 @@
 								</form>
 							</header>
 
-							<section class="photo-explore" id="photo-explore" aria-labelledby="photo-explore-title">
-								<div class="photo-explore__heading"><h2 id="photo-explore-title">Browse photos</h2><button type="button" class="photo-explore__button" data-explore-action="shuffle" hidden>Another mix <span aria-hidden="true">&#8635;</span></button></div>
-								<p class="photo-explore__hint" hidden>Choose a topic to find matching photos.</p>
-								<div class="photo-explore__cards"><noscript><!-- PHOTO_EXPLORE_FALLBACK --></noscript></div>
-								<template id="photo-explore-seeds"><!-- PHOTO_EXPLORE_SEEDS --></template>
-                                <!-- TRAVEL_SEED_BOOTSTRAP -->
-							</section>
-
 							<!-- Photo search results; the map and archive are hidden while they show. -->
 							<section class="photo-results" id="photo-results" aria-labelledby="photo-results-title" hidden>
 								<h2 class="sr-only" id="photo-results-title">Photo search results</h2>
@@ -51,7 +43,7 @@
 								<button type="button" class="button photo-results__more" hidden></button>
 							</section>
 
-							<div class="photo-explore__map-heading"><h2>Explore by destination</h2><p>Select a destination to browse trip stories and photos.</p></div>
+							<div class="photo-explore__map-heading"><h2>Explore by destination</h2><p>Every trip on one map, down to each stop.</p></div>
 							<div class="travel-atlas__layout" id="travel-map" data-map-script="assets/js/travel-map.js">
 								<div class="travel-map">
 								<div class="travel-map__viewport" role="region" tabindex="0" aria-label="Interactive travel map. Scroll to zoom and drag to move around the map.">
@@ -311,10 +303,19 @@
 							</article>
 
 						</section>
-						<script>/* The atlas sits below the journals once the timeline layout applies. Moving it here, while the page
-						   parses and before anything below the journals exists, means no laid-out content moves (desktop
-						   CLS was 0.046 when the chronology runtime moved it at ~1s). Without JavaScript it stays in the opening card. */
-						(function(){var g=document.querySelector('.travel-grid'),h=document.querySelector('.photo-explore__map-heading'),m=document.querySelector('.travel-atlas__layout');if(!g||!h||!m)return;var s=document.createElement('section');s.className='travel-atlas travel-atlas--map';s.setAttribute('aria-label','Explore by destination');g.after(s);s.append(h,m);})();</script>
+
+						<section class="photo-explore" id="photo-explore" aria-labelledby="photo-explore-title">
+							<div class="photo-explore__heading"><h2 id="photo-explore-title">Browse photos</h2><button type="button" class="photo-explore__button" data-explore-action="shuffle" hidden>Another mix <span aria-hidden="true">&#8635;</span></button></div>
+							<p class="photo-explore__hint" hidden>Choose a topic to find matching photos.</p>
+							<div class="photo-explore__cards"><noscript><!-- PHOTO_EXPLORE_FALLBACK --></noscript></div>
+							<template id="photo-explore-seeds"><!-- PHOTO_EXPLORE_SEEDS --></template>
+                                <!-- TRAVEL_SEED_BOOTSTRAP -->
+						</section>
+						<script>/* The atlas sits below the journals and Browse photos once the timeline layout applies. Moving it here, while
+						   the page parses and before anything below exists, means no laid-out content moves (desktop CLS was 0.046 when
+						   the chronology runtime moved it at ~1s). Browse photos follows the journals in the markup (21 Nov 2026: the
+						   journals lead), so its postcards are never on the first screen. Without JavaScript the atlas stays in the opening card. */
+						(function(){var g=document.querySelector('.travel-grid'),h=document.querySelector('.photo-explore__map-heading'),m=document.querySelector('.travel-atlas__layout');if(!g||!h||!m)return;var s=document.createElement('section');s.className='travel-atlas travel-atlas--map';s.setAttribute('aria-label','Explore by destination');(document.getElementById('photo-explore')||g).after(s);s.append(h,m);})();</script>
 
 								</div>
 <footer id="footer"></footer>

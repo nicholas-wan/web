@@ -62,7 +62,7 @@
   let nearest=null,distance=Infinity;const shown=[];
   entries.forEach(e=>{const box=e.art.getBoundingClientRect(),visible=Math.min(innerHeight,box.bottom)-Math.max(0,box.top);if(!box.height||visible<box.height/2)return;shown.push(e);const d=Math.abs((box.top+box.bottom)/2-innerHeight*.4)-(e===focus?28:0);if(d<distance){nearest=e;distance=d;}});
   [...playing.keys()].forEach(e=>{if(!shown.includes(e))stop(e);});
-  if(flicking){shown.forEach(e=>start(e,true));return;}
+  if(flicking){pick(null);shown.forEach(e=>start(e,true));return;}
   let k=0;shown.forEach(e=>{if(!playing.has(e))beat(e,start(e,false),Math.min(300,k++*STAGGER));});
   pick(nearest);
  }

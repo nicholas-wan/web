@@ -15,14 +15,8 @@
   // On phones the slot is that cap (travel-discovery.js refines it once laid out), so skip the read: mid-parse it forced a layout (Oct 2026).
   var phone = matchMedia('(max-width: 736px)').matches;
   var slot = phone ? 160 : parseFloat(getComputedStyle(cardGrid).gridTemplateColumns) - 2;
-  cards.forEach(function (a) { a.querySelector('img').sizes = Math.max(1, slot) + 'px'; });
+  cards.forEach(function (a) { var img = a.querySelector('img'); img.sizes = Math.max(1, slot) + 'px'; img.loading = 'lazy'; });
   cardGrid.replaceChildren.apply(cardGrid, cards);
-  // Only attached, initially visible images are eager; template images stay inert.
-  // Phones take all four without measuring: the box read forced a mid-parse layout
-  // (150-200ms at 4x CPU, 17 Nov 2026), and the lower pair sits within lazy loading's reach anyway.
-  cards.forEach(function (a) {
-    var img = a.querySelector('img'), box = phone ? null : img.getBoundingClientRect();
-    if (phone || box.top < innerHeight && box.bottom > 0) img.loading = 'eager';
-  });
+  // The postcards sit below the journals since 21 Nov 2026, so they stay lazy on every screen.
   try { sessionStorage.setItem(key, JSON.stringify(cards.map(function (a) { return a.dataset.tag; }))); } catch (e) {}
 }());

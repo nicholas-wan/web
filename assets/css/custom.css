@@ -6887,8 +6887,15 @@ a.travel-jump-group__label {
 .site-pager__link > strong {
   color: var(--color-ink-900);
   font-family: var(--font-display);
-  font-size: max(var(--text-floor), 0.88rem);
+  font-size: max(var(--text-floor), 1.02rem);
   line-height: 1.35;
+}
+
+/* The destination reads a step above its label, as on MDN's previous/next (21 Nov 2026, owner
+   pick "D" from lab/travel-ux; the short teal bar under the arrow was dropped: "dont like how it looks"). */
+.travel-pagination a > span,
+.site-pager__link > span {
+  margin-bottom: 0.15rem;
 }
 
 .travel-pagination__next,
@@ -6943,48 +6950,10 @@ a.travel-jump-group__label {
   box-shadow: none;
 }
 
-.site-pager__link > strong {
-  font-size: max(var(--text-floor), 0.8rem);
-}
-
-.travel-pagination a::after,
-.site-pager__link::after {
-  position: absolute;
-  bottom: 0.3rem;
-  left: var(--pager-pad, 0);
-  width: 1.8rem;
-  height: 2px;
-  background: var(--color-brand-200);
-  content: "";
-  opacity: 0.65;
-  transform: scaleX(0.45);
-  transform-origin: left center;
-  transition: background-color var(--motion-standard) ease,
-    opacity var(--motion-standard) ease,
-    transform var(--motion-standard) var(--ease-standard);
-}
-
-/* `.travel-pagination a::after` above is (0,1,1); a bare `__next::after` (0,1,0)
-   lost to it and the Next rule sat at the left of its box. */
-.travel-pagination a.travel-pagination__next::after,
-.site-pager__link--next::after {
-  right: var(--pager-pad, 0);
-  left: auto;
-  transform-origin: right center;
-}
 
 .travel-pagination a > strong,
 .site-pager__link > strong {
   transition: transform var(--motion-standard) var(--ease-standard);
-}
-
-.travel-pagination a:hover::after,
-.travel-pagination a:focus-visible::after,
-.site-pager__link:hover::after,
-.site-pager__link:focus-visible::after {
-  background: var(--color-brand-600);
-  opacity: 1;
-  transform: scaleX(1);
 }
 
 .travel-pagination__previous:hover > strong,
@@ -7055,10 +7024,8 @@ a.travel-jump-group__label {
 
 @media (prefers-reduced-motion: reduce) {
   .travel-pagination a,
-  .travel-pagination a::after,
   .travel-pagination a > strong,
   .site-pager__link,
-  .site-pager__link::after,
   .site-pager__link > strong {
     transition: none;
   }
@@ -7911,6 +7878,21 @@ body.lightbox-open {
   canvas {
     max-width: 100% !important;
   }
+}
+
+
+/* Phones (21 Nov 2026, Travel UX review): content on the tab pages starts 1.15rem in, but the
+   pager's text sat at 2rem (its own 1rem pad plus the link's) and the footer at 2rem, so the page
+   ended on two other edges. The link keeps its 1rem pad for the tap tint, outside the text. */
+@media screen and (max-width: 480px) {
+  body:not(.page-home) .site-pager { padding-inline: 1.15rem !important; }
+  body:not(.page-home) .site-pager__link { margin-inline: -1rem; }
+  body:not(.page-home) #footer .footer-band__inner { padding-inline: 1.15rem; }
+}
+
+/* A lone pager link on a phone takes the whole row: in half of it, "Previous section" was clipped. */
+@media screen and (max-width: 600px) {
+  .site-pager--single .site-pager__link--previous { grid-column: 1 / -1; }
 }
 
 /* Route bundle: experience-layout:start */
@@ -10382,7 +10364,7 @@ body.page-home #nav {
   margin-top: 0.12rem;
   overflow: hidden;
   color: var(--color-ink-600);
-  font: 500 max(var(--text-floor), 0.85rem)/1.35 "Raleway", sans-serif;
+  font: 300 max(var(--text-floor), 0.85rem)/1.35 var(--font-body);
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -10399,7 +10381,7 @@ body.page-home #nav {
   display: -webkit-box;
   overflow: hidden;
   color: var(--color-ink-500);
-  font: 500 max(var(--text-floor), 0.75rem)/1.4 "Raleway", sans-serif;
+  font: 300 max(var(--text-floor), 0.75rem)/1.4 var(--font-body);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
@@ -10917,6 +10899,7 @@ html .page-skills #main > .post { border-top:0; }
 @media(min-width:981px){.travel-atlas__layout,#travel-archive-title{scroll-margin-top:calc(3.5rem + 1.5rem)}}
 /* The opening shortcut owns the animated invitation; the lower phone teaser rests. */
 .travel-map-teaser.is-previewing,.travel-map-teaser.is-previewing *{animation:none!important}
+.travel-map-teaser .travel-map-teaser__route-line,.travel-map-teaser .travel-map-teaser__pin{opacity:1}.travel-map-teaser{box-shadow:none!important}
 @media(min-width:737px){.travel-atlas__header{align-items:flex-start}.travel-portals{margin-top:0;margin-bottom:0}}
 @media(max-width:736px){
  .travel-portals{gap:10px;margin:.75rem 0 .25rem}
@@ -10947,10 +10930,7 @@ html .page-skills #main > .post { border-top:0; }
 .chronology-controls { display: flex; gap: 4px; }
 .chronology-controls[hidden] { display: none; }
 .chronology-controls button { width: 44px; height: 44px; padding: 0; line-height: 1; border: 1px solid #d1dfd6; border-radius: 4px; box-shadow: none; font-size: 18px; letter-spacing: 0; color: #285f54; background: white; }
-.chronology-line { position: absolute; left: 56px; right: 56px; top: 147px; height: 1px; background: #c6d2cc; transform-origin: left; }
-.journal-chronology.is-revealed .chronology-line { animation: chronology-draw 1.2s ease-out both; }
-.journal-chronology.is-paused .chronology-line { animation-play-state: paused; }
-@keyframes chronology-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.chronology-line { position: absolute; left: 56px; right: 56px; top: 147px; height: 1px; background: #c6d2cc; }
 .chronology-trip { position: absolute; top: 139px; width: 100px; height: 48px; margin-left: -50px; border: 0 !important; color: #285f54; display: block; text-align: center; font: 600 12px/1.25 var(--font-display); pointer-events: none; }
 .chronology-dot, .chronology-name { pointer-events: auto; }
 .chronology-dot { display: block; position: absolute; left: 45px; top: 4px; width: 10px; height: 10px; border: 2px solid white; border-radius: 50%; background: #347d6c; box-shadow: 0 0 0 1px #347d6c; }
@@ -10967,7 +10947,6 @@ html .page-skills #main > .post { border-top:0; }
 .chronology-date { font-size: 11px; font-weight: 400; line-height: 1.25; color: #5e6f65; white-space: normal; text-decoration: none; }
 .chronology-detail { margin: 9px 0 0 !important; min-height: 2.5em; text-align: left !important; }
 @media (max-width: 736px) { #main > .journal-chronology { display: none; } }
-@media (prefers-reduced-motion: reduce) { .journal-chronology.is-revealed .chronology-line { animation: none; } }
 
 /* Original destination scenes: static SVG, finite interaction-only motion. */
 .authored-scene { display: flex; align-items: center; justify-content: center; width: 112px; height: 75px; margin-bottom: 4px; pointer-events: none; isolation: isolate; }
@@ -11734,6 +11713,32 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes pt3-go{80%{transform:translateX(var(--x));animation-timing-function:step-end}}
 @keyframes pt3-lift{33%{transform:none}46%,62%{transform:rotate(11deg)}82%{transform:none}}
 @keyframes pt3-rock{8%{transform:none}17%{transform:rotate(-3deg)}26%{transform:translateY(.5px) rotate(2deg)}36%{transform:rotate(-1.5deg)}47%{transform:rotate(.8deg)}60%{transform:none}}
+/* Travel UX review (21 Nov 2026, lab/travel-ux): one section rhythm, matched captions and tiles. */
+.travel-timeline .photo-explore__caption{justify-content:flex-start!important}
+.travel-timeline .photo-explore__caption strong{font-weight:700}
+.travel-timeline .photo-explore__caption>span{margin-top:0;min-width:0;color:var(--color-ink-500)}
+.travel-timeline .photo-explore__caption>span>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.travel-timeline .photo-explore__card,.travel-timeline .travel-portals .travel-portal{border-radius:var(--radius-compact)}
+.photo-explore__button{gap:.3em}
+.travel-timeline .photo-explore__hint,.travel-timeline .photo-explore__map-heading p{margin:0 0 16px;font-size:max(var(--text-floor),.85rem);line-height:1.5;color:#53656c}
+.travel-timeline .photo-explore__heading{margin-bottom:-1px!important}.travel-timeline .photo-explore__map-heading h2{margin:0 0 10px}
+@media(max-width:520px){.travel-portal[data-portal="map"] .portal-arrow{rotate:-90deg}}
+@media(min-width:981px){.travel-timeline .travel-atlas__header>.photo-search{align-self:center}}
+/* Each section head sits about 68px (phones) or 76px (desktop) below the block before it. */
+html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutter);border:0;background:#fff}
+.travel-timeline.travel-timeline #main>.travel-archive-heading{margin-top:28px!important;border-bottom:0!important}
+.travel-timeline .travel-atlas--map .photo-explore__map-heading{margin-top:46px;padding-top:0;border-top:0}
+@media(min-width:737px){html #main>.photo-explore{margin-top:63px!important}.travel-timeline.travel-timeline #main>.travel-archive-heading{margin-top:0!important;padding-top:11px!important}.travel-timeline .travel-atlas--map .photo-explore__map-heading{margin-top:32px}}
+@media(min-width:981px){.travel-map:not(.is-fullscreen) .travel-map__place{font-size:.625rem}}
+/* Desktop: the timeline is on the first screen, so it opens at its final size. Before travel-chronology.js runs,
+   the heading drops its static label and "Newest first" and keeps the Show all button's 48px, and the timeline keeps
+   the help line's 22px: the runtime's swap then moves nothing (CLS 0.027, from the heading and help line, before). */
+@media(min-width:737px){
+.travel-timeline #main>.travel-archive-heading:not(:has(.journal-show-all))>div>span,.travel-timeline #main>.travel-archive-heading:not(:has(.journal-show-all))>p{display:none}
+.travel-timeline #main>.travel-archive-heading:not(:has(.journal-show-all))::after{content:"0";height:48px;font:700 max(var(--text-floor),.85rem)/44px var(--font-display)}
+.travel-timeline .journal-chronology:not(:has(>.journal-preview-help))>.chronology-scroll{margin-top:22px}
+}
+@media(max-width:736px){.travel-timeline .travel-atlas__header{display:flex;flex-direction:column;align-items:stretch}.travel-timeline .travel-atlas__header>*{min-width:0;max-width:100%}.travel-timeline .travel-atlas__header>.photo-search{order:1}.travel-timeline .travel-atlas__header>.travel-portals{order:2;margin:1rem 0 0}}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */

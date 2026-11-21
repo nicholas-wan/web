@@ -46,7 +46,8 @@ test.describe('mobile reading animation',()=>{
   await page.clock.install();await page.setViewportSize({width:390,height:844});await page.goto('/travel');
   const {scenes,scroll,anims,states,active,focus,held}=rail(page);
   await expect(page.locator('.mobile-journal-list .authored-scene > svg')).toHaveCount(10);
-  await page.clock.pauseAt(Date.now()+1000);await expect(active).toHaveCount(0);
+  // The journals lead the page (21 Nov 2026), so the first scene is on the opening screen and the only one playing.
+  await page.clock.pauseAt(Date.now()+1000);await expect(active).toHaveCount(1);await expect(scenes.nth(0)).toHaveClass(/is-active/);
   // Mid-flick: Australia is set on its opening frame (1.5s in) and held at a lighter tint; no ring yet.
   await scroll({to:3});
   await expect(scenes.nth(3)).toHaveClass(/is-active/);await expect(scenes.nth(3)).toHaveClass(/is-held/);await expect(focus).toHaveCount(0);
@@ -76,7 +77,8 @@ test.describe('mobile reading animation',()=>{
   // Reduced motion clears every scene; scrolling the rail away stops them.
   await page.emulateMedia({reducedMotion:'reduce'});await expect(active).toHaveCount(0);await expect(focus).toHaveCount(0);await expect(held).toHaveCount(0);
   await page.emulateMedia({reducedMotion:'no-preference'});await expect(focus).toHaveCount(1);
-  await page.evaluate(()=>scrollTo(0,0));await page.waitForTimeout(100);await page.clock.runFor(200);await expect(active).toHaveCount(0);
+  // The page's foot (photos and map) is off the rail since the journals lead the page (21 Nov 2026).
+  await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));await page.waitForTimeout(100);await page.clock.runFor(200);await expect(active).toHaveCount(0);
  });
  // The ferry starts where the still drawing has it, so starting the scene never makes it jump or pop in:
  // Sydney's ferry waits at the rail's opening point.
@@ -110,9 +112,10 @@ test('no JavaScript retains ten visible journal covers',async({browser})=>{
 
 // Scene artwork ships as one cached file (8 Nov 2026): phones fetch it after load and the rail
 // borrows each single SVG; wider screens reuse the head's fetch, so the file is fetched once.
+// A short window keeps every scene off the first screen: with one on screen (390x844 since 21 Nov 2026) the file is fetched as soon as it shows.
 test('scene artwork waits for load on phones and fills each visible slot once',async({page})=>{
  const requests=[];page.on('request',r=>{if(r.url().includes('travel-scenes.svg'))requests.push(r.url());});
- await page.setViewportSize({width:390,height:844});await page.goto('/travel');
+ await page.setViewportSize({width:390,height:520});await page.goto('/travel');
  await expect(page.locator('.mobile-journal-list .authored-scene > svg')).toHaveCount(10);
  await expect(page.locator('.journal-chronology .authored-scene > svg')).toHaveCount(0);
  const timing=await page.evaluate(()=>({load:performance.getEntriesByType('navigation')[0].loadEventStart,scenes:performance.getEntriesByType('resource').find(e=>e.name.includes('travel-scenes.svg')).startTime}));

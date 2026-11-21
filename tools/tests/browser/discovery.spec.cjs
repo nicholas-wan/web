@@ -99,7 +99,8 @@ test('the lazy module itself can be retried', async ({ page }) => {
   expect(requests).toBe(2);
 });
 
-test('visible postcards are eager and high-density previews select larger images', async ({ browser }) => {
+// Browse photos follows the journals since 21 Nov 2026, so its postcards are never on the first screen and stay lazy.
+test('postcards below the journals stay lazy and high-density previews select larger images', async ({ browser }) => {
   // Four columns have narrower slots; DPR 3 requires a source above 480px.
   const context = await browser.newContext({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 3, reducedMotion: 'reduce' });
   const page = await context.newPage();
@@ -107,11 +108,11 @@ test('visible postcards are eager and high-density previews select larger images
   await page.goto('/travel');
   const images = page.locator('.photo-explore__cards img');
   await expect(images).toHaveCount(4);
-  const visible = await images.evaluateAll(es => es.filter(e => e.getBoundingClientRect().top < innerHeight).map(e => e.loading));
-  expect(visible.length).toBeGreaterThan(0);
-  expect(visible.every(value => value === 'eager')).toBe(true);
+  const loading = await images.evaluateAll(es => es.map(e => [e.loading, e.getBoundingClientRect().top >= innerHeight]));
+  expect(loading.every(([value, below]) => value === 'lazy' && below)).toBe(true);
   expect(await page.locator('script[src*="photo-search"]').count()).toBe(0);
   const responsive = page.locator('.photo-explore__cards img[srcset]').first();
+  await responsive.scrollIntoViewIfNeeded();
   await responsive.evaluate(img => img.decode());
   expect(await responsive.evaluate(img => img.currentSrc !== new URL(img.getAttribute('src'), location.href).href)).toBe(true);
   await page.setViewportSize({ width: 390, height: 844 });
@@ -120,8 +121,8 @@ test('visible postcards are eager and high-density previews select larger images
   await context.close();
 });
 
-test('phone postcards request their photos during parsing, before any layout', async ({ page }) => {
-  // 17 Nov 2026: all four are eager on phones without a box read, so the photos start before the first layout.
+test('phone postcards stay lazy, read no layout while parsing, and load once near', async ({ page }) => {
+  // 17 Nov 2026: no box read while parsing (it forced a layout). Since 21 Nov 2026 they sit below the journals and stay lazy.
   await page.setViewportSize({ width: 360, height: 640 });
   await page.addInitScript(() => {
     window.seedLayouts = 0;
@@ -131,8 +132,9 @@ test('phone postcards request their photos during parsing, before any layout', a
   await page.goto('/travel');
   const images = page.locator('.photo-explore__cards img');
   await expect(images).toHaveCount(4);
-  expect(await images.evaluateAll(es => es.map(e => e.loading))).toEqual(['eager', 'eager', 'eager', 'eager']);
+  expect(await images.evaluateAll(es => es.map(e => e.loading))).toEqual(['lazy', 'lazy', 'lazy', 'lazy']);
   expect(await page.evaluate(() => window.seedLayouts)).toBe(0);
+  await page.locator('#photo-explore').scrollIntoViewIfNeeded();
   await expect.poll(() => images.evaluateAll(es => es.every(e => e.complete && e.naturalWidth > 0))).toBe(true);
 });
 

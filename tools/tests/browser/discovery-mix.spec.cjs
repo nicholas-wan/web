@@ -23,6 +23,8 @@ async function prepare(page, motion = 'reduce') {
   // Wait for the lazy index as well as the module before controlling decoding.
   await expect(page.locator('script[src*="photo-search.js"]')).toHaveCount(1);
   await expect.poll(() => page.evaluate(() => document.querySelector('#photo-search-status').textContent)).not.toBe('Loading photos…');
+  // Browse photos follows the journals (21 Nov 2026): bring it to the top of the window, where a reader taps Another mix.
+  await page.locator('#photo-explore').evaluate(section => section.scrollIntoView({ block: 'start' }));
   return page.locator('[data-explore-action="shuffle"]');
 }
 
@@ -128,8 +130,10 @@ test('using an old postcard while decoding cancels the mix and preserves keyboar
 
 test('a stale mix cannot replace a search or a newer mix after clearing a search', async ({ page }) => {
   const button = await prepare(page);
+  // Clearing a search puts the journals back above Browse photos: bring it back to the top before each tap.
+  const mix = async () => { await page.locator('#photo-explore').evaluate(s => s.scrollIntoView({ block: 'start' })); await button.click(); };
   const storage = await saved(page);
-  await button.click();
+  await mix();
   await expect.poll(() => page.evaluate(() => window.pendingMixImages.length)).toBeGreaterThan(0);
   await page.evaluate(() => { window.oldMixImages = window.pendingMixImages.splice(0); });
   await page.getByRole('searchbox').fill('panda');
@@ -139,14 +143,14 @@ test('a stale mix cannot replace a search or a newer mix after clearing a search
   expect(await saved(page)).toBe(storage);
   await page.getByRole('searchbox').fill('');
   await expect(page.locator('#photo-explore')).toBeVisible();
-  await button.click();
+  await mix();
   await expect.poll(() => page.evaluate(() => window.pendingMixImages.length)).toBeGreaterThan(0);
   await page.evaluate(() => { window.oldMixImages = window.pendingMixImages.splice(0); });
   await page.getByRole('searchbox').fill('panda');
   await expect(page.locator('.photo-hit').first()).toBeVisible();
   await page.locator('.photo-search__clear').click();
   await expect(page.locator('#photo-explore')).toBeVisible();
-  await button.click();
+  await mix();
   await expect.poll(() => page.evaluate(() => window.pendingMixImages.length)).toBeGreaterThan(0);
   await release(page);
   await expect(button).not.toHaveAttribute('aria-disabled');
@@ -175,7 +179,9 @@ test('successful mix crossfades for 220ms without moving the grid', async ({ pag
 test('phone mix waits only for visible slots, leaving lower images lazy', async ({ page }) => {
   const button = await prepare(page);
   await page.setViewportSize({ width: 375, height: 600 });
-  await button.click();
+  // Only the first row of postcards on screen: the lower row must stay lazy.
+  await page.locator('.photo-explore__cards').evaluate(cards => scrollBy(0, cards.getBoundingClientRect().top - innerHeight + 160));
+  await button.evaluate(b => b.click());
   const visible = await page.locator('.photo-explore__cards > a img').evaluateAll(images => images.filter(img => {
     const box = img.getBoundingClientRect(); return box.bottom > 0 && box.top < innerHeight;
   }).length);
