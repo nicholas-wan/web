@@ -11047,13 +11047,9 @@ html .page-skills #main > .post { border-top:0; }
 
 
 
-.da-cologne-lower,.da-cologne-mid,.da-cologne-upper{opacity:0}
 .da-paris-light{opacity:0}
 
 .authored-scene.is-active .da-paris-light{animation:da-paris-light var(--scene-duration,6200ms) ease both}
-.authored-scene.is-active .da-cologne-lower{animation:da-cologne-lower var(--scene-duration,6200ms) ease both}
-.authored-scene.is-active .da-cologne-mid{animation:da-cologne-mid var(--scene-duration,6200ms) ease both}
-.authored-scene.is-active .da-cologne-upper{animation:da-cologne-upper var(--scene-duration,6200ms) ease both}
 
 
 @keyframes da-paris-light{0%,100%{opacity:0}10%{opacity:1}82%{opacity:1;animation-timing-function:ease-in-out}}
@@ -11070,10 +11066,6 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes gg-car-c{0%{opacity:0;transform:translate(100.21px,38.03px) scale(0.31)}46%{transform:translate(100.21px,38.03px) scale(0.31);opacity:0}50.5%{transform:translate(97.89px,38.44px) scale(0.33);opacity:1}55%{transform:translate(95.22px,38.91px) scale(0.36);opacity:1}59.5%{transform:translate(92.13px,39.46px) scale(0.39);opacity:1}64%{transform:translate(88.51px,40.1px) scale(0.42);opacity:1}68.5%{transform:translate(84.22px,40.87px) scale(0.46);opacity:1}73%{transform:translate(79.03px,41.79px) scale(0.51);opacity:1}77.5%{transform:translate(72.65px,42.92px) scale(0.57);opacity:1}82%{transform:translate(64.6px,44.35px) scale(0.64);opacity:1}86.5%{transform:translate(54.13px,46.21px) scale(0.74);opacity:1}91%{transform:translate(39.96px,48.72px) scale(0.87);opacity:1}95.5%{transform:translate(19.72px,52.31px) scale(1.05);opacity:1}100%{transform:translate(-11.59px,57.87px) scale(1.34);opacity:1}}
 @media(prefers-reduced-motion:reduce){.gg-car{animation:none!important;opacity:0}}
 
-/* Windows light tier by tier, hold, then fade out together over the last 1.9 s. */
-@keyframes da-cologne-lower{0%,3%{opacity:0}13%,70%{opacity:1;animation-timing-function:cubic-bezier(.45,0,.55,1)}100%{opacity:0}}
-@keyframes da-cologne-mid{0%,13%{opacity:0}24%,70%{opacity:.95;animation-timing-function:cubic-bezier(.45,0,.55,1)}100%{opacity:0}}
-@keyframes da-cologne-upper{0%,24%{opacity:0}36%,70%{opacity:.95;animation-timing-function:cubic-bezier(.45,0,.55,1)}100%{opacity:0}}
 
 .depth-sydney .dl-ferry{transform:translateX(-28.3px)}
 /* The phone rail opens Sydney 1.5s in (travel-rail.js OPEN), so its still ferry and gull wait there and never pop.
@@ -11418,57 +11410,17 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
    exactly the SVG's frame-0 sky; the SVG sky (.fjb-sky) shows only while the tile plays. Generator: lab/fuji/d4/gen.cjs. */
 .travel-timeline .journal-chronology .authored-scene.fjb-scene .fjb-sky{opacity:0;transition:opacity .5s ease}.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.fjb-scene .fjb-sky{opacity:0;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
 .travel-timeline .journal-chronology .authored-scene.fjb-scene.is-active .fjb-sky,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.fjb-scene.is-active .fjb-sky{opacity:1}
-.authored-scene.fjb-scene .fjb-tm{transform-box:view-box;transform-origin:0 0;transform:translate(57.9px,11.3px) skewX(-3deg) translate(-62.4px,-11.3px)}
-.authored-scene.fjb-scene .fjb-b1,.authored-scene.fjb-scene .fjb-bob,.authored-scene.fjb-scene .fjb-bands,.authored-scene.fjb-scene .fjb-glints,.authored-scene.fjb-scene .fjb-sun{transform-box:view-box;transform-origin:0 0}
+.authored-scene.fjb-scene .fjb-b1,.authored-scene.fjb-scene .fjb-bob,.authored-scene.fjb-scene .fjb-bands,.authored-scene.fjb-scene .fjb-glints{transform-box:view-box;transform-origin:0 0}
 @media (prefers-reduced-motion:no-preference){
 .authored-scene.fjb-scene.is-active .fjb-b1{animation:fjb-m1 var(--scene-duration,8000ms) linear both}
 .authored-scene.fjb-scene.is-active .fjb-bob{animation:fjb-y1 var(--scene-duration,8000ms) ease-in-out both}
 .authored-scene.fjb-scene.is-active .fjb-bands{animation:fjb-bd var(--scene-duration,8000ms) ease-in-out both}
 .authored-scene.fjb-scene.is-active .fjb-glints{animation:fjb-gl var(--scene-duration,8000ms) ease-in-out both}
-.authored-scene.fjb-scene.is-active .fjb-an{animation:var(--scene-duration,8000ms) ease-in-out both}
-.authored-scene.fjb-scene.is-active .fjb-sun{animation:fjb-sun var(--scene-duration,8000ms) linear both}
-.authored-scene.fjb-scene.is-active .fjb-sunO{animation:fjb-so var(--scene-duration,8000ms) linear both}
-.authored-scene.fjb-scene.is-active .fjb-sunL{animation:fjb-sl var(--scene-duration,8000ms) linear both}
-.authored-scene.fjb-scene.is-active .fjb-a0{animation-name:fjb-a0}
-.authored-scene.fjb-scene.is-active .fjb-a1{animation-name:fjb-a1}
-.authored-scene.fjb-scene.is-active .fjb-a2{animation-name:fjb-a2}
-.authored-scene.fjb-scene.is-active .fjb-a3{animation-name:fjb-a3}
-.authored-scene.fjb-scene.is-active .fjb-a4{animation-name:fjb-a4}
-.authored-scene.fjb-scene.is-active .fjb-a5{animation-name:fjb-a5}
-.authored-scene.fjb-scene.is-active .fjb-a6{animation-name:fjb-a6}
-.authored-scene.fjb-scene.is-active .fjb-a7{animation-name:fjb-a7}
-.authored-scene.fjb-scene.is-active .fjb-a8{animation-name:fjb-a8}
-.authored-scene.fjb-scene.is-active .fjb-a9{animation-name:fjb-a9}
-.authored-scene.fjb-scene.is-active .fjb-a10{animation-name:fjb-a10}
-.authored-scene.fjb-scene.is-active .fjb-a11{animation-name:fjb-a11}
-.authored-scene.fjb-scene.is-active .fjb-a12{animation-name:fjb-a12}
-.authored-scene.fjb-scene.is-active .fjb-a13{animation-name:fjb-a13}
-.authored-scene.fjb-scene.is-active .fjb-a14{animation-name:fjb-a14}
-.authored-scene.fjb-scene.is-active .fjb-tm{animation-name:fjb-tm}
 }
 @keyframes fjb-y1{0%,33.33%,66.67%,100%{transform:translateY(0)}16.67%,50%,83.33%{transform:translateY(.28px)}}
 @keyframes fjb-bd{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
 @keyframes fjb-gl{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(1.4px);opacity:.75}}
-@keyframes fjb-sun{0%,3.75%{transform:translateY(0);animation-timing-function:cubic-bezier(.42,0,.58,1)}56.25%,97.5%{transform:translateY(78px)}97.51%,100%{transform:translateY(0)}}
-@keyframes fjb-sl{0%,37.5%{opacity:1;animation-timing-function:ease-in-out}53.75%,57.5%{opacity:.15;animation-timing-function:ease-in-out}75%,97.5%{opacity:0}100%{opacity:1}}
-@keyframes fjb-so{0%,32.5%{opacity:1;animation-timing-function:ease-in-out}53.75%,97.5%{opacity:0}100%{opacity:1}}
 @keyframes fjb-m1{0%{transform:translateX(0)}76.22%{transform:translateX(112.2px)}76.23%{transform:translateX(-35px)}100%{transform:translateX(0)}}
-@keyframes fjb-a0{0%,13.95%{stop-color:#c69a9e}50%,57.5%{stop-color:#cdb2b2}100%{stop-color:#c69a9e}}
-@keyframes fjb-a1{0%,20.85%{stop-color:#ba95a0}50.94%,57.5%{stop-color:#bfa5b2}100%{stop-color:#ba95a0}}
-@keyframes fjb-a2{0%,25.84%{stop-color:#a99bb6}51.88%,57.5%{stop-color:#b0a6c2}100%{stop-color:#a99bb6}}
-@keyframes fjb-a3{0%,6.25%{stop-color:#555a8b}53.75%,57.5%{stop-color:#606a95}100%{stop-color:#555a8b}}
-@keyframes fjb-a4{0%,7.6%{stop-color:#525786}53.75%,57.5%{stop-color:#5d6790}100%{stop-color:#525786}}
-@keyframes fjb-a5{0%,8.35%{stop-color:#555d88}53.75%,57.5%{stop-color:#606a91}100%{stop-color:#555d88}}
-@keyframes fjb-a6{0%,9.25%{stop-color:#6c7599}53.75%,57.5%{stop-color:#7683a3}100%{stop-color:#6c7599}}
-@keyframes fjb-a7{0%,9.57%{stop-color:#fff2e9}47.5%,57.5%{stop-color:#fffbf6}100%{stop-color:#fff2e9}}
-@keyframes fjb-a8{0%,13.68%{stop-color:#fbdccd}49.38%,57.5%{stop-color:#fef4e8}100%{stop-color:#fbdccd}}
-@keyframes fjb-a9{0%,20.42%{stop-color:#f2c8bf}53.75%,57.5%{stop-color:#f9ebe1}100%{stop-color:#f2c8bf}}
-@keyframes fjb-a10{0%,6.25%{stop-color:#ddc9d6}53.75%,57.5%{stop-color:#dcdcea}100%{stop-color:#ddc9d6}}
-@keyframes fjb-a11{0%,6.25%{stop-color:#cdb9cb}53.75%,57.5%{stop-color:#cdcfe0}100%{stop-color:#cdb9cb}}
-@keyframes fjb-a12{0%,5%{stop-color:#b2c9e2}53.75%,57.5%{stop-color:#c6d7e8}100%{stop-color:#b2c9e2}}
-@keyframes fjb-a13{0%,5%{stop-color:#d1deeb}53.75%,57.5%{stop-color:#dfe8f0}100%{stop-color:#d1deeb}}
-@keyframes fjb-a14{0%,3.75%{stop-color:#f6ccb4;stop-opacity:.9;animation-timing-function:ease-in-out}25%{stop-color:#f9d6a4;stop-opacity:1;animation-timing-function:ease-in-out}53.75%,57.5%{stop-color:#f8e4c6;stop-opacity:.45;animation-timing-function:ease-in-out}100%{stop-color:#f6ccb4;stop-opacity:.9}}
-@keyframes fjb-tm{0%,5%{transform:translate(57.9px,11.3px) skewX(-3deg) translate(-62.4px,-11.3px)}48.75%,62.5%{transform:translate(62.4px,11.3px) skewX(0deg) translate(-62.4px,-11.3px)}100%{transform:translate(57.9px,11.3px) skewX(-3deg) translate(-62.4px,-11.3px)}}
 /* Journal card crops (20 Oct 2026): a fixed 4:3 photo box (213x160) keeps half or more of each portrait cover, framed by the
    per-cover focal point in the markup (--focus; --thumb-focus for the wider neighbour thumbnails). Show all uses the same
    focal points. Phones keep their centred crop. */
@@ -11564,7 +11516,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#c3d8e6,#e7eff2 60%,#f2f4f1)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(246,204,180,.9),rgba(246,204,180,0)),linear-gradient(#b2c9e2 -5%,#d1deeb 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(248,210,170,.9),rgba(248,210,170,0)),linear-gradient(#b9cee4 -5%,#d6e1ed 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#72adcb,#a8ccde 40%,#d9e8ee 68%,#f5eedf)}
 }
@@ -11585,7 +11537,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .travel-timeline .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#c3d8e6,#e7eff2 60%,#f2f4f1)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
-.travel-timeline .journal-chronology .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(246,204,180,.9),rgba(246,204,180,0)),linear-gradient(#b2c9e2 -5%,#d1deeb 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
+.travel-timeline .journal-chronology .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(248,210,170,.9),rgba(248,210,170,0)),linear-gradient(#b9cee4 -5%,#d6e1ed 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#72adcb,#a8ccde 40%,#d9e8ee 68%,#f5eedf)}
 /* Each sky follows that trip's real light (20 Oct 2026). Paris is the one night tile, so its navy stays at full strength at rest. */
@@ -11651,15 +11603,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 /* Seoul: Geunjeongjeon in snow: lab/travel-mobile/seoul-a (generator gen.cjs), 21 Nov 2026. */
 /* Seoul (scene 0), traced from the photo: the centre doors swing open onto a warm glow; tiled snow (whole tiles per run, so 100% = 0%); one clump of snow off the eave. */
 .authored-scene[data-scene="0"] .se2-snow{transform-box:view-box;transform-origin:0 0}
-.authored-scene[data-scene="0"] .se2-dl,.authored-scene[data-scene="0"] .se2-dr{transform-box:fill-box;transform-origin:0 50%}
-.authored-scene[data-scene="0"] .se2-dr{transform-origin:100% 50%}
-.authored-scene[data-scene="0"] .se2-in{opacity:.3}
-.authored-scene[data-scene="0"].is-active .se2-dl,.authored-scene[data-scene="0"].is-active .se2-dr{animation:se2-door var(--scene-duration,6200ms) cubic-bezier(.42,0,.25,1) both}
-.authored-scene[data-scene="0"].is-active .se2-in{animation:se2-warm var(--scene-duration,6200ms) ease-in-out both}
-.authored-scene[data-scene="0"].is-active .se2-spl{animation:se2-spill var(--scene-duration,6200ms) ease-in-out both}
-@keyframes se2-door{0%,6%{transform:scaleX(1);animation-timing-function:cubic-bezier(.5,0,.3,1)}44%,72%{transform:scaleX(.3);animation-timing-function:cubic-bezier(.45,0,.4,1)}100%{transform:scaleX(1)}}
-@keyframes se2-warm{0%,6%,100%{opacity:.3}38%,74%{opacity:.95}}
-@keyframes se2-spill{0%,14%,97%,100%{opacity:0}39%,72%{opacity:.9}}
 @media(prefers-reduced-motion:reduce){.authored-scene[data-scene="0"] .se2-snow{display:none}}
 /* Germany: Cologne Cathedral: lab/travel-mobile/germany-a (generator gen.cjs), 21 Nov 2026. */
 /* additions on top of the live CSS */
