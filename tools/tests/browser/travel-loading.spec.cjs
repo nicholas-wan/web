@@ -48,10 +48,10 @@ test.describe('mobile reading animation',()=>{
   await expect(page.locator('.mobile-journal-list .authored-scene > svg')).toHaveCount(10);
   // The journals lead the page (21 Nov 2026), so the first scene is on the opening screen and the only one playing.
   await page.clock.pauseAt(Date.now()+1000);await expect(active).toHaveCount(1);await expect(scenes.nth(0)).toHaveClass(/is-active/);
-  // Mid-flick: Australia is set on its opening frame (1.5s in) and held at a lighter tint; no ring yet.
+  // Mid-flick: Australia is set on its opening frame (3.75s into its 17s pass) and held at a lighter tint; no ring yet.
   await scroll({to:3});
   await expect(scenes.nth(3)).toHaveClass(/is-active/);await expect(scenes.nth(3)).toHaveClass(/is-held/);await expect(focus).toHaveCount(0);
-  expect(await anims(3)).toEqual(expect.arrayContaining([expect.objectContaining({t:1500,state:'paused'})]));
+  expect(await anims(3)).toEqual(expect.arrayContaining([expect.objectContaining({t:3750,state:'paused'})]));
   expect(await states(3)).toEqual(['paused']);
   await expect.poll(()=>scenes.nth(3).evaluate(el=>getComputedStyle(el,'::before').opacity)).toBe('0.78');
   // The stop: no scene is held, the ring is on, and the top scene opens fast, then eases back to normal speed.
@@ -63,11 +63,11 @@ test.describe('mobile reading animation',()=>{
   expect((await anims(3)).every(a=>a.rate===1)).toBe(true);
   // Repeats rewind to frame 0 in place, not to the opening point, and the class list does not flap.
   await scenes.nth(3).evaluate(el=>{window.sceneClassChanges=0;new MutationObserver(r=>{window.sceneClassChanges+=r.length;}).observe(el,{attributes:true,attributeFilter:['class']});});
-  // The first loop is due by about 6.1s of fake time (the beat's timers run on the fake clock too); real time only brings it sooner.
-  await page.clock.runFor(5000);
+  // The first loop is due by about 13.9s of fake time (the beat's timers run on the fake clock too); real time only brings it sooner.
+  await page.clock.runFor(12800);
   expect((await anims(3)).every(a=>a.t<1000&&a.state==='running')).toBe(true);
   // After the second pass it plays on to a lit frame and rests there, still in colour with its ring.
-  await page.clock.runFor(10000);
+  await page.clock.runFor(24600);
   expect(await states(3)).toEqual(['paused']);expect(await page.evaluate(()=>window.sceneClassChanges)).toBe(0);
   // WebKit once resolved this pause against a bogus clock and parked the ferry at -11s, off the tile.
   await page.waitForTimeout(100);expect((await anims(3)).every(a=>a.t>=0)).toBe(true);
@@ -100,9 +100,9 @@ test.describe('mobile reading animation',()=>{
   await scenes.nth(3).evaluate(el=>el.scrollIntoView({block:'center'}));await expect(scenes.nth(3)).toHaveClass(/is-active/);
   // WebKit only restores a scroll position it has had a moment to record.
   await page.waitForTimeout(800);await page.reload();await expect(scenes.nth(3)).toHaveClass(/is-active/);
-  // The rail opens Australia 1.5s in; left to themselves its animations start from 0.
+  // The rail opens Australia 3.75s in; left to themselves its animations start from 0.
   await expect.poll(async()=>(await times()).length).toBeGreaterThan(0);
-  expect(Math.min(...await times())).toBeGreaterThanOrEqual(1500);
+  expect(Math.min(...await times())).toBeGreaterThanOrEqual(3750);
  });
 });
 

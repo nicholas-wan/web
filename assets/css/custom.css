@@ -11577,10 +11577,10 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .authored-scene .mm-loop{opacity:0!important;transition:none}
  .authored-scene .mm-fx *{animation:none!important}
 }
-/* Desktop timeline scenes sit on the same per-scene skies as the phone tiles (20 Oct 2026). The sky rests at half
-   strength and comes up to full while its scene plays, is hovered or is selected; the artwork itself never fades. */
+/* Desktop timeline scenes sit on the same per-scene skies as the phone tiles (20 Oct 2026). The sky rests at .84
+   strength (half read as a pale wash on every start) and comes up to full while its scene plays, is hovered or is selected; the artwork itself never fades. */
 .travel-timeline .journal-chronology .authored-scene{position:relative;border-radius:10px;overflow:hidden}
-.travel-timeline .journal-chronology .authored-scene::before{content:"";position:absolute;inset:0;opacity:.5;transition:opacity .5s ease}
+.travel-timeline .journal-chronology .authored-scene::before{content:"";position:absolute;inset:0;opacity:.84;transition:opacity .7s ease}
 .travel-timeline .journal-chronology .authored-scene>svg{position:relative}
 .travel-timeline .journal-chronology .authored-scene[data-scene="0"]::before{background:linear-gradient(#d9dfe6,#eef1f4)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="1"]::before{background:linear-gradient(#bcd2e2,#e8ddc9 62%,#f0ebe0)}
@@ -11594,7 +11594,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .travel-timeline .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#72adcb,#a8ccde 40%,#d9e8ee 68%,#f5eedf)}
 /* Each sky follows that trip's real light (20 Oct 2026). Paris is the one night tile, so its navy stays at full strength at rest. */
 .travel-timeline .journal-chronology .authored-scene[data-scene="2"]::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="2"]::before{opacity:1}
-.travel-timeline .journal-chronology .mm-dusk-tile{display:inline;opacity:.5;transition:opacity .5s ease}
+.travel-timeline .journal-chronology .mm-dusk-tile{display:inline;opacity:.84;transition:opacity .7s ease}
 .travel-timeline .journal-chronology .authored-scene.is-active::before,.travel-timeline .journal-chronology .chronology-trip:hover .authored-scene::before,.travel-timeline .journal-chronology .chronology-trip:focus-visible .authored-scene::before,.travel-timeline .journal-chronology .chronology-trip.journal-is-selected .authored-scene::before,.travel-timeline .journal-chronology .authored-scene.is-active .mm-dusk-tile,.travel-timeline .journal-chronology .chronology-trip:hover .authored-scene .mm-dusk-tile,.travel-timeline .journal-chronology .chronology-trip:focus-visible .authored-scene .mm-dusk-tile,.travel-timeline .journal-chronology .chronology-trip.journal-is-selected .authored-scene .mm-dusk-tile{opacity:1}
 /* The hover/selected card hugs the tile: no white band above it, matching corners. */
 .travel-timeline .journal-chronology .chronology-name{padding-top:0;margin-top:3px;border-radius:10px}
@@ -11727,9 +11727,9 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .authored-scene.is-active :is(.pt4-nk,.pt4-hd,.pt4-rg){animation:pt4-dip var(--scene-duration)}
 .is-active .pt4-hd.pt4-hd{animation-name:pt4-hd}
 .is-active .pt4-rg.pt4-rg{animation-name:pt4-rg}
-@keyframes pt4-dip{55%,90%{rotate:none}62%,76%{rotate:-50deg}}
-@keyframes pt4-hd{55%,90%{rotate:none}59%{rotate:-95deg}62%,76%{rotate:-105deg}82%{rotate:-55deg}}
-@keyframes pt4-rg{62%{opacity:0;scale:.25}65%{opacity:.7}97%{opacity:0;scale:1.4}}
+@keyframes pt4-dip{0%,44%,92%,to{rotate:none;animation-timing-function:cubic-bezier(.45,.05,.55,.95)}66%,74%{rotate:-50deg;animation-timing-function:cubic-bezier(.45,.05,.55,.95)}}
+@keyframes pt4-hd{0%,47%,90%,to{rotate:none;animation-timing-function:cubic-bezier(.45,.05,.55,.95)}67%,74%{rotate:-105deg;animation-timing-function:cubic-bezier(.45,.05,.55,.95)}}
+@keyframes pt4-rg{64%{opacity:0;scale:.25}67%{opacity:.7}97%{opacity:0;scale:1.4}}
 /* Travel scenes round 3 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Heaven's Gate breathes cloud down the stair;
    a ferry wake breaks Liberty's lamp reflections at the seawall; Seoul's snow as wind-angled flecks with gusts. */
 .authored-scene.is-active .tg5-a{animation:tg5-a var(--scene-duration) both;transform-origin:60.6px 49.4px}
