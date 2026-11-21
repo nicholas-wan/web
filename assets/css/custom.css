@@ -11764,6 +11764,10 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes cr6-o{0%,100%{opacity:0}10%,82%{opacity:1}}
 @media(min-width:737px){.journal-chronology .authored-scene.is-active .cr6-r{animation:cr6-o var(--scene-duration,6200ms) both}}
 .scene-viewer .authored-scene .cr6-r{opacity:1;transition:none;animation:none!important}
+/* Soft, unoutlined glints where the rain meets the wet ground; opacity only. */
+.cr6-p{opacity:0}
+.authored-scene.is-active .cr6-p{animation:cr6-p calc(var(--scene-duration,6200ms)/3) ease-out calc(var(--scene-duration,6200ms)*var(--f)/-3) infinite!important}
+@keyframes cr6-p{0%,100%{opacity:0}5%{opacity:.3}30%{opacity:0}}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
