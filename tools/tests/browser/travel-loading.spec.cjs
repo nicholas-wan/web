@@ -53,7 +53,7 @@ test.describe('mobile reading animation',()=>{
   await expect(scenes.nth(3)).toHaveClass(/is-active/);await expect(scenes.nth(3)).toHaveClass(/is-held/);await expect(focus).toHaveCount(0);
   expect(await anims(3)).toEqual(expect.arrayContaining([expect.objectContaining({t:3750,state:'paused'})]));
   expect(await states(3)).toEqual(['paused']);
-  await expect.poll(()=>scenes.nth(3).evaluate(el=>getComputedStyle(el,'::before').opacity)).toBe('0.78');
+  await expect.poll(()=>scenes.nth(3).evaluate(el=>getComputedStyle(el,'::before').opacity)).toBe('0.92');
   // The stop: no scene is held, the ring is on, and the top scene opens fast, then eases back to normal speed.
   await page.clock.runFor(120);
   await expect(held).toHaveCount(0);await expect(focus).toHaveCount(1);await expect(scenes.nth(3)).toHaveClass(/is-focus/);

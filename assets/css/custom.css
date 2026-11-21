@@ -11491,9 +11491,9 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
    journal-grounded motion in its SVG (.mm-fx). Particles keep their own period (6.2s / n) so they are back in phase when a
    scene repeats; particle groups fade in once. Phones show 128x96 tiles on the sage tint, cropped to each landmark with the
    wrapper's --cx/--cy/--cw (and --vx/--vy/--vw/--vh for a non-default viewBox). */
-.mm-star{fill:#fffaf0;stroke:none;opacity:0;transform-box:fill-box;transform-origin:center}
+.mm-star{fill:inherit;stroke:none;opacity:0;transform-box:fill-box;transform-origin:center}
 .authored-scene.is-active .mm-star{animation:mm-twinkle var(--d) ease-in-out var(--del) infinite}
-@keyframes mm-twinkle{0%,50%,100%{opacity:0;transform:scale(.25)}70%{opacity:1;transform:scale(1)}85%{opacity:.35;transform:scale(.6)}}
+@keyframes mm-twinkle{0%,84%,100%{opacity:0;transform:scale(.55)}89%{opacity:1;transform:scale(1)}}
 .authored-scene.is-active .mm-fx .mm-star,.authored-scene.is-active .mm-fx .mm-flake{animation-duration:var(--d)!important}
 .mm-loop{opacity:0}
 .authored-scene.is-active .mm-loop{opacity:1;transition:opacity .6s ease}
@@ -11525,9 +11525,9 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
    the river echoes each colour. The lattice stays drawn over the overlay's 0.36. The live cycle drifted between
    faint tints (0.12 to 0.34) and the light pass only tinted the pale tower at tile size. A climbing-glow version, which
    lost a blind check to live, is kept on the travel-guangzhou-climb branch. */
-.mm-led{fill:#e99ac6;opacity:.36}
+.mm-led{fill:#d49bba;opacity:.33}
 .authored-scene.is-active .mm-led{animation:mm-led var(--scene-duration,6200ms) ease-in-out both}
-@keyframes mm-led{0%,12%,89%,100%{fill:#e99ac6}23%,45%{fill:#7cc2de}56%,78%{fill:#a991ec}}
+@keyframes mm-led{0%,23.4%,100%{fill:#d49bba}37.9%,54.4%{fill:#87b7cb}68.9%,85.5%{fill:#9f8fd0}}
 @media(max-width:736px){
  /* Each scene fills the row (20 Nov 2026; tiles were 150px beside a photo): the whole drawing at its native 3:2, so
     nothing is cropped; the row is a size container, so --tile is its width. Germany drops 6 units for headroom. */
@@ -11539,14 +11539,14 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .mobile-journal-row .mm-dusk-tile{display:inline}
  /* Soft resting skies; the scene that is playing comes up to full colour, and the one on the reading line glows. */
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene{position:relative;background:none!important;transition:box-shadow .45s ease}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene::before{content:"";position:absolute;inset:0;opacity:.55;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene::before{content:"";position:absolute;inset:0;opacity:.84;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene>svg{position:relative}
- .mobile-journal-row .mm-dusk-tile{opacity:.55;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
+ .mobile-journal-row .mm-dusk-tile{opacity:.84;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active .mm-dusk-tile{opacity:1}
  /* Held mid-flick on its opening frame: a lighter tint (the resting 55% read as unloaded images), full on the stop.
     Paris at night held nearer full, as 78% of its navy read slate grey. */
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held .mm-dusk-tile{opacity:.78}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held[data-scene="2"]::before{opacity:.9}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held .mm-dusk-tile{opacity:.92}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-active.is-held[data-scene="2"]::before{opacity:.96}
  /* Every scene on screen plays (9 Nov 2026); a soft sage glow marks the one on the reading line (20 Nov 2026, owner). */
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.is-focus{box-shadow:0 0 0 2px #fff,0 0 0 4px #86bba5,0 0 22px 3px rgba(63,140,110,.42)}
  /* Small movers drawn bigger on the phone tiles so they read on a flick. Each scales its inner
@@ -11634,13 +11634,13 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="8"]::before,
 .travel-timeline .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#22263b,#525773 50%,#af909c 77%,#5d5b71 81%,#181a2a)}
 /* tower glow and lattice take the hold-and-step colour: same keyframe stops as mm-led */
-.authored-scene[data-scene="8"] .gz2-halo{fill:#e99ac6;opacity:.22}
-.authored-scene[data-scene="8"] .gz2-lat{stroke:#e99ac6;opacity:.75}
-.authored-scene[data-scene="8"] .gz2-col{fill:#e99ac6;opacity:.9}
+.authored-scene[data-scene="8"] .gz2-halo{fill:#d49bba;opacity:.18}
+.authored-scene[data-scene="8"] .gz2-lat{stroke:#d49bba;opacity:.7}
+.authored-scene[data-scene="8"] .gz2-col{fill:#d49bba;opacity:.82}
 .authored-scene[data-scene="8"].is-active .gz2-col,.authored-scene[data-scene="8"].is-active .gz2-halo{animation:mm-led var(--scene-duration,6200ms) ease-in-out both}
 
 .authored-scene[data-scene="8"].is-active .gz2-lat{animation:gz2-lat var(--scene-duration,6200ms) ease-in-out both}
-@keyframes gz2-lat{0%,12%,89%,100%{stroke:#e99ac6}23%,45%{stroke:#7cc2de}56%,78%{stroke:#a991ec}}
+@keyframes gz2-lat{0%,23.4%,100%{stroke:#d49bba}37.9%,54.4%{stroke:#87b7cb}68.9%,85.5%{stroke:#9f8fd0}}
 /* the cruise boat crosses left to right; two copies 120 apart so it wraps in the same instant */
 /* the cabin orbit seen from the river, well below the deck: a flatter ellipse whose near half is the upper arc */
 .authored-scene[data-scene="8"] .dl-tram{offset-path:path('M52 22A8 .85 0 0 0 68 22A8 .85 0 0 0 52 22')}
@@ -11670,9 +11670,9 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .travel-timeline .authored-scene[data-scene="2"] svg{filter:contrast(1.05)}
 .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="2"]::before,.travel-timeline .journal-chronology .authored-scene[data-scene="2"]::before{background:radial-gradient(58% 22% at 50% 90%,rgba(142,114,100,.2),rgba(142,114,100,0)),linear-gradient(#131931,#192039 38%,#242842 66%,#373649 85%,#26263e 93%,#191b32)}
 .travel-timeline .authored-scene[data-scene="2"] .da-paris-light{stroke:#be9352}
-.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="2"] .mm-star{r:.84px}
+.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="2"] .mm-star{r:.66px}
 /* Guangzhou: Canton Tower: lab/travel-review/guangzhou-a, 21 Nov 2026. */
-.authored-scene[data-scene="8"] .gz3-r{stroke:#e99ac6}
+.authored-scene[data-scene="8"] .gz3-r{stroke:#d49bba}
 .authored-scene[data-scene="8"].is-active .gz3-r{animation:gz2-lat var(--scene-duration,6200ms) ease-in-out both,var(--k) var(--scene-duration,6200ms) ease-in-out both}
 @keyframes gz3-a{0%,50%,100%{transform:none;opacity:1}25%,75%{transform:translateX(.7px);opacity:.5}}
 @keyframes gz3-b{0%,33.3%,66.7%,100%{transform:none;opacity:1}16.7%,50%,83.3%{transform:translateX(-.8px);opacity:.5}}
@@ -11720,12 +11720,6 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
    Chengdu clouds pass through the gate; Seoul snow in three layers; Perth's swan dips to feed. */
 .authored-scene[data-scene="0"].is-active .se4-f{animation:se4-f var(--scene-duration,6200ms) linear}
 @keyframes se4-f{to{transform:translate(-8px,40px)}}
-.authored-scene.is-active :is(.pt4-nk,.pt4-hd,.pt4-rg){animation:pt4-dip var(--scene-duration)}
-.is-active .pt4-hd.pt4-hd{animation-name:pt4-hd}
-.is-active .pt4-rg.pt4-rg{animation-name:pt4-rg}
-@keyframes pt4-dip{0%,44%,92%,to{rotate:none;animation-timing-function:cubic-bezier(.45,.05,.55,.95)}66%,74%{rotate:-50deg;animation-timing-function:cubic-bezier(.45,.05,.55,.95)}}
-@keyframes pt4-hd{0%,47%,90%,to{rotate:none;animation-timing-function:cubic-bezier(.45,.05,.55,.95)}67%,74%{rotate:-105deg;animation-timing-function:cubic-bezier(.45,.05,.55,.95)}}
-@keyframes pt4-rg{64%{opacity:0;scale:.25}67%{opacity:.7}97%{opacity:0;scale:1.4}}
 /* Travel scenes round 3 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Heaven's Gate breathes cloud down the stair;
    a ferry wake breaks Liberty's lamp reflections at the seawall; Seoul's snow as wind-angled flecks with gusts. */
 .authored-scene[data-scene="0"].is-active .se5{animation:var(--k) var(--scene-duration,6200ms) linear}
@@ -11757,19 +11751,28 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .authored-scene.is-active .tg6-f{animation-name:tg6-f}
 @keyframes tg6-c{to{transform:translateX(20px)}}
 @keyframes tg6-f{to{transform:translateX(10px)}}
-.lb6-y,.lb6-v{opacity:.08}
-.authored-scene.is-active [class^=lb6-]{animation:lb6-x var(--scene-duration) ease-in-out both}
-.authored-scene.is-active .lb6-y{animation-name:lb6-y}
-.authored-scene.is-active .lb6-r{animation-direction:reverse}
-.authored-scene.is-active .lb6-u{animation-name:lb6-u}
-.authored-scene.is-active .lb6-v{animation-name:lb6-v}
-@keyframes lb6-x{0%,25%,50%,75%,to{opacity:1;transform:none}12.5%,62.5%{opacity:.2;transform:translateX(.8px)}37.5%,87.5%{opacity:.3;transform:translateX(-.6px)}}
-@keyframes lb6-y{0%,25%,50%,75%,to{opacity:.08;transform:none}12.5%,62.5%{opacity:1;transform:translateX(-.7px)}37.5%,87.5%{opacity:.9;transform:translateX(.6px)}}
-@keyframes lb6-u{0%,33.3%,66.7%,to{opacity:1}16.7%,50%,83.3%{opacity:.15}}
-@keyframes lb6-v{0%,33.3%,66.7%,to{opacity:.08}16.7%,50%,83.3%{opacity:1}}
 /* Scenes round 3 (21 Nov 2026, lab/animation-review, blind winners): Cologne's wet dusk holds steady behind the cathedral; the Golden Gate's sun glow no longer swells and retreats. */
 .cl6-d{opacity:.62}
 .mm-sunset-glow{opacity:.7}
+/* Scenes round 4 (21 Nov 2026, lab/animation-review, blind winners). Liberty: one slow swell crosses the harbour and bends the lamp reflections in turn. Perth: a six-bone neck keeps its curve, the body tips, and a ring starts at the bill. */
+.authored-scene.is-active .lb7-s{animation:lb7-s var(--scene-duration) linear both}
+.authored-scene.is-active .lb7-b{animation:lb7-b var(--scene-duration) ease-in-out calc(var(--scene-duration)*(var(--d) + var(--r,0))) both}
+.lb7-b{--a:1.3}.lb7-b:nth-child(2){--r:.025;--a:2.2}.lb7-b:nth-child(3){--r:.05;--a:3.1}
+@keyframes lb7-s{to{transform:translateX(160px)}}
+@keyframes lb7-b{0%,34%,to{transform:none}12.24%{transform:translateX(calc(var(--a)*1px))}24.48%{transform:translateX(calc(var(--a)*-.55px))}}
+.authored-scene.is-active [class^=pt6-j]{animation:pt6-d var(--scene-duration) cubic-bezier(.45,.05,.55,.95) both}
+.pt6-j0{--a:-6deg;transform-origin:0 .3px}
+.pt6-j1{--a:-34deg}
+.pt6-j2{--a:16deg}
+.pt6-j3{--a:-23deg}
+.pt6-j4{--a:-37deg}
+.pt6-j5{--a:-40deg}
+.pt6-j6{--a:-34deg}
+.pt6-j7{--a:31deg}
+.pt6-r{transform-box:fill-box;transform-origin:center}
+.authored-scene.is-active .pt6-r{animation:pt6-r var(--scene-duration) ease-out both}
+@keyframes pt6-d{0%,44%,92%,to{rotate:none}66%,74%{rotate:var(--a)}}
+@keyframes pt6-r{0%,65.5%{opacity:0;scale:.2}67.5%{opacity:.95;scale:.4}84%{opacity:.62}97%,to{opacity:0;scale:1.3}}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
