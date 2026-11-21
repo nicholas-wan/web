@@ -1234,7 +1234,7 @@
       price: price && price.textContent.trim(),
       klook: price && (price.querySelector('.travel-route__klook') || 0).className,
       hours: stop.dataset.hours,
-      day: (/^Day\s+\d+/i.exec(heading ? heading.textContent.trim() : '') || [''])[0],
+      day: heading,
       at: Array.prototype.indexOf.call(stop.parentNode.querySelectorAll('.guangzhou-route__stop'), stop) + 1,
       own: own
     };

@@ -86,6 +86,8 @@ window.travelPlaceCard = function (hooks) {
     var own = place.own;
     var photos = hooks.photoCount(own.length);
     var shown = own.slice(0, 4);
+    /* "Day 2" on day journals; a chapter journal (Japan, Australia, Seoul) names its chapter's pill instead. */
+    var h = place.day, ht = h ? h.textContent.trim() : '', day = h ? (/^Day\s+\d+/i.exec(ht) || [h.dataset.navLabel || ht.replace(/^#\d+\s*-\s*/, '')])[0] : '';
     var map = function (url, query, label, extra) {
       return '<a class="place-card__map' + extra + '" href="' + url + encodeURIComponent(query) + '" target="_blank" rel="noopener">' + label + '</a>';
     };
@@ -94,7 +96,7 @@ window.travelPlaceCard = function (hooks) {
        owner's decisions. Up to four thumbnails, "+N" on the last when there are more. */
     sheet.innerHTML = '<span class="place-card__handle" aria-hidden="true"></span>' +
       '<button class="place-card__close" type="button" data-card="close" aria-label="Close place card">&times;</button>' +
-      '<p class="place-card__eyebrow">' + (place.day ? place.day + ' &middot; ' : '') + 'Stop ' + place.at + '</p>' +
+      '<p class="place-card__eyebrow">' + (day ? escapeText(day) + ' &middot; ' : '') + 'Stop ' + place.at + '</p>' +
       '<p class="place-card__title" id="place-card-title"' + (place.lang ? ' lang="' + place.lang + '"' : '') + '>' + escapeText(place.name) + '</p>' +
       /* The price ends the subtitle's line at the right, as the route list writes it. */
       (place.sub || place.price ? '<p class="place-card__meta"><span' + (place.zh && place.zh === place.sub ? ' lang="zh-Hans">' : '>') + escapeText(place.sub || '') + '</span>' +

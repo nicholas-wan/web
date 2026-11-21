@@ -3379,6 +3379,13 @@ body.is-map-fullscreen .travel-atlas__layout {
   /* Upright like Japan's (24 Oct 2026): the theme's italic header <p> was the only use of the
      46 KB Merriweather 300 italic file on eight journals. */
   font-style: normal;
+  /* A standfirst a step above the body (21 Nov 2026): at the body size it had no presence. */
+  font-size: 1.25rem;
+}
+
+@media screen and (max-width: 736px) {
+  .travel-journal__lede,
+  .guangzhou-journal__lede { font-size: 1.125rem; }
 }
 
 .travel-journal__hero-image,
@@ -11061,22 +11068,18 @@ html .page-skills #main > .post { border-top:0; }
 .authored-scene.is-active .gg-car-a{animation:gg-car-a var(--scene-duration,6200ms) linear both}
 .authored-scene.is-active .gg-car-b{animation:gg-car-b var(--scene-duration,6200ms) linear both}
 .authored-scene.is-active .gg-car-c{animation:gg-car-c var(--scene-duration,6200ms) linear both}
-.authored-scene.is-active .gg-fog{animation:gg-fog var(--scene-duration,6200ms) ease-in-out both}
-.authored-scene.is-active .gg-fog-front{animation:gg-fog-front var(--scene-duration,6200ms) ease-in-out both}
 .gg-fog-roll{opacity:0;transform-box:fill-box;transform-origin:100% 100%}
 .authored-scene.is-active .gg-fog-roll{animation:gg-fog-roll var(--scene-duration,6200ms) linear both}
-@keyframes gg-fog-roll{0%,100%{transform:none;opacity:0}.1%{transform:translateY(0) scale(.6,.85);opacity:0;animation-timing-function:ease-out}6%{opacity:1}46%{transform:translateY(2px) scale(1.28,1.1)}72%{transform:translateY(2.3px) scale(1.32,1.12);animation-timing-function:ease-in-out}95%{transform:translateY(0) scale(.6,.85);opacity:1}99.9%{transform:translateY(0) scale(.6,.85);opacity:0}}
-@keyframes gg-fog{0%,100%{transform:translateX(0)}50%{transform:translateX(2.5px)}}
-@keyframes gg-fog-front{0%,100%{transform:translateX(0)}50%{transform:translateX(-1.8px)}}
+@keyframes gg-fog-roll{0%,100%{transform:none;scale:1;translate:0;opacity:0}.1%{transform:scale(.6,.85);opacity:0;animation-timing-function:cubic-bezier(.25,.45,.6,.85)}7%{opacity:1}50%{scale:1;translate:0;animation-timing-function:cubic-bezier(.45,0,.4,1)}82%{opacity:1}93%{opacity:0}82%,95%{scale:1 .45;translate:0 3px}95%{transform:translate(-3px,1px) scale(1.38,1.05)}}
 @keyframes gg-car-a{0%{transform:translate(-9.44px,58.22px) scale(1.36);opacity:1}7.83%{transform:translate(21.74px,52.53px) scale(1.06);opacity:1}15.67%{transform:translate(41.8px,48.87px) scale(0.87);opacity:1}23.5%{transform:translate(55.8px,46.31px) scale(0.74);opacity:1}31.33%{transform:translate(66.11px,44.43px) scale(0.64);opacity:1}39.17%{transform:translate(74.03px,42.98px) scale(0.57);opacity:1}47%{transform:translate(80.3px,41.84px) scale(0.51);opacity:1}54.83%{transform:translate(85.39px,40.91px) scale(0.46);opacity:1}62.67%{transform:translate(89.61px,40.14px) scale(0.42);opacity:1}70.5%{transform:translate(93.15px,39.49px) scale(0.39);opacity:1}78.33%{transform:translate(96.18px,38.94px) scale(0.36);opacity:1}86.17%{transform:translate(98.79px,38.46px) scale(0.34);opacity:1}94%{transform:translate(101.06px,38.05px) scale(0.31);opacity:0}100%{opacity:0;transform:translate(101.06px,38.05px) scale(0.31)}}
 @keyframes gg-car-b{0%{opacity:0;transform:translate(100.21px,38.03px) scale(0.31)}8%{transform:translate(100.21px,38.03px) scale(0.31);opacity:0}13.5%{transform:translate(97.89px,38.44px) scale(0.33);opacity:1}19%{transform:translate(95.22px,38.91px) scale(0.36);opacity:1}24.5%{transform:translate(92.13px,39.46px) scale(0.39);opacity:1}30%{transform:translate(88.51px,40.1px) scale(0.42);opacity:1}35.5%{transform:translate(84.22px,40.87px) scale(0.46);opacity:1}41%{transform:translate(79.03px,41.79px) scale(0.51);opacity:1}46.5%{transform:translate(72.65px,42.92px) scale(0.57);opacity:1}52%{transform:translate(64.6px,44.35px) scale(0.64);opacity:1}57.5%{transform:translate(54.13px,46.21px) scale(0.74);opacity:1}63%{transform:translate(39.96px,48.72px) scale(0.87);opacity:1}68.5%{transform:translate(19.72px,52.31px) scale(1.05);opacity:1}74%{transform:translate(-11.59px,57.87px) scale(1.34);opacity:1}100%{opacity:0;transform:translate(-11.59px,57.87px) scale(1.34)}}
 @keyframes gg-car-c{0%{opacity:0;transform:translate(100.21px,38.03px) scale(0.31)}46%{transform:translate(100.21px,38.03px) scale(0.31);opacity:0}50.5%{transform:translate(97.89px,38.44px) scale(0.33);opacity:1}55%{transform:translate(95.22px,38.91px) scale(0.36);opacity:1}59.5%{transform:translate(92.13px,39.46px) scale(0.39);opacity:1}64%{transform:translate(88.51px,40.1px) scale(0.42);opacity:1}68.5%{transform:translate(84.22px,40.87px) scale(0.46);opacity:1}73%{transform:translate(79.03px,41.79px) scale(0.51);opacity:1}77.5%{transform:translate(72.65px,42.92px) scale(0.57);opacity:1}82%{transform:translate(64.6px,44.35px) scale(0.64);opacity:1}86.5%{transform:translate(54.13px,46.21px) scale(0.74);opacity:1}91%{transform:translate(39.96px,48.72px) scale(0.87);opacity:1}95.5%{transform:translate(19.72px,52.31px) scale(1.05);opacity:1}100%{transform:translate(-11.59px,57.87px) scale(1.34);opacity:1}}
-@media(prefers-reduced-motion:reduce){.gg-car{animation:none!important;opacity:0}.gg-fog,.gg-fog-front{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.gg-car{animation:none!important;opacity:0}}
 
 /* Windows light tier by tier, hold, then fade out together over the last second. */
-@keyframes da-cologne-lower{0%,3%{opacity:0}13%,84%{opacity:1}100%{opacity:0}}
-@keyframes da-cologne-mid{0%,13%{opacity:0}24%,84%{opacity:.95}100%{opacity:0}}
-@keyframes da-cologne-upper{0%,24%{opacity:0}36%,84%{opacity:.95}100%{opacity:0}}
+@keyframes da-cologne-lower{0%,3%{opacity:0}13%,77%{opacity:1;animation-timing-function:cubic-bezier(.35,0,.75,.9)}100%{opacity:0}}
+@keyframes da-cologne-mid{0%,13%{opacity:0}24%,77%{opacity:.95;animation-timing-function:cubic-bezier(.35,0,.75,.9)}100%{opacity:0}}
+@keyframes da-cologne-upper{0%,24%{opacity:0}36%,77%{opacity:.95;animation-timing-function:cubic-bezier(.35,0,.75,.9)}100%{opacity:0}}
 
 .depth-sydney .dl-ferry{transform:translateX(-34px)}
 /* The phone rail opens Sydney 1.5s in (travel-rail.js OPEN), so its still ferry and gull wait there and never pop.
@@ -11624,14 +11627,11 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @media screen and (max-width:600px){.travel-timeline.travel-timeline #main > .travel-archive-heading{margin-top:0!important;padding-top:.25rem!important}}
 /* USA & Canada: Statue of Liberty: lab/travel-mobile/liberty-a (generator gen.cjs), 21 Nov 2026. */
 /* additions on top of the live CSS (scene 4, Liberty) */
-.travel-timeline .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#b3c5d7,#c6d3df 40%,#dbe2e8 70%,#e9ecee 86%,#c3d0d4 87%,#6a889a)}
+.travel-timeline .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#3f5274,#5c6b89 40%,#8b8ca2 70%,#b9a49e 86%,#6a7280 87%,#46525e)}
 @media(max-width:736px){
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]{--cy:-4!important}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#b3c5d7,#c6d3df 40%,#dbe2e8 70%,#e9ecee 90%,#c3d0d4 91%,#6a889a)}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#3f5274,#5c6b89 40%,#8b8ca2 70%,#b9a49e 90%,#6a7280 91%,#46525e)}
 }
-.authored-scene.is-active .lb2-drift{animation:lb2-drift var(--scene-duration) ease-in-out both}
-@keyframes lb2-drift{0%,100%{transform:translateX(0)}50%{transform:translateX(1.6px)}}
-@media(prefers-reduced-motion:reduce){.authored-scene .lb2-drift{animation:none!important}}
 /* Perth: Crawley Edge boathouse at sunrise: lab/travel-mobile/perth-a (generator gen.cjs), 21 Nov 2026. */
 /* Perth (scene 3) additions on top of the live CSS */
 .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="3"]::before,.travel-timeline .journal-chronology .authored-scene[data-scene="3"]::before{background:linear-gradient(#b7c9dd,#c9d4e1 25%,#e4dcd6 51%,#adc0cf 70%,#8ea8be)}
@@ -11672,16 +11672,9 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene[data-scene="0"].is-active .se2-dl,.authored-scene[data-scene="0"].is-active .se2-dr{animation:se2-door var(--scene-duration,6200ms) cubic-bezier(.42,0,.25,1) both}
 .authored-scene[data-scene="0"].is-active .se2-in{animation:se2-warm var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene[data-scene="0"].is-active .se2-spl{animation:se2-spill var(--scene-duration,6200ms) ease-in-out both}
-.authored-scene[data-scene="0"].is-active .se2-sf{animation:se2-sf var(--scene-duration,6200ms) linear both}
-.authored-scene[data-scene="0"].is-active .se2-sm{animation:se2-sm var(--scene-duration,6200ms) linear both}
-.authored-scene[data-scene="0"].is-active .se2-sn{animation:se2-sn var(--scene-duration,6200ms) linear both}
-.authored-scene[data-scene="0"].is-active .se2-sm .se2-sway,.authored-scene[data-scene="0"].is-active .se2-sn .se2-sway{animation:se2-sway var(--scene-duration,6200ms) ease-in-out both}
 @keyframes se2-door{0%,12%,100%{transform:scaleX(1)}38%,72%{transform:scaleX(.3)}}
 @keyframes se2-warm{0%,12%,100%{opacity:.3}38%,72%{opacity:.95}}
 @keyframes se2-spill{0%,18%,100%{opacity:0}40%,70%{opacity:.9}88%{opacity:.12}}
-@keyframes se2-sf{0%{transform:translate(0,0)}100%{transform:translate(0,40px)}}
-@keyframes se2-sm{0%{transform:translate(0,0)}100%{transform:translate(-20px,80px)}}
-@keyframes se2-sn{0%{transform:translate(0,0)}100%{transform:translate(-20px,160px)}}
 @keyframes se2-sway{0%,50%,100%{transform:translateX(0)}25%{transform:translateX(1.2px)}75%{transform:translateX(-1.2px)}}
 @media(prefers-reduced-motion:reduce){.authored-scene[data-scene="0"] .se2-snow{display:none}}
 /* Germany: Cologne Cathedral: lab/travel-mobile/germany-a (generator gen.cjs), 21 Nov 2026. */
@@ -11705,7 +11698,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes sy3-w1{0%,50%,100%{opacity:.62}25%,75%{opacity:.3}}
 @keyframes sy3-w2{0%,50%,100%{opacity:.46}25%,75%{opacity:.78}}
 /* USA & Canada: Statue of Liberty: lab/travel-review/liberty-a, 21 Nov 2026. */
-.authored-scene[data-scene="4"] .cr-liberty-glint{opacity:.3}[class^=lb3-]{opacity:0}.authored-scene.is-active [class^=lb3-]{animation:lb3-d var(--scene-duration) cubic-bezier(.37,0,.63,1) both}.authored-scene.is-active .lb3-l{animation-name:lb3-l}.authored-scene.is-active .lb3-f{animation-name:lb3-f}.authored-scene.is-active .lb3-s{animation-name:lb3-s}.authored-scene.is-active .lb3-u{animation-name:lb3-u}.authored-scene.is-active .lb3-v{animation-name:lb3-v}.authored-scene.is-active .lb3-t{animation-name:lb3-t}.authored-scene[data-scene="4"].is-active .cr-liberty-glint{animation:lb3-g var(--scene-duration) cubic-bezier(.37,0,.63,1) both}@keyframes lb3-d{0%,100%{opacity:0}38%,60%{opacity:1}}@keyframes lb3-l{0%,12%,100%{opacity:0}26%,66%{opacity:1}}@keyframes lb3-f{0%,18%,100%{opacity:0}40%,64%{opacity:1}}@keyframes lb3-s{0%,24%,100%{opacity:0}44%,64%{opacity:1}}@keyframes lb3-u{0%,30%,100%{opacity:0}48%,64%{opacity:1}}@keyframes lb3-v{0%,35%,100%{opacity:0}52%,64%{opacity:1}}@keyframes lb3-t{0%,44%,100%{opacity:0}54%,66%{opacity:1}}@keyframes lb3-g{0%,44%,100%{opacity:.3}55%,66%{opacity:1}}
+.authored-scene[data-scene="4"] .cr-liberty-glint{opacity:1}
 /* Perth: Crawley Edge boathouse: lab/travel-review/perth-a, 21 Nov 2026. */
 .authored-scene.is-active .pt3-go{animation:pt3-go var(--scene-duration,6200ms) linear both}
 .authored-scene.is-active .pt3-lift{animation:pt3-lift var(--scene-duration,6200ms) ease-in-out both;transform-origin:27.3px 31.6px}
@@ -11739,6 +11732,35 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .travel-timeline .journal-chronology:not(:has(>.journal-preview-help))>.chronology-scroll{margin-top:22px}
 }
 @media(max-width:736px){.travel-timeline .travel-atlas__header{display:flex;flex-direction:column;align-items:stretch}.travel-timeline .travel-atlas__header>*{min-width:0;max-width:100%}.travel-timeline .travel-atlas__header>.photo-search{order:1}.travel-timeline .travel-atlas__header>.travel-portals{order:2;margin:1rem 0 0}}
+/* Travel scenes round 2 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Liberty holds one blue hour with drifting cloud and harbour chop;
+   Chengdu clouds pass through the gate; Seoul snow in three layers; Perth's swan dips to feed; Cologne rain a touch heavier. */
+.lb4-d,.lb4-f,.lb4-b{opacity:0}
+.authored-scene.is-active [class^=lb4-]{animation:lb4-a var(--scene-duration) linear both}
+.authored-scene.is-active .lb4-b{animation-name:lb4-b}.authored-scene.is-active .lb4-c{animation-name:lb4-c}.authored-scene.is-active .lb4-d{animation-name:lb4-d}.authored-scene.is-active .lb4-e{animation-name:lb4-e}.authored-scene.is-active .lb4-f{animation-name:lb4-f}
+@keyframes lb4-c{0%,to{opacity:1;transform:none}65%{opacity:1;transform:translateX(15.6px)}99.99%{opacity:0;transform:translateX(24px)}}
+@keyframes lb4-d{0%,to{opacity:0;transform:none}65%{opacity:0;transform:translateX(15.6px)}99.99%{opacity:1;transform:translateX(24px)}}
+@keyframes lb4-a{0%,12.5%,25%,37.5%,50%,62.5%,75%,87.5%,to{opacity:1;transform:none}6.25%,18.75%,31.25%,43.75%,56.25%,68.75%,81.25%,93.75%{opacity:0;transform:translateX(.4px)}6.26%,18.76%,31.26%,43.76%,56.26%,68.76%,81.26%,93.76%{opacity:0;transform:translateX(-.4px)}}
+@keyframes lb4-b{0%,12.5%,25%,37.5%,50%,62.5%,75%,87.5%,to{opacity:0;transform:none}6.25%,18.75%,31.25%,43.75%,56.25%,68.75%,81.25%,93.75%{opacity:1;transform:translateX(.4px)}12.49%,24.99%,37.49%,49.99%,62.49%,74.99%,87.49%,99.99%{opacity:0;transform:translateX(.8px)}}
+@keyframes lb4-e{0%,to{opacity:1;transform:none}65%{opacity:1;transform:translateX(9.1px)}99.99%{opacity:0;transform:translateX(14px)}}
+@keyframes lb4-f{0%,to{opacity:0;transform:none}65%{opacity:0;transform:translateX(9.1px)}99.99%{opacity:1;transform:translateX(14px)}}
+.authored-scene.is-active [class^=tg4]{animation:tg4-b var(--scene-duration) linear both}
+.authored-scene.is-active .tg4-l{animation-name:tg4-l;transform-origin:60.6px 49.2px}
+@keyframes tg4-b{to{transform:translateX(4px)}}
+@keyframes tg4-l{0%,100%{transform:none}12%{opacity:.9}80%{opacity:0;transform:translate(.8px,-2px) scale(1.25,1.2)}}
+.authored-scene[data-scene="0"].is-active .se4-f{animation:se4-f var(--scene-duration,6200ms) linear}
+.authored-scene[data-scene="0"].is-active .se4-m{animation:se4-m var(--scene-duration,6200ms) linear}
+.authored-scene[data-scene="0"].is-active .se4-n{animation:se4-n var(--scene-duration,6200ms) linear}
+.authored-scene[data-scene="0"].is-active .se4-m .se2-sway{animation:se2-sway var(--scene-duration,6200ms) ease-in-out}
+@keyframes se4-f{to{transform:translate(-2.5px,20px)}}
+@keyframes se4-m{to{transform:translate(-10px,80px)}}
+@keyframes se4-n{to{transform:translate(-30px,240px)}}
+.authored-scene.is-active :is(.pt4-nk,.pt4-hd,.pt4-rg){animation:pt4-dip var(--scene-duration)}
+.is-active .pt4-hd.pt4-hd{animation-name:pt4-hd}
+.is-active .pt4-rg.pt4-rg{animation-name:pt4-rg}
+@keyframes pt4-dip{55%,90%{rotate:none}62%,76%{rotate:-50deg}}
+@keyframes pt4-hd{55%,90%{rotate:none}59%{rotate:-95deg}62%,76%{rotate:-105deg}82%{rotate:-55deg}}
+@keyframes pt4-rg{62%{opacity:0;scale:.25}65%{opacity:.7}97%{opacity:0;scale:1.4}}
+.authored-scene[data-scene="5"] .mm-rain-front .mm-drop{stroke-width:.48px;opacity:.7}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
