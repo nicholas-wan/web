@@ -10996,14 +10996,9 @@ html .page-skills #main > .post { border-top:0; }
 /* V2 keeps Fuji's sun in place: weather and light move continuously. */
 /* A short arm rests against the outer torso; the paw lifts its held bamboo to eat. */
 
-.cr-liberty-glint,.cr-liberty-ripple{opacity:0}.authored-scene.is-active .cr-liberty-glint{animation:cr-glint var(--polish-duration) ease both}.authored-scene.is-active .cr-liberty-ferry{animation:cr-ferry var(--polish-duration) linear both}.authored-scene.is-active .cr-ripple-a{animation:cr-ripple-a var(--polish-duration) ease both}.authored-scene.is-active .cr-ripple-b{animation:cr-ripple-b var(--polish-duration) ease both}@keyframes cr-ferry{0%,5%{transform:translateX(0);animation-timing-function:cubic-bezier(.35,0,.75,.8)}47%{transform:translateX(-96px);animation-timing-function:step-end}58%{transform:translateX(66px);animation-timing-function:cubic-bezier(.35,.4,.6,1)}93%,100%{transform:translateX(0)}}@keyframes cr-ripple-a{0%,24%,100%{opacity:0}32%{opacity:.8}50%{opacity:0}}@keyframes cr-ripple-b{0%,66%,100%{opacity:0}76%{opacity:.8}94%{opacity:0}}@media(prefers-reduced-motion:reduce){.authored-scene .cr-liberty-glint,.authored-scene .cr-liberty-ferry,.authored-scene .cr-liberty-ripple{animation:none!important}}
+.cr-liberty-glint{opacity:0}
 
 
-.cl-gull{transform:translate(17px,9px)}.cl-wing{transform-origin:0 0}
-.authored-scene.is-active .cl-gull{animation:cl-gull var(--polish-duration) linear both}
-.authored-scene.is-active .cl-wing{animation:cl-wing var(--polish-duration) ease-in-out both}
-@keyframes cl-gull{0%{transform:translate(17px,9px);opacity:1}24%{transform:translate(52px,7.5px)}50%{transform:translate(91px,8px)}76%{transform:translate(132px,9.5px);opacity:1}76.1%{transform:translate(132px,9.5px);opacity:0}76.2%{transform:translate(-12px,9.5px);opacity:0}76.3%{transform:translate(-12px,9.5px);opacity:1}100%{transform:translate(17px,9px);opacity:1}}
-@keyframes cl-wing{0%,5%,22%,40%,100%{transform:scaleY(1)}13%,31%{transform:scaleY(-.3)}50%,68%{transform:scaleY(.9)}}
 
 
 
@@ -11064,9 +11059,7 @@ html .page-skills #main > .post { border-top:0; }
 .authored-scene.is-active .ny-bands{animation:ny-bands var(--scene-duration,6400ms) ease-in-out both}
 @keyframes ny-bands{0%,100%{stroke-dashoffset:0}50%{stroke-dashoffset:-7}}
 /* Perth water: the boathouse reflection wobbles as its wavy gaps drift; a few glints drift with it. */
-.authored-scene.is-active .pw-bands{animation:pw-bands var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .pw-ripples{animation:pw-ripples var(--scene-duration,6200ms) ease-in-out both}
-@keyframes pw-bands{0%,100%{transform:translateX(0)}50%{transform:translateX(-4px)}}
 @keyframes pw-ripples{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(1.6px);opacity:.75}}
 
 
@@ -11091,9 +11084,9 @@ html .page-skills #main > .post { border-top:0; }
 .authored-scene.is-active .gg-car-c{animation:gg-car-c var(--scene-duration,6200ms) linear both}
 .authored-scene.is-active .gg-fog{animation:gg-fog var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .gg-fog-front{animation:gg-fog-front var(--scene-duration,6200ms) ease-in-out both}
-.gg-fog-roll{opacity:0;transform-box:fill-box;transform-origin:50% 100%}
+.gg-fog-roll{opacity:0;transform-box:fill-box;transform-origin:100% 100%}
 .authored-scene.is-active .gg-fog-roll{animation:gg-fog-roll var(--scene-duration,6200ms) linear both}
-@keyframes gg-fog-roll{0%{transform:translate(0,0) scale(1);opacity:0}30%{opacity:.95}58%{opacity:.95}96%{transform:translate(-32px,4.5px) scale(1.14);opacity:0}96.1%,100%{transform:translate(0,0) scale(1);opacity:0}}
+@keyframes gg-fog-roll{0%,100%{transform:none;opacity:0}.1%{transform:translateY(0) scale(.6,.85);opacity:0;animation-timing-function:ease-out}6%{opacity:1}46%{transform:translateY(2px) scale(1.28,1.1)}72%{transform:translateY(2.3px) scale(1.32,1.12);animation-timing-function:ease-in-out}95%{transform:translateY(0) scale(.6,.85);opacity:1}99.9%{transform:translateY(0) scale(.6,.85);opacity:0}}
 @keyframes gg-fog{0%,100%{transform:translateX(0)}50%{transform:translateX(2.5px)}}
 @keyframes gg-fog-front{0%,100%{transform:translateX(0)}50%{transform:translateX(-1.8px)}}
 @keyframes gg-car-a{0%{transform:translate(-9.44px,58.22px) scale(1.36);opacity:1}7.83%{transform:translate(21.74px,52.53px) scale(1.06);opacity:1}15.67%{transform:translate(41.8px,48.87px) scale(0.87);opacity:1}23.5%{transform:translate(55.8px,46.31px) scale(0.74);opacity:1}31.33%{transform:translate(66.11px,44.43px) scale(0.64);opacity:1}39.17%{transform:translate(74.03px,42.98px) scale(0.57);opacity:1}47%{transform:translate(80.3px,41.84px) scale(0.51);opacity:1}54.83%{transform:translate(85.39px,40.91px) scale(0.46);opacity:1}62.67%{transform:translate(89.61px,40.14px) scale(0.42);opacity:1}70.5%{transform:translate(93.15px,39.49px) scale(0.39);opacity:1}78.33%{transform:translate(96.18px,38.94px) scale(0.36);opacity:1}86.17%{transform:translate(98.79px,38.46px) scale(0.34);opacity:1}94%{transform:translate(101.06px,38.05px) scale(0.31);opacity:0}100%{opacity:0;transform:translate(101.06px,38.05px) scale(0.31)}}
@@ -11109,14 +11102,12 @@ html .page-skills #main > .post { border-top:0; }
 .depth-sydney .dl-ferry{transform:translateX(-34px)}
 /* The phone rail opens Sydney 1.5s in (travel-rail.js OPEN), so its still ferry and gull wait there and never pop.
    Desktop plays from frame 0, so it keeps the frame-0 pose. */
-@media(max-width:736px) and (prefers-reduced-motion:no-preference){.mobile-journal-row .depth-sydney .dl-ferry{transform:translateX(3.06px)}.mobile-journal-row .depth-sydney .cl-gull{transform:translate(49.17px,7.62px)}}
+@media(max-width:736px) and (prefers-reduced-motion:no-preference){.mobile-journal-row .depth-sydney .dl-ferry{transform:translateX(3.06px)}}
 .depth-sydney.is-active .dl-ferry{animation:dl-ferry-pass var(--polish-duration,6800ms) linear both}
 .depth-sydney.is-active .dl-ferry-foam{animation:dl-ferry-foam var(--polish-duration,6800ms) linear both}
 @keyframes dl-ferry-pass{from{transform:translateX(-34px)}to{transform:translateX(134px)}}
 @keyframes dl-ferry-foam{0%,100%{opacity:1}30%{opacity:.75}62%{opacity:.9}}
-.depth-sydney.is-active .dl-sydney-glint{animation:dl-sydney-glint var(--polish-duration,6800ms) ease-in-out both}
-@keyframes dl-sydney-glint{0%,50%,100%{opacity:.7;transform:translateX(0)}25%,75%{opacity:.2;transform:translateX(1.2px)}}
-@media(prefers-reduced-motion:reduce){.depth-sydney .dl-ferry{animation:none!important;transform:translateX(42px)}.depth-sydney .dl-ferry-foam,.depth-sydney .dl-sydney-glint{animation:none!important}}
+@media(prefers-reduced-motion:reduce){.depth-sydney .dl-ferry{animation:none!important;transform:translateX(42px)}.depth-sydney .dl-ferry-foam{animation:none!important}}
 .depth-canton .dl-tram{offset-path:path('M54.3 22 A5.7 1.75 0 0 1 65.7 22 A5.7 1.75 0 0 1 54.3 22');offset-distance:0%;offset-rotate:0deg;offset-anchor:0px 0px}
 .depth-canton.is-active .dl-tram{animation:dl-tram var(--scene-duration,6200ms) linear both}
 .depth-canton .dl-tram-rear{visibility:hidden}
@@ -11129,7 +11120,6 @@ html .page-skills #main > .post { border-top:0; }
 
 .authored-scene.is-active *{animation-duration:var(--scene-duration,6200ms)!important}
 /* A soft torch halo fades in, dips, swells again and fades out. */
-@keyframes cr-glint{0%,10%{opacity:0}22%,48%{opacity:1}60%{opacity:.6}70%,84%{opacity:.9}96%,100%{opacity:0}}
 /* Water and flag carry Perth's motion while the building remains fixed. */
 
 
@@ -11416,10 +11406,10 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
    lab/chengdu-polish/rd/gen.cjs (classes renamed trd- to tg-). */
 .authored-scene.tg-scene .tg-bird{transform-box:view-box;transform-origin:0 0;offset-rotate:0deg;offset-anchor:0px 0px}
 .authored-scene.tg-scene .tg-bs,.authored-scene.tg-scene .tg-fl,.authored-scene.tg-scene .tg-fm,.authored-scene.tg-scene .tg-mist{transform-box:view-box;transform-origin:0 0}
-.authored-scene.tg-scene .tg-b1,.authored-scene.tg-scene .tg-b2{offset-path:path('M94 -6C91 -4.7 81.3 0 76 2C70.7 4 65.6 4.4 62 6C58.4 7.6 55.6 9.4 54.6 11.4C53.6 13.4 54.5 16.5 56 18C57.5 19.5 62.4 18.8 63.6 20.4C64.8 22 63.7 25.2 63.4 27.6C63.1 30 62 32.2 61.6 35C61.2 37.8 60.9 42.8 60.8 44.4')}
+.authored-scene.tg-scene .tg-b1,.authored-scene.tg-scene .tg-b2{offset-path:path('M94 -6C91 -4.7 81.3 0 76 2C70.7 4 65.6 4.4 62 6C58.4 7.6 55.6 9.4 54.6 11.4C53.6 13.4 54.5 16.2 57 16.4C60.5 16.6 64 13.6 67 10C70 6.4 72.6 1 75 -9.07')}
 .authored-scene.tg-scene .tg-b1{offset-distance:52.35%}
 .authored-scene.tg-scene .tg-b2{offset-distance:0%;opacity:0}
-.authored-scene.tg-scene .tg-b3{offset-path:path('M22 -6C24.7 -4.8 32.7 -0.8 38 1C43.3 2.8 49.2 3.6 54 5C58.8 6.4 64.4 7.6 67 9.4C69.6 11.2 70 13.6 69.6 15.6C69.2 17.6 65.7 19.3 64.4 21.6C63.1 23.9 62.2 25.7 61.6 29.6C61 33.5 61.1 42.3 61 44.8');offset-distance:0%;opacity:0}
+.authored-scene.tg-scene .tg-b3{offset-path:path('M22 -6C24.7 -4.8 32.7 -0.8 38 1C43.3 2.8 49.2 3.6 54 5C58.8 6.4 64.4 7.6 67 9.4C70 11.5 74 11 77 7C80 3 83 -3 86 -10');offset-distance:0%;opacity:0}
 .authored-scene.tg-scene .tg-b4{offset-path:path('M58 12.4C58 8.6 72 8.4 72 12.2C72 15.8 58 16.2 58 12.4Z');offset-distance:0%}
 .authored-scene.tg-scene .tg-b5{offset-path:path('M73 4.6C73 1.6 53 1.4 53 4.4C53 7.4 73 7.6 73 4.6Z');offset-distance:0%}
 .authored-scene.tg-scene .tg-warm{opacity:0}
@@ -11568,13 +11558,8 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
    faint tints (0.12 to 0.34) and the light pass only tinted the pale tower at tile size. A climbing-glow version, which
    lost a blind check to live, is kept on the travel-guangzhou-climb branch. */
 .mm-led{fill:#e99ac6;opacity:.36}
-.mm-river path{stroke:#dcb8d9;stroke-width:.9;stroke-linecap:round;opacity:0}
 .authored-scene.is-active .mm-led{animation:mm-led var(--scene-duration,6200ms) ease-in-out both}
-.authored-scene.is-active .mm-river path{animation:mm-river var(--scene-duration,6200ms) ease-in-out both}
-.authored-scene.is-active .mm-river path+path{animation-name:mm-river-b}
 @keyframes mm-led{0%,12%,89%,100%{fill:#e99ac6}23%,45%{fill:#7cc2de}56%,78%{fill:#a991ec}}
-@keyframes mm-river{0%,100%{opacity:0;transform:translateX(0);stroke:#e99ac6}12%{opacity:0;stroke:#e99ac6}23%,45%{opacity:.85;stroke:#7cc2de}34%{transform:translateX(.8px)}56%,78%{opacity:.85;stroke:#a991ec}89%{opacity:.85;stroke:#e99ac6}}
-@keyframes mm-river-b{0%,100%{opacity:0;transform:translateX(0);stroke:#e99ac6}12%{opacity:0;stroke:#e99ac6}23%,45%{opacity:.85;stroke:#7cc2de}67%{transform:translateX(-.8px)}56%,78%{opacity:.85;stroke:#a991ec}89%{opacity:.85;stroke:#e99ac6}}
 @media(max-width:736px){
  /* Each scene fills the row (20 Nov 2026; tiles were 150px beside a photo): the whole drawing at its native 3:2, so
     nothing is cropped; the row is a size container, so --tile is its width. Germany drops 6 units for headroom. */
@@ -11599,8 +11584,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  /* Small movers drawn bigger on the phone tiles so they read on a flick. Each scales its inner
     drawing (or r / stroke-width), never the animated element, so its path is unchanged. */
  .travel-timeline.travel-phone-rail .mobile-journal-row .dl-tram>g{scale:1.8}
- .travel-timeline.travel-phone-rail .mobile-journal-row .gg-car>*{scale:2.2}
- .travel-timeline.travel-phone-rail .mobile-journal-row .cl-gull>g{scale:1.4;translate:0 4px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .mm-swan>path{scale:1.12}
  .travel-timeline.travel-phone-rail .mobile-journal-row .mm-star{r:.44px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .mm-flake{r:.55px}
@@ -11662,35 +11645,18 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @media screen and (max-width:600px){.travel-timeline.travel-timeline #main > .travel-archive-heading{margin-top:0!important;padding-top:.25rem!important}}
 /* USA & Canada: Statue of Liberty: lab/travel-mobile/liberty-a (generator gen.cjs), 21 Nov 2026. */
 /* additions on top of the live CSS (scene 4, Liberty) */
-.authored-scene[data-scene="4"] .cr-liberty-glint{opacity:.6}
-.authored-scene[data-scene="4"].is-active .cr-liberty-glint{animation:lb2-glint var(--scene-duration) ease-in-out both}
-.authored-scene[data-scene="4"].is-active .cr-liberty-ferry,.authored-scene.is-active .lb2-ferry-b{animation:lb2-ferry var(--scene-duration) both}
-.lb2-wake{opacity:.3}
-.authored-scene.is-active .lb2-wake{animation:lb2-wake var(--scene-duration) ease-in-out both}
-.authored-scene.is-active .lb2-flame{animation:lb2-flame var(--scene-duration) ease-in-out both}
-@keyframes lb2-ferry{0%,4.5%{transform:translateX(0);animation-timing-function:cubic-bezier(.333,0,.667,.333)}18%{transform:translateX(10.87px);animation-timing-function:linear}84%{transform:translateX(117.13px);animation-timing-function:cubic-bezier(.333,.667,.667,1)}100%{transform:translateX(130px)}}
-@keyframes lb2-wake{0%,4.5%{opacity:.3}18%,84%{opacity:1}100%{opacity:.3}}
-@keyframes lb2-glint{0%,100%{opacity:.6}50%{opacity:1}}
-@keyframes lb2-flame{0%,100%{opacity:.75}14%{opacity:.5}27%{opacity:.9}40%{opacity:.6}53%{opacity:.88}66%{opacity:.55}80%{opacity:.85}91%{opacity:.62}}
 .travel-timeline .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#b3c5d7,#c6d3df 40%,#dbe2e8 70%,#e9ecee 86%,#c3d0d4 87%,#6a889a)}
 @media(max-width:736px){
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]{--cy:-4!important}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#b3c5d7,#c6d3df 40%,#dbe2e8 70%,#e9ecee 90%,#c3d0d4 91%,#6a889a)}
 }
-.lb2-gl1,.lb2-gl2{opacity:0}
 .authored-scene.is-active .lb2-drift{animation:lb2-drift var(--scene-duration) ease-in-out both}
-.authored-scene.is-active .lb2-gl1{animation:lb2-gl1 var(--scene-duration) ease-in-out both}
-.authored-scene.is-active .lb2-gl2{animation:lb2-gl2 var(--scene-duration) ease-in-out both}
 @keyframes lb2-drift{0%,100%{transform:translateX(0)}50%{transform:translateX(1.6px)}}
-@keyframes lb2-gl1{0%,10%,34%,58%,82%,100%{opacity:0}22%,70%{opacity:.85}}
-@keyframes lb2-gl2{0%,22%,46%,70%,94%,100%{opacity:0}34%,82%{opacity:.85}}
-@media(prefers-reduced-motion:reduce){.authored-scene .lb2-ferry-b,.authored-scene .lb2-wake,.authored-scene .lb2-flame,.authored-scene .lb2-drift{animation:none!important}.authored-scene .lb2-gl1,.authored-scene .lb2-gl2{animation:none!important;opacity:0}}
+@media(prefers-reduced-motion:reduce){.authored-scene .lb2-drift{animation:none!important}}
 /* Perth: Crawley Edge boathouse at sunrise: lab/travel-mobile/perth-a (generator gen.cjs), 21 Nov 2026. */
 /* Perth (scene 3) additions on top of the live CSS */
 .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="3"]::before,.travel-timeline .journal-chronology .authored-scene[data-scene="3"]::before{background:linear-gradient(#b7c9dd,#c9d4e1 25%,#e4dcd6 51%,#adc0cf 70%,#8ea8be)}
 .authored-scene.is-active[data-scene="3"] .cn-perth-flag{transform-origin:27.3px 32.9px}
-.authored-scene.is-active .pt2-swan{animation:pt2-swim var(--scene-duration,6200ms) linear both}
-@keyframes pt2-swim{0%,100%{transform:translate(0,0)}52.47%{transform:translate(-136.20px,-6.13px);animation-timing-function:step-end}52.48%{transform:translate(123.40px,5.55px)}}
 .authored-scene.is-active .pt2-gla{animation:pt2-gla var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene.is-active .pt2-glb{animation:pt2-glb var(--scene-duration,6200ms) ease-in-out both}
 @keyframes pt2-gla{0%,100%{opacity:1}12.5%,37.5%,62.5%,87.5%{opacity:.4}25%,50%,75%{opacity:1}}
@@ -11712,9 +11678,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene[data-scene="8"].is-active .gz2-lat{animation:gz2-lat var(--scene-duration,6200ms) ease-in-out both}
 @keyframes gz2-lat{0%,12%,89%,100%{stroke:#e99ac6}23%,45%{stroke:#7cc2de}56%,78%{stroke:#a991ec}}
 /* the cruise boat crosses left to right; two copies 120 apart so it wraps in the same instant */
-.authored-scene[data-scene="8"] .gz2-boat{transform:translateX(0)}
-.authored-scene[data-scene="8"].is-active .gz2-boat{animation:gz2-boat var(--scene-duration,6200ms) linear both}
-@keyframes gz2-boat{0%{transform:translateX(0)}100%{transform:translateX(120px)}}
 /* the cabin orbit seen from the river, well below the deck: a flatter ellipse whose near half is the upper arc */
 .authored-scene[data-scene="8"] .dl-tram{offset-path:path('M52 22A8 .85 0 0 0 68 22A8 .85 0 0 0 52 22')}
 /* gentle shimmer: the reflection streaks break and drift down by one dash period per pass (0% looks like 100%) */
@@ -11727,7 +11690,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene[data-scene="0"] .se2-dl,.authored-scene[data-scene="0"] .se2-dr{transform-box:fill-box;transform-origin:0 50%}
 .authored-scene[data-scene="0"] .se2-dr{transform-origin:100% 50%}
 .authored-scene[data-scene="0"] .se2-in{opacity:.3}
-.authored-scene[data-scene="0"] .se2-slide,.authored-scene[data-scene="0"] .se2-puff{transform-box:fill-box;transform-origin:50% 50%;opacity:0}
 .authored-scene[data-scene="0"].is-active .se2-dl,.authored-scene[data-scene="0"].is-active .se2-dr{animation:se2-door var(--scene-duration,6200ms) cubic-bezier(.42,0,.25,1) both}
 .authored-scene[data-scene="0"].is-active .se2-in{animation:se2-warm var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene[data-scene="0"].is-active .se2-spl{animation:se2-spill var(--scene-duration,6200ms) ease-in-out both}
@@ -11735,8 +11697,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene[data-scene="0"].is-active .se2-sm{animation:se2-sm var(--scene-duration,6200ms) linear both}
 .authored-scene[data-scene="0"].is-active .se2-sn{animation:se2-sn var(--scene-duration,6200ms) linear both}
 .authored-scene[data-scene="0"].is-active .se2-sm .se2-sway,.authored-scene[data-scene="0"].is-active .se2-sn .se2-sway{animation:se2-sway var(--scene-duration,6200ms) ease-in-out both}
-.authored-scene[data-scene="0"].is-active .se2-slide{animation:se2-slide var(--scene-duration,6200ms) linear both}
-.authored-scene[data-scene="0"].is-active .se2-puff{animation:se2-puff var(--scene-duration,6200ms) ease-out both}
 @keyframes se2-door{0%,12%,100%{transform:scaleX(1)}38%,72%{transform:scaleX(.3)}}
 @keyframes se2-warm{0%,12%,100%{opacity:.3}38%,72%{opacity:.95}}
 @keyframes se2-spill{0%,18%,100%{opacity:0}40%,70%{opacity:.9}88%{opacity:.12}}
@@ -11744,9 +11704,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes se2-sm{0%{transform:translate(0,0)}100%{transform:translate(-20px,80px)}}
 @keyframes se2-sn{0%{transform:translate(0,0)}100%{transform:translate(-20px,160px)}}
 @keyframes se2-sway{0%,50%,100%{transform:translateX(0)}25%{transform:translateX(1.2px)}75%{transform:translateX(-1.2px)}}
-@keyframes se2-slide{0%,52%{opacity:0;transform:translate(0,0)}55%{opacity:1;transform:translate(.15px,.4px);animation-timing-function:cubic-bezier(.5,0,.9,.6)}66.5%{opacity:1;transform:translate(-.4px,13.2px) scale(1.15,1.35)}69%{opacity:0;transform:translate(-.5px,13.8px) scale(1.9,.7)}100%{opacity:0;transform:translate(0,0)}}
-@keyframes se2-puff{0%,66%{opacity:0;transform:scale(.35)}70%{opacity:.85;transform:scale(1)}86%,100%{opacity:0;transform:scale(1.7)}}
-@media(prefers-reduced-motion:reduce){.authored-scene[data-scene="0"] .se2-snow,.authored-scene[data-scene="0"] .se2-slide,.authored-scene[data-scene="0"] .se2-puff{display:none}}
+@media(prefers-reduced-motion:reduce){.authored-scene[data-scene="0"] .se2-snow{display:none}}
 /* Germany: Cologne Cathedral: lab/travel-mobile/germany-a (generator gen.cjs), 21 Nov 2026. */
 /* additions on top of the live CSS */
 /* Phone crop: was -6, which cut the cathedral's base and the whole plaza off the bottom of the card. */
@@ -11757,6 +11715,25 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="2"]::before,.travel-timeline .journal-chronology .authored-scene[data-scene="2"]::before{background:radial-gradient(58% 22% at 50% 90%,rgba(142,114,100,.2),rgba(142,114,100,0)),linear-gradient(#131931,#192039 38%,#242842 66%,#373649 85%,#26263e 93%,#191b32)}
 .travel-timeline .authored-scene[data-scene="2"] .da-paris-light{stroke:#be9352}
 .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="2"] .mm-star{r:.84px}
+/* Guangzhou: Canton Tower: lab/travel-review/guangzhou-a, 21 Nov 2026. */
+.authored-scene[data-scene="8"] .gz3-r{stroke:#e99ac6}
+.authored-scene[data-scene="8"].is-active .gz3-r{animation:gz2-lat var(--scene-duration,6200ms) ease-in-out both,var(--k) var(--scene-duration,6200ms) ease-in-out both}
+@keyframes gz3-a{0%,50%,100%{transform:none;opacity:1}25%,75%{transform:translateX(.7px);opacity:.5}}
+@keyframes gz3-b{0%,33.3%,66.7%,100%{transform:none;opacity:1}16.7%,50%,83.3%{transform:translateX(-.8px);opacity:.5}}
+@keyframes gz3-c{0%,20%,40%,60%,80%,100%{transform:none;opacity:1}10%,30%,50%,70%,90%{transform:translateX(.5px);opacity:.6}}
+/* Sydney: Opera House: lab/travel-review/sydney-b, 21 Nov 2026. */
+.authored-scene.is-active .sy3-w1{animation:sy3-w1 var(--scene-duration) ease-in-out both}.authored-scene.is-active .sy3-w2{animation:sy3-w2 var(--scene-duration) ease-in-out both}
+@keyframes sy3-w1{0%,50%,100%{opacity:.62}25%,75%{opacity:.3}}
+@keyframes sy3-w2{0%,50%,100%{opacity:.46}25%,75%{opacity:.78}}
+/* USA & Canada: Statue of Liberty: lab/travel-review/liberty-a, 21 Nov 2026. */
+.authored-scene[data-scene="4"] .cr-liberty-glint{opacity:.3}[class^=lb3-]{opacity:0}.authored-scene.is-active [class^=lb3-]{animation:lb3-d var(--scene-duration) cubic-bezier(.37,0,.63,1) both}.authored-scene.is-active .lb3-l{animation-name:lb3-l}.authored-scene.is-active .lb3-f{animation-name:lb3-f}.authored-scene.is-active .lb3-s{animation-name:lb3-s}.authored-scene.is-active .lb3-u{animation-name:lb3-u}.authored-scene.is-active .lb3-v{animation-name:lb3-v}.authored-scene.is-active .lb3-t{animation-name:lb3-t}.authored-scene[data-scene="4"].is-active .cr-liberty-glint{animation:lb3-g var(--scene-duration) cubic-bezier(.37,0,.63,1) both}@keyframes lb3-d{0%,100%{opacity:0}38%,60%{opacity:1}}@keyframes lb3-l{0%,12%,100%{opacity:0}26%,66%{opacity:1}}@keyframes lb3-f{0%,18%,100%{opacity:0}40%,64%{opacity:1}}@keyframes lb3-s{0%,24%,100%{opacity:0}44%,64%{opacity:1}}@keyframes lb3-u{0%,30%,100%{opacity:0}48%,64%{opacity:1}}@keyframes lb3-v{0%,35%,100%{opacity:0}52%,64%{opacity:1}}@keyframes lb3-t{0%,44%,100%{opacity:0}54%,66%{opacity:1}}@keyframes lb3-g{0%,44%,100%{opacity:.3}55%,66%{opacity:1}}
+/* Perth: Crawley Edge boathouse: lab/travel-review/perth-a, 21 Nov 2026. */
+.authored-scene.is-active .pt3-go{animation:pt3-go var(--scene-duration,6200ms) linear both}
+.authored-scene.is-active .pt3-lift{animation:pt3-lift var(--scene-duration,6200ms) ease-in-out both;transform-origin:27.3px 31.6px}
+.authored-scene.is-active .pt3-sw{animation:pt3-rock var(--scene-duration,6200ms) ease-in-out both}
+@keyframes pt3-go{80%{transform:translateX(var(--x));animation-timing-function:step-end}}
+@keyframes pt3-lift{33%{transform:none}46%,62%{transform:rotate(11deg)}82%{transform:none}}
+@keyframes pt3-rock{8%{transform:none}17%{transform:rotate(-3deg)}26%{transform:translateY(.5px) rotate(2deg)}36%{transform:rotate(-1.5deg)}47%{transform:rotate(.8deg)}60%{transform:none}}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */

@@ -78,9 +78,9 @@ test.describe('mobile reading animation',()=>{
   await page.emulateMedia({reducedMotion:'no-preference'});await expect(focus).toHaveCount(1);
   await page.evaluate(()=>scrollTo(0,0));await page.waitForTimeout(100);await page.clock.runFor(200);await expect(active).toHaveCount(0);
  });
- // Boats start where the still drawing has them, so starting a scene never makes one jump or pop in:
- // Sydney's ferry waits at the rail's opening point, the Liberty ferry docked (its frame 0 too).
- for(const [i,sel,name] of [[3,'.dl-ferry','Sydney'],[5,'.cr-liberty-ferry','Liberty']])test(`the ${name} ferry starts where the still drawing has it`,async({page})=>{
+ // The ferry starts where the still drawing has it, so starting the scene never makes it jump or pop in:
+ // Sydney's ferry waits at the rail's opening point.
+ for(const [i,sel,name] of [[3,'.dl-ferry','Sydney']])test(`the ${name} ferry starts where the still drawing has it`,async({page})=>{
   await page.clock.install();await page.setViewportSize({width:390,height:844});await page.goto('/travel');
   const {scenes,scroll}=rail(page),boat=scenes.nth(i).locator(sel);
   await expect(page.locator('.mobile-journal-list .authored-scene > svg')).toHaveCount(10);
@@ -88,7 +88,6 @@ test.describe('mobile reading animation',()=>{
   await scenes.nth(i).evaluate(el=>el.scrollIntoView({block:'center'}));const still=await boat.boundingBox();
   await scroll({to:i-1});await scroll({to:i});await expect(scenes.nth(i)).toHaveClass(/is-held/);
   const held=await boat.boundingBox();expect(Math.abs(held.x-still.x)).toBeLessThan(1);
-  if(name==='Liberty'){await boat.evaluate(el=>el.getAnimations()[0].currentTime=0);expect(Math.abs((await boat.boundingBox()).x-still.x)).toBeLessThan(1);expect(still.x).toBeGreaterThan(0);}
  });
  // main.css switches every animation off under body.is-preload for about 100ms after load. A scene the rail started
  // then held no animations: it played one pass by itself and never looped, rested or paused (10 Nov 2026).
