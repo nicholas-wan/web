@@ -12,7 +12,7 @@
 (() => {
  'use strict';
  const OPEN={guangzhou:700,australia:1500,germany:150,usacanada:300,seoul:800};
- const REST={chengdu_zhangjiajie:1600,guangzhou:2400,japan:4400,australia:3000,germany:2400,usacanada:3900,perth:2300,europe:1800,siliconvalley:3400,seoul:2400};
+ const REST={chengdu_zhangjiajie:1600,guangzhou:2400,japan:4400,australia:3000,germany:2400,usacanada:2700,perth:2300,europe:1800,siliconvalley:3400,seoul:2400};
  const FAST=900,SLOW=400,SETTLE=140,NUDGE=150,STAGGER=70,PASSES=2;
  const BURST=[[3,250],[2,150],[1.4,150]];// rate, ms
  const STEADY=new Set(['mm-flag']);// sped up, Perth's flag shows how stiff its wave is

@@ -11665,7 +11665,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes gz2-shim{0%{stroke-dashoffset:0}100%{stroke-dashoffset:-3.1}}
 /* Seoul: Geunjeongjeon in snow: lab/travel-mobile/seoul-a (generator gen.cjs), 21 Nov 2026. */
 /* Seoul (scene 0), traced from the photo: the centre doors swing open onto a warm glow; tiled snow (whole tiles per run, so 100% = 0%); one clump of snow off the eave. */
-.authored-scene[data-scene="0"] .se2-snow,.authored-scene[data-scene="0"] .se2-sway{transform-box:view-box;transform-origin:0 0}
+.authored-scene[data-scene="0"] .se2-snow{transform-box:view-box;transform-origin:0 0}
 .authored-scene[data-scene="0"] .se2-dl,.authored-scene[data-scene="0"] .se2-dr{transform-box:fill-box;transform-origin:0 50%}
 .authored-scene[data-scene="0"] .se2-dr{transform-origin:100% 50%}
 .authored-scene[data-scene="0"] .se2-in{opacity:.3}
@@ -11675,7 +11675,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes se2-door{0%,12%,100%{transform:scaleX(1)}38%,72%{transform:scaleX(.3)}}
 @keyframes se2-warm{0%,12%,100%{opacity:.3}38%,72%{opacity:.95}}
 @keyframes se2-spill{0%,18%,100%{opacity:0}40%,70%{opacity:.9}88%{opacity:.12}}
-@keyframes se2-sway{0%,50%,100%{transform:translateX(0)}25%{transform:translateX(1.2px)}75%{transform:translateX(-1.2px)}}
 @media(prefers-reduced-motion:reduce){.authored-scene[data-scene="0"] .se2-snow{display:none}}
 /* Germany: Cologne Cathedral: lab/travel-mobile/germany-a (generator gen.cjs), 21 Nov 2026. */
 /* additions on top of the live CSS */
@@ -11734,26 +11733,15 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @media(max-width:736px){.travel-timeline .travel-atlas__header{display:flex;flex-direction:column;align-items:stretch}.travel-timeline .travel-atlas__header>*{min-width:0;max-width:100%}.travel-timeline .travel-atlas__header>.photo-search{order:1}.travel-timeline .travel-atlas__header>.travel-portals{order:2;margin:1rem 0 0}}
 /* Travel scenes round 2 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Liberty holds one blue hour with drifting cloud and harbour chop;
    Chengdu clouds pass through the gate; Seoul snow in three layers; Perth's swan dips to feed; Cologne rain a touch heavier. */
-.lb4-d,.lb4-f,.lb4-b{opacity:0}
+.lb4-d,.lb4-f{opacity:0}
 .authored-scene.is-active [class^=lb4-]{animation:lb4-a var(--scene-duration) linear both}
-.authored-scene.is-active .lb4-b{animation-name:lb4-b}.authored-scene.is-active .lb4-c{animation-name:lb4-c}.authored-scene.is-active .lb4-d{animation-name:lb4-d}.authored-scene.is-active .lb4-e{animation-name:lb4-e}.authored-scene.is-active .lb4-f{animation-name:lb4-f}
+.authored-scene.is-active .lb4-c{animation-name:lb4-c}.authored-scene.is-active .lb4-d{animation-name:lb4-d}.authored-scene.is-active .lb4-e{animation-name:lb4-e}.authored-scene.is-active .lb4-f{animation-name:lb4-f}
 @keyframes lb4-c{0%,to{opacity:1;transform:none}65%{opacity:1;transform:translateX(15.6px)}99.99%{opacity:0;transform:translateX(24px)}}
 @keyframes lb4-d{0%,to{opacity:0;transform:none}65%{opacity:0;transform:translateX(15.6px)}99.99%{opacity:1;transform:translateX(24px)}}
-@keyframes lb4-a{0%,12.5%,25%,37.5%,50%,62.5%,75%,87.5%,to{opacity:1;transform:none}6.25%,18.75%,31.25%,43.75%,56.25%,68.75%,81.25%,93.75%{opacity:0;transform:translateX(.4px)}6.26%,18.76%,31.26%,43.76%,56.26%,68.76%,81.26%,93.76%{opacity:0;transform:translateX(-.4px)}}
-@keyframes lb4-b{0%,12.5%,25%,37.5%,50%,62.5%,75%,87.5%,to{opacity:0;transform:none}6.25%,18.75%,31.25%,43.75%,56.25%,68.75%,81.25%,93.75%{opacity:1;transform:translateX(.4px)}12.49%,24.99%,37.49%,49.99%,62.49%,74.99%,87.49%,99.99%{opacity:0;transform:translateX(.8px)}}
 @keyframes lb4-e{0%,to{opacity:1;transform:none}65%{opacity:1;transform:translateX(9.1px)}99.99%{opacity:0;transform:translateX(14px)}}
 @keyframes lb4-f{0%,to{opacity:0;transform:none}65%{opacity:0;transform:translateX(9.1px)}99.99%{opacity:1;transform:translateX(14px)}}
-.authored-scene.is-active [class^=tg4]{animation:tg4-b var(--scene-duration) linear both}
-.authored-scene.is-active .tg4-l{animation-name:tg4-l;transform-origin:60.6px 49.2px}
-@keyframes tg4-b{to{transform:translateX(4px)}}
-@keyframes tg4-l{0%,100%{transform:none}12%{opacity:.9}80%{opacity:0;transform:translate(.8px,-2px) scale(1.25,1.2)}}
 .authored-scene[data-scene="0"].is-active .se4-f{animation:se4-f var(--scene-duration,6200ms) linear}
-.authored-scene[data-scene="0"].is-active .se4-m{animation:se4-m var(--scene-duration,6200ms) linear}
-.authored-scene[data-scene="0"].is-active .se4-n{animation:se4-n var(--scene-duration,6200ms) linear}
-.authored-scene[data-scene="0"].is-active .se4-m .se2-sway{animation:se2-sway var(--scene-duration,6200ms) ease-in-out}
 @keyframes se4-f{to{transform:translate(-2.5px,20px)}}
-@keyframes se4-m{to{transform:translate(-10px,80px)}}
-@keyframes se4-n{to{transform:translate(-30px,240px)}}
 .authored-scene.is-active :is(.pt4-nk,.pt4-hd,.pt4-rg){animation:pt4-dip var(--scene-duration)}
 .is-active .pt4-hd.pt4-hd{animation-name:pt4-hd}
 .is-active .pt4-rg.pt4-rg{animation-name:pt4-rg}
@@ -11761,6 +11749,24 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes pt4-hd{55%,90%{rotate:none}59%{rotate:-95deg}62%,76%{rotate:-105deg}82%{rotate:-55deg}}
 @keyframes pt4-rg{62%{opacity:0;scale:.25}65%{opacity:.7}97%{opacity:0;scale:1.4}}
 .authored-scene[data-scene="5"] .mm-rain-front .mm-drop{stroke-width:.48px;opacity:.7}
+/* Travel scenes round 3 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Heaven's Gate breathes cloud down the stair;
+   a ferry wake breaks Liberty's lamp reflections at the seawall; Seoul's snow as wind-angled flecks with gusts. */
+.authored-scene.is-active .tg5-a{animation:tg5-a var(--scene-duration) both;transform-origin:60.6px 49.4px}
+.authored-scene.is-active .tg5-s{animation:tg5-s var(--scene-duration) both}
+.authored-scene.is-active .tg5-t{animation:tg5-t var(--scene-duration) both}
+@keyframes tg5-a{0%,2%{opacity:0;transform:none;animation-timing-function:cubic-bezier(.2,.6,.4,1)}7%{opacity:1}14%{opacity:1;transform:translateY(.4px)}32%{opacity:0;transform:translateY(.9px)}to{opacity:0;transform:none}}
+@keyframes tg5-s{0%,4%{opacity:0}12%,40%{opacity:.95}72%,to{opacity:0}}
+@keyframes tg5-t{0%,4%{transform:none;animation-timing-function:cubic-bezier(.3,.3,.5,1)}72%{transform:translate(calc(var(--t)*-.49),calc(var(--t)*.87))}to{transform:none}}
+.lb5-b,.lb5-w{opacity:0}
+.lb5-a,.lb5-b{transform-box:fill-box;transform-origin:50% 0}
+.authored-scene.is-active [class^=lb5-]{animation:lb5-a var(--scene-duration) var(--d,0s) both}
+.authored-scene.is-active .lb5-b{animation-name:lb5-b}.authored-scene.is-active .lb5-w{animation-name:lb5-w;animation-timing-function:linear}
+@keyframes lb5-a{0%,4.4%,23.5%,29.4%,48.5%,52.9%,72.1%,to{opacity:1;transform:none}9.6%,34.6%,58.1%{opacity:.35;transform:scaleY(1.45)}15.4%,40.4%,63.9%{opacity:.7;transform:scaleY(1.2)}}
+@keyframes lb5-b{0%,4.4%,23.5%,29.4%,48.5%,52.9%,72.1%,to{opacity:0;transform:scaleY(.45)}9.6%{opacity:1;transform:scaleX(1.7)}34.6%{opacity:1;transform:scale(1.9,1.05)}58.1%{opacity:.85;transform:scale(1.4,.85)}15.4%,40.4%,63.9%{opacity:.55;transform:scale(1.25,.72)}}
+@keyframes lb5-w{0%,18.9%,25.1%,43.9%,48.7%,67.5%,to{opacity:0;transform:translateX(100px)}2.1%,27.1%,50.6%{opacity:1;transform:translateX(92px)}16.6%,41.6%,65.1%{opacity:1;transform:translateX(30px)}18.8%,43.8%,67.4%{opacity:0;transform:translateX(20.5px)}}
+.authored-scene[data-scene="0"].is-active .se5{animation:var(--k) var(--scene-duration,6200ms) linear}
+@keyframes se5-m{3.2%{translate:-.2px 2.6px}22.6%{translate:-4.7px 18.1px}38.7%{translate:-5.7px 31px}58.1%{translate:-10.2px 46.5px}64.5%{translate:-10.5px 51.6px}83.9%{translate:-15.1px 67.1px}to{translate:-16px 80px}}
+@keyframes se5-n{3.2%{translate:-.7px 7.7px}6.4%{translate:-2.5px 15.4px}19.4%{translate:-15.8px 46.6px}22.6%{translate:-17.6px 54.2px}38.7%{translate:-21.2px 92.9px}41.9%{translate:-23px 100.6px}54.9%{translate:-36.2px 131.8px}58.1%{translate:-38.1px 139.4px}64.5%{translate:-39.5px 154.8px}67.7%{translate:-41.3px 162.5px}80.7%{translate:-54.5px 193.7px}83.9%{translate:-56.4px 201.4px}to{translate:-60px 240px}}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
