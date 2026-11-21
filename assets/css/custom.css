@@ -11070,10 +11070,10 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes gg-car-c{0%{opacity:0;transform:translate(100.21px,38.03px) scale(0.31)}46%{transform:translate(100.21px,38.03px) scale(0.31);opacity:0}50.5%{transform:translate(97.89px,38.44px) scale(0.33);opacity:1}55%{transform:translate(95.22px,38.91px) scale(0.36);opacity:1}59.5%{transform:translate(92.13px,39.46px) scale(0.39);opacity:1}64%{transform:translate(88.51px,40.1px) scale(0.42);opacity:1}68.5%{transform:translate(84.22px,40.87px) scale(0.46);opacity:1}73%{transform:translate(79.03px,41.79px) scale(0.51);opacity:1}77.5%{transform:translate(72.65px,42.92px) scale(0.57);opacity:1}82%{transform:translate(64.6px,44.35px) scale(0.64);opacity:1}86.5%{transform:translate(54.13px,46.21px) scale(0.74);opacity:1}91%{transform:translate(39.96px,48.72px) scale(0.87);opacity:1}95.5%{transform:translate(19.72px,52.31px) scale(1.05);opacity:1}100%{transform:translate(-11.59px,57.87px) scale(1.34);opacity:1}}
 @media(prefers-reduced-motion:reduce){.gg-car{animation:none!important;opacity:0}}
 
-/* Windows light tier by tier, hold, then fade out together over the last second. */
-@keyframes da-cologne-lower{0%,3%{opacity:0}13%,77%{opacity:1;animation-timing-function:cubic-bezier(.35,0,.75,.9)}100%{opacity:0}}
-@keyframes da-cologne-mid{0%,13%{opacity:0}24%,77%{opacity:.95;animation-timing-function:cubic-bezier(.35,0,.75,.9)}100%{opacity:0}}
-@keyframes da-cologne-upper{0%,24%{opacity:0}36%,77%{opacity:.95;animation-timing-function:cubic-bezier(.35,0,.75,.9)}100%{opacity:0}}
+/* Windows light tier by tier, hold, then fade out together over the last 1.9 s. */
+@keyframes da-cologne-lower{0%,3%{opacity:0}13%,70%{opacity:1;animation-timing-function:cubic-bezier(.45,0,.55,1)}100%{opacity:0}}
+@keyframes da-cologne-mid{0%,13%{opacity:0}24%,70%{opacity:.95;animation-timing-function:cubic-bezier(.45,0,.55,1)}100%{opacity:0}}
+@keyframes da-cologne-upper{0%,24%{opacity:0}36%,70%{opacity:.95;animation-timing-function:cubic-bezier(.45,0,.55,1)}100%{opacity:0}}
 
 .depth-sydney .dl-ferry{transform:translateX(-34px)}
 /* The phone rail opens Sydney 1.5s in (travel-rail.js OPEN), so its still ferry and gull wait there and never pop.
@@ -11137,7 +11137,6 @@ html.travel-timeline{--timeline-icon-width:152px;--timeline-icon-height:101px;--
 .travel-timeline .travel-atlas--map{padding-top:2rem!important}
 .travel-timeline .travel-atlas--map .photo-explore__map-heading{margin-top:0}
 .travel-timeline .da-paris-light{stroke:#ba842c;stroke-width:1.35}
-.travel-timeline .da-cologne-lower,.travel-timeline .da-cologne-mid,.travel-timeline .da-cologne-upper{fill:#e7b959}
 
 @media(prefers-reduced-motion:reduce){.travel-timeline .authored-scene *{animation:none!important}}
 .travel-timeline #main>.journal-preview-controls{display:flex;align-items:end;justify-content:space-between;gap:20px;padding:14px 40px!important;border-top:0}
@@ -11505,10 +11504,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes mm-fall{0%{transform:translate(0,0);opacity:0}8%{opacity:1}50%{transform:translate(var(--sway),36px)}88%{opacity:1}100%{transform:translate(0,76px);opacity:0}}
 
 
-.mm-sunset-glow{opacity:.35}
-.authored-scene.is-active .mm-sunset-glow{animation:mm-glow var(--scene-duration,6200ms) ease-in-out both}
 
-@keyframes mm-glow{0%,100%{opacity:.35}55%,70%{opacity:1}}
 
 .mm-paris-dusk{opacity:.25}
 .authored-scene.is-active .mm-paris-dusk{animation:mm-dusk var(--scene-duration,6200ms) ease-in-out both}
@@ -11771,6 +11767,9 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes lb6-y{0%,25%,50%,75%,to{opacity:.08;transform:none}12.5%,62.5%{opacity:1;transform:translateX(-.7px)}37.5%,87.5%{opacity:.9;transform:translateX(.6px)}}
 @keyframes lb6-u{0%,33.3%,66.7%,to{opacity:1}16.7%,50%,83.3%{opacity:.15}}
 @keyframes lb6-v{0%,33.3%,66.7%,to{opacity:.08}16.7%,50%,83.3%{opacity:1}}
+/* Scenes round 3 (21 Nov 2026, lab/animation-review, blind winners): Cologne's wet dusk holds steady behind the cathedral; the Golden Gate's sun glow no longer swells and retreats. */
+.cl6-d{opacity:.62}
+.mm-sunset-glow{opacity:.7}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
