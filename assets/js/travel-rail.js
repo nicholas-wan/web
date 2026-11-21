@@ -30,14 +30,11 @@
   s.bursts.push(setTimeout(()=>{rate(1);schedule(s);},t));// the scene clock ran ahead
   if(key(e)==='europe')e.art.querySelectorAll('.mm-star').forEach((el,i)=>{if(i%2===0)s.fx.push(el.animate(SPARKLE,{duration:900,delay:delay+100+i*2,easing:ease,fill:'backwards'}));});
  }
- // Golden Gate fog drifts across, apart from the scene's own loop, which never rewinds it.
- const drift=e=>key(e)!=='siliconvalley'?[]:[['.gg-fog',-12],['.gg-fog-front',10]].flatMap(([sel,dx])=>[...e.art.querySelectorAll(sel)].map(el=>
-  el.animate([{transform:'none'},{transform:`translateX(${dx}px)`},{transform:'none'}],{duration:9000,iterations:Infinity,easing:'ease-in-out',composite:'add'})));
  function start(e,held){
   if(playing.has(e))return playing.get(e);
   const a=e.art,k=key(e),at=OPEN[k]||0;a.classList.toggle('is-held',held);a.classList.add('is-active');
   const anims=a.getAnimations({subtree:true}).filter(x=>x.animationName);
-  const s={anims,extra:drift(e),full:+a.dataset.duration||6200,rest:REST[k]||1500,passes:0,held,bursts:[],fx:[]};
+  const s={anims,extra:[],full:+a.dataset.duration||6200,rest:REST[k]||1500,passes:0,held,bursts:[],fx:[]};
   const seek=t=>anims.forEach(x=>{x.currentTime=t;x.play();});
   s.loop=()=>{seek(0);if(++s.passes>=PASSES)s.ending=true;schedule(s);};
   if(at)seek(at);playing.set(e,s);

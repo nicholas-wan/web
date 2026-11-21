@@ -11068,9 +11068,6 @@ html .page-skills #main > .post { border-top:0; }
 .authored-scene.is-active .gg-car-a{animation:gg-car-a var(--scene-duration,6200ms) linear both}
 .authored-scene.is-active .gg-car-b{animation:gg-car-b var(--scene-duration,6200ms) linear both}
 .authored-scene.is-active .gg-car-c{animation:gg-car-c var(--scene-duration,6200ms) linear both}
-.gg-fog-roll{opacity:0;transform-box:fill-box;transform-origin:100% 100%}
-.authored-scene.is-active .gg-fog-roll{animation:gg-fog-roll var(--scene-duration,6200ms) linear both}
-@keyframes gg-fog-roll{0%,100%{transform:none;scale:1;translate:0;opacity:0}.1%{transform:scale(.6,.85);opacity:0;animation-timing-function:cubic-bezier(.25,.45,.6,.85)}7%{opacity:1}50%{scale:1;translate:0;animation-timing-function:cubic-bezier(.45,0,.4,1)}82%{opacity:1}93%{opacity:0}82%,95%{scale:1 .45;translate:0 3px}95%{transform:translate(-3px,1px) scale(1.38,1.05)}}
 @keyframes gg-car-a{0%{transform:translate(-9.44px,58.22px) scale(1.36);opacity:1}7.83%{transform:translate(21.74px,52.53px) scale(1.06);opacity:1}15.67%{transform:translate(41.8px,48.87px) scale(0.87);opacity:1}23.5%{transform:translate(55.8px,46.31px) scale(0.74);opacity:1}31.33%{transform:translate(66.11px,44.43px) scale(0.64);opacity:1}39.17%{transform:translate(74.03px,42.98px) scale(0.57);opacity:1}47%{transform:translate(80.3px,41.84px) scale(0.51);opacity:1}54.83%{transform:translate(85.39px,40.91px) scale(0.46);opacity:1}62.67%{transform:translate(89.61px,40.14px) scale(0.42);opacity:1}70.5%{transform:translate(93.15px,39.49px) scale(0.39);opacity:1}78.33%{transform:translate(96.18px,38.94px) scale(0.36);opacity:1}86.17%{transform:translate(98.79px,38.46px) scale(0.34);opacity:1}94%{transform:translate(101.06px,38.05px) scale(0.31);opacity:0}100%{opacity:0;transform:translate(101.06px,38.05px) scale(0.31)}}
 @keyframes gg-car-b{0%{opacity:0;transform:translate(100.21px,38.03px) scale(0.31)}8%{transform:translate(100.21px,38.03px) scale(0.31);opacity:0}13.5%{transform:translate(97.89px,38.44px) scale(0.33);opacity:1}19%{transform:translate(95.22px,38.91px) scale(0.36);opacity:1}24.5%{transform:translate(92.13px,39.46px) scale(0.39);opacity:1}30%{transform:translate(88.51px,40.1px) scale(0.42);opacity:1}35.5%{transform:translate(84.22px,40.87px) scale(0.46);opacity:1}41%{transform:translate(79.03px,41.79px) scale(0.51);opacity:1}46.5%{transform:translate(72.65px,42.92px) scale(0.57);opacity:1}52%{transform:translate(64.6px,44.35px) scale(0.64);opacity:1}57.5%{transform:translate(54.13px,46.21px) scale(0.74);opacity:1}63%{transform:translate(39.96px,48.72px) scale(0.87);opacity:1}68.5%{transform:translate(19.72px,52.31px) scale(1.05);opacity:1}74%{transform:translate(-11.59px,57.87px) scale(1.34);opacity:1}100%{opacity:0;transform:translate(-11.59px,57.87px) scale(1.34)}}
 @keyframes gg-car-c{0%{opacity:0;transform:translate(100.21px,38.03px) scale(0.31)}46%{transform:translate(100.21px,38.03px) scale(0.31);opacity:0}50.5%{transform:translate(97.89px,38.44px) scale(0.33);opacity:1}55%{transform:translate(95.22px,38.91px) scale(0.36);opacity:1}59.5%{transform:translate(92.13px,39.46px) scale(0.39);opacity:1}64%{transform:translate(88.51px,40.1px) scale(0.42);opacity:1}68.5%{transform:translate(84.22px,40.87px) scale(0.46);opacity:1}73%{transform:translate(79.03px,41.79px) scale(0.51);opacity:1}77.5%{transform:translate(72.65px,42.92px) scale(0.57);opacity:1}82%{transform:translate(64.6px,44.35px) scale(0.64);opacity:1}86.5%{transform:translate(54.13px,46.21px) scale(0.74);opacity:1}91%{transform:translate(39.96px,48.72px) scale(0.87);opacity:1}95.5%{transform:translate(19.72px,52.31px) scale(1.05);opacity:1}100%{transform:translate(-11.59px,57.87px) scale(1.34);opacity:1}}
@@ -11733,13 +11730,6 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @media(max-width:736px){.travel-timeline .travel-atlas__header{display:flex;flex-direction:column;align-items:stretch}.travel-timeline .travel-atlas__header>*{min-width:0;max-width:100%}.travel-timeline .travel-atlas__header>.photo-search{order:1}.travel-timeline .travel-atlas__header>.travel-portals{order:2;margin:1rem 0 0}}
 /* Travel scenes round 2 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Liberty holds one blue hour with drifting cloud and harbour chop;
    Chengdu clouds pass through the gate; Seoul snow in three layers; Perth's swan dips to feed; Cologne rain a touch heavier. */
-.lb4-d,.lb4-f{opacity:0}
-.authored-scene.is-active [class^=lb4-]{animation:lb4-a var(--scene-duration) linear both}
-.authored-scene.is-active .lb4-c{animation-name:lb4-c}.authored-scene.is-active .lb4-d{animation-name:lb4-d}.authored-scene.is-active .lb4-e{animation-name:lb4-e}.authored-scene.is-active .lb4-f{animation-name:lb4-f}
-@keyframes lb4-c{0%,to{opacity:1;transform:none}65%{opacity:1;transform:translateX(15.6px)}99.99%{opacity:0;transform:translateX(24px)}}
-@keyframes lb4-d{0%,to{opacity:0;transform:none}65%{opacity:0;transform:translateX(15.6px)}99.99%{opacity:1;transform:translateX(24px)}}
-@keyframes lb4-e{0%,to{opacity:1;transform:none}65%{opacity:1;transform:translateX(9.1px)}99.99%{opacity:0;transform:translateX(14px)}}
-@keyframes lb4-f{0%,to{opacity:0;transform:none}65%{opacity:0;transform:translateX(9.1px)}99.99%{opacity:1;transform:translateX(14px)}}
 .authored-scene[data-scene="0"].is-active .se4-f{animation:se4-f var(--scene-duration,6200ms) linear}
 @keyframes se4-f{to{transform:translate(-2.5px,20px)}}
 .authored-scene.is-active :is(.pt4-nk,.pt4-hd,.pt4-rg){animation:pt4-dip var(--scene-duration)}
@@ -11767,6 +11757,12 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .authored-scene[data-scene="0"].is-active .se5{animation:var(--k) var(--scene-duration,6200ms) linear}
 @keyframes se5-m{3.2%{translate:-.2px 2.6px}22.6%{translate:-4.7px 18.1px}38.7%{translate:-5.7px 31px}58.1%{translate:-10.2px 46.5px}64.5%{translate:-10.5px 51.6px}83.9%{translate:-15.1px 67.1px}to{translate:-16px 80px}}
 @keyframes se5-n{3.2%{translate:-.7px 7.7px}6.4%{translate:-2.5px 15.4px}19.4%{translate:-15.8px 46.6px}22.6%{translate:-17.6px 54.2px}38.7%{translate:-21.2px 92.9px}41.9%{translate:-23px 100.6px}54.9%{translate:-36.2px 131.8px}58.1%{translate:-38.1px 139.4px}64.5%{translate:-39.5px 154.8px}67.7%{translate:-41.3px 162.5px}80.7%{translate:-54.5px 193.7px}83.9%{translate:-56.4px 201.4px}to{translate:-60px 240px}}
+/* Travel scenes round 4 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Golden Gate advection fog, a still bank the
+   deck runs into and a soft stream flowing one way below the deck. */
+.authored-scene.is-active .gg5-n{animation:gg5-n var(--scene-duration,6200ms) linear both}
+.authored-scene.is-active .gg5-r{animation:gg5-r var(--scene-duration,6200ms) linear both}
+@keyframes gg5-n{to{transform:translate(-24.4px)}}
+@keyframes gg5-r{to{transform:translate(-16px,1.2px)}}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
