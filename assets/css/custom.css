@@ -11075,14 +11075,14 @@ html .page-skills #main > .post { border-top:0; }
 @keyframes da-cologne-mid{0%,13%{opacity:0}24%,70%{opacity:.95;animation-timing-function:cubic-bezier(.45,0,.55,1)}100%{opacity:0}}
 @keyframes da-cologne-upper{0%,24%{opacity:0}36%,70%{opacity:.95;animation-timing-function:cubic-bezier(.45,0,.55,1)}100%{opacity:0}}
 
-.depth-sydney .dl-ferry{transform:translateX(-34px)}
+.depth-sydney .dl-ferry{transform:translateX(-28.3px)}
 /* The phone rail opens Sydney 1.5s in (travel-rail.js OPEN), so its still ferry and gull wait there and never pop.
    Desktop plays from frame 0, so it keeps the frame-0 pose. */
-@media(max-width:736px) and (prefers-reduced-motion:no-preference){.mobile-journal-row .depth-sydney .dl-ferry{transform:translateX(3.06px)}}
+@media(max-width:736px) and (prefers-reduced-motion:no-preference){.mobile-journal-row .depth-sydney .dl-ferry{transform:translateX(3.9px)}}
 .depth-sydney.is-active .dl-ferry{animation:dl-ferry-pass var(--polish-duration,6800ms) linear both}
 .depth-sydney.is-active .dl-ferry-foam{animation:dl-ferry-foam var(--polish-duration,6800ms) linear both}
-@keyframes dl-ferry-pass{from{transform:translateX(-34px)}to{transform:translateX(134px)}}
-@keyframes dl-ferry-foam{0%,100%{opacity:1}30%{opacity:.75}62%{opacity:.9}}
+@keyframes dl-ferry-pass{from{transform:translateX(-28.3px)}to{transform:translateX(117.67px)}}
+@keyframes dl-ferry-foam{0%,98%,to{opacity:0}4%,88%{opacity:1}}
 @media(prefers-reduced-motion:reduce){.depth-sydney .dl-ferry{animation:none!important;transform:translateX(42px)}.depth-sydney .dl-ferry-foam{animation:none!important}}
 .depth-canton .dl-tram{offset-path:path('M54.3 22 A5.7 1.75 0 0 1 65.7 22 A5.7 1.75 0 0 1 54.3 22');offset-distance:0%;offset-rotate:0deg;offset-anchor:0px 0px}
 .depth-canton.is-active .dl-tram{animation:dl-tram var(--scene-duration,6200ms) linear both}
@@ -11727,10 +11727,6 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes se5-n{20%{translate:-9px 33px}47%{translate:-18px 76px}74%{translate:-31px 118px}to{translate:-40px 160px}}
 /* Travel scenes round 4 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Golden Gate advection fog, a still bank the
    deck runs into and a soft stream flowing one way below the deck. */
-.authored-scene.is-active .gg5-n{animation:gg5-n var(--scene-duration,6200ms) linear both}
-.authored-scene.is-active .gg5-r{animation:gg5-r var(--scene-duration,6200ms) linear both}
-@keyframes gg5-n{to{transform:translate(-24.4px)}}
-@keyframes gg5-r{to{transform:translate(-16px,1.2px)}}
 /* Cologne rain (21 Nov 2026, lab/cologne-rain, blind-reviewed): three depths of fine tapered streaks. Each depth is one tile that
    repeats a whole number of times a pass, so the loop has no seam; desktop eases the rain in and out with its single pass.
    The tile crops the scene, so rain may start above the SVG's own box. */
@@ -11773,6 +11769,15 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .authored-scene.is-active .pt6-r{animation:pt6-r var(--scene-duration) ease-out both}
 @keyframes pt6-d{0%,44%,92%,to{rotate:none}66%,74%{rotate:var(--a)}}
 @keyframes pt6-r{0%,65.5%{opacity:0;scale:.2}67.5%{opacity:.95;scale:.4}84%{opacity:.62}97%,to{opacity:0;scale:1.3}}
+/* Scenes round 5 (21 Nov 2026, lab/animation-review, blind winners). Sydney's hull pitches slightly. Liberty's torch lays one broken glitter path on the harbour. The Golden Gate's fog is one long front that advances under the deck, thins while still moving left, and restarts unseen in the bank. */
+.depth-sydney .dl-ferry-hull{rotate:-.45deg;transform-origin:15px 73.3px}
+.depth-sydney.is-active .dl-ferry-hull{animation:sy8-p var(--scene-duration) ease-in-out both}
+@keyframes sy8-p{0%,22.06%,44%,66%,88%,to{rotate:-.45deg}11%,33%,55%,77%,94%{rotate:.45deg}}
+.authored-scene.is-active .lb8-a{animation:lb8-a var(--scene-duration) ease-in-out both}
+.authored-scene.is-active .lb8-a+.lb8-a{animation-direction:reverse}
+@keyframes lb8-a{0%,20%,42%,65%,to{opacity:1}8%,33%,52%,79%{opacity:.38}}
+.authored-scene.is-active .gg8-f{animation:gg8-f var(--scene-duration,6200ms) linear both}
+@keyframes gg8-f{0%,62%,100%{opacity:1}0%,100%{transform:none}32%{transform:translate(-17px);opacity:1}46%{opacity:.6}53.8%{transform:translate(-36px);opacity:0}53.81%{transform:translate(24px);opacity:0}}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
