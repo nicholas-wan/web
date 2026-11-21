@@ -11009,9 +11009,6 @@ html .page-skills #main > .post { border-top:0; }
 .authored-scene[data-depth="seoul-gate-b"] .sb-persp{opacity:0}
 .authored-scene[data-depth="seoul-gate-b"].is-active .sb-persp{animation:sb-persp var(--scene-duration,6200ms) cubic-bezier(.42,0,.25,1) both}
 @keyframes sb-persp{0%,12%,100%{opacity:0}38%,72%{opacity:1}}
-/* Cologne (scene 5): fine rain streaks; the back layer is fainter and thinner. */
-.da-cologne-rain .mm-drop{stroke:#93a5b7;stroke-width:.26;opacity:.6}
-.da-cologne-rain.mm-back .mm-drop{stroke:#aab7c4;stroke-width:.18;opacity:.4}
 /* Look closer: a frosted loupe on the scene a reader is on; it opens the scene large. */
 .mobile-journal-row{position:relative}
 .scene-loupe{position:absolute;z-index:7;width:22px;margin:0;padding:0;border:0;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.3);-webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px);box-shadow:none;cursor:zoom-in;opacity:0;transform:scale(.8);transition:opacity .18s ease,transform .18s ease;pointer-events:none}
@@ -11498,7 +11495,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .mm-star{fill:#fffaf0;stroke:none;opacity:0;transform-box:fill-box;transform-origin:center}
 .authored-scene.is-active .mm-star{animation:mm-twinkle var(--d) ease-in-out var(--del) infinite}
 @keyframes mm-twinkle{0%,50%,100%{opacity:0;transform:scale(.25)}70%{opacity:1;transform:scale(1)}85%{opacity:.35;transform:scale(.6)}}
-.authored-scene.is-active .mm-fx .mm-star,.authored-scene.is-active .mm-fx .mm-flake,.authored-scene.is-active .mm-fx .mm-drop{animation-duration:var(--d)!important}
+.authored-scene.is-active .mm-fx .mm-star,.authored-scene.is-active .mm-fx .mm-flake{animation-duration:var(--d)!important}
 .mm-loop{opacity:0}
 .authored-scene.is-active .mm-loop{opacity:1;transition:opacity .6s ease}
 .authored-scene.is-active .mm-sparkle{transition-delay:.3s}
@@ -11523,10 +11520,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes mm-wake{0%,100%{opacity:0}6%,94%{opacity:.75}}
 
 @keyframes mm-flag{0%,100%{transform:skewY(0) scaleX(1)}12.5%,62.5%{transform:skewY(7deg) scaleX(.95)}25%,75%{transform:skewY(-4deg) scaleX(1.02)}37.5%,87.5%{transform:skewY(5deg) scaleX(.97)}50%{transform:skewY(-3deg) scaleX(1.01)}}
-.mm-drop{stroke:#6f88a0;stroke-width:.9;stroke-linecap:round;opacity:.8}
-.mm-rain-back .mm-drop{stroke:#94a8bb;stroke-width:.7;opacity:.65}
-.authored-scene.is-active .mm-drop{animation:mm-rain var(--d) linear var(--del) infinite}
-@keyframes mm-rain{from{transform:translate(0,0)}to{transform:translate(-6px,84px)}}
 .mm-dusk-tile{display:none}
 .mm-dusk-stars circle{fill:#fffbe8;opacity:.7}
 
@@ -11566,7 +11559,6 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .mm-swan>path{scale:1.12}
  .travel-timeline.travel-phone-rail .mobile-journal-row .mm-star{r:.44px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .mm-flake{r:.55px}
- .travel-timeline.travel-phone-rail .mobile-journal-row .mm-drop{stroke-width:.38px}
  .travel-timeline.travel-phone-rail .mobile-journal-row .cr-liberty-glint{r:7px}
  /* Each phone tile sits on its own soft sky (Fuji overcast, as in fuji1). */
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="0"]::before{background:linear-gradient(#d9dfe6,#eef1f4)}
@@ -11729,7 +11721,7 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 }
 @media(max-width:736px){.travel-timeline .travel-atlas__header{display:flex;flex-direction:column;align-items:stretch}.travel-timeline .travel-atlas__header>*{min-width:0;max-width:100%}.travel-timeline .travel-atlas__header>.photo-search{order:1}.travel-timeline .travel-atlas__header>.travel-portals{order:2;margin:1rem 0 0}}
 /* Travel scenes round 2 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Liberty holds one blue hour with drifting cloud and harbour chop;
-   Chengdu clouds pass through the gate; Seoul snow in three layers; Perth's swan dips to feed; Cologne rain a touch heavier. */
+   Chengdu clouds pass through the gate; Seoul snow in three layers; Perth's swan dips to feed. */
 .authored-scene[data-scene="0"].is-active .se4-f{animation:se4-f var(--scene-duration,6200ms) linear}
 @keyframes se4-f{to{transform:translate(-2.5px,20px)}}
 .authored-scene.is-active :is(.pt4-nk,.pt4-hd,.pt4-rg){animation:pt4-dip var(--scene-duration)}
@@ -11738,7 +11730,6 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes pt4-dip{55%,90%{rotate:none}62%,76%{rotate:-50deg}}
 @keyframes pt4-hd{55%,90%{rotate:none}59%{rotate:-95deg}62%,76%{rotate:-105deg}82%{rotate:-55deg}}
 @keyframes pt4-rg{62%{opacity:0;scale:.25}65%{opacity:.7}97%{opacity:0;scale:1.4}}
-.authored-scene[data-scene="5"] .mm-rain-front .mm-drop{stroke-width:.48px;opacity:.7}
 /* Travel scenes round 3 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Heaven's Gate breathes cloud down the stair;
    a ferry wake breaks Liberty's lamp reflections at the seawall; Seoul's snow as wind-angled flecks with gusts. */
 .authored-scene.is-active .tg5-a{animation:tg5-a var(--scene-duration) both;transform-origin:60.6px 49.4px}
@@ -11763,6 +11754,17 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .authored-scene.is-active .gg5-r{animation:gg5-r var(--scene-duration,6200ms) linear both}
 @keyframes gg5-n{to{transform:translate(-24.4px)}}
 @keyframes gg5-r{to{transform:translate(-16px,1.2px)}}
+/* Cologne rain (21 Nov 2026, lab/cologne-rain, blind-reviewed): three depths of fine tapered streaks. Each depth is one tile that
+   repeats a whole number of times a pass, so the loop has no seam; desktop eases the rain in and out with its single pass.
+   The tile crops the scene, so rain may start above the SVG's own box. */
+.authored-scene[data-scene="5"]>svg{overflow:visible}
+.cr6-r{opacity:0;transition:opacity .5s}
+.authored-scene.is-active .cr6-r{opacity:1}
+.authored-scene.is-active .cr6-f{animation:cr6-f calc(var(--scene-duration,6200ms)/var(--n)) linear infinite!important}
+@keyframes cr6-f{to{transform:translate(-13.5px,160px)}}
+@keyframes cr6-o{0%,100%{opacity:0}10%,82%{opacity:1}}
+@media(min-width:737px){.journal-chronology .authored-scene.is-active .cr6-r{animation:cr6-o var(--scene-duration,6200ms) both}}
+.scene-viewer .authored-scene .cr6-r{opacity:1;transition:none;animation:none!important}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
