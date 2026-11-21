@@ -11616,10 +11616,10 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @media screen and (max-width:600px){.travel-timeline.travel-timeline #main > .travel-archive-heading{margin-top:0!important;padding-top:.25rem!important}}
 /* USA & Canada: Statue of Liberty: lab/travel-mobile/liberty-a (generator gen.cjs), 21 Nov 2026. */
 /* additions on top of the live CSS (scene 4, Liberty) */
-.travel-timeline .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#3f5274,#5c6b89 40%,#8b8ca2 70%,#b9a49e 86%,#6a7280 87%,#46525e)}
+.travel-timeline .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#3f5274,#5c6b89 40%,#8b8ca2 68%,#b9a49e 84%,#6a7280 85%,#46525e)}
 @media(max-width:736px){
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]{--cy:-4!important}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#3f5274,#5c6b89 40%,#8b8ca2 70%,#b9a49e 90%,#6a7280 91%,#46525e)}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#3f5274,#5c6b89 40%,#8b8ca2 68%,#b9a49e 84%,#6a7280 85%,#46525e)}
 }
 /* Perth: Crawley Edge boathouse at sunrise: lab/travel-mobile/perth-a (generator gen.cjs), 21 Nov 2026. */
 /* Perth (scene 3) additions on top of the live CSS */
@@ -11661,9 +11661,9 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene[data-scene="0"].is-active .se2-dl,.authored-scene[data-scene="0"].is-active .se2-dr{animation:se2-door var(--scene-duration,6200ms) cubic-bezier(.42,0,.25,1) both}
 .authored-scene[data-scene="0"].is-active .se2-in{animation:se2-warm var(--scene-duration,6200ms) ease-in-out both}
 .authored-scene[data-scene="0"].is-active .se2-spl{animation:se2-spill var(--scene-duration,6200ms) ease-in-out both}
-@keyframes se2-door{0%,12%,100%{transform:scaleX(1)}38%,72%{transform:scaleX(.3)}}
-@keyframes se2-warm{0%,12%,100%{opacity:.3}38%,72%{opacity:.95}}
-@keyframes se2-spill{0%,18%,100%{opacity:0}40%,70%{opacity:.9}88%{opacity:.12}}
+@keyframes se2-door{0%,6%{transform:scaleX(1);animation-timing-function:cubic-bezier(.5,0,.3,1)}44%,72%{transform:scaleX(.3);animation-timing-function:cubic-bezier(.45,0,.4,1)}100%{transform:scaleX(1)}}
+@keyframes se2-warm{0%,6%,100%{opacity:.3}38%,74%{opacity:.95}}
+@keyframes se2-spill{0%,14%,97%,100%{opacity:0}39%,72%{opacity:.9}}
 @media(prefers-reduced-motion:reduce){.authored-scene[data-scene="0"] .se2-snow{display:none}}
 /* Germany: Cologne Cathedral: lab/travel-mobile/germany-a (generator gen.cjs), 21 Nov 2026. */
 /* additions on top of the live CSS */
@@ -11723,7 +11723,7 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 /* Travel scenes round 2 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Liberty holds one blue hour with drifting cloud and harbour chop;
    Chengdu clouds pass through the gate; Seoul snow in three layers; Perth's swan dips to feed. */
 .authored-scene[data-scene="0"].is-active .se4-f{animation:se4-f var(--scene-duration,6200ms) linear}
-@keyframes se4-f{to{transform:translate(-2.5px,20px)}}
+@keyframes se4-f{to{transform:translate(-8px,40px)}}
 .authored-scene.is-active :is(.pt4-nk,.pt4-hd,.pt4-rg){animation:pt4-dip var(--scene-duration)}
 .is-active .pt4-hd.pt4-hd{animation-name:pt4-hd}
 .is-active .pt4-rg.pt4-rg{animation-name:pt4-rg}
@@ -11732,21 +11732,9 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes pt4-rg{64%{opacity:0;scale:.25}67%{opacity:.7}97%{opacity:0;scale:1.4}}
 /* Travel scenes round 3 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Heaven's Gate breathes cloud down the stair;
    a ferry wake breaks Liberty's lamp reflections at the seawall; Seoul's snow as wind-angled flecks with gusts. */
-.authored-scene.is-active .tg5-a{animation:tg5-a var(--scene-duration) both;transform-origin:60.6px 49.4px}
-.authored-scene.is-active .tg5-s{animation:tg5-s var(--scene-duration) both}
-.authored-scene.is-active .tg5-t{animation:tg5-t var(--scene-duration) both}
-@keyframes tg5-a{0%,2%{opacity:0;transform:none;animation-timing-function:cubic-bezier(.2,.6,.4,1)}7%{opacity:1}14%{opacity:1;transform:translateY(.4px)}32%{opacity:0;transform:translateY(.9px)}to{opacity:0;transform:none}}
-@keyframes tg5-s{0%,4%{opacity:0}12%,40%{opacity:.95}72%,to{opacity:0}}
-@keyframes tg5-t{0%,4%{transform:none;animation-timing-function:cubic-bezier(.3,.3,.5,1)}72%{transform:translate(calc(var(--t)*-.49),calc(var(--t)*.87))}to{transform:none}}
-.lb5-b{opacity:0}
-.lb5-a,.lb5-b{transform-box:fill-box;transform-origin:50% 0}
-.authored-scene.is-active [class^=lb5-]{animation:lb5-a var(--scene-duration) var(--d,0s) both}
-.authored-scene.is-active .lb5-b{animation-name:lb5-b}
-@keyframes lb5-a{0%,4.4%,23.5%,29.4%,48.5%,52.9%,72.1%,to{opacity:1;transform:none}9.6%,34.6%,58.1%{opacity:.35;transform:scaleY(1.45)}15.4%,40.4%,63.9%{opacity:.7;transform:scaleY(1.2)}}
-@keyframes lb5-b{0%,4.4%,23.5%,29.4%,48.5%,52.9%,72.1%,to{opacity:0;transform:scaleY(.45)}9.6%{opacity:1;transform:scaleX(1.7)}34.6%{opacity:1;transform:scale(1.9,1.05)}58.1%{opacity:.85;transform:scale(1.4,.85)}15.4%,40.4%,63.9%{opacity:.55;transform:scale(1.25,.72)}}
 .authored-scene[data-scene="0"].is-active .se5{animation:var(--k) var(--scene-duration,6200ms) linear}
 @keyframes se5-m{3.2%{translate:-.2px 2.6px}22.6%{translate:-4.7px 18.1px}38.7%{translate:-5.7px 31px}58.1%{translate:-10.2px 46.5px}64.5%{translate:-10.5px 51.6px}83.9%{translate:-15.1px 67.1px}to{translate:-16px 80px}}
-@keyframes se5-n{3.2%{translate:-.7px 7.7px}6.4%{translate:-2.5px 15.4px}19.4%{translate:-15.8px 46.6px}22.6%{translate:-17.6px 54.2px}38.7%{translate:-21.2px 92.9px}41.9%{translate:-23px 100.6px}54.9%{translate:-36.2px 131.8px}58.1%{translate:-38.1px 139.4px}64.5%{translate:-39.5px 154.8px}67.7%{translate:-41.3px 162.5px}80.7%{translate:-54.5px 193.7px}83.9%{translate:-56.4px 201.4px}to{translate:-60px 240px}}
+@keyframes se5-n{20%{translate:-9px 33px}47%{translate:-18px 76px}74%{translate:-31px 118px}to{translate:-40px 160px}}
 /* Travel scenes round 4 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Golden Gate advection fog, a still bank the
    deck runs into and a soft stream flowing one way below the deck. */
 .authored-scene.is-active .gg5-n{animation:gg5-n var(--scene-duration,6200ms) linear both}
@@ -11768,6 +11756,21 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .cr6-p{opacity:0}
 .authored-scene.is-active .cr6-p{animation:cr6-p calc(var(--scene-duration,6200ms)/3) ease-out calc(var(--scene-duration,6200ms)*var(--f)/-3) infinite!important}
 @keyframes cr6-p{0%,100%{opacity:0}5%{opacity:.3}30%{opacity:0}}
+/* Scenes round 2 (21 Nov 2026, lab/animation-review, blind winners). Heaven's Gate: thin cloud drifts through the opening. Liberty: long lamp reflections shimmer on a wider harbour. */
+.authored-scene.is-active .tg6-c{animation:tg6-c var(--scene-duration) linear both}
+.authored-scene.is-active .tg6-f{animation-name:tg6-f}
+@keyframes tg6-c{to{transform:translateX(20px)}}
+@keyframes tg6-f{to{transform:translateX(10px)}}
+.lb6-y,.lb6-v{opacity:.08}
+.authored-scene.is-active [class^=lb6-]{animation:lb6-x var(--scene-duration) ease-in-out both}
+.authored-scene.is-active .lb6-y{animation-name:lb6-y}
+.authored-scene.is-active .lb6-r{animation-direction:reverse}
+.authored-scene.is-active .lb6-u{animation-name:lb6-u}
+.authored-scene.is-active .lb6-v{animation-name:lb6-v}
+@keyframes lb6-x{0%,25%,50%,75%,to{opacity:1;transform:none}12.5%,62.5%{opacity:.2;transform:translateX(.8px)}37.5%,87.5%{opacity:.3;transform:translateX(-.6px)}}
+@keyframes lb6-y{0%,25%,50%,75%,to{opacity:.08;transform:none}12.5%,62.5%{opacity:1;transform:translateX(-.7px)}37.5%,87.5%{opacity:.9;transform:translateX(.6px)}}
+@keyframes lb6-u{0%,33.3%,66.7%,to{opacity:1}16.7%,50%,83.3%{opacity:.15}}
+@keyframes lb6-v{0%,33.3%,66.7%,to{opacity:.08}16.7%,50%,83.3%{opacity:1}}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
