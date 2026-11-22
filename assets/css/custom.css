@@ -11481,7 +11481,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="2"]::before{background:linear-gradient(#081226,#0a172d 45%,#111b33 78%,#1b2440)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="3"]::before{background:linear-gradient(#b7d4e8,#e3eef3 65%,#f3f6f4)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="4"]::before{background:linear-gradient(#c3d8e6,#e7eff2 60%,#f2f4f1)}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="5"]::before{background:linear-gradient(#425983,#3a496c)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(248,210,170,.9),rgba(248,210,170,0)),linear-gradient(#b9cee4 -5%,#d6e1ed 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
@@ -11502,7 +11502,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .travel-timeline .journal-chronology .authored-scene[data-scene="2"]::before{background:linear-gradient(#081226,#0a172d 45%,#111b33 78%,#1b2440)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="3"]::before{background:linear-gradient(#b7d4e8,#e3eef3 65%,#f3f6f4)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="4"]::before{background:linear-gradient(#c3d8e6,#e7eff2 60%,#f2f4f1)}
-.travel-timeline .journal-chronology .authored-scene[data-scene="5"]::before{background:linear-gradient(#cdd3da,#e6e9ec 60%,#eef0f1)}
+.travel-timeline .journal-chronology .authored-scene[data-scene="5"]::before{background:linear-gradient(#425983,#3a496c)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(248,210,170,.9),rgba(248,210,170,0)),linear-gradient(#b9cee4 -5%,#d6e1ed 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
@@ -11663,7 +11663,6 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes tg6-c{to{transform:translateX(20px)}}
 @keyframes tg6-f{to{transform:translateX(10px)}}
 /* Scenes round 3 (21 Nov 2026, lab/animation-review, blind winners): Cologne's wet dusk holds steady behind the cathedral; the Golden Gate's sun glow no longer swells and retreats. */
-.cl6-d{opacity:.62}
 .mm-sunset-glow{opacity:.7}
 /* Scenes round 4 (21 Nov 2026, lab/animation-review, blind winners). Liberty: one slow swell crosses the harbour and bends the lamp reflections in turn. Perth: a six-bone neck keeps its curve, the body tips, and a ring starts at the bill. */
 .authored-scene.is-active .lb7-s{animation:lb7-s var(--scene-duration) linear both}
