@@ -11715,6 +11715,8 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .authored-scene.is-active .colognea-q use{animation:colognea-r calc(var(--scene-duration)/3) linear calc(var(--scene-duration)*var(--f)/-3) infinite!important}
 }
 @keyframes colognea-r{0%{opacity:0;transform:scale(.25)}10%{opacity:.855}to{opacity:0;transform:scale(1)}}
+/* Chengdu round 16 (chengdu-d3) */
+#cdg stop{stop-color:#e6e7e4}#cdg :nth-child(2){stop-color:#aab4ba}#tg-gL :first-child{stop-color:#c2c0bb}#tg-gL :nth-child(2){stop-color:#a9adb0}#tg-gR :first-child{stop-color:#bcbdbb}#tg-gFace :first-child{stop-color:#bdbcb8}#tg-gCap :first-child{stop-color:#ead2b8}#tg-gCap :nth-child(2){stop-color:#d8cbbd}.authored-scene[data-scene="9"] path[fill="#a58e5c"]{fill:#8e8468}.authored-scene[data-scene="9"] path[fill="#b9a26e"]{fill:#a29878}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
