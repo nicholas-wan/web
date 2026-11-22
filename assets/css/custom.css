@@ -11636,8 +11636,6 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @media(max-width:736px){.travel-timeline .travel-atlas__header{display:flex;flex-direction:column;align-items:stretch}.travel-timeline .travel-atlas__header>*{min-width:0;max-width:100%}.travel-timeline .travel-atlas__header>.photo-search{order:1}.travel-timeline .travel-atlas__header>.travel-portals{order:2;margin:1rem 0 0}}
 /* Travel scenes round 2 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Liberty holds one blue hour with drifting cloud and harbour chop;
    Chengdu clouds pass through the gate; Seoul snow in three layers; Perth's swan dips to feed. */
-.authored-scene[data-scene="0"].is-active .se4-f{animation:se4-f var(--scene-duration,6200ms) linear}
-@keyframes se4-f{to{transform:translate(-8px,40px)}}
 /* Travel scenes round 3 (21 Nov 2026, lab/travel-anim2, blind-reviewed): Heaven's Gate breathes cloud down the stair;
    a ferry wake breaks Liberty's lamp reflections at the seawall; Seoul's snow as wind-angled flecks with gusts. */
 .authored-scene[data-scene="0"].is-active .se5{animation:var(--k) var(--scene-duration,6200ms) linear}
@@ -11661,12 +11659,9 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 .authored-scene.is-active .cr6-p{animation:cr6-p calc(var(--scene-duration,6200ms)/3) ease-out calc(var(--scene-duration,6200ms)*var(--f)/-3) infinite!important}
 @keyframes cr6-p{0%,100%{opacity:0}5%{opacity:.3}30%{opacity:0}}
 .cr6-r[clip-path]{opacity:1;transition:none;animation:none!important}
-.cl8-p{opacity:0}.authored-scene.is-active .cl8-p{animation:cr6-p calc(var(--scene-duration)/3) ease-out calc(var(--scene-duration)*var(--f)/-3) infinite!important}
 /* Scenes round 2 (21 Nov 2026, lab/animation-review, blind winners). Heaven's Gate: thin cloud drifts through the opening. Liberty: long lamp reflections shimmer on a wider harbour. */
 .authored-scene.is-active .tg6-c{animation:tg6-c var(--scene-duration) linear both}
-.authored-scene.is-active .tg6-f{animation-name:tg6-f}
 @keyframes tg6-c{to{transform:translateX(20px)}}
-@keyframes tg6-f{to{transform:translateX(10px)}}
 /* Scenes round 3 (21 Nov 2026, lab/animation-review, blind winners): Cologne's wet dusk holds steady behind the cathedral; the Golden Gate's sun glow no longer swells and retreats. */
 .mm-sunset-glow{opacity:.7}
 /* Scenes round 4 (21 Nov 2026, lab/animation-review, blind winners). Liberty: one slow swell crosses the harbour and bends the lamp reflections in turn. Perth: a six-bone neck keeps its curve, the body tips, and a ring starts at the bill. */
@@ -11684,6 +11679,37 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes lb8-a{0%,20%,42%,65%,to{opacity:1}8%,33%,52%,79%{opacity:.38}}
 .authored-scene.is-active .gg8-f{animation:gg8-f var(--scene-duration,6200ms) linear both}
 @keyframes gg8-f{0%,62%,100%{opacity:1}0%,100%{transform:none}32%{transform:translate(-17px);opacity:1}46%{opacity:.6}53.8%{transform:translate(-36px);opacity:0}53.81%{transform:translate(24px);opacity:0}}
+/* Scenes round 15 (22 Nov 2026, lab/animation-review/fixes/r15, blind winners). Chengdu: a sea of cloud fills the valley. Seoul: a snow squall crosses behind the hall. Cologne: rain on the wet Roncalliplatz. */
+#cdm path{fill:#fff;transform:scale(6)}
+#cdg stop{stop-color:#f8f1e6}#cdg :nth-child(2){stop-color:#b9c3c9;stop-opacity:.92}#cdg :last-child{stop-color:#a7b4bc;stop-opacity:0}
+#cdd stop{stop-color:#8a97a1}#cdd :last-child{stop-opacity:0}
+.chengdua-a{transform:translate(0,49.4px) skewY(3.4deg) translateX(-46px) scale(0.95,0.95)}
+.authored-scene.is-active .chengdua-a{animation:chengdua-a var(--scene-duration) linear both}
+@keyframes chengdua-a{to{transform:translate(0,49.4px) skewY(3.4deg) translateX(-0.4px) scale(0.95,0.95)}}
+.chengdua-b{transform:translate(0,57.4px) skewY(-3deg) translateX(-58px) scale(1.2,1.1)}
+.authored-scene.is-active .chengdua-b{animation:chengdua-b var(--scene-duration) linear both}
+@keyframes chengdua-b{to{transform:translate(0,57.4px) skewY(-3deg) translateX(-0.4px) scale(1.2,1.1)}}
+.chengdua-c{transform:translate(0,61.6px) skewY(0.8deg) translateX(-78px) scale(1.6,0.9)}
+.authored-scene.is-active .chengdua-c{animation:chengdua-c var(--scene-duration) linear both}
+@keyframes chengdua-c{to{transform:translate(0,61.6px) skewY(0.8deg) translateX(-1.2px) scale(1.6,0.9)}}
+#seoula-e stop{stop-color:#71839d}
+.seoula-h{opacity:.13}
+.seoula-c{scale:.7}
+.authored-scene[data-scene="0"].is-active .seoula-f{animation:seoula-f var(--scene-duration,6200ms) linear}
+@keyframes seoula-f{to{transform:translateX(-250px)}}
+.authored-scene[data-scene="0"].is-active .seoula-h{animation:seoula-h var(--scene-duration,6200ms) linear}
+@keyframes seoula-h{to{transform:translateX(-1667px)}}
+.authored-scene[data-scene="0"].is-active .seoula-c{animation:seoula-c var(--scene-duration,6200ms) linear}
+@keyframes seoula-c{to{translate:238.8px 56px}}
+.authored-scene[data-scene="0"] .seoula-k{opacity:0}
+.authored-scene[data-scene="0"].is-active .seoula-k{animation:seoula-o var(--scene-duration,6200ms) linear,seoula-k var(--scene-duration,6200ms) linear}
+@keyframes seoula-o{10%{opacity:0}34%,60%{opacity:.85}88%,to{opacity:0}}
+@keyframes seoula-k{to{transform:translate(-36px,84px)}}
+.colognea-q use{stroke-width:.55px;opacity:calc(.95 - .95*var(--f));transform:scale(calc(.25 + .75*var(--f)))}
+@media(prefers-reduced-motion:no-preference){
+.authored-scene.is-active .colognea-q use{animation:colognea-r calc(var(--scene-duration)/3) linear calc(var(--scene-duration)*var(--f)/-3) infinite!important}
+}
+@keyframes colognea-r{0%{opacity:0;transform:scale(.25)}10%{opacity:.855}to{opacity:0;transform:scale(1)}}
 /* Route bundle: travel-navigation:end */
 
 /* Route bundle: journal-polish:start */
