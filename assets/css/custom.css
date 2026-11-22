@@ -11660,8 +11660,6 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes cr6-p{0%,100%{opacity:0}5%{opacity:.3}30%{opacity:0}}
 .cr6-r[clip-path]{opacity:1;transition:none;animation:none!important}
 /* Scenes round 2 (21 Nov 2026, lab/animation-review, blind winners). Heaven's Gate: thin cloud drifts through the opening. Liberty: long lamp reflections shimmer on a wider harbour. */
-.authored-scene.is-active .tg6-c{animation:tg6-c var(--scene-duration) linear both}
-@keyframes tg6-c{to{transform:translateX(20px)}}
 /* Scenes round 3 (21 Nov 2026, lab/animation-review, blind winners): Cologne's wet dusk holds steady behind the cathedral; the Golden Gate's sun glow no longer swells and retreats. */
 .mm-sunset-glow{opacity:.7}
 /* Scenes round 4 (21 Nov 2026, lab/animation-review, blind winners). Liberty: one slow swell crosses the harbour and bends the lamp reflections in turn. Perth: a six-bone neck keeps its curve, the body tips, and a ring starts at the bill. */
