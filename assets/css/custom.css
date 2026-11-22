@@ -11374,18 +11374,22 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
    against a real Kawaguchiko sunrise timelapse. The gradient stop colours animate (each on one eased curve), a soft
    sunlight front slides down the lit face from the summit (pink, then gold, then white; never on the shaded side), the
    shadow edge turns as the sun climbs, and the lake mirrors the sky (darker toward the viewer). The tile's ::before is
-   exactly the SVG's frame-0 sky; the SVG sky (.fjb-sky) shows only while the tile plays. Generator: lab/fuji/d4/gen.cjs. */
+   exactly the SVG's frame-0 sky; the SVG sky (.fjb-sky) shows only while the tile plays. Generator: lab/fuji/d4/gen.cjs.
+   Round 16 (22 Nov 2026, lab/animation-review/fixes/r16/fuji-c2, built by fuji_gen.py): .fjb-sg eases the boat's speed like a pedal boat, never
+   reversing; the boat has a broken reflection and a short soft wake that breaks the mirror in wavelets; the ripple rows are sparse dashed breeze patches that drift left (.fjb-rp, one dash period a pass). */
 .travel-timeline .journal-chronology .authored-scene.fjb-scene .fjb-sky{opacity:0;transition:opacity .5s ease}.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.fjb-scene .fjb-sky{opacity:0;transition:opacity .5s cubic-bezier(.2,.7,.2,1)}
 .travel-timeline .journal-chronology .authored-scene.fjb-scene.is-active .fjb-sky,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene.fjb-scene.is-active .fjb-sky{opacity:1}
-.authored-scene.fjb-scene .fjb-b1,.authored-scene.fjb-scene .fjb-bob,.authored-scene.fjb-scene .fjb-bands,.authored-scene.fjb-scene .fjb-glints{transform-box:view-box;transform-origin:0 0}
+.authored-scene.fjb-scene .fjb-b1,.authored-scene.fjb-scene .fjb-bob,.authored-scene.fjb-scene .fjb-sg,.authored-scene.fjb-scene .fjb-glints{transform-box:view-box;transform-origin:0 0}
 @media (prefers-reduced-motion:no-preference){
 .authored-scene.fjb-scene.is-active .fjb-b1{animation:fjb-m1 var(--scene-duration,8000ms) linear both}
 .authored-scene.fjb-scene.is-active .fjb-bob{animation:fjb-y1 var(--scene-duration,8000ms) ease-in-out both}
-.authored-scene.fjb-scene.is-active .fjb-bands{animation:fjb-bd var(--scene-duration,8000ms) ease-in-out both}
+.authored-scene.fjb-scene.is-active .fjb-sg{animation:fjb-sg var(--scene-duration,8000ms) linear both}
+.authored-scene.fjb-scene.is-active .fjb-rp path{animation:fjb-rp var(--scene-duration,8000ms) linear both}
 .authored-scene.fjb-scene.is-active .fjb-glints{animation:fjb-gl var(--scene-duration,8000ms) ease-in-out both}
 }
 @keyframes fjb-y1{0%,33.33%,66.67%,100%{transform:translateY(0)}16.67%,50%,83.33%{transform:translateY(.28px)}}
-@keyframes fjb-bd{0%,100%{transform:translateX(0)}50%{transform:translateX(-3px)}}
+@keyframes fjb-sg{0%,33.33%,66.67%{transform:translateX(0);animation-timing-function:cubic-bezier(.61,1,.88,1)}8.33%,41.67%,75%{transform:translateX(2.6px);animation-timing-function:cubic-bezier(.37,0,.63,1)}25%,58.33%,91.67%{transform:translateX(-2.6px);animation-timing-function:cubic-bezier(.12,0,.39,0)}to{transform:translateX(0)}}
+@keyframes fjb-rp{to{stroke-dashoffset:40}}
 @keyframes fjb-gl{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(1.4px);opacity:.75}}
 @keyframes fjb-m1{0%{transform:translateX(0)}69.14%{transform:translateX(93.2px);animation-timing-function:step-end}69.15%{transform:translateX(-41.6px)}to{transform:translateX(0)}}
 /* Journal card crops (20 Oct 2026): a fixed 4:3 photo box (213x160) keeps half or more of each portrait cover, framed by the
