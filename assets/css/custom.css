@@ -11603,13 +11603,13 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene.is-active .pt3-lift{animation:pt3-lift var(--scene-duration,6200ms) ease-in-out both;transform-origin:27.3px 31.6px}
 .authored-scene.is-active .pt9-r{animation:pt9-r var(--scene-duration,6200ms) ease-in-out both;transform-origin:1px .4px}
 @keyframes pt9-r{10%{transform:none}19%{transform:rotate(-2.2deg)}29%{transform:translateY(.2px) rotate(1.6deg)}39%{transform:rotate(-.9deg)}49%{transform:rotate(.4deg)}59%{transform:none}}
-/* Liberty from the ferry: one smooth swell a pass behind a still rail; after dark, floodlit from below, the pedestal windows and seawall lamps come on once. */
+/* Liberty from the ferry: one smooth swell a pass behind a still rail, the roll one even 1.1-degree sine; after dark, floodlit from below (her hem bright, shoulders darker), the pedestal windows and seawall lamps come on once. */
 .authored-scene.is-active .fa-h{animation:fa-h var(--scene-duration) cubic-bezier(.37,0,.63,1) both}
 .authored-scene.is-active .fa-r{animation:fa-r var(--scene-duration) linear both}
 .authored-scene.is-active .fa-p,.authored-scene.is-active .fa-g{animation:fa-p var(--scene-duration) cubic-bezier(.37,0,.63,1) both}
 .authored-scene.is-active .fa-g{animation-name:fa-g}
 @keyframes fa-h{0%,to{transform:none}50%{transform:translateY(2.1px)}}
-@keyframes fa-r{0%,to{transform:translate(60px,40px) rotate(0deg) translate(-60px,-40px);animation-timing-function:cubic-bezier(.4,.52,.7,1)}19.85%{transform:translate(60px,40px) rotate(.85deg) translate(-60px,-40px);animation-timing-function:cubic-bezier(.3,0,.6,.48)}39.7%{transform:translate(60px,40px) rotate(0deg) translate(-60px,-40px);animation-timing-function:cubic-bezier(.3,.59,.7,1)}69.85%{transform:translate(60px,40px) rotate(-.85deg) translate(-60px,-40px);animation-timing-function:cubic-bezier(.3,0,.7,.41)}}
+@keyframes fa-r{0%,50%,to{transform:translate(60px,40px) rotate(0deg) translate(-60px,-40px);animation-timing-function:cubic-bezier(.61,1,.88,1)}25%{transform:translate(60px,40px) rotate(1.1deg) translate(-60px,-40px);animation-timing-function:cubic-bezier(.12,0,.39,0)}75%{transform:translate(60px,40px) rotate(-1.1deg) translate(-60px,-40px);animation-timing-function:cubic-bezier(.12,0,.39,0)}}
 @keyframes fa-p{0%,to{transform:translate(56.6px,71px) scale(1,1) translate(-56.6px,-71px)}50%{transform:translate(56.6px,71px) scale(1.6,1) translate(-56.6px,-71px)}}@keyframes fa-g{0%,to{opacity:.2}50%{opacity:.28}}
 .authored-scene.is-active .fa-q{animation:fa-q var(--scene-duration) cubic-bezier(.37,0,.63,1) both}@keyframes fa-q{0%,to{transform:translate(0,71.4px) scale(1,1) translate(0,-71.4px)}50%{transform:translate(0,71.4px) scale(1,1.7) translate(0,-71.4px)}}
 .fa-l,.fa-f,.fa-s{opacity:0;transition:opacity 3s cubic-bezier(.4,0,.2,1)}
