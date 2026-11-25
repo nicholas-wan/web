@@ -243,7 +243,7 @@ test.describe('destination scene interactions', () => {
     await expect(trips.nth(1).locator('.authored-scene')).toHaveClass(/is-active/);
     await expect(trips.first().locator('.authored-scene')).not.toHaveClass(/is-active/);
     await expect(active).toHaveCount(1);
-    await expect(active).toHaveCount(0, { timeout: 8000 });
+    await expect(active).toHaveCount(0, { timeout: 14000 }); // the second trip is Guangzhou, a 12.4 s loop
     // Keyboard focus retains manual control after its finite scene ends.
     await page.waitForTimeout(2200);
     await expect(active).toHaveCount(0);
