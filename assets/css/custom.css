@@ -11680,6 +11680,8 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes lb8-a{0%,20%,42%,65%,to{opacity:1}8%,33%,52%,79%{opacity:.38}}
 .authored-scene.is-active .gg8-f{animation:gg8-f var(--scene-duration,6200ms) linear both}
 @keyframes gg8-f{0%,62%,100%{opacity:1}0%,100%{transform:none}32%{transform:translate(-17px);opacity:1}46%{opacity:.6}53.8%{transform:translate(-36px);opacity:0}53.81%{transform:translate(24px);opacity:0}}
+/* Scenes round 20b (25 Nov 2026, lab/animation-review/fixes/r20/goldengate-r): the Golden Gate fog bank swells slowly and drifts toward the bay. */
+.authored-scene.is-active :is(.ggr-a,.ggr-b){animation:ggr-a var(--scene-duration) linear 2 both}.authored-scene.is-active .ggr-b{animation-delay:calc(var(--scene-duration)/-2)}.authored-scene.is-active .ggr-c{animation:ggr-c var(--scene-duration) ease-in-out both}@keyframes ggr-a{0%{opacity:0;transform:translate(-1.8px,-.4px)}50%{opacity:1}to{opacity:0;transform:translate(1.8px,.4px)}}@keyframes ggr-c{50%{opacity:.15}}
 /* Scenes round 15 (22 Nov 2026, lab/animation-review/fixes/r15, blind winners). Chengdu: a sea of cloud fills the valley. Seoul: a snow squall crosses behind the hall. Cologne: rain on the wet Roncalliplatz. */
 #cdm path{fill:#fff;transform:scale(6)}
 #cdg stop{stop-color:#f8f1e6}#cdg :nth-child(2){stop-color:#b9c3c9;stop-opacity:.92}#cdg :last-child{stop-color:#a7b4bc;stop-opacity:0}
