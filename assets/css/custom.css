@@ -11390,7 +11390,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes fjb-sg{0%,33.33%,66.67%{transform:translateX(0);animation-timing-function:cubic-bezier(.61,1,.88,1)}8.33%,41.67%,75%{transform:translateX(2.6px);animation-timing-function:cubic-bezier(.37,0,.63,1)}25%,58.33%,91.67%{transform:translateX(-2.6px);animation-timing-function:cubic-bezier(.12,0,.39,0)}to{transform:translateX(0)}}
 @keyframes fjb-rp{to{stroke-dashoffset:40}}
 @keyframes fjb-gl{0%,100%{transform:translateX(0);opacity:1}50%{transform:translateX(1.4px);opacity:.75}}
-@keyframes fjb-m1{0%{transform:translateX(0)}69.14%{transform:translateX(93.2px);animation-timing-function:step-end}69.15%{transform:translateX(-41.6px)}to{transform:translateX(0)}}
+@keyframes fjb-m1{0%{transform:translateX(0)}70.75%{transform:translateX(86.32px);animation-timing-function:step-end}70.76%{transform:translateX(-35.68px)}to{transform:translateX(0)}}
 /* Journal card crops (20 Oct 2026): a fixed 4:3 photo box (213x160) keeps half or more of each portrait cover, framed by the
    per-cover focal point in the markup (--focus; --thumb-focus for the wider neighbour thumbnails). Show all uses the same
    focal points. Phones keep their centred crop. */
@@ -11601,7 +11601,8 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 @keyframes pt9-r{10%{transform:none}19%{transform:rotate(-2.2deg)}29%{transform:translateY(.2px) rotate(1.6deg)}39%{transform:rotate(-.9deg)}49%{transform:rotate(.4deg)}59%{transform:none}}
 /* Liberty from the ferry at night (r18 liberty-p6, on liberty-p5): one smooth swell a pass behind a still rail, the roll 1.14 then 1.74 degrees and level at the rail's rest frame; Jersey City and Bayonne a low band of small steady lights along the far shore with a few lit towers, everything lit from frame 0; their uneven, broken streaks and the torch's glitter path lean, stretch and widen with the swell, answering a touch quicker than the roll; her copper a step towards floodlit teal. */
 .authored-scene.is-active .libertyp-h{animation:fa-h var(--scene-duration) cubic-bezier(.37,0,.63,1) both}
-.libertyp-r{transform-origin:60px 40px}.libertyp-s,.libertyp-z{transform-origin:0 71.3px}
+.libertyp-r{transform-origin:60px 190px}
+.authored-scene.is-active .lb23-f{animation:lb23-f var(--scene-duration) linear both}@keyframes lb23-f{to{stroke-dashoffset:-25px}}.libertyp-s,.libertyp-z{transform-origin:0 71.3px}
 .authored-scene.is-active .libertyp-r{animation:libertyp-r var(--scene-duration) linear both}
 .authored-scene.is-active .libertyp-s{animation:libertyp-s var(--scene-duration) linear both}
 .authored-scene.is-active .libertyp-z{animation:libertyp-z var(--scene-duration) linear both}
@@ -11681,6 +11682,7 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 @keyframes lb8-a{0%,20%,42%,65%,to{opacity:1}8%,33%,52%,79%{opacity:.38}}
 .authored-scene.is-active .gg8-f{animation:gg8-f var(--scene-duration,6200ms) linear both}
 @keyframes gg8-f{0%,62%,100%{opacity:1}0%,100%{transform:none}32%{transform:translate(-17px);opacity:1}46%{opacity:.6}53.8%{transform:translate(-36px);opacity:0}53.81%{transform:translate(24px);opacity:0}}
+.authored-scene.is-active .ggs{animation:ggs var(--scene-duration) linear 2 both}@keyframes ggs{to{transform:translateX(72px)}}
 /* Scenes round 20b (25 Nov 2026, lab/animation-review/fixes/r20/goldengate-r): the Golden Gate fog bank swells slowly and drifts toward the bay. */
 .authored-scene.is-active :is(.ggr-a,.ggr-b){animation:ggr-a var(--scene-duration) linear 2 both}.authored-scene.is-active .ggr-b{animation-delay:calc(var(--scene-duration)/-2)}.authored-scene.is-active .ggr-c{animation:ggr-c var(--scene-duration) ease-in-out both}@keyframes ggr-a{0%{opacity:0;transform:translate(-1.8px,-.4px)}50%{opacity:1}to{opacity:0;transform:translate(1.8px,.4px)}}@keyframes ggr-c{50%{opacity:.15}}
 /* Scenes round 15 (22 Nov 2026, lab/animation-review/fixes/r15, blind winners). Chengdu: a sea of cloud fills the valley. Seoul: a snow squall crosses behind the hall. Cologne: rain on the wet Roncalliplatz. */
