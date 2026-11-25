@@ -11449,7 +11449,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
    lost a blind check to live, is kept on the travel-guangzhou-climb branch. */
 .mm-led{fill:#d49bba;opacity:.33}
 .authored-scene.is-active .mm-led{animation:mm-led var(--scene-duration,6200ms) ease-in-out both}
-@keyframes mm-led{0%,23.4%,100%{fill:#d49bba}37.9%,54.4%{fill:#87b7cb}68.9%,85.5%{fill:#9f8fd0}}
+@keyframes mm-led{0%,23.4%,100%{fill:#d49bba}30.6%{fill:#aaa8cc}37.9%,54.4%{fill:#88c2bd}68.9%,85.5%{fill:#9f8fd0}}
 @media(max-width:736px){
  /* Each scene fills the row (20 Nov 2026; tiles were 150px beside a photo): the whole drawing at its native 3:2, so
     nothing is cropped; the row is a size container, so --tile is its width. Germany drops 6 units for headroom. */
@@ -11488,7 +11488,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(248,210,170,.9),rgba(248,210,170,0)),linear-gradient(#b9cee4 -5%,#d6e1ed 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
- .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#72adcb,#a8ccde 40%,#d9e8ee 68%,#f5eedf)}
+ .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="9"]::before{background:linear-gradient(#a3c9dd,#c3dbe7 40%,#dde9ee 68%,#f5eedf)}
 }
 @media(prefers-reduced-motion:reduce){
  .travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene::before,.mobile-journal-row .mm-dusk-tile{opacity:1;transition:none}
@@ -11509,7 +11509,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .travel-timeline .journal-chronology .authored-scene[data-scene="6"]::before{background:linear-gradient(#aecfe6,#dfecf3 60%,#f2f6f5)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="7"]::before{background:radial-gradient(60% 46.25% at 9.17% 57.5%,rgba(248,210,170,.9),rgba(248,210,170,0)),linear-gradient(#b9cee4 -5%,#d6e1ed 36.25%,#e9e7ec 60.25%,#f0e7e3 70%)}
 .travel-timeline .journal-chronology .authored-scene[data-scene="8"]::before{background:linear-gradient(#263e66,#627c9e 55%,#b3b3b5)}
-.travel-timeline .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#72adcb,#a8ccde 40%,#d9e8ee 68%,#f5eedf)}
+.travel-timeline .journal-chronology .authored-scene[data-scene="9"]::before{background:linear-gradient(#a3c9dd,#c3dbe7 40%,#dde9ee 68%,#f5eedf)}
 /* Each sky follows that trip's real light (20 Oct 2026). Paris is the one night tile, so its navy stays at full strength at rest. */
 .travel-timeline .journal-chronology .authored-scene[data-scene="2"]::before,.travel-timeline.travel-phone-rail .mobile-journal-row .authored-scene[data-scene="2"]::before{opacity:1}
 .travel-timeline .journal-chronology .mm-dusk-tile{display:inline;opacity:.84;transition:opacity .7s ease}
@@ -11562,7 +11562,7 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene[data-scene="8"].is-active .gz2-col,.authored-scene[data-scene="8"].is-active .gz2-halo{animation:mm-led var(--scene-duration,6200ms) ease-in-out both}
 
 .authored-scene[data-scene="8"].is-active .gz2-lat{animation:gz2-lat var(--scene-duration,6200ms) ease-in-out both}
-@keyframes gz2-lat{0%,23.4%,100%{stroke:#d49bba}37.9%,54.4%{stroke:#87b7cb}68.9%,85.5%{stroke:#9f8fd0}}
+@keyframes gz2-lat{0%,23.4%,100%{stroke:#d49bba}30.6%{stroke:#aaa8cc}37.9%,54.4%{stroke:#88c2bd}68.9%,85.5%{stroke:#9f8fd0}}
 /* the cruise boat crosses left to right; two copies 120 apart so it wraps in the same instant */
 /* the cabin orbit seen from the river, well below the deck: a flatter ellipse whose near half is the upper arc */
 .authored-scene[data-scene="8"] .dl-tram{offset-path:path('M52 22A8 .85 0 0 0 68 22A8 .85 0 0 0 52 22')}
@@ -11701,7 +11701,7 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
 }
 @keyframes colognea-r{0%{opacity:0;transform:scale(.25)}10%{opacity:.855}to{opacity:0;transform:scale(1)}}
 /* Chengdu round 16 (chengdu-d3) */
-#cdg stop{stop-color:#e6e7e4}#cdg :nth-child(2){stop-color:#aab4ba}#tg-gL :first-child{stop-color:#c2c0bb}#tg-gL :nth-child(2){stop-color:#a9adb0}#tg-gR :first-child{stop-color:#bcbdbb}#tg-gFace :first-child{stop-color:#bdbcb8}#tg-gCap :first-child{stop-color:#ead2b8}#tg-gCap :nth-child(2){stop-color:#d8cbbd}.authored-scene[data-scene="9"] path[fill="#a58e5c"]{fill:#8e8468}.authored-scene[data-scene="9"] path[fill="#b9a26e"]{fill:#a29878}
+#cdg stop{stop-color:#e6e7e4}#cdg :nth-child(2){stop-color:#aab4ba}#tg-gL :first-child{stop-color:#c2c0bb}#tg-gL :nth-child(2){stop-color:#9a9fa3}#tg-gR :first-child{stop-color:#bcbdbb}#tg-gFace :first-child{stop-color:#bdbcb8}#tg-gCap :first-child{stop-color:#f8d2aa}#tg-gCap :nth-child(2){stop-color:#efcfb2}.authored-scene[data-scene="9"] path[fill="#a58e5c"]{fill:#8e8468}.authored-scene[data-scene="9"] path[fill="#b9a26e"]{fill:#a29878}
 /* Seoul round 18: snow in three depths, the near flakes kept off the hall */
 .authored-scene[data-scene="0"].is-active .seould2-f{animation:seould2-f var(--scene-duration,6200ms) linear}
 @keyframes seould2-f{to{transform:translateY(22px)}}
