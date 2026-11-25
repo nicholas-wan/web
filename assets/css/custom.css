@@ -11603,6 +11603,24 @@ img[data-journal-src],img.journal-photo-pending,img.journal-photo-failed{opacity
 .authored-scene.is-active .libertyp-h{animation:fa-h var(--scene-duration) cubic-bezier(.37,0,.63,1) both}
 .libertyp-r{transform-origin:60px 190px}
 .authored-scene.is-active .lb23-f{animation:lb23-f var(--scene-duration) linear both}@keyframes lb23-f{to{stroke-dashoffset:-25px}}.libertyp-s,.libertyp-z{transform-origin:0 71.3px}
+/* Liberty Bow 13e (round 23): close to her from the bow, underway */
+.lbw-z,.lbw-n,.lbw-o{transform-origin:48px 54.6px}
+.lbx-z{transform-origin:0 0}
+.lbw-r{transform-origin:60px 38px;--s:cubic-bezier(.45,0,.55,1);--e:cubic-bezier(.33,.2,.67,.49);--q:cubic-bezier(.33,.16,.67,.39)}
+.authored-scene.is-active .lbw-r{animation:lbw-r var(--scene-duration) var(--s) both}
+.authored-scene.is-active .lbw-p{animation:lbw-p var(--scene-duration) var(--s) both}
+.authored-scene.is-active .lbw-z{animation:lbw-z var(--scene-duration) var(--e) both}
+.authored-scene.is-active .lbx-z{animation:lbx-z var(--scene-duration) var(--e) both}
+.authored-scene.is-active .lbw-n{animation:lbw-n var(--scene-duration) var(--q) both}
+.authored-scene.is-active .lbw-o{animation:lbw-o var(--scene-duration) var(--q) both}
+.authored-scene.is-active .lbw-f{animation:lbw-f var(--scene-duration) linear both}
+@keyframes lbw-r{0%,to{transform:rotate(-.28deg)}27%{transform:rotate(.38deg)}52%{transform:rotate(-.2deg)}78%{transform:rotate(.35deg)}}
+@keyframes lbw-p{0%,to{transform:translateY(-.35px)}13%{transform:translateY(1.6px)}29%{transform:translateY(-.45px)}47%{transform:translateY(1.05px)}67%{transform:translateY(-.4px)}84%{transform:translateY(2px)}}
+@keyframes lbw-z{33.33%{transform:scale(2.5)}66.67%{transform:scale(6.25)}to{transform:scale(15.625)}}
+@keyframes lbx-z{33.33%{transform:scale(1.257,2.5)}66.67%{transform:scale(1.581,6.25)}to{transform:scale(1.988,15.625)}}
+@keyframes lbw-n{0%{opacity:0}50%{transform:scale(3.953)}to{transform:scale(15.625);opacity:0}}
+@keyframes lbw-o{0%,to{transform:scale(3.953)}50%{transform:scale(15.625);opacity:0}50.1%{transform:none;opacity:0}}
+@keyframes lbw-f{to{stroke-dashoffset:-81}}
 .authored-scene.is-active .libertyp-r{animation:libertyp-r var(--scene-duration) linear both}
 .authored-scene.is-active .libertyp-s{animation:libertyp-s var(--scene-duration) linear both}
 .authored-scene.is-active .libertyp-z{animation:libertyp-z var(--scene-duration) linear both}
