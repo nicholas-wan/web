@@ -6,7 +6,7 @@ Static personal site. `tools/site/build.ps1` builds `dist/` from the root pages 
 
 ```powershell
 powershell.exe -NoProfile -File tools/site.ps1 check  # clean build + verify (Windows PowerShell 5.1)
-powershell.exe -NoProfile -File tools/site.ps1 test   # check + unit + browser tests: everything CI runs
+powershell.exe -NoProfile -File tools/site.ps1 test   # check + unit + browser tests: everything CI runs (after the build, verify and unit tests run beside the browser tests; about 3 min)
 .\tools\site.ps1 build          # build only (-Clean to start fresh)
 .\tools\site.ps1 verify         # verify an existing dist/
 node tools/preview-server.mjs   # preview dist/ at http://localhost:4321 (plain static servers 404 the extensionless URLs)
@@ -18,6 +18,8 @@ CI then runs these; run them before pushing, after a build, from `tools/tests/br
 npm run test:unit   # search and lightbox logic
 npm test            # Playwright layout checks (PW_PORT=4398 if 4321 is taken: an existing server there is reused)
 ```
+
+CI splits the browser tests across three Windows runners at once with `PW_SPLIT=a|b|c` (`playwright.config.cjs`: a is the travel map and navigation files, b Projects and the Work peeks, c every other file, so a new spec always runs). On one runner they took about 6 of CI's 7.5 minutes. Set `PW_SPLIT` locally only to rerun one third; the groups are by file, sized from measured run times, so rebalance them there if one third grows much longer than the others.
 
 ## Layout
 

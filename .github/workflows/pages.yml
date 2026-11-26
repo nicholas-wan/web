@@ -13,9 +13,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # The browser tests are split across three runners that run at once
+  # (PW_SPLIT, tools/tests/browser/playwright.config.cjs). On one runner they
+  # took about 6 of the run's 7.5 minutes. Each runner builds and verifies
+  # dist/ itself (about 20 s), so none waits on another; split a also uploads
+  # the Pages artifact, and deploy waits for all three.
   build:
     runs-on: windows-latest
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        split: [a, b, c]
+    env:
+      PW_SPLIT: ${{ matrix.split }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v6
@@ -44,10 +55,11 @@ jobs:
           npx playwright install chromium webkit
 
       - name: Check search and lightbox logic
+        if: matrix.split == 'a'
         working-directory: tools/tests/browser
         run: npm run test:unit
 
-      - name: Check travel search and layouts before publishing
+      - name: Check travel search and layouts before publishing (split ${{ matrix.split }})
         working-directory: tools/tests/browser
         run: npm test
 
@@ -55,14 +67,16 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: travel-layout-failures
+          name: travel-layout-failures-${{ matrix.split }}
           path: tools/tests/browser/test-results
           if-no-files-found: ignore
 
       - name: Configure GitHub Pages
+        if: matrix.split == 'a'
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
+        if: matrix.split == 'a'
         uses: actions/upload-pages-artifact@v4
         with:
           path: dist

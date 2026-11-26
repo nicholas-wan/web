@@ -36,8 +36,11 @@ async function settled(page) {
   expect((await page.evaluate(audit)).errors).toEqual([]);
 }
 
-for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], [1280, 900]]) {
-  test(`travel geometry at ${width}x${height}`, async ({ page }) => {
+// Each viewport's trip sweep runs as two tests, alternate trips in each (26 Nov
+// 2026): one sweep took about 38 s and was the longest single test, so it set
+// the length of a run (and of a CI shard) on its own.
+for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], [1280, 900]]) for (const half of [0, 1]) {
+  test(`travel geometry at ${width}x${height}, trips ${half ? 'second' : 'first'} half`, async ({ page }) => {
     await page.setViewportSize({ width, height });
     await page.goto('/travel');
     await page.evaluate(() => document.fonts.ready);
@@ -46,7 +49,7 @@ for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], 
     if(width>736) expect(await grid.evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length)).toBe(width>=1100?3:1);
     else await expect(grid.locator('.mobile-journal-row')).toHaveCount(10);
     expect(await page.locator('.travel-card').count()).toBe(10);
-    if (width <= 600) {
+    if (width <= 600 && !half) {
       const card = page.locator('.mobile-journal-card').first();
       await expect(card.locator('.actions')).toBeHidden();
       const target = await card.locator('.mobile-journal-read').getAttribute('href');
@@ -58,7 +61,7 @@ for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], 
     else await page.locator('.travel-map__viewport').scrollIntoViewIfNeeded();
     await settled(page);
     const picker = page.getByRole('combobox', { name: 'Explore a trip', exact: true });
-    const trips = await picker.locator('option').evaluateAll(options => options.map(o => o.value));
+    const trips = (await picker.locator('option').evaluateAll(options => options.map(o => o.value))).filter((_, i) => i % 2 === half);
     for (const trip of trips) {
       await picker.selectOption(trip);
       await settled(page);
@@ -78,7 +81,7 @@ for (const [width, height] of [[320, 568], [390, 844], [844, 390], [768, 1024], 
       await page.getByRole('button', { name: 'Zoom out', exact: true }).click();
       await settled(page);
     }
-    if (width <= 520) {
+    if (width <= 520 && half) {
       await page.getByRole('button', { name: 'Close map', exact: true }).click();
       await page.getByRole('button', { name: 'Open the interactive travel atlas', exact: true }).click();
       await settled(page);
