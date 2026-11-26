@@ -106,6 +106,7 @@ Root HTML files are legacy content sources; `tools/site/build.ps1` generates `di
 python .\tools\images\make-responsive-variants.py
 python .\tools\images\make-responsive-variants.py --webp-tiers   # needs scikit-image
 python .\tools\images\convert-curated-webp.py
+python -I .\tools\images\pick-lead-photos.py   # after adding or removing journal photos (docs/contracts/journals.md)
 ```
 
 - `make-touch-icons.py` regenerates the home-screen icons from the owner-approved "NW" monogram.
