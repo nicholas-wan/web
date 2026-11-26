@@ -4036,7 +4036,11 @@ header.major > .travel-journal__stats {
     display: grid;
     grid-template-columns: none;
     grid-auto-rows: auto;
-    grid-auto-columns: min(18rem, calc(100% - 3.5rem));
+    /* At least 264px: the captions were shortened to fit a 264px card, but the
+       theme's smaller root font at 360px and below made 18rem 240px, cutting
+       about 12 captions (26 Nov 2026). 100% - 2rem keeps part of the next
+       card in view on 320px phones. */
+    grid-auto-columns: min(max(18rem, 264px), calc(100% - 2rem));
     grid-auto-flow: column;
     column-count: initial;
     gap: 0.75rem;
@@ -4201,7 +4205,9 @@ header.major > .travel-journal__stats {
 
   /* Both lines: the name's look by default (a one-line card's title is the
      name). The font stack beats the Raleway rules above (Japan's, and the
-     zh-Hans one), keeping their Japanese and Chinese fallbacks. */
+     zh-Hans one), keeping their Japanese and Chinese fallbacks. Upright case
+     too: a one-line card's title kept the desktop hover caption's capitals
+     (`.content-details h3`), unlike option G's board (26 Nov 2026). */
   .page-travel-journal .guangzhou-journal .content-details > :is(h3, p) {
     margin: 0;
     color: #fff !important;
@@ -4209,6 +4215,7 @@ header.major > .travel-journal__stats {
     font-weight: 700;
     line-height: 1.3 !important;
     letter-spacing: normal;
+    text-transform: none;
     text-align: left;
   }
 
@@ -6841,6 +6848,14 @@ a.travel-jump-group__label {
 #main > .travel-pagination {
   margin: 3rem auto 0;
   padding-bottom: 2.5rem;
+  border-top: 0;
+}
+
+/* The same 2px #eeeeee rule drew a second, column-wide line under the journal
+   strip and straight under the bar on House and Pre-wedding (26 Nov 2026
+   review): a hidden element comes first in their #main, so the theme's
+   :first-child reset missed the strip and the article. */
+#main > :is(.travel-section-nav, article) {
   border-top: 0;
 }
 

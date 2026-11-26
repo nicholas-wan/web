@@ -913,15 +913,20 @@ $canvasEndMarker = '/*Canvas end*/'
 $canvasStart = $mainJsSource.IndexOf($canvasStartMarker)
 $canvasEnd = $mainJsSource.IndexOf($canvasEndMarker)
 if ($canvasStart -lt 0 -or $canvasEnd -le $canvasStart) { throw 'Could not locate the homepage canvas JavaScript boundaries.' }
-$canvasJs = $mainJsSource.Substring($canvasStart, $canvasEnd - $canvasStart).Trim() + "`n"
-$sharedMainJs = ($mainJsSource.Substring(0, $canvasStart).TrimEnd() + "`n`n" + $mainJsSource.Substring($canvasEnd + $canvasEndMarker.Length).TrimStart())
+$canvasJs = Remove-JsCommentLines ($mainJsSource.Substring($canvasStart, $canvasEnd - $canvasStart).Trim() + "`n")
+$sharedMainJs = Remove-JsCommentLines ($mainJsSource.Substring(0, $canvasStart).TrimEnd() + "`n`n" + $mainJsSource.Substring($canvasEnd + $canvasEndMarker.Length).TrimStart())
 
 $assetVersions = @{}
 foreach ($file in $runtimeCssText.Keys) {
     $assetVersions["assets/css/$file"] = Get-ContentVersion $runtimeCssText[$file]
 }
-foreach ($file in @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'travel-shortcuts.js', 'travel-rail.js', 'travel-chronology.js', 'projects.js', 'projects-laptop.js', 'projects-companions.js', 'place-card.js')) {
-    $assetVersions["assets/js/$file"] = Get-FileContentVersion (Join-Path $root "assets\js\$file")
+# Publish only runtime assets used by the generated Pages site; each ships
+# without its whole-line comments (Remove-JsCommentLines, common.ps1).
+$runtimeJs = @('game.js', 'listing-effects.js', 'journal-progress.js', 'gallery.js', 'travel-nav.js', 'travel-map.js', 'travel-discovery.js', 'personal-timeline.js', 'scramble-reveal.js', 'photo-search.js', 'page-transitions.js', 'anomaly-peek.js', 'internship-peek.js', 'travel-shortcuts.js', 'travel-rail.js', 'travel-chronology.js', 'projects.js', 'projects-laptop.js', 'projects-companions.js', 'place-card.js')
+$runtimeJsText = @{}
+foreach ($file in $runtimeJs) {
+    $runtimeJsText[$file] = Remove-JsCommentLines (Read-SourceText (Join-Path $root "assets\js\$file"))
+    $assetVersions["assets/js/$file"] = Get-ContentVersion $runtimeJsText[$file]
 }
 $assetVersions['assets/css/custom.css'] = Get-ContentVersion $sharedCustomCss
 foreach ($bundle in $routeCssBundles.Keys) {
@@ -1529,8 +1534,6 @@ if ($imageDimensionCacheDirty) {
     Write-Utf8 $imageDimensionCachePath $cacheJson
 }
 
-# Publish only runtime assets used by the generated Pages site.
-$runtimeJs = @("game.js", "listing-effects.js", "journal-progress.js", "gallery.js", "travel-nav.js", "travel-map.js", "travel-discovery.js", "personal-timeline.js", "scramble-reveal.js", "photo-search.js", "page-transitions.js", "anomaly-peek.js", "internship-peek.js", "travel-shortcuts.js", "travel-rail.js", "travel-chronology.js", "projects.js", "projects-laptop.js", "projects-companions.js", "place-card.js")
 New-Item -ItemType Directory -Path (Join-Path $out "assets\css") -Force | Out-Null
 New-Item -ItemType Directory -Path (Join-Path $out "assets\js") -Force | Out-Null
 foreach ($file in $runtimeCssText.Keys) {
@@ -1545,7 +1548,7 @@ foreach ($bundle in $routeCssBundles.Keys) {
 Write-Utf8 (Join-Path $out 'assets\js\main.js') $sharedMainJs
 Write-Utf8 (Join-Path $out 'assets\js\canvas-background.js') $canvasJs
 foreach ($file in $runtimeJs) {
-    Write-Utf8 (Join-Path $out "assets\js\$file") (Read-SourceText (Join-Path $root "assets\js\$file"))
+    Write-Utf8 (Join-Path $out "assets\js\$file") $runtimeJsText[$file]
 }
 New-Item -ItemType Directory -Path (Join-Path $out "assets\data") -Force | Out-Null
 Write-Utf8 (Join-Path $out 'assets\data\photo-index.json') $photoIndexJson

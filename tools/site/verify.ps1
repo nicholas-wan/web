@@ -53,6 +53,7 @@ function Assert-DistMatchesSource([string]$RelativePath) {
     $distContent = (Get-Content -LiteralPath $distPath -Raw -Encoding UTF8).Replace("`r`n", "`n")
     $sourceContent = (Get-Content -LiteralPath $sourcePath -Raw -Encoding UTF8).Replace("`r`n", "`n")
     if ($RelativePath -like '*.css') { $sourceContent = Remove-CssComments $sourceContent }
+    if ($RelativePath -like '*.js') { $sourceContent = Remove-JsCommentLines $sourceContent }
     if ($distContent -ne $sourceContent) { throw "dist is stale: $RelativePath differs from its source. Rebuild with tools/site.ps1 build." }
 }
 
@@ -510,7 +511,10 @@ Assert-FileSizeBudget 'assets\css\skills-page.css' 19
 # Nag-bot's board and stickers, and the More features rows.
 # 74 -> 76 (9 Nov 2026): Travel Packing's demo head is the app's boarding pass, with the plane on its progress line.
 # 76 -> 77 (9 Nov 2026): the demo pass's PACKED stamp and plane marker.
-Assert-FileSizeBudget 'assets\css\projects.css' 77
+# 77 -> 78 (26 Nov 2026): SquashBot's chat wallpaper inlined as a data URI. It was the
+# page's largest paint and only requested once projects.js drew the chat: phone LCP
+# 4.2 s to 1.7 s on a priority-ordered Slow 4G server, 2.6 s to 2.1 s under DevTools.
+Assert-FileSizeBudget 'assets\css\projects.css' 78
 # 69 -> 70 (9 Nov 2026): the loader for Travel Packing's laptop; the page stays under 80 KB.
 # 70 -> 71 (17 Nov 2026): the More features page counter and arrows (owner-approved that day); the page stays under its 80 KB code ceiling.
 Assert-FileSizeBudget 'assets\js\projects.js' 71
@@ -1439,7 +1443,7 @@ if ($journalProgressJs -notmatch "fill\.style\.transform = 'scaleX\('" -or $gall
 if ($galleryJs -match "window\.addEventListener\('resize', refreshCue\)" -or $personalTimelineJs -match "window\.addEventListener\('resize', remeasureAndUpdate\)") { throw "Phone URL-bar resizes must not re-run width-only layout work." }
 
 # Oct 2026: explicit phone gallery navigation replaces the animated swipe hint.
-if ($galleryJs -notmatch 'journal-gallery-controls' -or $galleryJs -notmatch 'Previous photo' -or $galleryJs -notmatch 'Next photo' -or $galleryJs -notmatch "counter.setAttribute\('role', 'status'\)" -or $galleryJs -notmatch "behavior: reducedMotion.matches \? 'instant' : 'smooth'" -or $customCss -notmatch 'grid-auto-columns: min\(18rem, calc\(100% - 3.5rem\)\)' -or $customCss -match 'journal-scroll-cue|has-scroll-cue') { throw "Phone galleries must retain live progress, accessible arrows, native swiping, an unfaded next-photo preview, and reduced-motion support." }
+if ($galleryJs -notmatch 'journal-gallery-controls' -or $galleryJs -notmatch 'Previous photo' -or $galleryJs -notmatch 'Next photo' -or $galleryJs -notmatch "counter.setAttribute\('role', 'status'\)" -or $galleryJs -notmatch "behavior: reducedMotion.matches \? 'instant' : 'smooth'" -or $customCss -notmatch 'grid-auto-columns: min\(max\(18rem, 264px\), calc\(100% - 2rem\)\)' -or $customCss -match 'journal-scroll-cue|has-scroll-cue') { throw "Phone galleries must retain live progress, accessible arrows, native swiping, an unfaded next-photo preview, and reduced-motion support." }
 
 # Viewing-size preparation must stay bounded and respect stale request guards.
 if ($galleryJs -notmatch 'image.decode\(\)' -or $galleryJs -notmatch 'fittedImages.length > 5' -or $galleryJs -notmatch '2 \* navigationDirection' -or $galleryJs -notmatch "prepareFitted\(source, 'high'\)" -or $galleryJs -notmatch 'request === imageRequest && currentSource === source && zoomLevel === 1' -or $galleryJs -notmatch '(?s)var close = function.*?clearFittedImages\(\)') { throw "Lightbox preparation must decode nearby viewing-size images in a bounded cache and protect zoom, navigation and close from stale loads." }

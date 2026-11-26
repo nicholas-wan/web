@@ -46,8 +46,9 @@ function pDate(t) {
 	let m = t.match(new RegExp(`\\b(\\d{1,2})(?:st|nd|rd|th)?\\s+${MW}`));
 	if (m) {
 		const at = (y) => (Date.UTC(y, MO.findIndex((x) => x.toLowerCase() === m[2]), m[1]) - T0) / 864e5;
-		const y = dt(0).getUTCFullYear();
-		return at(y) < -180 ? at(y + 1) : at(y);
+		const y = dt(0).getUTCFullYear(), o = at(y) < -180 ? at(y + 1) : at(y);
+		/* false: no such day (31 Feb rolled into March), as the bot refuses it. */
+		return dt(o).getUTCDate() === +m[1] ? o : false;
 	}
 	if (!(m = t.match(/\b(next\s+)?(sun|mon|tue|wed|thu|fri|sat)[a-z]*\b/))) return null;
 	const a = (WD.findIndex((x) => x.toLowerCase() === m[2]) + 2) % 7;
@@ -58,7 +59,13 @@ function pTime(t) {
 	t = t.replace(new RegExp(COURT, 'g'), ' ').replace(new RegExp(`\\b\\d{1,2}(?:st|nd|rd|th)?\\s+${MW}`, 'g'), ' ');
 	const H = (h, mi, a) => (a ? (h % 12) + (a === 'pm' ? 12 : 0) : +h) * 60 + (+mi || 0);
 	let m = t.match(/\b(\d{1,2})(?:[:.](\d{2}))?\s*([ap]m)?\s*(?:-|–|to)\s*(\d{1,2})(?:[:.](\d{2}))?\s*([ap]m)\b/);
-	if (m) return { s: H(m[1], m[2], m[3] || m[6]), e: H(m[4], m[5], m[6]) };
+	if (m) {
+		/* The bot's rule: a range runs at most 6 hours, past midnight if the end is
+		   earlier. A start without am/pm takes the end's, else the other half. */
+		const e = H(m[4], m[5], m[6]), len = (s) => (e - s + 1440) % 1440 || 1440;
+		const s = [m[3] || m[6], m[6] === 'pm' ? 'am' : 'pm'].map((a) => H(m[1], m[2], a)).find((s, i) => len(s) <= 360 && (!i || !m[3]));
+		return s == null ? false : { s, e };
+	}
 	if ((m = t.match(/\b(\d{1,2})(?:[:.](\d{2}))?\s*([ap]m)\b/))) return { s: H(m[1], m[2], m[3]) };
 	if ((m = t.match(/\b([01]?\d|2[0-3])[:.]?([0-5]\d)\b/))) return { s: H(m[1], m[2]) };
 	return null;
@@ -66,8 +73,9 @@ function pTime(t) {
 function draft(text) {
 	const t = text.toLowerCase();
 	if (!intent(t)) return null;
-	const tm = pTime(t) || {};
-	return { src: text, o: pDate(t), c: pCourt(t), s: tm.s ?? null, e: tm.e ?? null, ch: {}, is: [] };
+	const T = pTime(t), tm = T || {}, o = pDate(t);
+	return { src: text, o: o === false ? null : o, c: pCourt(t), s: tm.s ?? null, e: tm.e ?? null, ch: {},
+		is: [o === false && 'That date does not exist.', T === false && 'That time range is invalid or longer than 6 hours.'].filter(Boolean) };
 }
 
 function card(d) {
@@ -289,9 +297,10 @@ function init(root) {
 		const v = f === 'd' ? pDate(t) : f === 'c' ? pCourt(`court ${t.replace(/^c[a-z]*\s*/, '')}`) || t.match(/^(?:court\s*)?([a-z])$/)?.[1].toUpperCase() : pTime(t);
 		later(500, () => {
 			drop(mine);
-			if (v == null) return ask(f, 1);
+			if (v == null || v === false) return ask(f, 1);
 			if (f === 't') { d.s = v.s; d.e = v.e ?? null; } else d[f === 'd' ? 'o' : 'c'] = v;
 			d.ch[f] = null;
+			d.is = [];
 			drop(S.prompt);
 			if (S.card) edit(S.card, card(d));
 		});

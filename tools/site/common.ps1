@@ -38,3 +38,33 @@ function Remove-CssComments([string]$Css) {
     $stripped = [regex]::Replace($stripped, '(?m)^[ \t]+$', '')
     return ([regex]::Replace($stripped, '(\r?\n){3,}', "`n`n")).Trim() + "`n"
 }
+
+# Published JavaScript ships without whole-line comments (26 Nov 2026; about a
+# fifth of its gzip size), by the rule verify.ps1's Get-JsCodeBytes counts with:
+# a line whose first non-blank text is //, and a /* ... */ block whose /* starts
+# a line (code after its closing */ stays). Comments after code on a line are
+# kept, so a // inside a string, regex or URL is never touched. The sources keep
+# every comment. The one gap: a multi-line template literal with a line starting
+# // or /* would lose that line; the only one (26 Nov 2026) is a CSS comment in
+# the style template of projects-laptop.js, which is safe to drop.
+function Remove-JsCommentLines([string]$Js) {
+    $kept = New-Object System.Text.StringBuilder
+    $inBlock = $false
+    foreach ($line in [regex]::Split($Js, '(?<=\n)')) {
+        if ($line.Length -eq 0) { continue }
+        $trimmed = $line.TrimStart()
+        if (-not $inBlock) {
+            if ($trimmed.StartsWith('//')) { continue }
+            if (-not $trimmed.StartsWith('/*')) { [void]$kept.Append($line); continue }
+            $inBlock = $true
+        }
+        $from = 0
+        if ($trimmed.StartsWith('/*')) { $from = $line.IndexOf('/*') + 2 }
+        $close = $line.IndexOf('*/', $from)
+        if ($close -lt 0) { continue }
+        $inBlock = $false
+        $rest = $line.Substring($close + 2)
+        if ($rest.Trim().Length -gt 0) { [void]$kept.Append($line.Substring(0, $line.Length - $trimmed.Length) + $rest.TrimStart()) }
+    }
+    return [regex]::Replace($kept.ToString(), '\n{3,}', "`n`n")
+}
