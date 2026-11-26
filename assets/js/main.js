@@ -363,8 +363,10 @@
     if ((W - b.w) / 2 > LR * 1.7) {
       return [W / 2 + (W / 2 - LR * 0.9) * Math.cos(a), b.y + b.h / 2 + (H / 2 - LR * 0.6) * Math.sin(a) + H * 0.06 * Math.sin(2.7 * a)];
     }
-    var below = H - b.y - b.h >= b.y, lo = below ? b.y + b.h + LR * 0.9 : LR * 0.35, hi = below ? H - LR * 0.35 : b.y - LR * 0.9;
-    return [W / 2 + (W / 2 - LR * 0.55) * Math.sin(a * 1.6), (lo + hi) / 2 + Math.max(0, (hi - lo) / 2) * Math.sin(a * 2.4 + 1)];
+    // The whole lens stays 16px inside the screen (27 Nov 2026, approved from lab/visual-ideas):
+    // it drifted to 0.55 of its radius from the sides and 0.35 from the bottom, so edges cut its rim.
+    var below = H - b.y - b.h >= b.y, lo = below ? b.y + b.h + LR * 0.9 : LR * 0.35, hi = below ? H - LR - 16 : b.y - LR * 0.9;
+    return [W / 2 + (W / 2 - LR - 16) * Math.sin(a * 1.6), (lo + hi) / 2 + Math.max(0, (hi - lo) / 2) * Math.sin(a * 2.4 + 1)];
   }
 
   // A threat sits where the lens can open fully on it: clear of text, edges and bar.

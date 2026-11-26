@@ -154,6 +154,19 @@ function Get-CachedImageDimensions([string]$Path, [hashtable]$SourceIndex) {
 
 $journalTileSizes = '(max-width: 736px) 160px, (max-width: 1179px) 20vw, (max-width: 1365px) 224px, (max-width: 1680px) 240px, 325px'
 $wideJournalTileSizes = '(max-width: 736px) 160px, 20vw'
+# A day's lead photo (img data-lead, tools/images/pick-lead-photos.py) spans two columns and two
+# rows from 981px: 40vw plus the gap to 1179px, then 464, 504 and 666px; tablets keep the tile's
+# 20vw and phones its 160px (27 Nov 2026). The photo covers that 4:3 box, so one wider than 4:3
+# is drawn wider than the box: the desktop slots grow by its aspect over 4:3 (a 16:9 lead 1.33x),
+# or a 1x screen took the -480 file for a 462px box and stretched it.
+function Get-LeadJournalTileSizes($Dimensions) {
+    $f = 1.0
+    if ($Dimensions -and $Dimensions.Height -gt 0) { $f = [math]::Max(1.0, ($Dimensions.Width / $Dimensions.Height) / (4.0 / 3.0)) }
+    $px = { param($v) [string][int][math]::Ceiling($v * $f) }
+    $vw = [string]([math]::Round(40 * $f, 1))
+    $gap = & $px 16
+    return '(max-width: 736px) 160px, (max-width: 980px) 20vw, (max-width: 1179px) calc(' + $vw + 'vw + ' + $gap + 'px), (max-width: 1365px) ' + (& $px 464) + 'px, (max-width: 1680px) ' + (& $px 504) + 'px, ' + (& $px 666) + 'px'
+}
 # Gives images in two-up (mason2) journal galleries their wider slot before
 # Add-ImagePerformanceAttributes, which keeps any sizes already present.
 function Set-WideJournalTileSizes([string]$Markup) {
@@ -270,7 +283,7 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
                         # 480w previews for the ~264 CSS px horizontal tiles, via a
                         # 160px density-capped slot at DPR <= 3. The lightbox selects
                         # its own fitted source; zoom still uses the original.
-                        $sizes = if ($isJournalBanner) { '(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 100vw, (max-width: 1024px) calc(100vw - 176px), (max-width: 1680px) 1024px, 1366px' } elseif ($JournalGallery) { $journalTileSizes } else { '(max-width: 736px) 250px, 800px' }
+                        $sizes = if ($isJournalBanner) { '(max-width: 736px) and (min-resolution: 2.5dppx) 266px, (max-width: 736px) 100vw, (max-width: 1024px) calc(100vw - 176px), (max-width: 1680px) 1024px, 1366px' } elseif ($JournalGallery -and $tag -match '\bdata-lead\b') { Get-LeadJournalTileSizes $dimensions } elseif ($JournalGallery) { $journalTileSizes } else { '(max-width: 736px) 250px, 800px' }
                         $tag = Add-AttributeToImgTag $tag ('sizes="{0}"' -f $sizes)
                     }
                 }

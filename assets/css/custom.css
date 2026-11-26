@@ -16,7 +16,6 @@
   --color-border-soft: #e5eaeb;
   --font-display: "Source Sans Pro", "Source Sans Fallback", Helvetica, sans-serif;
   --font-body: "Merriweather", "Merriweather Fallback", Georgia, serif;
-  --font-typewriter: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
   --radius-card: 0.75rem;
   --radius-compact: 0.5rem;
   --radius-control: 0.3rem;
@@ -3362,8 +3361,9 @@ body.is-map-fullscreen .travel-atlas__layout {
 }
 
 /* Journals open closer to the section tabs than the theme's 4rem (Oct 2026);
-   phones keep main.css's own 2rem. */
-.travel-journal > .travel-journal__content {
+   phones keep main.css's own 2rem. Every journal's article since 27 Nov 2026: Japan and
+   Australia, without the class, opened 24px lower than the rest once all openings matched. */
+.travel-journal > article {
   padding-top: 2.5rem;
 }
 
@@ -3678,6 +3678,23 @@ header.major > .travel-journal__stats {
 
 .travel-gallery--compact.travel-gallery--sparse {
   max-width: 42rem;
+}
+
+/* Desktop: each day of five or more photos opens on one lead photo two columns wide and two
+   rows tall; the rest fill in around it (27 Nov 2026, owner: "Lead photo is ok but choose the
+   highest resolution one"). tools/images/pick-lead-photos.py marks it img[data-lead]; the
+   build gives it a wider sizes slot. DOM order is unchanged, so phones and the lightbox keep
+   the day's order. */
+@media screen and (min-width: 981px) {
+  :is(.travel-gallery--compact, .guangzhou-day--compact .masonry):not(:has(> .brick[hidden])) > .brick:has(> .content > img[data-lead]) {
+    grid-column: 1 / span 2;
+    grid-row: 1 / span 2;
+    aspect-ratio: auto;
+  }
+
+  :is(.travel-gallery--compact, .guangzhou-day--compact .masonry):not(:has(> .brick[hidden])) > .brick:has(> .content > img[data-lead]) :is(.content, .content-image) {
+    height: 100%;
+  }
 }
 
 /* Three-photo days take the four-up track like every other day (26 Nov 2026): capped at 42rem
@@ -4725,13 +4742,19 @@ header.major > .travel-journal__stats {
 }
 
 .company-logo--dsta {
-  width: 5.5rem;
-  height: 2.75rem;
-  padding: 0.42rem 0.55rem;
-  border: 1px solid rgba(22, 65, 148, 0.14);
-  border-radius: 0.55rem;
-  background: #f2f0e9;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 0.3rem 0.8rem rgba(4, 28, 33, 0.1);
+  /* The mark and wordmark in white on the dark card, without the cream plate that was the
+     card's brightest object or the unreadable descriptor line (owner-approved 27 Nov 2026,
+     lab/visual-ideas). images/company/dsta-mark-white.svg is cut from dsta.svg. */
+  width: auto;
+  height: 1.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  object-fit: contain;
+  opacity: 0.92;
+  align-self: center;
 }
 
 .company-logo--shopee {
@@ -5897,6 +5920,16 @@ body:not(.page-home) #wrapper.fade-in::before {
     opacity: 1;
     transform: none;
   }
+
+  /* Sentence case at 15px, 48px tall, the first one leading in teal (27 Nov 2026, approved
+     from lab/visual-ideas): they were two identical grey boxes in 12px tracked capitals. */
+  /* .portfolio-hero__actions out-ranks the later touch rule's 3rem, which is 40-44px where the
+     phone root shrinks (27 Nov 2026 review). */
+  #intro .portfolio-hero__actions .portfolio-hero__cta { min-height: 48px; height: 48px; }
+  #intro .portfolio-hero__cta-label { font-size: 15px; letter-spacing: 0.01em; text-transform: none; }
+  #intro .portfolio-hero__actions li:first-child .portfolio-hero__cta { background: rgba(40, 215, 197, 0.14); box-shadow: inset 0 0 0 1px rgba(40, 215, 197, 0.62); }
+  #intro .portfolio-hero__actions li:first-child .portfolio-hero__cta:is(:hover, :focus-visible) { background: rgba(40, 215, 197, 0.22); }
+  #intro .portfolio-hero__cta--projects { background: transparent; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3); }
 
   /* Dark like the bar, with a teal menu icon (15 Nov 2026 review: the
      light-grey pill was the brightest off-palette object on every page).
@@ -8016,8 +8049,8 @@ body.lightbox-open {
 }
 
 .page-experience #agentic-ai .case-study__highlights li > span {
+  /* The light card's Source Sans 700 (27 Nov 2026); it was the system monospace. */
   color: #28d7c5;
-  font-family: var(--font-typewriter);
 }
 
 /* 5.2rem top padding starts the first PROBLEM stop level with the title
@@ -9409,34 +9442,38 @@ body.page-home #intro {
 }
 
 /* Route bundle: journal-japan:start */
-/* Japan editorial title and lower banner crop. */
-.japan-journal .japan-journal__intro {
+/* Every journal's editorial opening (Japan's, since 26 Nov 2026, owner-approved from
+   lab/visual-ideas): eyebrow, title, dates, standfirst on one left edge. Japan alone keeps
+   its lower banner crop. */
+.page-travel-journal .journal-intro {
   margin-bottom: 1.75rem;
   text-align: left;
 }
 
-.japan-journal .japan-journal__eyebrow {
+.page-travel-journal .journal-intro__eyebrow {
   margin: 0 0 0.65rem;
+  text-align: left;
   color: var(--color-brand-700);
   font: 700 var(--eyebrow-size)/1.2 var(--font-display);
   letter-spacing: var(--eyebrow-tracking);
   text-transform: uppercase;
 }
 
-.japan-journal .japan-journal__title {
+.page-travel-journal .journal-intro > .travel-journal__title {
   margin: 0 0 1rem;
   font: 400 clamp(3.5rem, 7vw, 6.5rem)/0.9 "Raleway", sans-serif;
+  text-align: left;
   text-transform: none;
 }
 
-.japan-journal .japan-journal__intro > .date {
+.page-travel-journal .journal-intro > .date {
   display: block;
   margin: 0 0 0.85rem;
   font: 700 max(var(--text-floor), 0.78rem)/1.4 var(--font-display);
   text-transform: uppercase;
 }
 
-.japan-journal .japan-journal__intro .guangzhou-journal__lede {
+.page-travel-journal .journal-intro .guangzhou-journal__lede {
   margin: 0;
   text-align: left;
 }
@@ -9450,20 +9487,23 @@ body.page-home #intro {
 @media screen and (max-width: 600px) {
   /* Phone first screen (Oct 2026): a tighter editorial intro brings the
      banner above ~280px. verify.ps1 pins the 10rem summit-framed crop. */
-  .japan-journal .japan-journal__intro {
+  .page-travel-journal .journal-intro {
     margin-bottom: 0.75rem;
   }
 
-  .japan-journal .japan-journal__eyebrow {
+  .page-travel-journal .journal-intro__eyebrow {
     margin-bottom: 0.4rem;
   }
 
-  .japan-journal .japan-journal__title {
+  /* Line height 1, not 0.9, on phones: "Chengdu & Zhangjiajie" takes two lines here, and at 0.9
+     its descenders nearly met the next line and the dates (27 Nov 2026 review). */
+  .page-travel-journal .journal-intro > .travel-journal__title {
     margin-bottom: 0.5rem;
     font-size: 3rem;
+    line-height: 1;
   }
 
-  .japan-journal .japan-journal__intro > .date {
+  .page-travel-journal .journal-intro > .date {
     margin-bottom: 0.5rem;
   }
 

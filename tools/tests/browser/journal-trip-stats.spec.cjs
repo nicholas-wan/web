@@ -31,7 +31,10 @@ test('Chengdu shows the trip at a glance under its banner, and so does every oth
     return { banner: box('.journal-banner'), stats: box('.travel-journal__stats'), date: box('.guangzhou-day__date') };
   });
   // The banner keeps its place near the top on phones; the line follows it, one row at 390px.
-  expect(geometry.banner.top).toBeLessThan(220);
+  // 250, not 220, since every journal opens like Japan (27 Nov 2026): the eyebrow sits above, and
+  // "Chengdu & Zhangjiajie" takes two lines of the large title at line height 1 (banner at 245px,
+  // was 193px; Japan's own opening puts its banner at 229px).
+  expect(geometry.banner.top).toBeLessThan(250);
   expect(geometry.stats.top).toBeGreaterThan(geometry.banner.bottom);
   expect(geometry.stats.height).toBeLessThan(48);
   expect(geometry.date.top).toBeGreaterThan(geometry.stats.bottom);
