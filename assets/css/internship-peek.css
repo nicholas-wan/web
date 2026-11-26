@@ -27,6 +27,13 @@
 .page-experience .case-study--internship .internship-demo-hint strong { color: #0c6663; font-weight: 700; }
 .page-experience .case-study--internship .internship-demo-hint + .internship-demo-peek,
 .page-experience .case-study--internship .internship-demo-hint + .internship-demo-peeks { margin-top: 0.22rem; }
+/* Wide screens with a mouse put the hint beside the chips (custom.css,
+   26 Nov 2026), so Shopee's single peek is only as wide as its chip: its card
+   takes the shared 28rem itself, as the League pair's card does. */
+@media screen and (min-width: 1101px) and (hover: hover) {
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-entry__body > .internship-demo-peek { width: auto; }
+  .page-experience :is(.case-study--internship, #agentic-ai) .internship-entry__body > .internship-demo-peek > .internship-demo-card { width: min(28rem, calc(100vw - 2rem)); }
+}
 @media screen and (max-width: 736px), screen and (hover: none) {
   .page-experience .case-study--internship .internship-demo-hint .anomaly-peek__hint-hover { display: none; }
   .page-experience .case-study--internship .internship-demo-hint .anomaly-peek__hint-touch { display: inline; }

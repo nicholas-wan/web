@@ -507,6 +507,8 @@ test('internship rows invite a hover (or a tap on phones), and the first chip of
  // and its call to action sits beside the chip; on phones it sits above the chip, as on every other row.
  await expect(page.locator('#agentic-ai .internship-demo-hint')).toHaveText('Click the chart to see it in action',{useInnerText:true});
  {const h=await page.locator('#agentic-ai .internship-demo-hint').boundingBox(),c=await chip(peek(page,'agentic')).boundingBox();expect(h.x).toBeGreaterThan(c.x+c.width);expect(Math.abs((h.y+h.height/2)-(c.y+c.height/2))).toBeLessThan(3);}
+ // At 1101px and wider with a mouse each internship row's hint sits beside its chips too, after the last one (26 Nov 2026).
+ for(const last of ['shopee','league-ab']){const h=await hints.nth(last==='shopee'?0:1).boundingBox(),c=await chip(peek(page,last)).boundingBox();expect(h.x).toBeGreaterThan(c.x+c.width);expect(Math.abs((h.y+h.height/2)-(c.y+c.height/2))).toBeLessThan(4);}
  const first=chip(peek(page,'shopee'));
  await first.scrollIntoViewIfNeeded();
  await expect(first).toHaveClass(/is-breathing/);
@@ -519,6 +521,7 @@ test('internship rows invite a hover (or a tap on phones), and the first chip of
  await page.setViewportSize({width:390,height:844});
  await page.reload();
  await expect(hints.nth(1)).toHaveText('Tap a chart to see it in action',{useInnerText:true});
+ {const h=await hints.nth(1).boundingBox(),c=await chip(peek(page,'league')).boundingBox();expect(h.y+h.height).toBeLessThan(c.y);}
  await expect(page.locator('#agentic-ai .internship-demo-hint')).toHaveText('Tap the chart to see it in action',{useInnerText:true});
  {const h=await page.locator('#agentic-ai .internship-demo-hint').boundingBox(),c=await chip(peek(page,'agentic')).boundingBox();expect(h.y+h.height).toBeLessThan(c.y);expect(Math.abs(h.x-c.x)).toBeLessThan(1);}
 });
