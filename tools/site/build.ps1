@@ -166,6 +166,9 @@ function Set-WideJournalTileSizes([string]$Markup) {
 }
 function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [hashtable]$SourceIndex, [bool]$JournalGallery = $false) {
     $state = @{ Counter = 0 }
+    # String joins, not Join-Path/Split-Path, for each of ~2,900 images (26 Nov 2026).
+    $imageBase = $ImageRoot.TrimEnd('\') + '\'
+    $webpBase = [IO.Path]::GetDirectoryName($ImageRoot.TrimEnd('\')) + '\images-webp\'
     return [regex]::Replace($Markup, '<img\b[^>]*>', {
         param($match)
         $tag = $match.Value
@@ -173,18 +176,17 @@ function Add-ImagePerformanceAttributes([string]$Markup, [string]$ImageRoot, [ha
         $srcMatch = [regex]::Match($tag, 'src="([^"]+)"')
         if (-not $srcMatch.Success -or $srcMatch.Groups[1].Value -match '^(https?:|data:)') { return $tag }
         $relative = $srcMatch.Groups[1].Value.Replace('/', '\')
-        $path = Join-Path $ImageRoot ($relative -replace '^images\\', '')
-        if (-not (Get-SourceImageInfo $path $SourceIndex)) {
-            $webpRootPath = Join-Path (Split-Path $ImageRoot -Parent) 'images-webp'
-            $bare = $relative -replace '^images\\', ''
+        $bare = ($relative -replace '^images\\', '').TrimStart('\')
+        $path = $imageBase + $bare
+        if (-not $SourceIndex[[IO.Path]::GetFullPath($path).ToLowerInvariant()]) {
             if ($relative -match '\.webp$') {
-                $path = Join-Path $webpRootPath $bare
+                $path = $webpBase + $bare
             } elseif ($relative -match '\.(jpg|jpeg)$') {
                 # The markup still names the .jpg, but the original was removed once a
                 # webp replacement existed (see $webpMap). Without this fallback the
                 # build finds no file, so those images ship with no intrinsic
                 # width/height and no srcset -- the house gallery lost both that way.
-                $path = Join-Path $webpRootPath ([IO.Path]::ChangeExtension($bare, '.webp'))
+                $path = $webpBase + [IO.Path]::ChangeExtension($bare, '.webp')
             }
         }
         $dimensions = Get-CachedImageDimensions $path $SourceIndex
@@ -330,7 +332,16 @@ function Normalize-MissingJpegReferences([string]$Markup, [string]$ImageRoot) {
 if ($Clean -and (Test-Path -LiteralPath $out)) {
     # Keep the output directory itself so a local preview process with that
     # directory open cannot prevent an otherwise clean rebuild.
-    Get-ChildItem -LiteralPath $out -Force | Remove-Item -Recurse -Force
+    # .NET deletes first (Remove-Item took about 0.4 s over ~3,000 files, 26 Nov
+    # 2026); Remove-Item -Force stays the fallback for anything they refuse, such
+    # as a read-only file. Deleting a hard link leaves its source image alone.
+    foreach ($entry in [IO.Directory]::GetFileSystemEntries($out)) {
+        try {
+            if ([IO.Directory]::Exists($entry)) { [IO.Directory]::Delete($entry, $true) } else { [IO.File]::Delete($entry) }
+        } catch {
+            Remove-Item -LiteralPath $entry -Recurse -Force
+        }
+    }
 }
 New-Item -ItemType Directory -Path $out -Force | Out-Null
 
@@ -361,12 +372,14 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
         '(?i)(images/[^"''\s\),?#]+)'
     )
 
+    # The extension test runs before unescaping (no page percent-encodes an image
+    # extension), so the ~8,000 matches that are not images skip it (26 Nov 2026).
     foreach ($file in $scanFiles) {
-        $content = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8
+        $content = [IO.File]::ReadAllText($file.FullName)
         foreach ($pattern in $patterns) {
             foreach ($match in [regex]::Matches($content, $pattern)) {
-                $path = [Uri]::UnescapeDataString($match.Groups[1].Value) -replace '\\', '/'
-                if ($path -match '(?i)\.(?:avif|gif|jpe?g|mp4|png|svg|webm|webp)$') { [void]$references.Add($path) }
+                $value = $match.Groups[1].Value
+                if ($value -match '(?i)\.(?:avif|gif|jpe?g|mp4|png|svg|webm|webp)$') { [void]$references.Add(([Uri]::UnescapeDataString($value)).Replace('\', '/')) }
             }
         }
     }
@@ -392,8 +405,14 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
         $source = $null
         $webpCandidate = if ($webpBase) { $webpBase + $relative } else { $null }
         $imageCandidate = $imageBase + $relative
-        if ($webpCandidate -and (Get-SourceImageInfo $webpCandidate $SourceIndex)) { $source = $webpCandidate }
-        elseif (Get-SourceImageInfo $imageCandidate $SourceIndex) { $source = $imageCandidate }
+        # Direct index lookups, not Get-SourceImageInfo: a function call per image
+        # adds up over ~2,900 of them (26 Nov 2026).
+        $sourceInfo = if ($webpCandidate) { $SourceIndex[[IO.Path]::GetFullPath($webpCandidate).ToLowerInvariant()] } else { $null }
+        if ($sourceInfo) { $source = $webpCandidate }
+        else {
+            $sourceInfo = $SourceIndex[[IO.Path]::GetFullPath($imageCandidate).ToLowerInvariant()]
+            if ($sourceInfo) { $source = $imageCandidate }
+        }
         if (-not $source) {
             $missing.Add($reference)
             continue
@@ -403,7 +422,6 @@ function Copy-ReferencedImages([string]$OutputRoot, [string]$ImageRoot, [string]
         $destinationInfo = $publishedImageIndex[[IO.Path]::GetFullPath($destination).ToLowerInvariant()]
         $copyRequired = -not $destinationInfo
         if (-not $copyRequired) {
-            $sourceInfo = Get-SourceImageInfo $source $SourceIndex
             $copyRequired = $sourceInfo.Length -ne $destinationInfo.Length -or
                 $sourceInfo.LastWriteTimeUtc -gt $destinationInfo.LastWriteTimeUtc
         }
@@ -936,11 +954,14 @@ function ConvertTo-PlainText([string]$Markup) {
     return [System.Net.WebUtility]::HtmlDecode(($text -replace '\s+', ' ').Trim())
 }
 
+# String joins and a direct index lookup: four Join-Path calls a reference cost
+# about 0.6 s over the photo index's ~3,000 lookups (26 Nov 2026).
+$sourceImageRoots = @(($root.TrimEnd('\') + '\images\'), ($root.TrimEnd('\') + '\images-webp\'))
 function Resolve-SourceImagePath([string]$Reference) {
-    $bare = ($Reference -replace '^images/', '') -replace '/', '\'
-    foreach ($imageSourceRoot in @((Join-Path $root 'images'), (Join-Path $root 'images-webp'))) {
-        $candidate = Join-Path $imageSourceRoot $bare
-        if (Get-SourceImageInfo $candidate $script:sourceImageIndex) { return $candidate }
+    $bare = (($Reference -replace '^images/', '') -replace '/', '\').TrimStart('\')
+    foreach ($imageSourceRoot in $script:sourceImageRoots) {
+        $candidate = $imageSourceRoot + $bare
+        if ($script:sourceImageIndex[[IO.Path]::GetFullPath($candidate).ToLowerInvariant()]) { return $candidate }
     }
     return $null
 }
@@ -1150,8 +1171,14 @@ $photoIndexTags = foreach ($property in $tagVocabulary.PSObject.Properties) {
     $synonyms = @(foreach ($synonym in $property.Value.synonyms) { ConvertTo-JsonString $synonym }) -join ','
     '{"tag":' + (ConvertTo-JsonString $property.Name) + ',"facet":' + (ConvertTo-JsonString $property.Value.facet) + ',"count":' + [int]$photoTagCounts[$property.Name] + ',"synonyms":[' + $synonyms + ']}'
 }
+# Each tag is escaped once: about 8,600 tag uses share about 800 tags (26 Nov 2026).
+$jsonTagCache = New-Object System.Collections.Hashtable ([System.StringComparer]::Ordinal)
 $photoIndexPhotos = foreach ($entry in $photoEntries) {
-    $tags = @(foreach ($tag in $entry.Tags) { ConvertTo-JsonString $tag }) -join ','
+    $tags = @(foreach ($tag in $entry.Tags) {
+        $jsonTag = $jsonTagCache[$tag]
+        if ($null -eq $jsonTag) { $jsonTag = ConvertTo-JsonString $tag; $jsonTagCache[$tag] = $jsonTag }
+        $jsonTag
+    }) -join ','
     $video = if ($entry.Video) { 'true' } else { 'false' }
     $focus = if ($entry.FocusX -ne 50 -or $entry.FocusY -ne 50) { ',"fx":' + $entry.FocusX.ToString([System.Globalization.CultureInfo]::InvariantCulture) + ',"fy":' + $entry.FocusY.ToString([System.Globalization.CultureInfo]::InvariantCulture) } else { '' }
     '{"id":' + (ConvertTo-JsonString $entry.Id) + ',"src":' + (ConvertTo-JsonString $entry.Src) + ',"thumb":' + (ConvertTo-JsonString $entry.Thumb) +

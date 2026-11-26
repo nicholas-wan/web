@@ -10,10 +10,36 @@ $journalStarterPath = Join-Path $root 'journals\_template.html'
 # shipped bytes rather than restating a number. A hand-kept literal here could
 # only ever agree with whatever the build emitted, which is exactly why the
 # previous stale-bundle drift passed verification.
+# Memoised: pages ask for the same few assets about 150 times, and dist does not
+# change while verify runs (26 Nov 2026).
+$script:distAssetRefs = @{}
 function Get-DistAssetRef([string]$RelativePath) {
+    $cached = $script:distAssetRefs[$RelativePath]
+    if ($cached) { return $cached }
     $path = Join-Path $dist ($RelativePath -replace '/', '\')
     if (-not (Test-Path -LiteralPath $path)) { throw "Versioned asset is missing from dist: $RelativePath" }
-    return "$RelativePath`?v=$(Get-ContentVersion (Get-Content -LiteralPath $path -Raw -Encoding UTF8))"
+    $ref = "$RelativePath`?v=$(Get-ContentVersion (Get-Content -LiteralPath $path -Raw -Encoding UTF8))"
+    $script:distAssetRefs[$RelativePath] = $ref
+    return $ref
+}
+
+# Per-photo existence checks without Join-Path/Test-Path, which cost about 0.8 s
+# over the ~2,500 photo-index checks (26 Nov 2026). Like Test-Path, a folder counts.
+$distPrefix = $dist.TrimEnd('\') + '\'
+function Test-DistPath([string]$RelativePath) {
+    $target = $distPrefix + $RelativePath.TrimStart('\')
+    return [IO.File]::Exists($target) -or [IO.Directory]::Exists($target)
+}
+
+# The atlas checks read the same ten journal pages about 140 times.
+$script:distPageText = @{}
+function Read-DistPage([string]$Path) {
+    $text = $script:distPageText[$Path]
+    if ($null -eq $text) {
+        $text = Get-Content -LiteralPath $Path -Raw -Encoding UTF8
+        $script:distPageText[$Path] = $text
+    }
+    return $text
 }
 
 # Recomputing hashes from dist made the standalone verify task self-consistent
@@ -109,8 +135,10 @@ foreach ($psSource in @((Join-Path $root 'tools\site.ps1')) + @(Get-ChildItem -L
 # The build reads every text source as LF (Read-SourceText), so a CRLF checkout
 # no longer changes what ships, but the file still differs from what git stores.
 # A warning, not a failure: the working tree is the owner's to renormalise.
+# Only paths with the text attribute: a bare --eol reads all ~3,100 tracked files,
+# photos included, to report on the ~220 text ones (2.4 s of a 7 s verify, 26 Nov 2026).
 if (Get-Command git -ErrorAction SilentlyContinue) {
-    $crSources = @(git -C $root ls-files --eol | Where-Object { $_ -match '^\S+\s+w/(crlf|mixed)\s+attr/text\b' } | ForEach-Object { ($_ -split "`t", 2)[1] })
+    $crSources = @(git -C $root ls-files --eol -- ':(attr:text)' | Where-Object { $_ -match '^\S+\s+w/(crlf|mixed)\s+attr/text\b' } | ForEach-Object { ($_ -split "`t", 2)[1] })
     if ($crSources.Count) { Write-Warning ("Tracked text sources hold CR line endings in this checkout (git stores LF): " + ($crSources -join ', ') + '. Convert them to LF; the build output is unaffected.') }
 }
 if (-not (Test-Path -LiteralPath $journalManifestPath) -or -not (Test-Path -LiteralPath $journalPartialPath) -or -not (Test-Path -LiteralPath $journalStarterPath)) { throw "Travel journal manifest, shared partial, or starter is missing." }
@@ -307,7 +335,7 @@ foreach ($page in $pages) {
         # JPEG photos' -480/-800 tiers (and banners' -1200, 6 Nov 2026) are WebP where
         # make-responsive-variants.py --webp-tiers made them (5 Nov 2026): never
         # mixed, never a .jpg beside its .webp.
-        $tierExtensions = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+        $tierExtensions = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
         foreach ($tier in [regex]::Matches($match.Groups[1].Value, '-(?:480|800|1200)\.(jpg|webp) (?:480|800|1200)w')) { [void]$tierExtensions.Add($tier.Groups[1].Value) }
         if ($tierExtensions.Count -gt 1) { throw "$($page.Name) mixes JPEG and WebP -480/-800/-1200 tiers in one srcset: $($match.Groups[1].Value)" }
         foreach ($jpegTier in [regex]::Matches($match.Groups[1].Value, '(images/[^\s,]+-(?:480|800|1200))\.jpg (?:480|800|1200)w')) {
@@ -707,7 +735,7 @@ for ($i = 0; $i -lt $photoIndex.photos.Count; $i++) {
     # A JPEG photo's -480 thumb may be its WebP tier (5 Nov 2026); the base must still match.
     if ($photo.video -or $photo.w -le 480 -or $photo.src -cnotmatch '\.(?:jpg|webp)$' -or $photo.thumb -cnotmatch '-480\.(?:jpg|webp)$' -or ($photo.thumb -creplace '\.[^.]+$', '') -cne (($photo.src -creplace '\.[^.]+$', '') + '-480')) { throw "Unsafe responsive photo: $($photo.id)" }
     if ($photo.src -cmatch '\.webp$' -and $photo.thumb -cnotmatch '\.webp$') { throw "A WebP photo must keep a WebP -480 thumb: $($photo.id)" }
-    if ($flag -eq '2' -and -not (Test-Path -LiteralPath (Join-Path $dist ($photo.thumb -replace '-480\.', '-800.')))) { throw "Missing responsive sibling: $($photo.id)" }
+    if ($flag -eq '2' -and -not (Test-DistPath (($photo.thumb -replace '-480\.', '-800.') -replace '/', '\'))) { throw "Missing responsive sibling: $($photo.id)" }
 }
 $coverReviews = Get-Content -LiteralPath (Join-Path $root 'journals/explore-covers.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 if (@($photoIndex.covers).Count -ne $coverReviews.Count) { throw 'The photo index must include every reviewed discovery cover.' }
@@ -732,7 +760,7 @@ foreach ($row in $photoIndex.covers) {
     if (-not $review -or -not $photo -or $photo.video -or $review.thumb -cne $photo.thumb -or $cover.fx -ne $review.fx -or $cover.fy -ne $review.fy -or ($cover.tags -join '|') -cne ($review.tags -join '|')) {
         throw "Discovery cover no longer matches its visual review: $($cover.id)"
     }
-    if ((Get-FileSha256 (Join-Path $dist $photo.thumb)) -ine $review.sha256) { throw "Published discovery thumbnail changed since visual review: $($cover.id)" }
+    if ((Get-FileSha256 ($distPrefix + ($photo.thumb -replace '/', '\'))) -ine $review.sha256) { throw "Published discovery thumbnail changed since visual review: $($cover.id)" }
 }
 $coverTemplate = [regex]::Match($travel, '(?s)<template id="photo-explore-seeds">(.*?)</template>').Groups[1].Value
 foreach ($card in [regex]::Matches($coverTemplate, '(?s)<a\b.*?</a>')) {
@@ -787,7 +815,7 @@ for ($i = 0; $i -lt $indexedPhotos.Count; $i++) {
     }
     if ($tile.SearchThumb -and $photo.thumb -cne $tile.SearchThumb) { throw "Photo index entry $($photo.id) does not preserve its art-directed search thumbnail." }
     foreach ($asset in @($photo.src, $photo.thumb)) {
-        if (-not $asset -or -not (Test-Path -LiteralPath (Join-Path $dist ($asset -replace '/', '\')))) { throw "Photo index entry $($photo.id) references a file missing from dist: $asset" }
+        if (-not $asset -or -not (Test-DistPath ($asset -replace '/', '\'))) { throw "Photo index entry $($photo.id) references a file missing from dist: $asset" }
     }
     $photoTagList = @($photo.tags)
     if ($photoTagList.Count -eq 0) { throw "Photo index entry $($photo.id) has no tags; run python -I tools/photos/seed_photo_tags.py." }
@@ -838,7 +866,7 @@ if ([regex]::Matches($travel, 'class="travel-map__city-links"').Count -ne 12 -or
 foreach ($cityLink in [regex]::Matches($travel, 'href="(travel_[^"#]+)#(trip-section-\d+)"')) {
     $targetPage = Join-Path $dist ($cityLink.Groups[1].Value + '.html')
     if (-not (Test-Path -LiteralPath $targetPage)) { throw "Travel map city link points to a missing journal: $($cityLink.Value)" }
-    $targetHtml = Get-Content -LiteralPath $targetPage -Raw -Encoding UTF8
+    $targetHtml = Read-DistPage $targetPage
     if ($targetHtml -notmatch ('id="' + [regex]::Escape($cityLink.Groups[2].Value) + '"')) { throw "Travel map city link points to a missing section: $($cityLink.Value)" }
 }
 if ($travel -match 'travel-atlas__destinations|travel-atlas__journal|travel-atlas__thumb') { throw "Travel atlas must not duplicate the journal archive with a destination list." }
@@ -1112,7 +1140,7 @@ if ($customCss -notmatch '(?s)\.travel-map__detail-step\s*\{[^}]*background:\s*r
 foreach ($detailLink in [regex]::Matches($travelMapJs, "'(travel_[^'#]+)#(trip-section-\d+)'")) {
     $detailPage = Join-Path $dist ($detailLink.Groups[1].Value + '.html')
     if (-not (Test-Path -LiteralPath $detailPage)) { throw "Progressive map point targets a missing journal: $($detailLink.Value)" }
-    $detailHtml = Get-Content -LiteralPath $detailPage -Raw -Encoding UTF8
+    $detailHtml = Read-DistPage $detailPage
     if ($detailHtml -notmatch ('id="' + [regex]::Escape($detailLink.Groups[2].Value) + '"')) { throw "Progressive map point targets a missing section: $($detailLink.Value)" }
     $sectionNeedle = 'id="' + $detailLink.Groups[2].Value + '"'
     $sectionStart = $detailHtml.IndexOf($sectionNeedle, [StringComparison]::Ordinal)
