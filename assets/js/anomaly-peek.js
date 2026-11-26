@@ -556,6 +556,9 @@
     c.mini = makers[k][1](c.chip.querySelector('[data-mini]'));
   });
   keys.forEach(function (k) { charts[k].chart.layout(); });
+  // A closed chart's pulse rings stay still until it opens and its ticker
+  // unpauses them (26 Nov 2026: they ticked while hidden).
+  charts.series.chart.setPaused(true);
 
   var onScreen = false;
   // Minis: play each time the card comes into view, then rest (and loop).
@@ -636,10 +639,16 @@
   glow.innerHTML = '<i></i><i></i><i></i><i></i><i></i><i></i>';
   charts[keys[0]].chip.appendChild(glow);
   function breathe() {
-    var b = charts[keys[0]].chip, on = onScreen && !keys.some(function (k) { return charts[k].state.open; });
+    var b = charts[keys[0]].chip, on = chipOnScreen && !keys.some(function (k) { return charts[k].state.open; });
     // In phase with the internship chips' breathing.
     if (on !== b.classList.contains('is-breathing')) { b.style.animationDelay = on ? -(window.performance.now() % 2600) + 'ms' : ''; }
     b.classList.toggle('is-breathing', on);
+  }
+  // It breathes while the chip itself is on screen, as the internship chips
+  // do; the card's top edge alone kept it breathing below the fold.
+  var chipOnScreen = !('IntersectionObserver' in window);
+  if (!chipOnScreen) {
+    new IntersectionObserver(function (es) { chipOnScreen = es[es.length - 1].isIntersecting; breathe(); }, { threshold: 0.5 }).observe(charts[keys[0]].chip);
   }
   function update() {
     var want = keys.filter(function (k) { var s = charts[k].state; return !s.dismissed && (s.hovering || s.focus); });
