@@ -361,6 +361,21 @@
   transform: translateY(-2px);
 }
 
+/* One Skills hover (26 Nov 2026): the tiles and the Education cards take the capability cards'
+   quiet border and surface tint, without the 2px lift or the 3D pointer tilt (listing-effects.js
+   tilted the Education cards); Skills cards are static, not links. */
+.page-skills .tech-stack__grid li,
+.page-skills .education-card {
+  transition: border-color var(--motion-standard) ease, background-color var(--motion-standard) ease;
+}
+
+.page-skills .tech-stack__grid li:hover,
+.page-skills .education-card:hover {
+  border-color: #c8d2d0;
+  background: #f5f7f5;
+  transform: none;
+}
+
 .tech-stack__grid li > i {
   color: var(--color-brand-600);
   font-size: 1.65rem;
@@ -903,7 +918,9 @@
 }
 
 .notfound .homepage-link {
-  justify-content: center;
+  /* Top-aligned: centred, a one-line description put About's title 9px lower
+     than its neighbours' on tablets (26 Nov 2026). */
+  justify-content: flex-start;
   min-height: 7rem;
   background-image: none;
   box-shadow: none;
@@ -3152,7 +3169,7 @@ body.is-map-fullscreen .travel-atlas__layout {
   min-width: 0;
   padding: 0 !important;
   border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 0.3rem;
+  border-radius: var(--radius-compact);
   background: #fff;
   overflow: hidden;
   box-shadow: 0 0.2rem 0.75rem rgba(0, 0, 0, 0.04);
@@ -3520,8 +3537,9 @@ header.major > .travel-journal__stats {
 .guangzhou-day__route strong {
   color: var(--color-brand-700);
   font-family: var(--font-display);
-  font-size: max(var(--text-floor), 0.68rem);
-  letter-spacing: 0.08em;
+  font-size: var(--eyebrow-size);
+  font-weight: 700;
+  letter-spacing: var(--eyebrow-tracking);
   text-transform: uppercase;
 }
 
@@ -3660,6 +3678,16 @@ header.major > .travel-journal__stats {
 
 .travel-gallery--compact.travel-gallery--sparse {
   max-width: 42rem;
+}
+
+/* Three-photo days take the four-up track like every other day (26 Nov 2026): capped at 42rem
+   their tiles were 213px beside the 244px ones, which the build's tile sizes already assume. */
+@media screen and (min-width: 601px) {
+  /* .masonry out-ranks the later .guangzhou-day--compact .masonry.mason3 three-column rule. */
+  .travel-gallery--compact.travel-gallery--sparse.masonry.mason3 {
+    max-width: none;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 /* A day with one photo shows it as a feature image instead of one quarter-width
@@ -4645,6 +4673,7 @@ header.major > .travel-journal__stats {
   margin-right: 0.45rem;
   color: var(--color-brand-700);
   font-size: var(--eyebrow-size);
+  font-weight: 700;
   letter-spacing: var(--eyebrow-tracking);
 }
 
@@ -4905,7 +4934,7 @@ header.major > .travel-journal__stats {
 #main > .earlier-work {
   margin: 0 2rem 4rem;
   border: 1px solid #dde5e7;
-  border-radius: 0.65rem;
+  border-radius: var(--radius-card);
   background: #f8faf9;
   transition: border-color var(--motion-standard) ease;
 }
@@ -4922,7 +4951,7 @@ header.major > .travel-journal__stats {
   gap: 1rem;
   padding: 1.3rem 1.5rem;
   /* Rounds the focus ring to the box's corners. */
-  border-radius: calc(0.65rem - 1px);
+  border-radius: calc(var(--radius-card) - 1px);
   cursor: pointer;
   list-style: none;
 }
@@ -4966,7 +4995,7 @@ header.major > .travel-journal__stats {
   flex-direction: column;
   padding: 0;
   border: 1px solid #e1e7e9;
-  border-radius: 0.45rem;
+  border-radius: var(--radius-compact);
   background: #fff;
   box-shadow: var(--shadow-card);
   overflow: hidden;
@@ -6110,6 +6139,8 @@ body:not(.page-home) #wrapper.fade-in::before {
 }
 
 @media screen and (max-width: 980px) {
+  /* The journals' dark strip (26 Nov 2026; it was the only white bar, with a bare glyph at the
+     right): the menu first behind a hairline, then the way back. */
   .mobile-context-bar {
     position: sticky;
     top: 0;
@@ -6118,12 +6149,9 @@ body:not(.page-home) #wrapper.fade-in::before {
     width: 100%;
     height: 3.5rem;
     align-items: center;
-    justify-content: space-between;
-    /* Back link on the gallery's 2rem edge; the menu icon's right edge too. */
-    padding: 0 calc(2rem - 1.05rem) 0 2rem;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    background: #fff;
-    box-shadow: none;
+    padding: 0 0.75rem 0 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(25, 30, 35, 0.98);
   }
 
   .mobile-context-bar__back {
@@ -6131,26 +6159,36 @@ body:not(.page-home) #wrapper.fade-in::before {
     /* 3rem is 40px where the root shrinks (320-360px). */
     min-height: max(44px, 3rem);
     align-items: center;
+    padding-left: 0.25rem;
     border: 0 !important;
-    color: var(--color-ink-800) !important;
+    color: rgba(255, 255, 255, 0.68) !important;
     font-family: var(--font-display);
-    font-size: max(var(--text-floor), 0.78rem);
+    font-size: max(var(--text-floor), 0.82rem);
     font-weight: 700;
     letter-spacing: 0.025em;
+    transition: color var(--motion-standard) ease;
   }
+
+  .mobile-context-bar__back:hover { color: #fff !important; }
 
   .mobile-context-bar #navPanelToggle,
   .mobile-context-bar #navPanelToggle.alt {
     position: static;
-    top: auto;
-    right: auto;
-    min-width: 3rem;
-    min-height: 3rem;
+    order: -1;
+    display: flex;
+    width: 3.5rem;
+    height: 3.5rem;
+    flex: 0 0 3.5rem;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
     padding: 0;
+    border: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.16);
     border-radius: 0;
     background: transparent;
     box-shadow: none;
-    color: var(--color-ink-800);
+    color: #fff;
     font-size: 0;
   }
 
@@ -6158,11 +6196,6 @@ body:not(.page-home) #wrapper.fade-in::before {
     margin: 0;
     font-size: 1rem;
   }
-}
-
-/* Tablets: the gallery sits 6rem in (the sheet's 2rem plus 4rem). */
-@media screen and (min-width: 737px) and (max-width: 980px) {
-  .mobile-context-bar { padding: 0 calc(6rem - 1.05rem) 0 6rem; }
 }
 
 /* Route bundle: event-context-bar:end */
@@ -6857,6 +6890,24 @@ a.travel-jump-group__label {
    :first-child reset missed the strip and the article. */
 #main > :is(.travel-section-nav, article) {
   border-top: 0;
+}
+
+/* Tablets: the journal strip runs the window's width as on phones and desktop; #main's 2rem
+   inset left it floating 29px in from each edge, shadow and all (26 Nov 2026). */
+@media screen and (min-width: 481px) and (max-width: 980px) {
+  #main > .travel-section-nav {
+    width: auto;
+    margin-right: -2rem;
+    margin-left: -2rem;
+  }
+}
+
+/* House and Pre-wedding share the journals' 16px phone gutter (26 Nov 2026; theirs was 29px). */
+@media screen and (max-width: 600px) {
+  .page-event #main > article {
+    padding-right: 1.1rem;
+    padding-left: 1.1rem;
+  }
 }
 
 /* Inset to the text column below 64rem, as the tab pages' pager is. */
@@ -9367,7 +9418,7 @@ body.page-home #intro {
 .japan-journal .japan-journal__eyebrow {
   margin: 0 0 0.65rem;
   color: var(--color-brand-700);
-  font: 900 var(--eyebrow-size)/1.2 var(--font-display);
+  font: 700 var(--eyebrow-size)/1.2 var(--font-display);
   letter-spacing: var(--eyebrow-tracking);
   text-transform: uppercase;
 }
@@ -9748,6 +9799,7 @@ body.page-home #nav {
   font-family: var(--font-body);
   font-size: 1.5rem;
   font-weight: 700;
+  line-height: 1.1;
   letter-spacing: 0;
   text-align: left;
   text-transform: none;
@@ -9878,7 +9930,7 @@ body.page-home #nav {
     background: #f8f9f7;
     box-shadow: none;
     transform: none;
-    transition: border-color 0.18s ease, background-color 0.18s ease;
+    transition: border-color var(--motion-standard) ease, background-color var(--motion-standard) ease;
   }
 
   .page-skills .toolkit-card:hover,
