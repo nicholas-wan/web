@@ -92,7 +92,7 @@ window.travelPlaceCard = function (hooks) {
       return '<a class="place-card__map' + extra + '" href="' + url + encodeURIComponent(query) + '" target="_blank" rel="noopener">' + label + '</a>';
     };
     var sheet = card.firstChild;
-    /* Layout after Google and Apple Maps' place sheets; the README's place-card bullet has the
+    /* Layout after Google and Apple Maps' place sheets; docs/contracts/journals.md's place-card bullet has the
        owner's decisions. Up to four thumbnails, "+N" on the last when there are more. */
     sheet.innerHTML = '<span class="place-card__handle" aria-hidden="true"></span>' +
       '<button class="place-card__close" type="button" data-card="close" aria-label="Close place card">&times;</button>' +

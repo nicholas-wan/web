@@ -720,7 +720,7 @@ function Add-RouteSummaries([string]$Markup, [string]$Slug) {
 # animations included. No money: a sum of ticket prices without flights, stays and
 # food read as the trip's cost (owner, 18 Nov 2026: "misleading to put"); day totals stay, each
 # saying what it counts. It follows the banner rather than the lede: above it, the phone banner
-# fell to about 250px from the top, past the README's ~220px.
+# fell to about 250px from the top, past the ~220px in docs/contracts/journals.md.
 function Add-TripStats([string]$Markup, [string]$Slug) {
     if ($tripOrder -notcontains $Slug) { return $Markup }
     $days = 0; $months = 0; $stops = 0
@@ -830,6 +830,13 @@ if (Test-Path -LiteralPath $webpSource) {
 # shipped under an unchanged key, reaching nobody. verify.ps1 could not catch
 # either, because it asserted the same stale number the build emitted.
 # Get-ContentVersion and Remove-CssComments live in common.ps1.
+# A marker or attribute the page's source must hold. A plain .Replace() did nothing when one
+# went missing, so the page shipped without that block or with an unversioned URL (26 Nov 2026).
+function Replace-Marker([string]$Text, [string]$Marker, [string]$Value, [string]$Page) {
+    if ($Text.IndexOf($Marker, [StringComparison]::Ordinal) -lt 0) { throw "Build marker missing from ${Page}: $Marker" }
+    return $Text.Replace($Marker, $Value)
+}
+
 function Get-FileContentVersion([string]$Path) {
     return Get-ContentVersion (Read-SourceText $Path)
 }
@@ -1293,23 +1300,23 @@ foreach ($page in $pages) {
         # Travel Packing's laptop script is not a <script src>: the page sits at its 80 KB
         # JavaScript ceiling and only wide screens show the laptop. projects.js injects it
         # from this attribute's versioned URL.
-        $main = $main.Replace('data-script="assets/js/projects-laptop.js"', "data-script=`"$(Get-AssetRef 'assets/js/projects-laptop.js')`"")
+        $main = Replace-Marker $main 'data-script="assets/js/projects-laptop.js"' ("data-script=`"$(Get-AssetRef 'assets/js/projects-laptop.js')`"") $slug
         # The companion devices (Finance's laptop, the bots' lock screens) load the same way.
-        $main = $main.Replace('data-script="assets/js/projects-companions.js"', "data-script=`"$(Get-AssetRef 'assets/js/projects-companions.js')`"")
+        $main = Replace-Marker $main 'data-script="assets/js/projects-companions.js"' ("data-script=`"$(Get-AssetRef 'assets/js/projects-companions.js')`"") $slug
     }
     if ($slug -eq 'travel') {
-        $main = $main.Replace('<!-- TRAVEL_SHORTCUTS -->', (Read-SourceText (Join-Path $root 'partials/travel-shortcuts.html')).Trim())
-        $main = $main.Replace('<!-- TRAVEL_CHRONOLOGY -->', $travelChronologyHtml.Replace('data-scenes="assets/data/travel-scenes.svg"', "data-scenes=`"$(Get-AssetRef 'assets/data/travel-scenes.svg')`""))
+        $main = Replace-Marker $main '<!-- TRAVEL_SHORTCUTS -->' ((Read-SourceText (Join-Path $root 'partials/travel-shortcuts.html')).Trim()) $slug
+        $main = Replace-Marker $main '<!-- TRAVEL_CHRONOLOGY -->' (Replace-Marker $travelChronologyHtml 'data-scenes="assets/data/travel-scenes.svg"' ("data-scenes=`"$(Get-AssetRef 'assets/data/travel-scenes.svg')`"") 'partials/travel-chronology.html') $slug
         # The photo search script is not a <script src> on the travel page: that
         # page sits at its 80 KB JavaScript ceiling, and the search is only
         # needed once a visitor focuses the field. An inline loader reads the
         # versioned URL from this attribute and injects the script on demand.
-        $main = $main.Replace('data-search-script="assets/js/photo-search.js"', "data-search-script=`"$(Get-AssetRef 'assets/js/photo-search.js')`"")
-        $main = $main.Replace('data-search-index="assets/data/photo-index.json"', "data-search-index=`"$(Get-AssetRef 'assets/data/photo-index.json')`"")
-        $main = $main.Replace('data-map-script="assets/js/travel-map.js"', "data-map-script=`"$(Get-AssetRef 'assets/js/travel-map.js')`"")
-        $main = $main.Replace('<!-- PHOTO_EXPLORE_SEEDS -->', ($exploreCards -join "`n"))
-        $main = $main.Replace('<!-- TRAVEL_SEED_BOOTSTRAP -->', '<script>' + (Read-SourceText (Join-Path $root 'assets/js/travel-seeds.js')).Trim() + '</script>')
-        $main = $main.Replace('<!-- PHOTO_EXPLORE_FALLBACK -->', (($exploreFallback | Select-Object -First 4) -join "`n"))
+        $main = Replace-Marker $main 'data-search-script="assets/js/photo-search.js"' ("data-search-script=`"$(Get-AssetRef 'assets/js/photo-search.js')`"") $slug
+        $main = Replace-Marker $main 'data-search-index="assets/data/photo-index.json"' ("data-search-index=`"$(Get-AssetRef 'assets/data/photo-index.json')`"") $slug
+        $main = Replace-Marker $main 'data-map-script="assets/js/travel-map.js"' ("data-map-script=`"$(Get-AssetRef 'assets/js/travel-map.js')`"") $slug
+        $main = Replace-Marker $main '<!-- PHOTO_EXPLORE_SEEDS -->' (($exploreCards -join "`n")) $slug
+        $main = Replace-Marker $main '<!-- TRAVEL_SEED_BOOTSTRAP -->' ('<script>' + (Read-SourceText (Join-Path $root 'assets/js/travel-seeds.js')).Trim() + '</script>') $slug
+        $main = Replace-Marker $main '<!-- PHOTO_EXPLORE_FALLBACK -->' ((($exploreFallback | Select-Object -First 4) -join "`n")) $slug
     }
     if ($journalBySlug.ContainsKey($slug)) {
         $title = $journalBySlug[$slug].title

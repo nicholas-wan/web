@@ -796,7 +796,7 @@ html .page-projects .portfolio-headline h1{color:#ecedf0}
 .page-projects .app-demo .demo-island{background:#000}
 /* Travel Packing's laptop is styled by projects-laptop.js, which loads on wide screens only; until then it stays hidden. */
 .page-projects :is(.pkl,.cpn):not(.is-on){display:none}
-/* Proof of use under each app's name (owner, 12 Nov 2026: option A of lab/projects-proof). Real counts; see README. */
+/* Proof of use under each app's name (owner, 12 Nov 2026: option A of lab/projects-proof). Real counts; see docs/contracts/projects.md. */
 .page-projects .app-card__head .app-card__proof{grid-column:2/4;grid-row:3;margin:.35rem 0 0;font:500 .95rem/1.3 Archivo,system-ui,sans-serif;color:var(--pj-muted)}
 .page-projects .app-card__proof b{font-size:1.1rem;font-weight:650;letter-spacing:-.01em;color:var(--pj-ink)}
 .page-projects .app-card__proof i{font-style:normal;margin:0 .6rem;color:#3a3e45}

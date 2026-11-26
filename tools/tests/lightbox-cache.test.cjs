@@ -5,8 +5,16 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const source = fs.readFileSync(path.join(__dirname, '../../assets/js/gallery.js'), 'utf8');
-const code = source.slice(source.indexOf('  var responsiveCandidate ='), source.indexOf('  var lightboxSource =')) +
-  source.slice(source.indexOf('  var fittedImages ='), source.indexOf('  var clamp ='));
+// The suites run slices of gallery.js between two declarations. A renamed or reordered
+// declaration used to give indexOf -1 and silently run the wrong code (26 Nov 2026).
+function between(from, to) {
+  const start = source.indexOf(from), end = source.indexOf(to, start + 1);
+  assert.ok(start >= 0, `gallery.js no longer declares "${from.trim()}"`);
+  assert.ok(end > start, `gallery.js no longer declares "${to.trim()}" after "${from.trim()}"`);
+  return source.slice(start, end);
+}
+const code = between('  var responsiveCandidate =', '  var lightboxSource =') +
+  between('  var fittedImages =', '  var clamp =');
 
 function setup() {
   const requests = [];
@@ -55,7 +63,7 @@ test('reuse requests, promote current-image priority, and cap retained images at
 
 test('cold journal fallback starts with a small preview instead of the viewing-size download', () => {
   const t = setup(), s = t.state;
-  vm.runInContext(source.slice(source.indexOf('  var lightboxSource ='), source.indexOf('  var warmNeighbours =')), s);
+  vm.runInContext(between('  var lightboxSource =', '  var warmNeighbours ='), s);
   s.isJournal = true;
   assert.equal(s.lightboxSource(t.media[0]), '0-480.jpg');
   t.media[0].currentSrc = 'already-loaded.jpg';
@@ -134,8 +142,8 @@ test('zoom returning to fit cancels its original and rejects a late decode; fail
   const s = vm.createContext({ Image, currentSource: { src: 'original' }, viewerImage: { src: 'preview' },
     zoomLevel: 1, imageRequest: 0, isJournal: true, clamp: (n, lo, hi) => Math.min(hi, Math.max(lo, n)),
     fitUpgrade() {}, renderMediaTransform() {} });
-  vm.runInContext(source.slice(source.indexOf('  var zoomImage ='), source.indexOf('  var resetMediaTransform =')) +
-    source.slice(source.indexOf('  var setZoom ='), source.indexOf('  var toggleLandscapeView =')), s);
+  vm.runInContext(between('  var zoomImage =', '  var resetMediaTransform =') +
+    between('  var setZoom =', '  var toggleLandscapeView ='), s);
   s.setZoom(2);
   s.setZoom(2.5);
   assert.equal(requests.length, 1, 'pinching must reuse the original request');

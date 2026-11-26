@@ -1,4 +1,4 @@
-// Puts the Agentic AI card's "Hunt from a report" chart on Experience (README "Agentic AI glance chart").
+// Puts the Agentic AI card's "Hunt from a report" chart on Experience (docs/contracts/work.md "Agentic AI glance chart").
 //   node tools/scenes/agentic-glance/build.cjs && node tools/scenes/agentic-glance/apply.cjs
 // In experience.html, replaces the #agentic-ai card's peek (the internship-demo-peek, and a hint line before it as the
 // pre-Nov 2026 markup had) with the chip, its hint and the card around scene-d.svg and scene-m.svg. In assets/css/internship-peek.css, writes scene.css

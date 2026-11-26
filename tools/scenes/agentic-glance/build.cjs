@@ -1,4 +1,4 @@
-// The Agentic AI card's "Hunt from a report" chart (README "Agentic AI glance chart"): one hunt in three steps, the
+// The Agentic AI card's "Hunt from a report" chart (docs/contracts/work.md "Agentic AI glance chart"): one hunt in three steps, the
 // owner's narrative (31 Oct 2026: "Narrow AI subagents purpose built for specific task. Agents equipped with tools and
 // skills to iteratively adjust and adapt based on evidence found. Agents surface suspicious threats to assist
 // analyst"). Version C refined (1 Nov 2026): fresh blind reviews found the earlier chart's motion generic and its
@@ -472,7 +472,7 @@ ${sel} .ag-wash2 { animation: ${an([w2, .48], 'ag-on', EZ, 'forwards', k2)}, ${a
 // the colours once, as custom properties, for what the stylesheet paints outside keyframes (round 3: only those it
 // uses; the drawing's own colours are attributes, and keyframes keep the values, since WebKit ignored var() in them)
 const VARS = css0 => Object.entries(C).filter(([k]) => css0.includes(`var(--ag-${k})`)).map(([k, v]) => `--ag-${k}: ${v};`).join(' ');
-const css0 = `/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; README "Agentic AI glance chart"). Base styles
+const css0 = `/* The Agentic AI glance chart (tools/scenes/agentic-glance/build.cjs; docs/contracts/work.md "Agentic AI glance chart"). Base styles
    are the final frame; motion only under .is-playing (internship-peek.js plays, fades and replays it; .is-still holds). */
 .internship-demo-card__plot > svg.ag-scene:not(.ag-scene--m) { aspect-ratio: 640 / ${DH}; }
 .internship-demo-card__plot > svg.ag-scene--m { aspect-ratio: 360 / ${PH.H}; }

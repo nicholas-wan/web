@@ -6,6 +6,61 @@ $journalManifestPath = Join-Path $root 'journals\manifest.json'
 $journalPartialPath = Join-Path $root 'partials\travel-journal.html'
 $journalStarterPath = Join-Path $root 'journals\_template.html'
 
+# Most checks join several pins with -or and throw one sentence for all of them, so a
+# failure did not say which pin broke. This trap finds the failing if statement in this
+# file's syntax tree, re-runs each of its -or clauses and names the ones that failed, with
+# the line (26 Nov 2026). It runs only after a failure, so passing runs cost nothing.
+# Clauses read script-scope variables (loop variables keep the failing iteration's value);
+# one that reads a function's locals may report as failed when it did not.
+function Get-FailedPins([int]$Line) {
+    $tokens = $null
+    $parseErrors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseFile($PSCommandPath, [ref]$tokens, [ref]$parseErrors)
+    $best = $null
+    foreach ($node in $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.IfStatementAst] }, $true)) {
+        if ($node.Extent.StartLineNumber -gt $Line -or $node.Extent.EndLineNumber -lt $Line) { continue }
+        if (-not $best -or $node.Extent.Text.Length -lt $best.Extent.Text.Length) { $best = $node }
+    }
+    if (-not $best) { return '' }
+    $clause = $null
+    foreach ($pair in $best.Clauses) {
+        if ($pair.Item2.Extent.StartLineNumber -le $Line -and $pair.Item2.Extent.EndLineNumber -ge $Line) { $clause = $pair }
+    }
+    if (-not $clause) { return '' }
+    $expr = $clause.Item1
+    if ($expr -is [System.Management.Automation.Language.PipelineAst] -and $expr.PipelineElements.Count -eq 1 -and $expr.PipelineElements[0] -is [System.Management.Automation.Language.CommandExpressionAst]) {
+        $expr = $expr.PipelineElements[0].Expression
+    }
+    $parts = New-Object System.Collections.ArrayList
+    $pending = New-Object System.Collections.Stack
+    $pending.Push($expr)
+    while ($pending.Count) {
+        $part = $pending.Pop()
+        if ($part -is [System.Management.Automation.Language.BinaryExpressionAst] -and $part.Operator -eq [System.Management.Automation.Language.TokenKind]::Or) {
+            $pending.Push($part.Right)
+            $pending.Push($part.Left)
+        } else { [void]$parts.Add($part.Extent.Text) }
+    }
+    if ($parts.Count -lt 2) { return "line $Line" }
+    $failed = New-Object System.Collections.ArrayList
+    foreach ($text in $parts) {
+        $hit = $true
+        try { $hit = [bool](& ([scriptblock]::Create($text))) } catch { $hit = $true }
+        if ($hit) { [void]$failed.Add($(if ($text.Length -gt 240) { $text.Substring(0, 240) + '...' } else { $text })) }
+    }
+    if (-not $failed.Count) { return "line $Line" }
+    return "line $Line, failed: " + ($failed -join ' | ')
+}
+trap {
+    $failure = $_
+    if ($failure.InvocationInfo -and $failure.InvocationInfo.ScriptName -eq $PSCommandPath -and $failure.Exception -is [System.Management.Automation.RuntimeException]) {
+        $where = ''
+        try { $where = Get-FailedPins $failure.InvocationInfo.ScriptLineNumber } catch { $where = '' }
+        if ($where) { throw ($failure.Exception.Message + " (verify.ps1 $where)") }
+    }
+    break
+}
+
 # Cache versions are content hashes, so verification recomputes them from the
 # shipped bytes rather than restating a number. A hand-kept literal here could
 # only ever agree with whatever the build emitted, which is exactly why the
@@ -201,6 +256,10 @@ $navSignatures = [System.Collections.Generic.HashSet[string]]::new([System.Strin
 
 foreach ($page in $pages) {
     $html = Get-Content -LiteralPath $page.FullName -Raw -Encoding UTF8
+    # The build fills <!-- UPPER_CASE --> markers (always with an underscore, unlike Japan's
+    # <!-- KYOTO --> section notes); one left over is a block that never shipped.
+    $leftoverMarker = [regex]::Match($html, '<!-- [A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+ -->')
+    if ($leftoverMarker.Success) { throw "$($page.Name) still holds the build marker $($leftoverMarker.Value)." }
     $scan = [regex]::Replace($html, '<!--.*?-->', '', 'Singleline')
     if ($page.Name -eq '404.html') {
         if ($scan -match '\b(?:src|href)="(?![a-zA-Z][a-zA-Z0-9+.-]*:|/|#)[^"]+') {
@@ -414,7 +473,7 @@ $iconsCss = Get-Content -LiteralPath (Join-Path $dist 'assets\css\icons.css') -R
 $customCss = @($sharedCustomCss, $galleryCss, $travelMapPageCss, $travelJournalCss, $experiencePageCss, $personalPageCss, $skillsPageCss) -join "`n"
 # Page changes (Oct 2026): content pages skip the theme's black load overlay, pages
 # opt in to cross-document view transitions on the 220ms token, and reduced motion
-# opts out. See "Page changes" in README.md.
+# opts out. See "Page changes" in docs/contracts/site-wide.md.
 if ($sharedCustomCss -notmatch '(?s)body:not\(\.page-home\) #wrapper\.fade-in::before\s*\{\s*display:\s*none' -or $sharedCustomCss -notmatch '(?s)@view-transition\s*\{\s*navigation:\s*auto' -or $sharedCustomCss -notmatch '(?s)prefers-reduced-motion: reduce\)\s*\{\s*@view-transition\s*\{\s*navigation:\s*none' -or $sharedCustomCss -notmatch '(?s)::view-transition-group\(\*\).*?animation-duration:\s*var\(--motion-standard\)' -or $sharedCustomCss -notmatch '(?s)#nav \.nav-active-mark\s*\{[^}]*view-transition-name:\s*nav-active-mark') { throw "Content pages must skip the black load overlay and keep the 220ms page transition with its reduced-motion opt-out and gliding tab mark." }
 # Desktop tab-page titles glide too (Oct 2026), the old title gone by halfway so two
 # different words never overlap, and page-transitions.js sits them out off-screen.
@@ -1218,7 +1277,7 @@ if ($homeHtml -notmatch '<canvas id="nokey"') { throw "Homepage background anima
 # The Cyber Detection Analytics card ends with three chips that each open one small chart
 # below them (never over the writeup); only the Work page loads the script.
 if ([regex]::Matches($experience, 'data-peek="(site|series|graph)"').Count -ne 3 -or [regex]::Matches($experience, 'data-peek-card="(site|series|graph)"').Count -ne 3 -or $experience -notmatch [regex]::Escape((Get-DistAssetRef 'assets/js/anomaly-peek.js'))) { throw "The Work page must carry the three anomaly-peek chips, their three chart cards and anomaly-peek.js." }
-# The Agentic AI glance chart (README "Agentic AI glance chart"; 31 Oct 2026, one moment of the hunt in place of the
+# The Agentic AI glance chart (docs/contracts/work.md "Agentic AI glance chart"; 31 Oct 2026, one moment of the hunt in place of the
 # agent console): "Hunt from a report" is the same chip-and-card peek as the internships, opening one SVG per
 # layout, written by tools/scenes/agentic-glance (apply.cjs). Since 17 Nov 2026 it docks (data-dock): on a screen with a
 # mouse a click opens it in the card's flow, so its call to action says "Click" and shares the chip's row, and the card

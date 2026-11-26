@@ -435,3 +435,38 @@ test('clicking into Travel from another page keeps the page alive and renders th
   await expect(page.locator('.photo-explore__cards > a').first()).toBeVisible();
   expect(await page.evaluate(() => document.readyState)).toBe('complete');
 });
+
+// House and Pre-wedding are linked from the Personal timeline but had no spec (26 Nov 2026).
+for (const slug of ['house', 'prewed']) {
+  test(`${slug} opens on phones under the dark strip, its photos load, and the way back is first`, async ({ page }) => {
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('response', response => { if (response.status() >= 400) errors.push(response.status() + ' ' + response.url()); });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/' + slug);
+    const bar = page.locator('.mobile-context-bar');
+    await expect(bar).toBeVisible();
+    const back = bar.locator('.mobile-context-bar__back');
+    await expect(back).toHaveAttribute('href', 'personal');
+    const layout = await page.evaluate(() => {
+      const bar = document.querySelector('.mobile-context-bar');
+      const toggle = bar.querySelector('#navPanelToggle');
+      const back = bar.querySelector('.mobile-context-bar__back');
+      const tile = document.querySelector('#main .masonry .brick');
+      return {
+        background: getComputedStyle(bar).backgroundColor,
+        menuFirst: toggle && toggle.getBoundingClientRect().right <= back.getBoundingClientRect().left,
+        gutter: Math.round(tile.getBoundingClientRect().left),
+        right: Math.round(innerWidth - tile.getBoundingClientRect().right)
+      };
+    });
+    expect(layout.background).toBe('rgba(25, 30, 35, 0.98)');
+    expect(layout.menuFirst).toBe(true);
+    expect(layout).toMatchObject({ gutter: 16, right: 16 });
+    const first = page.locator('#main .masonry img').first();
+    await expect.poll(() => first.evaluate(img => img.complete && img.naturalWidth > 0)).toBe(true);
+    await back.click();
+    await expect(page).toHaveURL(/\/personal$/);
+    expect(errors).toEqual([]);
+  });
+}
