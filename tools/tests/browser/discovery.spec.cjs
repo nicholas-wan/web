@@ -52,10 +52,14 @@ for (const delayed of ['photo-search.js', 'photo-index.json']) {
 
 test('retry recovers a pending discovery action without duplicate downloads', async ({ page }) => {
   let requests = 0;
+  // The retried download waits for the test, not a 300ms timer: on a slow CI runner the
+  // index arrived before the disabled check ran, so the button was already gone (26 Nov 2026).
+  let release;
+  const held = new Promise(resolve => { release = resolve; });
   await page.route('**/photo-index.json*', async route => {
     requests++;
     if (requests === 1) return route.abort();
-    await new Promise(resolve => setTimeout(resolve, 300));
+    await held;
     await route.continue();
   });
   await page.goto('/travel');
@@ -65,6 +69,7 @@ test('retry recovers a pending discovery action without duplicate downloads', as
   await retry.click();
   await expect(retry).toBeDisabled();
   await retry.evaluate(button => { button.click(); button.click(); });
+  release();
   await expect(page.locator('.photo-hit').first()).toBeVisible();
   await expect(page.locator('.photo-hit').first()).toBeFocused();
   expect(requests).toBe(2);
