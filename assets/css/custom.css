@@ -8280,7 +8280,10 @@ body.lightbox-open {
   }
 
   /* Both DSTA cards use the same phone reading order: identity, title,
-     Problem/Role/Outcome rail, supporting copy, then capabilities. */
+     Problem/Role/Outcome rail, charts, supporting copy, then capabilities
+     (charts moved up 26 Nov 2026, owner: "ship shorter copy" from
+     lab/work-polish: the agentic chart was 1,085px down a 390px phone,
+     under the writeup; after the rail it is 688px, on the first screen). */
   .page-experience #agentic-ai > .case-study__company,
   .page-experience #cloud-analytics > .case-study__company-context {
     grid-row: 1;
@@ -8296,15 +8299,28 @@ body.lightbox-open {
     grid-row: 3;
   }
 
+  html .page-experience #agentic-ai > .internship-demo-peek,
+  html .page-experience #cloud-analytics > .anomaly-peek {
+    grid-row: 4;
+  }
+
   .page-experience #agentic-ai > .case-study__writeup,
   .page-experience #cloud-analytics > header > .case-study__lede {
-    grid-row: 4;
+    grid-row: 5;
   }
 
   .page-experience #agentic-ai > .case-study__tags,
   .page-experience #cloud-analytics > .case-study__tags {
-    grid-row: 5;
+    grid-row: 6;
   }
+
+  html .page-experience #agentic-ai > .internship-demo-peek { margin-top: 1.25rem; }
+  html .page-experience #agentic-ai > .case-study__writeup { margin-top: 1.4rem; }
+  html .page-experience #agentic-ai > .case-study__tags { margin-top: 1rem; }
+  html .page-experience #cloud-analytics > .anomaly-peek { margin-top: 0.5rem; }
+  html .page-experience #cloud-analytics > header > .case-study__lede { margin-top: 1rem; }
+  /* 1rem from the text to its tags, less the card's 0.8rem gap. */
+  html .page-experience #cloud-analytics > .case-study__tags { margin-top: 0.2rem; }
 
   .page-experience #cloud-analytics > header {
     display: contents;
@@ -8369,6 +8385,32 @@ body.lightbox-open {
 
   /* Thumbnails stay on top at full width: the BrainHack and showcase
      artwork carries lettering that a narrow side crop makes illegible. */
+}
+
+/* DSTA cards: tags sit with their text (26 Nov 2026, lab/work-polish). The
+   text ends with no margin of its own, so the gap above the tags is the
+   tags' own margin. On desktop the gap had been set by the rail beside the
+   text (43px on the agentic card and 50px on Cyber Detection at 1440, now
+   18px): the rail keeps its natural spacing, its last row drops the padding
+   that only the connector needs, and Cyber Detection's rail starts beside
+   "Also at DSTA", as the agentic rail starts beside the company line. */
+html .page-experience #agentic-ai > .case-study__writeup,
+html .page-experience #agentic-ai > .case-study__writeup p:last-child,
+html .page-experience #cloud-analytics > header > .case-study__lede { margin-bottom: 0; }
+@media screen and (min-width: 981px) {
+  html .page-experience #agentic-ai { grid-template-rows: auto auto auto minmax(0, 1fr) auto; }
+  html .page-experience #agentic-ai > .case-study__company { grid-row: 1; grid-column: 1; }
+  html .page-experience #agentic-ai > header { grid-row: 2; grid-column: 1; }
+  html .page-experience #agentic-ai > .case-study__writeup { grid-row: 3; grid-column: 1; }
+  html .page-experience #agentic-ai > .case-study__highlights { grid-row: 1 / span 4; align-self: start; }
+  html .page-experience #agentic-ai > .case-study__tags { grid-row: 4; grid-column: 1; align-self: start; margin-top: 1.1rem; }
+  html .page-experience #agentic-ai > .internship-demo-peek { grid-row: 5; }
+  html .page-experience #cloud-analytics { grid-template-rows: auto auto minmax(0, 1fr) auto; }
+  html .page-experience #cloud-analytics > .case-study__company-context { grid-column: 1; }
+  html .page-experience #cloud-analytics > .case-study__highlights { grid-row: 1 / 4; }
+  /* 1.1rem from the text, less the card's 1.25rem row gap. */
+  html .page-experience #cloud-analytics > .case-study__tags { align-self: start; margin-top: -0.15rem; }
+  html .page-experience :is(#agentic-ai, #cloud-analytics) .case-study__highlights li:last-child { padding-bottom: 0; min-height: 0; }
 }
 /* Route bundle: experience-responsive:end */
 

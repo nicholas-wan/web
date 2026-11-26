@@ -464,7 +464,8 @@ test('agentic AI chart: a short phone shows all of it, reduced motion keeps its 
  const count=state=>c.evaluate((e,s)=>e.getAnimations({subtree:true}).filter(a=>a.animationName&&a.playState===s).length,state);
  await page.waitForTimeout(1800);
  expect(await count('running')).toBeGreaterThan(0);
- await page.evaluate(()=>scrollTo(0,0));
+ // Since 26 Nov 2026 the chart sits right after the rail, near the top of a phone, so the foot of the page takes it off screen.
+ await page.evaluate(()=>scrollTo(0,document.documentElement.scrollHeight));
  await expect.poll(()=>count('running')).toBe(0);
  expect(await count('paused')).toBeGreaterThan(0);
  await c.evaluate(e=>e.scrollIntoView({block:'start'}));
@@ -545,4 +546,22 @@ test('smart zoom: a click near the bottom eases the whole card into view, keeps 
   await page.keyboard.press('Escape');
   await page.mouse.move(0,0);
  }
+});
+
+// DSTA cards (26 Nov 2026): on desktop the tags sit with their text, not at the foot of the rail;
+// on phones each card's charts follow the Problem / My role / Outcome rail, before the text.
+test('DSTA cards keep tags with their text and put the charts after the rail on phones',async({page})=>{
+ await page.goto('/experience');
+ for(const id of ['agentic-ai','cloud-analytics']){
+  const gap=await page.locator('#'+id).evaluate(c=>{const t=[...c.querySelectorAll('.case-study__writeup p, .case-study__lede')].pop().getBoundingClientRect();return c.querySelector('.case-study__tags').getBoundingClientRect().top-t.bottom;});
+  expect(gap,id+' text to tags').toBeLessThan(24);
+ }
+ await page.setViewportSize({width:390,height:844});
+ await page.reload();
+ for(const [id,peekSel,textSel] of [['agentic-ai','.internship-demo-peek','.case-study__writeup'],['cloud-analytics','.anomaly-peek','.case-study__lede']]){
+  const [afterRail,beforeText]=await page.locator('#'+id).evaluate((c,[p,t])=>{const rail=c.querySelector('.case-study__highlights').getBoundingClientRect(),pk=c.querySelector(p).getBoundingClientRect(),tx=c.querySelector(t).getBoundingClientRect();return [pk.top-rail.bottom,tx.top-pk.bottom];},[peekSel,textSel]);
+  expect(afterRail,id+' charts after the rail').toBeGreaterThan(0);
+  expect(beforeText,id+' charts before the text').toBeGreaterThan(0);
+ }
+ expect(await page.locator('#agentic-ai .internship-demo-peek__chip').evaluate(e=>e.getBoundingClientRect().bottom+scrollY)).toBeLessThan(844);
 });
