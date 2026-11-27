@@ -351,8 +351,10 @@
 			// field under the phone Menu pill (its Clear button covered) and, in
 			// WebKit, ran while the page shrank, so few results landed off screen.
 			// Scroll once, after layout, to put the field just below whatever
-			// floats at the top: the phone pill or the desktop bar.
-			results.querySelector('.photo-hit').focus({ preventScroll: true });
+			// floats at the top: the phone pill or the desktop bar. The hit takes
+			// focus without a ring: after a tap WebKit showed :focus-visible on it
+			// (a square outline and the hover lift; 27 Nov 2026).
+			results.querySelector('.photo-hit').focus({ preventScroll: true, focusVisible: false });
 			// The pill's offsets give its resting place even while it slides back in.
 			var top = 0, pill = document.getElementById('navPanelToggle'), nav = document.getElementById('nav');
 			if (pill && getComputedStyle(pill).position === 'fixed') top = pill.offsetTop + pill.offsetHeight;

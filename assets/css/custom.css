@@ -7004,6 +7004,18 @@ a.travel-jump-group__label {
   margin-bottom: 0.15rem;
 }
 
+/* The label never wraps and each link is at least its label's width, so "Previous journal" stays on
+   one line on 360-390px phones; the destination may wrap, and build.ps1 ties each arrow to its word
+   with &nbsp; (27 Nov 2026: Guangzhou's pager had the label on two lines and the arrow alone after
+   "Chengdu & Zhangjiajie"). */
+.travel-pagination a > span {
+  white-space: nowrap;
+}
+
+.travel-pagination a {
+  min-width: min-content;
+}
+
 .travel-pagination__next,
 .site-pager__link--next {
   align-items: flex-end;
@@ -11749,7 +11761,7 @@ html #main>.photo-explore{margin:16px 0 0!important;padding:0 var(--opening-gutt
    the help line's 22px: the runtime's swap then moves nothing (CLS 0.027, from the heading and help line, before). */
 @media(min-width:737px){
 .travel-timeline #main>.travel-archive-heading:not(:has(.journal-show-all))>div>span,.travel-timeline #main>.travel-archive-heading:not(:has(.journal-show-all))>p{display:none}
-.travel-timeline #main>.travel-archive-heading:not(:has(.journal-show-all))::after{content:"0";height:48px;font:700 max(var(--text-floor),.85rem)/44px var(--font-display)}
+.travel-timeline #main>.travel-archive-heading:not(:has(.journal-show-all))::after{content:"\a0";height:48px;font:700 max(var(--text-floor),.85rem)/44px var(--font-display)}
 .travel-timeline .journal-chronology:not(:has(>.journal-preview-help))>.chronology-scroll{margin-top:22px}
 }
 @media(max-width:736px){.travel-timeline .travel-atlas__header{display:flex;flex-direction:column;align-items:stretch}.travel-timeline .travel-atlas__header>*{min-width:0;max-width:100%}.travel-timeline .travel-atlas__header>.photo-search{order:1}.travel-timeline .travel-atlas__header>.travel-portals{order:2;margin:1rem 0 0}}

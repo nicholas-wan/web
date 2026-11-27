@@ -586,12 +586,12 @@ function Add-TravelNavigation([string]$Markup, [string]$Slug) {
     $currentIndex = [array]::IndexOf($tripOrder, $Slug)
     $previous = if ($currentIndex -gt 0) { $tripOrder[$currentIndex - 1] } else { $null }
     $next = if ($currentIndex -lt ($tripOrder.Count - 1)) { $tripOrder[$currentIndex + 1] } else { $null }
-    $previousLink = if ($previous) { '<a class="travel-pagination__previous" href="' + $previous + '"><span>Previous journal</span><strong>&#8592; ' + $tripLabels[$previous] + '</strong></a>' } else { '' }
-    $nextLink = if ($next) { '<a class="travel-pagination__next" href="' + $next + '"><span>Next journal</span><strong>' + $tripLabels[$next] + ' &#8594;</strong></a>' } else { '' }
+    $previousLink = if ($previous) { '<a class="travel-pagination__previous" href="' + $previous + '"><span>Previous journal</span><strong>&#8592;&nbsp;' + $tripLabels[$previous] + '</strong></a>' } else { '' }
+    $nextLink = if ($next) { '<a class="travel-pagination__next" href="' + $next + '"><span>Next journal</span><strong>' + $tripLabels[$next] + '&nbsp;&#8594;</strong></a>' } else { '' }
     # The newest and oldest journals have one neighbour: the empty side leads back to all journals (21 Nov 2026),
     # rather than leaving half the row blank.
-    if (-not $next) { $nextLink = '<a class="travel-pagination__next" href="travel"><span>Travel</span><strong>All journals &#8594;</strong></a>' }
-    if (-not $previous) { $previousLink = '<a class="travel-pagination__previous" href="travel"><span>Travel</span><strong>&#8592; All journals</strong></a>' }
+    if (-not $next) { $nextLink = '<a class="travel-pagination__next" href="travel"><span>Travel</span><strong>All journals&nbsp;&#8594;</strong></a>' }
+    if (-not $previous) { $previousLink = '<a class="travel-pagination__previous" href="travel"><span>Travel</span><strong>&#8592;&nbsp;All journals</strong></a>' }
     # The breadcrumb leads the strip (17 Nov 2026; it replaced the boxed Travel journals masthead
     # and the "Trip sections" label): "Travel / Japan" pinned at the left on desktop, only the
     # "Travel" link on phones and tablets, where the journal's title sits right under the rail.
